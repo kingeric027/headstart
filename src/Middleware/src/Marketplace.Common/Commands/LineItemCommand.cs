@@ -17,7 +17,8 @@ namespace Marketplace.Common.Commands
     public interface ILineItemCommand
     {
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesWithNotification(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -34,12 +35,34 @@ namespace Marketplace.Common.Commands
             _meProductCommand = meProductCommand;
         }
 
+        // used on post order submit
+        public async Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID)
+        {
+            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID);
+            var updatedLineItems = await Throttler.RunAsync(lineItems.Items, 100, 5, li =>
+            {
+                var partial = new PartialLineItem()
+                {
+                    xp = new
+                    {
+                        StatusByQuantity = new Dictionary<LineItemStatus, int>() {
+                            { LineItemStatus.Submitted, li.Quantity }
+                        },
+                        Returns = new List<LineItemClaim>(),
+                        Cancelations = new List<LineItemClaim>()
+                    }
+                };
+                return _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID, li.ID, partial);
+            });
+            return updatedLineItems.ToList();
+        }
+
         /// <summary>
         /// Validates LineItemStatus Change, Updates Line Item Statuses, Updates Order Statuses, Sends Necessary Emails
         /// </summary>
-  
+
         // all line item status changes should go through here
-        public async Task<List<MarketplaceLineItem>> UpdateLineItemStatusesWithNotification(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null)
+        public async Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null)
         {
             var userType = verifiedUser?.UsrType ?? "noUser";
             var verifiedUserType = userType.Reserialize<VerifiedUserType>();
@@ -51,13 +74,13 @@ namespace Marketplace.Common.Commands
             {
                 var newPartialLineItem = BuildNewPartialLineItem(lineItemStatusChange, previousLineItemsStates.Items.ToList(), lineItemStatusChanges.Status);
                // if there is no verified user passed in it has been called from somewhere else in the code base and will be done with the client grant access
-               return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.LineItemID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.LineItemID, newPartialLineItem);
+               return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem);
             });
 
             var buyerOrderID = orderID.Split('-')[0];
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrderID);
             var allLineItemsForOrder = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID);
-            var lineItemsChanged = allLineItemsForOrder.Items.Where(li => lineItemStatusChanges.Changes.Select(li => li.LineItemID).Contains(li.ID)).ToList();
+            var lineItemsChanged = allLineItemsForOrder.Items.Where(li => lineItemStatusChanges.Changes.Select(li => li.ID).Contains(li.ID)).ToList();
             var supplierIDsRelatingToChange = lineItemsChanged.Select(li => li.SupplierID).Distinct().ToList();
             var relatedSupplierOrderIDs = supplierIDsRelatingToChange.Select(supplierID => $"{buyerOrderID}-{supplierID}").ToList();
 
@@ -98,7 +121,7 @@ namespace Marketplace.Common.Commands
 
         private PartialLineItem BuildNewPartialLineItem(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> previousLineItemStates, LineItemStatus newLineItemStatus)
         {
-            var existingLineItem = previousLineItemStates.First(li => li.ID == lineItemStatusChange.LineItemID);
+            var existingLineItem = previousLineItemStates.First(li => li.ID == lineItemStatusChange.ID);
             var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
             var StatusByQuantity = BuildNewLineItemStatusByQuantity(lineItemStatusChange, existingLineItem, newLineItemStatus);
             if (newLineItemStatus == LineItemStatus.ReturnRequested || newLineItemStatus == LineItemStatus.Returned)
@@ -259,7 +282,7 @@ namespace Marketplace.Common.Commands
             // 2)
             var areCurrentQuantitiesToSupportChange = lineItemStatusChanges.Changes.All(lineItemChange =>
             {
-                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.LineItemID);
+                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.ID);
                 if (relatedLineItems.Count() != 1)
                 {
                     // if the lineitem is not found on the order, invalid change
@@ -294,7 +317,7 @@ namespace Marketplace.Common.Commands
             // 3)
             var areValidPreviousStates = lineItemStatusChanges.Changes.All(lineItemChange =>
             {
-                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.LineItemID);
+                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.ID);
                 var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[lineItemStatusChanges.Status];
                 var existingLineItem = relatedLineItems.First();
                 foreach (KeyValuePair<LineItemStatus, int> entry in lineItemChange.PreviousQuantities)

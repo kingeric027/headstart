@@ -278,7 +278,7 @@ namespace Marketplace.Common.Commands
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
-            //await _lineItemCommand.PatchLineItemStatus(buyerOrder.ID, LineItemStatus.Submitted);
+            await _lineItemCommand.SetInitialSubmittedLineItemStatuses(buyerOrder.ID);
 
             var buyerOrderPatch = new PartialOrder()
             {

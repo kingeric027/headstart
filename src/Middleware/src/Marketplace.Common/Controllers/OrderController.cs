@@ -71,14 +71,14 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("{orderID}/{orderDirection}/lineitem/status"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
         public async Task<List<MarketplaceLineItem>> SellerSupplierUpdateLineItemStatusesWithNotification(string orderID, OrderDirection orderDirection, [FromBody] LineItemStatusChanges lineItemStatusChanges)
         {
-            return await _lineItemCommand.UpdateLineItemStatusesWithNotification(orderDirection, orderID, lineItemStatusChanges, VerifiedUserContext);
+            return await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(orderDirection, orderID, lineItemStatusChanges, VerifiedUserContext);
         }
 
         [DocName("Buyer Set Line Item Statuses On Order with Related Notification")]
         [HttpPost, Route("{orderID}/lineitem/status"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<List<MarketplaceLineItem>> BuyerUpdateLineItemStatusesWithNotification(string orderID, [FromBody] LineItemStatusChanges lineItemStatusChanges)
         {
-            return await _lineItemCommand.UpdateLineItemStatusesWithNotification(OrderDirection.Outgoing, orderID, lineItemStatusChanges, VerifiedUserContext);
+            return await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, orderID, lineItemStatusChanges, VerifiedUserContext);
         }
     }
 }

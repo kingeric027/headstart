@@ -290,7 +290,7 @@ namespace Marketplace.Common.Services
                     order.BillingAddress.Zip
                 },
                 Products = productsList,
-                order.Subtotal,
+                order.Subtotal, 
                 order.TaxCost,
                 order.ShippingCost,
                 PromotionalDiscount = order.PromotionDiscount,
