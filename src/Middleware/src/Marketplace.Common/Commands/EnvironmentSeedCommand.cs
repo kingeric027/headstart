@@ -290,7 +290,7 @@ namespace Marketplace.Common.Commands
 		public async Task CreateMarketPlaceRoles(string accessToken)
 		{
 			var profiles = DefaultSecurityProfiles.Select(p =>
-				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = { p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString() }, Roles = p.Roles });
+				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString()).ToList(), Roles = p.Roles });
 
 			foreach (var profile in profiles)
 			{
