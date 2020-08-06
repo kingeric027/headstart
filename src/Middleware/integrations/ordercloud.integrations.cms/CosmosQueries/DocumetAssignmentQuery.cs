@@ -37,7 +37,7 @@ namespace ordercloud.integrations.cms
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var assignments = await _store.Query()
-				.Where(doc => 
+				.Where(doc =>
 					doc.SchemaID == schema.id && 
 					doc.RsrcID == resource.ResourceID &&
 					doc.ParentRsrcID == resource.ParentResourceID &&
@@ -80,7 +80,7 @@ namespace ordercloud.integrations.cms
 				RsrcID = assignment.ResourceID,
 				ParentRsrcID = assignment.ParentResourceID,
 				RsrcType = resource.ResourceType ?? 0,
-				ClientID = user.ClientID,
+				SellerOrgID = user.SellerID,
 				SchemaID = schema.id,
 				DocID = document.id
 			});
@@ -97,7 +97,7 @@ namespace ordercloud.integrations.cms
 				assign.RsrcID == assignment.ResourceID &&
 				assign.ParentRsrcID == assignment.ParentResourceID &&
 				assign.RsrcType == assignment.ResourceType &&
-				assign.ClientID == user.ClientID &&
+				assign.SellerOrgID == user.ClientID &&
 				assign.SchemaID == schema.id &&
 				assign.DocID == document.id
 			);
