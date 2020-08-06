@@ -1,12 +1,10 @@
 ﻿using Marketplace.Models.Attributes;
+using Marketplace.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Marketplace.Common.Controllers.CMS
@@ -27,6 +25,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<ListPage<DocSchema>> List(ListArgs<DocSchema> args)
 		{
+			RequireOneOf(CustomRole.SchemaAdmin, CustomRole.SchemaReader);
 			return await _schemas.List(args, VerifiedUserContext);
 		}
 
@@ -34,6 +33,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpGet, Route("{schemaID}"), OrderCloudIntegrationsAuth]
 		public async Task<DocSchema> Get(string schemaID)
 		{
+			RequireOneOf(CustomRole.SchemaAdmin, CustomRole.SchemaReader);
 			return await _schemas.Get(schemaID, VerifiedUserContext);
 		}
 
@@ -41,20 +41,23 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<DocSchema> Create([FromBody] DocSchema schema)
 		{
+			RequireOneOf(CustomRole.SchemaAdmin);
 			return await _schemas.Create(schema, VerifiedUserContext);
 		}
 
 		[DocName("Update a Document Schema")]
 		[HttpPut, Route("{schemaID}"), OrderCloudIntegrationsAuth]
-		public async Task<DocSchema> Update(string schemaID, [FromBody] DocSchema schema)
+		public async Task<DocSchema> Save(string schemaID, [FromBody] DocSchema schema)
 		{
-			return await _schemas.Update(schemaID, schema, VerifiedUserContext);
+			RequireOneOf(CustomRole.SchemaAdmin);
+			return await _schemas.Save(schemaID, schema, VerifiedUserContext);
 		}
 
 		[DocName("Delete a Document Schema")]
 		[HttpDelete, Route("{schemaID}"), OrderCloudIntegrationsAuth]
 		public async Task Delete(string schemaID)
 		{
+			RequireOneOf(CustomRole.SchemaAdmin);
 			await _schemas.Delete(schemaID, VerifiedUserContext);
 		}
 	}

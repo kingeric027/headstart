@@ -11,9 +11,9 @@ namespace ordercloud.integrations.cms
 		public StorageConnectionException(string containerInteropID, object ex) : base("Storage Connection", $"Container \"{containerInteropID}\" storage connection failed.", null) { }
 	}
 
-	public class AssetUploadValidationException : OrderCloudIntegrationException
+	public class AssetCreateValidationException : OrderCloudIntegrationException
 	{
-		public AssetUploadValidationException(string message) : base("Asset Upload Validation", message, null) { }
+		public AssetCreateValidationException(string message) : base("Asset Create Validation", message, null) { }
 	}
 
 	public class TokenExpiredException : OrderCloudIntegrationException

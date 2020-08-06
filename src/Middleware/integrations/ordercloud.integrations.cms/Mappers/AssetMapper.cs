@@ -15,7 +15,7 @@ namespace ordercloud.integrations.cms
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
-				throw new AssetUploadValidationException("Asset upload must include either File or Url override but not both.");
+				throw new AssetCreateValidationException("Asset create must include either File or Url override but not both.");
 			}
 			var asset = new AssetDO()
 			{
@@ -63,7 +63,7 @@ namespace ordercloud.integrations.cms
 			if (form.File == null) return;
 			if (!ValidImageFormats.Contains(form.File.ContentType)) 
 			{
-				throw new AssetUploadValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
+				throw new AssetCreateValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
 			}
 			using (var image = Image.FromStream(form.File.OpenReadStream()))
 			{

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using System.Collections.Generic;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.CMS.Controllers
 {
@@ -28,6 +29,7 @@ namespace Marketplace.CMS.Controllers
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<ListPage<Asset>> List(ListArgs<Asset> args)
 		{
+			RequireOneOf(CustomRole.AssetAdmin, CustomRole.AssetReader);
 			return await _assets.List(args, VerifiedUserContext);
 		}
 
@@ -35,6 +37,7 @@ namespace Marketplace.CMS.Controllers
 		[HttpGet, Route("{assetID}"), OrderCloudIntegrationsAuth]
 		public async Task<Asset> Get(string assetID)
 		{
+			RequireOneOf(CustomRole.AssetAdmin, CustomRole.AssetReader);
 			return await _assets.Get(assetID, VerifiedUserContext);
 		}
 
@@ -43,20 +46,23 @@ namespace Marketplace.CMS.Controllers
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<Asset> Create([FromForm] AssetUpload form)
 		{
+			RequireOneOf(CustomRole.AssetAdmin);
 			return await _assets.Create(form, VerifiedUserContext);
 		}
 
 		[DocName("Update an Asset")]
 		[HttpPut, Route("{assetID}"), OrderCloudIntegrationsAuth]
-		public async Task<Asset> Update(string assetID, [FromBody] Asset asset)
+		public async Task<Asset> Save(string assetID, [FromBody] Asset asset)
 		{
-			return await _assets.Update(assetID, asset, VerifiedUserContext);
+			RequireOneOf(CustomRole.AssetAdmin);
+			return await _assets.Save(assetID, asset, VerifiedUserContext);
 		}
 
 		[DocName("Delete an Asset")]
 		[HttpDelete, Route("{assetID}"), OrderCloudIntegrationsAuth]
 		public async Task Delete(string assetID)
 		{
+			RequireOneOf(CustomRole.AssetAdmin);
 			await _assets.Delete(assetID, VerifiedUserContext);
 		}
 
@@ -64,6 +70,7 @@ namespace Marketplace.CMS.Controllers
 		[HttpPost, Route("assignments"), OrderCloudIntegrationsAuth]
 		public async Task SaveAssetAssignment([FromBody] AssetAssignment assignment)
 		{
+			RequireOneOf(CustomRole.AssetAdmin);
 			await _assetedResources.SaveAssignment(assignment, VerifiedUserContext);
 		}
 
@@ -71,6 +78,7 @@ namespace Marketplace.CMS.Controllers
 		[HttpDelete, Route("assignments")]
 		public async Task DeleteAssetAssignment([FromQuery] AssetAssignment assignment)
 		{
+			RequireOneOf(CustomRole.AssetAdmin);
 			await _assetedResources.DeleteAssignment(assignment, VerifiedUserContext);
 		}
 
@@ -78,6 +86,7 @@ namespace Marketplace.CMS.Controllers
 		[HttpPost, Route("assignments/moveto/{listOrderWithinType}")]
 		public async Task ReorderAssetAssignment(int listOrderWithinType, [FromBody] AssetAssignment assignment)
 		{
+			RequireOneOf(CustomRole.AssetAdmin);
 			await _assetedResources.MoveAssignment(assignment, listOrderWithinType, VerifiedUserContext);
 		}
 

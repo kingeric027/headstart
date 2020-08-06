@@ -19,7 +19,7 @@ namespace ordercloud.integrations.cms
 		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user);
 		Task<Document<T>> Get<T>(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 		Task<Document<T>> Create<T>(string schemaInteropID, Document<T> document, VerifiedUserContext user);
-		Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
+		Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 
 		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
@@ -88,25 +88,27 @@ namespace ordercloud.integrations.cms
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var matchingID = await GetWithoutExceptions(schema.id, dataObject.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
+			dataObject = Init(dataObject, schema, user);
 			dataObject = SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
-			dataObject.SellerOrgID = user.SellerID;
-			dataObject.SchemaID = schema.id;
-			dataObject.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
-			dataObject.History = HistoryBuilder.OnCreate(user);
 			var newDocument = await _store.AddAsync(dataObject);
 			return DocumentMapper.MapTo<T>(newDocument);
 		}
 
-		public async Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
+		public async Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
-			var existingDocument = await GetDOByInternalSchemaID(schema.id, documentInteropID, user);
+			if (documentInteropID != document.ID)
+			{
+				var matchingID = await GetWithoutExceptions(schema.id, document.ID, user);
+				if (matchingID != null) throw new DuplicateIDException();
+			}
+			var existingDocument = await GetWithoutExceptions(schema.id, documentInteropID, user);
+			if (existingDocument == null) existingDocument = Init(new DocumentDO(), schema, user);
 			existingDocument.InteropID = document.ID;
 			existingDocument.Doc = JObject.FromObject(document.Doc);
-			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
 			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
-
-			var updatedDocument = await _store.UpdateAsync(existingDocument);
+			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
+			var updatedDocument = await _store.UpsertAsync(existingDocument);
 			return DocumentMapper.MapTo<T>(updatedDocument);
 		}
 
@@ -123,6 +125,15 @@ namespace ordercloud.integrations.cms
 				.Query(GetFeedOptions(user))
 				.FirstOrDefaultAsync(d => d.InteropID == documentInteropID && d.SchemaID == schemaID);
 			return document;
+		}
+
+		private DocumentDO Init(DocumentDO doc, DocSchemaDO schema, VerifiedUserContext user)
+		{
+			doc.SellerOrgID = user.SellerID;
+			doc.SchemaID = schema.id;
+			doc.SchemaSpecUrl = schema.Schema.GetValue("$id").ToString();
+			doc.History = HistoryBuilder.OnCreate(user);
+			return doc;
 		}
 
 		private FeedOptions GetFeedOptions(VerifiedUserContext user) => new FeedOptions() { PartitionKey = new PartitionKey(user.SellerID) };

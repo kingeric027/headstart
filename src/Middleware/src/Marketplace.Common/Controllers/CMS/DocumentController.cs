@@ -11,6 +11,8 @@ using ordercloud.integrations.cms;
 using IDocumentQuery = ordercloud.integrations.cms.IDocumentQuery;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using Marketplace.Models.Misc;
+using Avalara.AvaTax.RestClient;
 
 namespace Marketplace.Common.Controllers.CMS
 {
@@ -32,6 +34,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<ListPage<JDocument>> List(string schemaID, ListArgs<Document<JObject>> args)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin, CustomRole.DocumentReader);
 			var docs = await _documents.List<JObject>(schemaID, args, VerifiedUserContext);
 			return docs.Reserialize<ListPage<JDocument>>();
 		}
@@ -40,6 +43,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpGet, Route("{documentID}"), OrderCloudIntegrationsAuth]
 		public async Task<JDocument> Get(string schemaID, string documentID)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin, CustomRole.DocumentReader);
 			var doc = await _documents.Get<JObject>(schemaID, documentID, VerifiedUserContext);
 			return doc.Reserialize<JDocument>();
 		}
@@ -48,15 +52,17 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
 		public async Task<JDocument> Create(string schemaID, [FromBody] JDocument document)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin);
 			var doc = await _documents.Create(schemaID, document, VerifiedUserContext);
 			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Update a Document")]
 		[HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<JDocument> Update(string schemaID, string documentID, [FromBody] JDocument document)
+		public async Task<JDocument> SAve(string schemaID, string documentID, [FromBody] JDocument document)
 		{
-			var doc =  await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
+			RequireOneOf(CustomRole.DocumentAdmin);
+			var doc =  await _documents.Save(schemaID, documentID, document, VerifiedUserContext);
 			return doc.Reserialize<JDocument>();
 		}
 
@@ -64,6 +70,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpDelete, Route("{documentID}"), OrderCloudIntegrationsAuth]
 		public async Task Delete(string schemaID, string documentID)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin);
 			await _documents.Delete(schemaID, documentID, VerifiedUserContext);
 		}
 
@@ -71,6 +78,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpGet, Route("assignments"), OrderCloudIntegrationsAuth]
 		public async Task<ListPage<DocumentAssignment>> ListAssignments(string schemaID, ListArgs<DocumentAssignment> args)
 		{
+			RequireOneOf(CustomRole.DocumentReader, CustomRole.DocumentAdmin);
 			return await _assignments.ListAssignments(schemaID, args, VerifiedUserContext);
 		}
 
@@ -78,6 +86,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpPost, Route("assignments"), OrderCloudIntegrationsAuth]
 		public async Task SaveAssignment(string schemaID, [FromBody] DocumentAssignment assignment)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin);
 			await _assignments.SaveAssignment(schemaID, assignment, VerifiedUserContext);
 		}
 
@@ -85,6 +94,7 @@ namespace Marketplace.Common.Controllers.CMS
 		[HttpDelete, Route("assignments"), OrderCloudIntegrationsAuth]
 		public async Task DeleteAssignment(string schemaID, [FromQuery] DocumentAssignment assignment)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin);
 			await _assignments.DeleteAssignment(schemaID, assignment, VerifiedUserContext);
 		}
 
