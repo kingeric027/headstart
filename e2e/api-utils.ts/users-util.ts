@@ -39,3 +39,32 @@ export async function deleteUser(
 		accessToken: clientAuth,
 	})
 }
+
+export async function deleteVendorUser(
+	userID: string,
+	vendorID: string,
+	clientAuth: string
+) {
+	await OrderCloudSDK.SupplierUsers.Delete(vendorID, userID, {
+		accessToken: clientAuth,
+	})
+}
+
+export async function getVendorUserID(
+	username: string,
+	vendorID: string,
+	clientAuth: string
+) {
+	const searchResponse = await OrderCloudSDK.SupplierUsers.List(
+		vendorID,
+		{
+			search: username,
+			searchOn: 'Username',
+		},
+		{ accessToken: clientAuth }
+	)
+
+	const user = searchResponse.Items.find(x => x.Username === username)
+
+	if (user.Username.includes('.hpmqx9la@mailosaur.io')) return user.ID
+}

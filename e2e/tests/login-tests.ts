@@ -8,6 +8,7 @@ import {
 	loginTestSetup,
 	loginTestCleanup,
 } from '../helpers/test-setup'
+import adminHeaderPage from '../pages/admin/admin-header-page'
 
 const getLocation = ClientFunction(() => document.location.href)
 
@@ -16,9 +17,8 @@ fixture`Log In Tests`
 	.before(async ctx => {
 		ctx.adminClientAuth = await adminClientSetup()
 	})
-	.page(testConfig.appUrl)
+	.page(testConfig.buyerAppUrl)
 
-//failing due to https://four51.atlassian.net/browse/SEB-788
 test
 	.before(async t => {
 		t.ctx.testUser = await loginTestSetup(t.fixtureCtx.adminClientAuth)
@@ -29,20 +29,24 @@ test
 			'0005',
 			t.fixtureCtx.adminClientAuth
 		)
-	})('Log In And Out With New User | 19700', async t => {
+	})('Buyer Log In And Out | 19700', async t => {
 	const testUser: OrderCloudSDK.User = t.ctx.testUser
 	await loginPage.login(testUser.Username, testUser.Password)
 	await t.expect(getLocation()).contains('home')
+	await t.debug()
 	await headerPage.logout()
 	await t.expect(getLocation()).contains('login')
 	await t.expect(loginPage.submitButton.exists).ok()
 })
 
-test.skip('Log In And Out With Existing User | 19701', async t => {
+test('Admin Log In And Out', async t => {
 	await t.maximizeWindow()
-	await loginPage.login('erosen-buyer1', 'fails345')
+	await loginPage.login(
+		testConfig.adminSellerUsername,
+		testConfig.adminSellerPassword
+	)
 	await t.expect(getLocation()).contains('home')
-	await headerPage.logout()
+	await adminHeaderPage.logout()
 	await t.expect(getLocation()).contains('login')
 	await t.expect(loginPage.submitButton.exists).ok()
-})
+}).page(testConfig.adminAppUrl)

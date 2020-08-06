@@ -1,5 +1,5 @@
 import * as OrderCloudSDK from 'ordercloud-javascript-sdk'
-import { adminClientAuth } from '../api-utils.ts/auth-util'
+import { adminClientAuth, authAdminBrowser } from '../api-utils.ts/auth-util'
 import testConfig from '../testConfig'
 import {
 	ApiRole,
@@ -17,20 +17,28 @@ export async function adminClientSetup() {
 	setStagingUrl()
 
 	const adminClientToken = await adminClientAuth(
-		testConfig.adminClientID,
-		testConfig.adminClientSecret,
+		testConfig.automationClientID,
+		testConfig.automationClientSecret,
 		adminRoles
 	)
 
 	return adminClientToken
 }
 
-const adminRoles: ApiRole[] = ['BuyerUserAdmin', 'UserGroupAdmin']
+const adminRoles: ApiRole[] = [
+	'SupplierAdmin',
+	'BuyerUserAdmin',
+	'UserGroupAdmin',
+	'SupplierUserReader',
+	'SupplierUserAdmin',
+	'SupplierAddressReader',
+	'SupplierAddressAdmin',
+]
 
 export function setStagingUrl() {
 	const config: SdkConfiguration = {
 		baseApiUrl: 'https://stagingapi.ordercloud.io/v1',
-		baseAuthUrl: 'https://stagingauth.ordercloud.io/oauth/token',
+		baseAuthUrl: 'https://stagingapi.ordercloud.io/oauth/token',
 	}
 	Configuration.Set(config)
 }
@@ -48,4 +56,17 @@ export async function loginTestCleanup(
 	authToken: string
 ) {
 	await deleteUser(userID, buyerID, authToken)
+}
+
+export async function adminTestSetup() {
+	await t.maximizeWindow()
+
+	const user: Partial<OrderCloudSDK.User> = {
+		Username: testConfig.adminSellerUsername,
+		Password: testConfig.adminSellerPassword,
+	}
+
+	await authAdminBrowser(user)
+
+	await t.navigateTo(`${testConfig.adminAppUrl}home`)
 }
