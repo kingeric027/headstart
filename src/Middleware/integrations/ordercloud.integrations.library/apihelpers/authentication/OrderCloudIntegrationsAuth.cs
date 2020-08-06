@@ -62,7 +62,7 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
-                var user = await new OrderCloudClientWithContext(token).Me.GetAsync();
+                var user = await new OrderCloudClientWithContext(token).GetMeWithSellerID(token);
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));
@@ -70,6 +70,8 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("email", user.Email ?? ""));
                 cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
                 cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
+                cid.AddClaim(new Claim("seller", user?.Seller?.ID ?? ""));
+
                 cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
                 var roles = user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)).ToList();
                 roles.Add(new Claim(ClaimTypes.Role, BaseUserRole));

@@ -14,6 +14,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Common.Commands
 {
     #region Models
+    [SwaggerModel]
     public class ChiliTemplate
     {
         public SuperMarketplaceProduct Product { get; set; }
@@ -21,6 +22,7 @@ namespace Marketplace.Common.Commands
         public string ChiliTemplateID { get; set; }
     }
 
+    [SwaggerModel]
     public class ChiliConfig : ICosmosObject
     {
         public string SupplierProductID { get; set; }
@@ -32,18 +34,21 @@ namespace Marketplace.Common.Commands
         [CosmosPartitionKey, ApiIgnore]
         public string OwnerClientID { get; set; }
     }
-    
+
+    [SwaggerModel]
     public class ChiliSpec : Spec<ChiliSpecXp, SpecOption>
     {
         
     }
 
+    [SwaggerModel]
     public class ChiliSpecXp
     {
         [Required]
         public ChiliSpecUI UI { get; set; } = new ChiliSpecUI();
     }
 
+    [SwaggerModel]
     public class ChiliSpecUI
     {
         public ControlType ControlType { get; set; } = ControlType.Text;
@@ -55,10 +60,12 @@ namespace Marketplace.Common.Commands
         Text, DropDown, Checkbox, Range
     }
 
+    [SwaggerModel]
     public class ChiliSpecOption : SpecOption<ChiliSpecOptionXp>
     {
     }
 
+    [SwaggerModel]
     public class ChiliSpecOptionXp
     {
         public string Description { get; set; }

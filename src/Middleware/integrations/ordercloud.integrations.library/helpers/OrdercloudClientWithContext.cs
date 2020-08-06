@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
+using Flurl.Http;
 using ordercloud.integrations.library.extensions;
 using OrderCloud.SDK;
 
@@ -19,7 +21,7 @@ namespace ordercloud.integrations.library
 		public OrderCloudClientWithContext(VerifiedUserContext user) : 
 			this(user.AccessToken, user.ApiUrl, user.AuthUrl, user.ClientID, user.AccessTokenExpiresUTC) { } 
 
-        public OrderCloudClientWithContext(string token, string apiUrl, string authUrl, string clientID, DateTime tokenExpiresUTC) : base(
+        private OrderCloudClientWithContext(string token, string apiUrl, string authUrl, string clientID, DateTime tokenExpiresUTC) : base(
             new OrderCloudClientConfig()
             {
                 ApiUrl = apiUrl,
@@ -35,5 +37,22 @@ namespace ordercloud.integrations.library
                 ExpiresUtc = tokenExpiresUTC
             };
         }
+
+        // TODO - delete once a new OC SDK is published with MeUser.Seller.ID
+        public async Task<MeUserWithSellerID> GetMeWithSellerID(string token)
+        {
+                return await $"{Config.ApiUrl}/v1/me".WithOAuthBearerToken(token).GetJsonAsync<MeUserWithSellerID>();
+        }
+    }
+
+    // TODO - delete once a new OC SDK is published with MeUser.Seller.ID
+    public class MeUserWithSellerID : MeUser
+    {
+        public Seller Seller { get; set; }
+    }
+
+    public class Seller
+    {
+        public string ID { get; set; }
     }
 }

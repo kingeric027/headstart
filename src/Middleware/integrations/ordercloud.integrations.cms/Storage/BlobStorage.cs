@@ -9,9 +9,9 @@ namespace ordercloud.integrations.cms
 	public interface IBlobStorage
 	{
 		CMSConfig Config { get; }
-		Task<Asset> UploadAsset(AssetContainer container, IFormFile file, Asset asset);
-		Task OnContainerDeleted(AssetContainer container);
-		Task OnAssetDeleted(AssetContainer container, string assetID);
+		Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset);
+		Task OnContainerDeleted(AssetContainerDO container);
+		Task OnAssetDeleted(AssetContainerDO container, string assetID);
 	}
 
 	public class BlobStorage : IBlobStorage
@@ -23,7 +23,7 @@ namespace ordercloud.integrations.cms
 			Config = config;
 		}
 
-		public async Task<Asset> UploadAsset(AssetContainer container, IFormFile file, Asset asset)
+		public async Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset)
 		{
 			try
 			{
@@ -32,11 +32,11 @@ namespace ordercloud.integrations.cms
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container.InteropID, ex);
+				throw new StorageConnectionException(container.id, ex);
 			}
 		}
 
-		public async Task OnContainerDeleted(AssetContainer container)
+		public async Task OnContainerDeleted(AssetContainerDO container)
 		{
 			try
 			{
@@ -44,11 +44,11 @@ namespace ordercloud.integrations.cms
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container.InteropID, ex);
+				throw new StorageConnectionException(container.id, ex);
 			}
 		}
 
-		public async Task OnAssetDeleted(AssetContainer container, string assetID)
+		public async Task OnAssetDeleted(AssetContainerDO container, string assetID)
 		{
 			try
 			{
@@ -56,16 +56,16 @@ namespace ordercloud.integrations.cms
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container.InteropID, ex);
+				throw new StorageConnectionException(container.id, ex);
 			}
 		}
 
-		private OrderCloudIntegrationsBlobService BuildBlobService(AssetContainer container)
+		private OrderCloudIntegrationsBlobService BuildBlobService(AssetContainerDO container)
 		{
 			return new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
 			{
 				ConnectionString = Config.BlobStorageConnectionString,
-				Container = $"assets-{container.id}",
+				Container = $"assets-{container.id}", // SellerOrgID can contain "_", an illegal character for blob containers.
 				AccessType = BlobContainerPublicAccessType.Container
 			});
 		}

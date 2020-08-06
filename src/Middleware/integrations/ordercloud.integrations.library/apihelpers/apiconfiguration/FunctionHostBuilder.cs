@@ -111,10 +111,6 @@ namespace ordercloud.integrations.library
                     ConnectionMode = ConnectionMode.Direct
                 }, defaultCollectionThroughput: 400)
                 {
-                    JsonSerializerSettings = new JsonSerializerSettings()
-                    {
-                        ContractResolver = new CosmosContractResolver()
-                    },
                     UniqueKeyPolicy = new UniqueKeyPolicy()
                     {
                         UniqueKeys = (Collection<UniqueKey>)typeof(TModel).GetMethod("GetUniqueKeys")?.Invoke(null, null) ?? new Collection<UniqueKey>()

@@ -199,7 +199,7 @@ namespace Marketplace.Common.Commands
 
 		private async Task SetApiClientIDs(string token)
 		{
-			var list = await _oc.ApiClients.ListAsync(accessToken: token);
+			var list = await _oc.ApiClients.ListAsync(pageSize: 100, accessToken: token);
 			_adminUIApiClientID = list.Items.First(a => a.AppName == _sellerApiClientName).ID;
 			_buyerUIApiClientID = list.Items.First(a => a.AppName == _buyerApiClientName).ID;
 			_middlewareApiClientID = list.Items.First(a => a.AppName == _integrationsApiClientName).ID;
@@ -290,7 +290,7 @@ namespace Marketplace.Common.Commands
 		public async Task CreateMarketPlaceRoles(string accessToken)
 		{
 			var profiles = DefaultSecurityProfiles.Select(p =>
-				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = { p.CustomRole.ToString() }, Roles = p.Roles });
+				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString()).ToList(), Roles = p.Roles });
 
 			foreach (var profile in profiles)
 			{
@@ -488,6 +488,22 @@ namespace Marketplace.Common.Commands
 							MainContent = "ForgottenPassword"
 						}
 				}
+			},
+			new MessageSender()
+			{
+				Name = "New User Registration",
+				MessageTypes = new[] { MessageType.NewUserInvitation },
+				URL = "/newuser",
+				SharedKey = "wkaWSxPBBAABaxEp", // Where does this come from? Should it live somewhere else?
+				xp = new {
+						MessageTypeConfig = new {
+							MessageType = "NewUserInvitation",
+							FromEmail = "noreply@ordercloud.io",
+							Subject = "New User Registration",
+							TemplateName = "ForgottenPassword",
+							MainContent = "NewUserInvitation"
+						}
+				}
 			}
 		};
 		
@@ -499,6 +515,7 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin, ApiRole.AdminAddressReader, ApiRole.PriceScheduleAdmin  } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionAdmin, Roles = new[] { ApiRole.PromotionAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPContentAdmin, CustomRoles = new[] { CustomRole.AssetAdmin, CustomRole.SchemaAdmin, CustomRole.DocumentAdmin, } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionReader, Roles = new[] { ApiRole.PromotionReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPStoreFrontAdmin, Roles = new[] { ApiRole.ProductFacetAdmin, ApiRole.ProductFacetReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCategoryAdmin, Roles = new[] { ApiRole.CategoryAdmin } },
@@ -544,7 +561,8 @@ namespace Marketplace.Common.Commands
 			CustomRole.MPSellerAdmin,
 			CustomRole.MPSupplierAdmin,
 			CustomRole.MPSupplierUserGroupAdmin,
-			CustomRole.MPReportReader
+			CustomRole.MPReportReader,
+			CustomRole.MPContentAdmin
 		};
 	}
 }

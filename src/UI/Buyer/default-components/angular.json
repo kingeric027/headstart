@@ -24,19 +24,135 @@
             "tsConfig": "tsconfig.app.json",
             "aot": false,
             "preserveSymlinks": true,
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/web.config"
-            ],
-            "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles/main.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets", "src/web.config"],
+            "styles": ["src/styles/main.scss"],
             "scripts": []
           },
           "configurations": {
+            "dev": {
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "af": {
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/anytime-fitness"]
+              },
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bcf": {
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/basecamp"]
+              },
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "wtc": {
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bm": {
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/bar-method"]
+              },
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
             "test": {
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -70,6 +186,9 @@
                   "with": "src/environments/environment.staging.ts"
                 }
               ],
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -97,6 +216,9 @@
                   "with": "src/environments/environment.production.ts"
                 }
               ],
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/styles/themes/waxing-the-city"]
+              },
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -129,6 +251,21 @@
             }
           },
           "configurations": {
+            "dev": {
+              "browserTarget": "default-components:build:dev"
+            },
+            "af": {
+              "browserTarget": "default-components:build:af"
+            },
+            "bcf": {
+              "browserTarget": "default-components:build:bcf"
+            },
+            "wtc": {
+              "browserTarget": "default-components:build:wtc"
+            },
+            "bm": {
+              "browserTarget": "default-components:build:bm"
+            },
             "test": {
               "browserTarget": "default-components:build:test"
             },
@@ -153,29 +290,16 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/web.config"
-            ],
-            "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets", "src/web.config"],
+            "styles": ["./node_modules/@angular/material/prebuilt-themes/indigo-pink.css", "src/styles/main.scss"],
             "scripts": []
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["tsconfig.app.json", "tsconfig.spec.json", "e2e/tsconfig.json"],
+            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {

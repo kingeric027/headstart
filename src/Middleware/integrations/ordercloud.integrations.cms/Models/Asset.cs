@@ -1,28 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using Cosmonaut.Attributes;
-using Microsoft.Azure.Documents;
-using Newtonsoft.Json;
-using ordercloud.integrations.library;
+﻿using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace ordercloud.integrations.cms
 {
 	public enum AssetType { Image, Theme, Attachment, Structured }
 
 	[SwaggerModel]
-	[CosmosCollection("assets")]
-	public class Asset : CosmosObject
+	public class Asset
 	{
-		[JsonProperty("ID"), CosmosInteropID]
-		public string InteropID { get; set; }
-		[ApiIgnore, CosmosPartitionKey]
-		public string ContainerID { get; set; } // real id, not interop. Don't need to set or return.
+		[CosmosInteropID]
+		public string ID { get; set; }
 		[MaxLength(100)]
 		public string Title { get; set; }
 		public bool Active { get; set; } = false;
@@ -32,14 +24,8 @@ namespace ordercloud.integrations.cms
 		public string FileName { get; set; } // Defaults to the file name in the upload. Or should be required?
 		[ApiReadOnly]
 		public AssetMetadata Metadata { get; set; }
-
-		public new static Collection<UniqueKey> GetUniqueKeys()
-		{
-			return new Collection<UniqueKey>
-			{
-				new UniqueKey() { Paths = new Collection<string> { "/InteropID", "/ContainerID" }}
-			};
-		}
+		[ApiReadOnly]
+		public History History { get; set; }
 	}
 
 	[SwaggerModel]

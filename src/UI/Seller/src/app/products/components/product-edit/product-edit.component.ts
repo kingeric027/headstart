@@ -29,6 +29,7 @@ import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
+import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 
 @Component({
   selector: 'app-product-edit',
@@ -345,7 +346,7 @@ export class ProductEditComponent implements OnInit {
       FileName: file.Filename
     }
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-    await HeadStartSDK.ProductContents.SaveAssetAssignment(productID, newAsset.ID, accessToken);
+    await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
     return await HeadStartSDK.Products.Get(productID, accessToken);
   }
 
@@ -518,6 +519,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return this.imageFiles[0]?.URL || `${environment.middlewareUrl}/products/${this._superMarketplaceProductEditable?.Product?.ID}/image`;
+    return this.imageFiles[0]?.URL || getProductMainImageUrlOrPlaceholder(this._superMarketplaceProductEditable?.Product);
   }
 }

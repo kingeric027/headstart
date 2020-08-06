@@ -162,6 +162,7 @@ export enum LineItemStatus {
   Open = 'Open',
   Backordered = 'Backordered',
   Canceled = 'Canceled',
+  CancelRequested = 'CancelRequested',
   Returned = 'Returned',
   ReturnRequested = 'ReturnRequested',
 }
@@ -190,6 +191,10 @@ export enum OrdercloudEnv {
   Production = 'Production',
   Staging = 'Staging',
   Sandbox = 'Sandbox',
+}
+
+export interface Theme {
+  logoSrc: string;
 }
 
 export class AppConfig {
@@ -233,6 +238,7 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: ApiRole[];
+  theme: Theme;
 }
 
 export interface DecodedOCToken {

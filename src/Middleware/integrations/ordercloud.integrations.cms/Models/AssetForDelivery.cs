@@ -12,10 +12,10 @@ namespace ordercloud.integrations.cms
 
 		public AssetForDelivery() { }
 
-		public AssetForDelivery(Asset asset, int listOrder)
+		public AssetForDelivery(AssetDO asset, int listOrder)
 		{
 			ListOrderWithinType = listOrder;
-			InteropID = asset.InteropID;
+			ID = asset.InteropID;
 			Title = asset.Title;
 			Active = asset.Active;
 			Url = asset.Url;

@@ -57,10 +57,6 @@ namespace ordercloud.integrations.library
                     ConnectionMode = ConnectionMode.Direct
                 }, defaultCollectionThroughput: 400)
             {
-                JsonSerializerSettings = new JsonSerializerSettings()
-                {
-                    ContractResolver = new CosmosContractResolver()
-                },
                 UniqueKeyPolicy = new UniqueKeyPolicy()
                 {
                     UniqueKeys =

@@ -62,7 +62,7 @@
             <select class="form-control"
                     id="Currency"
                     formControlName="Currency"
-                    (change)="updateResourceFromEvent({target: { value: $event.value }}, 'xp.Currency')">
+                    (change)="updateResourceFromEvent($event, 'xp.Currency')">
               <option *ngFor="let currency of availableCurrencies"
                       [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</option>
             </select>

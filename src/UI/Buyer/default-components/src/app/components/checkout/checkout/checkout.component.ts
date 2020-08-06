@@ -189,8 +189,9 @@ export class OCMCheckout implements OnInit {
     this.currentPanel = $event.panelId;
   }
 
-  updateOrderMeta(): void {
+  updateOrderMeta(promos?: CustomEvent<OrderPromotion[]>): void {
     this.orderPromotions = this.context.order.promos.get().Items;
+    this.orderPromotions = promos.detail;
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
   }
 }

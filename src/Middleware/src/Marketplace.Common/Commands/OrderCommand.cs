@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Common.Services;
-using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
@@ -20,8 +19,6 @@ namespace Marketplace.Common.Commands
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
-        Task RequestReturnEmail(string OrderID);
-        Task PatchOrderCanceledStatus(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
     }
 
@@ -49,31 +46,10 @@ namespace Marketplace.Common.Commands
             await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
             return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
         }
-
-        public async Task RequestReturnEmail(string orderID)
-        {
-            await _sendgridService.SendReturnRequestedEmail(orderID);
-        }
-
-        public async Task PatchOrderCanceledStatus(string orderID)
-        {
-                await PatchOrderStatus(orderID, ShippingStatus.Canceled, ClaimStatus.NoClaim);
-                await PatchLineItemStatus(orderID, LineItemStatus.Canceled);
-        }
+       
         public async Task PatchOrderRequiresApprovalStatus(string orderID)
         {
                 await PatchOrderStatus(orderID, ShippingStatus.Processing, ClaimStatus.NoClaim);
-        }
-        public async Task PatchLineItemStatus(string orderID, LineItemStatus lineItemStatus)
-        {
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
-            var partialLi = new PartialLineItem { xp = new { LineItemStatus = lineItemStatus } };
-            List<Task> lineItemsToPatch = new List<Task>();
-            foreach (var li in lineItems.Items)
-            {
-                lineItemsToPatch.Add(_oc.LineItems.PatchAsync(OrderDirection.Incoming, orderID, li.ID, partialLi));
-            }
-            await Task.WhenAll(lineItemsToPatch);
         }
 
         private async Task PatchOrderStatus(string orderID, ShippingStatus shippingStatus, ClaimStatus claimStatus)

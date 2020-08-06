@@ -4,6 +4,7 @@
 
 import { OrdercloudEnv } from 'marketplace';
 import { Environment } from './env.interface';
+import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
@@ -16,6 +17,7 @@ export const environment: Environment = {
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
+  theme: wtcTheme,
 };
 
 /*

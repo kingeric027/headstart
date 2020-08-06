@@ -1,0 +1,46 @@
+// --------------------------------------------------------------------------------------
+// This file should include variable overrides as well as custom variables
+//
+// we've included a subset of common bootstrap variables you might want to override
+// to start you off. want to see the full list of bootstrap variables?
+// check out node_modules/bootstrap/variables.scss
+// --------------------------------------------------------------------------------------
+
+$blue: #1c3f65;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #e83e8c;
+$red: #dc3545;
+$orange: #ee7421;
+$yellow: #ffc107;
+$teal: #20c997;
+$green: #28a745;
+$cyan: #94a8cd;
+$sky: #68cbdf;
+$plum: #652f6c;
+$blush: #f4e2e2;
+
+$white: #fff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000;
+
+$primary: $orange;
+$secondary: $plum;
+$success: $green;
+$info: $sky;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-100;
+$gray-light: $gray-300;
+$medium: $gray-500;
+$dark: $gray-800;
+$sky: $sky;
+$blush: $blush;

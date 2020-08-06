@@ -8,14 +8,14 @@
                 <ocm-order-return-table [liGroup]="liGroupedByShipFrom[i]"
                                         [liGroupForm]="liGroupForm"
                                         [supplier]="suppliers[i].supplier"
-                                        [columnsToDisplay]="displayedColumns">
+                                        [action]="_action">
                 </ocm-order-return-table>
             </div>
         </form>
             <div>
                 <button (click)="onSubmit()"
                         class="btn btn-primary btn-block-xs mt-4 mr-2"
-                        [disabled]="!requestReturnForm.valid || !isAnyRowSelected() || isSaving">Submit Return Request
+                        [disabled]="!requestReturnForm.valid || !isAnyRowSelected() || isSaving">Submit Request
                 </button>
             </div>
     </div>

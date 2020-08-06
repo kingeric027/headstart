@@ -3,7 +3,7 @@ import { MarketplaceMeProduct } from 'marketplace';
 import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 export const getPrimaryImageUrl = (product: MarketplaceMeProduct): string => {
-  return `${ocAppConfig.middlewareUrl}/products/${product.ID}/image`;
+  return `${ocAppConfig.middlewareUrl}/assets/resource/primary-image?ResourceID=${product.ID}&ResourceType=Products`;
 };
 
 export const getPrimaryLineItemImage = (lineItemID: string, lineItems: MarketplaceLineItem[]): string => {
