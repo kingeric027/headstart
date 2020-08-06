@@ -195,8 +195,6 @@ export enum OrdercloudEnv {
 
 export interface Theme {
   logoSrc: string;
-  loginBg: string;
-  btnLinkColor: string;
 }
 
 export class AppConfig {
