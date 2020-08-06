@@ -29,7 +29,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID = wi.RecordId;
-                var ps = await _oc.PriceSchedules.CreateAsync(new MarketplacePriceSchedule()
+                var priceSchedule = await _oc.PriceSchedules.CreateAsync(new MarketplacePriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -74,9 +74,9 @@ namespace Marketplace.Common.Commands
                 await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
                 {
                     ProductID = product.ID,
-                    PriceScheduleID = ps.ID
+                    PriceScheduleID = priceSchedule.ID
                 }, wi.Token);
-                return JObject.FromObject(obj);
+                return JObject.FromObject(Map(product, priceSchedule));
             }
             catch (OrderCloudException exId) when (IdExists(exId))
             {
@@ -119,7 +119,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
-                var ps = await _oc.PriceSchedules.SaveAsync(wi.RecordId, new MarketplacePriceSchedule()
+                var priceSchedule = await _oc.PriceSchedules.SaveAsync(wi.RecordId, new MarketplacePriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -131,7 +131,7 @@ namespace Marketplace.Common.Commands
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
                 }, wi.Token);
-                var product = await _oc.Products.SaveAsync(wi.RecordId, new MarketplaceProduct()
+                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(wi.RecordId, new MarketplaceProduct()
                 {
                     Active = true,
                     AutoForward = false,
@@ -164,9 +164,9 @@ namespace Marketplace.Common.Commands
                 await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
                 {
                     ProductID = product.ID,
-                    PriceScheduleID = ps.ID
+                    PriceScheduleID = priceSchedule.ID
                 }, wi.Token);
-                return JObject.FromObject(obj);
+                return JObject.FromObject(Map(product, priceSchedule));
             }
             catch (OrderCloudException ex)
             {
@@ -180,14 +180,45 @@ namespace Marketplace.Common.Commands
             }
         }
 
+        private static TemplateProductFlat Map(MarketplaceProduct product, PriceSchedule priceSchedule)
+        {
+            return new TemplateProductFlat
+            {
+                ID = product.ID,
+                Active = product.Active,
+                ApplyShipping = priceSchedule.ApplyShipping,
+                ApplyTax = priceSchedule.ApplyTax,
+                Description = product.Description,
+                IsResale = product.xp.IsResale,
+                MaxQuantity = priceSchedule.MaxQuantity,
+                MinQuantity = priceSchedule.MinQuantity,
+                Name = product.Name,
+                Price = priceSchedule.PriceBreaks.FirstOrDefault()?.Price,
+                ShipHeight = product.ShipHeight,
+                ShipLength = product.ShipLength,
+                ShipWidth = product.ShipWidth,
+                ShipWeight = product.ShipWeight,
+                QuantityMultiplier = product.QuantityMultiplier,
+                RestrictedQuantity = priceSchedule.RestrictedQuantity,
+                TaxCategory = product.xp.Tax.Category,
+                TaxCode = product.xp.Tax.Code,
+                TaxDescription = product.xp.Tax.Description,
+                UseCumulativeQuantity = priceSchedule.UseCumulativeQuantity,
+                UnitOfMeasure = product.xp.UnitOfMeasure.Unit,
+                UnitOfMeasureQty = product.xp.UnitOfMeasure.Qty
+            };
+        }
+
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = wi.Diff.ToObject<TemplateProductFlat>(OrchestrationSerializer.Serializer);
+            var objProduct = wi.Diff.ToObject<PartialMarketplaceProduct>(OrchestrationSerializer.Serializer);
+            var objPrice = wi.Diff.ToObject<PartialPriceSchedule>(OrchestrationSerializer.Serializer);
             try
             {
                 //TODO: partial mapping
-                var response = await _oc.Products.PatchAsync(wi.RecordId, new PartialMarketplaceProduct(), wi.Token);
-                return JObject.FromObject(response);
+                var product = await _oc.Products.PatchAsync<MarketplaceProduct>(wi.RecordId, objProduct, wi.Token);
+                var priceSchedule = await _oc.PriceSchedules.PatchAsync(wi.RecordId, objPrice, wi.Token);
+                return JObject.FromObject(Map(product, priceSchedule));
             }
             catch (OrderCloudException ex)
             {
@@ -214,31 +245,7 @@ namespace Marketplace.Common.Commands
                 var priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
                 //var _images = GetProductImages(id, user);
                 //var _attachments = GetProductAttachments(id, user);
-                return JObject.FromObject(new TemplateProductFlat
-                {
-                    ID = product.ID,
-                    Active = product.Active,
-                    ApplyShipping = priceSchedule.ApplyShipping,
-                    ApplyTax = priceSchedule.ApplyTax,
-                    Description = product.Description,
-                    IsResale = product.xp.IsResale,
-                    MaxQuantity = priceSchedule.MaxQuantity,
-                    MinQuantity = priceSchedule.MinQuantity,
-                    Name = product.Name,
-                    Price = priceSchedule.PriceBreaks.FirstOrDefault()?.Price,
-                    ShipHeight = product.ShipHeight,
-                    ShipLength = product.ShipLength,
-                    ShipWidth = product.ShipWidth,
-                    ShipWeight = product.ShipWeight,
-                    QuantityMultiplier = product.QuantityMultiplier,
-                    RestrictedQuantity = priceSchedule.RestrictedQuantity,
-                    TaxCategory = product.xp.Tax.Category,
-                    TaxCode = product.xp.Tax.Code,
-                    TaxDescription = product.xp.Tax.Description,
-                    UseCumulativeQuantity = priceSchedule.UseCumulativeQuantity,
-                    UnitOfMeasure = product.xp.UnitOfMeasure.Unit,
-                    UnitOfMeasureQty = product.xp.UnitOfMeasure.Qty
-                });
+                return JObject.FromObject(Map(product, priceSchedule));
             }
             catch (OrderCloudException ex)
             {
