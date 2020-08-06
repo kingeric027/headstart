@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
-using Npoi.Mapper.Attributes;
-using NPOI.SS.Formula.Functions;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -111,7 +110,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string ErrorMessage { get; set; }
     }
 
-    public class TemplateProductFlat
+    public class TemplateProductFlat : IMarketplaceObject
     {
         [Required]
         public string ID { get; set; }
@@ -125,7 +124,9 @@ namespace Marketplace.Common.Commands.SupplierSync
         public decimal? ShipHeight { get; set; }
         public decimal? ShipWidth { get; set; }
         public decimal? ShipLength { get; set; }
+        [Required]
         public string TaxCategory { get; set; }
+        [Required]
         public string TaxCode { get; set; }
         public string TaxDescription { get; set; }
         public string UnitOfMeasureQty { get; set; }
@@ -137,6 +138,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public int MaxQuantity { get; set; }
         public bool UseCumulativeQuantity { get; set; }
         public bool RestrictedQuantity { get; set; }
+        [Required]
         public double Price { get; set; }
         public string ImageTitle { get; set; }
         public string Url { get; set; }

@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId, string clientId) where T : IMarketplaceObject;
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : IMarketplaceObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
@@ -47,7 +47,7 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId, string clientId) where T : IMarketplaceObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user) where T : IMarketplaceObject
         {
             try
             {
@@ -58,7 +58,7 @@ namespace Marketplace.Common.Commands
                     ID = obj.ID,
                     Model = obj
                 };
-                await _blobQueue.Save(orch.BuildPath(resourceId, clientId), JsonConvert.SerializeObject(orch));
+                await _blobQueue.Save(orch.BuildPath(user.SupplierID, user.ClientID), JsonConvert.SerializeObject(orch));
                 return await Task.FromResult(obj);
             }
             catch (OrderCloudIntegrationException ex)
