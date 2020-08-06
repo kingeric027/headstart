@@ -23,10 +23,11 @@ namespace Marketplace.Models
         public bool StopShipSync { get; set; }
         public OrderType? OrderType { get; set; }
         public QuoteOrderInfo QuoteOrderInfo { get; set; }
-        public OrderReturnInfo OrderReturnInfo { get; set; }
-        public OrderCancelInfo OrderCancelInfo { get; set; }
+        public ClaimsSummary Returns { get; set; }
+        public ClaimsSummary Cancelations { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
+        public SubmittedOrderStatus SubmittedOrderStatus { get; set; }
         public ShippingStatus ShippingStatus { get; set; }
         public ClaimStatus ClaimStatus { get; set; }
 	}
@@ -48,21 +49,21 @@ namespace Marketplace.Models
         public IList<OrderApproval> Approvals { get; set; } 
     }
 
-	[SwaggerModel]
-    public class OrderReturnInfo
+    [SwaggerModel]
+    public class ClaimsSummary
     {
-        public bool HasReturn { get; set; }
-        public string RMANumber { get; set; }
-        public bool Resolved { get; set; }
+        public bool HasClaims { get; set; }
+        public bool HasUnresolvedClaims { get; set; }
+        public List<ClaimResolutionStatuses> Resolutions { get; set; }
     }
 
-    [SwaggerModel]
-    public class OrderCancelInfo
+    public class ClaimResolutionStatuses
     {
-        public bool HasCancel { get; set; }
+        public string LineItemID { get; set; }
         public string RMANumber { get; set; }
-        public bool Resolved { get; set; }
+        public bool IsResolved { get; set; }
     }
+
     public class MarketplaceOrderSubmitPayload
     {
         public MarketplaceOrderSubmitPayloadResponse Response { get; set; }
@@ -71,5 +72,13 @@ namespace Marketplace.Models
     public class MarketplaceOrderSubmitPayloadResponse
     {
         public MarketplaceOrder Body { get; set; }
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SubmittedOrderStatus
+    {
+        Open,
+        Completed,
+        Canceled
     }
 }

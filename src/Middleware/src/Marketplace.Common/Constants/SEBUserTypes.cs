@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Marketplace.Models.Misc;
 
-namespace Marketplace.Common.TemporaryAppConstants
+namespace Marketplace.Common.Constants
 {
     public static class SEBUserTypes
     {
