@@ -82,6 +82,11 @@ namespace ordercloud.integrations.cms
 		public async Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
+			if (assetInteropID != asset.ID)
+			{
+				var matchingID = await GetWithoutExceptions(container.id, asset.ID);
+				if (matchingID != null) throw new DuplicateIDException();
+			}
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) {
 				if (asset.Url == null) throw new AssetCreateValidationException("Must include a Url");
@@ -104,7 +109,7 @@ namespace ordercloud.integrations.cms
 			existingAsset.History = HistoryBuilder.OnUpdate(existingAsset.History, user);
 
 			// Intentionally don't allow changing the type. Could mess with assignments.
-			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
+			var updatedAsset = await _assetStore.UpsertAsync(existingAsset);
 			return AssetMapper.MapTo(updatedAsset);
 		}
 

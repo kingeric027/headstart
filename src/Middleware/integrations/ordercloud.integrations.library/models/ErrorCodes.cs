@@ -18,7 +18,8 @@ namespace ordercloud.integrations.library
             { "List.InvalidType", new ErrorCode("Invalid type", 400, "Invalid type") },
             { "Blob.ConnectionString", new ErrorCode("InvalidConnectionString", 404, "Invalid Connection String")},
             { "Blob.Container", new ErrorCode("InvalidContainerString", 404, "Invalid Container")},
-            { "Webhook.MissingHeader", new ErrorCode("MissingWebhookHeader", 401, "Invalid Header")}
+            { "Webhook.MissingHeader", new ErrorCode("MissingWebhookHeader", 401, "Invalid Header")},
+            { "Auth.InsufficientRoles", new ErrorCode("InsufficientRoles", 401, "Insufficient Roles") }
         };
 
         public static partial class Auth

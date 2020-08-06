@@ -75,12 +75,17 @@ namespace ordercloud.integrations.cms
 
 		public async Task<DocSchema> Save(string schemaInteropID, DocSchema schema, VerifiedUserContext user)
 		{
+			if (schemaInteropID != schema.ID)
+			{
+				var matchingID = await GetWithoutExceptions(schema.ID, user);
+				if (matchingID != null) throw new DuplicateIDException();
+			}
 			var existingSchema = await GetWithoutExceptions(schemaInteropID, user);
 			if (existingSchema == null) existingSchema = Init(new DocSchemaDO(), user);
 			existingSchema.InteropID = schema.ID;
 			existingSchema.RestrictedAssignmentTypes = schema.RestrictedAssignmentTypes;
 			existingSchema.Schema = schema.Schema;
-			existingSchema.History = HistoryBuilder.OnUpdate(schema.History, user);
+			existingSchema.History = HistoryBuilder.OnUpdate(existingSchema.History, user);
 			existingSchema = Validate(existingSchema);
 			var newSchema = await _store.UpsertAsync(existingSchema);
 			return SchemaMapper.MapTo(newSchema);

@@ -34,6 +34,14 @@ namespace Marketplace.Models.Misc
 		MPLocationOrderApprover,
 		MPLocationNeedsApproval,
 		MPLocationViewAllOrders,
-		MPLocationResaleCertAdmin
+		MPLocationResaleCertAdmin,
+
+		// cms 
+		AssetAdmin,
+		AssetReader,
+		DocumentAdmin,
+		DocumentReader,
+		SchemaAdmin,
+		SchemaReader
 	}
 }

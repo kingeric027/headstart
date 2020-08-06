@@ -97,11 +97,16 @@ namespace ordercloud.integrations.cms
 		public async Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
+			if (documentInteropID != document.ID)
+			{
+				var matchingID = await GetWithoutExceptions(schema.id, document.ID, user);
+				if (matchingID != null) throw new DuplicateIDException();
+			}
 			var existingDocument = await GetWithoutExceptions(schema.id, documentInteropID, user);
 			if (existingDocument == null) existingDocument = Init(new DocumentDO(), schema, user);
 			existingDocument.InteropID = document.ID;
 			existingDocument.Doc = JObject.FromObject(document.Doc);
-			existingDocument.History = HistoryBuilder.OnUpdate(document.History, user);
+			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
 			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
 			var updatedDocument = await _store.UpsertAsync(existingDocument);
 			return DocumentMapper.MapTo<T>(updatedDocument);
