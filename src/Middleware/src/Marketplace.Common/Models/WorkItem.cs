@@ -89,7 +89,7 @@ namespace Marketplace.Common.Models
     {
         HydratedProduct, Product, PriceSchedule, Spec, SpecOption, SpecProductAssignment, ProductFacet,
         Buyer, User, UserGroup, Address, CostCenter, UserGroupAssignment, AddressAssignment, 
-        CatalogAssignment, Catalog, Supplier, Order
+        CatalogAssignment, Catalog, Supplier, Order, TemplateProductFlat
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
