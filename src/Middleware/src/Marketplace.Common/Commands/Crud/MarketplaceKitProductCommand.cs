@@ -116,7 +116,7 @@ namespace Marketplace.Common.Commands.Crud
             var kitProductDoc = new KitProductDocument();
             kitProductDoc.ID = _updatedProduct.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
-            var _productAssignments = await _query.Update<KitProduct>("KitProduct", _updatedProduct.ID, kitProductDoc, user);
+            var _productAssignments = await _query.Save<KitProduct>("KitProduct", _updatedProduct.ID, kitProductDoc, user);
             var _images = await GetProductImages(_updatedProduct.ID, user);
             var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
             return new MarketplaceKitProduct

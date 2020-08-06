@@ -59,10 +59,10 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("Update a Document")]
 		[HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<JDocument> Update(string schemaID, string documentID, [FromBody] JDocument document)
+		public async Task<JDocument> SAve(string schemaID, string documentID, [FromBody] JDocument document)
 		{
 			RequireOneOf(CustomRole.DocumentAdmin);
-			var doc =  await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
+			var doc =  await _documents.Save(schemaID, documentID, document, VerifiedUserContext);
 			return doc.Reserialize<JDocument>();
 		}
 

@@ -19,7 +19,7 @@ namespace ordercloud.integrations.cms
 		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user);
 		Task<Document<T>> Get<T>(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 		Task<Document<T>> Create<T>(string schemaInteropID, Document<T> document, VerifiedUserContext user);
-		Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
+		Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 
 		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
@@ -94,7 +94,7 @@ namespace ordercloud.integrations.cms
 			return DocumentMapper.MapTo<T>(newDocument);
 		}
 
-		public async Task<Document<T>> Update<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
+		public async Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			if (documentInteropID != document.ID)
