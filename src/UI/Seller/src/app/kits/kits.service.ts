@@ -57,12 +57,6 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
                     MinQty: null,
                     MaxQty: null
                 },
-                {
-                    ID: null,
-                    Required: false,
-                    MinQty: null,
-                    MaxQty: null
-                }
             ]
         },
     };

@@ -55,4 +55,8 @@ export class MiddlewareKitService {
         const url = `${this.appConfig.middlewareUrl}/kitproducts/${productID}`;
         return await this.http.delete<MarketplaceKitProduct>(url, this.headers).toPromise();
     }
+    async Create(product: MarketplaceKitProduct) {
+        const url = `${this.appConfig.middlewareUrl}/kitproducts`;
+        return await this.http.post<MarketplaceKitProduct>(url, product, this.headers).toPromise();
+    }
 }
