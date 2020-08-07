@@ -1,0 +1,32 @@
+// override btn-primary with gradient
+.btn-primary {
+  color: $gray-100;
+  border: none;
+  font-weight: bolder;
+  text-transform: uppercase;
+  kerning: 2rem;
+  border-radius: 0;
+  background: linear-gradient(128.04deg, rgba($black, 0.9) 39.63%, rgba($blue, 0.9) 93.79%);
+  transition: 200ms ease all;
+  &:hover,
+  &:focus {
+    background: linear-gradient(128.04deg, $black 39.63%, $blue 93.79%);
+    border: none;
+    color: white !important;
+  }
+  // wish I could dry this up a little better, but needs to explicitly override the disabled styles
+  &.disabled,
+  &:disabled {
+    color: white;
+    background: linear-gradient(128.04deg, darken($black, 5) 39.63%, darken($blue, 5) 93.79%);
+    border: none;
+  }
+}
+.btn-primary.btn-sm {
+  font-weight: normal;
+  text-transform: none;
+}
+
+.form-control {
+  border-radius: 0;
+}
