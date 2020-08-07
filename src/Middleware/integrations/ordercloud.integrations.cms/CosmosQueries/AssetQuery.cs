@@ -16,21 +16,23 @@ namespace ordercloud.integrations.cms
 	public interface IAssetQuery
 	{
 		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
-		Task<List<Asset>> ListByInternalIDs(IEnumerable<string> assetIDs);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
-		Task<Asset> GetByInternalID(string assetID); // real id
 		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
-		Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user);
+		Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user);
 		Task Delete(string assetInteropID, VerifiedUserContext user);
+
+		Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs);
+		Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user);
+		Task<AssetDO> GetByInternalID(string assetID); // real id
 	}
 
 	public class AssetQuery : IAssetQuery
 	{
-		private readonly ICosmosStore<Asset> _assetStore;
+		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IBlobStorage _blob;
 
-		public AssetQuery(ICosmosStore<Asset> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
+		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
@@ -46,11 +48,16 @@ namespace ordercloud.integrations.cms
 				.Sort(args);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			var listPage = list.ToListPage(args.Page, args.PageSize, count);
-			return listPage;
+			var assets = list.ToListPage(args.Page, args.PageSize, count);
+			return AssetMapper.MapTo(assets);
 		}
 
 		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
+		{
+			return AssetMapper.MapTo(await GetDO(assetInteropID, user));
+		}
+
+		public async Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
@@ -67,17 +74,30 @@ namespace ordercloud.integrations.cms
 			if (file != null) {			
 				await _blob.UploadAsset(container, file, asset);
 			}
-
+			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
-			return newAsset;
+			return AssetMapper.MapTo(newAsset);
 		}
 
-		public async Task<Asset> Update(string assetInteropID, Asset asset, VerifiedUserContext user)
+		public async Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
+			if (assetInteropID != asset.ID)
+			{
+				var matchingID = await GetWithoutExceptions(container.id, asset.ID);
+				if (matchingID != null) throw new DuplicateIDException();
+			}
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
-			if (existingAsset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
-			existingAsset.InteropID = asset.InteropID;
+			if (existingAsset == null) {
+				if (asset.Url == null) throw new AssetCreateValidationException("Must include a Url");
+				existingAsset = new AssetDO()
+				{
+					ContainerID = container.id,
+					History = HistoryBuilder.OnCreate(user),
+					Metadata = new AssetMetadata() { IsUrlOverridden = true  }
+				};
+			}
+			existingAsset.InteropID = asset.ID;
 			existingAsset.Title = asset.Title;
 			existingAsset.Active = asset.Active;
 			if (existingAsset.Metadata.IsUrlOverridden)
@@ -86,36 +106,37 @@ namespace ordercloud.integrations.cms
 			}
 			existingAsset.Tags = asset.Tags;
 			existingAsset.FileName = asset.FileName;
+			existingAsset.History = HistoryBuilder.OnUpdate(existingAsset.History, user);
+
 			// Intentionally don't allow changing the type. Could mess with assignments.
-			var updatedAsset = await _assetStore.UpdateAsync(existingAsset);
-			return updatedAsset;
+			var updatedAsset = await _assetStore.UpsertAsync(existingAsset);
+			return AssetMapper.MapTo(updatedAsset);
 		}
 
 		public async Task Delete(string assetInteropID, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
-			var asset = await Get(assetInteropID, user);
+			var asset = await GetWithoutExceptions(container.id, assetInteropID);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			await _blob.OnAssetDeleted(container, asset.id);
 		}
 
-		public async Task<List<Asset>> ListByInternalIDs(IEnumerable<string> assetIDs)
+		public async Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs)
 		{
 			var assets = await _assetStore.FindMultipleAsync(assetIDs);
 			return assets.ToList();
 		}
 
-		public async Task<Asset> GetByInternalID(string assetID)
+		public async Task<AssetDO> GetByInternalID(string assetID)
 		{
-			var asset = await _assetStore.Query($"select top 1 * from c where c.id = @id", new { id = assetID }).FirstOrDefaultAsync();
+			var asset = await _assetStore.Query().FirstOrDefaultAsync(a => a.id == assetID);
 			if (asset == null) throw new NotImplementedException(); // Why not implemented instead of not found?
 			return asset;
 		}
 
-		private async Task<Asset> GetWithoutExceptions(string containerID, string assetInteropID)
+		private async Task<AssetDO> GetWithoutExceptions(string containerID, string assetInteropID)
 		{
-			var query = $"select top 1 * from c where c.InteropID = @id";
-			var asset = await _assetStore.Query(query, new { id = assetInteropID }, GetFeedOptions(containerID)).FirstOrDefaultAsync();
+			var asset = await _assetStore.Query(GetFeedOptions(containerID)).FirstOrDefaultAsync(a => a.InteropID == assetInteropID);
 			return asset;
 		}
 

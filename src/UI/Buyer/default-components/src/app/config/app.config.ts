@@ -11,6 +11,7 @@ export const ocAppConfig: AppConfig = {
   ssoLink: environment.ssoLink,
   translateBlobUrl: environment.translateBlobUrl,
   ordercloudEnv: environment.ordercloudEnv,
+  theme: environment.theme,
   anonymousShoppingEnabled: false,
   avalaraCompanyId: 280411,
   scope: [

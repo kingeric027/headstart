@@ -167,14 +167,14 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("Update a Chili Assignment")]
-        [HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
+        [HttpPut, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ChiliConfig> Update([FromBody] ChiliConfig config)
         {
             return await _command.Save(config);
         }
 
         [DocName("Delete a Chili Assignment")]
-        [HttpDelete, Route("{documentID}"), OrderCloudIntegrationsAuth]
+        [HttpDelete, Route("{configID}"), OrderCloudIntegrationsAuth]
         public async Task Delete(string configID)
         {
             await _command.Delete(configID);

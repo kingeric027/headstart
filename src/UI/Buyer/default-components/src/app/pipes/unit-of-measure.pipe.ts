@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { MarketplaceProduct } from 'marketplace-javascript-sdk';
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Pipe({
   name: 'UofM',

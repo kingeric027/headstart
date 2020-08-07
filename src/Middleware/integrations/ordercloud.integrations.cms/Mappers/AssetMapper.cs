@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using ordercloud.integrations.library.Cosmos;
+using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cms
 {
@@ -10,13 +11,13 @@ namespace ordercloud.integrations.cms
 	{
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public static (Asset, IFormFile) MapFromUpload(CMSConfig config, AssetContainer container, AssetUpload form)
+		public static (AssetDO, IFormFile) MapFromUpload(CMSConfig config, AssetContainerDO container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
-				throw new AssetUploadValidationException("Asset upload must include either File or Url override but not both.");
+				throw new AssetCreateValidationException("Asset create must include either File or Url override but not both.");
 			}
-			var asset = new Asset()
+			var asset = new AssetDO()
 			{
 				InteropID = form.ID ?? CosmosInteropID.New(),
 				ContainerID = container.id,
@@ -42,7 +43,7 @@ namespace ordercloud.integrations.cms
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
-		private static void TypeSpecificMapping(ref Asset asset, AssetUpload form)
+		private static void TypeSpecificMapping(ref AssetDO asset, AssetUpload form)
 		{
 			switch (asset.Type)
 			{
@@ -57,12 +58,12 @@ namespace ordercloud.integrations.cms
 			}
 		}
 
-		private static void ImageSpecificMapping(ref Asset asset, AssetUpload form)
+		private static void ImageSpecificMapping(ref AssetDO asset, AssetUpload form)
 		{
 			if (form.File == null) return;
 			if (!ValidImageFormats.Contains(form.File.ContentType)) 
 			{
-				throw new AssetUploadValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
+				throw new AssetCreateValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
 			}
 			using (var image = Image.FromStream(form.File.OpenReadStream()))
 			{
@@ -73,6 +74,36 @@ namespace ordercloud.integrations.cms
 
 				// TODO - potentially image resizing?
 			}
+		}
+
+		public static Asset MapTo(AssetDO asset)
+		{
+			return new Asset()
+			{
+				ID = asset.InteropID,
+				Title = asset.Title,
+				Active = asset.Active,
+				Url = asset.Url,
+				Type = asset.Type,
+				Tags = asset.Tags,
+				FileName = asset.FileName,
+				Metadata = asset.Metadata,
+				History = asset.History
+			};
+		}
+
+		public static IEnumerable<Asset> MapTo(IEnumerable<AssetDO> assets)
+		{
+			return assets.Select(asset => MapTo(asset));
+		}
+
+		public static ListPage<Asset> MapTo(ListPage<AssetDO> listPage)
+		{
+			return new ListPage<Asset>
+			{
+				Meta = listPage.Meta,
+				Items = MapTo(listPage.Items).ToList()
+			};
 		}
 	}
 }

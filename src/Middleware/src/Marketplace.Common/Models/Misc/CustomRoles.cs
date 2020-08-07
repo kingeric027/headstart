@@ -9,6 +9,7 @@ namespace Marketplace.Models.Misc
 		MeProductAdmin,
 		MPProductReader,
 		MPPromotionReader,
+		MPContentAdmin,
 		MPPromotionAdmin,
 		MPCategoryAdmin,
 		MPCategoryReader, 
@@ -34,6 +35,14 @@ namespace Marketplace.Models.Misc
 		MPLocationOrderApprover,
 		MPLocationNeedsApproval,
 		MPLocationViewAllOrders,
-		MPLocationResaleCertAdmin
+		MPLocationResaleCertAdmin,
+
+		// cms 
+		AssetAdmin,
+		AssetReader,
+		DocumentAdmin,
+		DocumentReader,
+		SchemaAdmin,
+		SchemaReader
 	}
 }

@@ -16,14 +16,14 @@ import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
 import {
-  MarketplaceSDK,
+  HeadStartSDK,
   Address,
   OrderCloudIntegrationsCreditCardPayment,
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
   ListPage,
   MarketplaceLineItem,
-} from 'marketplace-javascript-sdk';
+} from '@ordercloud/headstart-sdk';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -38,7 +38,7 @@ export class CheckoutService {
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await MarketplaceSDK.MePayments.Post(payment); // authorize card
+    await HeadStartSDK.MePayments.Post(payment); // authorize card
     const orderID = this.submit();
     return orderID;
   }
@@ -65,7 +65,7 @@ export class CheckoutService {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     (address as any).ID = null;
-    this.order = await MarketplaceSDK.ValidatedAddresses.SetShippingAddress(
+    this.order = await HeadStartSDK.ValidatedAddresses.SetShippingAddress(
       'Outgoing',
       this.order.ID,
       address as Address

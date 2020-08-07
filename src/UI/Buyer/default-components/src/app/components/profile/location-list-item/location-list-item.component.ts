@@ -4,7 +4,7 @@ import { ShopperContextService } from 'marketplace';
 
 import {
   MarketplaceAddressBuyer,
-} from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+} from '@ordercloud/headstart-sdk';
 
 
 @Component({

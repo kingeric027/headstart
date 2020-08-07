@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
-import { AssetForDelivery } from 'marketplace-javascript-sdk';
+import { AssetForDelivery } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './image-gallery.component.html',

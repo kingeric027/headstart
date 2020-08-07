@@ -46,7 +46,7 @@
             <label class="form-check-label"
                    for="Percentage"
                    translate>
-                   ADMIN.PROMOTIONS.PERCENTAGE
+              ADMIN.PROMOTIONS.PERCENTAGE
             </label>
           </div>
           <div class="form-check">
@@ -61,7 +61,7 @@
             <label class="form-check-label"
                    for="FixedAmount"
                    translate>
-                   ADMIN.PROMOTIONS.FIXED_AMOUNT
+              ADMIN.PROMOTIONS.FIXED_AMOUNT
             </label>
           </div>
           <div class="form-check">
@@ -76,7 +76,7 @@
             <label class="form-check-label"
                    for="FreeShipping"
                    translate>
-                   ADMIN.PROMOTIONS.FREE_SHIPPING
+              ADMIN.PROMOTIONS.FREE_SHIPPING
             </label>
           </div>
         </div>
@@ -104,8 +104,8 @@
               translate>ADMIN.PROMOTIONS.APPLIES_TO</h6>
           <small>
             <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon> 
-                     <span translate>ADMIN.PROMOTIONS.ALL_PROMOS_ORDERWIDE</span>
+                     [icon]="faExclamationCircle"></fa-icon>
+            <span translate>ADMIN.PROMOTIONS.ALL_PROMOS_ORDERWIDE</span>
           </small>
           <div class="form-check">
             <input class="form-check-input"
@@ -122,6 +122,41 @@
               ADMIN.PROMOTIONS.ENTIRE_ORDER
             </label>
           </div>
+          <div class="form-check">
+            <input class="form-check-input"
+                   type="radio"
+                   name="AppliesTo"
+                   id="SpecificSupplier"
+                   value="SpecificSupplier"
+                   formControlName="AppliesTo"
+                   (change)="handleUpdatePromo($event, 'xp.AppliesTo')"
+                   (change)="toggleApplyToSpecificSupplier()"
+                   [checked]="promoTypeCheck('SpecificSupplier')">
+            <label class="form-check-label"
+                   for="SpecificSupplier"
+                   translate>
+              ADMIN.PROMOTIONS.SPECIFIC_SUPPLIER
+            </label>
+          </div>
+          <span *ngIf="_promotionEditable?.xp?.AppliesTo === 'SpecificSupplier'">
+            <div ngbDropdown
+                 *ngIf="suppliers?.length && selectedSupplier"
+                 class="btn-block">
+              <button class="resource-btn btn btn-outline-dark"
+                      id="supplierSelectDropdown"
+                      ngbDropdownToggle>{{selectedSupplier.Name}}</button>
+              <div ngbDropdownMenu
+                   aria-labelledby="supplier select dropdown">
+                <button ngbDropdownItem
+                        *ngFor="let supplier of suppliers"
+                        (click)="selectSupplier(supplier.ID)">
+                  <summary-resource-display-component [resource]="supplier"
+                                                      [resourceType]="'suppliers'">
+                  </summary-resource-display-component>
+                </button>
+              </div>
+            </div>
+          </span>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
           <h6 class="font-weight-medium"
@@ -142,7 +177,7 @@
             <label class="form-check-label"
                    for="None"
                    translate>
-                   ADMIN.PROMOTIONS.NONE
+              ADMIN.PROMOTIONS.NONE
             </label>
           </div>
           <div class="form-check">
@@ -157,7 +192,7 @@
             <label class="form-check-label"
                    for="MinPurchase"
                    translate>
-                   ADMIN.PROMOTIONS.MINIMUM_PURCHASE_AMOUNT
+              ADMIN.PROMOTIONS.MINIMUM_PURCHASE_AMOUNT
             </label>
           </div>
           <div [hidden]="!_promotionEditable?.xp?.MinReq?.Type || _promotionEditable?.xp?.MinReq?.Type === 'MinItemQty'"
@@ -185,7 +220,7 @@
             <label class="form-check-label"
                    for="MinItemQty"
                    translate>
-                   ADMIN.PROMOTIONS.MINIMUM_QUANTITY_ITEMS
+              ADMIN.PROMOTIONS.MINIMUM_QUANTITY_ITEMS
             </label>
           </div>
           <div [hidden]="!_promotionEditable?.xp?.MinReq?.Type || _promotionEditable?.xp?.MinReq?.Type === 'MinPurchase'"
@@ -202,44 +237,10 @@
                     translate>ADMIN.PROMOTIONS.ITEMS</span>
             </div>
           </div>
-          <span *ngIf="_promotionEditable?.xp?.MinReq?.Type">
-            <hr />
-            <h6 class="font-weight-medium"
-                translate>ADMIN.PROMOTIONS.REQUIREMENT_SCOPE</h6>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox"
-                     class="custom-control-input"
-                     [resourceForm]="resourceForm"
-                     formControlName="ScopeToSupplier"
-                     (input)="handleUpdatePromo($event, 'xp.ScopeToSupplier')"
-                     id="ScopeToSupplier">
-              <label class="custom-control-label"
-                     for="ScopeToSupplier"
-                     translate>ADMIN.PROMOTIONS.LIMIT_REQUIREMENT</label>
-            </div>
-          </span>
-          <span *ngIf="_promotionEditable?.xp?.ScopeToSupplier && _promotionEditable?.xp?.MinReq?.Type">
-            <div ngbDropdown
-                 *ngIf="suppliers?.length && selectedSupplier"
-                 class="btn-block">
-              <button class="resource-btn btn btn-outline-dark"
-                      id="supplierSelectDropdown"
-                      ngbDropdownToggle>{{selectedSupplier.Name}}</button>
-              <div ngbDropdownMenu
-                   aria-labelledby="supplier select dropdown">
-                <button ngbDropdownItem
-                        *ngFor="let supplier of suppliers"
-                        (click)="selectSupplier(supplier.ID)">
-                  <summary-resource-display-component [resource]="supplier"
-                                                      [resourceType]="'suppliers'">
-                  </summary-resource-display-component>
-                </button>
-              </div>
-            </div>
-          </span>
           <ng-container *ngIf="_promotionEditable?.xp?.Type === 'FreeShipping'">
             <hr>
-            <h6 class="font-weight-medium">Shipping</h6>
+            <h6 class="font-weight-medium"
+                translate>ADMIN.PROMOTIONS.SHIPPING</h6>
             <div class="custom-control custom-checkbox">
               <input type="checkbox"
                      class="custom-control-input"
@@ -270,8 +271,8 @@
               translate>ADMIN.PROMOTIONS.BUYER_ELIGIBILITY</h6>
           <small>
             <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon> 
-                     <span translate>ADMIN.PROMOTIONS.ALL_PROMOTIONS_ELIGIBLE</span>
+                     [icon]="faExclamationCircle"></fa-icon>
+            <span translate>ADMIN.PROMOTIONS.ALL_PROMOTIONS_ELIGIBLE</span>
           </small>
           <div class="form-check">
             <input class="form-check-input"
@@ -436,20 +437,23 @@
                 class="badge badge-pill"
                 [ngClass]="{'badge-success': !isExpired, 'badge-light': isExpired}"
                 translate>
-                {{isExpired ? 'ADMIN.PROMOTIONS.EXPIRED' : 'ADMIN.PROMOTIONS.ACTIVE'}}
+            {{isExpired ? 'ADMIN.PROMOTIONS.EXPIRED' : 'ADMIN.PROMOTIONS.ACTIVE'}}
           </span>
         </div>
         <p *ngIf="!_promotionEditable?.Code && !_promotionEditable?.xp?.Value"
-            translate>ADMIN.PROMOTIONS.NO_INFO_ENTERED</p>
+           translate>ADMIN.PROMOTIONS.NO_INFO_ENTERED</p>
         <ng-container *ngIf="_promotionEditable?.xp?.Value || _promotionEditable?.xp?.Type === 'FreeShipping'">
           <ul>
             <li>{{getValueDisplay()}}</li>
             <li *ngIf="_promotionEditable?.StartDate && _promotionEditable?.ExpirationDate">{{getDateRangeDisplay()}}</li>
             <li *ngIf="_promotionEditable?.xp?.MaxShipCost"
-                 translate>ADMIN.PROMOTIONS.APPLIES_TO_RATES {{_promotionEditable?.xp?.MaxShipCost | currency}}</li>
+                translate>ADMIN.PROMOTIONS.APPLIES_TO_RATES {{_promotionEditable?.xp?.MaxShipCost | currency}}</li>
             <li>{{getEligibilityDisplay()}}</li>
             <li *ngIf="_promotionEditable?.RedemptionLimit || _promotionEditable?.RedemptionLimitPerUser">{{getUsageLimitDisplay()}}</li>
-            <li translate>{{_promotionEditable?.CanCombine ? 'ADMIN.PROMOTIONS.CAN_BE_COMBINED' : 'ADMIN.PROMOTIONS.CANNOT_BE_COMBINED'}}</li>
+            <li *ngIf="_promotionEditable?.CanCombine"
+                translate>ADMIN.PROMOTIONS.CAN_BE_COMBINED</li>
+            <li *ngIf="!_promotionEditable?.CanCombine"
+                translate>ADMIN.PROMOTIONS.CANNOT_BE_COMBINED</li>
           </ul>
         </ng-container>
         <ng-container *ngIf="!isCreatingNew && _promotionStatic.ID">

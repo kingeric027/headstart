@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Me, ListPage } from 'ordercloud-javascript-sdk';
-import { MarketplaceSDK, OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
+import { HeadStartSDK, OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { MarketplaceBuyerCreditCard } from '../../shopper-context';
 
 @Injectable({
@@ -22,7 +22,7 @@ export class CreditCardService {
 
   async Save(card: OrderCloudIntegrationsCreditCardToken): Promise<MarketplaceBuyerCreditCard> {
     card.CardType = this.getCardType(card.AccountNumber);
-    return await MarketplaceSDK.MeCreditCardAuthorizations.MePost(card);
+    return await HeadStartSDK.MeCreditCardAuthorizations.MePost(card);
   }
 
   async Delete(cardID: string): Promise<void> {

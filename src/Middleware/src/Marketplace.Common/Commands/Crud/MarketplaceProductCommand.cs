@@ -318,8 +318,8 @@ namespace Marketplace.Common.Commands.Crud
 			// Delete specs images and attachments associated with the requested product
 			await Task.WhenAll(
 				_oc.PriceSchedules.DeleteAsync(product.DefaultPriceScheduleID),
-				Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.InteropID, user)),
-				Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.InteropID, user)),
+				Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.ID, user)),
+				Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.ID, user)),
 				Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken)),
 				_oc.Products.DeleteAsync(id, user.AccessToken)
 			);

@@ -62,7 +62,7 @@
             <select class="form-control"
                     id="Currency"
                     formControlName="Currency"
-                    (change)="updateResourceFromEvent({target: { value: $event.value }}, 'xp.Currency')">
+                    (change)="updateResourceFromEvent($event, 'xp.Currency')">
               <option *ngFor="let currency of availableCurrencies"
                       [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</option>
             </select>
@@ -123,6 +123,31 @@
               What types of products is this supplier able to sell? Check at least one.
             </small>
           </div>
+
+          <div *ngIf="countriesServicingOptions.length"
+               [formGroup]="countriesServicingForm"
+               class="form-group col-md-12">
+            <label>Countries to Service</label>
+            <div class="d-flex justify-content-start align-items-center">
+              <div *ngFor="let country of countriesServicingOptions"
+                   class="mr-3
+                   custom-control
+                   custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       [formControlName]="country.Value"
+                       (change)="updateCountriesServicing($event, country.Value)"
+                       id="{{country.Value}}">
+                <label class="custom-control-label"
+                       for="{{country.Value}}">{{country.Text}}</label>
+              </div>
+            </div>
+            <small id="productTypesHelp"
+                   class="form-text text-muted">
+              Which countries will you provide products to?
+            </small>
+          </div>
+
         </div>
       </div>
     </div>

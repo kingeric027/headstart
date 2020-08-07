@@ -6,7 +6,7 @@ import { FormControl } from '@angular/forms';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { BuyerTempService, SuperMarketplaceBuyer } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
-import { SuperMarketplaceProduct, MarketplaceBuyer, MarketplaceSDK, MarketplacePriceSchedule } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, MarketplaceBuyer, HeadStartSDK, MarketplacePriceSchedule } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'product-pricing-component',
@@ -72,7 +72,7 @@ export class ProductPricingComponent {
   
   async setUpExchangeRate(): Promise<void> {
     if(this.supplierCurrency !== this.sellerCurrency) {
-      const usdExchangeRates = await MarketplaceSDK.ExchangeRates.Get(this.sellerCurrency.Currency as any);
+      const usdExchangeRates = await HeadStartSDK.ExchangeRates.Get(this.sellerCurrency.Currency as any);
       const supplierToSellerExchangeRate = usdExchangeRates.Items.find(r => r.Currency === this.supplierCurrency.Currency);
       this.supplierToSellerCurrencyRate = supplierToSellerExchangeRate.Rate;
     }

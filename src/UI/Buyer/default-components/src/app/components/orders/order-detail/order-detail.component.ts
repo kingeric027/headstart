@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { ShopperContextService, OrderReorderResponse, OrderViewContext, ShippingStatus } from 'marketplace';
-import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
@@ -19,6 +19,7 @@ export class OCMOrderDetails implements OnInit {
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
   showRequestReturn = false;
+  showRequestCancel = false;
   isQuoteOrder = isQuoteOrder;
   constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
@@ -49,13 +50,27 @@ export class OCMOrderDetails implements OnInit {
     let total = 0;
     this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
       if (li.xp?.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
-      total += li.Quantity;
+      total += li.QuantityShipped;
     });
     return (
       qtyReturned !== total &&
       this.order.Status !== 'Unsubmitted' &&
       (this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped ||
         this.order.xp.ShippingStatus === ShippingStatus.Shipped)
+    );
+  }
+
+  canRequestCancel(): boolean {
+    let qtyCanceled = 0;
+    let total = 0;
+    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
+      if ((li.xp as any)?.LineItemCancelInfo) qtyCanceled += (li.xp as any)?.LineItemCancelInfo?.QuantityToCancel;
+      total += (li.Quantity - li.QuantityShipped);
+    });
+    return (
+      qtyCanceled < total &&
+      this.order.Status !== 'Unsubmitted' &&
+      this.order.xp.ShippingStatus !== ShippingStatus.Shipped
     );
   }
 
@@ -66,6 +81,12 @@ export class OCMOrderDetails implements OnInit {
 
   toggleRequestReturn(): void {
     this.showRequestReturn = !this.showRequestReturn;
+    if(this.showRequestReturn) this.showRequestCancel = false;
+  }
+
+  toggleRequestCancel(): void {
+    this.showRequestCancel = !this.showRequestCancel;
+    if(this.showRequestCancel) this.showRequestReturn = false;
   }
 
   toShipments(): void {
@@ -125,5 +146,6 @@ export class OCMOrderDetails implements OnInit {
   toggleShowRequestForm(showRequestReturn: boolean): void {
     this.ngOnInit();
     this.showRequestReturn = showRequestReturn;
+    this.showRequestCancel = showRequestReturn;
   }
 }

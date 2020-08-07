@@ -6,7 +6,7 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { ProductFilters, MarketplaceMeProduct } from '../../shopper-context';
 import { Me, Product, ListPageWithFacets, BuyerProduct } from 'ordercloud-javascript-sdk';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
