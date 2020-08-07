@@ -19,28 +19,22 @@ namespace ordercloud.integrations.cms
 		}
 		[Required]
 		public string ResourceID { get; set; }
+		[RequireBasedOnType]
 		public string ParentResourceID { get; set; } = null;
 		[Required]
 		public ResourceType? ResourceType { get; set; }
 	}
 
-	public enum ResourceType
+	public class RequireBasedOnTypeAttribute : ValidationAttribute
 	{
-		Products, 
-		Categories, 
-		Catalogs, 
-		Promotions, 
-		Suppliers, 
-		Buyers, 
-		ProductFacets,
-		Users, 
-		SupplierUsers, 
-		AdminUsers, 
-		Addresses, 
-		SupplierAddresses, 
-		AdminAddresses,
-		UserGroups,
-		SupplierUserGroups,
-		AdminUserGroups
+		protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+		{
+			var instance = validationContext.ObjectInstance;
+			var type = (ResourceType) instance.GetType().GetProperty("ResourceType").GetValue(instance);
+			var hasParentType = type.GetType().HasAttribute<ParentTypeAttribute>();
+			if (hasParentType && value == null) return new ValidationResult("ParentResourceID is required.");
+			return ValidationResult.Success;
+		}
+
 	}
 }

@@ -17,6 +17,7 @@ namespace ordercloud.integrations.cms
 		public string ResourceID { get; set; }
 		[Required]
 		public ResourceType? ResourceType { get; set; } // nullable so the required validation works
+		[RequireBasedOnType]
 		public string ParentResourceID { get; set; } = null;		
 		[Required]
 		public string DocumentID { get; set; }  // NOTE - Cannot filter on DocumentID
