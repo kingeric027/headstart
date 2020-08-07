@@ -63,7 +63,7 @@ namespace Marketplace.Orchestration
                 
                 await context.CallActivityAsync("UpdateCache", wi);
 
-                log.LogInformation($"{wi.RecordId}: {wi.Action.ToString()} successfully");
+                log.LogInformation($"{wi.RecordId}: {wi.Action} successfully");
                 await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi) { Level = LogLevel.Success });
             }
             catch (OrchestrationException oex)
