@@ -19,22 +19,24 @@ namespace ordercloud.integrations.cms
 		}
 		[Required]
 		public string ResourceID { get; set; }
-		[RequireBasedOnType]
-		public string ParentResourceID { get; set; } = null;
 		[Required]
 		public ResourceType? ResourceType { get; set; }
+		[RequireBasedOnResourceType]
+		public string ParentResourceID { get; set; } = null;
+
 	}
 
-	public class RequireBasedOnTypeAttribute : ValidationAttribute
+	public class RequireBasedOnResourceTypeAttribute : ValidationAttribute
 	{
 		protected override ValidationResult IsValid(object value, ValidationContext validationContext)
 		{
 			var instance = validationContext.ObjectInstance;
-			var type = (ResourceType) instance.GetType().GetProperty("ResourceType").GetValue(instance);
-			var hasParentType = type.GetType().HasAttribute<ParentTypeAttribute>();
-			if (hasParentType && value == null) return new ValidationResult("ParentResourceID is required.");
+			var resourceType = instance.GetType().GetProperty("ResourceType").GetValue(instance);
+			if (resourceType == null) return ValidationResult.Success;
+			var field = typeof(ResourceType).GetField(resourceType.ToString());
+			var parentType = field.GetAttribute<ParentTypeAttribute>();
+			if (parentType != null && value == null) return new ValidationResult($"ParentResourceID is required. For resource {resourceType.ToString()} please supply a {parentType.ParentType} ID");
 			return ValidationResult.Success;
 		}
-
 	}
 }

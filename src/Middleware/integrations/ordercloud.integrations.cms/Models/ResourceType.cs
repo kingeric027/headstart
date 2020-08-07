@@ -6,8 +6,8 @@ namespace ordercloud.integrations.cms
 {
 	public enum ResourceType
 	{
-		Categories,
-		[ParentType(Categories)] Catalogs,
+		Catalogs,
+		[ParentType(Catalogs)] Categories,
 		Products,
 		PriceSchedules,
 		ProductFacets,
@@ -34,9 +34,9 @@ namespace ordercloud.integrations.cms
 
 		// Param "Direction" breaks these for now.
 		//Orders,
-		//LineItems,
-		//Payments,
-		//Shipments,
+		// [ParentType(Suppliers)] LineItems,
+		// [ParentType(Suppliers)] Payments,
+		// [ParentType(Suppliers)]Shipments,
 		Promotions,
 
 		AdminUsers,
