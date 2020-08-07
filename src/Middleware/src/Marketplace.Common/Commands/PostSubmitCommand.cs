@@ -184,7 +184,7 @@ namespace Marketplace.Common.Commands
                 return new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
-                    UnhandledErrorBody = JsonConvert.SerializeObject(ex),
+                    UnhandledErrorBody = "Failure handling failure marking process"
                 };
             }
         }
