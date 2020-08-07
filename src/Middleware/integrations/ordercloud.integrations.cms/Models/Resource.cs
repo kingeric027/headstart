@@ -34,7 +34,7 @@ namespace ordercloud.integrations.cms
 			var resourceType = instance.GetType().GetProperty("ResourceType").GetValue(instance);
 			if (resourceType == null) return ValidationResult.Success;
 			var field = typeof(ResourceType).GetField(resourceType.ToString());
-			var parentType = field.GetAttribute<ParentTypeAttribute>();
+			var parentType = field.GetAttribute<ParentResourceAttribute>();
 			if (parentType != null && value == null) return new ValidationResult($"ParentResourceID is required. For resource {resourceType.ToString()} please supply a {parentType.ParentType} ID");
 			return ValidationResult.Success;
 		}

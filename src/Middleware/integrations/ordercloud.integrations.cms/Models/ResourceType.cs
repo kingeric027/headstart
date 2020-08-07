@@ -7,7 +7,7 @@ namespace ordercloud.integrations.cms
 	public enum ResourceType
 	{
 		Catalogs,
-		[ParentType(Catalogs)] Categories,
+		[ParentResource(Catalogs)] Categories,
 		Products,
 		PriceSchedules,
 		ProductFacets,
@@ -19,24 +19,24 @@ namespace ordercloud.integrations.cms
 		ImpersonationConfigs,
 
 		Buyers,
-		[ParentType(Buyers)] Users,
-		[ParentType(Buyers)] UserGroups,
-		[ParentType(Buyers)] Addresses,
-		[ParentType(Buyers)] CostCenters,
-		[ParentType(Buyers)] CreditCards,
-		[ParentType(Buyers)] SpendingAccounts,
-		[ParentType(Buyers)] ApprovalRules,
+		[ParentResource(Buyers)] Users,
+		[ParentResource(Buyers)] UserGroups,
+		[ParentResource(Buyers)] Addresses,
+		[ParentResource(Buyers)] CostCenters,
+		[ParentResource(Buyers)] CreditCards,
+		[ParentResource(Buyers)] SpendingAccounts,
+		[ParentResource(Buyers)] ApprovalRules,
 
 		Suppliers,
-		[ParentType(Suppliers)] SupplierUsers,
-		[ParentType(Suppliers)] SupplierUserGroups,
-		[ParentType(Suppliers)] SupplierAddresses,
+		[ParentResource(Suppliers)] SupplierUsers,
+		[ParentResource(Suppliers)] SupplierUserGroups,
+		[ParentResource(Suppliers)] SupplierAddresses,
 
 		// Param "Direction" breaks these for now.
 		//Orders,
-		// [ParentType(Suppliers)] LineItems,
-		// [ParentType(Suppliers)] Payments,
-		// [ParentType(Suppliers)]Shipments,
+		// [ParentResource(Orders)] LineItems,
+		// [ParentResource(Orders)] Payments,
+		// [ParentResource(Orders)]Shipments,
 		Promotions,
 
 		AdminUsers,
@@ -51,10 +51,10 @@ namespace ordercloud.integrations.cms
 	}
 
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-	public class ParentTypeAttribute: Attribute
+	public class ParentResourceAttribute: Attribute
 	{
 		public ResourceType ParentType { get; set; }
-		public ParentTypeAttribute(ResourceType type)
+		public ParentResourceAttribute(ResourceType type)
 		{
 			ParentType = type;
 		}
