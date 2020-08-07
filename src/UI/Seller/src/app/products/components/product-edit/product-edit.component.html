@@ -81,7 +81,8 @@
                            placeholder="{{'ADMIN.PRODUCT_EDIT.ENTER_NAME' | translate}}">
                   </div>
                 </div>
-                <div class="form-row">
+                <div class="form-row"
+                     [hidden]="isCreatingNew">
                   <div class="form-group col-md-6">
                     <label for="ProductType"
                            translate>ADMIN.PRODUCT_EDIT.PRODUCT_TYPE</label>
@@ -210,6 +211,7 @@
                                                    [productForm]="productForm"
                                                    [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
                                                    [taxCodes]="taxCodes"
+                                                   [isRequired]="isRequired('TaxCodeCategory')"
                                                    (handleTaxCodeCategorySelection)="handleTaxCodeCategorySelection($event)"
                                                    (handleTaxCodeSelection)="handleUpdateProduct($event, 'Product.xp.Tax')"
                                                    (handleTaxCodesSearched)="searchTaxCodes($event)"
@@ -218,6 +220,7 @@
                 <div class="form-group">
                   <label for="ShipFromAddressID"
                          translate>ADMIN.PRODUCT_EDIT.WHICH_LOCATION_SHIP</label>
+                  <span *ngIf="!isRequired('ShipFromAddressID')">- Optional</span>
                   <select [attr.disabled]="readonly ? true : null"
                           type="dropdown"
                           class="form-control"
@@ -236,6 +239,7 @@
                   <div class="form-group col-md-6">
                     <label for="ShipHeight"
                            translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</label>
+                    <span *ngIf="!isRequired('ShipHeight')">- Optional</span>
                     <input [attr.disabled]="readonly ? true : null"
                            type="number"
                            class="form-control"
@@ -249,6 +253,7 @@
                   <div class="form-group col-md-6">
                     <label for="ShipWidth"
                            translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</label>
+                    <span *ngIf="!isRequired('ShipWidth')">- Optional</span>
                     <input [attr.disabled]="readonly ? true : null"
                            type="number"
                            class="form-control"
@@ -264,6 +269,7 @@
                   <div class="form-group col-md-6">
                     <label for="ShipLength"
                            translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</label>
+                    <span *ngIf="!isRequired('ShipLength')">- Optional</span>
                     <input [attr.disabled]="readonly ? true : null"
                            type="number"
                            class="form-control"
@@ -277,6 +283,7 @@
                   <div class="form-group col-md-6">
                     <label for="ShipWeight"
                            translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</label>
+                    <span *ngIf="!isRequired('ShipWeight')">- Optional</span>
                     <input [attr.disabled]="readonly ? true : null"
                            type="number"
                            class="form-control"
@@ -398,6 +405,7 @@
                                      [supplierCurrency]="supplierCurrency"
                                      [sellerCurrency]="sellerCurrency"
                                      [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+                                     [isRequired]="isRequired('Price')"
                                      (updateProduct)="updateProductResource($event)">
           </product-pricing-component>
         </ng-template>

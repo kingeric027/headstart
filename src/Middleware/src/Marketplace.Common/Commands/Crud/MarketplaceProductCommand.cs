@@ -193,9 +193,11 @@ namespace Marketplace.Common.Commands.Crud
 			// Patch Specs with requested DefaultOptionID
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Create Price Schedule
+			var _priceSchedule = new PriceSchedule();
 			superProduct.PriceSchedule.ID = superProduct.Product.ID;
-			var _priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
-			// Create Product
+			// If the superProduct has a price schedule, create it
+			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+        			// Create Product
 			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });

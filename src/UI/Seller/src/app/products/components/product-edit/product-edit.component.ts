@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { get as _get } from 'lodash';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
@@ -18,7 +18,7 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
@@ -30,13 +30,14 @@ import { SupportedRates } from '@app-seller/shared/models/supported-rates.interf
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
   styleUrls: ['./product-edit.component.scss'],
 })
-export class ProductEditComponent implements OnInit {
+export class ProductEditComponent implements OnInit, OnDestroy {
   @Input()
   productForm: FormGroup;
   @Input()
@@ -44,7 +45,7 @@ export class ProductEditComponent implements OnInit {
     if (product.ID) {
       this.handleSelectedProductChange(product);
     } else {
-      this.setTaxCodes(this.productService.emptyResource.Product.xp.Tax.Category)
+      // this.setTaxCodes(this.productService.emptyResource.Product.xp.Tax.Category)
       this.createProductForm(this.productService.emptyResource);
       this._superMarketplaceProductEditable = this.productService.emptyResource;
       this._superMarketplaceProductStatic = this.productService.emptyResource;
@@ -61,6 +62,7 @@ export class ProductEditComponent implements OnInit {
   isCreatingNew: boolean;
   @Input()
   dataIsSaving = false;
+  resourceType: string;
   userContext = {};
   hasVariations = false;
   images: Asset[] = [];
@@ -93,6 +95,7 @@ export class ProductEditComponent implements OnInit {
   newProductPriceBreaks = [];
   availableProductTypes = [];
   active: number;
+  alive = true;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -120,8 +123,18 @@ export class ProductEditComponent implements OnInit {
     this.setProductEditTab();
   }
 
+  setResourceType(): void {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    this.resourceType = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
+    this.productType = this.resourceType;
+    this.productForm.controls['ProductType'].setValue(this.resourceType);
+    this.handleUpdateProduct({target: {value: this.productForm.controls['ProductType'].value}}, 'Product.xp.ProductType');
+  }
+
   setProductEditTab(): void {
-    const productDetailSection = this.router.url.split('/')[3];
+    const productDetailSection = this.isCreatingNew ? 'undefined' : this.router.url.split('/')[3];
+    console.log('section', productDetailSection)
     this.active = setProductEditTab(productDetailSection);
   }
 
@@ -159,12 +172,12 @@ export class ProductEditComponent implements OnInit {
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
-    this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.staticContent = this._superMarketplaceProductEditable.Attachments;
     this.createProductForm(this._superMarketplaceProductEditable);
     this.images = this._superMarketplaceProductEditable.Images;
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.isCreatingNew = this.productService.checkIfCreatingNew();
+    this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.checkForChanges();
   }
 
@@ -192,14 +205,16 @@ export class ProductEditComponent implements OnInit {
         QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
         InventoryEnabled: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.Enabled')),
         OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
-        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
+        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', 'P0000000'), Validators.required),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
       }, { validators: ValidateMinMax }
       );
+      console.log('controls pre-manip', this.productForm.controls)
       this.setInventoryValidator();
       this.setNonRequiredFields();
+      !superMarketplaceProduct.Product?.ID && this.setResourceType();
     }
   }
 
@@ -217,23 +232,26 @@ export class ProductEditComponent implements OnInit {
   }
 
   setNonRequiredFields(): void {
+    console.log('setting non req fields')
     const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipFromAddressID', 'Price'];
-    const optionalControls = optionalFieldsArray.map(item => (this.productForm.get(item)))
+    const optionalControls = optionalFieldsArray.map(item => this.productForm.get(item))
     this.productForm.get('ProductType').valueChanges
-    .subscribe(productType => {
-      console.log(productType)
+    .pipe(takeWhile(() => this.alive)).subscribe(productType => {
+      console.log('>product type', productType)
       if(productType === 'Quote') {
+        console.log('doing quote product things')
         optionalControls.forEach(control => {
           control.setValidators(null);
           control.updateValueAndValidity();
         })
       } else {
         optionalControls.forEach(control => {
-          control.setValidators([Validators.required]);
+          control.setValidators(Validators.required);
           control.updateValueAndValidity();
         })
       }
     })
+    console.log(this.productForm.controls)
     // const taxCodeCategory = this.productForm.get('TaxCodeCategory');
     // const taxCode = this.productForm.get('TaxCode');
     // const shipLength = this.productForm.get('ShipLength');
@@ -278,6 +296,8 @@ export class ProductEditComponent implements OnInit {
   async createNewProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
+      console.log('form status', this.productForm.valid)
+      console.log('form controls again bb', this.productForm.controls)
       const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
       if (this.staticContentFiles.length > 0) await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
@@ -285,6 +305,8 @@ export class ProductEditComponent implements OnInit {
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
       this.dataIsSaving = false;
     } catch (ex) {
+      console.log('ya know we are just failing today')
+      console.log('ex', ex)
       this.dataIsSaving = false;
       throw ex;
     }
@@ -312,6 +334,7 @@ export class ProductEditComponent implements OnInit {
   updateProductResource(productUpdate: any): void {
     const resourceToUpdate = this._superMarketplaceProductEditable || this.productService.emptyResource;
     this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(productUpdate, resourceToUpdate);
+    console.log(this._superMarketplaceProductEditable)
     this.checkForChanges();
   }
 
@@ -499,10 +522,12 @@ export class ProductEditComponent implements OnInit {
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
     const supplier = await this.currentUserService.getMySupplier();
+    superMarketplaceProduct.Product.xp.ProductType = (<ProductXp>["ProductType"])[this.productType];
     superMarketplaceProduct.Product.xp.Status = 'Draft';
     superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
+    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null) superMarketplaceProduct.PriceSchedule = null;
     return await HeadStartSDK.Products.Post(superMarketplaceProduct);
   }
 
@@ -554,5 +579,9 @@ export class ProductEditComponent implements OnInit {
 
   getProductPreviewImage(): string | SafeUrl {
     return this.imageFiles[0]?.URL || getProductMainImageUrlOrPlaceholder(this._superMarketplaceProductEditable?.Product);
+  }
+  
+  ngOnDestroy(): void {
+    this.alive = false;
   }
 }
