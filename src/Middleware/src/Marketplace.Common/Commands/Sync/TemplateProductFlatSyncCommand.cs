@@ -20,15 +20,19 @@ namespace Marketplace.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly AssetQuery _assets;
+        private readonly IOrderCloudIntegrationsFunctionToken _token;
+
         public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, AssetQuery assets) : base(settings, oc, assets, log)
         {
             _oc = oc;
             _assets = assets;
+            _token = new OrderCloudIntegrationsFunctionToken(settings);
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
             var obj = wi.Current.ToObject<TemplateProductFlat>();
+            var user = await _token.Authorize(wi.Token, new[] {ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin});
             try
             {
                 obj.ID = wi.RecordId;
@@ -50,6 +54,7 @@ namespace Marketplace.Common.Commands
                     Active = true,
                     AutoForward = false,
                     DefaultSupplierID = wi.ResourceId,
+                    DefaultPriceScheduleID = priceSchedule.ID,
                     ID = obj.ID,
                     Name = obj.Name,
                     Description = obj.Description,
@@ -97,12 +102,7 @@ namespace Marketplace.Common.Commands
                 finally
                 {
                     product = await _oc.Products.CreateAsync<MarketplaceProduct>(product, wi.Token);
-                    image = await _assets.Create(asset, await new VerifiedUserContext().Define(wi.Token));
-                    await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
-                    {
-                        ProductID = product.ID,
-                        PriceScheduleID = priceSchedule.ID
-                    }, wi.Token);
+                    image = await _assets.Create(asset, user);
                 }
                 
                 return JObject.FromObject(Map(product, priceSchedule, image));
@@ -145,6 +145,7 @@ namespace Marketplace.Common.Commands
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
             var obj = wi.Current.ToObject<TemplateProductFlat>(OrchestrationSerializer.Serializer);
+            var user = await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -165,6 +166,7 @@ namespace Marketplace.Common.Commands
                     Active = true,
                     AutoForward = false,
                     DefaultSupplierID = wi.ResourceId,
+                    DefaultPriceScheduleID = priceSchedule.ID,
                     ID = obj.ID,
                     Name = obj.Name,
                     Description = obj.Description,
@@ -190,7 +192,7 @@ namespace Marketplace.Common.Commands
                         }
                     }
                 }, wi.Token);
-                var image = await _assets.Update(wi.RecordId, new Asset()
+                var image = await _assets.Save(wi.RecordId, new Asset()
                 {
                     Type = AssetType.Image,
                     Active = true,
@@ -198,12 +200,7 @@ namespace Marketplace.Common.Commands
                     FileName = obj.FileName,
                     Title = obj.ImageTitle,
                     Tags = obj.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
-                }, await new VerifiedUserContext().Define(wi.Token));
-                await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
-                {
-                    ProductID = product.ID,
-                    PriceScheduleID = priceSchedule.ID
-                }, wi.Token);
+                }, user);
                 return JObject.FromObject(Map(product, priceSchedule, image));
             }
             catch (OrderCloudException ex)
@@ -283,11 +280,12 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> GetAsync(WorkItem wi)
         {
+            var user = await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
             try
             {
                 var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
-                var image = await _assets.Get(wi.RecordId, await new VerifiedUserContext().Define(wi.Token));
+                var image = await _assets.Get(wi.RecordId, user);
                 return JObject.FromObject(Map(product, priceSchedule, image));
             }
             catch (OrderCloudException ex)

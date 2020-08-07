@@ -27,15 +27,16 @@ namespace Marketplace.Orchestration
                 .InjectAzureFunctionSettings<AppSettings>(connectionString)
                 .BindSettings<AppSettings>();
 
+            var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName,
+                settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
             builder.Services
-                .InjectCosmosStore<AssetQuery, Asset>(new CosmosConfig(settings.CosmosSettings.DatabaseName,
-                    settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey))
-                .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
-                    settings.CosmosSettings.DatabaseName,
-                    settings.CosmosSettings.EndpointUri,
-                    settings.CosmosSettings.PrimaryKey))
+                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
+                .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
                 .Inject<IFlurlClient>()
+                .Inject<IAssetQuery>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl

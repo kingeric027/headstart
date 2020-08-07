@@ -17,20 +17,6 @@ namespace ordercloud.integrations.library
 
         public VerifiedUserContext() { }
 
-        public async Task<VerifiedUserContext> Define(string token)
-        {
-            var jwt = new JwtSecurityToken(token);
-
-            var cid = new ClaimsIdentity("OrderCloudIntegrations");
-            cid.AddClaim(new Claim("accesstoken", token));
-            cid.AddClaim(new Claim("clientid", jwt.GetClientID()));
-            cid.AddClaim(new Claim("usrtype", jwt.GetUserType()));
-
-            Principal = new ClaimsPrincipal(cid);
-            _token = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            return await Task.FromResult(this);
-        }
-
         public async Task<VerifiedUserContext> Define(OrderCloudClientConfig config)
         {
             var _oc = new OrderCloudClient(config);
@@ -76,7 +62,7 @@ namespace ordercloud.integrations.library
         }
         public string Username
         {
-            get { return Principal.Claims.First(c => c.Type == "username").Value; }
+            get { return Principal.Claims.FirstOrDefault(c => c.Type == "username")?.Value; }
         }
         public string ClientID
         {
@@ -84,20 +70,20 @@ namespace ordercloud.integrations.library
         }
         public string Email
         {
-            get { return Principal.Claims.First(c => c.Type == "email").Value; }
+            get { return Principal.Claims.FirstOrDefault(c => c.Type == "email")?.Value; }
         }
         public string SupplierID
         {
-            get { return Principal.Claims.First(c => c.Type == "supplier").Value; }
+            get { return Principal.Claims.FirstOrDefault(c => c.Type == "supplier")?.Value; }
         }
         public string BuyerID
         {
-            get { return Principal.Claims.First(c => c.Type == "buyer").Value; }
+            get { return Principal.Claims.FirstOrDefault(c => c.Type == "buyer")?.Value; }
         }
 
         public string SellerID
         {
-            get { return Principal.Claims.First(c => c.Type == "seller").Value; }
+            get { return Principal.Claims.FirstOrDefault(c => c.Type == "seller")?.Value; }
         }
 
         public string AccessToken
