@@ -51,7 +51,7 @@ namespace Marketplace.Common.Commands.Crud
         }
         public async Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user)
         {
-            var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
+            var _product = await _oc.Products.GetAsync<Product>(id, user.AccessToken);
             var _images = GetProductImages(id, user);
             var _attachments = GetProductAttachments(id, user);
             var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
@@ -90,7 +90,7 @@ namespace Marketplace.Common.Commands.Crud
         }
         public async Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user)
         {
-            var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(kitProduct.Product, user.AccessToken);
+            var _product = await _oc.Products.CreateAsync<Product>(kitProduct.Product, user.AccessToken);
             var kitProductDoc = new KitProductDocument();
             kitProductDoc.ID = _product.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;

@@ -1,4 +1,5 @@
-<form [formGroup]="kitProductForm">
+<form *ngIf="kitProductForm"
+      [formGroup]="kitProductForm">
   <div class="container-fluid">
     <div class="row pt-3">
       <div class="col-md-8 form-group">
@@ -9,7 +10,6 @@
             <label class="d-block switch mb-0">
               <input class="form-check-input"
                      type="checkbox"
-                     formControlName="Active"
                      (click)="handleUpdateProduct($event, 'Product.Active', 'boolean')"
                      [checked]="kitProductEditable?.Product.Active">
               <span class="slider round"></span>
@@ -85,12 +85,182 @@
     </div>
   </div>
   <!-- /Product Details -->
+  <!-- Images & Documents -->
+  <div class="container-fluid">
+    <div class="row pt-3">
+      <div class="col-md-5">
+        <h5>Product Images</h5>
+        <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--dropped image preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div *ngFor="let image of images; let i = index"
+               class="product-img-wrapper mr-2">
+            <div class="product-img">
+              <img [id]="i"
+                   [src]="image.Url"
+                   width="auto"
+                   height="100px">
+              <span *ngIf="i === 0"
+                    class="badge badge-primary primary-badge position-absolute mt-1 ml-1">
+                Primary
+              </span>
+            </div>
+            <div class="product-img-delete text-center">
+              <button title="Delete photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="delete"
+                      type="button"
+                      (click)="open(content)">
+
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <ng-template #content
+                           let-modal
+                           class="confirm-modal">
+                <confirm-modal modalTitle="Delete Image?"
+                               description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
+                  <button type="button"
+                          class="btn btn-link text-dark"
+                          (click)="modal.dismiss()">Cancel</button>
+                  <button type="button"
+                          class="btn brand-button--danger"
+                          (click)="removeFile(image)"
+                          (click)="modal.dismiss()">Yes, Delete</button>
+                </confirm-modal>
+              </ng-template>
+            </div>
+          </div>
+          <div *ngFor="let image of imageFiles; let i = index"
+               class="product-img-wrapper mr-2">
+            <img class="product-img"
+                 [id]="i"
+                 [src]="image.URL"
+                 width="auto"
+                 height="100px">
+            <div class="product-img-delete text-center">
+              <button title="Un-stage photo"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstageFile"
+                      (click)="unstageFile(i, 'image')">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <label class="rmpm dropzone"
+                 for="imageUpload"
+                 appDrag
+                 (files)="stageImages($event)">
+          </label>
+          <input class="d-none"
+                 id="imageUpload"
+                 type="file"
+                 (change)="manualFileUpload($event, 'image')"
+                 multiple>
+        </div>
+      </div>
+    </div>
+    <div class="row pt-3 mt-5 border-top">
+      <div class="col-md-5">
+        <h5>Product Documents</h5>
+        <p class="font-italic">Name and upload your product documents to display and dowload on the buyer site.</p>
+      </div>
+      <div class="col-md-7">
+        <!--droped doc preview-->
+        <div class="d-flex justify-content-start align-items-center flex-wrap">
+          <div class="input-group mb-3">
+            <input type="text"
+                   required
+                   class="form-control"
+                   value="{{documentName}}"
+                   placeholder="Document Name"
+                   aria-label="Document Name"
+                   (keyup)="getDocumentName($event)"
+                   aria-describedby="document name">
+            <div class="input-group-append">
+              <label *ngIf="documentName?.length"
+                     class="btn btn-outline-primary"
+                     for="documentUpload"
+                     (files)="stageDocuments($event)">
+                choose file
+                <input id="documentUpload"
+                       class="d-none"
+                       type="file"
+                       (change)="manualFileUpload($event, 'staticContent')">
+              </label>
+            </div>
+          </div>
+          <div *ngFor="let file of staticContentFiles; let i = index"
+               class="product-img-wrapper mr-2">
+            <a class="text-link">{{file.Filename}}</a>
+            <div class="float-right float-middle">
+              <button title="Un-stage file"
+                      class="btn btn-light btn-group-item"
+                      data-ui="action-btn"
+                      data-action="unstageFile"
+                      (click)="unstageFile(i, 'staticContent')">
+                <fa-icon [icon]="faTimes"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <table class="table table-sm bg-light"
+                 *ngIf="staticContent?.length > 0">
+            <thead>
+              <tr>
+                <th>Documents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of staticContent">
+                <td>{{file.FileName}}</td>
+                <td><a class="btn-link"
+                     href="{{file.Url}}"
+                     target="_blank"
+                     download="file.FileName">download</a></td>
+                <td>
+                  <button title="Delete file"
+                          class="btn btn-light btn-group-item"
+                          data-ui="action-btn"
+                          data-action="delete"
+                          type="button"
+                          (click)="open(content)">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                  </button></td>
+                <ng-template #content
+                             let-modal
+                             class="confirm-modal">
+                  <confirm-modal modalTitle="Delete Document?"
+                                 description="Deleting this document cannot be reversed.">
+                    <button type="button"
+                            class="btn btn-link text-dark"
+                            (click)="modal.dismiss()">Cancel</button>
+                    <button type="button"
+                            class="btn brand-button--danger"
+                            (click)="removeFile(file)"
+                            (click)="modal.dismiss()">Yes, Delete</button>
+                  </confirm-modal>
+                </ng-template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /Images & Documents -->
   <!-- Products in Kit -->
-  <div>
-    <p class="font-weight-bold">Products Included in Kit</p>
-    <button class="btn btn-outline-primary"
-            [disabled]="isAddingNewProduct"
-            (click)="addProductAssignment()">Add Product to Kit</button>
+  <div class="pt-3 mt-5 border-top">
+    <span class="font-weight-bold">Products Included in Kit
+      <button class="btn btn-outline-primary float-right"
+              [disabled]="isAddingNewProduct"
+              (click)="addProductAssignment(true)">Add Product to Kit</button>
+      <button *ngIf="isAddingNewProduct"
+              class="btn btn-link text-danger float-right"
+              (click)="addProductAssignment(false)">Cancel</button>
+    </span>
     <div *ngIf="isAddingNewProduct && productList?.length"
          class="input-group">
       <select class="custom-select"
@@ -104,7 +274,7 @@
       </div>
     </div>
     <table *ngIf="productsIncluded?.length > 0"
-           class="table table-striped table-bordered table-hover bg-light">
+           class="table table-striped table-bordered table-hover bg-light mt-2">
       <thead>
         <tr>
           <th>ID</th>
@@ -112,6 +282,7 @@
           <th>Required</th>
           <th>Min Qty</th>
           <th>Max Qty</th>
+          <th></th>
         </tr>
       </thead>
       <tbody *ngFor="let product of productsIncluded;">
@@ -159,7 +330,7 @@
   <button *ngIf="areChanges"
           class="btn btn-primary"
           type="submit"
-          [disabled]="dataIsSaving"
+          [disabled]="dataIsSaving || productsIncluded?.length < 1"
           (click)="handleSave()">{{getSaveBtnText()}}</button>
   <button class="btn brand-button ml-3"
           (click)="handleDiscardChanges()"

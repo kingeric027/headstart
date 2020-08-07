@@ -1,5 +1,5 @@
 import { Product, OcTokenService } from '@ordercloud/angular-sdk';
-import { AssetForDelivery, ListPage } from '@ordercloud/headstart-sdk';
+import { AssetForDelivery, ListPage, Asset } from '@ordercloud/headstart-sdk';
 import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
@@ -7,8 +7,8 @@ import { Router } from '@angular/router';
 
 export interface MarketplaceKitProduct {
     Product: Product;
-    Images: AssetForDelivery;
-    Attachments: AssetForDelivery;
+    Images: Asset[];
+    Attachments: Asset[];
     ProductAssignments: KitProduct;
 }
 export interface KitProductDocument extends Document {
