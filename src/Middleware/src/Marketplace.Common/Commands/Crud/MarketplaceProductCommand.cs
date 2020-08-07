@@ -193,12 +193,15 @@ namespace Marketplace.Common.Commands.Crud
 			// Patch Specs with requested DefaultOptionID
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Create Price Schedule
-			var _priceSchedule = new PriceSchedule();
-			superProduct.PriceSchedule.ID = superProduct.Product.ID;
-			// If the superProduct has a price schedule, create it
-			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
-        			// Create Product
-			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
+			PriceSchedule _priceSchedule = null;
+			// If the superProduct has a price schedule, create
+			if (superProduct.PriceSchedule != null)
+            {
+				superProduct.PriceSchedule.ID = superProduct.Product.ID;
+				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+				superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
+            }
+        	// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
 			var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
@@ -288,8 +291,12 @@ namespace Marketplace.Common.Commands.Crud
 					return _oc.Products.PatchVariantAsync(id, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
 				});
 			};
-			// Update the Product PriceSchedule
-			var _updatedPriceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
+			// If applicable, update OR create the Product PriceSchedule
+			PriceSchedule _priceSchedule = null;
+			if (superProduct.PriceSchedule != null)
+            {
+				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
+            }
 			// Update the Product itself
 			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// List Variants
@@ -303,7 +310,7 @@ namespace Marketplace.Common.Commands.Crud
 			return new SuperMarketplaceProduct
 			{
 				Product = _updatedProduct,
-				PriceSchedule = _updatedPriceSchedule,
+				PriceSchedule = _priceSchedule,
 				Specs = _specs.Items,
 				Variants = _variants.Items,
 				Images = _images,

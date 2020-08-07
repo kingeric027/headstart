@@ -62,7 +62,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   isCreatingNew: boolean;
   @Input()
   dataIsSaving = false;
-  resourceType: string;
   userContext = {};
   hasVariations = false;
   images: Asset[] = [];
@@ -79,7 +78,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   areChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
-  productType: string;
+  productType: ProductXp["ProductType"];
   productVariations: any;
   variantsValid = true;
   editSpecs = false;
@@ -126,15 +125,16 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   setResourceType(): void {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
-    this.resourceType = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
-    this.productType = this.resourceType;
-    this.productForm.controls['ProductType'].setValue(this.resourceType);
+    const productTypeFromUrl = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
+    if (this.productService.checkIfCreatingNew()) {
+      this.productType = productTypeFromUrl as ProductXp["ProductType"];
+    }
+    this.productForm.controls['ProductType'].setValue(this.productType);
     this.handleUpdateProduct({target: {value: this.productForm.controls['ProductType'].value}}, 'Product.xp.ProductType');
   }
 
   setProductEditTab(): void {
     const productDetailSection = this.isCreatingNew ? 'undefined' : this.router.url.split('/')[3];
-    console.log('section', productDetailSection)
     this.active = setProductEditTab(productDetailSection);
   }
 
@@ -154,8 +154,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  async setTaxCodes(taxCategory: string): Promise<any> {
-    this.taxCodes = await this.listTaxCodes(taxCategory, '', 1, 100);
+  async setTaxCodes(taxCategory: string, searchTerm: string): Promise<any> {
+    this.taxCodes = await this.listTaxCodes(taxCategory, searchTerm, 1, 100);
   }
 
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
@@ -168,16 +168,16 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
-      await this.setTaxCodes(this._superMarketplaceProductEditable.Product.xp.Tax.Category)
+      await this.setTaxCodes(this._superMarketplaceProductEditable.Product.xp.Tax.Category, '')
     } else {
       this.taxCodes = { Meta: {}, Items: [] };
     }
     this.staticContent = this._superMarketplaceProductEditable.Attachments;
-    this.createProductForm(this._superMarketplaceProductEditable);
     this.images = this._superMarketplaceProductEditable.Images;
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
-    this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
+    this.createProductForm(this._superMarketplaceProductEditable);
+    this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
   }
 
@@ -196,9 +196,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
         ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
         Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null), Validators.required),
-        MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MinQuantity, Validators.min(1)),
-        MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.MaxQuantity, Validators.min(1)),
-        UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule.UseCumulativeQuantity),
+        MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule?.MinQuantity, Validators.min(1)),
+        MaxQuantity: new FormControl(superMarketplaceProduct.PriceSchedule?.MaxQuantity, Validators.min(1)),
+        UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule?.UseCumulativeQuantity),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
         IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
@@ -211,10 +211,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
       }, { validators: ValidateMinMax }
       );
-      console.log('controls pre-manip', this.productForm.controls)
       this.setInventoryValidator();
       this.setNonRequiredFields();
-      !superMarketplaceProduct.Product?.ID && this.setResourceType();
+      this.setResourceType();
     }
   }
 
@@ -232,14 +231,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   setNonRequiredFields(): void {
-    console.log('setting non req fields')
     const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipFromAddressID', 'Price'];
     const optionalControls = optionalFieldsArray.map(item => this.productForm.get(item))
     this.productForm.get('ProductType').valueChanges
     .pipe(takeWhile(() => this.alive)).subscribe(productType => {
-      console.log('>product type', productType)
       if(productType === 'Quote') {
-        console.log('doing quote product things')
         optionalControls.forEach(control => {
           control.setValidators(null);
           control.updateValueAndValidity();
@@ -251,19 +247,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         })
       }
     })
-    console.log(this.productForm.controls)
     // const taxCodeCategory = this.productForm.get('TaxCodeCategory');
     // const taxCode = this.productForm.get('TaxCode');
     // const shipLength = this.productForm.get('ShipLength');
   }
 
   isRequired(control: string): boolean {
-    console.log(control)
     const theControl = this.productForm.get(control);
-    console.log(theControl) 
     if(theControl.validator === null) return false;
     const validator = this.productForm.get(control).validator({} as AbstractControl);
-    console.log(validator)
     return validator && validator.required;
   }
 
@@ -296,8 +288,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async createNewProduct(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      console.log('form status', this.productForm.valid)
-      console.log('form controls again bb', this.productForm.controls)
       const superProduct = await this.createNewSuperMarketplaceProduct(this._superMarketplaceProductEditable);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
       if (this.staticContentFiles.length > 0) await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
@@ -305,8 +295,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`);
       this.dataIsSaving = false;
     } catch (ex) {
-      console.log('ya know we are just failing today')
-      console.log('ex', ex)
       this.dataIsSaving = false;
       throw ex;
     }
@@ -334,7 +322,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   updateProductResource(productUpdate: any): void {
     const resourceToUpdate = this._superMarketplaceProductEditable || this.productService.emptyResource;
     this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(productUpdate, resourceToUpdate);
-    console.log(this._superMarketplaceProductEditable)
     this.checkForChanges();
   }
 
@@ -485,7 +472,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.resetTaxCodeAndDescription();
     this.handleUpdateProduct(event, 'Product.xp.Tax.Category');
     this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
-    await this.setTaxCodes(event.target.value)
+    await this.setTaxCodes(event.target.value, '')
   }
   // Reset TaxCode Code and Description if a new TaxCode Category is selected
   resetTaxCodeAndDescription(): void {
@@ -496,7 +483,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async searchTaxCodes(searchTerm: string): Promise<void> {
     if (searchTerm === undefined) searchTerm = '';
     const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax.Category;
-    await this.setTaxCodes(taxCodeCategory)
+    await this.setTaxCodes(taxCodeCategory, searchTerm)
   }
 
   async handleScrollEnd(searchTerm: string): Promise<void> {
@@ -522,16 +509,23 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     superMarketplaceProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
     const supplier = await this.currentUserService.getMySupplier();
-    superMarketplaceProduct.Product.xp.ProductType = (<ProductXp>["ProductType"])[this.productType];
+    superMarketplaceProduct.Product.xp.ProductType = this.productType;
     superMarketplaceProduct.Product.xp.Status = 'Draft';
     superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
+    if (superMarketplaceProduct.Product.xp.Tax.Category === null) superMarketplaceProduct.Product.xp.Tax = null;
     if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null) superMarketplaceProduct.PriceSchedule = null;
     return await HeadStartSDK.Products.Post(superMarketplaceProduct);
   }
 
   async updateMarketplaceProduct(superMarketplaceProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
+    // If PriceSchedule has a price break price, but no ID or name, set them
+    if (superMarketplaceProduct.PriceSchedule?.PriceBreaks[0]?.Price && superMarketplaceProduct.PriceSchedule.ID === null) {
+      superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
+      superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
+    }
+    if (superMarketplaceProduct.PriceSchedule.PriceBreaks.length === 0) superMarketplaceProduct.PriceSchedule = null;
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
     superMarketplaceProduct.Product.xp.Status = 'Draft';
     return await HeadStartSDK.Products.Put(superMarketplaceProduct.Product.ID, superMarketplaceProduct);

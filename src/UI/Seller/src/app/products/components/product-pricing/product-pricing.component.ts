@@ -27,6 +27,9 @@ export class ProductPricingComponent {
   @Input()
   set superMarketplaceProductStatic(value: SuperMarketplaceProduct) {
     this.superProduct = value;
+    if (value.Product?.xp?.ProductType === 'Quote' && value.PriceSchedule.PriceBreaks === null) {
+      this.superProduct.PriceSchedule.PriceBreaks = [{Price: null, Quantity: null}];
+    }
     if (value) {
       this.supplierPriceSchedule = JSON.parse(JSON.stringify(value.PriceSchedule));
       if(this.readonly) {

@@ -439,11 +439,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   checkIfCreatingNew(): boolean {
     const routeUrl = this.router.routerState.snapshot.url;
-    console.log(routeUrl)
-    console.log('split url', routeUrl.split('/'))
     const endUrl = routeUrl.split('/')[2];
-    console.log(endUrl)
-    console.log(endUrl === 'new')
     return endUrl === 'new';
   }
 

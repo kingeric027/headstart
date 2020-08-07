@@ -310,7 +310,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     const splitUrl = routeUrl.split('/');
     const endUrl =
       this._currentResourceNamePlural === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
-    console.log('end url from resource table', endUrl);
     this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
     if (this._currentResourceNamePlural === 'products' && this.isCreatingNew) {
       this.resourceType = splitUrl[splitUrl.length - 1].split('-').join(' ');
