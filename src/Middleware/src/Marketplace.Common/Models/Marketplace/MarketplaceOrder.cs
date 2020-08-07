@@ -57,6 +57,7 @@ namespace Marketplace.Models
         public List<ClaimResolutionStatuses> Resolutions { get; set; }
     }
 
+    [SwaggerModel]
     public class ClaimResolutionStatuses
     {
         public string LineItemID { get; set; }

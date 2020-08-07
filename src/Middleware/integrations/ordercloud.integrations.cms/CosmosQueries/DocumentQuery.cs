@@ -47,11 +47,11 @@ namespace ordercloud.integrations.cms
 		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user)
 		{
 			var schema = await _schemas.GetDO(schemaInteropID, user);
-			var query = _store.Query(GetFeedOptions(user))
+			var query = _store.Query()
 				.Search(args)
 				.Filter(args)
 				.Sort(args)
-				.Where(doc => doc.SchemaID == schema.id);
+				.Where(doc => doc.SchemaID == schema.id && doc.SellerOrgID == user.SellerID);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var documents = list.ToListPage(args.Page, args.PageSize, count);
@@ -122,8 +122,8 @@ namespace ordercloud.integrations.cms
 		private async Task<DocumentDO> GetWithoutExceptions(string schemaID, string documentInteropID, VerifiedUserContext user)
 		{
 			var document = await _store
-				.Query(GetFeedOptions(user))
-				.FirstOrDefaultAsync(d => d.InteropID == documentInteropID && d.SchemaID == schemaID);
+				.Query()
+				.FirstOrDefaultAsync(d => d.InteropID == documentInteropID && d.SchemaID == schemaID && d.SellerOrgID == user.SellerID);
 			return document;
 		}
 
@@ -135,7 +135,5 @@ namespace ordercloud.integrations.cms
 			doc.History = HistoryBuilder.OnCreate(user);
 			return doc;
 		}
-
-		private FeedOptions GetFeedOptions(VerifiedUserContext user) => new FeedOptions() { PartitionKey = new PartitionKey(user.SellerID) };
 	}
 }
