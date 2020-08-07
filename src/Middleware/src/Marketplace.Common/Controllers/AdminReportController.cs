@@ -8,6 +8,7 @@ using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using Marketplace.Models.Attributes;
 using Newtonsoft.Json.Linq;
+using Marketplace.Common.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -45,6 +46,12 @@ namespace Marketplace.Common.Controllers
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocationReport([FromBody] MarketplaceReportFilter filters)
         {
             return await _command.BuyerLocationReport(filters, VerifiedUserContext);
+        }
+
+        [HttpGet, Route("listreporttemplates/{reportType}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
+        public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(string reportType)
+        {
+            return await _command.ListReportTemplatesByReportType(reportType, VerifiedUserContext);
         }
     }
 }

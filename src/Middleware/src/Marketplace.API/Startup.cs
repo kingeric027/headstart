@@ -83,6 +83,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
+                .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
