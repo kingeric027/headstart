@@ -8,6 +8,7 @@ using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
 using Marketplace.Common.Commands.SupplierSync;
+using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using ordercloud.integrations.freightpop;
@@ -27,8 +28,13 @@ namespace Marketplace.Orchestration
                 .BindSettings<AppSettings>();
 
             builder.Services
+                .InjectCosmosStore<AssetQuery, Asset>(new CosmosConfig(settings.CosmosSettings.DatabaseName,
+                    settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey))
+                .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
+                    settings.CosmosSettings.DatabaseName,
+                    settings.CosmosSettings.EndpointUri,
+                    settings.CosmosSettings.PrimaryKey))
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
-                .Inject<IOrderCloudClient>()
                 .Inject<IFlurlClient>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
@@ -37,11 +43,7 @@ namespace Marketplace.Orchestration
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
-                .Inject<IProductTemplateCommand>()
-                .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
-                        settings.CosmosSettings.DatabaseName, 
-                        settings.CosmosSettings.EndpointUri, 
-                        settings.CosmosSettings.PrimaryKey));
+                .Inject<IProductTemplateCommand>();
         }
     }
 }

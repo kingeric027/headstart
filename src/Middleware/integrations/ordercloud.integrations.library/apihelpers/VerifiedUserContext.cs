@@ -17,6 +17,20 @@ namespace ordercloud.integrations.library
 
         public VerifiedUserContext() { }
 
+        public async Task<VerifiedUserContext> Define(string token)
+        {
+            var jwt = new JwtSecurityToken(token);
+
+            var cid = new ClaimsIdentity("OrderCloudIntegrations");
+            cid.AddClaim(new Claim("accesstoken", token));
+            cid.AddClaim(new Claim("clientid", jwt.GetClientID()));
+            cid.AddClaim(new Claim("usrtype", jwt.GetUserType()));
+
+            Principal = new ClaimsPrincipal(cid);
+            _token = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            return await Task.FromResult(this);
+        }
+
         public async Task<VerifiedUserContext> Define(OrderCloudClientConfig config)
         {
             var _oc = new OrderCloudClient(config);

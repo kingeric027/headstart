@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
+using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
@@ -17,9 +18,11 @@ namespace Marketplace.Common.Commands
     public class HydratedProductSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public HydratedProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
+        private readonly IAssetQuery _assets;
+        public HydratedProductSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IAssetQuery assets) : base(settings, oc, assets, log)
         {
             _oc = oc;
+            _assets = assets;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)

@@ -187,7 +187,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string ImageTitle { get; set; }
         public string Url { get; set; }
         public AssetType Type { get; set; }
-        public List<string> Tags { get; set; }
+        public string Tags { get; set; }
         public string FileName { get; set; }
 
     }

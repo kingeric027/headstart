@@ -11,6 +11,7 @@ using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
+using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
@@ -18,9 +19,11 @@ namespace Marketplace.Common.Commands
     public class TemplateProductFlatSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
+        private readonly AssetQuery _assets;
+        public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, AssetQuery assets) : base(settings, oc, assets, log)
         {
             _oc = oc;
+            _assets = assets;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
@@ -72,6 +75,17 @@ namespace Marketplace.Common.Commands
                         }
                     }
                 };
+                var image = new Asset();
+                var asset = new AssetUpload()
+                {
+                    ID = wi.RecordId,
+                    Type = AssetType.Image,
+                    Active = true,
+                    Url = obj.Url,
+                    FileName = obj.FileName,
+                    Title = obj.ImageTitle,
+                    Tags = obj.Tags, //.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                };
                 try
                 {
                     priceSchedule = await _oc.PriceSchedules.CreateAsync<MarketplacePriceSchedule>(priceSchedule, wi.Token);
@@ -83,6 +97,7 @@ namespace Marketplace.Common.Commands
                 finally
                 {
                     product = await _oc.Products.CreateAsync<MarketplaceProduct>(product, wi.Token);
+                    image = await _assets.Create(asset, await new VerifiedUserContext().Define(wi.Token));
                     await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
                     {
                         ProductID = product.ID,
@@ -90,7 +105,7 @@ namespace Marketplace.Common.Commands
                     }, wi.Token);
                 }
                 
-                return JObject.FromObject(Map(product, priceSchedule));
+                return JObject.FromObject(Map(product, priceSchedule, image));
             }
             catch (OrderCloudException exId) when (IdExists(exId))
             {
@@ -175,12 +190,21 @@ namespace Marketplace.Common.Commands
                         }
                     }
                 }, wi.Token);
+                var image = await _assets.Update(wi.RecordId, new Asset()
+                {
+                    Type = AssetType.Image,
+                    Active = true,
+                    Url = obj.Url,
+                    FileName = obj.FileName,
+                    Title = obj.ImageTitle,
+                    Tags = obj.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                }, await new VerifiedUserContext().Define(wi.Token));
                 await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
                 {
                     ProductID = product.ID,
                     PriceScheduleID = priceSchedule.ID
                 }, wi.Token);
-                return JObject.FromObject(Map(product, priceSchedule));
+                return JObject.FromObject(Map(product, priceSchedule, image));
             }
             catch (OrderCloudException ex)
             {
@@ -194,7 +218,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private static TemplateProductFlat Map(MarketplaceProduct product, MarketplacePriceSchedule priceSchedule)
+        private static TemplateProductFlat Map(MarketplaceProduct product, MarketplacePriceSchedule priceSchedule, Asset asset = null)
         {
             return new TemplateProductFlat
             {
@@ -219,7 +243,12 @@ namespace Marketplace.Common.Commands
                 TaxDescription = product.xp.Tax.Description,
                 UseCumulativeQuantity = priceSchedule.UseCumulativeQuantity,
                 UnitOfMeasure = product.xp.UnitOfMeasure.Unit,
-                UnitOfMeasureQty = product.xp.UnitOfMeasure.Qty
+                UnitOfMeasureQty = product.xp.UnitOfMeasure.Qty,
+                ImageTitle = asset?.Title,
+                Url = asset?.Url,
+                Type = asset?.Type ?? AssetType.Image,
+                Tags = asset?.Tags.JoinString(","),
+                FileName = asset?.FileName
             };
         }
 
@@ -227,12 +256,13 @@ namespace Marketplace.Common.Commands
         {
             var objProduct = wi.Diff.ToObject<PartialMarketplaceProduct>(OrchestrationSerializer.Serializer);
             var objPrice = wi.Diff.ToObject<PartialPriceSchedule>(OrchestrationSerializer.Serializer);
+            // assets don't support partials
             try
             {
                 //TODO: partial mapping
                 var product = await _oc.Products.PatchAsync<MarketplaceProduct>(wi.RecordId, objProduct, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.PatchAsync<MarketplacePriceSchedule>(wi.RecordId, objPrice, wi.Token);
-                return JObject.FromObject(Map(product, priceSchedule));
+                return JObject.FromObject(Map(product, priceSchedule, null));
             }
             catch (OrderCloudException ex)
             {
@@ -257,9 +287,8 @@ namespace Marketplace.Common.Commands
             {
                 var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
-                //var _images = GetProductImages(id, user);
-                //var _attachments = GetProductAttachments(id, user);
-                return JObject.FromObject(Map(product, priceSchedule));
+                var image = await _assets.Get(wi.RecordId, await new VerifiedUserContext().Define(wi.Token));
+                return JObject.FromObject(Map(product, priceSchedule, image));
             }
             catch (OrderCloudException ex)
             {
