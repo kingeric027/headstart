@@ -6,8 +6,8 @@ using Newtonsoft.Json;
 using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
-using Marketplace.Common.TemporaryAppConstants;
 using ordercloud.integrations.library;
+using Marketplace.Common.Constants;
 
 namespace Marketplace.Common.Commands
 {

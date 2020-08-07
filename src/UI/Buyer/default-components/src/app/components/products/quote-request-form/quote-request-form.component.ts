@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ValidateEmail, ValidateName, ValidatePhone } from 'src/app/validators/validators';
-import { QuoteOrderInfo } from 'marketplace-javascript-sdk';
+import { QuoteOrderInfo } from '@ordercloud/headstart-sdk';
 import { CurrentUser } from 'marketplace';
 
 @Component({

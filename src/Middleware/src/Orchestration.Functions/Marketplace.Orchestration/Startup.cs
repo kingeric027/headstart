@@ -8,6 +8,7 @@ using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
 using Marketplace.Common.Commands.SupplierSync;
+using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using ordercloud.integrations.freightpop;
@@ -26,22 +27,24 @@ namespace Marketplace.Orchestration
                 .InjectAzureFunctionSettings<AppSettings>(connectionString)
                 .BindSettings<AppSettings>();
 
+            var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName,
+                settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
             builder.Services
+                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
+                .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
+                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
-                .Inject<IOrderCloudClient>()
                 .Inject<IFlurlClient>()
+                .Inject<IAssetQuery>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
-                    ApiUrl = settings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = settings.OrderCloudSettings.AuthUrl
+                    ApiUrl = settings.OrderCloudSettings.ApiUrl
                 })
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
-                .InjectCosmosStore<LogQuery, OrchestrationLog>(new CosmosConfig(
-                        settings.CosmosSettings.DatabaseName, 
-                        settings.CosmosSettings.EndpointUri, 
-                        settings.CosmosSettings.PrimaryKey));
+                .Inject<IProductTemplateCommand>();
         }
     }
 }

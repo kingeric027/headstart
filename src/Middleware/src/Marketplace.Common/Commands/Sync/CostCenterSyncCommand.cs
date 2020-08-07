@@ -7,15 +7,18 @@ using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
+using ordercloud.integrations.cms;
 
 namespace Marketplace.Common.Commands
 {
     public class CostCenterSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public CostCenterSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
+        private readonly IAssetQuery _assets;
+        public CostCenterSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IAssetQuery assets) : base(settings, oc, assets, log)
         {
             _oc = oc;
+            _assets = assets;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)

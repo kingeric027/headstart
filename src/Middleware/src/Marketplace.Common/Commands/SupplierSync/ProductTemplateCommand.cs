@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using ordercloud.integrations.cms;
@@ -14,7 +16,7 @@ namespace Marketplace.Common.Commands.SupplierSync
     public interface IProductTemplateCommand
     {
         Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user);
-        Task<List<TemplateProductFlat>> ParseProductTemplateFlat(IFormFile file, VerifiedUserContext user);
+        Task<TemplateProductResult> ParseProductTemplateFlat(IFormFile file, VerifiedUserContext user);
     }
 
     public class ProductTemplateCommand : IProductTemplateCommand
@@ -25,12 +27,55 @@ namespace Marketplace.Common.Commands.SupplierSync
             _settings = settings;
         }
 
-        public async Task<List<TemplateProductFlat>> ParseProductTemplateFlat(IFormFile file, VerifiedUserContext user)
+        public async Task<TemplateProductResult> ParseProductTemplateFlat(IFormFile file, VerifiedUserContext user)
         {
             using var stream = file.OpenReadStream();
-            var mapper = new Mapper(stream);
-            var products = mapper.Take<TemplateProductFlat>("TemplateFlat");
-            return await Task.FromResult(products.Select(p => p.Value).ToList());
+            var products = new Mapper(stream).Take<TemplateProductFlat>("TemplateFlat", 1000).ToList();
+            var result = Validate(products.Where(p => p.Value?.ID != null).Select(p => p).ToList());
+            return await Task.FromResult(result);
+        }
+
+        public static TemplateProductResult Validate(List<RowInfo<TemplateProductFlat>> rows)
+        {
+            var result = new TemplateProductResult()
+            {
+                Invalid = new List<TemplateRowError>(),
+                Valid = new List<TemplateProductFlat>()
+            };
+
+            foreach (var row in rows)
+            {
+                if (row.ErrorColumnIndex > -1)
+                    result.Invalid.Add(new TemplateRowError()
+                    {
+                        ErrorMessage = row.ErrorMessage,
+                        Row = row.RowNumber++
+                    });
+                else
+                {
+                    var results = new List<ValidationResult>();
+                    if (Validator.TryValidateObject(row.Value, new ValidationContext(row.Value), results, true) == false)
+                    {
+                        result.Invalid.Add(new TemplateRowError()
+                        {
+                            ErrorMessage = $"{results.FirstOrDefault()?.ErrorMessage}",
+                            Row = row.RowNumber++
+                        });
+                    }
+                    else
+                    {
+                        result.Valid.Add(row.Value);
+                    }
+                }
+            }
+
+            result.Meta = new TemplateParseSummary()
+            {
+                InvalidCount = result.Invalid.Count,
+                ValidCount = result.Valid.Count,
+                TotalCount = rows.Count
+            };
+            return result;
         }
 
         public async Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
@@ -89,34 +134,60 @@ namespace Marketplace.Common.Commands.SupplierSync
         public IList<TemplateAsset> Attachments { get; set; }
     }
 
-    public class TemplateProductFlat
+    public class TemplateProductResult
     {
+        public TemplateParseSummary Meta { get; set; }
+        public List<TemplateProductFlat> Valid = new List<TemplateProductFlat>();
+        public List<TemplateRowError> Invalid = new List<TemplateRowError>();
+    }
+
+    public class TemplateParseSummary
+    {
+        public int TotalCount { get; set; }
+        public int ValidCount { get; set; }
+        public int InvalidCount { get; set; }
+    }
+
+    public class TemplateRowError
+    {
+        public int Row { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+
+    public class TemplateProductFlat : IMarketplaceObject
+    {
+        [OrderCloud.SDK.Required]
         public string ID { get; set; }
         public bool Active { get; set; }
+        [OrderCloud.SDK.Required]
         public string Name { get; set; }
         public string Description { get; set; }
+        [MinValue(1)]
         public int QuantityMultiplier { get; set; }
         public decimal? ShipWeight { get; set; }
         public decimal? ShipHeight { get; set; }
         public decimal? ShipWidth { get; set; }
         public decimal? ShipLength { get; set; }
+        [OrderCloud.SDK.Required]
         public string TaxCategory { get; set; }
+        [OrderCloud.SDK.Required]
         public string TaxCode { get; set; }
         public string TaxDescription { get; set; }
-        public string UnitOfMeasureQty { get; set; }
+        public int UnitOfMeasureQty { get; set; }
         public string UnitOfMeasure { get; set; }
         public bool IsResale { get; set; }
         public bool ApplyTax { get; set; }
         public bool ApplyShipping { get; set; }
-        public int MinQuantity { get; set; }
-        public int MaxQuantity { get; set; }
+        public int? MinQuantity { get; set; }
+        public int? MaxQuantity { get; set; }
         public bool UseCumulativeQuantity { get; set; }
         public bool RestrictedQuantity { get; set; }
-        public double Price { get; set; }
+        [OrderCloud.SDK.Required]
+        public decimal? Price { get; set; }
         public string ImageTitle { get; set; }
         public string Url { get; set; }
         public AssetType Type { get; set; }
-        public List<string> Tags { get; set; }
+        public string Tags { get; set; }
         public string FileName { get; set; }
 
     }

@@ -9,7 +9,7 @@ import {
   BuyerCreditCard,
   OrderPromotion,
 } from 'ordercloud-javascript-sdk';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
@@ -189,8 +189,9 @@ export class OCMCheckout implements OnInit {
     this.currentPanel = $event.panelId;
   }
 
-  updateOrderMeta(): void {
+  updateOrderMeta(promos?: CustomEvent<OrderPromotion[]>): void {
     this.orderPromotions = this.context.order.promos.get().Items;
+    this.orderPromotions = promos.detail;
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
   }
 }

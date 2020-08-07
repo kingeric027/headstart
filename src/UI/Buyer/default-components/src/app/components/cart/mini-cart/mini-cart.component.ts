@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import { ShopperContextService } from 'marketplace';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './mini-cart.component.html',

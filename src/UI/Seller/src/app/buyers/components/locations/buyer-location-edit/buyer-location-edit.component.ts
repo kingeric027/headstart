@@ -9,8 +9,7 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
 @Component({
   selector: 'app-buyer-location-edit',
@@ -51,7 +50,6 @@ export class BuyerLocationEditComponent implements OnInit {
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
-    private ocIntegrations: OcIntegrationsAPIService
   ) {this.countryOptions = GeographyConfig.getCountries();}
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
@@ -114,7 +112,7 @@ export class BuyerLocationEditComponent implements OnInit {
       this.buyerLocationEditable.UserGroup.xp.Type = 'BuyerLocation';
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
       (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
-      const newBuyerLocation = await MarketplaceSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
+      const newBuyerLocation = await HeadStartSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
       this.refreshBuyerLocationData(newBuyerLocation);
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
@@ -128,7 +126,7 @@ export class BuyerLocationEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
-      const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
+      const updatedBuyerLocation = await HeadStartSDK.BuyerLocations.Update(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
         this.buyerLocationEditable
@@ -145,7 +143,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async handleDelete($event): Promise<void> {
-    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
+    await HeadStartSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
@@ -182,7 +180,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   private async handleSelectedAddressChange(address: Address): Promise<void> {
-    const marketplaceBuyerLocation = await MarketplaceSDK.BuyerLocations.Get(this.buyerID, address.ID);
+    const marketplaceBuyerLocation = await HeadStartSDK.BuyerLocations.Get(this.buyerID, address.ID);
     this.refreshBuyerLocationData(marketplaceBuyerLocation);
   }
 }

@@ -31,7 +31,7 @@ import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-inte
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
-import { Configuration } from 'marketplace-javascript-sdk';
+import { Configuration } from '@ordercloud/headstart-sdk';
 import { applicationConfiguration, AppConfig, ocAppConfig } from './config/app.config';
 
 export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): TranslateHttpLoader {
@@ -67,9 +67,9 @@ export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): Tra
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient, ocAppConfig]
-      }
-    })
+        deps: [HttpClient, ocAppConfig],
+      },
+    }),
   ],
   providers: [
     { provide: ocAppConfig, useValue: ocAppConfig },
@@ -93,10 +93,7 @@ export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): Tra
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(
-    @Inject(applicationConfiguration) private appConfig: AppConfig,
-    public translate: TranslateService  
-  ) {
+  constructor(@Inject(applicationConfiguration) private appConfig: AppConfig, public translate: TranslateService) {
     translate.setDefaultLang('en');
     Configuration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,

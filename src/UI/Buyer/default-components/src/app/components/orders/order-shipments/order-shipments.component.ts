@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
-import { MarketplaceShipmentWithItems } from 'marketplace-javascript-sdk';
+import { MarketplaceShipmentWithItems } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './order-shipments.component.html',

@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk';
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { ListArgs } from '@ordercloud/headstart-sdk';
 import { AppConfig, MarketplaceMeProduct, SupplierFilterConfigDocument } from '../../shopper-context';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 
@@ -55,5 +55,16 @@ export class TempSdk {
         headers: this.buildHeaders(),
       })
       .toPromise();
+  }
+
+  async sendCancelEmail(orderId: string): Promise<any> {
+    const url = `${this.appConfig.middlewareUrl}/order/requestcancel/${orderId}`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
+    });
+    return await this.http
+    .post(url,{},{headers}).toPromise();
+    
   }
 }

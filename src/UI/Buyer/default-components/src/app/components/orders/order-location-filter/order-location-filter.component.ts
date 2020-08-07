@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService, OrderFilters } from 'marketplace';
-import { MarketplaceAddressBuyer } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({

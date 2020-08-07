@@ -3,11 +3,8 @@ import { environment } from '../../environments/environment';
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
-  marketplaceID: environment.marketplaceID,
-  cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
   middlewareUrl: environment.middlewareUrl,
-  ocMiddlewareUrl: environment.ocMiddlewareUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
@@ -53,6 +50,11 @@ export const ocAppConfig: AppConfig = {
     'ProductFacetAdmin',
     'ProductFacetReader',
     'ShipmentAdmin',
+
+    // custom cms roles
+    'AssetAdmin',
+    'DocumentAdmin',
+    'SchemaAdmin',
 
     // custom roles used to conditionally display ui
     'MPMeProductAdmin',
@@ -101,14 +103,6 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string;
-  /**
-   * base path to ordercloud integrations middleware
-   */
-  ocMiddlewareUrl: string;
-
-  cmsUrl: string;
-
-  marketplaceID: string;
 
   translateBlobUrl: string;
 

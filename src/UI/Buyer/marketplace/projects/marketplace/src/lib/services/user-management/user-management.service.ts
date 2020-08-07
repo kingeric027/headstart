@@ -3,7 +3,7 @@ import { UserGroup, UserGroupAssignment, Me, Tokens } from 'ordercloud-javascrip
 import { CurrentUserService } from '../current-user/current-user.service';
 import { AppConfig } from '../../shopper-context';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MarketplaceUser, ListPage, MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { MarketplaceUser, ListPage, HeadStartSDK } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,7 @@ export class UserManagementService {
 
   async getLocationUsers(locationID: string): Promise<ListPage<MarketplaceUser>> {
     const buyerID = this.currentUserService.get().Buyer.ID;
-    return await MarketplaceSDK.BuyerLocations.ListLocationUsers(buyerID, locationID);
+    return await HeadStartSDK.BuyerLocations.ListLocationUsers(buyerID, locationID);
   }
 
   async getLocationPermissions(locationID: string): Promise<UserGroupAssignment[]> {
@@ -61,7 +61,7 @@ export class UserManagementService {
       AssignmentsToAdd: add,
       AssignmentsToDelete: del,
     };
-    return await MarketplaceSDK.BuyerLocations.UpdateLocationPermissions(buyerID, locationID, body);
+    return await HeadStartSDK.BuyerLocations.UpdateLocationPermissions(buyerID, locationID, body);
   }
 
   async getLocationApprovalThreshold(locationID: string): Promise<number> {

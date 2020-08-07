@@ -1,4 +1,4 @@
-import { MarketplaceOrder, MarketplaceLineItem, OrderPromotion } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem, OrderPromotion } from '@ordercloud/headstart-sdk';
 
 export interface OrderSummaryMeta {
   StandardLineItems: MarketplaceLineItem[];

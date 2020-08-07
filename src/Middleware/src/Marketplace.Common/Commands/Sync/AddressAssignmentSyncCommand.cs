@@ -6,6 +6,7 @@ using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using Marketplace.Models;
+using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -13,9 +14,11 @@ namespace Marketplace.Common.Commands
     public class AddressAssignmentSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public AddressAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
+        private readonly IAssetQuery _assets;
+        public AddressAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IAssetQuery assets) : base(settings, oc, assets, log)
         {
             _oc = oc;
+            _assets = assets;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)

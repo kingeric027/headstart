@@ -9,10 +9,11 @@ import {
   MarketplaceLineItem,
   OrderDetails,
   MarketplaceShipmentWithItems,
-  MarketplaceSDK,
-} from 'marketplace-javascript-sdk';
+  HeadStartSDK,
+} from '@ordercloud/headstart-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { ClaimStatus, LineItemStatus } from '../../../lib/shopper-context';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +24,8 @@ export class OrderHistoryService {
     public filters: OrderFilterService,
     private reorderHelper: ReorderHelperService,
     private httpClient: HttpClient,
-    private appConfig: AppConfig
+    private appConfig: AppConfig,
+    private tempSdk: TempSdk
   ) {}
 
   async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
@@ -60,7 +62,7 @@ export class OrderHistoryService {
   }
 
   async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
-    return await MarketplaceSDK.Orders.GetOrderDetails(orderID);
+    return await HeadStartSDK.Orders.GetOrderDetails(orderID);
   }
 
   async getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]> {
@@ -87,11 +89,25 @@ export class OrderHistoryService {
       .toPromise();
   }
 
+  //  How to handle ClaimStatus ? should I put it within OrderReturnInfo / OrderCancelInfo?
   async returnOrder(orderID: string): Promise<MarketplaceOrder> {
     const order = await Orders.Patch('Outgoing', orderID, {
       xp: {
         OrderReturnInfo: {
           HasReturn: true,
+          Resolved: false,
+        },
+        ClaimStatus: ClaimStatus.Pending,
+      },
+    });
+    return order as MarketplaceOrder;
+  }
+
+  async cancelOrder(orderID: string): Promise<MarketplaceOrder> {
+    const order = await Orders.Patch('Outgoing', orderID, {
+      xp: {
+        OrderCancelInfo: {
+          HasCancel: true,
           Resolved: false,
         },
         ClaimStatus: ClaimStatus.Pending
@@ -113,11 +129,35 @@ export class OrderHistoryService {
           ReturnReason: returnReason,
           Resolved: false,
         },
-        LineItemStatus: LineItemStatus.ReturnRequested
+        LineItemStatus: LineItemStatus.ReturnRequested,
       },
     };
     const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
+    await HeadStartSDK.Orders.RequestReturnEmail(orderID);
     return line;
   }
+
+  async cancelLineItem(
+    orderID: string,
+    lineItemID: string,
+    quantityToCancel: number,
+    cancelReason: string
+  ): Promise<MarketplaceLineItem> {
+    const patch = {
+      xp: {
+        LineItemCancelInfo: {
+          QuantityToCancel: quantityToCancel,
+          CancelReason: cancelReason,
+          Resolved: false,
+        },
+        LineItemStatus: LineItemStatus.CancelRequested
+      },
+    };
+    const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
+    //  await HeadStartSDK.Orders.RequestReturnEmail(orderID);
+    await this.tempSdk.sendCancelEmail(orderID);
+    return line;
+  }
+
+
 }

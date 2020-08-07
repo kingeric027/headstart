@@ -26,6 +26,7 @@ export class OCMOrderStatusIcon {
     [LineItemStatus.Complete]: this.faCircle,
     [LineItemStatus.Returned]: this.faCircle,
     [LineItemStatus.Submitted]: this.faCircle,
-    [LineItemStatus.ReturnRequested]: this.faClock
+    [LineItemStatus.ReturnRequested]: this.faClock,
+    [LineItemStatus.CancelRequested]: this.faClock
   };
 }

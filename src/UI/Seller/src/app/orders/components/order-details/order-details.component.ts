@@ -4,7 +4,7 @@ import { Address, LineItem, OcLineItemService, OcPaymentService, Order, Payment 
 import { groupBy as _groupBy } from 'lodash';
 
 // temporarily any with sdk update
-// import { ProductImage } from 'marketplace-javascript-sdk';
+// import { ProductImage } from '@ordercloud/headstart-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
 import { faDownload, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -75,7 +75,9 @@ export class OrderDetailsComponent {
   }
 
   async setOrderStatus() {
-    await this.middleware.acknowledgeQuoteOrder(this._order.ID).then(completedOrder => this.handleSelectedOrderChange(completedOrder));
+    await this.middleware
+      .acknowledgeQuoteOrder(this._order.ID)
+      .then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
   isQuoteOrder(order: Order) {

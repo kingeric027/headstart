@@ -5,8 +5,11 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using Action = Marketplace.Common.Models.Action;
 using LogLevel = Marketplace.Common.Models.LogLevel;
 
@@ -16,13 +19,15 @@ namespace Marketplace.Orchestration
     {
         private readonly IOrchestrationCommand _orch;
         private readonly ISyncCommand _sync;
+        private readonly IOrderCloudIntegrationsFunctionToken _token;
         private readonly LogQuery _log;
 
-        public OrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
+        public OrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, IOrderCloudIntegrationsFunctionToken token, LogQuery log)
         {
             _orch = orch;
             _sync = sync;
             _log = log;
+            _token = token;
         }
 
         [FunctionName("OrchestrationWorkflow")]
@@ -41,6 +46,7 @@ namespace Marketplace.Orchestration
                 wi.Current = queue["Model"] as JObject;
                 wi.Token = queue["Token"].ToString();
                 wi.ClientId = queue["ClientId"].ToString();
+                //wi.User = await context.CallActivityAsync<VerifiedUserContext>("DefineUserContext", wi);
                 wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
@@ -83,6 +89,9 @@ namespace Marketplace.Orchestration
                 await context.CallActivityAsync("CleanupQueue", context.GetInput<string>());
             }
         }
+
+        [FunctionName("DefineUserContext")]
+        public async Task<VerifiedUserContext> DefineUserContext([ActivityTrigger] WorkItem wi) => await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
 
         [FunctionName("LogEvent")]
         public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Save(log);
