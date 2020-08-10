@@ -46,32 +46,11 @@ export class OCMOrderDetails implements OnInit {
   }
 
   canRequestReturn(): boolean {
-    let qtyReturned = 0;
-    let total = 0;
-    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if (li.xp?.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
-      total += li.QuantityShipped;
-    });
-    return (
-      qtyReturned !== total &&
-      this.order.Status !== 'Unsubmitted' &&
-      (this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped ||
-        this.order.xp.ShippingStatus === ShippingStatus.Shipped)
-    );
+    return this.orderDetails.LineItems.some(li => (li as any).xp.StatusByQuantity?.Complete);
   }
 
   canRequestCancel(): boolean {
-    let qtyCanceled = 0;
-    let total = 0;
-    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if ((li.xp as any)?.LineItemCancelInfo) qtyCanceled += (li.xp as any)?.LineItemCancelInfo?.QuantityToCancel;
-      total += (li.Quantity - li.QuantityShipped);
-    });
-    return (
-      qtyCanceled < total &&
-      this.order.Status !== 'Unsubmitted' &&
-      this.order.xp.ShippingStatus !== ShippingStatus.Shipped
-    );
+    return this.orderDetails.LineItems.some(li => (li as any).xp.StatusByQuantity?.Submitted || (li as any).xp.StatusByQuantity?.Backordered);
   }
 
   toggleFavorite(order: MarketplaceOrder): void {
@@ -132,11 +111,11 @@ export class OCMOrderDetails implements OnInit {
         Quantity: li.Quantity,
         Specs: li.Specs,
         xp: {
-          LineItemImageUrl: li.xp?.LineItemImageUrl,
+          ImageUrl: li.xp?.ImageUrl,
         },
       };
     });
-    await this.context.order.cart.addMany(items);
+    await this.context.order.cart.addMany(items as any);
   }
 
   async moveOrderToCart(): Promise<void> {

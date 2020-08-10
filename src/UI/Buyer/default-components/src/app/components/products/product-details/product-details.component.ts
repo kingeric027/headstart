@@ -4,7 +4,7 @@ import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo, LineItem } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -104,14 +104,14 @@ export class OCMProductDetails implements OnInit {
   async addToCart(): Promise<void> {
       this.isAddingToCart = true;
       try {
-        await this.context.order.cart.add({
+        await this.context.order.cart.add(({
           ProductID: this._product.ID,
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
           xp: {
-            LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+            ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
           }
-        });
+        } as any));
         this.isAddingToCart = false;
       } catch (ex) {
         this.isAddingToCart = false;
@@ -177,11 +177,11 @@ export class OCMProductDetails implements OnInit {
 
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
-      const lineItem: MarketplaceLineItem = {};
+      const lineItem: LineItem = {};
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
-      lineItem.xp = {
-        LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._product)
+      (lineItem as any).xp = {
+        ImageUrl: this.specFormService.getLineItemImageUrl(this._product)
       };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;

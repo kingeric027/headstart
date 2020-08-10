@@ -1,10 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {
-  ShopperContextService,
-  LineItemGroupSupplier,
-} from 'marketplace';
-import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from '@ordercloud/headstart-sdk';
-import { groupBy as _groupBy } from 'lodash';
+import { ShopperContextService, LineItemGroupSupplier } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem, OrderDetails, LineItem } from '@ordercloud/headstart-sdk';
+import { groupBy as _groupBy, flatten as _flatten } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
 
@@ -30,10 +27,11 @@ export class OCMOrderReturn {
     this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
     //  this.setRequestReturnForm();
+    console.log(this.suppliers);
   }
   @Input() set action(value: string) {
     this._action = value;
-    this.setRequestReturnForm(value)
+    this.setRequestReturnForm(value);
   }
   @Output()
   viewReturnFormEvent = new EventEmitter<boolean>();
@@ -46,54 +44,77 @@ export class OCMOrderReturn {
     return !!selectedItem;
   }
 
-  setRequestReturnForm(action: string): void  {
-    this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, action));
+  setRequestReturnForm(action: string): void {
+    this.requestReturnForm = this.fb.group(
+      new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, action)
+    );
   }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
-  async updateOrder(orderID: string): Promise<void> {
-    if(this._action === 'return') {
-      await this.context.orderHistory.returnOrder(orderID)
+  async submitClaim(): Promise<void> {
+    const allLineItems = this.requestReturnForm.value.liGroups.reduce((acc, current) => {
+      return [...acc, ...current.lineItems];
+    }, []);
+    const lineItemsToSubmitClaim = allLineItems.filter(li => li.selected);
+    const lineItemChanges = lineItemsToSubmitClaim.map(claim => {
+      return {
+        ID: claim.lineItem.ID,
+        Reason: claim.returnReason,
+        PreviousQuantities: this.getPreviousQuantities(claim.lineItem.ID, claim.quantityToReturnOrCancel, this._action)
+      };
+    });
+    const changeRequest = {
+      Status: this._action === 'return' ? 'ReturnRequested' : 'CancelRequested',
+      Changes: lineItemChanges
+    };
+    await this.context.orderHistory.submitCancelOrReturn(this.order.ID, changeRequest);
+  }
+
+  getPreviousQuantities(lineItemID: string, quantityToReturnOrCancel: number, action: string): any {
+    if(action === 'return') {
+      return this.getPreviousQuantitiesForReturn(lineItemID, quantityToReturnOrCancel);
     } else {
-      await this.context.orderHistory.cancelOrder(orderID)
+      return this.getPreviousQuantitiesForCancelation(lineItemID, quantityToReturnOrCancel);
     }
   }
 
-  async updateLineItems(orderID: string): Promise<void> {
-    const lineItemsToUpdate: Promise<MarketplaceLineItem>[] = [];
-    this.requestReturnForm.value.liGroups.forEach(liGroup =>
-      liGroup.lineItems
-        .filter(lineItem => lineItem.selected === true)
-        .forEach(li => {
-          const newSumToReturn = (li.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + li.quantityToReturnOrCancel;
-          const newSumToCancel = (li.lineItem?.xp?.LineItemCancelInfo?.QuantityToCancel || 0) + li.quantityToReturnOrCancel;
-          if(this._action === 'return') {
-            lineItemsToUpdate.push(this.context.orderHistory.returnLineItem(
-              orderID,
-              li.id,
-              newSumToReturn,
-              li.returnReason
-            ))
-          } else {
-            lineItemsToUpdate.push(this.context.orderHistory.cancelLineItem(
-              orderID,
-              li.id,
-              newSumToCancel,
-              li.returnReason))
-          }
-        }
-      )
-    );
-    await Promise.all(lineItemsToUpdate);
+  getPreviousQuantitiesForReturn(lineItemID: string, quantityToReturn: number): any {
+    const lineItem = this.lineItems.find(li => li.ID === lineItemID);
+    const Complete = (lineItem.xp as any).StatusByQuantity?.Complete || 0;
+    if(Complete >= quantityToReturn) {
+      return {Complete: quantityToReturn};
+    } else {
+      throw new Error('Not enough quantity to support change');
+    }
+  } 
+
+  getPreviousQuantitiesForCancelation(lineItemID: string, quantityToCancel: number): any {
+    const lineItem = this.lineItems.find(li => li.ID === lineItemID);
+    const previousQuantities = {Submitted: 0, Backordered: 0};
+    let Submitted = (lineItem.xp as any).StatusByQuantity?.Submitted || 0;
+    let Backordered = (lineItem.xp as any).StatusByQuantity?.Backordered || 0;
+    while(quantityToCancel > 0) {
+      if(Submitted) {
+        previousQuantities.Submitted++;
+        Submitted--
+        quantityToCancel--;
+      } else if(Backordered) {
+        previousQuantities.Backordered++;
+        Backordered--;
+        quantityToCancel--;
+      } else {
+        throw new Error('Not enough quantity to support change');
+      }
+    }
+    return previousQuantities;
   }
 
   async onSubmit(): Promise<void> {
     this.isSaving = true;
-    const orderID = this.requestReturnForm.value.orderID;
-    await Promise.all([this.updateOrder(orderID), this.updateLineItems(orderID)])
+    await this.submitClaim();
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
   }

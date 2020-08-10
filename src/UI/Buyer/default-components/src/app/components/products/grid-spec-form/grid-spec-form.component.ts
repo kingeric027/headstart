@@ -76,12 +76,12 @@ export class OCMGridSpecForm {
             ProductID: this._product.ID,
             Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray),
             xp: {
-                LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+                ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
             }
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
-        if (i === -1) this.lineItems.push(item);
-        else this.lineItems[i] = item;
+        if (i === -1) this.lineItems.push(item as any);
+        else this.lineItems[i] = item as any;
         this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, this.specFormService.getGridLineItemSpecs(this._specs, specArray));
         this.totalPrice = this.getTotalPrice();
     }
