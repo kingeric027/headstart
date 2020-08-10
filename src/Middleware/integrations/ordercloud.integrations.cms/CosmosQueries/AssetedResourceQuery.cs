@@ -62,7 +62,7 @@ namespace ordercloud.integrations.cms
 		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
 			var resource = assignment.MapToResource();
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
+			//await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var asset = await _assets.GetDO(assignment.AssetID, user);
 			var assetedResource = await GetExistingOrDefault(resource);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 

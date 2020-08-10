@@ -120,7 +120,7 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
-			await _blob.OnAssetDeleted(container, asset.id);
+			await _blob.DeleteAsset(container, asset.id);
 		}
 
 		public async Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs)

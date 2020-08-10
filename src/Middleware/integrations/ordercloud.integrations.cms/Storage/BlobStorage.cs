@@ -10,8 +10,7 @@ namespace ordercloud.integrations.cms
 	{
 		CMSConfig Config { get; }
 		Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset);
-		Task OnContainerDeleted(AssetContainerDO container);
-		Task OnAssetDeleted(AssetContainerDO container, string assetID);
+		Task DeleteAsset(AssetContainerDO container, string assetID);
 	}
 
 	public class BlobStorage : IBlobStorage
@@ -36,19 +35,7 @@ namespace ordercloud.integrations.cms
 			}
 		}
 
-		public async Task OnContainerDeleted(AssetContainerDO container)
-		{
-			try
-			{
-				await BuildBlobService(container).DeleteContainer();
-			}
-			catch (Exception ex)
-			{
-				throw new StorageConnectionException(container.id, ex);
-			}
-		}
-
-		public async Task OnAssetDeleted(AssetContainerDO container, string assetID)
+		public async Task DeleteAsset(AssetContainerDO container, string assetID)
 		{
 			try
 			{
