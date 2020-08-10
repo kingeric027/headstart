@@ -80,8 +80,8 @@ export class OCMGridSpecForm {
             }
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
-        if (i === -1) this.lineItems.push(item as any);
-        else this.lineItems[i] = item as any;
+        if (i === -1) this.lineItems.push(item);
+        else this.lineItems[i] = item;
         this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, this.specFormService.getGridLineItemSpecs(this._specs, specArray));
         this.totalPrice = this.getTotalPrice();
     }

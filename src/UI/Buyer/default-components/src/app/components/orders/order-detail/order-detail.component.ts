@@ -4,6 +4,7 @@ import { ShopperContextService, OrderReorderResponse, OrderViewContext, Shipping
 import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
+import { CanReturnOrder, CanCancelOrder } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-detail.component.html',
@@ -46,11 +47,11 @@ export class OCMOrderDetails implements OnInit {
   }
 
   canRequestReturn(): boolean {
-    return this.orderDetails.LineItems.some(li => (li as any).xp.StatusByQuantity?.Complete);
+    return CanReturnOrder(this.orderDetails.LineItems);
   }
 
   canRequestCancel(): boolean {
-    return this.orderDetails.LineItems.some(li => (li as any).xp.StatusByQuantity?.Submitted || (li as any).xp.StatusByQuantity?.Backordered);
+    return CanCancelOrder(this.orderDetails.LineItems);
   }
 
   toggleFavorite(order: MarketplaceOrder): void {
@@ -115,7 +116,7 @@ export class OCMOrderDetails implements OnInit {
         },
       };
     });
-    await this.context.order.cart.addMany(items as any);
+    await this.context.order.cart.addMany(items);
   }
 
   async moveOrderToCart(): Promise<void> {

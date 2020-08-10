@@ -104,14 +104,14 @@ export class OCMProductDetails implements OnInit {
   async addToCart(): Promise<void> {
       this.isAddingToCart = true;
       try {
-        await this.context.order.cart.add(({
+        await this.context.order.cart.add({
           ProductID: this._product.ID,
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
           xp: {
             ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
           }
-        } as any));
+        });
         this.isAddingToCart = false;
       } catch (ex) {
         this.isAddingToCart = false;
@@ -177,10 +177,10 @@ export class OCMProductDetails implements OnInit {
 
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
-      const lineItem: LineItem = {};
+      const lineItem: MarketplaceLineItem = {};
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
-      (lineItem as any).xp = {
+      lineItem.xp = {
         ImageUrl: this.specFormService.getLineItemImageUrl(this._product)
       };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);

@@ -27,7 +27,6 @@ export class OCMOrderReturn {
     this.liGroupedByShipFrom = Object.values(liGroups);
     this.setSupplierInfo(this.liGroupedByShipFrom);
     //  this.setRequestReturnForm();
-    console.log(this.suppliers);
   }
   @Input() set action(value: string) {
     this._action = value;
@@ -63,18 +62,18 @@ export class OCMOrderReturn {
       return {
         ID: claim.lineItem.ID,
         Reason: claim.returnReason,
-        PreviousQuantities: this.getPreviousQuantities(claim.lineItem.ID, claim.quantityToReturnOrCancel, this._action)
+        PreviousQuantities: this.getPreviousQuantities(claim.lineItem.ID, claim.quantityToReturnOrCancel, this._action),
       };
     });
     const changeRequest = {
       Status: this._action === 'return' ? 'ReturnRequested' : 'CancelRequested',
-      Changes: lineItemChanges
+      Changes: lineItemChanges,
     };
     await this.context.orderHistory.submitCancelOrReturn(this.order.ID, changeRequest);
   }
 
   getPreviousQuantities(lineItemID: string, quantityToReturnOrCancel: number, action: string): any {
-    if(action === 'return') {
+    if (action === 'return') {
       return this.getPreviousQuantitiesForReturn(lineItemID, quantityToReturnOrCancel);
     } else {
       return this.getPreviousQuantitiesForCancelation(lineItemID, quantityToReturnOrCancel);
@@ -83,25 +82,27 @@ export class OCMOrderReturn {
 
   getPreviousQuantitiesForReturn(lineItemID: string, quantityToReturn: number): any {
     const lineItem = this.lineItems.find(li => li.ID === lineItemID);
-    const Complete = (lineItem.xp as any).StatusByQuantity?.Complete || 0;
-    if(Complete >= quantityToReturn) {
-      return {Complete: quantityToReturn};
+    const Complete = lineItem.xp.StatusByQuantity['Complete'] || 0;
+    if (Complete >= quantityToReturn) {
+      return { Complete: quantityToReturn };
     } else {
       throw new Error('Not enough quantity to support change');
     }
-  } 
+  }
 
   getPreviousQuantitiesForCancelation(lineItemID: string, quantityToCancel: number): any {
     const lineItem = this.lineItems.find(li => li.ID === lineItemID);
-    const previousQuantities = {Submitted: 0, Backordered: 0};
-    let Submitted = (lineItem.xp as any).StatusByQuantity?.Submitted || 0;
-    let Backordered = (lineItem.xp as any).StatusByQuantity?.Backordered || 0;
-    while(quantityToCancel > 0) {
-      if(Submitted) {
+    const previousQuantities = { Submitted: 0, Backordered: 0 };
+    // todo figure out why the typing is potentially off here for dictionaries in sdk
+    let Submitted = lineItem.xp.StatusByQuantity['Submitted'] || 0;
+
+    let Backordered = lineItem.xp.StatusByQuantity['Backordered'] || 0;
+    while (quantityToCancel > 0) {
+      if (Submitted) {
         previousQuantities.Submitted++;
-        Submitted--
+        Submitted--;
         quantityToCancel--;
-      } else if(Backordered) {
+      } else if (Backordered) {
         previousQuantities.Backordered++;
         Backordered--;
         quantityToCancel--;
