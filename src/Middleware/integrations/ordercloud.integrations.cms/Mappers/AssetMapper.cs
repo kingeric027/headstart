@@ -9,9 +9,7 @@ namespace ordercloud.integrations.cms
 {
 	public static class AssetMapper
 	{
-		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
-
-		public static (AssetDO, IFormFile) MapFromUpload(CMSConfig config, AssetContainerDO container, AssetUpload form)
+		public static AssetDO MapFromUpload(CMSConfig config, AssetContainerDO container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
@@ -34,46 +32,12 @@ namespace ordercloud.integrations.cms
 				}
 			};
 			asset.Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{container.id}/{asset.id}";
-			TypeSpecificMapping(ref asset, form);
-			return (asset, form.File);
+			return asset;
 		}
 
 		private static List<string> MapTags(string tags)
 		{
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
-		}
-
-		private static void TypeSpecificMapping(ref AssetDO asset, AssetUpload form)
-		{
-			switch (asset.Type)
-			{
-				case AssetType.Image:
-					ImageSpecificMapping(ref asset, form);
-					return;
-				case AssetType.Attachment:
-				case AssetType.Structured:
-				case AssetType.Theme:
-				default:
-					return;
-			}
-		}
-
-		private static void ImageSpecificMapping(ref AssetDO asset, AssetUpload form)
-		{
-			if (form.File == null) return;
-			if (!ValidImageFormats.Contains(form.File.ContentType)) 
-			{
-				throw new AssetCreateValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
-			}
-			using (var image = Image.FromStream(form.File.OpenReadStream()))
-			{
-				asset.Metadata.ImageWidth = image.Width;
-				asset.Metadata.ImageHeight = image.Height;
-				asset.Metadata.ImageHorizontalResolution = (decimal) image.HorizontalResolution;
-				asset.Metadata.ImageVerticalResolution = (decimal) image.VerticalResolution;
-
-				// TODO - potentially image resizing?
-			}
 		}
 
 		public static Asset MapTo(AssetDO asset)

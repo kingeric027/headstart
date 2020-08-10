@@ -3,14 +3,17 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace ordercloud.integrations.cms
 {
 	public interface IBlobStorage
 	{
 		CMSConfig Config { get; }
-		Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset);
-		Task DeleteAsset(AssetContainerDO container, string assetID);
+		Task UploadAsset(AssetContainerDO container, string blobName, IFormFile file);
+		Task UploadAsset(AssetContainerDO container, string blobName, Image image);
+		Task DeleteAsset(AssetContainerDO container, string blobName);
 	}
 
 	public class BlobStorage : IBlobStorage
@@ -22,12 +25,11 @@ namespace ordercloud.integrations.cms
 			Config = config;
 		}
 
-		public async Task<AssetDO> UploadAsset(AssetContainerDO container, IFormFile file, AssetDO asset)
+		public async Task UploadAsset(AssetContainerDO container, string blobName, IFormFile file)
 		{
 			try
 			{
-				await BuildBlobService(container).Save(asset.id, file);
-				return asset;
+				await BuildBlobService(container).Save(blobName, file);
 			}
 			catch (Exception ex)
 			{
@@ -35,11 +37,24 @@ namespace ordercloud.integrations.cms
 			}
 		}
 
-		public async Task DeleteAsset(AssetContainerDO container, string assetID)
+		public async Task UploadAsset(AssetContainerDO container, string blobName, Image image)
 		{
 			try
 			{
-				await BuildBlobService(container).Delete(assetID);
+				var bytes = image.ToBytes(ImageFormat.Png);
+				await BuildBlobService(container).Save(blobName, bytes, "image/png");
+			}
+			catch (Exception ex)
+			{
+				throw new StorageConnectionException(container.id, ex);
+			}
+		}
+
+		public async Task DeleteAsset(AssetContainerDO container, string blobName)
+		{
+			try
+			{
+				await BuildBlobService(container).Delete(blobName);
 			}
 			catch (Exception ex)
 			{

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using ordercloud.integrations.library;
@@ -31,6 +34,7 @@ namespace ordercloud.integrations.cms
 		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IBlobStorage _blob;
+		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
 		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
 		{
@@ -69,11 +73,18 @@ namespace ordercloud.integrations.cms
 		public async Task<Asset> Create(AssetUpload form, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
-			var (asset, file) = AssetMapper.MapFromUpload(_blob.Config, container, form);
+			var asset = AssetMapper.MapFromUpload(_blob.Config, container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
-			if (file != null) {			
-				await _blob.UploadAsset(container, file, asset);
+			if (form.File != null) {
+				Task uploadThumb = Task.FromResult(0);
+				if (asset.Type == AssetType.Image)
+				{
+					var thumbNail = OpenImageDetails(ref asset, form);
+					uploadThumb = _blob.UploadAsset(container, $"{asset.id}-m", thumbNail);
+				}
+				await uploadThumb;
+				await _blob.UploadAsset(container, asset.id, form.File);
 			}
 			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
@@ -120,7 +131,13 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
-			await _blob.DeleteAsset(container, asset.id);
+			Task deleteThumb = Task.FromResult(0);
+			if (asset.Type == AssetType.Image)
+			{
+				deleteThumb = _blob.DeleteAsset(container, $"{asset.id}-m");
+			}
+			await deleteThumb;
+			await _blob.DeleteAsset(container, asset.id); 
 		}
 
 		public async Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs)
@@ -134,6 +151,22 @@ namespace ordercloud.integrations.cms
 			var asset = await _assetStore.Query().FirstOrDefaultAsync(a => a.id == assetID);
 			if (asset == null) throw new NotImplementedException(); // Why not implemented instead of not found?
 			return asset;
+		}
+
+		private Image OpenImageDetails(ref AssetDO asset, AssetUpload form)
+		{
+			if (!ValidImageFormats.Contains(form.File.ContentType))
+			{
+				throw new AssetCreateValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
+			}
+			using (var image = Image.FromStream(form.File.OpenReadStream()))
+			{
+				asset.Metadata.ImageWidth = image.Width;
+				asset.Metadata.ImageHeight = image.Height;
+				asset.Metadata.ImageHorizontalResolution = (decimal)image.HorizontalResolution;
+				asset.Metadata.ImageVerticalResolution = (decimal)image.VerticalResolution;
+				return image.CreateThumbnail();
+			}
 		}
 
 		private async Task<AssetDO> GetWithoutExceptions(string containerID, string assetInteropID)

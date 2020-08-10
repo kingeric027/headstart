@@ -4,17 +4,25 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Text;
 
-namespace ordercloud.integrations.cms.Extensions
+namespace ordercloud.integrations.cms
 {
 	public static class ImageExtensions
 	{
-        public static Image Resize(this Image image, int targetWidth)
+        public static Image CreateThumbnail(this Image image)
         {
-            int tagetHeight = image.Height * (targetWidth / image.Width); // preserve aspect ratio
-            var destRect = new Rectangle(0, 0, targetWidth, tagetHeight);
-            var destImage = new Bitmap(targetWidth, tagetHeight);
+            double scaleFactor = 200 / Math.Min(image.Width, image.Height); // bring the smaller dimension to 200 px.
+            if (scaleFactor > 1) return image; // don't increase image size
+            return image.Resize(scaleFactor);
+        }
+
+        public static Image Resize(this Image image, double scaleFactor)
+		{
+            var (targetWidth, targetHeight) = (((int)(image.Width * scaleFactor), (int)(image.Height * scaleFactor))); // preserve aspect ratio
+            var destRect = new Rectangle(0, 0, targetWidth, targetHeight);
+            var destImage = new Bitmap(targetWidth, targetHeight);
 
             destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
 
@@ -33,7 +41,19 @@ namespace ordercloud.integrations.cms.Extensions
                 }
             }
 
-            return (Image) destImage;
+            return destImage;
         }
+
+
+
+
+        public static byte[] ToBytes(this Image image, ImageFormat format)
+        {
+            using (var stream = new MemoryStream())
+			{
+                image.Save(stream, format);
+                return stream.ToArray();
+            }
+		}
     }
 }
