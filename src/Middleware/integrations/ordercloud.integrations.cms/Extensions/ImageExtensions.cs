@@ -11,20 +11,31 @@ namespace ordercloud.integrations.cms
 {
 	public static class ImageExtensions
 	{
-        public static Image CreateThumbnail(this Image image)
+        public static Image CreateSquareThumbnail(this Image srcImage, int targetDimension)
         {
-            double scaleFactor = 200 / Math.Min(image.Width, image.Height); // bring the smaller dimension to 200 px.
-            if (scaleFactor > 1) return image; // don't increase image size
-            return image.Resize(scaleFactor);
+            var aspectRatio = srcImage.Width / srcImage.Height;
+            if (aspectRatio > 2 || aspectRatio < 0.5)
+			{
+                return srcImage.CreateSquareWhiteSpaced(targetDimension);
+			} else
+			{
+                return srcImage.CreateSquareCropped(targetDimension);
+            }
         }
 
-        public static Image Resize(this Image image, double scaleFactor)
+        private static Image CreateSquareCropped(this Image srcImage, int targetDimension)
 		{
-            var (targetWidth, targetHeight) = (((int)(image.Width * scaleFactor), (int)(image.Height * scaleFactor))); // preserve aspect ratio
-            var destRect = new Rectangle(0, 0, targetWidth, targetHeight);
-            var destImage = new Bitmap(targetWidth, targetHeight);
+            var scaleFactor = targetDimension / (double)Math.Min(srcImage.Width, srcImage.Height);
+            if (scaleFactor > 1) return null; // Don't increase image size
+            var rectWidth = (int)(targetDimension / scaleFactor);
+            var rectHeight = (int)(targetDimension / scaleFactor);
+            var rectX = (srcImage.Width - rectWidth) / 2;
+            var rectY = (srcImage.Height - rectHeight) / 2;
+            var destRect = new Rectangle(0, 0, targetDimension, targetDimension);
 
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            var destImage = new Bitmap(targetDimension, targetDimension);
+            destImage.SetResolution(srcImage.HorizontalResolution, srcImage.VerticalResolution);
 
             using (var graphics = Graphics.FromImage(destImage))
             {
@@ -37,15 +48,44 @@ namespace ordercloud.integrations.cms
                 using (var wrapMode = new ImageAttributes())
                 {
                     wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                    graphics.DrawImage(srcImage, destRect, rectX, rectY, rectWidth, rectHeight, GraphicsUnit.Pixel, wrapMode);
                 }
             }
 
             return destImage;
         }
 
+        private static Image CreateSquareWhiteSpaced(this Image srcImage, int targetDimension)
+        {
+            var scaleFactor = targetDimension / (double)Math.Max(srcImage.Width, srcImage.Height);
+            if (scaleFactor > 1) return null; // Don't increase image size
+            var rectWidth = (int)(srcImage.Width * scaleFactor);
+            var rectHeight = (int)(srcImage.Height * scaleFactor);
+            var rectX = (targetDimension - rectWidth) / 2;
+            var rectY = (targetDimension - rectHeight) / 2;
+            var destRect = new Rectangle(rectX, rectY, rectWidth, rectHeight);
 
 
+            var destImage = new Bitmap(targetDimension, targetDimension);
+            destImage.SetResolution(srcImage.HorizontalResolution, srcImage.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(srcImage, destRect, 0, 0, srcImage.Width, srcImage.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
 
         public static byte[] ToBytes(this Image image, ImageFormat format)
         {

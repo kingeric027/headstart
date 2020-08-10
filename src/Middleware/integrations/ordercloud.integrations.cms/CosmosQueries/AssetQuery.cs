@@ -129,7 +129,7 @@ namespace ordercloud.integrations.cms
 		public async Task Delete(string assetInteropID, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
-			var asset = await GetWithoutExceptions(container.id, assetInteropID);
+			var asset = await GetDO(assetInteropID, user);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
 			Task deleteThumb = Task.FromResult(0);
 			if (asset.Type == AssetType.Image)
@@ -165,7 +165,7 @@ namespace ordercloud.integrations.cms
 				asset.Metadata.ImageHeight = image.Height;
 				asset.Metadata.ImageHorizontalResolution = (decimal)image.HorizontalResolution;
 				asset.Metadata.ImageVerticalResolution = (decimal)image.VerticalResolution;
-				return image.CreateThumbnail();
+				return image.CreateSquareThumbnail(300);
 			}
 		}
 
