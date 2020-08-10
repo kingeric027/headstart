@@ -9,7 +9,7 @@ import { FormGroup, FormArray } from '@angular/forms';
 import { CancelReturnTranslations } from './models/cancel-return-translations.model';
 import { returnHeaders, returnReasons, cancelReasons, cancelHeaders } from './constants/cancel-return-table.constants';
 import { CancelReturnReason } from './models/cancel-return-translations.enum';
-import { CanReturnOrCancel } from 'src/app/services/lineitem-status.helper';
+import { CanReturnOrCancel, NumberCanCancelOrReturn } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-return-table.component.html',
@@ -94,11 +94,7 @@ export class OCMOrderReturnTable {
   }
 
   getQuantityReturnedCanceled(lineItem: MarketplaceLineItem): number {
-    if (this._action === 'return') {
-      return lineItem.xp.StatusByQuantity['ReturnRequested'] + lineItem.xp.StatusByQuantity['Retruned'];
-    } else {
-      return lineItem.xp.StatusByQuantity['Canceled'] + lineItem.xp.StatusByQuantity['CancelRequested'];
-    }
+    return NumberCanCancelOrReturn(lineItem, this._action);
   }
 
   selectRow(row: FormGroup): void {

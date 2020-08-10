@@ -89,14 +89,7 @@ export class OrderHistoryService {
       .toPromise();
   }
 
-  async submitCancelOrReturn(orderID: string, lineItemStatusChange: any): Promise<MarketplaceLineItem[]> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
-    });
-    const url = `${this.appConfig.middlewareUrl}/order/${orderID}/lineitem/status`;
-    return this.httpClient
-      .post<MarketplaceLineItem[]>(url, lineItemStatusChange, { headers })
-      .toPromise();
+  async submitCancelOrReturn(orderID: string, lineItemStatusChange: any): Promise<void> {
+    return HeadStartSDK.Orders.BuyerUpdateLineItemStatusesWithNotification(orderID, lineItemStatusChange);
   }
 }
