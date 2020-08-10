@@ -15,10 +15,10 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faTimes, faCircle, faHeart, faAsterisk, faCheckCircle, faTimesCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
@@ -70,6 +70,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   faTrash = faTrash;
   faCircle = faCircle;
   faHeart = faHeart;
+  faAsterisk = faAsterisk;
+  faTimesCircle = faTimesCircle;
+  faCheckCircle = faCheckCircle;
+  faExclamationCircle = faExclamationCircle;
   _superMarketplaceProductStatic: SuperMarketplaceProduct;
   _superMarketplaceProductEditable: SuperMarketplaceProduct;
   supplierCurrency: SupportedRates;
@@ -140,7 +144,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   tabChanged(event: any, productID: string): void {
     const nextIndex = Number(event.nextId);
-    if (productID === null) return;
+    if (productID === null || this.isCreatingNew) return;
     const newLocation = nextIndex === 0 ? `products/${productID}` : `products/${productID}/${TabIndexMapper[nextIndex]}`;
     this.location.replaceState(newLocation);
   }
@@ -201,11 +205,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule?.UseCumulativeQuantity),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
-        IsResale: new FormControl(_get(superMarketplaceProduct.Product, 'xp.IsResale')),
+        IsResale: new FormControl({value: _get(superMarketplaceProduct.Product, 'xp.IsResale'), disabled: this.readonly}),
         QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
-        InventoryEnabled: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.Enabled')),
+        InventoryEnabled: new FormControl({value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'), disabled: this.readonly}),
         OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
-        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', 'P0000000'), Validators.required),
+        TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
@@ -257,6 +261,35 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     if(theControl.validator === null) return false;
     const validator = this.productForm.get(control).validator({} as AbstractControl);
     return validator && validator.required;
+  }
+
+  productDetailsTabIsValid(): boolean {
+    const requiredAndValid: string[] = Object.keys(this.productForm.controls).filter((k: string) => k !== 'Price' && this.isRequired(k) && this.productForm.controls[k].valid);
+    return requiredAndValid.sort().toString() === Object.keys(this.productForm.controls).filter((k: string) => k !== 'Price' && this.isRequired(k)).sort().toString();
+  }
+
+  // TODO: I'm sure there is a way to DRY this up
+  shipDimensionsValid(): boolean {
+    if (this.productForm.controls['ProductType'].value === 'Quote') return false;
+    return this.isCreatingNew 
+      && this.isRequired('ShipLength') 
+      && this.isRequired('ShipWidth') 
+      && this.isRequired('ShipHeight') 
+      && this.isRequired('ShipFromAddressID')
+      && this.productForm.controls['ShipLength'].valid
+      && this.productForm.controls['ShipWidth'].valid
+      && this.productForm.controls['ShipHeight'].valid
+      && this.productForm.controls['ShipFromAddressID'].valid
+  }
+
+  unitOfMeasureValid(): boolean {
+    return (
+      this.isCreatingNew 
+      && this.isRequired('UnitOfMeasureQty') 
+      && this.isRequired('UnitOfMeasureUnit') 
+      && this.productForm.controls['UnitOfMeasureUnit'].valid 
+      && this.productForm.controls['UnitOfMeasureQty'].valid
+    );
   }
 
   async getAvailableProductTypes(): Promise<void> {
@@ -329,10 +362,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const productUpdate = {
       field,
       value:
-        ['Product.Active', 'Product.xp.IsResale', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed'].includes(field)
+        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed'].includes(field)
           ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
+  }
+
+  handleUpdatePricing(event: any): void {
+    this.updateProductResource(event);
+    this.productForm.controls["Price"].setValue(event?.value?.PriceBreaks[0]?.Price);
   }
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
@@ -474,6 +512,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this._superMarketplaceProductEditable.Product.xp.Tax.Code = '';
     await this.setTaxCodes(event.target.value, '')
   }
+
+  handleTaxCodeSelection(event: TaxProperties): void {
+    const codeUpdate = {target: {value: event.Code}};
+    const descriptionUpdate = {target: {value: event.Description}};
+    this.productForm.controls["TaxCode"].setValue(event.Code);
+    this.handleUpdateProduct(codeUpdate, 'Product.xp.Tax.Code');
+    this.handleUpdateProduct(descriptionUpdate, 'Product.xp.Tax.Description');
+  }
+
   // Reset TaxCode Code and Description if a new TaxCode Category is selected
   resetTaxCodeAndDescription(): void {
     this.handleUpdateProduct({ target: { value: null } }, 'Product.xp.Tax.Code');

@@ -2,6 +2,8 @@ import { Component, Input, Output, EventEmitter, ViewChild, OnChanges, SimpleCha
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { SuperMarketplaceProduct, ListPage, TaxProperties } from '@ordercloud/headstart-sdk';
+import { faTimesCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'product-tax-code-select-dropdown',
@@ -10,6 +12,8 @@ import { SuperMarketplaceProduct, ListPage, TaxProperties } from '@ordercloud/he
 })
 export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Input()
+  productForm: FormGroup;
+  @Input()
   taxCodes: ListPage<TaxProperties>;
   @Input()
   superMarketplaceProductEditable: SuperMarketplaceProduct;
@@ -17,6 +21,8 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   readonly: boolean;
   @Input()
   isRequired: boolean
+  @Input()
+  isCreatingNew: boolean
 
   @Output()
   taxCodesSearched = new EventEmitter<any>();
@@ -25,6 +31,8 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Output()
   onSelectTaxCode = new EventEmitter<TaxProperties>();
 
+  faTimesCircle = faTimesCircle;
+  faCheckCircle = faCheckCircle;
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   searchTerm = '';
