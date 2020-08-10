@@ -15,7 +15,7 @@ namespace ordercloud.integrations.cms
 		public string ParentRsrcID { get; set; } = null;
 		public ResourceType RsrcType { get; set; }
 		[CosmosPartitionKey]
-		public string ClientID { get; set; }
+		public string SellerOrgID { get; set; }
 		public string SchemaID { get; set; } // real ID
 		public string DocID { get; set; } // real ID
 
@@ -24,7 +24,7 @@ namespace ordercloud.integrations.cms
 			return new Collection<UniqueKey>
 			{
 				// Resource is abreviated as Rsrc because I'm running up against a 60 char limit in Cosmos for the sum of field paths in a unique key
-				new UniqueKey() { Paths = new Collection<string> { "/RsrcID", "/RsrcType", "/ParentRsrcID", "/ClientID", "/SchemaID", "/DocID"  }}
+				new UniqueKey() { Paths = new Collection<string> { "/RsrcID", "/RsrcType", "/ParentRsrcID", "/SellerOrgID", "/SchemaID", "/DocID"  }}
 			};
 		}
 	}
