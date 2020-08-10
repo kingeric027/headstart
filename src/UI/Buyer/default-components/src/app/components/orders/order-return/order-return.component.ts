@@ -4,6 +4,7 @@ import { MarketplaceOrder, MarketplaceLineItem, OrderDetails, LineItem } from '@
 import { groupBy as _groupBy, flatten as _flatten } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
+import { CanReturnOrCancel } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-return.component.html',
@@ -21,7 +22,7 @@ export class OCMOrderReturn {
   _action: string;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
-    this.lineItems = value.LineItems;
+    this.lineItems = value.LineItems.filter(li => CanReturnOrCancel(li, this._action));
     //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
     const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
     this.liGroupedByShipFrom = Object.values(liGroups);
