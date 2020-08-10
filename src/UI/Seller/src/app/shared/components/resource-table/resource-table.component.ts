@@ -330,6 +330,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     }
   }
 
+  impersonateUser() {
+    if(this.activatedRoute.snapshot?.params?.supplierID) {
+      //impersonate supplier
+    }
+    console.log(this._resourceInSelection)
+    console.log(this.parentResources) 
+  }
+
   getSelectedFilterValue(pathOfFilter: string) {
     return (this.resourceOptions && this.resourceOptions.filters && this.resourceOptions.filters[pathOfFilter]) || '';
   }
