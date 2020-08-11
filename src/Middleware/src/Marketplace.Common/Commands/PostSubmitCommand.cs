@@ -287,7 +287,8 @@ namespace Marketplace.Common.Commands
                     ShipFromAddressIDs = shipFromAddressIDs,
                     SupplierIDs = supplierIDs,
                     ClaimStatus = ClaimStatus.NoClaim,
-                    ShippingStatus = ShippingStatus.Processing
+                    ShippingStatus = ShippingStatus.Processing,
+                    SubmittedOrderStatus = SubmittedOrderStatus.Open
                 }
             };
             
@@ -304,7 +305,10 @@ namespace Marketplace.Common.Commands
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
                 QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
-				Currency = supplier.xp.Currency
+				Currency = supplier.xp.Currency,
+                ClaimStatus = ClaimStatus.NoClaim,
+                ShippingStatus = ShippingStatus.Processing,
+                SubmittedOrderStatus = SubmittedOrderStatus.Open
             };
             return supplierOrderXp;
         }
