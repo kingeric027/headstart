@@ -3,8 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OcPromotionService, Product, OcProductService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { MarketplaceKitProduct, MiddlewareKitService } from '../shared/services/middleware-api/middleware-kit.service';
-import { AssetForDelivery } from '@ordercloud/headstart-sdk';
+import { MiddlewareKitService } from '../shared/services/middleware-api/middleware-kit.service';
+import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 @Injectable({
     providedIn: 'root',
 })
@@ -59,6 +59,9 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
                 },
             ]
         },
+        xp: {
+            Static: false
+        }
     };
 
     constructor(

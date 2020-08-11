@@ -1,28 +1,9 @@
-import { Product, OcTokenService } from '@ordercloud/angular-sdk';
-import { AssetForDelivery, ListPage, Asset } from '@ordercloud/headstart-sdk';
-import { Injectable, Inject } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { Router } from '@angular/router';
+import { OcTokenService } from '@ordercloud/angular-sdk';
+import { ListPage, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 
-export interface MarketplaceKitProduct {
-    Product: Product;
-    Images: Asset[];
-    Attachments: Asset[];
-    ProductAssignments: KitProduct;
-}
-export interface KitProductDocument extends Document {
-    Doc: KitProduct;
-}
-export interface KitProduct {
-    ProductsInKit: ProductInKit[];
-}
-export interface ProductInKit {
-    ID: string;
-    Required: boolean;
-    MinQty: number;
-    MaxQty: number;
-}
 
 @Injectable({
     providedIn: 'root',

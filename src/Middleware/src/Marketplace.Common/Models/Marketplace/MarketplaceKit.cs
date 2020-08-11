@@ -1,4 +1,4 @@
-﻿using ordercloud.integrations.cms;
+using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
@@ -28,8 +28,8 @@ namespace Marketplace.Common.Models.Marketplace
     {
         public string ID { get; set; }
         public bool Required { get; set; }
-        public int MinQty { get; set; }
-        public int MaxQty { get; set; }
+        public int? MinQty { get; set; }
+        public int? MaxQty { get; set; }
     }
 
 }

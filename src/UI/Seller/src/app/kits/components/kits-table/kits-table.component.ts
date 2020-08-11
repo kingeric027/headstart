@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { KitService } from '@app-seller/kits/kits.service';
-import { MarketplaceKitProduct } from '../../../shared/services/middleware-api/middleware-kit.service';
+import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
     selector: 'app-kits-table',

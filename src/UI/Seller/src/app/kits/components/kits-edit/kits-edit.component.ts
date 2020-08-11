@@ -2,14 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AppAuthService } from '@app-seller/auth';
 import { KitService } from '@app-seller/kits/kits.service';
-import { MarketplaceKitProduct, MiddlewareKitService, ProductInKit } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
 import { faCircle, faHeart, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ListAddress } from '@ordercloud/angular-sdk';
-import { HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, Asset, AssetUpload, MarketplaceKitProduct, ProductInKit } from '@ordercloud/headstart-sdk';
 import { Router } from '@angular/router';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MiddlewareKitService } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
 @Component({
     selector: 'app-kits-edit',
     templateUrl: './kits-edit.component.html',
@@ -80,7 +80,7 @@ export class KitsEditComponent implements OnInit {
 
     async getProductList() {
         const accessToken = await this.appAuthService.fetchToken().toPromise();
-        const productList = await HeadStartSDK.Products.List({}, accessToken);
+        const productList = await HeadStartSDK.Products.List({ page: 1, pageSize: 100, filters: {} }, accessToken);
         this.productList = productList?.Items.filter(p => p.PriceSchedule.ID !== null);
     }
 
@@ -143,6 +143,8 @@ export class KitsEditComponent implements OnInit {
             if (JSON.stringify(this.kitProductEditable) !== JSON.stringify(this.kitProductStatic)) {
                 superProduct = await this.middlewareKitService.Update(this.kitProductEditable);
             }
+            if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
+            if (this.staticContentFiles.length > 0) { await this.addDocuments(this.staticContentFiles, superProduct.Product.ID); }
             this.dataIsSaving = false;
         } catch (ex) {
             this.dataIsSaving = false;
@@ -211,7 +213,8 @@ export class KitsEditComponent implements OnInit {
     handleDeleteAssignment(event: any, product: any) {
         const updatedAssignments = this.kitProductEditable.ProductAssignments.ProductsInKit;
         for (let i = 0; i < updatedAssignments.length; i++) {
-            if (updatedAssignments[i].ID === product.ID) { updatedAssignments.splice(i, 1) }
+            if (updatedAssignments[i].ID === product.ID) { updatedAssignments.splice(i, 1); }
+            if (this.productsIncluded[i].ID === product.ID) { this.productsIncluded.splice(i, 1); }
         }
         const updatedProduct = {
             field: 'ProductAssignments.ProductsInKit',
@@ -262,6 +265,7 @@ export class KitsEditComponent implements OnInit {
     stageImages(files: FileHandle[]): void {
         this.imageFiles = this.imageFiles.concat(files);
         this.checkForChanges();
+        debugger;
     }
     async addDocuments(files: FileHandle[], productID: string): Promise<void> {
         let superProduct;
@@ -276,13 +280,14 @@ export class KitsEditComponent implements OnInit {
 
     async addImages(files: FileHandle[], productID: string): Promise<void> {
         let superProduct;
-        for (const file of files) {
-            superProduct = await this.uploadAsset(productID, file, 'Image');
-        }
+        // for (const file of files) {
+        //     superProduct = await this.uploadAsset(productID, file, 'Image');
+        // }
         this.imageFiles = []
         // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
         superProduct = Object.assign(this.kitProductStatic || {}, superProduct);
         this.refreshProductData(superProduct);
+        debugger;
     }
     async uploadAsset(productID: string, file: FileHandle, assetType: string): Promise<MarketplaceKitProduct> {
         const accessToken = await this.appAuthService.fetchToken().toPromise();
@@ -293,7 +298,7 @@ export class KitsEditComponent implements OnInit {
             FileName: file.Filename
         }
         const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-        await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
+        await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken);
         return await this.middlewareKitService.Get(productID);
     }
     async removeFile(file: Asset): Promise<void> {
