@@ -276,6 +276,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       && this.productForm.controls['ShipLength'].valid
       && this.productForm.controls['ShipWidth'].valid
       && this.productForm.controls['ShipHeight'].valid
+      && this.productForm.controls['ShipWeight'].valid
       && this.productForm.controls['ShipFromAddressID'].valid
   }
 
