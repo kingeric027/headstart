@@ -128,8 +128,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   setResourceType(): void {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
-    const productTypeFromUrl = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
     if (this.productService.checkIfCreatingNew()) {
+      const productTypeFromUrl = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
       this.productType = productTypeFromUrl as ProductXp["ProductType"];
     }
     this.productForm.controls['ProductType'].setValue(this.productType);
