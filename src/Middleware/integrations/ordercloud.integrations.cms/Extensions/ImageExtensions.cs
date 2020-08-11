@@ -27,32 +27,14 @@ namespace ordercloud.integrations.cms
 		{
             var scaleFactor = targetDimension / (double)Math.Min(srcImage.Width, srcImage.Height);
             if (scaleFactor > 1) return null; // Don't increase image size
-            var rectWidth = (int)(targetDimension / scaleFactor);
-            var rectHeight = (int)(targetDimension / scaleFactor);
-            var rectX = (srcImage.Width - rectWidth) / 2;
-            var rectY = (srcImage.Height - rectHeight) / 2;
+            var srcDimension = (int)(targetDimension / scaleFactor);
+            var rectX = (srcImage.Width - srcDimension) / 2;
+            var rectY = (srcImage.Height - srcDimension) / 2;
             var destRect = new Rectangle(0, 0, targetDimension, targetDimension);
+            var srcRect = new Rectangle(rectX, rectY, srcDimension, srcDimension);
 
+            return srcImage.CreateSquare(targetDimension, srcRect, destRect);
 
-            var destImage = new Bitmap(targetDimension, targetDimension);
-            destImage.SetResolution(srcImage.HorizontalResolution, srcImage.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(srcImage, destRect, rectX, rectY, rectWidth, rectHeight, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return destImage;
         }
 
         private static Image CreateSquareWhiteSpaced(this Image srcImage, int targetDimension)
@@ -64,8 +46,13 @@ namespace ordercloud.integrations.cms
             var rectX = (targetDimension - rectWidth) / 2;
             var rectY = (targetDimension - rectHeight) / 2;
             var destRect = new Rectangle(rectX, rectY, rectWidth, rectHeight);
+            var srcRect = new Rectangle(0, 0, srcImage.Width, srcImage.Height);
 
+            return srcImage.CreateSquare(targetDimension, srcRect, destRect);
+        }
 
+        private static Image CreateSquare(this Image srcImage, int targetDimension, Rectangle srcRect, Rectangle destRect)
+		{
             var destImage = new Bitmap(targetDimension, targetDimension);
             destImage.SetResolution(srcImage.HorizontalResolution, srcImage.VerticalResolution);
 
@@ -80,12 +67,13 @@ namespace ordercloud.integrations.cms
                 using (var wrapMode = new ImageAttributes())
                 {
                     wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(srcImage, destRect, 0, 0, srcImage.Width, srcImage.Height, GraphicsUnit.Pixel, wrapMode);
+                    graphics.DrawImage(srcImage, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, wrapMode);
                 }
             }
 
             return destImage;
         }
+
 
         public static byte[] ToBytes(this Image image, ImageFormat format)
         {

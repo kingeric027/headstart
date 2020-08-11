@@ -77,13 +77,10 @@ namespace ordercloud.integrations.cms
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
 			if (form.File != null) {
-				Task uploadThumb = Task.FromResult(0);
 				if (asset.Type == AssetType.Image)
 				{
-					var thumbNail = OpenImageDetails(ref asset, form);
-					uploadThumb = _blob.UploadAsset(container, $"{asset.id}-m", thumbNail);
+					asset = await OpenImageAndUploadThumbs(container, asset, form);
 				}
-				await uploadThumb;
 				await _blob.UploadAsset(container, asset.id, form.File);
 			}
 			asset.History = HistoryBuilder.OnCreate(user);
@@ -153,7 +150,7 @@ namespace ordercloud.integrations.cms
 			return asset;
 		}
 
-		private Image OpenImageDetails(ref AssetDO asset, AssetUpload form)
+		private async Task<AssetDO> OpenImageAndUploadThumbs(AssetContainerDO container, AssetDO asset, AssetUpload form)
 		{
 			if (!ValidImageFormats.Contains(form.File.ContentType))
 			{
@@ -165,8 +162,14 @@ namespace ordercloud.integrations.cms
 				asset.Metadata.ImageHeight = image.Height;
 				asset.Metadata.ImageHorizontalResolution = (decimal)image.HorizontalResolution;
 				asset.Metadata.ImageVerticalResolution = (decimal)image.VerticalResolution;
-				return image.CreateSquareThumbnail(300);
+				var small = image.CreateSquareThumbnail(100);
+				var medium = image.CreateSquareThumbnail(300);
+				await Task.WhenAll(new[] {
+					_blob.UploadAsset(container, $"{asset.id}-m", medium),
+					_blob.UploadAsset(container, $"{asset.id}-s", small)
+				});
 			}
+			return asset;
 		}
 
 		private async Task<AssetDO> GetWithoutExceptions(string containerID, string assetInteropID)
