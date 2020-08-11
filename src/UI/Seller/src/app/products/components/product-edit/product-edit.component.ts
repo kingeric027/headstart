@@ -234,7 +234,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   setNonRequiredFields(): void {
-    const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipFromAddressID', 'Price'];
+    const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipWeight', 'ShipFromAddressID', 'Price'];
     const optionalControls = optionalFieldsArray.map(item => this.productForm.get(item))
     this.productForm.get('ProductType').valueChanges
     .pipe(takeWhile(() => this.alive)).subscribe(productType => {
@@ -271,6 +271,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       && this.isRequired('ShipLength') 
       && this.isRequired('ShipWidth') 
       && this.isRequired('ShipHeight') 
+      && this.isRequired('ShipWeight') 
       && this.isRequired('ShipFromAddressID')
       && this.productForm.controls['ShipLength'].valid
       && this.productForm.controls['ShipWidth'].valid
