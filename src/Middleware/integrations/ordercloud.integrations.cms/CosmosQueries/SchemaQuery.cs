@@ -4,6 +4,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ordercloud.integrations.cms
@@ -33,7 +34,8 @@ namespace ordercloud.integrations.cms
 
 		public async Task<ListPage<DocSchema>> List(IListArgs args, VerifiedUserContext user)
 		{
-			var query = _store.Query(GetFeedOptions(user.SellerID))
+			var query = _store.Query()
+				.Where(s => s.SellerOrgID == user.SellerID)
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -106,7 +108,7 @@ namespace ordercloud.integrations.cms
 
 		private async Task<DocSchemaDO> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)
 		{
-			var schema = await _store.Query(GetFeedOptions(user.SellerID)).FirstOrDefaultAsync(s => s.InteropID == schemaInteropID);
+			var schema = await _store.Query().FirstOrDefaultAsync(s => s.InteropID == schemaInteropID && s.SellerOrgID == user.SellerID);
 			return schema;
 		}
 
@@ -116,8 +118,5 @@ namespace ordercloud.integrations.cms
 			schema.History = HistoryBuilder.OnCreate(user);
 			return schema;
 		}
-
-		private FeedOptions GetFeedOptions(string sellerOrgID) => new FeedOptions() { PartitionKey = new PartitionKey(sellerOrgID) };
-
 	}
 }

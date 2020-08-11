@@ -7,15 +7,18 @@
 // --------------------------------------------------------------------------------------
 
 $blue: #1c3f65;
-$indigo: #6610f2;
+$indigo: #0824f5; // intense blue
 $purple: #6f42c1;
 $pink: #e83e8c;
-$red: #dc3545;
+$red: #fe0701; // intense red
 $orange: #e65727;
 $yellow: #ffc107;
 $teal: #20c997;
 $cyan: #94a8cd;
 $green: #28a745;
+$intense-blue: #0824f5;
+$intense-red: #fe0701;
+$iron-gray: #636466;
 
 $white: #fff;
 $gray-100: #f8f9fa;
@@ -30,7 +33,7 @@ $gray-900: #212529;
 $black: #000;
 
 $primary: $blue;
-$secondary: $orange;
+$secondary: $iron-gray;
 $success: $green;
 $info: $cyan;
 $warning: $yellow;

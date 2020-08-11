@@ -63,6 +63,7 @@ export class CurrentUserService {
 
   async getMySupplier(): Promise<Supplier> {
     const me = await this.getUser();
+    if (!me.Supplier) return;
     return this.mySupplier && this.mySupplier.ID === me.Supplier.ID ? this.mySupplier : await this.refreshSupplier(me.Supplier.ID); 
   }
 

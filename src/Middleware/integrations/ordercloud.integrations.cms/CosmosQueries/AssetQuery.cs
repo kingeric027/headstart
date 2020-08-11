@@ -42,7 +42,8 @@ namespace ordercloud.integrations.cms
 		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
-			var query = _assetStore.Query(GetFeedOptions(container.id))
+			var query = _assetStore.Query()
+				.Where(a => a.ContainerID == container.id)
 				.Search(args)
 				.Filter(args)
 				.Sort(args);
@@ -92,6 +93,7 @@ namespace ordercloud.integrations.cms
 				if (asset.Url == null) throw new AssetCreateValidationException("Must include a Url");
 				existingAsset = new AssetDO()
 				{
+					Type = asset.Type,
 					ContainerID = container.id,
 					History = HistoryBuilder.OnCreate(user),
 					Metadata = new AssetMetadata() { IsUrlOverridden = true  }
@@ -136,10 +138,8 @@ namespace ordercloud.integrations.cms
 
 		private async Task<AssetDO> GetWithoutExceptions(string containerID, string assetInteropID)
 		{
-			var asset = await _assetStore.Query(GetFeedOptions(containerID)).FirstOrDefaultAsync(a => a.InteropID == assetInteropID);
+			var asset = await _assetStore.Query().FirstOrDefaultAsync(a => a.InteropID == assetInteropID && a.ContainerID == containerID);
 			return asset;
 		}
-
-		private FeedOptions GetFeedOptions(string containerID) => new FeedOptions() { PartitionKey = new PartitionKey(containerID) };
  	}
 }

@@ -3,12 +3,13 @@ import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ShopperContextService } from 'marketplace';
-import { Supplier } from 'ordercloud-javascript-sdk'
+import { Supplier } from 'ordercloud-javascript-sdk';
 import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
 import { CancelReturnTranslations } from './models/cancel-return-translations.model';
 import { returnHeaders, returnReasons, cancelReasons, cancelHeaders } from './constants/cancel-return-table.constants';
 import { CancelReturnReason } from './models/cancel-return-translations.enum';
+import { CanReturnOrCancel, NumberCanCancelOrReturn } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-return-table.component.html',
@@ -29,12 +30,12 @@ export class OCMOrderReturnTable {
     'quantityOrdered',
     'quantityReturned',
     'quantityToReturnOrCancel',
-    'returnReason' 
-];
+    'returnReason',
+  ];
   _action: string;
-  
+
   @Input() set liGroup(value: MarketplaceLineItem[]) {
-    this._liGroup = value; 
+    this._liGroup = value;
   }
   @Input() supplier: Supplier;
   @Input() set liGroupForm(value: FormGroup) {
@@ -43,25 +44,25 @@ export class OCMOrderReturnTable {
   }
   @Input() set action(value: string) {
     this._action = value;
-    if(value === 'return') {
+    if (value === 'return') {
       this.translationData = {
         Headers: returnHeaders,
-        AvailableReasons: returnReasons
-      }
+        AvailableReasons: returnReasons,
+      };
     } else {
       this.translationData = {
         Headers: cancelHeaders,
-        AvailableReasons: cancelReasons
-      }
+        AvailableReasons: cancelReasons,
+      };
     }
   }
   @Output()
   quantitiesToReturnEvent = new EventEmitter<number>();
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   getImageUrl(lineItemID: string): string {
-    return getPrimaryLineItemImage(lineItemID, this._liGroup)
+    return getPrimaryLineItemImage(lineItemID, this._liGroup);
   }
 
   toProductDetails(productID: string): void {
@@ -89,20 +90,11 @@ export class OCMOrderReturnTable {
   }
 
   isRowEnabled(row: FormGroup): boolean {
-    return (this._action === 'return') ? 
-      // if quantity shipped greater than quantity already returned  
-      row.controls.lineItem.value.QuantityShipped > 
-      (row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn || 0) : 
-      // if quantity NOT shipped greater than quantity already canceled
-      (row.controls.lineItem.value.Quantity - row.controls.lineItem.value.QuantityShipped) > 
-      (row.controls.lineItem.value.xp?.LineItemCancelInfo?.QuantityToCancel || 0);
-
+    return CanReturnOrCancel(row.controls.lineItem.value, this._action);
   }
 
   getQuantityReturnedCanceled(lineItem: MarketplaceLineItem): number {
-    return (this._action === 'return') ? 
-      (lineItem.xp?.LineItemReturnInfo?.QuantityToReturn || 0) : 
-      ((lineItem.xp as any)?.LineItemCancelInfo?.QuantityToCancel || 0);
+    return NumberCanCancelOrReturn(lineItem, this._action);
   }
 
   selectRow(row: FormGroup): void {
@@ -118,20 +110,20 @@ export class OCMOrderReturnTable {
     row.controls.returnReason.disable();
     row.controls.selected.setValue(false);
   }
-  
+
   /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle(): void {    
+  masterToggle(): void {
     if (this.isAllEnabledSelected()) {
       this.dataSource.data.forEach(row => {
         if (this.isRowEnabled(row)) {
           this.deselectRow(row);
-       }
+        }
       });
     } else {
       this.dataSource.data.forEach(row => {
         if (this.isRowEnabled(row)) {
           this.selectRow(row);
-       }
+        }
       });
     }
   }
@@ -143,7 +135,7 @@ export class OCMOrderReturnTable {
       this.selectRow(row);
     }
   }
-  
+
   /** The label for the checkbox on the passed row */
   checkboxLabel(i: number, row?: FormGroup): string {
     if (!row) {
