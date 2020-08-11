@@ -2,8 +2,8 @@
   <div class="d-flex justify-content-between align-items-center">
     <h6 class="font-weight-medium">Tax Categorization</h6>
     <fa-icon [hidden]="productForm.controls['ProductType'].value === 'Quote'"
-             class="text-danger"
-             [icon]="faTimesCircle"
+             class="tab-status-icon text-danger"
+             [icon]="faAsterisk"
              *ngIf="isCreatingNew && !taxSelectionsValid()">
     </fa-icon>
     <fa-icon [hidden]="productForm.controls['ProductType'].value === 'Quote'"

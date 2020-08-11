@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import { SuperMarketplaceProduct, ListPage, TaxProperties } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
-import { faTimesCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faCheckCircle, faAsterisk } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'product-tax-code-select-component',
@@ -35,6 +35,7 @@ export class ProductTaxCodeSelect {
   isCreatingNew: boolean;
   faTimesCircle = faTimesCircle;
   faCheckCircle = faCheckCircle;
+  faAsterisk = faAsterisk;
 
   onTaxCodeCategorySelection(event): void {
     this.handleTaxCodeCategorySelection.emit(event);

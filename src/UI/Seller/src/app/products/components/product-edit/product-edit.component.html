@@ -9,13 +9,13 @@
       <!-- Product Details -->
       <li [ngbNavItem]="0"
           id="0">
-        <a class="text-muted"
+        <a class="text-muted d-flex justify-content-center align-items-center"
            ngbNavLink
-           translate>ADMIN.PRODUCT_EDIT.PRODUCT <fa-icon class="text-danger tab-status-icon"
-                   [icon]="faTimesCircle"
+           translate>ADMIN.PRODUCT_EDIT.PRODUCT <fa-icon class="tab-status-icon text-danger ml-1"
+                   [icon]="faExclamationCircle"
                    *ngIf="isCreatingNew && !productDetailsTabIsValid()">
           </fa-icon>
-          <fa-icon class="text-success tab-status-icon"
+          <fa-icon class="tab-status-icon text-success ml-1"
                    [icon]="faCheckCircle"
                    *ngIf="isCreatingNew && productDetailsTabIsValid()">
           </fa-icon>
@@ -28,8 +28,8 @@
                   <!-- Product Name -->
                   <div class="d-flex justify-content-between align-items-center">
                     <h6 class="font-weight-medium">Details</h6>
-                    <fa-icon class="text-danger"
-                             [icon]="faTimesCircle"
+                    <fa-icon class="tab-status-icon text-danger"
+                             [icon]="faAsterisk"
                              *ngIf="isCreatingNew && isRequired('Name') && !this.productForm.controls['Name']?.valid">
                     </fa-icon>
                     <fa-icon class="text-success"
@@ -116,8 +116,8 @@
                 <div class="card py-2 px-3 mt-3 bg-white">
                   <div class="d-flex justify-content-between align-items-center">
                     <h6 class="font-weight-medium">Unit of Measure</h6>
-                    <fa-icon class="text-danger"
-                             [icon]="faTimesCircle"
+                    <fa-icon class="tab-status-icon text-danger"
+                             [icon]="faAsterisk"
                              *ngIf="isCreatingNew && !unitOfMeasureValid()">
                     </fa-icon>
                     <fa-icon class="text-success"
@@ -259,8 +259,8 @@
                 <div class="card py-2 px-3 mt-3 bg-white">
                   <div class="d-flex justify-content-between align-items-center">
                     <h6 class="font-weight-medium">Packaged Weight</h6>
-                    <fa-icon class="text-danger"
-                             [icon]="faTimesCircle"
+                    <fa-icon class="tab-status-icon text-danger"
+                             [icon]="faAsterisk"
                              *ngIf="isCreatingNew && isRequired('ShipWeight') && !this.productForm.controls['ShipWeight']?.valid">
                     </fa-icon>
                     <fa-icon class="text-success"
@@ -289,8 +289,8 @@
                     <h6 class="font-weight-medium"
                         translate>Shipping Dimensions & From Address</h6>
                     <fa-icon [hidden]="productForm.controls['ProductType'].value === 'Quote'"
-                             class="text-danger"
-                             [icon]="faTimesCircle"
+                             class="tab-status-icon text-danger"
+                             [icon]="faAsterisk"
                              *ngIf="isCreatingNew && !shipDimensionsValid()">
                     </fa-icon>
                     <fa-icon [hidden]="productForm.controls['ProductType'].value === 'Quote'"
@@ -376,7 +376,7 @@
                      translate>ADMIN.PRODUCT_EDIT.PRODUCT_PREVIEW</p>
                   <div class="card product-preview w-100 border-hover cursor-pointer">
                     <div class="ribbon ribbon-top-right bg-light">
-                      <fa-icon class="text-danger"
+                      <fa-icon class="tab-status-icon text-danger"
                                [icon]="faHeart"
                                style="cursor: pointer;"></fa-icon>
                     </div>
@@ -482,16 +482,16 @@
       <li [ngbNavItem]="3"
           id="3">
         <a [fragment]="price"
-           class="text-muted"
+           class="text-muted d-flex justify-content-center align-items-center"
            ngbNavLink
            translate>
           ADMIN.PRODUCT_EDIT.PRICING
           <!-- Validity Status Indicators -->
-          <fa-icon class="text-danger tab-status-icon"
-                   [icon]="faTimesCircle"
+          <fa-icon class="tab-status-icon text-danger ml-1"
+                   [icon]="faExclamationCircle"
                    *ngIf="isCreatingNew && isRequired('Price') && !productForm.controls['Price'].valid">
           </fa-icon>
-          <fa-icon class="text-success tab-status-icon"
+          <fa-icon class="tab-status-icon text-success ml-1"
                    [icon]="faCheckCircle"
                    *ngIf="isCreatingNew && isRequired('Price') && productForm.controls['Price'].valid">
           </fa-icon>
