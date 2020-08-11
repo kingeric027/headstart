@@ -14,11 +14,9 @@ namespace Marketplace.Common.Commands
     public class ProductAssignmentSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly IAssetQuery _assets;
-        public ProductAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IAssetQuery assets) : base(settings, oc, assets, log)
+        public ProductAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
-            _assets = assets;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)

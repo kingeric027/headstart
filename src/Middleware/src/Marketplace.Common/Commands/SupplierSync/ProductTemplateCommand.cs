@@ -154,6 +154,11 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string ErrorMessage { get; set; }
     }
 
+    [SwaggerModel]
+    public class PartialTemplateProductFlat : PartialProduct<ProductXp>
+    {
+    }
+
     public class TemplateProductFlat : IMarketplaceObject
     {
         [OrderCloud.SDK.Required]
@@ -165,7 +170,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         [MinValue(1)]
         public int QuantityMultiplier { get; set; }
 
-        public string ShipAddressID { get; set; }
+        public string ShipFromAddressID { get; set; }
         public decimal? ShipWeight { get; set; }
         public decimal? ShipHeight { get; set; }
         public decimal? ShipWidth { get; set; }

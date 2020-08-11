@@ -40,13 +40,11 @@ namespace Marketplace.Orchestration
                 var wi = new WorkItem(path)
                 {
                     Cache = await context.CallActivityAsync<JObject>("GetCachedItem", path),
-                    //Current = await context.CallActivityAsync<JObject>("GetQueuedItem", path)
                 };
                 var queue = await context.CallActivityAsync<JObject>("GetQueuedItem", path);
                 wi.Current = queue["Model"] as JObject;
                 wi.Token = queue["Token"].ToString();
                 wi.ClientId = queue["ClientId"].ToString();
-                //wi.User = await context.CallActivityAsync<VerifiedUserContext>("DefineUserContext", wi);
                 wi.Diff = await context.CallActivityAsync<JObject>("CalculateDiff", wi);
                 wi.Action = await context.CallActivityAsync<Action>("DetermineAction", wi);
 
@@ -69,20 +67,24 @@ namespace Marketplace.Orchestration
                 
                 await context.CallActivityAsync("UpdateCache", wi);
 
+                log.LogDebug($"{wi.RecordId}: {wi.Action} success");
                 log.LogInformation($"{wi.RecordId}: {wi.Action} successfully");
                 await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi) { Level = LogLevel.Success });
             }
             catch (OrchestrationException oex)
             {
                 log.LogError($"{oex.Error.Type}: {oex.Message}", oex.Error.Data);
+                log.LogDebug($"{oex.Error.Type}: {oex.Message}", oex.Error.Data);
             }
             catch (FunctionFailedException fex)
             {
                 log.LogError(fex.Message);
+                log.LogDebug(fex.Message);
             }
             catch (Exception ex)
             {
                 log.LogError(ex.Message);
+                log.LogDebug(ex.Message);
             }
             finally
             {

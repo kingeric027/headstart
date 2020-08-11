@@ -8,6 +8,7 @@ using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
 using Marketplace.Common.Commands.SupplierSync;
+using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
@@ -29,18 +30,28 @@ namespace Marketplace.Orchestration
 
             var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName,
                 settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
+            var cmsConfig = new CMSConfig()
+            {
+                BaseUrl = settings.EnvironmentSettings.BaseUrl,
+                BlobStorageHostUrl = settings.BlobSettings.HostUrl,
+                BlobStorageConnectionString = settings.BlobSettings.ConnectionString
+            };
             builder.Services
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
                 .Inject<IFlurlClient>()
-                .Inject<IAssetQuery>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl
                 })
+                .AddSingleton<CMSConfig>(x => cmsConfig)
+                .Inject<IAssetQuery>()
+                .Inject<IAssetedResourceQuery>()
+                .Inject<IBlobStorage>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()

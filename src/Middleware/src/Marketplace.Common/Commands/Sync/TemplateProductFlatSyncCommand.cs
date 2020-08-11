@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Exceptions;
@@ -19,24 +20,27 @@ namespace Marketplace.Common.Commands
     public class TemplateProductFlatSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly AssetQuery _assets;
+        private readonly IAssetQuery _assets;
+        private readonly IAssetedResourceQuery _assignment;
         private readonly IOrderCloudIntegrationsFunctionToken _token;
+        private VerifiedUserContext _user;
 
-        public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, AssetQuery assets) : base(settings, oc, assets, log)
+        public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IAssetQuery assets, IAssetedResourceQuery assignment) : base(settings, oc, assets, assignment, log)
         {
             _oc = oc;
             _assets = assets;
+            _assignment = assignment;
             _token = new OrderCloudIntegrationsFunctionToken(settings);
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<TemplateProductFlat>();
-            var user = await _token.Authorize(wi.Token, new[] {ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin});
+            var obj = wi.Current.ToObject<TemplateProductFlat>(OrchestrationSerializer.Serializer);
+            _user ??= await _token.Authorize(wi.Token, new[] {ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin});
             try
             {
-                obj.ID = wi.RecordId;
-                var priceSchedule = new MarketplacePriceSchedule()
+                obj.ID ??= wi.RecordId;
+                var priceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(obj.ID, new MarketplacePriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -48,14 +52,14 @@ namespace Marketplace.Common.Commands
                         {new PriceBreak() {Price = obj.Price.To<decimal>(), Quantity = obj.QuantityMultiplier}},
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
-                };
-                var product = new MarketplaceProduct()
+                }, _user.AccessToken);
+                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(obj.ID, new MarketplaceProduct()
                 {
                     Active = true,
                     AutoForward = false,
                     DefaultSupplierID = wi.ResourceId,
                     DefaultPriceScheduleID = priceSchedule.ID,
-                    ShipFromAddressID = obj.ShipAddressID,
+                    ShipFromAddressID = obj.ShipFromAddressID,
                     ID = obj.ID,
                     Name = obj.Name,
                     Description = obj.Description,
@@ -80,33 +84,30 @@ namespace Marketplace.Common.Commands
                             Unit = obj.UnitOfMeasure
                         }
                     }
-                };
-                var image = new Asset();
-                var asset = new AssetUpload()
+                }, _user.AccessToken);
+                Asset image = new Asset()
                 {
-                    ID = wi.RecordId,
-                    Type = AssetType.Image,
+                    ID = obj.ID,
                     Active = true,
-                    Url = obj.Url,
                     FileName = obj.FileName,
+                    Type = AssetType.Image,
+                    Url = obj.Url,
                     Title = obj.ImageTitle,
-                    Tags = obj.Tags, //.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                    Tags = obj.Tags?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
                 };
-                try
+                if (obj.Url != null)
                 {
-                    priceSchedule = await _oc.PriceSchedules.CreateAsync<MarketplacePriceSchedule>(priceSchedule, wi.Token);
-                }
-                catch (OrderCloudException exists) when (IdExists(exists))
-                {
-                    //continue on
-                }
-                finally
-                {
-                    product = await _oc.Products.CreateAsync<MarketplaceProduct>(product, wi.Token);
-                    image = await _assets.Create(asset, user);
+                    image = await _assets.Save(obj.ID, image, _user);
+                    await _assignment.SaveAssignment(new AssetAssignment()
+                    {
+                        AssetID = image.ID,
+                        ParentResourceID = product.ID,
+                        ResourceType = ResourceType.Products,
+                        ResourceID = product.ID
+                    }, _user);
                 }
                 
-                return JObject.FromObject(Map(product, priceSchedule, image));
+                return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
             }
             catch (OrderCloudException exId) when (IdExists(exId))
             {
@@ -146,11 +147,11 @@ namespace Marketplace.Common.Commands
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
             var obj = wi.Current.ToObject<TemplateProductFlat>(OrchestrationSerializer.Serializer);
-            var user = await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
+            _user ??= await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
             try
             {
-                if (obj.ID == null) obj.ID = wi.RecordId;
-                var priceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(wi.RecordId, new MarketplacePriceSchedule()
+                obj.ID ??= wi.RecordId;
+                var priceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(obj.ID, new MarketplacePriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -158,17 +159,18 @@ namespace Marketplace.Common.Commands
                     MaxQuantity = obj.MaxQuantity,
                     MinQuantity = obj.MinQuantity,
                     Name = obj.Name,
-                    PriceBreaks = new List<PriceBreak>() { new PriceBreak() { Price = obj.Price.To<decimal>(), Quantity = obj.QuantityMultiplier } },
+                    PriceBreaks = new List<PriceBreak>()
+                        {new PriceBreak() {Price = obj.Price.To<decimal>(), Quantity = obj.QuantityMultiplier}},
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
-                }, wi.Token);
-                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(wi.RecordId, new MarketplaceProduct()
+                }, _user.AccessToken);
+                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(obj.ID, new MarketplaceProduct()
                 {
                     Active = true,
                     AutoForward = false,
                     DefaultSupplierID = wi.ResourceId,
                     DefaultPriceScheduleID = priceSchedule.ID,
-                    ShipFromAddressID = obj.ShipAddressID,
+                    ShipFromAddressID = obj.ShipFromAddressID,
                     ID = obj.ID,
                     Name = obj.Name,
                     Description = obj.Description,
@@ -193,27 +195,63 @@ namespace Marketplace.Common.Commands
                             Unit = obj.UnitOfMeasure
                         }
                     }
-                }, wi.Token);
-                var image = await _assets.Save(wi.RecordId, new Asset()
+                }, _user.AccessToken);
+                Asset image = null;
+                if (obj.Url != null)
                 {
-                    Type = AssetType.Image,
-                    Active = true,
-                    Url = obj.Url,
-                    FileName = obj.FileName,
-                    Title = obj.ImageTitle,
-                    Tags = obj.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
-                }, user);
-                return JObject.FromObject(Map(product, priceSchedule, image));
+                    image = await _assets.Save(obj.ID, new Asset()
+                    {
+                        ID = obj.ID,
+                        Active = true,
+                        FileName = obj.FileName,
+                        Type = AssetType.Image,
+                        Url = obj.Url,
+                        Title = obj.ImageTitle,
+                        Tags = obj.Tags?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                    }, _user);
+                    await _assignment.SaveAssignment(new AssetAssignment()
+                    {
+                        AssetID = image.ID,
+                        ParentResourceID = product.ID,
+                        ResourceType = ResourceType.Products,
+                        ResourceID = product.ID
+                    }, _user);
+                }
+
+                return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
+            }
+            catch (OrderCloudException exId) when (IdExists(exId))
+            {
+                // handle 409 errors by refreshing cache
+                await _log.Save(new OrchestrationLog(wi)
+                {
+                    ErrorType = OrchestrationErrorType.CreateExistsError,
+                    Message = exId.Message,
+                    Level = LogLevel.Error,
+                    OrderCloudErrors = exId.Errors
+                });
+                return await GetAsync(wi);
             }
             catch (OrderCloudException ex)
             {
                 await _log.Save(new OrchestrationLog(wi)
                 {
-                    ErrorType = OrchestrationErrorType.UpdateGeneralError,
+                    ErrorType = OrchestrationErrorType.CreateGeneralError,
                     Message = ex.Message,
+                    Level = LogLevel.Error,
+                    OrderCloudErrors = ex.Errors
+                });
+                throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
+            }
+            catch (Exception e)
+            {
+                await _log.Save(new OrchestrationLog(wi)
+                {
+                    ErrorType = OrchestrationErrorType.CreateGeneralError,
+                    Message = e.Message,
                     Level = LogLevel.Error
                 });
-                throw new Exception(OrchestrationErrorType.UpdateGeneralError.ToString(), ex);
+                throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
         }
 
@@ -231,6 +269,7 @@ namespace Marketplace.Common.Commands
                 MinQuantity = priceSchedule.MinQuantity,
                 Name = product.Name,
                 Price = priceSchedule.PriceBreaks.FirstOrDefault()?.Price,
+                ShipFromAddressID = product.ShipFromAddressID,
                 ShipHeight = product.ShipHeight,
                 ShipLength = product.ShipLength,
                 ShipWidth = product.ShipWidth,
@@ -246,22 +285,38 @@ namespace Marketplace.Common.Commands
                 ImageTitle = asset?.Title,
                 Url = asset?.Url,
                 Type = asset?.Type ?? AssetType.Image,
-                Tags = asset?.Tags.JoinString(","),
+                Tags = asset?.Tags?.JoinString(","),
                 FileName = asset?.FileName
             };
         }
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var objProduct = wi.Diff.ToObject<PartialMarketplaceProduct>(OrchestrationSerializer.Serializer);
+            _user ??= await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
+            var objProduct = wi.Diff.ToObject<PartialTemplateProductFlat>(OrchestrationSerializer.Serializer);
             var objPrice = wi.Diff.ToObject<PartialPriceSchedule>(OrchestrationSerializer.Serializer);
-            // assets don't support partials
+            // don't see evidence Assets support partials. had to choose to either ignore or always update
+            var obj = wi.Current.ToObject<TemplateProductFlat>(OrchestrationSerializer.Serializer);
+            
             try
             {
-                //TODO: partial mapping
                 var product = await _oc.Products.PatchAsync<MarketplaceProduct>(wi.RecordId, objProduct, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.PatchAsync<MarketplacePriceSchedule>(wi.RecordId, objPrice, wi.Token);
-                return JObject.FromObject(Map(product, priceSchedule, null));
+                Asset image = null;
+                if (obj.Url != null)
+                {
+                    image = await _assets.Save(obj.ID, new Asset()
+                    {
+                        ID = obj.ID,
+                        Active = true,
+                        FileName = obj.FileName,
+                        Type = AssetType.Image,
+                        Url = obj.Url,
+                        Title = obj.ImageTitle,
+                        Tags = obj.Tags?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                    }, _user);
+                }
+                return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
             }
             catch (OrderCloudException ex)
             {
@@ -282,13 +337,21 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> GetAsync(WorkItem wi)
         {
-            var user = await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
+            _user ??= await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
             try
             {
                 var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
-                var image = await _assets.Get(wi.RecordId, user);
-                return JObject.FromObject(Map(product, priceSchedule, image));
+                var assn = await _assignment.GetFirstImage(
+                    new Resource()
+                    {
+                        ParentResourceID = product.ID, ResourceType = ResourceType.Products, ResourceID = product.ID
+                    }, _user);
+                Asset image = null;
+                if (assn != null)
+                    image = await _assets.Get(wi.RecordId, _user);
+
+                return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
             }
             catch (OrderCloudException ex)
             {

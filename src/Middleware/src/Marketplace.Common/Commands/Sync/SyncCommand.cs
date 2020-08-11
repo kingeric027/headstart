@@ -31,13 +31,19 @@ namespace Marketplace.Common.Commands
         protected readonly LogQuery _log;
         private readonly IOrderCloudClient _client;
         private readonly IAssetQuery _assets;
+        private readonly IAssetedResourceQuery _assetAssignment;
         
-        public SyncCommand(AppSettings settings, IOrderCloudClient client, IAssetQuery assets, LogQuery log)
+        public SyncCommand(AppSettings settings, IOrderCloudClient client, IAssetQuery assets, IAssetedResourceQuery assetAssignment, LogQuery log) : this(settings, client, log)
+        {
+            _assets = assets;
+            _assetAssignment = assetAssignment;
+        }
+
+        public SyncCommand(AppSettings settings, IOrderCloudClient client, LogQuery log)
         {
             _settings = settings;
             _log = log;
             _client = client;
-            _assets = assets;
         }
 
         public bool IdExists(OrderCloudException ex)
@@ -48,21 +54,30 @@ namespace Marketplace.Common.Commands
         public async Task<JObject> Dispatch(WorkItem wi)
         {
             if (wi.Action == Action.Ignore) return null;
-
-            //_oc = new OrderCloudClient(new OrderCloudClientConfig()
-            //{
-            //    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-            //    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
-            //    ClientId = wi.ClientId
-            //});
             _client.Config.ClientId = wi.ClientId;
             var type = Type.GetType($"{ASSEMBLY}{wi.RecordType}SyncCommand", true);
-            var command = (IWorkItemCommand) Activator.CreateInstance(type, _settings, _log, _client, _assets);
-            var method = command.GetType()
-                .GetMethod($"{wi.Action}Async", BindingFlags.Public | BindingFlags.Instance);
-            if (method == null) throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");
-
-            return await (Task<JObject>) method.Invoke(command, new object[] { wi });
+            var constructors = type.GetConstructors()[0].GetParameters().Length;
+            switch (constructors)
+            {
+                case 3:
+                {
+                    var command = (IWorkItemCommand)Activator.CreateInstance(type, _settings, _log, _client);
+                    var method = command.GetType()
+                        .GetMethod($"{wi.Action}Async", BindingFlags.Public | BindingFlags.Instance);
+                    if (method == null) throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");
+                    return await (Task<JObject>) method.Invoke(command, new object[] { wi });
+                }
+                case 5:
+                {
+                    var command = (IWorkItemCommand)Activator.CreateInstance(type, _settings, _log, _client, _assets, _assetAssignment);
+                    var method = command.GetType()
+                        .GetMethod($"{wi.Action}Async", BindingFlags.Public | BindingFlags.Instance);
+                    if (method == null) throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");
+                    return await (Task<JObject>) method.Invoke(command, new object[] { wi });
+                }
+                default:
+                    throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");
+            }
         }
     }
 
