@@ -197,6 +197,10 @@ export class OrderShipmentsComponent implements OnChanges {
     return quantityList;
   }
 
+  canShipLineItems(): boolean {
+    return this.lineItems && CanChangeLineItemsOnOrderTo(LineItemStatus.Complete, this.lineItems);
+  }
+
   toggleShipAllItems(): void {
     this.shipAllItems = !this.shipAllItems;
     if( this.shipAllItems ) {
