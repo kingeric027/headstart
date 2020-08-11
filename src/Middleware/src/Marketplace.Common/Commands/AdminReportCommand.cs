@@ -1,5 +1,4 @@
 ﻿using Marketplace.Models;
-using Marketplace.Models.Misc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
@@ -7,13 +6,17 @@ using System.Collections.Generic;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceAdminReportCommand
     {
-        Task<List<MarketplaceAddressBuyer>> BuyerLocationReport(MarketplaceReportFilter filters, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
         Task<List<ReportTemplate>> ListReportTemplatesByReportType(string reportType, VerifiedUserContext verifiedUser);
+        Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
+        Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser);
     }
     
     public class MarketplaceAdminReportCommand : IMarketplaceAdminReportCommand
@@ -29,31 +32,51 @@ namespace Marketplace.Common.Commands
             _template = template;
         }
 
-        public async Task<List<MarketplaceAddressBuyer>> BuyerLocationReport(MarketplaceReportFilter filters, VerifiedUserContext user)
+        public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser)
         {
-            //Loop through each of the filters.BuyerIDs.  For each buyer ID, run the ListAsync call.  Results of that call (items) push into allBuyerLocations variable.
+            var template = await _template.Get(templateID, verifiedUser);
             var allBuyerLocations = new List<MarketplaceAddressBuyer>();
-            foreach (var buyerID in filters.Filters.BuyerID)
+            foreach (var buyerID in template.Filters.BuyerID)
             {
-                var buyerLocationsForBuyerID = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: user.AccessToken, page: 1, pageSize: 100);
-                allBuyerLocations.AddRange(buyerLocationsForBuyerID.Items);
-                if (buyerLocationsForBuyerID.Meta.TotalPages > 1)
+                var buyerLocations = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: verifiedUser.AccessToken, page: 1, pageSize: 100);
+                allBuyerLocations.AddRange(buyerLocations.Items);
+                if (buyerLocations.Meta.TotalPages > 1)
                 {
-                    for (int i = 2; i <= buyerLocationsForBuyerID.Meta.TotalPages; i++)
+                    for (int i = 2; i <= buyerLocations.Meta.TotalPages; i++)
                     {
-                        var excessBuyerLocationsForBuyerID = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: user.AccessToken, page: i, pageSize: 100);
-                        allBuyerLocations.AddRange(excessBuyerLocationsForBuyerID.Items);
+                        var excessBuyerLocations = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: verifiedUser.AccessToken, page: i, pageSize: 100);
+                        allBuyerLocations.AddRange(excessBuyerLocations.Items);
                     }
                 }
             }
-
-            //When we have allBuyerLocations, push the ones that pass the remaining filter tests into filteredBuyerLocations variable.
+            var filterClassProperties = template.Filters.GetType().GetProperties();
+            var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
+            foreach (var property in filterClassProperties)
+            {
+                if (property.GetValue(template.Filters) != null && property.Name != "BuyerID")
+                {
+                    filtersToEvaluateMap.Add(property, (List<string>) property.GetValue(template.Filters));
+                }
+            }
             var filteredBuyerLocations = new List<MarketplaceAddressBuyer>();
             foreach (var location in allBuyerLocations)
             {
-                if (BuyerStateFilter(location, filters)) { continue; }
-                if (BuyerCountryFilter(location, filters)) { continue; }
-                filteredBuyerLocations.Add(location);
+                var passesFilters = true;
+                foreach (var filterProps in filtersToEvaluateMap)
+                {
+                    var filterKey = filterProps.Key.Name;
+                    var filterValues = filterProps.Value;
+                    var locValue = location.GetType().GetProperty(filterKey).GetValue(location);
+                    if (!filterValues.Contains(locValue))
+                    {
+                        passesFilters = false;
+                        break;
+                    }
+                }
+                if (passesFilters)
+                {
+                    filteredBuyerLocations.Add(location);
+                }
             }
             return filteredBuyerLocations;
         }
@@ -64,28 +87,15 @@ namespace Marketplace.Common.Commands
             return template;
         }
 
-        public bool BuyerStateFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
+        public async Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser)
         {
-            if (filters.Filters.State != null)
-            {
-                if (location.State == null || !filters.Filters.State.Contains(location.State))
-                {
-                    return true;
-                }
-            }
-            return false;
+            var template = await _template.Post(reportTemplate, verifiedUser);
+            return template;
         }
 
-        public bool BuyerCountryFilter(MarketplaceAddressBuyer location, MarketplaceReportFilter filters)
+        public async Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser)
         {
-            if (filters.Filters.Country != null)
-            {
-                if (location.Country == null || !filters.Filters.Country.Contains(location.Country))
-                {
-                    return true;
-                }
-            }
-            return false;
+            await _template.Delete(id, verifiedUser);
         }
     }
 }

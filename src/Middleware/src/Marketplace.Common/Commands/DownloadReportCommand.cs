@@ -21,13 +21,7 @@ namespace Marketplace.Common.Commands
             _container = _blob.BlobClient.GetContainerReference("downloads");
         }
 
-        //public void AddDownloadRequestToQueue(string orgID, string reportType)
-        //{
-        //    var message = "download" + "reportType";
-        //    _iq.DropMessage(message, orgID);
-        //}
-
-        public async Task ExportToExcel(string reportType, string[] headers, IEnumerable<JObject> data)
+        public async Task ExportToExcel(string reportType, string[] headers, IEnumerable<object> data)
         {
             using (var excel = new ExcelPackage())
             {
@@ -56,22 +50,23 @@ namespace Marketplace.Common.Commands
             }
             return worksheet;
         }
-        private ExcelWorksheet SetValues(IEnumerable<JObject> data, string[] headers, ExcelWorksheet worksheet)
+        private ExcelWorksheet SetValues(IEnumerable<object> data, string[] headers, ExcelWorksheet worksheet)
         {
             int row = 2;
             foreach (var dataSet in data)
             {
+                var dataJSON = JObject.FromObject(dataSet);
                 int col = 1;
                 foreach (var header in headers)
                 {
                     if (header.Contains("."))
                     {
-                        var cellValue = dataSet[header.Split(".")[0]][header.Split(".")[1]];
+                        var cellValue = dataJSON[header.Split(".")[0]][header.Split(".")[1]];
                         worksheet.Cells[row, col].Value = cellValue.ToString();
                     }
                     else
                     {
-                        worksheet.Cells[row, col].Value = dataSet[header].ToString();
+                        worksheet.Cells[row, col].Value = dataJSON[header].ToString();
                     }
                     col++;
                 }

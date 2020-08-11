@@ -15,6 +15,9 @@ namespace Marketplace.Common.Queries
     public interface IReportTemplateQuery<ReportTemplate>
     {
         Task<List<ReportTemplate>> List(string reportType, VerifiedUserContext verifiedUser);
+        Task<ReportTemplate> Post(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
+        Task Delete(string id, VerifiedUserContext verifiedUser);
+        Task<ReportTemplate> Get(string id, VerifiedUserContext verifiedUser);
     }
 
     public class ReportTemplateQuery : IReportTemplateQuery<ReportTemplate>
@@ -29,12 +32,40 @@ namespace Marketplace.Common.Queries
         {
             Console.WriteLine(_store);
             Console.WriteLine(verifiedUser);
+            var query = $"select * from c where c.ReportType='{reportType}'";
+            if (verifiedUser.UsrType == "supplier")
+            {
+                query = query + " and c.AvailableToSuppliers='true'";
+            }
             var templates = await _store.Query(
-                $"select * from c where c.ReportType='{reportType}'", 
-                null, 
-                new FeedOptions() { PartitionKey = new PartitionKey($"{verifiedUser.ClientID}") })
-                .ToListAsync();
+                    query,
+                    null,
+                    new FeedOptions() { PartitionKey = new PartitionKey($"{verifiedUser.ClientID}") })
+                    .ToListAsync();
             return templates;
+        }
+
+        public async Task<ReportTemplate> Post(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser)
+        {
+            var template = reportTemplate;
+            template.ClientID = verifiedUser.ClientID;
+            var newTemplate = await _store.AddAsync(template);
+            return newTemplate;
+        }
+
+        public async Task Delete(string id, VerifiedUserContext verifiedUser)
+        {
+            await _store.RemoveByIdAsync(id, verifiedUser.ClientID);
+        }
+
+        public async Task<ReportTemplate> Get(string id, VerifiedUserContext verifiedUser)
+        {
+            var template = await _store.Query(
+                $"select * from c where c.id='{id}'",
+                null,
+                new FeedOptions() { PartitionKey = new PartitionKey($"{verifiedUser.ClientID}") })
+                .FirstOrDefaultAsync();
+            return template;
         }
     }
 }

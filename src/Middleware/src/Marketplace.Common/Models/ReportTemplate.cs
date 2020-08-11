@@ -1,8 +1,10 @@
 ﻿using Cosmonaut.Attributes;
+using Newtonsoft.Json;
 using ordercloud.integrations.library;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Marketplace.Common.Models
 {
@@ -10,7 +12,8 @@ namespace Marketplace.Common.Models
     [CosmosCollection("reporttemplates")]
     public class ReportTemplate : CosmosObject
     {
-        public string TemplateID { get; set; }
+        [JsonProperty("id")]
+        public string ID { get; set; }
         [CosmosPartitionKey]
         public string ClientID { get; set; }
         public string ReportType { get; set; }
@@ -24,7 +27,8 @@ namespace Marketplace.Common.Models
     public class Filters
     {
         public List<string> BuyerID { get; set; }
-        public List<string> State { get; set; }
         public List<string> Country { get; set; }
+        public List<string> State { get; set; }
+        public List<string> TaxCode { get; set; }
     }
 }
