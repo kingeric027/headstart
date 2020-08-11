@@ -43,7 +43,7 @@ export class OCMProductCard {
         ProductID: this._product.ID, 
         Quantity: this.quantity,
         xp: {
-          LineItemImageUrl: getPrimaryImageUrl(this._product)
+          ImageUrl: getPrimaryImageUrl(this._product)
         } 
       });
       this.isAddingToCart = false;

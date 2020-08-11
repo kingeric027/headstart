@@ -89,75 +89,7 @@ export class OrderHistoryService {
       .toPromise();
   }
 
-  //  How to handle ClaimStatus ? should I put it within OrderReturnInfo / OrderCancelInfo?
-  async returnOrder(orderID: string): Promise<MarketplaceOrder> {
-    const order = await Orders.Patch('Outgoing', orderID, {
-      xp: {
-        OrderReturnInfo: {
-          HasReturn: true,
-          Resolved: false,
-        },
-        ClaimStatus: ClaimStatus.Pending,
-      },
-    });
-    return order as MarketplaceOrder;
+  async submitCancelOrReturn(orderID: string, lineItemStatusChange: any): Promise<void> {
+    return HeadStartSDK.Orders.BuyerUpdateLineItemStatusesWithNotification(orderID, lineItemStatusChange);
   }
-
-  async cancelOrder(orderID: string): Promise<MarketplaceOrder> {
-    const order = await Orders.Patch('Outgoing', orderID, {
-      xp: {
-        OrderCancelInfo: {
-          HasCancel: true,
-          Resolved: false,
-        },
-        ClaimStatus: ClaimStatus.Pending
-      },
-    });
-    return order as MarketplaceOrder;
-  }
-
-  async returnLineItem(
-    orderID: string,
-    lineItemID: string,
-    quantityToReturn: number,
-    returnReason: string
-  ): Promise<MarketplaceLineItem> {
-    const patch = {
-      xp: {
-        LineItemReturnInfo: {
-          QuantityToReturn: quantityToReturn,
-          ReturnReason: returnReason,
-          Resolved: false,
-        },
-        LineItemStatus: LineItemStatus.ReturnRequested,
-      },
-    };
-    const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    await HeadStartSDK.Orders.RequestReturnEmail(orderID);
-    return line;
-  }
-
-  async cancelLineItem(
-    orderID: string,
-    lineItemID: string,
-    quantityToCancel: number,
-    cancelReason: string
-  ): Promise<MarketplaceLineItem> {
-    const patch = {
-      xp: {
-        LineItemCancelInfo: {
-          QuantityToCancel: quantityToCancel,
-          CancelReason: cancelReason,
-          Resolved: false,
-        },
-        LineItemStatus: LineItemStatus.CancelRequested
-      },
-    };
-    const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    //  await HeadStartSDK.Orders.RequestReturnEmail(orderID);
-    await this.tempSdk.sendCancelEmail(orderID);
-    return line;
-  }
-
-
 }
