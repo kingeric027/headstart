@@ -33,6 +33,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task<List<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, VerifiedUserContext user) 
 		{
+			resource.Validate();
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var schema = await _schemas.GetDO(schemaInteropID, user);
@@ -67,10 +68,11 @@ namespace ordercloud.integrations.cms
 
 		public async Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			var resource = assignment.MapToResource();
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
+
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
 			var schema = await _schemas.GetDO(schemaInteropID, user);
-			if (!isValidAssignment(schema.RestrictedAssignmentTypes, resource.ResourceType ?? 0))
+			if (!isValidAssignment(schema.RestrictedAssignmentTypes, assignment.ResourceType ?? 0))
 			{
 				throw new InvalidAssignmentException(schema.RestrictedAssignmentTypes);
 			}
@@ -79,7 +81,7 @@ namespace ordercloud.integrations.cms
 			{
 				RsrcID = assignment.ResourceID,
 				ParentRsrcID = assignment.ParentResourceID,
-				RsrcType = resource.ResourceType ?? 0,
+				RsrcType = assignment.ResourceType ?? 0,
 				SellerOrgID = user.SellerID,
 				SchemaID = schema.id,
 				DocID = document.id
@@ -88,8 +90,8 @@ namespace ordercloud.integrations.cms
 
 		public async Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)
 		{
-			var resource = assignment.MapToResource();
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var document = await _documents.GetDOByInternalSchemaID(schema.id, assignment.DocumentID, user);
 			// TODO - what is the correct way to handle delete that doesn't exist?

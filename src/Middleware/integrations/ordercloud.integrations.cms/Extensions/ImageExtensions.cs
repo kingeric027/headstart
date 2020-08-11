@@ -34,7 +34,6 @@ namespace ordercloud.integrations.cms
             var srcRect = new Rectangle(rectX, rectY, srcDimension, srcDimension);
 
             return srcImage.CreateSquare(targetDimension, srcRect, destRect);
-
         }
 
         private static Image CreateSquareWhiteSpaced(this Image srcImage, int targetDimension)

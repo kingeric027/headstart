@@ -90,18 +90,36 @@ namespace Marketplace.CMS.Controllers
 			await _assetedResources.MoveAssignment(assignment, listOrderWithinType, VerifiedUserContext);
 		}
 
-		// TODO - add list page and list args
 		[DocName("List Assets Assigned to Resource")]
-		[HttpGet, Route("resource"), OrderCloudIntegrationsAuth]
-		public async Task<List<AssetForDelivery>> ListAssets([FromQuery] Resource resource)
+		[HttpGet, Route("{type}/{ID}"), OrderCloudIntegrationsAuth]
+		public async Task<List<AssetForDelivery>> ListAssets(ResourceType type, string ID)
 		{
+			var resource = new Resource(type, ID);
+			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
+		}
+
+		[DocName("List Assets Assigned to Resource")]
+		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}"), OrderCloudIntegrationsAuth]
+		public async Task<List<AssetForDelivery>> ListAssets(ParentResourceType parentType, string parentID, ResourceType type, string ID)
+		{
+			var resource = new Resource(type, ID, parentType, parentID);
 			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
 		}
 
 		[DocName("Get a Resource's primary image")]
-		[HttpGet, Route("resource/primary-image")] // No auth
-		public async Task GetFirstImage([FromQuery] Resource resource)
+		[HttpGet, Route("{type}/{ID}/thumbnail")] // No auth
+		public async Task GetThumbnail(ResourceType type, string ID)
 		{
+			var resource = new Resource(type, ID);
+			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
+			Response.Redirect(url);
+		}
+
+		[DocName("Get a Resource's primary image")]
+		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
+		public async Task GetThumbnail(ParentResourceType parentType, string parentID, ResourceType type, string ID)
+		{
+			var resource = new Resource(type, ID, parentType, parentID);
 			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
 			Response.Redirect(url);
 		}

@@ -1,13 +1,22 @@
-﻿using System;
+﻿using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ordercloud.integrations.cms
 {
+	public enum ParentResourceType
+	{
+		Catalogs,
+		Buyers,
+		Suppliers,
+	}
+
 	public enum ResourceType
 	{
 		Catalogs,
-		[ParentResource(Catalogs)] Categories,
+		[Parent(ParentResourceType.Catalogs)] Categories,
 		Products,
 		PriceSchedules,
 		ProductFacets,
@@ -19,18 +28,18 @@ namespace ordercloud.integrations.cms
 		ImpersonationConfigs,
 
 		Buyers,
-		[ParentResource(Buyers)] Users,
-		[ParentResource(Buyers)] UserGroups,
-		[ParentResource(Buyers)] Addresses,
-		[ParentResource(Buyers)] CostCenters,
-		[ParentResource(Buyers)] CreditCards,
-		[ParentResource(Buyers)] SpendingAccounts,
-		[ParentResource(Buyers)] ApprovalRules,
+		[Parent(ParentResourceType.Buyers)] Users,
+		[Parent(ParentResourceType.Buyers)] UserGroups,
+		[Parent(ParentResourceType.Buyers)] Addresses,
+		[Parent(ParentResourceType.Buyers)] CostCenters,
+		[Parent(ParentResourceType.Buyers)] CreditCards,
+		[Parent(ParentResourceType.Buyers)] SpendingAccounts,
+		[Parent(ParentResourceType.Buyers)] ApprovalRules,
 
 		Suppliers,
-		[ParentResource(Suppliers)] SupplierUsers,
-		[ParentResource(Suppliers)] SupplierUserGroups,
-		[ParentResource(Suppliers)] SupplierAddresses,
+		[Parent(ParentResourceType.Suppliers)] SupplierUsers,
+		[Parent(ParentResourceType.Suppliers)] SupplierUserGroups,
+		[Parent(ParentResourceType.Suppliers)] SupplierAddresses,
 
 		// Param "Direction" breaks these for now.
 		//Orders,
@@ -51,12 +60,20 @@ namespace ordercloud.integrations.cms
 	}
 
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-	public class ParentResourceAttribute: Attribute
+	public class ParentAttribute: Attribute
 	{
-		public ResourceType ParentType { get; set; }
-		public ParentResourceAttribute(ResourceType type)
+		public ParentResourceType ParentType { get; set; }
+		public ParentAttribute(ParentResourceType type)
 		{
 			ParentType = type;
+		}
+	}
+
+	public static class ResourceTypeExtesions
+	{
+		public static ParentResourceType? GetParentType(this ResourceType type)
+		{
+			return typeof(ResourceType).GetField(type.ToString()).GetAttribute<ParentAttribute>()?.ParentType;
 		}
 	}
 }

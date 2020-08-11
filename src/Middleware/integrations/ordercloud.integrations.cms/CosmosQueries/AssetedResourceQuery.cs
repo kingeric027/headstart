@@ -32,6 +32,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user)
 		{
+			resource.Validate();
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var assetedResource = await GetExisting(resource);
@@ -50,6 +51,7 @@ namespace ordercloud.integrations.cms
 
 		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)
 		{
+			resource.Validate();
 			var assetedResource = await GetExisting(resource);
 			if (assetedResource?.ImageAssetIDs == null || assetedResource.ImageAssetIDs.Count == 0)
 			{
@@ -61,30 +63,30 @@ namespace ordercloud.integrations.cms
 
 		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			var resource = assignment.MapToResource();
+			assignment.Validate();
 			//await new OrderCloudClientWithContext(user).EmptyPatch(resource);
 			var asset = await _assets.GetDO(assignment.AssetID, user);
-			var assetedResource = await GetExistingOrDefault(resource);
+			var assetedResource = await GetExistingOrDefault(assignment);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
 		}
 
 		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			var resource = assignment.MapToResource();
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
 			var asset = await _assets.GetDO(assignment.AssetID, user);
-			var assetedResource = await GetExistingOrDefault(resource);
+			var assetedResource = await GetExistingOrDefault(assignment);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
 		}
 
 		public async Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user)
 		{
-			var resource = assignment.MapToResource();
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
 			var asset = await _assets.GetDO(assignment.AssetID, user);
-			var assetedResource = await GetExistingOrDefault(resource);
+			var assetedResource = await GetExistingOrDefault(assignment);
 			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
 			await _store.UpdateAsync(assetedResource);
 		}
