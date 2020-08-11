@@ -6,5 +6,5 @@ export const PLACEHOLDER_URL = 'http://placehold.it/300x300';
 export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY';
 
 export function getProductMainImageUrlOrPlaceholder(product: Product): string {
-  return `${environment.middlewareUrl}/assets/resource/primary-image?ResourceID=${product.ID}&ResourceType=Products`;
+  return `${environment.middlewareUrl}/assets/resource/primary-image?ResourceID=${product?.ID}&ResourceType=Products`;
 }
