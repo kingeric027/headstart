@@ -25,6 +25,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
 import { pipe } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 interface BreadCrumb {
   displayText: string;
@@ -75,12 +76,14 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   filterForm: FormGroup;
   fromDate: string;
   toDate: string;
+  resourceType: string | null = null;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     private translate: TranslateService,
+    private currentUserService: CurrentUserService,
     ngZone: NgZone
   ) {}
 
@@ -123,8 +126,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   set filterConfig(value: any) {
     this._filterConfig = value;
-    this.setFilterForm()
-  };
+    this.setFilterForm();
+  }
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -139,30 +142,44 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   labelSingular: string;
   @Input()
   labelPlural: string;
+  availableProductTypes = [];
 
   async ngOnInit(): Promise<void> {
     await this.determineViewingContext();
+    await this.getAvailableProductTypes();
     this.initializeSubscriptions();
     this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
   }
 
+  async getAvailableProductTypes(): Promise<void> {
+    const supplier = await this.currentUserService.getMySupplier();
+    const formattedSupplierProductTypes = supplier?.xp?.ProductTypes
+    .map(pt => {
+      const link = pt.match(/[A-Z][a-z]+/g).map(t => t.toLowerCase()).join('-');
+      return {
+        Display: `${pt.match(/[A-Z][a-z]+/g).join(' ')} Product`,
+        Link: link
+      }
+    });
+    this.availableProductTypes = formattedSupplierProductTypes || [];
+  }
+
   getTitle(isMyResource: boolean, resourceName: string, selectedParentResourceName: string): string {
     const translatedResourceName = this.translate.instant(this.labelPlural);
-    if(isMyResource) {
-      if(resourceName === 'suppliers') {
+    if (isMyResource) {
+      if (resourceName === 'suppliers') {
         return this.translate.instant('ADMIN.NAV.MY_PROFILE');
       } else {
         return translatedResourceName;
       }
     } else {
-        if(selectedParentResourceName) {
-          return translatedResourceName + ' - ' + selectedParentResourceName;
-      } 
-      else {
+      if (selectedParentResourceName) {
+        return translatedResourceName + ' - ' + selectedParentResourceName;
+      } else {
         return translatedResourceName;
       }
-    } 
+    }
   }
 
   ngAfterViewChecked() {
@@ -224,7 +241,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   async determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
     this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
-    if(this.isMyResource) {
+    if (this.isMyResource) {
       const resource = await this._ocService.getMyResource();
       this.selectedParentResourceName = resource.Name;
     }
@@ -240,7 +257,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   private async redirectToFirstParentIfNeeded() {
     if (this.parentResourceService) {
-      const parentResourceID = await this.parentResourceService.getParentResourceID(); 
+      const parentResourceID = await this.parentResourceService.getParentResourceID();
       if (parentResourceID === REDIRECT_TO_FIRST_PARENT) {
         await this.parentResourceService.listResources();
         this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
@@ -270,7 +287,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
         const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
-        if( this.isMyResource ) {
+        if (this.isMyResource) {
           const parentResource = await this._ocService.getMyResource();
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
@@ -291,8 +308,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   private checkIfCreatingNew() {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
-    const endUrl = splitUrl[splitUrl.length - 1];
+    const endUrl =
+      this._currentResourceNamePlural === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
     this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
+    if (this._currentResourceNamePlural === 'products' && this.isCreatingNew) {
+      this.resourceType = splitUrl[splitUrl.length - 1].split('-').join(' ');
+    }
     this.isCreatingSubResource = endUrl.includes('new?');
   }
 

@@ -65,14 +65,32 @@
       <!-- /sub resource dropdown -->
     </div>
     <div class="col-lg-2 col-md-1 col-sm-7 d-flex justify-content-start align-items-center"
-         *ngIf="!isCreatingNew && shouldShowCreateNew">
+         *ngIf="shouldShowCreateNew">
       <!-- route accidentally works for both subresoures and first level resources because the extra / are ignored by the router it appears-->
-      <button class="btn btn-block brand-button--orange"
-              routerLink="/{{isMyResource ? _ocService.myRoute : _ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new">
+      <button *ngIf="_currentResourceNamePlural !== 'products'"
+              class="btn btn-block brand-button--orange"
+              routerLink="/{{isMyResource ? _ocService.myRoute : _ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new"
+              [disabled]="isCreatingNew">
         Create New {{labelSingular | translate}}
       </button>
+      <div ngbDropdown
+           class="d-inline-block"
+           *ngIf="_currentResourceNamePlural === 'products'">
+        <button ngbDropdownToggle
+                class="btn btn-block brand-button--orange"
+                [disabled]="isCreatingNew">
+          Create New {{labelSingular | translate}}
+        </button>
+        <div ngbDropdownMenu>
+          <button ngbDropdownItem
+                  *ngFor="let type of availableProductTypes"
+                  routerLink="/{{isMyResource ? _ocService.myRoute : _ocService.route}}/{{selectedParentResourceID}}/{{_ocService.secondaryResourceLevel}}/new/{{type.Link}}">
+            {{type.Display}}
+          </button>
+        </div>
+      </div>
     </div>
-    <div [ngClass]="{'col-lg-7 col-md-7': parentResourceService, 'col-lg-10 col-md-10': !parentResourceService && !isCreatingNew && shouldShowCreateNew, 'col-lg-12': !parentResourceService && !shouldShowCreateNew}">
+    <div [ngClass]="{'col-lg-7 col-md-7': parentResourceService, 'col-lg-10 col-md-10': !parentResourceService && shouldShowCreateNew, 'col-lg-12': !parentResourceService && !shouldShowCreateNew}">
       <!-- Resource Search -->
       <div class="mr-2">
         <div class="row">
@@ -257,7 +275,9 @@
                 </div>
               </div>
               <h3 *ngIf="isCreatingNew"
-                  class="d-inline-block ml-1 mb-0">New {{labelSingular | translate}}</h3>
+                  class="d-inline-block ml-1 mb-0">
+                New {{resourceType | titlecase}} {{labelSingular | translate}}
+              </h3>
               <h3 *ngIf="!isCreatingNew"
                   class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>

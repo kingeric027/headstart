@@ -2,6 +2,7 @@
        class="container-fluid mb-5">
     <h4 class="mt-3"
         translate>{{!readonly ? 'ADMIN.PRODUCT_EDIT.PRICE_BREAKS' : 'ADMIN.PRODUCT_EDIT.SUPPLIER_PRICING'}} </h4>
+    <span *ngIf="!isRequired">- Optional</span>
     <price-break-editor [readonly]="readonly"
                         [currency]="supplierCurrency"
                         [priceSchedule]="supplierPriceSchedule"

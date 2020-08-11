@@ -439,8 +439,8 @@ export abstract class ResourceCrudService<ResourceType> {
 
   checkIfCreatingNew(): boolean {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    return endUrl === '/new';
+    const endUrl = routeUrl.split('/')[2];
+    return endUrl === 'new';
   }
 
   checkForChanges<T>(resourceEditable: T, resourceStatic: T): boolean {
