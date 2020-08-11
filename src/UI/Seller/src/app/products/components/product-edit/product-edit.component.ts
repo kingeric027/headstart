@@ -45,7 +45,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     if (product.ID) {
       this.handleSelectedProductChange(product);
     } else {
-      // this.setTaxCodes(this.productService.emptyResource.Product.xp.Tax.Category)
       this.createProductForm(this.productService.emptyResource);
       this._superMarketplaceProductEditable = this.productService.emptyResource;
       this._superMarketplaceProductStatic = this.productService.emptyResource;
@@ -251,9 +250,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         })
       }
     })
-    // const taxCodeCategory = this.productForm.get('TaxCodeCategory');
-    // const taxCode = this.productForm.get('TaxCode');
-    // const shipLength = this.productForm.get('ShipLength');
   }
 
   isRequired(control: string): boolean {
