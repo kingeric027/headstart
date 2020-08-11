@@ -175,8 +175,8 @@ namespace Marketplace.Common.Commands
                     if(existinglineItemStatusChangeRequests[currentClaimIndex].Quantity <= numberReturnedOrCanceled)
                     {
                         existinglineItemStatusChangeRequests[currentClaimIndex].IsResolved = true;
-                        currentClaimIndex++;
                         numberReturnedOrCanceled -= existinglineItemStatusChangeRequests[currentClaimIndex].Quantity;
+                        currentClaimIndex++;
                     } else
                     {
                         currentClaimIndex++;
