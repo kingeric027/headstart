@@ -56,6 +56,9 @@
                 <fa-icon [icon]="faCopy"></fa-icon>
         </button>
         </span>
+        <span *ngIf="cell.type === 'IMPERSONATE_BUTTON'">
+          <button (click)="impersonateUser(row.resource)" class="btn btn-light">IMPERSONATE</button> 
+        </span>
       </td>
     </tr>
   </tbody>

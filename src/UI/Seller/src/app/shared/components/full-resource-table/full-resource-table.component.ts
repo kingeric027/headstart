@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import {
   FULL_TABLE_RESOURCE_DICTIONARY,
   ResourceRow,
@@ -15,7 +15,9 @@ import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SortDirection } from './sort-direction.enum';
 import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import {  OcUserService } from '@ordercloud/angular-sdk';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -52,7 +54,10 @@ export class FullResourceTableComponent {
   resourceSelected = new EventEmitter();
 
   constructor(private router: Router,
-              private toastrService: ToastrService) {}
+              private toastrService: ToastrService,
+              private activatedRoute: ActivatedRoute,
+              @Inject(applicationConfiguration) private appConfig: AppConfig,
+              private userService: OcUserService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
     this.headers = this.getHeaders();
@@ -151,5 +156,17 @@ export class FullResourceTableComponent {
     } else {
       return faSort;
     }
+  }
+
+  async impersonateUser(resource: any) {
+    event.stopPropagation();
+    const token = await this.userService.GetAccessToken(this.activatedRoute.snapshot.params?.buyerID, resource.ID,
+      {
+        ClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+        Roles: ['Shopper'],
+      }).toPromise();
+    console.log(token)
+    const url = 'https://marketplace-buyer-ui-test.azurewebsites.net/home?token=' + token.access_token;
+    window.open(url, '_blank'); 
   }
 }
