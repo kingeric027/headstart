@@ -9,6 +9,8 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { OrderService } from '@app-seller/orders/order.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ShippingStatus, LineItemStatus } from '../../../shared/models/order-status.interface';
+import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'app-order-shipments',
@@ -28,7 +30,7 @@ export class OrderShipmentsComponent implements OnChanges {
   shipmentItems: ListShipmentItem;
   selectedShipment: Shipment;
   supplierAddresses: ListAddress;
-  lineItems: LineItem[];
+  lineItems: MarketplaceLineItem[];
   isSaving = false;
   isSellerUser = false;
   shipAllItems = false;
@@ -129,7 +131,7 @@ export class OrderShipmentsComponent implements OnChanges {
 
   async getLineItems(): Promise<void> {
     const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, this.order.ID).toPromise();
-    this.lineItems = lineItemsResponse.Items;
+    this.lineItems = lineItemsResponse.Items as MarketplaceLineItem[];
   }
 
   async patchLineItems(): Promise<void> {
