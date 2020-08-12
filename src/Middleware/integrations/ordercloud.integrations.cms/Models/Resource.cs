@@ -54,22 +54,22 @@ namespace ordercloud.integrations.cms
 			{
 				if (ParentResourceType != correctParentType)
 				{
-					throw new ValidationException($"Field ParentResourceType must be {ParentResourceType} for type ${ResourceType}.");
+					throw new ValidationException("ParentResourceType", $"The ParentResourceType field must be {correctParentType} for type {ResourceType}.");
 				}
 				if (ParentResourceID == null)
 				{
-					throw new ValidationException($"Field ParentResourceID is required for type ${ResourceType}.");
+					throw new ValidationException("ParentResourceID", $"Field ParentResourceID is required for type {ResourceType}.");
 				}
 			}
-			else
+			if (correctParentType == null)
 			{
 				if (ParentResourceType != null)
 				{
-					throw new ValidationException($"Field ParentResourceType must be null for type ${ResourceType}.");
+					throw new ValidationException("ParentResourceType", $"Field ParentResourceType must be null for type {ResourceType}.");
 				}
 				if (ParentResourceID != null)
 				{
-					throw new ValidationException($"Field ParentResourceID must be null for type ${ResourceType}.");
+					throw new ValidationException("ParentResourceID", $"Field ParentResourceID must be null for type {ResourceType}.");
 				}
 			}
 		}
