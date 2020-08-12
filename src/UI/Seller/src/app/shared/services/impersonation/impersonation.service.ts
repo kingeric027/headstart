@@ -17,9 +17,7 @@ export class ImpersonationService {
             ClientID: this.appConfig.buyerClientID,
             Roles: this.appConfig.impersonatingBuyerScope,
           }).toPromise();
-        console.log('token: ' + auth.access_token); 
-        //  const url = this.appConfig.buyerUrl + 'impersonation?token=' + auth.access_token
-        const url = 'http://localhost:4200/' + 'impersonation?token=' + auth.access_token;
+        const url = this.appConfig.buyerUrl + 'impersonation?token=' + auth.access_token
         window.open(url, '_blank'); 
       }
 }
