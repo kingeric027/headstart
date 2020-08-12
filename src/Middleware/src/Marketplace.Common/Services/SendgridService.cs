@@ -115,7 +115,8 @@ namespace Marketplace.Common.Services
                 lineItemEmailDisplayText.StatusChangeDetail,
                 lineItemEmailDisplayText.StatusChangeDetail2,
                 DateSubmitted = order.DateSubmitted.ToString(),
-                Comments = "PLACEHOLDERFORCOMMENTS"
+                OrderID = order.ID,
+                order.Comments
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
