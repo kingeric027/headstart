@@ -22,12 +22,10 @@ namespace Marketplace.Common.Commands
     public class MarketplaceAdminReportCommand : IMarketplaceAdminReportCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly AppSettings _settings;
         private readonly ReportTemplateQuery _template;
 
-        public MarketplaceAdminReportCommand(AppSettings settings, IOrderCloudClient oc, ReportTemplateQuery template)
+        public MarketplaceAdminReportCommand(IOrderCloudClient oc, ReportTemplateQuery template)
         {
-            _settings = settings;
             _oc = oc;
             _template = template;
         }
@@ -61,24 +59,52 @@ namespace Marketplace.Common.Commands
             var filteredBuyerLocations = new List<MarketplaceAddressBuyer>();
             foreach (var location in allBuyerLocations)
             {
-                var passesFilters = true;
-                foreach (var filterProps in filtersToEvaluateMap)
-                {
-                    var filterKey = filterProps.Key.Name;
-                    var filterValues = filterProps.Value;
-                    var locValue = location.GetType().GetProperty(filterKey).GetValue(location);
-                    if (!filterValues.Contains(locValue))
-                    {
-                        passesFilters = false;
-                        break;
-                    }
-                }
-                if (passesFilters)
+
+                if (PassesFilters(location, filtersToEvaluateMap))
                 {
                     filteredBuyerLocations.Add(location);
                 }
+
+                //var passesFilters = true;
+                //foreach (var filterProps in filtersToEvaluateMap)
+                //{
+                //    var filterKey = filterProps.Key.Name;
+                //    var filterValues = filterProps.Value;
+                //    var locValue = location.GetType().GetProperty(filterKey).GetValue(location);
+                //    if (!filterValues.Contains(locValue))
+                //    {
+                //        passesFilters = false;
+                //        break;
+                //    }
+                //}
+                //if (passesFilters)
+                //{
+                //    filteredBuyerLocations.Add(location);
+                //}
+            }
+            var test1 = new List<object>();
+            // add to test1 with your filter loop
+            var test2 = new List<MarketplaceAddressBuyer>();
+            foreach (var obj in test1)
+            {
+                test2.Add((MarketplaceAddressBuyer) obj);
             }
             return filteredBuyerLocations;
+        }
+
+        public bool PassesFilters(object data, Dictionary<PropertyInfo, List<string>> filtersToEvaluate)
+        {
+            foreach (var filterProps in filtersToEvaluate)
+            {
+                var filterKey = filterProps.Key.Name;
+                var filterValues = filterProps.Value;
+                var dataValue = data.GetType().GetProperty(filterKey).GetValue(data);
+                if (!filterValues.Contains(dataValue))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(string reportType, VerifiedUserContext verifiedUser)
