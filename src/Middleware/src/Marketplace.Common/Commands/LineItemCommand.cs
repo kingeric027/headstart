@@ -375,9 +375,8 @@ namespace Marketplace.Common.Commands
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
             liReq.UnitPrice = markedUpPrice;
 
-            if (liReq.xp.StatusByQuantity == null) liReq.xp.StatusByQuantity = new Dictionary<LineItemStatus, int>();
-            // should be among the only line item status changes not handled by the updatelineitemstatuswithnotification function
-            liReq.xp.StatusByQuantity.Add(LineItemStatus.Open, liReq.Quantity);
+            liReq.xp.StatusByQuantity = LineItemStatusConstants.EmptyStatuses;
+            liReq.xp.StatusByQuantity[LineItemStatus.Open] = liReq.Quantity;
 
             li = await _oc.LineItems
                 .CreateAsync<MarketplaceLineItem>
