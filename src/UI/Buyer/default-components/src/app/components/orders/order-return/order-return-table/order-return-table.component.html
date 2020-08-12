@@ -27,7 +27,7 @@
     <ng-container matColumnDef="product">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element; let i = index">
-        <img [id]="i" [src]="element.value.lineItem.xp.LineItemImageUrl || getImageUrl(element.value.lineItem.ID)" width="auto" height="100px" />
+        <img [id]="i" [src]="element.value.lineItem.xp.ImageUrl || getImageUrl(element.value.lineItem.ID)" width="auto" height="100px" />
       </td>
     </ng-container>
 

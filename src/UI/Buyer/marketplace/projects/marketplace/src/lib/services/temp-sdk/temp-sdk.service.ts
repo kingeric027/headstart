@@ -56,15 +56,4 @@ export class TempSdk {
       })
       .toPromise();
   }
-
-  async sendCancelEmail(orderId: string): Promise<any> {
-    const url = `${this.appConfig.middlewareUrl}/order/requestcancel/${orderId}`;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
-    });
-    return await this.http
-    .post(url,{},{headers}).toPromise();
-    
-  }
 }

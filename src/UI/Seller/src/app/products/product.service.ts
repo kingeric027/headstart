@@ -46,7 +46,7 @@ export class ProductService extends ResourceCrudService<Product> {
         HasVariants: false,
         Note: '',
         Tax: {
-          Category: 'P0000000', // SEB-827 default tax category to TPP
+          Category: null, // SEB-827 default tax category to TPP
           Code: null,
           Description: null,
         },

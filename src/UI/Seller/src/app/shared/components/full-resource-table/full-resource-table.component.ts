@@ -116,7 +116,7 @@ export class FullResourceTableComponent {
   }
 
   getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {
-    return `${environment.middlewareUrl}/${this.resourceType}/${resource.ID}/image`;
+    return `${environment.middlewareUrl}/assets/resource/primary-image?ResourceID=${resource.ID}&ResourceType=Products`
   }
 
   selectResource(value: any) {

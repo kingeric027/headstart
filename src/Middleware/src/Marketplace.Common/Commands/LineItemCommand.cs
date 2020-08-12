@@ -210,17 +210,19 @@ namespace Marketplace.Common.Commands
         {
             var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
 
-            var newStatusDictionary = new Dictionary<LineItemStatus, int>();
+            Dictionary<LineItemStatus, int> newStatusDictionary;
+            newStatusDictionary = existingLineItem.xp.StatusByQuantity ?? new Dictionary<LineItemStatus, int>();
+
             foreach (KeyValuePair<LineItemStatus, int> entry in lineItemStatusChange.PreviousQuantities)
             {
                 // decrement the quantity by the quantity changed
                 if(entry.Value > 0)
                 {
-                    newStatusDictionary[entry.Key] = existingLineItem.xp.StatusByQuantity[entry.Key] - entry.Value;
+                    newStatusDictionary[entry.Key] -= entry.Value;
                 }
             }
 
-            newStatusDictionary.Add(newLineItemStatus, quantitySetting);
+            newStatusDictionary[newLineItemStatus] += quantitySetting;
             return newStatusDictionary;
         }
 

@@ -71,7 +71,7 @@ namespace Marketplace.Models
         public bool HasVariants { get; set; }
         [MaxLength(500), OrchestrationIgnore]
         public string Note { get; set; }
-        public TaxProperties Tax { get; set; } = new TaxProperties();
+        public TaxProperties Tax { get; set; }
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
         public bool IsResale { get; set; } = false;

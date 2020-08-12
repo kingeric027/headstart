@@ -43,7 +43,9 @@ export class PriceBreakEditor {
     private buyerTempService: BuyerTempService) {}
   
   getEmptyBreak(): any {
-    const nextQuantity = this.priceScheduleEditable.PriceBreaks[this.priceScheduleEditable.PriceBreaks.length - 1].Quantity + 1
+    const ps = this.priceScheduleEditable;
+    if (ps.PriceBreaks.length === 0) this.priceScheduleEditable.PriceBreaks = [{Quantity: 1, Price: null}];
+    const nextQuantity = ps.PriceBreaks[this.priceScheduleEditable.PriceBreaks.length - 1].Quantity + 1;
     return {
       Price: 0,
       Quantity: nextQuantity,
