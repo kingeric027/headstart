@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
@@ -8,7 +7,6 @@ using Marketplace.Common.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using ordercloud.integrations.library;
-using OrderCloud.SDK;
 
 namespace Marketplace.Common.Queries
 {

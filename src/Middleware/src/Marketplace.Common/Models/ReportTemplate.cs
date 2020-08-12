@@ -1,10 +1,7 @@
 ﻿using Cosmonaut.Attributes;
 using Newtonsoft.Json;
 using ordercloud.integrations.library;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
 
 namespace Marketplace.Common.Models
 {

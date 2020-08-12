@@ -32,22 +32,23 @@ namespace Marketplace.Common.Commands
 
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser)
         {
+            //Get stored template from Cosmos DB container
             var template = await _template.Get(templateID, verifiedUser);
             var allBuyerLocations = new List<MarketplaceAddressBuyer>();
             foreach (var buyerID in template.Filters.BuyerID)
             {
-                var buyerLocations = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: verifiedUser.AccessToken, page: 1, pageSize: 100);
-                allBuyerLocations.AddRange(buyerLocations.Items);
-                if (buyerLocations.Meta.TotalPages > 1)
-                {
-                    for (int i = 2; i <= buyerLocations.Meta.TotalPages; i++)
-                    {
-                        var excessBuyerLocations = await _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(buyerID, accessToken: verifiedUser.AccessToken, page: i, pageSize: 100);
-                        allBuyerLocations.AddRange(excessBuyerLocations.Items);
-                    }
-                }
+                //For every buyer included in the template filters, grab all buyer locations (exceeding 100 maximum)
+                var buyerLocations = await OcListAllAsync((page) => _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(
+                    buyerID,
+                    filters: null,
+                    page: page,
+                    pageSize: 1
+                ));
+                allBuyerLocations.AddRange(buyerLocations);
             }
+            //Use reflection to determine available filters from model
             var filterClassProperties = template.Filters.GetType().GetProperties();
+            //Create dictionary of key/value pairings of filters, where provided in the template
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
             {
@@ -56,6 +57,7 @@ namespace Marketplace.Common.Commands
                     filtersToEvaluateMap.Add(property, (List<string>) property.GetValue(template.Filters));
                 }
             }
+            //Filter through collected records, adding only those that pass the PassesFilters check.
             var filteredBuyerLocations = new List<MarketplaceAddressBuyer>();
             foreach (var location in allBuyerLocations)
             {
@@ -64,47 +66,8 @@ namespace Marketplace.Common.Commands
                 {
                     filteredBuyerLocations.Add(location);
                 }
-
-                //var passesFilters = true;
-                //foreach (var filterProps in filtersToEvaluateMap)
-                //{
-                //    var filterKey = filterProps.Key.Name;
-                //    var filterValues = filterProps.Value;
-                //    var locValue = location.GetType().GetProperty(filterKey).GetValue(location);
-                //    if (!filterValues.Contains(locValue))
-                //    {
-                //        passesFilters = false;
-                //        break;
-                //    }
-                //}
-                //if (passesFilters)
-                //{
-                //    filteredBuyerLocations.Add(location);
-                //}
-            }
-            var test1 = new List<object>();
-            // add to test1 with your filter loop
-            var test2 = new List<MarketplaceAddressBuyer>();
-            foreach (var obj in test1)
-            {
-                test2.Add((MarketplaceAddressBuyer) obj);
             }
             return filteredBuyerLocations;
-        }
-
-        public bool PassesFilters(object data, Dictionary<PropertyInfo, List<string>> filtersToEvaluate)
-        {
-            foreach (var filterProps in filtersToEvaluate)
-            {
-                var filterKey = filterProps.Key.Name;
-                var filterValues = filterProps.Value;
-                var dataValue = data.GetType().GetProperty(filterKey).GetValue(data);
-                if (!filterValues.Contains(dataValue))
-                {
-                    return false;
-                }
-            }
-            return true;
         }
 
         public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(string reportType, VerifiedUserContext verifiedUser)
@@ -122,6 +85,40 @@ namespace Marketplace.Common.Commands
         public async Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser)
         {
             await _template.Delete(id, verifiedUser);
+        }
+
+        private bool PassesFilters(object data, Dictionary<PropertyInfo, List<string>> filtersToEvaluate)
+        {
+            foreach (var filterProps in filtersToEvaluate)
+            {
+                var filterKey = filterProps.Key.Name;
+                var filterValues = filterProps.Value;
+                var dataValue = data.GetType().GetProperty(filterKey).GetValue(data);
+                if (!filterValues.Contains(dataValue))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private async Task<List<T>> OcListAllAsync<T>(Func<int, Task<ListPage<T>>> listFunc)
+        {
+            var pageTasks = new List<Task<ListPage<T>>>();
+            var totalPages = 0;
+            var i = 1;
+            do
+            {
+                pageTasks.Add(listFunc(i++));
+                var running = pageTasks.Where(t => !t.IsCompleted && !t.IsFaulted).ToList();
+                if (totalPages == 0 || running.Count >= 16) // throttle parallel tasks at 16
+                    totalPages = (await await Task.WhenAny(running)).Meta.TotalPages;  //Set total number of pages based on returned Meta.
+            } while (i <= totalPages);
+            var data = (
+                from finalResult in await Task.WhenAll(pageTasks) //When all pageTasks are complete, save items in data variable.
+                from item in finalResult.Items
+                select item).ToList();
+            return data;
         }
     }
 }

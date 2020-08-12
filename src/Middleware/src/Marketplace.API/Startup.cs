@@ -26,7 +26,6 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
-using Document = ordercloud.integrations.cms.Document;
 using OrderCloud.AzureStorage;
 
 namespace Marketplace.API

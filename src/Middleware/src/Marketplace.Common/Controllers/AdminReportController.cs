@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using ordercloud.integrations.library;
 using Marketplace.Models.Attributes;
 using Marketplace.Common.Models;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Controllers
 {
@@ -29,35 +30,40 @@ namespace Marketplace.Common.Controllers
             public string[] Headers { get; set; }
         }
 
-        [HttpGet, Route("buyerLocation/preview/{templateID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierReader, ApiRole.AdminUserAdmin)]
+        [HttpGet, Route("buyerLocation/preview/{templateID}"), OrderCloudIntegrationsAuth]
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID)
         {
+            RequireOneOf(CustomRole.MPReportReader);
             return await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
         }
 
-        [HttpPost, Route("buyerLocation/download/{templateID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierReader, ApiRole.AdminUserAdmin)]
+        [HttpPost, Route("buyerLocation/download/{templateID}"), OrderCloudIntegrationsAuth]
         public async Task DownloadBuyerLocation([FromBody] ReportRequestBody requestBody, string templateID)
         {
+            RequireOneOf(CustomRole.MPReportReader);
             var reportData = await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
             await _downloadReportCommand.ExportToExcel("BuyerLocation", requestBody.Headers, reportData);
 
         }
 
-        [HttpGet, Route("{reportType}/listtemplates"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+        [HttpGet, Route("{reportType}/listtemplates"), OrderCloudIntegrationsAuth]
         public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(string reportType)
         {
+            RequireOneOf(CustomRole.MPReportReader);
             return await _reportDataCommand.ListReportTemplatesByReportType(reportType, VerifiedUserContext);
         }
 
-        [HttpPost, Route("{reportType}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
+        [HttpPost, Route("{reportType}"), OrderCloudIntegrationsAuth(ApiRole.AdminUserAdmin)]
         public async Task<ReportTemplate> PostReportTemplate([FromBody] ReportTemplate reportTemplate)
         {
+            RequireOneOf(CustomRole.MPReportReader);
             return await _reportDataCommand.PostReportTemplate(reportTemplate, VerifiedUserContext);
         }
 
-        [HttpDelete, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
+        [HttpDelete, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.AdminUserAdmin)]
         public async Task DeleteReportTemplate(string id)
         {
+            RequireOneOf(CustomRole.MPReportReader);
             await _reportDataCommand.DeleteReportTemplate(id, VerifiedUserContext);
         }
     }

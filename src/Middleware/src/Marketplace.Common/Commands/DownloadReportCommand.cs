@@ -1,12 +1,13 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using OrderCloud.SDK;
 using Microsoft.WindowsAzure.Storage.Blob;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using OrderCloud.AzureStorage;
+using System;
+
 namespace Marketplace.Common.Commands
 {
     public class DownloadReportCommand
@@ -29,8 +30,9 @@ namespace Marketplace.Common.Commands
                 worksheet = SetHeaders(headers, worksheet);
                 worksheet = SetValues(data, headers, worksheet);
                 excel.Save();
-                var fileReference = _container.GetAppendBlobReference($"{reportType}.xlsx");
-
+                var date = DateTime.UtcNow.ToString("MMddyyyy");
+                var time = DateTime.Now.ToString("hmmsstt");
+                var fileReference = _container.GetAppendBlobReference($"{reportType}-{date}-{time}.xlsx");
                 using (Stream stream = await fileReference.OpenWriteAsync(true))
                 {
                     excel.SaveAs(stream);
