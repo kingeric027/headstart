@@ -56,7 +56,7 @@
                 <fa-icon [icon]="faCopy"></fa-icon>
         </button>
         </span>
-        <span *ngIf="cell.type === 'IMPERSONATE_BUTTON'">
+        <span *ngIf="cell.type === 'IMPERSONATE_BUTTON' && (routeUrl?.includes('buyers'))">
           <button (click)="impersonateUser(row.resource)" class="btn brand-button--orange">Impersonate</button> 
         </span>
       </td>
