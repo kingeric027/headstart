@@ -31,7 +31,7 @@ namespace Marketplace.Common.Commands
                 worksheet = SetValues(data, headers, worksheet);
                 excel.Save();
                 var date = DateTime.UtcNow.ToString("MMddyyyy");
-                var time = DateTime.Now.ToString("hmmsstt");
+                var time = DateTime.Now.ToString("hmmss.ffff");
                 var fileReference = _container.GetAppendBlobReference($"{reportType}-{date}-{time}.xlsx");
                 using (Stream stream = await fileReference.OpenWriteAsync(true))
                 {
