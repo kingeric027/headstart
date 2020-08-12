@@ -30,7 +30,7 @@ export class HasTokenGuard implements CanActivate {
     // check for impersonation superseeds existing tokens to allow impersonating buyers sequentially.
     if (this.isImpersonating()) {
       const token = this.getImpersonationToken();
-      this.auth.setToken(token);
+      this.auth.loginWithTokens(token);
       return true;
     }
 
