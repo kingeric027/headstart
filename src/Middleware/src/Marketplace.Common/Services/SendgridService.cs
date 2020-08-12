@@ -98,7 +98,7 @@ namespace Marketplace.Common.Services
                 lineItem.ProductID,
                 lineItem.Quantity,
                 lineItem.LineTotal,
-                QuantityChanged = lineItemStatusChange.PreviousQuantities.Aggregate(0, (currentValue, previousQuantity) => currentValue + previousQuantity.Value).ToString()
+                QuantityChanged = lineItemStatusChange.Quantity
             };
         }
 
