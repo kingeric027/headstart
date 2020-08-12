@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
                     buyerID,
                     filters: null,
                     page: page,
-                    pageSize: 1
+                    pageSize: 100
                 ));
                 allBuyerLocations.AddRange(buyerLocations);
             }
