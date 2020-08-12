@@ -18,8 +18,8 @@ namespace Marketplace.Common.Commands.Crud
         Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
-        Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user);
-        Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user);
+        Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
+        Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
     }
 
     public class MarketplaceKitProductCommand : IMarketplaceKitProductCommand
@@ -37,13 +37,13 @@ namespace Marketplace.Common.Commands.Crud
             _query = query;
         }
 
-        public async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
+        public async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
         {
             var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
             var images = assets.Where(a => a.Type == AssetType.Image).ToList();
             return images;
         }
-        public async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
+        public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
         {
             var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
             var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
@@ -104,8 +104,8 @@ namespace Marketplace.Common.Commands.Crud
             return new MarketplaceKitProduct
             {
                 Product = _product,
-                Images = new List<AssetForDelivery>(),
-                Attachments = new List<AssetForDelivery>(),
+                Images = new List<Asset>(),
+                Attachments = new List<Asset>(),
                 ProductAssignments = _productAssignments.Doc
             };
         }

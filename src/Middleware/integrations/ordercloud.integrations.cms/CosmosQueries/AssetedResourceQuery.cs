@@ -10,7 +10,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface IAssetedResourceQuery
 	{
-		Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user);
+		Task<List<Asset>> ListAssets(Resource resource, VerifiedUserContext user);
 		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
@@ -30,23 +30,24 @@ namespace ordercloud.integrations.cms
 			_blob = blob;
 		}
 
-		public async Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user)
+		public async Task<List<Asset>> ListAssets(Resource resource, VerifiedUserContext user)
 		{
 			resource.Validate();
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var assetedResource = await GetExisting(resource);
-			if (assetedResource == null) return new List<AssetForDelivery>();
+			if (assetedResource == null) return new List<Asset>();
 			var assetIDs = assetedResource.ImageAssetIDs
 				.Concat(assetedResource.ThemeAssetIDs)
 				.Concat(assetedResource.AttachmentAssetIDs)
 				.Concat(assetedResource.StructuredAssetsIDs)
 				.ToList();
 			var assets = await _assets.ListByInternalIDs(assetIDs);
-			return assets.Select(asset => {
-				int indexWithinType = GetAssetIDs(assetedResource, asset.Type).IndexOf(asset.id);
-				return new AssetForDelivery(asset, indexWithinType);
-			}).OrderBy(c => c.Type).ThenBy(c => c.ListOrderWithinType).ToList();
+			return assets.Select(a => {
+				int indexWithinType = GetAssetIDs(assetedResource, a.Type).IndexOf(a.id);
+				var asset = AssetMapper.MapTo(a);
+				return (asset, indexWithinType);
+			}).OrderBy(c => c.asset.Type).ThenBy(c => c.indexWithinType).Select(x => x.asset).ToList();
 		}
 
 		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)

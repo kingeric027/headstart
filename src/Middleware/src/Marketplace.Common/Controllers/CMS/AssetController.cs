@@ -92,7 +92,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets Assigned to Resource")]
 		[HttpGet, Route("{type}/{ID}"), OrderCloudIntegrationsAuth]
-		public async Task<List<AssetForDelivery>> ListAssets(ResourceType type, string ID)
+		public async Task<List<Asset>> ListAssets(ResourceType type, string ID)
 		{
 			var resource = new Resource(type, ID);
 			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
@@ -100,7 +100,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets Assigned to Resource")]
 		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}"), OrderCloudIntegrationsAuth]
-		public async Task<List<AssetForDelivery>> ListAssets(ParentResourceType parentType, string parentID, ResourceType type, string ID)
+		public async Task<List<Asset>> ListAssets(ParentResourceType parentType, string parentID, ResourceType type, string ID)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
 			return await _assetedResources.ListAssets(resource, VerifiedUserContext);

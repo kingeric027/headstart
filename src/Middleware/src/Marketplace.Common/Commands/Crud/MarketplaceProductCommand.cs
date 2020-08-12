@@ -21,8 +21,8 @@ namespace Marketplace.Common.Commands.Crud
 		Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user);
 		Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
 		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
-		Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user);
-		Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user);
+		Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
+		Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -107,13 +107,13 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		public async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
+		public async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var images = assets.Where(a => a.Type == AssetType.Image).ToList();
 			return images;
 		}
-		public async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
+		public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
 			var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
@@ -223,8 +223,8 @@ namespace Marketplace.Common.Commands.Crud
 				PriceSchedule = _priceSchedule,
 				Specs = _specs.Items,
 				Variants = _variants.Items,
-				Images = new List<AssetForDelivery>(),
-				Attachments = new List<AssetForDelivery>()
+				Images = new List<Asset>(),
+				Attachments = new List<Asset>()
 			};
 		}
 
