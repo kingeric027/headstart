@@ -191,7 +191,7 @@ namespace Marketplace.Common.Commands
 		static readonly List<Incrementor> DefaultIncrementors = new List<Incrementor>() {
 			new Incrementor { ID = "orderIncrementor", Name = "Order Incrementor", LastNumber = 1, LeftPaddingCount = 6 },
 			new Incrementor { ID = "supplierIncrementor", Name = "Supplier Incrementor", LastNumber = 1, LeftPaddingCount = 3 },
-			new Incrementor { ID = "buyerIncrementor", Name = "Buyer Incrementor", LastNumber = 1, LeftPaddingCount = 4 },
+			new Incrementor { ID = "buyerIncrementor", Name = "Buyer Incrementor", LastNumber = 1, LeftPaddingCount = 4 }
 		};
 
 		public async Task CreateIncrementors(string token)

@@ -26,6 +26,5 @@ namespace Marketplace.Common.Models
         public List<string> BuyerID { get; set; }
         public List<string> Country { get; set; }
         public List<string> State { get; set; }
-        public List<string> TaxCode { get; set; }
     }
 }
