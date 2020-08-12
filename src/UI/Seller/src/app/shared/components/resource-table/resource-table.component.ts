@@ -25,6 +25,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
 import { pipe } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
 
 interface BreadCrumb {
   displayText: string;
@@ -72,6 +73,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   tableHeight = 450;
   editResourceHeight = 450;
   activeFilterCount = 0;
+  canImpersonateResource = false;
   filterForm: FormGroup;
   fromDate: string;
   toDate: string;
@@ -81,6 +83,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
     private translate: TranslateService,
+    private impersonationService: ImpersonationService,
     ngZone: NgZone
   ) {}
 
@@ -224,6 +227,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   async determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
     this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+    const routeParams = this.activatedRoute.snapshot.params
+    this.canImpersonateResource = routeParams.buyerID && routeParams.userID;
     if(this.isMyResource) {
       const resource = await this._ocService.getMyResource();
       this.selectedParentResourceName = resource.Name;
@@ -330,12 +335,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     }
   }
 
-  impersonateUser() {
-    if(this.activatedRoute.snapshot?.params?.supplierID) {
-      //impersonate supplier
-    }
-    console.log(this._resourceInSelection)
-    console.log(this.parentResources) 
+  async impersonateUser(): Promise<void> {
+    await this.impersonationService.impersonateUser(this.activatedRoute.snapshot?.params?.buyerID, this._resourceInSelection)
   }
 
   getSelectedFilterValue(pathOfFilter: string) {

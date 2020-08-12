@@ -16,8 +16,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { SortDirection } from './sort-direction.enum';
 import { environment } from 'src/environments/environment';
 import { Router, ActivatedRoute } from '@angular/router';
-import {  OcUserService } from '@ordercloud/angular-sdk';
-import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
+import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -56,8 +55,7 @@ export class FullResourceTableComponent {
   constructor(private router: Router,
               private toastrService: ToastrService,
               private activatedRoute: ActivatedRoute,
-              @Inject(applicationConfiguration) private appConfig: AppConfig,
-              private userService: OcUserService) {}
+              private impersonationService: ImpersonationService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
     this.headers = this.getHeaders();
@@ -160,13 +158,7 @@ export class FullResourceTableComponent {
 
   async impersonateUser(resource: any) {
     event.stopPropagation();
-    const token = await this.userService.GetAccessToken(this.activatedRoute.snapshot.params?.buyerID, resource.ID,
-      {
-        ClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
-        Roles: ['Shopper'],
-      }).toPromise();
-    console.log(token)
-    const url = 'https://marketplace-buyer-ui-test.azurewebsites.net/home?token=' + token.access_token;
-    window.open(url, '_blank'); 
+    const buyerID = this.activatedRoute.snapshot.params?.buyerID;
+    await this.impersonationService.impersonateUser(buyerID, resource);
   }
 }
