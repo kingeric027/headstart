@@ -63,7 +63,7 @@ export class OCMOrderReturn {
       return {
         ID: claim.lineItem.ID,
         Reason: claim.returnReason,
-        PreviousQuantities: this.getPreviousQuantities(claim.lineItem.ID, claim.quantityToReturnOrCancel, this._action),
+        Quantity: claim.quantityToReturnOrCancel,
       };
     });
     const changeRequest = {
@@ -71,47 +71,6 @@ export class OCMOrderReturn {
       Changes: lineItemChanges,
     };
     await this.context.orderHistory.submitCancelOrReturn(this.order.ID, changeRequest);
-  }
-
-  getPreviousQuantities(lineItemID: string, quantityToReturnOrCancel: number, action: string): any {
-    if (action === 'return') {
-      return this.getPreviousQuantitiesForReturn(lineItemID, quantityToReturnOrCancel);
-    } else {
-      return this.getPreviousQuantitiesForCancelation(lineItemID, quantityToReturnOrCancel);
-    }
-  }
-
-  getPreviousQuantitiesForReturn(lineItemID: string, quantityToReturn: number): any {
-    const lineItem = this.lineItems.find(li => li.ID === lineItemID);
-    const Complete = lineItem.xp.StatusByQuantity['Complete'] || 0;
-    if (Complete >= quantityToReturn) {
-      return { Complete: quantityToReturn };
-    } else {
-      throw new Error('Not enough quantity to support change');
-    }
-  }
-
-  getPreviousQuantitiesForCancelation(lineItemID: string, quantityToCancel: number): any {
-    const lineItem = this.lineItems.find(li => li.ID === lineItemID);
-    const previousQuantities = { Submitted: 0, Backordered: 0 };
-    // todo figure out why the typing is potentially off here for dictionaries in sdk
-    let Submitted = lineItem.xp.StatusByQuantity['Submitted'] || 0;
-
-    let Backordered = lineItem.xp.StatusByQuantity['Backordered'] || 0;
-    while (quantityToCancel > 0) {
-      if (Submitted) {
-        previousQuantities.Submitted++;
-        Submitted--;
-        quantityToCancel--;
-      } else if (Backordered) {
-        previousQuantities.Backordered++;
-        Backordered--;
-        quantityToCancel--;
-      } else {
-        throw new Error('Not enough quantity to support change');
-      }
-    }
-    return previousQuantities;
   }
 
   async onSubmit(): Promise<void> {

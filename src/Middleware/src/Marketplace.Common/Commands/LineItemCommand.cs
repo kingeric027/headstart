@@ -214,8 +214,8 @@ namespace Marketplace.Common.Commands
                 {
                     if(statusDictionary[status] <= quantitySetting)
                     {
-                        statusDictionary[status] = 0;
                         quantitySetting -= statusDictionary[status];
+                        statusDictionary[status] = 0;
                     } else
                     {
                         statusDictionary[status] -= quantitySetting;
