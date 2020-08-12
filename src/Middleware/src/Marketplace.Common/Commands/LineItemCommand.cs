@@ -198,12 +198,16 @@ namespace Marketplace.Common.Commands
 
         private Dictionary<LineItemStatus, int> BuildNewLineItemStatusByQuantity(LineItemStatusChange lineItemStatusChange, MarketplaceLineItem existingLineItem, LineItemStatus newLineItemStatus)
         {
+            Dictionary<LineItemStatus, int> statusDictionary = existingLineItem.xp.StatusByQuantity;
             var quantitySetting = lineItemStatusChange.Quantity;
 
-            Dictionary<LineItemStatus, int> statusDictionary = existingLineItem.xp.StatusByQuantity;
+            // increment
+            statusDictionary[newLineItemStatus] += quantitySetting;
+
 
             var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[newLineItemStatus];
 
+            // decrement
             foreach(LineItemStatus status in validPreviousStates)
             {
                 if(statusDictionary[status] != 0)
@@ -219,6 +223,7 @@ namespace Marketplace.Common.Commands
                     }
                 }
             }
+
 
             return statusDictionary;
         }
