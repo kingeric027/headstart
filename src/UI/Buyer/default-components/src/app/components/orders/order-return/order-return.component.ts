@@ -5,6 +5,7 @@ import { groupBy as _groupBy, flatten as _flatten } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
 import { CanReturnOrCancel } from 'src/app/services/lineitem-status.helper';
+import { faThermometerHalf } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   templateUrl: './order-return.component.html',
@@ -22,21 +23,31 @@ export class OCMOrderReturn {
   _action: string;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
-    this.lineItems = value.LineItems.filter(li => CanReturnOrCancel(li, this._action));
-    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
-    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(liGroups);
-    this.setSupplierInfo(this.liGroupedByShipFrom);
+    this.lineItems = value.LineItems;
+    if (this._action) {
+      this.setData();
+    }
     //  this.setRequestReturnForm();
   }
   @Input() set action(value: string) {
     this._action = value;
-    this.setRequestReturnForm(value);
+    if (this.lineItems?.length) {
+      this.setData();
+    }
   }
   @Output()
   viewReturnFormEvent = new EventEmitter<boolean>();
 
   constructor(private context: ShopperContextService, private fb: FormBuilder) {}
+
+  setData(): void {
+    this.lineItems = this.lineItems.filter(li => CanReturnOrCancel(li, this._action));
+    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
+    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(liGroups);
+    this.setSupplierInfo(this.liGroupedByShipFrom);
+    this.setRequestReturnForm(this._action);
+  }
 
   isAnyRowSelected(): boolean {
     const liGroups = this.requestReturnForm.controls.liGroups as FormArray;
