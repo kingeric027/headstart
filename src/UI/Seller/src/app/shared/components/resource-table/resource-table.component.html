@@ -281,6 +281,7 @@
               <h3 *ngIf="!isCreatingNew"
                   class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
             </span>
+            <button *ngIf="canImpersonateResource && !isCreatingNew" (click)="impersonateUser()" class="btn brand-button--orange">Impersonate</button>
             <span class="d-flex align-items-center"
                   *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
               <a class="btn btn-outline-info ml-3"

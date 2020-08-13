@@ -120,6 +120,7 @@ export const BASIC_STRING = 'BASIC_STRING';
 export const DATE_TIME = 'DATE_TIME';
 export const CURRENCY = 'CURRENCY';
 export const COPY_OBJECT = 'COPY_OBJECT';
+export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON';
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -182,6 +183,12 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         type: BASIC_STRING,
         sortable: true,
       },
+      {
+        path: 'Impersonate',
+        header: '',
+        type: IMPERSONATE_BUTTON,
+        sortable: false
+      }
     ],
     imgPath: '',
   },

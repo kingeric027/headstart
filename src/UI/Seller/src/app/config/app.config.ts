@@ -8,6 +8,8 @@ export const ocAppConfig: AppConfig = {
   orderCloudApiUrl: environment.orderCloudApiUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
+  buyerUrl: environment.buyerUrl,
+  buyerClientID: environment.buyerClientID,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
@@ -79,6 +81,21 @@ export const ocAppConfig: AppConfig = {
     'MPSupplierUserGroupAdmin',
     'MPStoreFrontAdmin',
   ],
+  impersonatingBuyerScope: [
+    'MeAddressAdmin',
+    'AddressAdmin', // Only for location owners
+    'MeAdmin',
+    'MeCreditCardAdmin',
+    'MeXpAdmin',
+    'UserGroupAdmin',
+    'ApprovalRuleAdmin',
+    'Shopper',
+    'BuyerUserAdmin',
+    'BuyerReader',
+    'PasswordReset',
+    'SupplierReader',
+    'SupplierAddressReader'
+  ]
 };
 
 export const applicationConfiguration = new InjectionToken<AppConfig>('app.config', {
@@ -109,6 +126,10 @@ export interface AppConfig {
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: string;
 
+  //  buyer url and client ID are needed for impersonating buyers
+  buyerUrl: string;
+  buyerClientID: string;
+
   /**
    * An array of security roles that will be requested upon login.
    * These roles allow access to specific endpoints in the OrderCloud.io API.
@@ -120,4 +141,5 @@ export interface AppConfig {
   orderCloudApiVersion: string;
 
   scope: string[];
+  impersonatingBuyerScope: string[];
 }
