@@ -108,19 +108,19 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Get a Resource's primary image")]
 		[HttpGet, Route("{type}/{ID}/thumbnail")] // No auth
-		public async Task GetThumbnail(ResourceType type, string ID)
+		public async Task GetThumbnail(ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{
 			var resource = new Resource(type, ID);
-			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
+			var url = await _assetedResources.GetThumbnail(resource, size, VerifiedUserContext);
 			Response.Redirect(url);
 		}
 
 		[DocName("Get a Resource's primary image")]
 		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
-		public async Task GetThumbnail(ParentResourceType parentType, string parentID, ResourceType type, string ID)
+		public async Task GetThumbnail(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
-			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
+			var url = await _assetedResources.GetThumbnail(resource, size, VerifiedUserContext);
 			Response.Redirect(url);
 		}
 	}

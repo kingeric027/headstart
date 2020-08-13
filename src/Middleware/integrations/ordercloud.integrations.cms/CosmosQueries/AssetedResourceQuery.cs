@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
@@ -12,7 +13,7 @@ namespace ordercloud.integrations.cms
 	public interface IAssetedResourceQuery
 	{
 		Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user);
-		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
+		Task<string> GetThumbnail(Resource resource, ThumbSize size, VerifiedUserContext user);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user);
@@ -57,7 +58,7 @@ namespace ordercloud.integrations.cms
 			};
 		}
 
-		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)
+		public async Task<string> GetThumbnail(Resource resource, ThumbSize size, VerifiedUserContext user)
 		{
 			resource.Validate();
 			var assetedResource = await GetExisting(resource);
@@ -66,7 +67,7 @@ namespace ordercloud.integrations.cms
 				return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
 			}
 			var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
-			return asset.Url;
+			return $"{asset.Url}-{size.ToString().ToLower()}";
 		}
 
 		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
