@@ -8,7 +8,12 @@
         class="ml-3 mb-3 btn btn-outline-dark">
   Mark Items as Canceled
 </button>
-<button *ngIf="_tableStatus === 'Backordered' || _tableStatus ==='Canceled'"
+<button *ngIf="_tableStatus === 'Default' && canChangeTo('Returned')"
+        (click)="changeTableStatus('Returned')"
+        class="ml-3 mb-3 btn btn-outline-dark">
+  Mark Items as Returned
+</button>
+<button *ngIf="_tableStatus !== 'Default'"
         (click)="changeTableStatus('Default')"
         class="ml-3 mb-3 btn btn-outline-dark">
   Abandon Changes
