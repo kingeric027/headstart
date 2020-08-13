@@ -10,4 +10,6 @@ export const environment = {
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   orderCloudApiUrl: 'https://api.ordercloud.io',
   orderCloudApiVersion: 'v1',
+  buyerUrl: 'https://marketplace-admin-ui-staging.azurewebsites.net/',
+  buyerClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B'
 };

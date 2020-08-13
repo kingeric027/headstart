@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import {
   FULL_TABLE_RESOURCE_DICTIONARY,
   ResourceRow,
@@ -15,7 +15,8 @@ import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SortDirection } from './sort-direction.enum';
 import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -52,7 +53,9 @@ export class FullResourceTableComponent {
   resourceSelected = new EventEmitter();
 
   constructor(private router: Router,
-              private toastrService: ToastrService) {}
+              private toastrService: ToastrService,
+              private activatedRoute: ActivatedRoute,
+              private impersonationService: ImpersonationService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
     this.headers = this.getHeaders();
@@ -151,5 +154,11 @@ export class FullResourceTableComponent {
     } else {
       return faSort;
     }
+  }
+
+  async impersonateUser(resource: any) {
+    event.stopPropagation();
+    const buyerID = this.activatedRoute.snapshot.params?.buyerID;
+    await this.impersonationService.impersonateUser(buyerID, resource);
   }
 }
