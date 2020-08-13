@@ -102,6 +102,17 @@ namespace Marketplace.Common.Constants
             return ClaimStatus.NoClaim;
         }
 
+        public static Dictionary<LineItemStatus, int> EmptyStatuses = new Dictionary<LineItemStatus, int>()
+        {
+            { LineItemStatus.Submitted, 0 },
+            { LineItemStatus.Backordered, 0 },
+            { LineItemStatus.CancelRequested, 0 },
+            { LineItemStatus.Complete, 0 },
+            { LineItemStatus.ReturnRequested, 0 },
+            { LineItemStatus.Returned, 0 },
+            { LineItemStatus.Canceled, 0 },
+        };
+
         private static Dictionary<LineItemStatus, SubmittedOrderStatus> RelatedOrderStatus = new Dictionary<LineItemStatus, SubmittedOrderStatus>()
         {
             { LineItemStatus.Submitted, SubmittedOrderStatus.Open },
