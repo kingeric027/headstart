@@ -55,8 +55,6 @@ export const isSecondDuplicateCategory = (
   styleUrls: ['./supplier-category-select.component.scss'],
 })
 export class SupplierCategorySelectComponent {
-
-  constructor(private ref: ChangeDetectorRef) {}
   canAddAnotherCategory = true;
   _categorySelectionsControl: FormControl;
   _categorySelections: SupplierCategorySelection[];
@@ -77,7 +75,6 @@ export class SupplierCategorySelectComponent {
       this._categorySelections = categorySelections;
       this.updateCategoryValidation(categorySelections);
     });
-    this.ref.detectChanges();
   }
   @Input()
   set filterConfig(value: SupplierCategoryConfig) {
@@ -85,7 +82,6 @@ export class SupplierCategorySelectComponent {
       this._vendorLevelConfig = value.Filters.find(filter => filter.Display === 'Vendor Level');
       this._serviceCatagoryConfig = value.Filters.find(filter => filter.Display === 'Service Category');
     }
-    this.ref.detectChanges();
   }
   @Output()
   selectionsChanged = new EventEmitter();
