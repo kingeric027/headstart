@@ -447,8 +447,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       superProduct = await this.uploadAsset(productID, file, 'Image');
     }
     this.imageFiles = []
+    superProduct = Object.assign({ ...this._superMarketplaceProductStatic } || {}, superProduct);
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
-    superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
     this.refreshProductData(superProduct);
   }
 
