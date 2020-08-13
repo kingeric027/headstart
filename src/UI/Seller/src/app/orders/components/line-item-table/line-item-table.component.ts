@@ -3,10 +3,9 @@ import { groupBy as _groupBy } from 'lodash';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { MarketplaceLineItem, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { LineItemTableStatus } from '../order-details/order-details.component';
-import { NumberCanChangeTo, CanChangeTo, CanChangeLineItemsOnOrderTo, GetPreviousQuantityAssumptions } from '@app-seller/orders/line-item-status.helper';
+import { NumberCanChangeTo, CanChangeTo, CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
 import { FormArray, Validators, FormControl } from '@angular/forms';
-import { LineItemStatusChanges } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'app-line-item-table',
@@ -78,7 +77,7 @@ export class LineItemTableComponent {
       .join(', ');
   }
 
-  quantityCanChange(lineItem: MarketplaceLineItem) {
+  quantityCanChange(lineItem: MarketplaceLineItem): number {
     return NumberCanChangeTo(this._tableStatus as LineItemStatus, lineItem);
   }
 
@@ -102,8 +101,11 @@ export class LineItemTableComponent {
     }
   }
 
-  buildLineItemChanges(): LineItemStatusChanges {
-    const lineItemChanges: LineItemStatusChanges = {
+  // temporarily qny
+  // buildLineItemChanges(): LineItemStatusChanges {
+  buildLineItemChanges(): any {
+    // const lineItemChanges: LineItemStatusChanges = {
+    const lineItemChanges: any = {
       Status: this._tableStatus as LineItemStatus,
       Changes: []
     }
@@ -114,7 +116,7 @@ export class LineItemTableComponent {
           const lineItem = this._liGroupedByShipFrom[shipFromIndex][lineItemIndex];
           lineItemChanges.Changes.push({
             ID: lineItem.ID,
-            PreviousQuantities: GetPreviousQuantityAssumptions(this._tableStatus as LineItemStatus, lineItem, subControl.value)
+            Quantity: subControl.value
           });
         }
       })

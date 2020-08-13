@@ -1,7 +1,18 @@
 import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { faShippingFast, faWindowClose, faPlus, faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { LineItem, Shipment, OcSupplierAddressService, ListAddress, ListShipment, OcShipmentService, ListShipmentItem, OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
+import {
+  LineItem,
+  Shipment,
+  OcSupplierAddressService,
+  ListAddress,
+  ListShipment,
+  OcShipmentService,
+  ListShipmentItem,
+  OcLineItemService,
+  OcOrderService,
+  Order,
+} from '@ordercloud/angular-sdk';
 import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppAuthService } from '@app-seller/auth';
@@ -9,13 +20,17 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { OrderService } from '@app-seller/orders/order.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ShippingStatus, LineItemStatus } from '../../../shared/models/order-status.interface';
-import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
+import {
+  CanChangeLineItemsOnOrderTo,
+  CanChangeTo,
+  NumberCanChangeTo,
+} from '@app-seller/orders/line-item-status.helper';
 import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'app-order-shipments',
   templateUrl: './order-shipments.component.html',
-  styleUrls: ['./order-shipments.component.scss']
+  styleUrls: ['./order-shipments.component.scss'],
 })
 export class OrderShipmentsComponent implements OnChanges {
   faShippingFast = faShippingFast;
@@ -71,12 +86,12 @@ export class OrderShipmentsComponent implements OnChanges {
       // FromAddressID: new FormControl(''),
       Shipper: new FormControl(''),
       Service: new FormControl(''),
-      Quantities: new FormGroup({})
+      Quantities: new FormGroup({}),
     });
     const group = this.shipmentForm.get('Quantities') as FormGroup;
-    this.lineItems.forEach((item) => {
-      group.addControl(item.ID, new FormControl(0))
-    })
+    this.lineItems.forEach(item => {
+      group.addControl(item.ID, new FormControl(0));
+    });
   }
 
   getCurrentDate(): string {
@@ -137,9 +152,13 @@ export class OrderShipmentsComponent implements OnChanges {
   async patchLineItems(): Promise<void> {
     const lineItemsToPatch = [];
     const quantities = this.shipmentForm.value.Quantities;
-    this.lineItems.forEach(async (li) => {
+    this.lineItems.forEach(async li => {
       if (quantities[li.ID] > 0 && quantities[li.ID] === li.Quantity) {
-        lineItemsToPatch.push(this.ocLineItemService.Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } }).toPromise());
+        lineItemsToPatch.push(
+          this.ocLineItemService
+            .Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } })
+            .toPromise()
+        );
       }
     });
     await Promise.all(lineItemsToPatch);
@@ -191,9 +210,10 @@ export class OrderShipmentsComponent implements OnChanges {
     }
   }
 
-  getQuantityDropdown(quantityToShip: number): number[] {
+  getQuantityDropdown(lineItem: MarketplaceLineItem): number[] {
+    const quantityAvailableToShip = NumberCanChangeTo(LineItemStatus.Complete, lineItem);
     const quantityList = [];
-    for (let i = 1; i <= quantityToShip; i++) {
+    for (let i = 1; i <= quantityAvailableToShip; i++) {
       quantityList.push(i);
     }
     return quantityList;
@@ -205,14 +225,14 @@ export class OrderShipmentsComponent implements OnChanges {
 
   toggleShipAllItems(): void {
     this.shipAllItems = !this.shipAllItems;
-    if( this.shipAllItems ) {
+    if (this.shipAllItems) {
       this.lineItems.forEach(item => {
         this.shipmentForm.patchValue({
           Quantities: {
-            [item.ID]: (item.Quantity - item.QuantityShipped) 
-          }
-        })
-      })
+            [item.ID]: item.Quantity - item.QuantityShipped,
+          },
+        });
+      });
     }
   }
 
@@ -225,21 +245,27 @@ export class OrderShipmentsComponent implements OnChanges {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + accessToken
-      })
+        Authorization: 'Bearer ' + accessToken,
+      }),
     };
     const superShipment = {
-      Shipment: { TrackingNumber: shipment.TrackingNumber,
-                  ShipDate: shipment.ShipDate,
-                  Cost: shipment.Cost,
-                  Shipper: shipment.Shipper,
-                   xp: { Service: this.shipmentForm.value.Service } },
-      ShipmentItems: this.lineItems.map((li) => {
-          return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: shipment.Quantities[li.ID] }
-      }).filter(li => li !== undefined)
-    }
+      Shipment: {
+        TrackingNumber: shipment.TrackingNumber,
+        ShipDate: shipment.ShipDate,
+        Cost: shipment.Cost,
+        Shipper: shipment.Shipper,
+        xp: { Service: this.shipmentForm.value.Service },
+      },
+      ShipmentItems: this.lineItems
+        .map(li => {
+          return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: shipment.Quantities[li.ID] };
+        })
+        .filter(li => li !== undefined),
+    };
     this.patchLineItems();
-    const postedShipment: any = await this.httpClient.post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions).toPromise();
+    const postedShipment: any = await this.httpClient
+      .post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions)
+      .toPromise();
     await this.ocShipmentService.Patch(postedShipment.Shipment.ID, { DateShipped: shipDate }).toPromise();
     this.getShipments();
     this.getLineItems();

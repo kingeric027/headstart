@@ -169,12 +169,15 @@ namespace Marketplace.Common.Constants
             // no previous states for submitted
             { LineItemStatus.Submitted, new List<LineItemStatus>() { } },
 
+            /* ordering of the items in the list is used for determining which line item statuses to change
+            * for example when setting status to canceled, cancel requested will be the first quantity to decrement,
+            * once this is depleted, the backordered quantity will be decremented */
             { LineItemStatus.Complete, new List<LineItemStatus>() { LineItemStatus.Submitted, LineItemStatus.Backordered } },
             { LineItemStatus.ReturnRequested, new List<LineItemStatus>() { LineItemStatus.Complete } },
             { LineItemStatus.Returned, new List<LineItemStatus>() { LineItemStatus.ReturnRequested, LineItemStatus.Complete } },
             { LineItemStatus.Backordered, new List<LineItemStatus>() { LineItemStatus.Submitted } },
-            { LineItemStatus.CancelRequested, new List<LineItemStatus>() { LineItemStatus.Submitted, LineItemStatus.Backordered } },
-            { LineItemStatus.Canceled, new List<LineItemStatus>() { LineItemStatus.CancelRequested, LineItemStatus.Submitted, LineItemStatus.Backordered } },
+            { LineItemStatus.CancelRequested, new List<LineItemStatus>() { LineItemStatus.Backordered, LineItemStatus.Submitted } },
+            { LineItemStatus.Canceled, new List<LineItemStatus>() { LineItemStatus.CancelRequested, LineItemStatus.Backordered, LineItemStatus.Submitted } },
         };
 
         public static Dictionary<LineItemStatus, Dictionary<VerifiedUserType, LineItemEmailDisplayText>> GetStatusChangeEmailText(string supplierName)
