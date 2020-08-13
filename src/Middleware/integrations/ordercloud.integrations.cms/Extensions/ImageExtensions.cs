@@ -26,7 +26,7 @@ namespace ordercloud.integrations.cms
         private static Image CreateSquareCropped(this Image srcImage, int targetDimension)
 		{
             var scaleFactor = targetDimension / (double)Math.Min(srcImage.Width, srcImage.Height);
-            if (scaleFactor > 1) return null; // Don't increase image size
+            if (scaleFactor > 1) return srcImage; // Don't increase image size
             var srcDimension = (int)(targetDimension / scaleFactor);
             var rectX = (srcImage.Width - srcDimension) / 2;
             var rectY = (srcImage.Height - srcDimension) / 2;
@@ -39,7 +39,7 @@ namespace ordercloud.integrations.cms
         private static Image CreateSquareWhiteSpaced(this Image srcImage, int targetDimension)
         {
             var scaleFactor = targetDimension / (double)Math.Max(srcImage.Width, srcImage.Height);
-            if (scaleFactor > 1) return null; // Don't increase image size
+            if (scaleFactor > 1) return srcImage; // Don't increase image size
             var rectWidth = (int)(srcImage.Width * scaleFactor);
             var rectHeight = (int)(srcImage.Height * scaleFactor);
             var rectX = (targetDimension - rectWidth) / 2;
