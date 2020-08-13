@@ -12,7 +12,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentAssignmentQuery
 	{
-		Task<List<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, VerifiedUserContext user);
+		Task<ListPage<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, ListArgsPageOnly args, VerifiedUserContext user);
 		Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user);
 		Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user);
@@ -31,7 +31,7 @@ namespace ordercloud.integrations.cms
 			_schemas = schemas;
 		}
 
-		public async Task<List<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, VerifiedUserContext user) 
+		public async Task<ListPage<Document<T>>> ListDocuments<T>(string schemaInteropID, Resource resource, ListArgsPageOnly args, VerifiedUserContext user) 
 		{
 			resource.Validate();
 			// Confirm user has access to resource.
@@ -45,8 +45,8 @@ namespace ordercloud.integrations.cms
 					doc.RsrcType== resource.ResourceType
 				).ToListAsync();
 			var documentIDs = assignments.Select(assign => assign.DocID);
-			var documents = DocumentMapper.MapTo<T>(await _documents.ListByInternalIDs(documentIDs));
-			return documents.ToList();
+			var documents = await _documents.ListByInternalIDs(documentIDs, args);
+			return DocumentMapper.MapTo<T>(documents);
 		}
 
 		public async Task<ListPage<DocumentAssignment>> ListAssignments(string schemaInteropID, ListArgs<DocumentAssignment> args, VerifiedUserContext user)
@@ -63,7 +63,7 @@ namespace ordercloud.integrations.cms
 			var assignments = list.ToListPage(arguments.Page, arguments.PageSize, count);
 			var documentIDs = assignments.Items.Select(assign => assign.DocID);
 			var documents = await _documents.ListByInternalIDs(documentIDs);
-			return DocumentAssignmentMapper.MapTo(assignments, documents);
+			return DocumentAssignmentMapper.MapTo(assignments, documents.Items);
 		}
 
 		public async Task SaveAssignment(string schemaInteropID, DocumentAssignment assignment, VerifiedUserContext user)

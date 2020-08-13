@@ -24,7 +24,7 @@ namespace ordercloud.integrations.cms
 		Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user);
 		Task Delete(string assetInteropID, VerifiedUserContext user);
 
-		Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs);
+		Task<ListPage<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs, ListArgsPageOnly args);
 		Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user);
 		Task<AssetDO> GetByInternalID(string assetID); // real id
 	}
@@ -137,10 +137,10 @@ namespace ordercloud.integrations.cms
 			await _blob.DeleteAsset(container, asset.id); 
 		}
 
-		public async Task<List<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs)
+		public async Task<ListPage<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs, ListArgsPageOnly args)
 		{
-			var assets = await _assetStore.FindMultipleAsync(assetIDs);
-			return assets.ToList();
+
+			return await _assetStore.FindMultipleAsync(assetIDs, args);
 		}
 
 		public async Task<AssetDO> GetByInternalID(string assetID)

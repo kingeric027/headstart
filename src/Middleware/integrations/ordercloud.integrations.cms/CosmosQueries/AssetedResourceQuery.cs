@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
 using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cms
 {
 	public interface IAssetedResourceQuery
 	{
-		Task<List<Asset>> ListAssets(Resource resource, VerifiedUserContext user);
+		Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user);
 		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
@@ -30,24 +31,30 @@ namespace ordercloud.integrations.cms
 			_blob = blob;
 		}
 
-		public async Task<List<Asset>> ListAssets(Resource resource, VerifiedUserContext user)
+		public async Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user)
 		{
 			resource.Validate();
+			args = args ?? new ListArgsPageOnly();
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var assetedResource = await GetExisting(resource);
-			if (assetedResource == null) return new List<Asset>();
+			if (assetedResource == null) return new ListPage<Asset>();
 			var assetIDs = assetedResource.ImageAssetIDs
 				.Concat(assetedResource.ThemeAssetIDs)
 				.Concat(assetedResource.AttachmentAssetIDs)
 				.Concat(assetedResource.StructuredAssetsIDs)
 				.ToList();
-			var assets = await _assets.ListByInternalIDs(assetIDs);
-			return assets.Select(a => {
+			var assets = await _assets.ListByInternalIDs(assetIDs, args);
+			var items = assets.Items.Select(a => {
 				int indexWithinType = GetAssetIDs(assetedResource, a.Type).IndexOf(a.id);
 				var asset = AssetMapper.MapTo(a);
 				return (asset, indexWithinType);
 			}).OrderBy(c => c.asset.Type).ThenBy(c => c.indexWithinType).Select(x => x.asset).ToList();
+			return new ListPage<Asset>()
+			{
+				Items = items,
+				Meta = assets.Meta
+			};
 		}
 
 		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)

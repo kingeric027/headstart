@@ -92,18 +92,18 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets Assigned to Resource")]
 		[HttpGet, Route("{type}/{ID}"), OrderCloudIntegrationsAuth]
-		public async Task<List<Asset>> ListAssets(ResourceType type, string ID)
+		public async Task<ListPage<Asset>> ListAssets(ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
 		{
 			var resource = new Resource(type, ID);
-			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
+			return await _assetedResources.ListAssets(resource, args, VerifiedUserContext);
 		}
 
 		[DocName("List Assets Assigned to Resource")]
 		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}"), OrderCloudIntegrationsAuth]
-		public async Task<List<Asset>> ListAssets(ParentResourceType parentType, string parentID, ResourceType type, string ID)
+		public async Task<ListPage<Asset>> ListAssets(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
-			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
+			return await _assetedResources.ListAssets(resource, args, VerifiedUserContext);
 		}
 
 		[DocName("Get a Resource's primary image")]

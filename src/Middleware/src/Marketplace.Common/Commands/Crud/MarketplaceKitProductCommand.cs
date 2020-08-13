@@ -39,14 +39,14 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
         {
-            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
-            var images = assets.Where(a => a.Type == AssetType.Image).ToList();
+            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100},  user);
+            var images = assets.Items.Where(a => a.Type == AssetType.Image).ToList();
             return images;
         }
         public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
         {
-            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
-            var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
+            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
+            var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
             return attachments;
         }
         public async Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user)
