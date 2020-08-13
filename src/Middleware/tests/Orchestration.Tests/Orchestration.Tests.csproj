@@ -11,6 +11,8 @@
   <ItemGroup>
     <None Remove="JObjectTests\cache.json" />
     <None Remove="JObjectTests\current.json" />
+    <None Remove="JObjectTests\hydrated.json" />
+    <None Remove="Orchestration.Tests.csproj.DotSettings" />
     <None Remove="TemplateTests\TemplateCsv.csv" />
     <None Remove="TemplateTests\TemplateExcel.xlsx" />
     <None Remove="TemplateTests\TemplateSheets.xlsx" />
@@ -21,6 +23,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="JObjectTests\current.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JObjectTests\hydrated.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="TemplateTests\TemplateCsv.csv">
@@ -49,6 +54,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Marketplace.Common\Marketplace.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="JObjectTests\hydrated.json" />
   </ItemGroup>
 
 </Project>
