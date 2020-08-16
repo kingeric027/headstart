@@ -13,7 +13,7 @@ using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
-    public interface IMarketplaceAdminReportCommand
+    public interface IMarketplaceReportCommand
     {
         Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
         Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser);
@@ -21,12 +21,12 @@ namespace Marketplace.Common.Commands
         Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser);
     }
     
-    public class MarketplaceAdminReportCommand : IMarketplaceAdminReportCommand
+    public class MarketplaceReportCommand : IMarketplaceReportCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly ReportTemplateQuery _template;
 
-        public MarketplaceAdminReportCommand(IOrderCloudClient oc, ReportTemplateQuery template)
+        public MarketplaceReportCommand(IOrderCloudClient oc, ReportTemplateQuery template)
         {
             _oc = oc;
             _template = template;

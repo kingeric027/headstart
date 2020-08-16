@@ -15,12 +15,12 @@ namespace Marketplace.Common.Controllers
     [DocComments("\"Marketplace Reports\" for generating and downloading reports in the Admin application")]
     [MarketplaceSection.Marketplace(ListOrder = 11)]
     [Route("reports")]
-    public class AdminReportController : BaseController
+    public class ReportController : BaseController
     {
-        private readonly IMarketplaceAdminReportCommand _reportDataCommand;
+        private readonly IMarketplaceReportCommand _reportDataCommand;
         private readonly DownloadReportCommand _downloadReportCommand;
 
-        public AdminReportController(IMarketplaceAdminReportCommand reportDataCommand, AppSettings settings, DownloadReportCommand downloadReportCommand) : base(settings)
+        public ReportController(IMarketplaceReportCommand reportDataCommand, AppSettings settings, DownloadReportCommand downloadReportCommand) : base(settings)
         {
             _reportDataCommand = reportDataCommand;
             _downloadReportCommand = downloadReportCommand;
