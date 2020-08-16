@@ -8,6 +8,7 @@ using ordercloud.integrations.library;
 using Marketplace.Models.Attributes;
 using Marketplace.Common.Models;
 using Marketplace.Models.Misc;
+using static Marketplace.Common.Models.ReportTemplate;
 
 namespace Marketplace.Common.Controllers
 {
@@ -33,23 +34,23 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("buyerLocation/preview/{templateID}"), OrderCloudIntegrationsAuth]
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID)
         {
-            RequireOneOf(CustomRole.MPReportReader);
+            RequireOneOf(CustomRole.MPSupplierAdmin);
             return await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
         }
 
         [HttpPost, Route("buyerLocation/download/{templateID}"), OrderCloudIntegrationsAuth]
         public async Task DownloadBuyerLocation([FromBody] ReportRequestBody requestBody, string templateID)
         {
-            RequireOneOf(CustomRole.MPReportReader);
+            RequireOneOf(CustomRole.MPSupplierAdmin);
             var reportData = await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
-            await _downloadReportCommand.ExportToExcel("BuyerLocation", requestBody.Headers, reportData);
+            await _downloadReportCommand.ExportToExcel(ReportTypeEnum.BuyerLocation, requestBody.Headers, reportData);
 
         }
 
         [HttpGet, Route("{reportType}/listtemplates"), OrderCloudIntegrationsAuth]
-        public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(string reportType)
+        public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType)
         {
-            RequireOneOf(CustomRole.MPReportReader);
+            RequireOneOf(CustomRole.MPSupplierAdmin);
             return await _reportDataCommand.ListReportTemplatesByReportType(reportType, VerifiedUserContext);
         }
 
