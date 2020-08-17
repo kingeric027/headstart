@@ -9,6 +9,7 @@ using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,6 +21,7 @@ namespace Marketplace.Common.Commands
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task PatchOrderRequiresApprovalStatus(string orderID);
+        Task AutoApplyPromotions(string orderID);
     }
 
     public class OrderCommand : IOrderCommand
@@ -163,6 +165,22 @@ namespace Marketplace.Common.Commands
 
             // if function has not been exited yet we throw an insufficient access error
             Require.That(false, new ErrorCode("Insufficient Access", 403, $"User cannot access order {order.ID}"));
+        }
+
+        public async Task AutoApplyPromotions(string orderID)
+        {
+            var autoEligablePromos = await _oc.Promotions.ListAsync(filters: "xp.AutoApply: true");
+            foreach(var promo in autoEligablePromos.Items)
+            {
+                try
+                {
+                    await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
+                    break;
+                } catch
+                {
+                    continue;
+                }
+            }
         }
     };
 }

@@ -93,5 +93,12 @@ namespace Marketplace.Common.Controllers
             // to mp manager when a supplier is updated
             await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
         }
+
+        //[HttpPost, Route("appypromotions")]
+        //[OrderCloudWebhookAuth]
+        //public async void HandleApplyingPromotions([FromBody] WebhookPayloads.LineItems.Save payload)
+        //{
+        //    await _orderCommand.AutoApplyPromotions(payload.Response.Body.)
+        //}
     }
 }
