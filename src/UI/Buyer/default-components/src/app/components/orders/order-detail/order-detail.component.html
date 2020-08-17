@@ -19,12 +19,12 @@
     </div>
     <div class="row">
       <div class="col-md-4">
-        <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{ order.Status }}</div>
+        <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.xp.SubmittedOrderStatus"></ocm-order-status-icon> {{ order.xp.SubmittedOrderStatus }}</div>
         <div><span translate>ORDERS.DETAIL.SHIPPING_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ShippingStatus"></ocm-order-status-icon> {{ order.xp.ShippingStatus | orderStatusDisplay}}</div>
         <div><span translate>ORDERS.DETAIL.CLAIM_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ClaimStatus"></ocm-order-status-icon> {{ order.xp.ClaimStatus | orderStatusDisplay}}</div>
         <small class="float-left"><span translate>ORDERS.DETAIL.SUBMITTED</span> {{ order.DateSubmitted | date: 'short' }}</small>
       </div>
-      <div class="col-md-8"> 
+      <div class="col-md-8">
         <ocm-order-approval *ngIf="approvalVersion"
                             class="float-right"
                             [orderID]="order.ID"></ocm-order-approval>
@@ -67,7 +67,7 @@
                 translate>
           ORDERS.DETAIL.DISCARD_RETURN_REQUEST
         </button>
-        
+
         <button *ngIf="!approvalVersion && !isQuoteOrder(order) && order.Status === 'Unsubmitted'"
                 class="btn btn-secondary float-right mr-2"
                 (click)="open(updateOrderModal)"

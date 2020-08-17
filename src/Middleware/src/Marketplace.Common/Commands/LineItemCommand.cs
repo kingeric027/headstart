@@ -6,9 +6,7 @@ using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Common.Services;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
-using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Constants;
 
@@ -17,7 +15,7 @@ namespace Marketplace.Common.Commands
     public interface ILineItemCommand
     {
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
         Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
     }
 
@@ -28,7 +26,7 @@ namespace Marketplace.Common.Commands
         private readonly IMeProductCommand _meProductCommand;
 
 
-        public LineItemCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
+        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
@@ -46,7 +44,14 @@ namespace Marketplace.Common.Commands
                     xp = new
                     {
                         StatusByQuantity = new Dictionary<LineItemStatus, int>() {
-                            { LineItemStatus.Submitted, li.Quantity }
+                            { LineItemStatus.Submitted, li.Quantity },
+                            { LineItemStatus.Open, 0 },
+                            { LineItemStatus.Backordered, 0 },
+                            { LineItemStatus.Canceled, 0 },
+                            { LineItemStatus.CancelRequested, 0 },
+                            { LineItemStatus.Returned, 0 },
+                            { LineItemStatus.ReturnRequested, 0 },
+                            { LineItemStatus.Complete, 0 }
                         },
                         Returns = new List<LineItemClaim>(),
                         Cancelations = new List<LineItemClaim>()
@@ -66,8 +71,9 @@ namespace Marketplace.Common.Commands
         {
             var userType = verifiedUser?.UsrType ?? "noUser";
             var verifiedUserType = userType.Reserialize<VerifiedUserType>();
-
-            var previousLineItemsStates = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID);
+            
+            var buyerOrderID = orderID.Split('-')[0];
+            var previousLineItemsStates = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID);
 
             ValidateLineItemStatusChange(previousLineItemsStates.Items.ToList(), lineItemStatusChanges, verifiedUserType);
             var updatedLineItems = await Throttler.RunAsync(lineItemStatusChanges.Changes, 100, 5, (lineItemStatusChange) =>
@@ -77,7 +83,6 @@ namespace Marketplace.Common.Commands
                return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem);
             });
 
-            var buyerOrderID = orderID.Split('-')[0];
             var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrderID);
             var allLineItemsForOrder = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID);
             var lineItemsChanged = allLineItemsForOrder.Items.Where(li => lineItemStatusChanges.Changes.Select(li => li.ID).Contains(li.ID)).ToList();
@@ -122,7 +127,6 @@ namespace Marketplace.Common.Commands
         private PartialLineItem BuildNewPartialLineItem(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> previousLineItemStates, LineItemStatus newLineItemStatus)
         {
             var existingLineItem = previousLineItemStates.First(li => li.ID == lineItemStatusChange.ID);
-            var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
             var StatusByQuantity = BuildNewLineItemStatusByQuantity(lineItemStatusChange, existingLineItem, newLineItemStatus);
             if (newLineItemStatus == LineItemStatus.ReturnRequested || newLineItemStatus == LineItemStatus.Returned)
             {
@@ -131,7 +135,7 @@ namespace Marketplace.Common.Commands
                 {
                     xp = new
                     {
-                        Returns = GetUpdatedChangeRequests(returnRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, StatusByQuantity),
+                        Returns = GetUpdatedChangeRequests(returnRequests, lineItemStatusChange, lineItemStatusChange.Quantity, newLineItemStatus, StatusByQuantity),
                         StatusByQuantity
                     }
                 };
@@ -142,7 +146,7 @@ namespace Marketplace.Common.Commands
                 {
                     xp = new
                     {
-                        Cancelations = GetUpdatedChangeRequests(cancelRequests, lineItemStatusChange, quantitySetting, newLineItemStatus, StatusByQuantity),
+                        Cancelations = GetUpdatedChangeRequests(cancelRequests, lineItemStatusChange, lineItemStatusChange.Quantity, newLineItemStatus, StatusByQuantity),
                         StatusByQuantity
                     }
                 };
@@ -170,8 +174,8 @@ namespace Marketplace.Common.Commands
                     if(existinglineItemStatusChangeRequests[currentClaimIndex].Quantity <= numberReturnedOrCanceled)
                     {
                         existinglineItemStatusChangeRequests[currentClaimIndex].IsResolved = true;
-                        currentClaimIndex++;
                         numberReturnedOrCanceled -= existinglineItemStatusChangeRequests[currentClaimIndex].Quantity;
+                        currentClaimIndex++;
                     } else
                     {
                         currentClaimIndex++;
@@ -192,28 +196,36 @@ namespace Marketplace.Common.Commands
             return existinglineItemStatusChangeRequests;
         }
 
-        private int GetQuantityBeingChanged(Dictionary<LineItemStatus, int> previousQuantities)
-        {
-            return previousQuantities.Aggregate(0, (currentCount, previousQuantity) =>
-            {
-                var value = previousQuantity.Value;
-                return currentCount + value;
-            });
-        }
-
         private Dictionary<LineItemStatus, int> BuildNewLineItemStatusByQuantity(LineItemStatusChange lineItemStatusChange, MarketplaceLineItem existingLineItem, LineItemStatus newLineItemStatus)
         {
-            var quantitySetting = GetQuantityBeingChanged(lineItemStatusChange.PreviousQuantities);
+            Dictionary<LineItemStatus, int> statusDictionary = existingLineItem.xp.StatusByQuantity;
+            var quantitySetting = lineItemStatusChange.Quantity;
 
-            var newStatusDictionary = new Dictionary<LineItemStatus, int>();
-            foreach (KeyValuePair<LineItemStatus, int> entry in lineItemStatusChange.PreviousQuantities)
+            // increment
+            statusDictionary[newLineItemStatus] += quantitySetting;
+
+
+            var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[newLineItemStatus];
+
+            // decrement
+            foreach(LineItemStatus status in validPreviousStates)
             {
-                // decrement the quantity by the quantity changed
-                newStatusDictionary[entry.Key] = existingLineItem.xp.StatusByQuantity[entry.Key] - entry.Value;
+                if(statusDictionary[status] != 0)
+                {
+                    if(statusDictionary[status] <= quantitySetting)
+                    {
+                        quantitySetting -= statusDictionary[status];
+                        statusDictionary[status] = 0;
+                    } else
+                    {
+                        statusDictionary[status] -= quantitySetting;
+                        quantitySetting = 0;
+                    }
+                }
             }
 
-            newStatusDictionary.Add(newLineItemStatus, quantitySetting);
-            return newStatusDictionary;
+
+            return statusDictionary;
         }
 
         private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, MarketplaceOrder buyerOrder, List<string> supplierIDsRelatedToChange, List<MarketplaceLineItem> lineItemsChanged, LineItemStatusChanges lineItemStatusChanges)
@@ -272,7 +284,6 @@ namespace Marketplace.Common.Commands
              * 
              * 1) user making the request has the ability to make that line item change based on usertype
              * 2) there are sufficient amount of the previous quantities for each lineitem
-             * 3) the previous values are valid for the new values being set
              */
 
             // 1) 
@@ -282,57 +293,38 @@ namespace Marketplace.Common.Commands
             // 2)
             var areCurrentQuantitiesToSupportChange = lineItemStatusChanges.Changes.All(lineItemChange =>
             {
-                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.ID);
-                if (relatedLineItems.Count() != 1)
-                {
-                    // if the lineitem is not found on the order, invalid change
-                    return false;
-                }
-                if (lineItemChange.PreviousQuantities == null)
-                {
-                    return false;
-                }
-
-                var existingLineItem = relatedLineItems.First();
-                foreach (KeyValuePair<LineItemStatus, int> entry in lineItemChange.PreviousQuantities)
-                {
-                    var lineItemChangeStatus = entry.Key;
-                    var lineItemChangeQuantity = entry.Value;
-
-                    if (existingLineItem.xp.StatusByQuantity == null || !existingLineItem.xp.StatusByQuantity.ContainsKey(lineItemChangeStatus))
-                    {
-                        return false;
-                    }
-
-                    var existingQuantity = existingLineItem.xp.StatusByQuantity[lineItemChangeStatus];
-                    if(existingQuantity < lineItemChangeQuantity)
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                return ValidateCurrentQuantities(previousLineItemStates, lineItemChange, lineItemStatusChanges.Status);
             });
             Require.That(areCurrentQuantitiesToSupportChange, new ErrorCode("Invalid lineItem status change", 400, $"Current lineitem quantity statuses on the order are not sufficient to support the requested change"));
+        }
 
-            // 3)
-            var areValidPreviousStates = lineItemStatusChanges.Changes.All(lineItemChange =>
+        public bool ValidateCurrentQuantities(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChange lineItemStatusChange, LineItemStatus lineItemStatusChangingTo)
+        {
+            var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemStatusChange.ID);
+            if (relatedLineItems.Count() != 1)
             {
-                var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemChange.ID);
-                var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[lineItemStatusChanges.Status];
-                var existingLineItem = relatedLineItems.First();
-                foreach (KeyValuePair<LineItemStatus, int> entry in lineItemChange.PreviousQuantities)
-                {
-                    var lineItemChangeStatus = entry.Key;
-                    var lineItemChangeQuantity = entry.Value;
+                // if the lineitem is not found on the order, invalid change
+                return false;
+            }
 
-                    if (!validPreviousStates.Contains(lineItemChangeStatus))
-                    {
-                        return false;
-                    }
+            var existingLineItem = relatedLineItems.First();
+
+            var existingStatusByQuantity = existingLineItem.xp.StatusByQuantity;
+            if (existingStatusByQuantity == null)
+            {
+                return false;
+            }
+
+            var countCanBeChanged = 0;
+            var validPreviousStates = LineItemStatusConstants.ValidPreviousStateLineItemChangeMap[lineItemStatusChangingTo];
+
+            foreach (KeyValuePair<LineItemStatus, int> entry in existingStatusByQuantity)
+            {
+                if (validPreviousStates.Contains(entry.Key)) {
+                    countCanBeChanged += entry.Value;
                 }
-                return true;
-            });
-            Require.That(areValidPreviousStates, new ErrorCode("Invalid lineItem status change", 400, $"The previous line item statuses you are attempting to change cannot all be changed to the new Line Item Status"));
+            }
+            return countCanBeChanged >= lineItemStatusChange.Quantity;
         }
 
         public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
@@ -355,8 +347,9 @@ namespace Marketplace.Common.Commands
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
             liReq.UnitPrice = markedUpPrice;
 
-            // should be among the only line item status changes not handled by the updatelineitemstatuswithnotification function
-            liReq.xp.StatusByQuantity.Add(LineItemStatus.Open, liReq.Quantity);
+            liReq.xp.StatusByQuantity = LineItemStatusConstants.EmptyStatuses;
+            liReq.xp.StatusByQuantity[LineItemStatus.Open] = liReq.Quantity;
+
             li = await _oc.LineItems
                 .CreateAsync<MarketplaceLineItem>
                 (OrderDirection.Incoming, orderID, liReq);

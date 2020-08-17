@@ -26,6 +26,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
+using OrderCloud.AzureStorage;
 
 namespace Marketplace.API
 {
@@ -81,6 +82,7 @@ namespace Marketplace.API
 				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
+                .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
@@ -105,6 +107,8 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .Inject<IChiliTemplateCommand>()
                 .Inject<IChiliConfigCommand>()
+                .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
+                .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
                     AccessToken = _settings.ZohoSettings.AccessToken,

@@ -6,7 +6,9 @@ import { IsSellerGuard } from '@app-seller/shared/guards/is-seller/is-seller.gua
 
 const routes: Routes = [
   { path: '', component: ProductTableComponent, pathMatch: 'prefix' },
-  { path: 'new', component: ProductTableComponent, pathMatch: 'full' },
+  { path: 'new/standard', component: ProductTableComponent, pathMatch: 'full' },
+  { path: 'new/quote', component: ProductTableComponent, pathMatch: 'full' },
+  { path: 'new/purchase-order', component: ProductTableComponent, pathMatch: 'full' },
   { path: ':productID', component: ProductTableComponent, pathMatch: 'full' },
   {
     path: ':productID/catalog-assignments',

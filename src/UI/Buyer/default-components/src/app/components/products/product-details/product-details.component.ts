@@ -4,7 +4,7 @@ import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo, LineItem } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -109,7 +109,7 @@ export class OCMProductDetails implements OnInit {
           Quantity: this.quantity,
           Specs: this.specFormService.getLineItemSpecs(this._specs),
           xp: {
-            LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+            ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
           }
         });
         this.isAddingToCart = false;
@@ -181,7 +181,7 @@ export class OCMProductDetails implements OnInit {
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
       lineItem.xp = {
-        LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._product)
+        ImageUrl: this.specFormService.getLineItemImageUrl(this._product)
       };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;

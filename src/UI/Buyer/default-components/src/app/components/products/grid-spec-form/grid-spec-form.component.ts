@@ -76,7 +76,7 @@ export class OCMGridSpecForm {
             ProductID: this._product.ID,
             Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray),
             xp: {
-                LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+                ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
             }
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));

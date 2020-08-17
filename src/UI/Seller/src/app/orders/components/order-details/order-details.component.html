@@ -15,8 +15,9 @@
     </div>
     <div class="row">
       <div class="col-md-6">
-        <div>Status: {{_order.Status}}
-        </div>
+        <div>Status: {{_order?.xp?.SubmittedOrderStatus}}</div>
+        <div>Claim Status: {{_order?.xp?.ClaimStatus}}</div>
+        <div>Shipping Status: {{_order?.xp?.ShippingStatus}}</div>
         <small class="float-left">Submitted on {{_order.DateSubmitted | date: 'short'}}</small>
       </div>
     </div>
@@ -79,11 +80,11 @@
           <hr>
         </div>
         <div class="text-right lead"><b class="float-left">Total:</b><span class="_order-total">
-          <span *ngIf="_order.xp?.Currency"
+            <span *ngIf="_order.xp?.Currency"
                   class="badge
                       badge-pill
                       badge-primary">{{_order.xp.Currency}}</span>
-                      {{_order.Total | currency}}</span></div>
+            {{_order.Total | currency}}</span></div>
         <hr>
         <!-- Since Outgoing Orders do not have Payment information, using an *ngIf -->
         <div class="lead"
@@ -126,111 +127,10 @@
                          [orderDirection]="orderDirection">
 
     </app-order-shipments>
-    <div *ngIf="_liGroupedByShipFrom?.length > 0 && !createShipment">
-      <div class="card border shadow-sm mb-4"
-           *ngFor="let liGroup of _liGroupedByShipFrom">
-        <div class="card-header p-3">
-          <div class="row">
-            <div class="col">
-              <h5 class="card-title mb-0">
-                Ship From: {{ liGroup[0].ShipFromAddress.CompanyName }}
-                <small class="text-muted d-block">
-                  <span>{{ liGroup[0].ShipFromAddress.Street1 }}<span *ngIf="_lineItems[0].ShippingAddress?.Street2">, {{_lineItems[0].ShippingAddress.Street2}}</span>,
-                    {{ liGroup[0].ShipFromAddress.City }}, {{ liGroup[0].ShipFromAddress.State }} {{ liGroup[0].ShipFromAddress.Zip }}</span>
-                </small>
-              </h5>
-            </div>
-          </div>
-          <ng-content></ng-content>
-        </div>
-        <div *ngIf="!isQuoteOrder"
-             class="px-3 pt-2 d-none d-sm-block border-bottom">
-          <div class="row">
-            <div class="col-sm-7">
-            </div>
-            <div class="col-sm-5">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <h6>Price</h6>
-                </div>
-                <div class="col-4 text-center">
-                  <h6>Qty</h6>
-                </div>
-                <div class="col-4 text-center">
-                  <h6>Total</h6>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover display-table">
-            <thead>
-              <tr>
-                <th>Item ID</th>
-                <th>Product</th>
-                <th>Description</th>
-                <th>Quantity</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let li of liGroup; let i = index">
-                <td class="align-middle">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <div class="d-flex align-items-center">
-                      <h6>
-                        <span>{{ li.ID }}</span>
-                      </h6>
-                    </div>
-                  </div>
-                </td>
-                <td class="align-middle">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <img [id]="i"
-                         [src]="li.xp?.LineItemImageUrl"
-                         width="auto"
-                         height="100px"
-                         class="d-print-none">
-                  </div>
-                </td>
-                <td class="align-middle">
-                  <div class="d-flex align-items-center">
-                    <h6>
-                      <span>{{ li.Product.Name }} 
-                        <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span>
-                      </span>
-                      <small class="text-muted d-block">{{ li.Product.ID }}</small>
-                      <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
-                            class="
-                      badge
-                      badge-pill
-                      badge-primary">Purchase Order</span>
-                    </h6>
-                  </div>
-                </td>
-                <td class="align-middle text-center">
-                  {{ li.Quantity }}
-                </td>
-                <td class="align-middle">
-                  <span>Status: {{ li.xp.LineItemStatus === "ReturnRequested" ? "Return Requested" : li.xp.LineItemStatus }}</span>
-                  <div *ngIf="li.xp.LineItemReturnInfo?.QuantityToReturn > 0">
-                    <div class="d-flex flex-column">
-                      <small>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</small>
-                      <small>Reason: {{ getReturnReason(li.xp.LineItemReturnInfo?.ReturnReason) }}</small>
-                      <small *ngIf="li.xp.LineItemReturnInfo.Comment">Comment: {{li.xp.LineItemReturnInfo.Comment}}</small>
-                    </div>
-                  </div>
-                  <return-form *ngIf="li.xp.LineItemStatus === 'ReturnRequested' && isSellerUser"
-                               [order]="_order"
-                               (lineItemUpdate)="handleLineItemUpdate()"
-                               [lineItem]="li"></return-form>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <app-line-item-table [lineItems]="_lineItems"
+                         [orderDirection]="orderDirection"
+                         (orderChange)="refreshOrder()"
+                         [orderID]="_order.ID">
+    </app-line-item-table>
   </div>
 </div>

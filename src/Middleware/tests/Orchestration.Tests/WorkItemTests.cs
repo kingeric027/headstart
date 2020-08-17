@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Cosmonaut;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Exceptions;
+using Marketplace.Common.Exceptions;   
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -36,7 +36,7 @@ namespace Orchestration.Tests
         [OrchestrationIgnore]
         public string ShouldBeIgnored { get; set; }
         public string ShouldBeChanged { get; set; }
-        public MockSubObject MockSub { get; set; } = new MockSubObject();
+        public MockSubObject MockSub { get; set; } = new MockSubObject();  
     }
 
     public class MockSubObject

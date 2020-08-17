@@ -5,6 +5,7 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
+using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -12,7 +13,7 @@ namespace Marketplace.Common.Commands
     public class CatalogAssignmentSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public CatalogAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public CatalogAssignmentSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
         }

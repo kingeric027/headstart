@@ -1,12 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {
-  ShopperContextService,
-  LineItemGroupSupplier,
-} from 'marketplace';
-import {MarketplaceOrder, MarketplaceLineItem, OrderDetails} from '@ordercloud/headstart-sdk';
-import { groupBy as _groupBy } from 'lodash';
+import { ShopperContextService, LineItemGroupSupplier } from 'marketplace';
+import { MarketplaceOrder, MarketplaceLineItem, OrderDetails, LineItem } from '@ordercloud/headstart-sdk';
+import { groupBy as _groupBy, flatten as _flatten } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
+import { CanReturnOrCancel } from 'src/app/services/lineitem-status.helper';
+import { faThermometerHalf } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   templateUrl: './order-return.component.html',
@@ -25,20 +24,30 @@ export class OCMOrderReturn {
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
     this.lineItems = value.LineItems;
-    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
-    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(liGroups);
-    this.setSupplierInfo(this.liGroupedByShipFrom);
+    if (this._action) {
+      this.setData();
+    }
     //  this.setRequestReturnForm();
   }
   @Input() set action(value: string) {
     this._action = value;
-    this.setRequestReturnForm(value)
+    if (this.lineItems?.length) {
+      this.setData();
+    }
   }
   @Output()
   viewReturnFormEvent = new EventEmitter<boolean>();
 
   constructor(private context: ShopperContextService, private fb: FormBuilder) {}
+
+  setData(): void {
+    this.lineItems = this.lineItems.filter(li => CanReturnOrCancel(li, this._action));
+    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
+    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(liGroups);
+    this.setSupplierInfo(this.liGroupedByShipFrom);
+    this.setRequestReturnForm(this._action);
+  }
 
   isAnyRowSelected(): boolean {
     const liGroups = this.requestReturnForm.controls.liGroups as FormArray;
@@ -46,54 +55,38 @@ export class OCMOrderReturn {
     return !!selectedItem;
   }
 
-  setRequestReturnForm(action: string): void  {
-    this.requestReturnForm = this.fb.group(new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, action));
+  setRequestReturnForm(action: string): void {
+    this.requestReturnForm = this.fb.group(
+      new ReturnRequestForm(this.fb, this.order.ID, this.liGroupedByShipFrom, action)
+    );
   }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
-  async updateOrder(orderID: string): Promise<void> {
-    if(this._action === 'return') {
-      await this.context.orderHistory.returnOrder(orderID)
-    } else {
-      await this.context.orderHistory.cancelOrder(orderID)
-    }
-  }
-
-  async updateLineItems(orderID: string): Promise<void> {
-    const lineItemsToUpdate: Promise<MarketplaceLineItem>[] = [];
-    this.requestReturnForm.value.liGroups.forEach(liGroup =>
-      liGroup.lineItems
-        .filter(lineItem => lineItem.selected === true)
-        .forEach(li => {
-          const newSumToReturn = (li.lineItem?.xp?.LineItemReturnInfo?.QuantityToReturn || 0) + li.quantityToReturnOrCancel;
-          const newSumToCancel = (li.lineItem?.xp?.LineItemCancelInfo?.QuantityToCancel || 0) + li.quantityToReturnOrCancel;
-          if(this._action === 'return') {
-            lineItemsToUpdate.push(this.context.orderHistory.returnLineItem(
-              orderID,
-              li.id,
-              newSumToReturn,
-              li.returnReason
-            ))
-          } else {
-            lineItemsToUpdate.push(this.context.orderHistory.cancelLineItem(
-              orderID,
-              li.id,
-              newSumToCancel,
-              li.returnReason))
-          }
-        }
-      )
-    );
-    await Promise.all(lineItemsToUpdate);
+  async submitClaim(): Promise<void> {
+    const allLineItems = this.requestReturnForm.value.liGroups.reduce((acc, current) => {
+      return [...acc, ...current.lineItems];
+    }, []);
+    const lineItemsToSubmitClaim = allLineItems.filter(li => li.selected);
+    const lineItemChanges = lineItemsToSubmitClaim.map(claim => {
+      return {
+        ID: claim.lineItem.ID,
+        Reason: claim.returnReason,
+        Quantity: claim.quantityToReturnOrCancel,
+      };
+    });
+    const changeRequest = {
+      Status: this._action === 'return' ? 'ReturnRequested' : 'CancelRequested',
+      Changes: lineItemChanges,
+    };
+    await this.context.orderHistory.submitCancelOrReturn(this.order.ID, changeRequest);
   }
 
   async onSubmit(): Promise<void> {
     this.isSaving = true;
-    const orderID = this.requestReturnForm.value.orderID;
-    await Promise.all([this.updateOrder(orderID), this.updateLineItems(orderID)])
+    await this.submitClaim();
     this.isSaving = false;
     this.viewReturnFormEvent.emit(false);
   }

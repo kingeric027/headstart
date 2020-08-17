@@ -4,6 +4,7 @@ import { ShopperContextService, OrderReorderResponse, OrderViewContext, Shipping
 import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
+import { CanReturnOrder, CanCancelOrder } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-detail.component.html',
@@ -46,32 +47,11 @@ export class OCMOrderDetails implements OnInit {
   }
 
   canRequestReturn(): boolean {
-    let qtyReturned = 0;
-    let total = 0;
-    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if (li.xp?.LineItemReturnInfo) qtyReturned += li.xp.LineItemReturnInfo.QuantityToReturn;
-      total += li.QuantityShipped;
-    });
-    return (
-      qtyReturned !== total &&
-      this.order.Status !== 'Unsubmitted' &&
-      (this.order.xp.ShippingStatus === ShippingStatus.PartiallyShipped ||
-        this.order.xp.ShippingStatus === ShippingStatus.Shipped)
-    );
+    return CanReturnOrder(this.orderDetails.LineItems);
   }
 
   canRequestCancel(): boolean {
-    let qtyCanceled = 0;
-    let total = 0;
-    this.orderDetails.LineItems.forEach((li: MarketplaceLineItem) => {
-      if ((li.xp as any)?.LineItemCancelInfo) qtyCanceled += (li.xp as any)?.LineItemCancelInfo?.QuantityToCancel;
-      total += (li.Quantity - li.QuantityShipped);
-    });
-    return (
-      qtyCanceled < total &&
-      this.order.Status !== 'Unsubmitted' &&
-      this.order.xp.ShippingStatus !== ShippingStatus.Shipped
-    );
+    return CanCancelOrder(this.orderDetails.LineItems);
   }
 
   toggleFavorite(order: MarketplaceOrder): void {
@@ -132,7 +112,7 @@ export class OCMOrderDetails implements OnInit {
         Quantity: li.Quantity,
         Specs: li.Specs,
         xp: {
-          LineItemImageUrl: li.xp?.LineItemImageUrl,
+          ImageUrl: li.xp?.ImageUrl,
         },
       };
     });

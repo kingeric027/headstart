@@ -7,6 +7,7 @@ using ordercloud.integrations.library;
 using System;
 using Marketplace.Models.Extended;
 using System.Collections.Generic;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Commands
 {
@@ -17,24 +18,29 @@ namespace Marketplace.Common.Commands
     public class ShipmentCommand : IShipmentCommand
     {
         private readonly IOrderCloudClient _oc;
+        private readonly ILineItemCommand _lineItemCommand;
 
-        public ShipmentCommand(AppSettings settings, IOrderCloudClient oc)
+        public ShipmentCommand(AppSettings settings, IOrderCloudClient oc, ILineItemCommand lineItemCommand)
         {
             _oc = oc;
+            _lineItemCommand = lineItemCommand;
         }
         public async Task<ShipmentCreateResponse> CreateShipment(SuperShipment superShipment, string supplierToken)
         {
             var firstShipmentItem = superShipment.ShipmentItems.First();
+            var supplierOrderID = firstShipmentItem.OrderID;
+            var buyerOrderID = supplierOrderID.Split("-").First();
+            
+            await PatchLineItemStatuses(supplierOrderID, superShipment);
             var buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
-            var buyerOrderID = firstShipmentItem.OrderID.Split("-").First();
+            
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
             var shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems, 
                 100, 
                 5, 
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
-            await PatchShipmentStatus(buyerOrderID, superShipment);
             return new ShipmentCreateResponse()
             {
                 Shipment = ocShipment,
@@ -42,25 +48,24 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        private async Task PatchShipmentStatus(string buyerOrderID, SuperShipment superShipment)
+        private async Task PatchLineItemStatuses(string supplierOrderID, SuperShipment superShipment)
         {
-            var partiallyShippedOrder = new PartialOrder { xp = new { ShippingStatus = ShippingStatus.PartiallyShipped } };
-            var fullyShippedOrder = new PartialOrder { xp = new { ShippingStatus = ShippingStatus.Shipped } };
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrderID);
-            var qty = 0;
-            var qtyShipped = 0;
-            foreach (var item in lineItems.Items)
+            var lineItemStatusChanges = superShipment.ShipmentItems.Select(shipmentItem =>
             {
-                qty += item.Quantity;
-                qtyShipped += item.QuantityShipped;
-            }
-            if (qty == qtyShipped + superShipment.ShipmentItems.Count) 
+                return new LineItemStatusChange()
+                {
+                    Quantity = shipmentItem.QuantityShipped,
+                    ID = shipmentItem.LineItemID
+                };
+            }).ToList();
+
+            var lineItemStatusChange = new LineItemStatusChanges()
             {
-                await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, fullyShippedOrder);
-            } else if (qtyShipped + superShipment.ShipmentItems.Count < qty)
-            {
-                await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, partiallyShippedOrder);
-            }
+                Changes = lineItemStatusChanges,
+                Status = LineItemStatus.Complete
+            };
+
+            await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, supplierOrderID, lineItemStatusChange);
         }
 
         private async Task<string> GetBuyerIDForSupplierOrder(string supplierOrderID)
