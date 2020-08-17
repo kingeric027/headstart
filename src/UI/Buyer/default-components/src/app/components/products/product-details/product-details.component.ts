@@ -4,11 +4,11 @@ import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo, LineItem } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { SuperMarketplaceProduct, ListPage, Asset } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, ListPage } from '@ordercloud/headstart-sdk';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 
@@ -36,7 +36,7 @@ export class OCMProductDetails implements OnInit {
   priceBreakRange: string[];
   selectedBreak: object;
   relatedProducts$: Observable<MarketplaceMeProduct[]>;
-  images: AssetForDelivery[] = [];
+  images: Asset[] = [];
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
