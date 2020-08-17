@@ -34,14 +34,14 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("buyerLocation/preview/{templateID}"), OrderCloudIntegrationsAuth]
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID)
         {
-            RequireOneOf(CustomRole.MPSupplierAdmin);
+            RequireOneOf(CustomRole.MPReportReader);
             return await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
         }
 
         [HttpPost, Route("buyerLocation/download/{templateID}"), OrderCloudIntegrationsAuth]
         public async Task DownloadBuyerLocation([FromBody] ReportRequestBody requestBody, string templateID)
         {
-            RequireOneOf(CustomRole.MPSupplierAdmin);
+            RequireOneOf(CustomRole.MPReportReader);
             var reportData = await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
             await _downloadReportCommand.ExportToExcel(ReportTypeEnum.BuyerLocation, requestBody.Headers, reportData);
 
@@ -50,7 +50,7 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{reportType}/listtemplates"), OrderCloudIntegrationsAuth]
         public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType)
         {
-            RequireOneOf(CustomRole.MPSupplierAdmin);
+            RequireOneOf(CustomRole.MPReportReader);
             return await _reportDataCommand.ListReportTemplatesByReportType(reportType, VerifiedUserContext);
         }
 
