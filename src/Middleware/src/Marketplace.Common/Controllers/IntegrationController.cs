@@ -43,5 +43,13 @@ namespace Marketplace.Common.Controllers
 			var response = await _postSubmitCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
 			return response;
 		}
+
+		[HttpPost, Route("orderapproved")]
+		[OrderCloudWebhookAuth]
+		public async Task<OrderSubmitResponse> HandleOrderApproved([FromBody] OrderCalculatePayload<MarketplaceOrderWorksheet> payload)
+		{
+			var response = await _postSubmitCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
+			return response;
+		}
 	}
 }
