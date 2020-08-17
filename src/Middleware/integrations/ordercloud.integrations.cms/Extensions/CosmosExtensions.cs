@@ -19,7 +19,7 @@ namespace ordercloud.integrations.cms
 		{
 			var uniqueIds = new HashSet<string>(ids).ToList(); // remove any duplicates
 			var count = uniqueIds.Count;
-			if (count == 0) return new ListPage<T>();
+			if (count == 0) return new ListPage<T>().Empty();
 			var paramNames = uniqueIds.Select((id, i) => $"@id{i}");
 			var parameters = new ExpandoObject();
 			for (int i = 0; i < count; i++)

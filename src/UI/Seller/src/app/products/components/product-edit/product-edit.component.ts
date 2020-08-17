@@ -29,7 +29,7 @@ import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
 
 @Component({
   selector: 'app-product-edit',
@@ -519,6 +519,6 @@ export class ProductEditComponent implements OnInit {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return this.imageFiles[0]?.URL || getProductMainImageUrlOrPlaceholder(this._superMarketplaceProductEditable?.Product);
+    return this.imageFiles[0]?.URL || getProductMediumImageUrl(this._superMarketplaceProductEditable?.Product);
   }
 }

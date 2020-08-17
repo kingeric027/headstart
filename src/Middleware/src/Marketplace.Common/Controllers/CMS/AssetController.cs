@@ -100,7 +100,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("List Assets Assigned to Resource")]
 		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}"), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<Asset>> ListAssets(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
+		public async Task<ListPage<Asset>> ListAssetsOnChild(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
 			return await _assetedResources.ListAssets(resource, args, VerifiedUserContext);
@@ -117,7 +117,7 @@ namespace Marketplace.CMS.Controllers
 
 		[DocName("Get a Resource's primary image")]
 		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
-		public async Task GetThumbnail(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
+		public async Task GetThumbnailOnChild(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
 			var url = await _assetedResources.GetThumbnail(resource, size, VerifiedUserContext);

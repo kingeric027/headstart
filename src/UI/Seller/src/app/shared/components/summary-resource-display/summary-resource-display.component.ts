@@ -3,7 +3,7 @@ import { singular } from 'pluralize';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
 import { faChevronDown, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductSmallImageUrl } from '@app-seller/products/product-image.helper';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 @Component({
@@ -82,7 +82,7 @@ export class SummaryResourceDisplay implements OnChanges {
     const piecesOfPath = pathToValue.split('.');
     if (pathToValue) {
       if (pathToValue === PRODUCT_IMAGE_PATH_STRATEGY) {
-        return getProductMainImageUrlOrPlaceholder(value);
+        return getProductSmallImageUrl(value);
       } else {
         let currentObject = value;
         piecesOfPath.forEach(piece => {
@@ -173,7 +173,7 @@ export class SummaryResourceDisplay implements OnChanges {
     this.router.navigate([`${splitUrl[1]}/${splitUrl[2]}/${splitUrl[3]}/new`], { queryParams: { ParentCategory: resource } });
   }
 
-  //Nested resources cannot be added beyond a third tier
+  // Nested resources cannot be added beyond a third tier
   isAtMaximumDepth() {
     const parentOfResource = this._resource?.ParentID;
     let parentOfParentOfResource;

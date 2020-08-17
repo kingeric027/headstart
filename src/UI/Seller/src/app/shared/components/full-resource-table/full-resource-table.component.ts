@@ -7,7 +7,7 @@ import {
 import { RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
 import {
   PRODUCT_IMAGE_PATH_STRATEGY,
-  getProductMainImageUrlOrPlaceholder,
+  getProductMediumImageUrl,
   PLACEHOLDER_URL,
 } from '@app-seller/products/product-image.helper';
 import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
@@ -90,7 +90,7 @@ export class FullResourceTableComponent {
     return {
       resource,
       cells: resourceCells,
-      imgPath: resourceConfiguration.imgPath ? this.getImage(resource, resourceConfiguration) : '',
+      imgPath: resourceConfiguration.imgPath ? this.getImage(resource) : '',
     };
   }
 
@@ -100,7 +100,7 @@ export class FullResourceTableComponent {
       closeButton: true,
       tapToDismiss: true,
     });
-    let copy = document.createElement('textarea');
+    const copy = document.createElement('textarea');
     document.body.appendChild(copy);
     copy.value = JSON.stringify(resource);
     copy.select();
@@ -112,8 +112,8 @@ export class FullResourceTableComponent {
     this.objectPreviewText = JSON.stringify(resource);
   }
 
-  getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {
-    return `${environment.middlewareUrl}/${this.resourceType}/${resource.ID}/image`;
+  getImage(resource: any): string {
+    return `${environment.middlewareUrl}/assets/${this.resourceType}/${resource.ID}/thumbnail?size=s`;
   }
 
   selectResource(value: any) {
@@ -139,7 +139,7 @@ export class FullResourceTableComponent {
     if (this.sortDirection === SortDirection.None) {
       this.activeSort = '';
     }
-    let sortInverse = this.sortDirection === SortDirection.Desc ? '!' : '';
+    const sortInverse = this.sortDirection === SortDirection.Desc ? '!' : '';
     this.ocService.sortBy(sortInverse + this.activeSort);
   }
 

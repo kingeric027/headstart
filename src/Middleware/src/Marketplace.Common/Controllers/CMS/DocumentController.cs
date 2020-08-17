@@ -107,7 +107,7 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
 		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}")]
-		public async Task<ListPage<JDocument>> ListDocuments(string schemaID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
+		public async Task<ListPage<JDocument>> ListDocumentsOnChild(string schemaID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
 			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, args, VerifiedUserContext);

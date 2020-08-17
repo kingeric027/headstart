@@ -129,15 +129,21 @@ namespace Marketplace.Common.Commands.Crud
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _images = GetProductImages(id, user);
 			var _attachments =  GetProductAttachments(id, user);
-			return new SuperMarketplaceProduct
+			try
 			{
-				Product = _product,
-				PriceSchedule = await _priceSchedule,
-				Specs = (await _specs).Items,
-				Variants = (await _variants).Items,
-				Images = await _images,
-				Attachments = await _attachments
-			};
+				return new SuperMarketplaceProduct
+				{
+					Product = _product,
+					PriceSchedule = await _priceSchedule,
+					Specs = (await _specs).Items,
+					Variants = (await _variants).Items,
+					Images = await _images,
+					Attachments = await _attachments
+				};
+			} catch (Exception e)
+			{
+				throw e;
+			}
 		}
 
 		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)

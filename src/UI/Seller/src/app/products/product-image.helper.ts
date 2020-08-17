@@ -5,6 +5,10 @@ export const IMAGE_HOST_URL = 'https://s3.dualstack.us-east-1.amazonaws.com/stat
 export const PLACEHOLDER_URL = 'http://placehold.it/300x300';
 export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY';
 
-export function getProductMainImageUrlOrPlaceholder(product: Product): string {
-  return `${environment.middlewareUrl}/assets/resource/primary-image?ResourceID=${product.ID}&ResourceType=Products`;
+export function getProductSmallImageUrl(product: Product): string {
+  return `${environment.middlewareUrl}/assets/products/${product.ID}/thumbnail?size=s`;
+}
+
+export function getProductMediumImageUrl(product: Product): string {
+  return `${environment.middlewareUrl}/assets/products/${product.ID}/thumbnail?size=m`;
 }

@@ -303,7 +303,7 @@ export class ProductVariations {
     // Queue up image/content requests, then send them all at aonce
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    const requests = this.superProductEditable.Images.map(i => HeadStartSDK.Assets.Update(i.ID, i, accessToken));
+    const requests = this.superProductEditable.Images.map(i => HeadStartSDK.Assets.Save(i.ID, i, accessToken));
     await Promise.all(requests);
     // Ensure there is no mistaken change detection
     Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);
