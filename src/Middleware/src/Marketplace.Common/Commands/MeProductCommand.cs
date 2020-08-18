@@ -100,30 +100,35 @@ namespace Marketplace.Common.Commands
 
 		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
-			/* if the price schedule Id matches the product ID we 
-			 * we mark up the produc
-			 * if they dont match we just convert for currecny as the 
-			 * seller has set custom pricing */
-			var shouldMarkupProduct = product.PriceSchedule.ID == product.ID;
-			if (shouldMarkupProduct)
-			{
-				product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+			
+			if(product.PriceSchedule != null)
+            {
+				/* if the price schedule Id matches the product ID we 
+				 * we mark up the produc
+				 * if they dont match we just convert for currecny as the 
+				 * seller has set custom pricing */
+				var shouldMarkupProduct = product.PriceSchedule.ID == product.ID;
+				if (shouldMarkupProduct)
 				{
-					var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
-					var convertedPrice = ConvertPrice(markedupPrice, product.xp.Currency, exchangeRates);
-					priceBreak.Price = convertedPrice;
-					return priceBreak;
-				}).ToList();
-			} else
-			{
-				product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+					{
+						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
+						var convertedPrice = ConvertPrice(markedupPrice, product.xp.Currency, exchangeRates);
+						priceBreak.Price = convertedPrice;
+						return priceBreak;
+					}).ToList();
+				}
+				else
 				{
-					// price on price schedule will be in USD as it is set by the seller
-					// may be different rates in the future
-					// refactor to save price on the price schedule not product xp?
-					priceBreak.Price = ConvertPrice(priceBreak.Price, CurrencySymbol.USD, exchangeRates);
-					return priceBreak;
-				}).ToList();
+					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+					{
+						// price on price schedule will be in USD as it is set by the seller
+						// may be different rates in the future
+						// refactor to save price on the price schedule not product xp?
+						priceBreak.Price = ConvertPrice(priceBreak.Price, CurrencySymbol.USD, exchangeRates);
+						return priceBreak;
+					}).ToList();
+				}
 			}
 			return product;
 		}
