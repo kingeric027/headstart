@@ -33,7 +33,7 @@
     "js-beautify": "^1.10.3",
     "jwt-decode": "^2.2.0",
     "ngx-cookie": "^4.1.2",
-    "ordercloud-javascript-sdk": "4.0.0-12",
+    "ordercloud-javascript-sdk": "4.0.0",
     "prettier": "^1.19.1",
     "rxjs": "^6.5.4",
     "tslib": "^1.10.0",

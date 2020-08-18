@@ -4,10 +4,7 @@ import {
   Supplier,
   OcSupplierService,
   OcMeService,
-  UserGroupAssignment,
   OcSupplierUserGroupService,
-  ListUserGroup,
-  ListUserGroupAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';

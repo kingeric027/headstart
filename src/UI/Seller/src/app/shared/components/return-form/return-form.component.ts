@@ -2,7 +2,7 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LineItem, OcLineItemService, OcOrderService, Order } from '@ordercloud/angular-sdk';
+import { LineItem, OcLineItemService, OcOrderService, Order, OrderDirection } from '@ordercloud/angular-sdk';
 
 @Component({
     selector: 'return-form',
@@ -26,11 +26,11 @@ export class ReturnForm implements OnInit {
         });
     }
 
-    getIncomingOrOutgoing(): string {
-        let orderDirection;
-        const url = window.location.href;
-        url.includes('Outgoing') ? (orderDirection = 'Outgoing') : (orderDirection = 'Incoming');
-        return orderDirection;
+    getIncomingOrOutgoing(): OrderDirection {
+        if (window.location.href.includes('Outgoing')) {
+            return 'Outgoing';
+        }
+        return 'Incoming'
     }
 
     open(content) {

@@ -4,6 +4,7 @@
 
 export const environment = {
   hostedApp: false,
+  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
   appname: 'Marketplace Admin Local',

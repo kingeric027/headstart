@@ -107,20 +107,20 @@ namespace Marketplace.CMS.Controllers
 		}
 
 		[DocName("Get a Resource's primary image")]
-		[HttpGet, Route("{type}/{ID}/thumbnail")] // No auth
-		public async Task GetThumbnail(ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
+		[HttpGet, Route("{sellerID}/{type}/{ID}/thumbnail")] // No auth
+		public async Task GetThumbnail(string sellerID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{
 			var resource = new Resource(type, ID);
-			var url = await _assetedResources.GetThumbnail(resource, size, VerifiedUserContext);
+			var url = await _assetedResources.GetThumbnail(resource, size, sellerID);
 			Response.Redirect(url);
 		}
 
 		[DocName("Get a Resource's primary image")]
-		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
-		public async Task GetThumbnailOnChild(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
+		[HttpGet, Route("{sellerID}/{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
+		public async Task GetThumbnailOnChild(string sellerID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{
 			var resource = new Resource(type, ID, parentType, parentID);
-			var url = await _assetedResources.GetThumbnail(resource, size, VerifiedUserContext);
+			var url = await _assetedResources.GetThumbnail(resource, size, sellerID);
 			Response.Redirect(url);
 		}
 	}

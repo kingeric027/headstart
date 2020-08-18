@@ -3,7 +3,6 @@ import { SpecFormEvent } from './spec-form-values.interface';
 import { SpecOption, Spec, LineItemSpec, ListPage, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
-import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 
 @Injectable({
   providedIn: 'root',

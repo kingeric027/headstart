@@ -5,11 +5,6 @@ import {
   ResourceConfiguration,
 } from '@app-seller/shared/services/configuration/table-display';
 import { RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
-import {
-  PRODUCT_IMAGE_PATH_STRATEGY,
-  getProductMediumImageUrl,
-  PLACEHOLDER_URL,
-} from '@app-seller/products/product-image.helper';
 import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
@@ -17,6 +12,7 @@ import { SortDirection } from './sort-direction.enum';
 import { environment } from 'src/environments/environment';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -55,6 +51,7 @@ export class FullResourceTableComponent {
   constructor(private router: Router,
               private toastrService: ToastrService,
               private activatedRoute: ActivatedRoute,
+              @Inject(applicationConfiguration) private appConfig: AppConfig,
               private impersonationService: ImpersonationService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
@@ -116,7 +113,7 @@ export class FullResourceTableComponent {
   }
 
   getImage(resource: any): string {
-    return `${environment.middlewareUrl}/assets/${this.resourceType}/${resource.ID}/thumbnail?size=s`;
+    return `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/${this.resourceType}/${resource.ID}/thumbnail?size=s`;
   }
 
   selectResource(value: any) {

@@ -4,7 +4,7 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
 import {
-  ListAddress,
+  Address,
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
@@ -56,7 +56,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   @Output()
   updateResource = new EventEmitter<any>();
   @Input()
-  addresses: ListAddress;
+  addresses: ListPage<Address>;
   @Input()
   isCreatingNew: boolean;
   @Input()
@@ -617,7 +617,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return this.imageFiles[0]?.URL || getProductMediumImageUrl(this._superMarketplaceProductEditable?.Product);
+    return this.imageFiles[0]?.URL || getProductMediumImageUrl(this._superMarketplaceProductEditable?.Product, this.appConfig.sellerID);
   }
   
   ngOnDestroy(): void {

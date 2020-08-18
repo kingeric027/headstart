@@ -31,16 +31,18 @@ namespace ordercloud.integrations.cms
 
 	public class AssetQuery : IAssetQuery
 	{
+		private readonly CMSConfig _config;
 		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
 		private readonly IBlobStorage _blob;
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob)
+		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob, CMSConfig config)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
 			_blob = blob;
+			_config = config;
 		}
 
 		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
@@ -54,12 +56,12 @@ namespace ordercloud.integrations.cms
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var assets = list.ToListPage(args.Page, args.PageSize, count);
-			return AssetMapper.MapTo(assets);
+			return AssetMapper.MapTo(_config, assets);
 		}
 
 		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
-		{
-			return AssetMapper.MapTo(await GetDO(assetInteropID, user));
+		{ 
+			return AssetMapper.MapTo(_config, await GetDO(assetInteropID, user));
 		}
 
 		public async Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user)
@@ -73,7 +75,7 @@ namespace ordercloud.integrations.cms
 		public async Task<Asset> Create(AssetUpload form, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
-			var asset = AssetMapper.MapFromUpload(_blob.Config, container, form);
+			var asset = AssetMapper.MapFromUpload(container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
 			if (matchingID != null) throw new DuplicateIDException();
 			if (form.File != null) {
@@ -85,7 +87,7 @@ namespace ordercloud.integrations.cms
 			}
 			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
-			return AssetMapper.MapTo(newAsset);
+			return AssetMapper.MapTo(_config, newAsset);
 		}
 
 		public async Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user)
@@ -120,7 +122,7 @@ namespace ordercloud.integrations.cms
 
 			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpsertAsync(existingAsset);
-			return AssetMapper.MapTo(updatedAsset);
+			return AssetMapper.MapTo(_config, updatedAsset);
 		}
 
 		public async Task Delete(string assetInteropID, VerifiedUserContext user)

@@ -56,14 +56,14 @@ export class ProductPricingComponent {
   isUsingPriceOverride = false;
   areChangesToBuyerVisibility = false;
   
-  emptyPriceSchedule: PriceSchedule = {
+  emptyPriceSchedule = {
     UseCumulativeQuantity: true,
     PriceBreaks: [{
       Price: 0,
       Quantity: 1,
     }
   ]
-};
+} as PriceSchedule;
 
   isSavedOverride = false;
   overridePriceScheduleEditable = this.emptyPriceSchedule;

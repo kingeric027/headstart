@@ -10,7 +10,6 @@ namespace ordercloud.integrations.cms
 {
 	public interface IBlobStorage
 	{
-		CMSConfig Config { get; }
 		Task UploadAsset(AssetContainerDO container, string blobName, IFormFile file);
 		Task UploadAsset(AssetContainerDO container, string blobName, Image image);
 		Task DeleteAsset(AssetContainerDO container, string blobName);
@@ -18,12 +17,13 @@ namespace ordercloud.integrations.cms
 
 	public class BlobStorage : IBlobStorage
 	{
-		public CMSConfig Config { get; }
+		private readonly CMSConfig _config;
 
 		public BlobStorage(CMSConfig config)
 		{
-			Config = config;
+			_config = config;
 		}
+
 
 		public async Task UploadAsset(AssetContainerDO container, string blobName, IFormFile file)
 		{
@@ -66,7 +66,7 @@ namespace ordercloud.integrations.cms
 		{
 			return new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
 			{
-				ConnectionString = Config.BlobStorageConnectionString,
+				ConnectionString = _config.BlobStorageConnectionString,
 				Container = $"assets-{container.id}", // SellerOrgID can contain "_", an illegal character for blob containers.
 				AccessType = BlobContainerPublicAccessType.Container
 			});

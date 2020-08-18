@@ -41,7 +41,7 @@
     "@ngx-progressbar/http": "^5.2.1",
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^5.0.0",
-    "@ordercloud/angular-sdk": "0.0.1-29",
+    "@ordercloud/angular-sdk": "1.0.0-12",
     "@ordercloud/headstart-sdk": "^1.6.7",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",

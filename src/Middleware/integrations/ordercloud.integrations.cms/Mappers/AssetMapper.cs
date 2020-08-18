@@ -9,7 +9,7 @@ namespace ordercloud.integrations.cms
 {
 	public static class AssetMapper
 	{
-		public static AssetDO MapFromUpload(CMSConfig config, AssetContainerDO container, AssetUpload form)
+		public static AssetDO MapFromUpload(AssetContainerDO container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
@@ -31,7 +31,6 @@ namespace ordercloud.integrations.cms
 					IsUrlOverridden = form.Url != null
 				}
 			};
-			asset.Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{container.id}/{asset.id}";
 			return asset;
 		}
 
@@ -40,14 +39,14 @@ namespace ordercloud.integrations.cms
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
-		public static Asset MapTo(AssetDO asset)
+		public static Asset MapTo(CMSConfig config, AssetDO asset)
 		{
 			return new Asset()
 			{
 				ID = asset.InteropID,
 				Title = asset.Title,
 				Active = asset.Active,
-				Url = asset.Url,
+				Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}",
 				Type = asset.Type,
 				Tags = asset.Tags,
 				FileName = asset.FileName,
@@ -56,17 +55,17 @@ namespace ordercloud.integrations.cms
 			};
 		}
 
-		public static IEnumerable<Asset> MapTo(IEnumerable<AssetDO> assets)
+		public static IEnumerable<Asset> MapTo(CMSConfig config, IEnumerable<AssetDO> assets)
 		{
-			return assets.Select(asset => MapTo(asset));
+			return assets.Select(asset => MapTo(config, asset));
 		}
 
-		public static ListPage<Asset> MapTo(ListPage<AssetDO> listPage)
+		public static ListPage<Asset> MapTo(CMSConfig config, ListPage<AssetDO> listPage)
 		{
 			return new ListPage<Asset>
 			{
 				Meta = listPage.Meta,
-				Items = MapTo(listPage.Items).ToList()
+				Items = MapTo(config, listPage.Items).ToList()
 			};
 		}
 	}

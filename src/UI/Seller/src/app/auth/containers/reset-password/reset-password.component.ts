@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 // ordercloud
 import { AppFormErrorService } from '@app-seller/shared';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
-import { OcPasswordResetService, PasswordReset, TokenPasswordReset, OcMeService } from '@ordercloud/angular-sdk';
+import { OcForgottenPasswordService, PasswordReset, TokenPasswordReset, OcMeService } from '@ordercloud/angular-sdk';
 import { ValidateFieldMatches, ValidateStrongPassword } from '@app-seller/validators/validators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -28,7 +28,6 @@ export class ResetPasswordComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private toasterService: ToastrService,
     private formBuilder: FormBuilder,
-    private ocPasswordResetService: OcPasswordResetService,
     private ocMeService: OcMeService,
     private formErrorService: AppFormErrorService,
     private http: HttpClient,
@@ -45,7 +44,7 @@ export class ResetPasswordComponent implements OnInit {
   private buildHeaders(): HttpHeaders {
     const urlParams = this.activatedRoute.snapshot.queryParams;
     return new HttpHeaders({
-      Authorization: `Bearer ${urlParams['token']}`,
+      Authorization: `Bearer ${urlParams.token}`,
     });
   }
 
@@ -68,7 +67,7 @@ export class ResetPasswordComponent implements OnInit {
         throw error;
       }
     );
-    //TODO: We SHOULD be able to use this function from the SDK, but if you uncomment,
+    // TODO: We SHOULD be able to use this function from the SDK, but if you uncomment,
     // ***  you'll see that you are unable to send along an accessToken ...
 
     // this.ocMeService.ResetPasswordByToken(config, { accessToken: this.token }).subscribe(

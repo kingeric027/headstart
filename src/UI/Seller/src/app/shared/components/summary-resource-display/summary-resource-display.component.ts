@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, Inject } from '@angular/core';
 import { singular } from 'pluralize';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
 import { faChevronDown, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductSmallImageUrl } from '@app-seller/products/product-image.helper';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 
 @Component({
   selector: 'summary-resource-display-component',
@@ -67,7 +68,7 @@ export class SummaryResourceDisplay implements OnChanges {
   constructor(
     private ocCategoryService: OcCategoryService,
     private router: Router,
-    private activatedRoute: ActivatedRoute) {}
+    @Inject(applicationConfiguration) private appConfig: AppConfig) {}
 
   setDisplayValuesForResource(resource: any) {
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
@@ -82,7 +83,7 @@ export class SummaryResourceDisplay implements OnChanges {
     const piecesOfPath = pathToValue.split('.');
     if (pathToValue) {
       if (pathToValue === PRODUCT_IMAGE_PATH_STRATEGY) {
-        return getProductSmallImageUrl(value);
+        return getProductSmallImageUrl(value, this.appConfig.sellerID);
       } else {
         let currentObject = value;
         piecesOfPath.forEach(piece => {
