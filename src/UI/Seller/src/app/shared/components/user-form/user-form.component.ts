@@ -10,7 +10,7 @@ import { RegexService } from '@app-seller/shared/services/regex/regex.service';
   styleUrls: ['./user-form.component.scss'],
 })
 export class UserFormComponent implements OnInit {
-  protected _existingUser: User = {};
+  protected _existingUser = {} as User;
   @Input()
   btnText: string;
   @Output()
@@ -29,7 +29,7 @@ export class UserFormComponent implements OnInit {
 
   @Input()
   set existingUser(user: User) {
-    this._existingUser = user || {};
+    this._existingUser = user || ({} as User);
     if (!this.userForm) {
       this.setForm();
       return;
@@ -48,10 +48,7 @@ export class UserFormComponent implements OnInit {
 
   setForm() {
     this.userForm = this.formBuilder.group({
-      ID: [
-        this._existingUser.ID || '',
-        Validators.pattern(this.regexService.ID),
-      ],
+      ID: [this._existingUser.ID || '', Validators.pattern(this.regexService.ID)],
       Username: [this._existingUser.Username || '', Validators.required],
       FirstName: [
         this._existingUser.FirstName || '',
@@ -61,14 +58,8 @@ export class UserFormComponent implements OnInit {
         this._existingUser.LastName || '',
         [Validators.required, Validators.pattern(this.regexService.HumanName)],
       ],
-      Phone: [
-        this._existingUser.Phone || '',
-        Validators.pattern(this.regexService.Phone),
-      ],
-      Email: [
-        this._existingUser.Email || '',
-        [Validators.required, Validators.email],
-      ],
+      Phone: [this._existingUser.Phone || '', Validators.pattern(this.regexService.Phone)],
+      Email: [this._existingUser.Email || '', [Validators.required, Validators.email]],
       Active: [!!this._existingUser.Active],
     });
   }
@@ -89,6 +80,5 @@ export class UserFormComponent implements OnInit {
     this.formErrorService.hasRequiredError(controlName, this.userForm);
   protected hasPatternError = (controlName: string) =>
     this.formErrorService.hasPatternError(controlName, this.userForm);
-  protected hasEmailError = () =>
-    this.formErrorService.hasValidEmailError(this.userForm.get('Email'));
+  protected hasEmailError = () => this.formErrorService.hasValidEmailError(this.userForm.get('Email'));
 }

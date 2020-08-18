@@ -8,6 +8,7 @@ import {
   Order,
   Payment,
   OcOrderService,
+  OrderDirection,
 } from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 
@@ -27,6 +28,7 @@ import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status
 export const LineItemTableStatus = {
   Default: 'Default',
   Canceled: 'Canceled',
+  Returned: 'Returned',
   Backorered: 'Backorered',
 };
 
@@ -42,7 +44,7 @@ export class OrderDetailsComponent {
   _lineItems: MarketplaceLineItem[] = [];
   _payments: Payment[] = [];
   images: any[] = [];
-  orderDirection: string;
+  orderDirection: OrderDirection;
   cardType: string;
   createShipment: boolean;
   isSellerUser = false;

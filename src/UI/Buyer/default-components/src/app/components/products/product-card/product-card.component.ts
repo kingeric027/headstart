@@ -43,7 +43,7 @@ export class OCMProductCard {
         ProductID: this._product.ID, 
         Quantity: this.quantity,
         xp: {
-          ImageUrl: getPrimaryImageUrl(this._product)
+          ImageUrl: getPrimaryImageUrl(this._product, this.context.currentUser.get())
         } 
       });
       this.isAddingToCart = false;
@@ -54,7 +54,7 @@ export class OCMProductCard {
   }
 
   getImageUrl(): string {
-    return getPrimaryImageUrl(this._product);
+    return getPrimaryImageUrl(this._product, this.context.currentUser.get());
   }
 
   toDetails(): void {

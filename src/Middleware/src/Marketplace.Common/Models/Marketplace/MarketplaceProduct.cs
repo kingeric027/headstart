@@ -20,8 +20,8 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
-        public IList<AssetForDelivery> Images { get; set; }
-        public IList<AssetForDelivery> Attachments { get; set; }
+        public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
     [SwaggerModel]
@@ -32,8 +32,8 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
-        public IList<AssetForDelivery> Images { get; set; }
-        public IList<AssetForDelivery> Attachments { get; set; }
+        public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
 

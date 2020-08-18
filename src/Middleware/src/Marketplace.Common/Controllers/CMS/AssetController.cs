@@ -90,19 +90,37 @@ namespace Marketplace.CMS.Controllers
 			await _assetedResources.MoveAssignment(assignment, listOrderWithinType, VerifiedUserContext);
 		}
 
-		// TODO - add list page and list args
 		[DocName("List Assets Assigned to Resource")]
-		[HttpGet, Route("resource"), OrderCloudIntegrationsAuth]
-		public async Task<List<AssetForDelivery>> ListAssets([FromQuery] Resource resource)
+		[HttpGet, Route("{type}/{ID}"), OrderCloudIntegrationsAuth]
+		public async Task<ListPage<Asset>> ListAssets(ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
 		{
-			return await _assetedResources.ListAssets(resource, VerifiedUserContext);
+			var resource = new Resource(type, ID);
+			return await _assetedResources.ListAssets(resource, args, VerifiedUserContext);
+		}
+
+		[DocName("List Assets Assigned to Resource")]
+		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}"), OrderCloudIntegrationsAuth]
+		public async Task<ListPage<Asset>> ListAssetsOnChild(ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
+		{
+			var resource = new Resource(type, ID, parentType, parentID);
+			return await _assetedResources.ListAssets(resource, args, VerifiedUserContext);
 		}
 
 		[DocName("Get a Resource's primary image")]
-		[HttpGet, Route("resource/primary-image")] // No auth
-		public async Task GetFirstImage([FromQuery] Resource resource)
+		[HttpGet, Route("{sellerID}/{type}/{ID}/thumbnail")] // No auth
+		public async Task GetThumbnail(string sellerID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{
-			var url = await _assetedResources.GetFirstImage(resource, VerifiedUserContext);
+			var resource = new Resource(type, ID);
+			var url = await _assetedResources.GetThumbnail(resource, size, sellerID);
+			Response.Redirect(url);
+		}
+
+		[DocName("Get a Resource's primary image")]
+		[HttpGet, Route("{sellerID}/{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
+		public async Task GetThumbnailOnChild(string sellerID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
+		{
+			var resource = new Resource(type, ID, parentType, parentID);
+			var url = await _assetedResources.GetThumbnail(resource, size, sellerID);
 			Response.Redirect(url);
 		}
 	}
