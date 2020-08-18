@@ -309,6 +309,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.changeDetectorRef.detectChanges();
     });
   }
+
   // TODO: Refactor to remove duplicate function (function exists in resrouce-crud.service.ts)
   private checkIfCreatingNew() {
     const routeUrl = this.router.routerState.snapshot.url;
