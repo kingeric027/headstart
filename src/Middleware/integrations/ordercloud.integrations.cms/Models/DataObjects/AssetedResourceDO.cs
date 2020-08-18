@@ -11,6 +11,7 @@ namespace ordercloud.integrations.cms
 	public class AssetedResourceDO : CosmosObject
 	{
 		[CosmosPartitionKey]
+		public string SellerOrgID { get; set; }
 		public string ResourceID { get; set; }
 		public string ResourceParentID { get; set; }
 		public ResourceType ResourceType { get; set; }
@@ -23,7 +24,7 @@ namespace ordercloud.integrations.cms
 		{
 			return new Collection<UniqueKey>
 			{
-				new UniqueKey() { Paths = new Collection<string> { "/ResourceID", "/ResourceType", "/ResourceParentID" }}
+				new UniqueKey() { Paths = new Collection<string> { "/SellerOrgID", "/ResourceID", "/ResourceType", "/ResourceParentID" }}
 			};
 		}
 	}

@@ -22,7 +22,7 @@ namespace ordercloud.integrations.cms
 		Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 
-		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
+		Task<ListPage<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs, ListArgsPageOnly args = null);
 		Task<DocumentDO> GetDOByInternalID(string documentID); // real id
 		Task<DocumentDO> GetDOByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
 	}
@@ -38,11 +38,11 @@ namespace ordercloud.integrations.cms
 			_schemas = schemas;
 		}
 
-		public async Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs)
+		public async Task<ListPage<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs, ListArgsPageOnly args = null)
 		{
-			return (await _store.FindMultipleAsync(documentIDs)).ToList();
+			args = args ?? new ListArgsPageOnly(1, documentIDs.Count());
+			return await _store.FindMultipleAsync(documentIDs, args);
 		}
-
 
 		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user)
 		{
