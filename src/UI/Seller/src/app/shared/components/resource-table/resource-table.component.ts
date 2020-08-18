@@ -280,7 +280,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
       this.setBreadCrumbs();
-      this._ocService.checkIfCreatingNew();
+      this.checkIfCreatingNew();
     });
   }
 
@@ -308,6 +308,19 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.requestStatus = requestStatus;
       this.changeDetectorRef.detectChanges();
     });
+  }
+
+  // TODO: Refactor to remove duplicate function (function exists in resrouce-crud.service.ts)
+  private checkIfCreatingNew() {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    const endUrl =
+      this._currentResourceNamePlural === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
+    this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
+    if (this._currentResourceNamePlural === 'products' && this.isCreatingNew) {
+      this.resourceType = splitUrl[splitUrl.length - 1].split('-').join(' ');
+    }
+    this.isCreatingSubResource = endUrl.includes('new?');
   }
 
   private setBreadCrumbs() {
