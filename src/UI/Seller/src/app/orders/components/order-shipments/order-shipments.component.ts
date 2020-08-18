@@ -5,15 +5,16 @@ import {
   LineItem,
   Shipment,
   OcSupplierAddressService,
-  ListAddress,
-  ListShipment,
+  Address,
   OcShipmentService,
-  ListShipmentItem,
+  ShipmentItem,
   OcLineItemService,
   OcOrderService,
   Order,
+  OrderDirection,
+  ListPage,
 } from '@ordercloud/angular-sdk';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppAuthService } from '@app-seller/auth';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
@@ -26,6 +27,7 @@ import {
   NumberCanChangeTo,
 } from '@app-seller/orders/line-item-status.helper';
 import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'app-order-shipments',
@@ -41,16 +43,16 @@ export class OrderShipmentsComponent implements OnChanges {
   viewShipments = false;
   editShipFromAddress = false; // TO-DO - Use for editing Ship From address.
   shipmentForm: FormGroup;
-  shipments: ListShipment;
-  shipmentItems: ListShipmentItem;
+  shipments: ListPage<Shipment>;
+  shipmentItems: ListPage<ShipmentItem>;
   selectedShipment: Shipment;
-  supplierAddresses: ListAddress;
+  supplierAddresses: ListPage<Address>;
   lineItems: MarketplaceLineItem[];
   isSaving = false;
   isSellerUser = false;
   shipAllItems = false;
   @Input()
-  orderDirection: string;
+  orderDirection: OrderDirection;
   @Input()
   order: Order;
   @Output()
@@ -63,6 +65,7 @@ export class OrderShipmentsComponent implements OnChanges {
     private ocShipmentService: OcShipmentService,
     private ocLineItemService: OcLineItemService,
     private httpClient: HttpClient,
+    private currentUser: CurrentUserService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
@@ -173,9 +176,10 @@ export class OrderShipmentsComponent implements OnChanges {
     this.shipmentItems = await this.ocShipmentService.ListItems(shipmentID).toPromise();
   }
 
-  getImageUrl(lineItem: LineItem): string {
+  async getImageUrl(lineItem: LineItem): Promise<string> {
     const product = lineItem.Product;
-    return getProductMainImageUrlOrPlaceholder(product);
+    const user = await this.currentUser.getUser();
+    return getProductMediumImageUrl(product, this.appConfig.sellerID);
   }
 
   getCreateButtonAction(): string {

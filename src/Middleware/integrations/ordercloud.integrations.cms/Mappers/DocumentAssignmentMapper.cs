@@ -16,20 +16,9 @@ namespace ordercloud.integrations.cms
 				ResourceID = assignment.RsrcID,
 				ResourceType = assignment.RsrcType,
 				ParentResourceID = assignment.ParentRsrcID,
+				ParentResourceType = assignment.RsrcType.GetParentType(),
 				DocumentID = doc.InteropID
 			};
-		}
-
-		public static Resource MapToResource(this DocumentAssignment assignment)
-		{
-			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
-			return new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
-		}
-
-		public static Resource MapToResource(this AssetAssignment assignment)
-		{
-			var resourceType = assignment.ResourceType ?? 0; // "Required" validation should prevent null ResourceType
-			return new Resource(resourceType, assignment.ResourceID, assignment.ParentResourceID);
 		}
 
 		public static IEnumerable<DocumentAssignment> MapTo(IEnumerable<DocumentAssignmentDO> assignments, IEnumerable<DocumentDO> docs)

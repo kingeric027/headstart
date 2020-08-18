@@ -62,7 +62,7 @@ export class OCMOrderReturnTable {
   constructor(private context: ShopperContextService) {}
 
   getImageUrl(lineItemID: string): string {
-    return getPrimaryLineItemImage(lineItemID, this._liGroup);
+    return getPrimaryLineItemImage(lineItemID, this._liGroup, this.context.currentUser.get());
   }
 
   toProductDetails(productID: string): void {

@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using Cosmonaut.Attributes;
 using Microsoft.Azure.Documents;
-using Newtonsoft.Json;
 using ordercloud.integrations.library;
-using ordercloud.integrations.library.Cosmos;
-using OrderCloud.SDK;
-using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace ordercloud.integrations.cms
 {

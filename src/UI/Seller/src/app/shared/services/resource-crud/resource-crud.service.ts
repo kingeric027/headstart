@@ -12,12 +12,12 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
-import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
+import { Address } from '@ordercloud/angular-sdk';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -375,7 +375,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   // TODO - move to some other file. Not related to resource crud
-  getSuggestedAddresses = (ex): ListBuyerAddress => {
+  getSuggestedAddresses = (ex): ListPage<Address> => {
     for (const err of ex.error.Errors) {
       if (err.ErrorCode === 'blocked by web hook') {
         return err.Data?.Body?.SuggestedAddresses;
@@ -437,10 +437,13 @@ export abstract class ResourceCrudService<ResourceType> {
     return JSON.parse(JSON.stringify(resource));
   }
 
+  // TODO: Refactor to remove duplicate function (function exists in resource-table.component.ts)
   checkIfCreatingNew(): boolean {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.split('/')[2];
-    return endUrl === 'new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl =
+      this.primaryResourceLevel === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
+    return endUrl === 'new' || endUrl.startsWith('new?');
   }
 
   checkForChanges<T>(resourceEditable: T, resourceStatic: T): boolean {

@@ -1,9 +1,11 @@
 import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { ApiRole } from '@ordercloud/angular-sdk';
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
   clientID: environment.clientID,
+  sellerID: environment.sellerID,
   middlewareUrl: environment.middlewareUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
@@ -80,7 +82,7 @@ export const ocAppConfig: AppConfig = {
     'MPMeSupplierUserAdmin',
     'MPSupplierUserGroupAdmin',
     'MPStoreFrontAdmin',
-  ],
+  ] as ApiRole[],
   impersonatingBuyerScope: [
     'MeAddressAdmin',
     'AddressAdmin', // Only for location owners
@@ -94,8 +96,8 @@ export const ocAppConfig: AppConfig = {
     'BuyerReader',
     'PasswordReset',
     'SupplierReader',
-    'SupplierAddressReader'
-  ]
+    'SupplierAddressReader',
+  ] as ApiRole[],
 };
 
 export const applicationConfiguration = new InjectionToken<AppConfig>('app.config', {
@@ -115,6 +117,7 @@ export interface AppConfig {
    * will be used for authentication. You can view client ids for apps
    * you own or are a contributor to on the [dashboard](https://developer.ordercloud.io/dashboard)
    */
+  sellerID: string;
   clientID: string;
   /**
    * base path to middleware
@@ -140,6 +143,6 @@ export interface AppConfig {
   orderCloudApiUrl: string;
   orderCloudApiVersion: string;
 
-  scope: string[];
-  impersonatingBuyerScope: string[];
+  scope: ApiRole[];
+  impersonatingBuyerScope: ApiRole[];
 }

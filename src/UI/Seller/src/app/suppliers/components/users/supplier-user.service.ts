@@ -6,9 +6,9 @@ import {
   OcSupplierUserService,
   UserGroupAssignment,
   OcSupplierUserGroupService,
-  ListUserGroup,
-  ListUserGroupAssignment,
   Supplier,
+  ListPage,
+  UserGroup,
 } from '@ordercloud/angular-sdk';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
@@ -39,7 +39,7 @@ export class SupplierUserService extends ResourceCrudService<User> {
       activatedRoute,
       ocSupplierUserService,
       currentUserService,
-      '/suppliers', 
+      '/suppliers',
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
       'users',
@@ -70,11 +70,11 @@ export class SupplierUserService extends ResourceCrudService<User> {
       .toPromise();
   }
 
-  async getUserGroups(supplierID: string, options: ListArgs): Promise<ListUserGroup> {
+  async getUserGroups(supplierID: string, options: ListArgs): Promise<ListPage<UserGroup>> {
     return await this.ocSupplierUserGroupService.List(supplierID, options as any).toPromise();
   }
 
-  async listUserAssignments(userID: string, supplierID: string): Promise<ListUserGroupAssignment> {
+  async listUserAssignments(userID: string, supplierID: string): Promise<ListPage<UserGroupAssignment>> {
     return await this.ocSupplierUserGroupService.ListUserAssignments(supplierID, { userID }).toPromise();
   }
 }
