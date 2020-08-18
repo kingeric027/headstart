@@ -107,7 +107,7 @@ namespace Marketplace.Common.Commands
 				 * we mark up the produc
 				 * if they dont match we just convert for currecny as the 
 				 * seller has set custom pricing */
-				var shouldMarkupProduct = product.PriceSchedule?.ID == product.ID;
+				var shouldMarkupProduct = product.PriceSchedule.ID == product.ID;
 				if (shouldMarkupProduct)
 				{
 					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
@@ -120,7 +120,7 @@ namespace Marketplace.Common.Commands
 				}
 				else
 				{
-					product.PriceSchedule.PriceBreaks = product.PriceSchedule?.PriceBreaks?.Select(priceBreak =>
+					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
 					{
 						// price on price schedule will be in USD as it is set by the seller
 						// may be different rates in the future
