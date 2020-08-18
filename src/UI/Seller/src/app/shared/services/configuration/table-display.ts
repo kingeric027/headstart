@@ -80,7 +80,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   },
   orders: {
     toPrimaryHeader: 'ID',
-    toSecondaryHeader: 'Status',
+    toSecondaryHeader: 'xp.SubmittedOrderStatus',
     toImage: '',
     toExpandable: false,
   },
@@ -187,8 +187,8 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         path: 'Impersonate',
         header: '',
         type: IMPERSONATE_BUTTON,
-        sortable: false
-      }
+        sortable: false,
+      },
     ],
     imgPath: '',
   },

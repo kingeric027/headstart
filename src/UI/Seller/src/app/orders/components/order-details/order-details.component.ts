@@ -27,6 +27,7 @@ import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status
 export const LineItemTableStatus = {
   Default: 'Default',
   Canceled: 'Canceled',
+  Returned: 'Returned',
   Backorered: 'Backorered',
 };
 
