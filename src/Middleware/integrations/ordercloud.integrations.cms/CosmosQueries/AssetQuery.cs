@@ -130,13 +130,14 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetDO(assetInteropID, user);
 			await _assetStore.RemoveByIdAsync(asset.id, container.id);
-			Task deleteThumb = Task.FromResult(0);
+			var medium = Task.CompletedTask;
+			var small = Task.CompletedTask;
 			if (asset.Type == AssetType.Image)
 			{
-				deleteThumb = _blob.DeleteAsset(container, $"{asset.id}-m");
+				medium = _blob.DeleteAsset(container, $"{asset.id}-m");
+				small = _blob.DeleteAsset(container, $"{asset.id}-s");
 			}
-			await deleteThumb;
-			await _blob.DeleteAsset(container, asset.id); 
+			await Task.WhenAll(medium, small, _blob.DeleteAsset(container, asset.id));
 		}
 
 		public async Task<ListPage<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs, ListArgsPageOnly args)
