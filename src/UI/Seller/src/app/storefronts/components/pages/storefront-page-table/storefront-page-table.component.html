@@ -13,6 +13,7 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)"
                           [shouldShowResourceActions]="false"
+                          [shouldShowTitleContainer]="false"
                           [labelSingular]="'Page'"
                           [labelPlural]="'Pages'">
   <cms-page-editor class="resource-edit"
@@ -20,7 +21,9 @@
                    renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net/"
                    [resourceID]="selectedResourceID"
                    [document]="resourceOrEmptyDoc()"
-                   [parentResourceID]="parentResourceID">
+                   [parentResourceID]="parentResourceID"
+                   (pageSaved)="onPageSaved($event)"
+                   (backClicked)="back()">
   </cms-page-editor>
 </resource-table-component>
 <!-- <cms-page-list *ngIf="parentResourceID"

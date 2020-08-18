@@ -61,6 +61,7 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
       'pages'
     );
   }
+  // Overwritten functions
   async list(args: any[]): Promise<ListPage<JDocument>> {
     console.group();
     console.log(this.ocService);
@@ -84,4 +85,11 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
       Items: DocResponse,
     };
   }
+
+  async getResourceById(resourceID: string): Promise<any> {
+    const orderDirection = this.optionsSubject.value.OrderDirection;
+    const args = await this.createListArgs([resourceID], orderDirection);
+    return HeadStartSDK.Documents.Get('cms-page-schema', resourceID);
+  }
+  // End Overwritten functions
 }

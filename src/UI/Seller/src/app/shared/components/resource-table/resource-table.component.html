@@ -265,7 +265,8 @@
           </perfect-scrollbar>
         </div>
         <div class="col-md-9 col-sm-12 bg-light contents">
-          <div class="py-1 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
+          <div *ngIf="shouldShowTitleContainer"
+               class="py-1 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
             <span class="d-flex flex-row justify-content-start align-items-center">
               <div class="icon-button ripple hover-btn"
                    (click)="handleSelectResource({})">

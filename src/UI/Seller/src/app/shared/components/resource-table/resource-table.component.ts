@@ -79,7 +79,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   fromDate: string;
   toDate: string;
   resourceType: string | null = null;
-
+  
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -88,38 +88,38 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private impersonationService: ImpersonationService,
     private currentUserService: CurrentUserService,
     ngZone: NgZone
-  ) {}
-
-  @Input()
-  resourceList: ListPage<any> = { Meta: {}, Items: [] };
-  @Input()
-  set ocService(service: ResourceCrudService<any>) {
-    console.group()
-    console.log(service)
-    console.log('primary', service.primaryResourceLevel)
-    console.log('secondary', service.secondaryResourceLevel)
-    console.groupEnd();
-    this._ocService = service;
-    this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
-    this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
-  }
-  @Input()
-  parentResourceService?: ResourceCrudService<any>;
-  @Output()
-  searched: EventEmitter<any> = new EventEmitter();
-  @Output()
-  hitScrollEnd: EventEmitter<any> = new EventEmitter();
-  @Output()
-  changesSaved: EventEmitter<any> = new EventEmitter();
-  @Output()
-  resourceDelete: EventEmitter<any> = new EventEmitter();
-  @Output()
-  changesDiscarded: EventEmitter<any> = new EventEmitter();
-  @Output()
-  resourceSelected: EventEmitter<any> = new EventEmitter();
-  @Input()
-  set updatedResource(value: any) {
-    this._updatedResource = value;
+    ) {}
+    
+    @Input()
+    resourceList: ListPage<any> = { Meta: {}, Items: [] };
+    @Input()
+    set ocService(service: ResourceCrudService<any>) {
+      console.group()
+      console.log(service)
+      console.log('primary', service.primaryResourceLevel)
+      console.log('secondary', service.secondaryResourceLevel)
+      console.groupEnd();
+      this._ocService = service;
+      this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
+      this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
+    }
+    @Input()
+    parentResourceService?: ResourceCrudService<any>;
+    @Output()
+    searched: EventEmitter<any> = new EventEmitter();
+    @Output()
+    hitScrollEnd: EventEmitter<any> = new EventEmitter();
+    @Output()
+    changesSaved: EventEmitter<any> = new EventEmitter();
+    @Output()
+    resourceDelete: EventEmitter<any> = new EventEmitter();
+    @Output()
+    changesDiscarded: EventEmitter<any> = new EventEmitter();
+    @Output()
+    resourceSelected: EventEmitter<any> = new EventEmitter();
+    @Input()
+    set updatedResource(value: any) {
+      this._updatedResource = value;
     if (this._resourceInSelection && this._updatedResource && this._ocService)
       this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
@@ -127,7 +127,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   set resourceInSelection(value: any) {
     this._resourceInSelection = value;
     if (this._resourceInSelection && this._updatedResource && this._ocService)
-      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
+    this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   selectedResourceID: string;
@@ -140,6 +140,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   resourceForm: FormGroup;
   @Input()
   shouldShowCreateNew = true;
+  @Input() 
+  shouldShowTitleContainer = true;
   @Input()
   shouldShowResourceActions = true;
   @Input()

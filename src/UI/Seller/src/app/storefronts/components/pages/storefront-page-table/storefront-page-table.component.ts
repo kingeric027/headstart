@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StorefrontsService } from '../../storefronts/storefronts.service';
-import { JDocument } from '@ordercloud/headstart-sdk';
+import { JDocument, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { StorefrontPageService } from '../storefront-page.service';
 @Component({
   selector: 'app-storefront-page-table',
@@ -31,5 +31,20 @@ export class StorefrontPageTableComponent extends ResourceCrudComponent<JDocumen
       console.log(this.resourceInSelection);
       return this.resourceInSelection;
     }
+  }
+
+  onPageSaved(event): void {
+    console.log(event);
+    HeadStartSDK.Documents.SaveAssignment('cms-page-schema', {
+      DocumentID: event.ID,
+      ParentResourceID: null,
+      ResourceID: this.parentResourceID,
+      ResourceType: 'ApiClients',
+    });
+    this.selectResource(event);
+  }
+
+  back(): void {
+    this.selectResource({});
   }
 }
