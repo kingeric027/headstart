@@ -137,6 +137,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 
 export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
@@ -242,6 +243,7 @@ const components = [
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     UnitOfMeasurePipe,
+    SafeHTMLPipe,
     ...components,
   ],
   imports: [
