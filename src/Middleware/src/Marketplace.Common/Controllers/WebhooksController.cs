@@ -49,13 +49,6 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderRequiresApprovalEmail(payload);
         }
 
-        [HttpPost, Route("orderapproved")]
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderApproved([FromBody] MarketplaceOrderApprovePayload payload)
-        {
-            await _sendgridService.SendOrderApprovedEmail(payload);
-        }
-
         [HttpPost, Route("orderdeclined")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderDeclined([FromBody] MarketplaceOrderDeclinePayload payload)

@@ -10,7 +10,7 @@ import { RegexService } from '@app-seller/shared/services/regex/regex.service';
   styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit {
-  private _existingProduct: Product = {};
+  private _existingProduct = {} as Product;
   @Input()
   btnText: string;
   @Output()
@@ -29,7 +29,7 @@ export class ProductFormComponent implements OnInit {
 
   @Input()
   set existingProduct(product: Product) {
-    this._existingProduct = product || {};
+    this._existingProduct = product || ({} as Product);
     if (!this.productForm) {
       this.setForm();
       return;

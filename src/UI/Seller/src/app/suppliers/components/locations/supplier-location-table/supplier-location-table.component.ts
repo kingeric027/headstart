@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Address, ListAddress } from '@ordercloud/angular-sdk';
+import { Address, ListPage } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import { ValidatePhone, ValidateUSZip } from '@app-seller/validators/validators';
@@ -27,7 +27,7 @@ function createSupplierLocationForm(supplierLocation: Address) {
   styleUrls: ['./supplier-location-table.component.scss'],
 })
 export class SupplierLocationTableComponent extends ResourceCrudComponent<Address> {
-  suggestedAddresses: ListAddress;
+  suggestedAddresses: ListPage<Address>;
   selectedAddress: Address;
   canBeDeleted: boolean;
 

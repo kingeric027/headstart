@@ -23,8 +23,7 @@ namespace Marketplace.Models.Models.Marketplace
 	public class LineItemStatusChange
 	{
 		public string ID { get; set; }
-		public Dictionary<LineItemStatus, int> PreviousQuantities { get; set; }
-		
+		public int Quantity { get; set; }
 		// reason and comment are optional, only apply to return and canelation request
 		public string Reason { get; set; }
 		public string Comment { get; set; }

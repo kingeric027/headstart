@@ -14,8 +14,8 @@ namespace Marketplace.Common.Models.Marketplace
         public string ID { get; set; }
         public string Name { get; set; }
         public Product Product { get; set; }
-        public IList<AssetForDelivery> Images { get; set; }
-        public IList<AssetForDelivery> Attachments { get; set; }
+        public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
         public KitProduct ProductAssignments { get; set; }
     }
 

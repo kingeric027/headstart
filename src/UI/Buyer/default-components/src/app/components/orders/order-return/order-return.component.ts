@@ -5,6 +5,7 @@ import { groupBy as _groupBy, flatten as _flatten } from 'lodash';
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model';
 import { CanReturnOrCancel } from 'src/app/services/lineitem-status.helper';
+import { faThermometerHalf } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   templateUrl: './order-return.component.html',
@@ -22,21 +23,31 @@ export class OCMOrderReturn {
   _action: string;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
-    this.lineItems = value.LineItems.filter(li => CanReturnOrCancel(li, this._action));
-    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
-    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(liGroups);
-    this.setSupplierInfo(this.liGroupedByShipFrom);
+    this.lineItems = value.LineItems;
+    if (this._action) {
+      this.setData();
+    }
     //  this.setRequestReturnForm();
   }
   @Input() set action(value: string) {
     this._action = value;
-    this.setRequestReturnForm(value);
+    if (this.lineItems?.length) {
+      this.setData();
+    }
   }
   @Output()
   viewReturnFormEvent = new EventEmitter<boolean>();
 
   constructor(private context: ShopperContextService, private fb: FormBuilder) {}
+
+  setData(): void {
+    this.lineItems = this.lineItems.filter(li => CanReturnOrCancel(li, this._action));
+    //  Need to group lineitems by shipping address and by whether it has been shipped for return/cancel distinction.
+    const liGroups = _groupBy(this.lineItems, li => li.ShipFromAddressID);
+    this.liGroupedByShipFrom = Object.values(liGroups);
+    this.setSupplierInfo(this.liGroupedByShipFrom);
+    this.setRequestReturnForm(this._action);
+  }
 
   isAnyRowSelected(): boolean {
     const liGroups = this.requestReturnForm.controls.liGroups as FormArray;
@@ -63,7 +74,7 @@ export class OCMOrderReturn {
       return {
         ID: claim.lineItem.ID,
         Reason: claim.returnReason,
-        PreviousQuantities: this.getPreviousQuantities(claim.lineItem.ID, claim.quantityToReturnOrCancel, this._action),
+        Quantity: claim.quantityToReturnOrCancel,
       };
     });
     const changeRequest = {
@@ -71,47 +82,6 @@ export class OCMOrderReturn {
       Changes: lineItemChanges,
     };
     await this.context.orderHistory.submitCancelOrReturn(this.order.ID, changeRequest);
-  }
-
-  getPreviousQuantities(lineItemID: string, quantityToReturnOrCancel: number, action: string): any {
-    if (action === 'return') {
-      return this.getPreviousQuantitiesForReturn(lineItemID, quantityToReturnOrCancel);
-    } else {
-      return this.getPreviousQuantitiesForCancelation(lineItemID, quantityToReturnOrCancel);
-    }
-  }
-
-  getPreviousQuantitiesForReturn(lineItemID: string, quantityToReturn: number): any {
-    const lineItem = this.lineItems.find(li => li.ID === lineItemID);
-    const Complete = lineItem.xp.StatusByQuantity['Complete'] || 0;
-    if (Complete >= quantityToReturn) {
-      return { Complete: quantityToReturn };
-    } else {
-      throw new Error('Not enough quantity to support change');
-    }
-  }
-
-  getPreviousQuantitiesForCancelation(lineItemID: string, quantityToCancel: number): any {
-    const lineItem = this.lineItems.find(li => li.ID === lineItemID);
-    const previousQuantities = { Submitted: 0, Backordered: 0 };
-    // todo figure out why the typing is potentially off here for dictionaries in sdk
-    let Submitted = lineItem.xp.StatusByQuantity['Submitted'] || 0;
-
-    let Backordered = lineItem.xp.StatusByQuantity['Backordered'] || 0;
-    while (quantityToCancel > 0) {
-      if (Submitted) {
-        previousQuantities.Submitted++;
-        Submitted--;
-        quantityToCancel--;
-      } else if (Backordered) {
-        previousQuantities.Backordered++;
-        Backordered--;
-        quantityToCancel--;
-      } else {
-        throw new Error('Not enough quantity to support change');
-      }
-    }
-    return previousQuantities;
   }
 
   async onSubmit(): Promise<void> {

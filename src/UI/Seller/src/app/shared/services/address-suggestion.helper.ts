@@ -1,4 +1,4 @@
-import { ListBuyerAddress, Buyer, BuyerAddress } from '@ordercloud/angular-sdk';
+import { BuyerAddress } from '@ordercloud/angular-sdk';
 
 export const getSuggestedAddresses = (ex): Array<BuyerAddress> => {
   for (const err of ex) {

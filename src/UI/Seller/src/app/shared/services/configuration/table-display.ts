@@ -86,7 +86,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   },
   orders: {
     toPrimaryHeader: 'ID',
-    toSecondaryHeader: 'Status',
+    toSecondaryHeader: 'xp.SubmittedOrderStatus',
     toImage: '',
     toExpandable: false,
   },
@@ -126,6 +126,7 @@ export const BASIC_STRING = 'BASIC_STRING';
 export const DATE_TIME = 'DATE_TIME';
 export const CURRENCY = 'CURRENCY';
 export const COPY_OBJECT = 'COPY_OBJECT';
+export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON';
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -204,6 +205,12 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
+      },
+      {
+        path: 'Impersonate',
+        header: '',
+        type: IMPERSONATE_BUTTON,
+        sortable: false,
       },
     ],
     imgPath: '',

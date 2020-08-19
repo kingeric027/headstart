@@ -4,7 +4,7 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { UserContext } from '@app-seller/config/user-context';
 import {
-  ListAddress,
+  Address,
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
@@ -29,7 +29,7 @@ import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
-import { getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
@@ -56,7 +56,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   @Output()
   updateResource = new EventEmitter<any>();
   @Input()
-  addresses: ListAddress;
+  addresses: ListPage<Address>;
   @Input()
   isCreatingNew: boolean;
   @Input()
@@ -81,7 +81,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   areChanges = false;
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
-  productType: ProductXp["ProductType"];
+  productType: ProductXp['ProductType'];
   productVariations: any;
   variantsValid = true;
   editSpecs = false;
@@ -128,12 +128,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   setResourceType(): void {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
-    const productTypeFromUrl = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
     if (this.productService.checkIfCreatingNew()) {
-      this.productType = productTypeFromUrl as ProductXp["ProductType"];
+      const productTypeFromUrl = splitUrl[splitUrl.length - 1].split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('');
+      this.productType = productTypeFromUrl as ProductXp['ProductType'];
     }
-    this.productForm.controls['ProductType'].setValue(this.productType);
-    this.handleUpdateProduct({target: {value: this.productForm.controls['ProductType'].value}}, 'Product.xp.ProductType');
+    this.productForm.controls.ProductType.setValue(this.productType);
+    this.handleUpdateProduct({target: {value: this.productForm.controls.ProductType.value}}, 'Product.xp.ProductType');
   }
 
   setProductEditTab(): void {
@@ -190,7 +190,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         Active: new FormControl(superMarketplaceProduct.Product.Active),
         Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
         ID: new FormControl(superMarketplaceProduct.Product.ID),
-        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
+        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(2000)),
         Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
         ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
@@ -234,7 +234,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   setNonRequiredFields(): void {
-    const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipFromAddressID', 'Price'];
+    const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipWeight', 'ShipFromAddressID', 'Price'];
     const optionalControls = optionalFieldsArray.map(item => this.productForm.get(item))
     this.productForm.get('ProductType').valueChanges
     .pipe(takeWhile(() => this.alive)).subscribe(productType => {
@@ -266,16 +266,18 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   // TODO: I'm sure there is a way to DRY this up
   shipDimensionsValid(): boolean {
-    if (this.productForm.controls['ProductType'].value === 'Quote') return false;
+    if (this.productForm.controls.ProductType.value === 'Quote') return false;
     return this.isCreatingNew 
       && this.isRequired('ShipLength') 
       && this.isRequired('ShipWidth') 
       && this.isRequired('ShipHeight') 
+      && this.isRequired('ShipWeight') 
       && this.isRequired('ShipFromAddressID')
-      && this.productForm.controls['ShipLength'].valid
-      && this.productForm.controls['ShipWidth'].valid
-      && this.productForm.controls['ShipHeight'].valid
-      && this.productForm.controls['ShipFromAddressID'].valid
+      && this.productForm.controls.ShipLength.valid
+      && this.productForm.controls.ShipWidth.valid
+      && this.productForm.controls.ShipHeight.valid
+      && this.productForm.controls.ShipWeight.valid
+      && this.productForm.controls.ShipFromAddressID.valid
   }
 
   unitOfMeasureValid(): boolean {
@@ -283,8 +285,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.isCreatingNew 
       && this.isRequired('UnitOfMeasureQty') 
       && this.isRequired('UnitOfMeasureUnit') 
-      && this.productForm.controls['UnitOfMeasureUnit'].valid 
-      && this.productForm.controls['UnitOfMeasureQty'].valid
+      && this.productForm.controls.UnitOfMeasureUnit.valid 
+      && this.productForm.controls.UnitOfMeasureQty.valid
     );
   }
 
@@ -366,7 +368,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   handleUpdatePricing(event: any): void {
     this.updateProductResource(event);
-    this.productForm.controls["Price"].setValue(event?.value?.PriceBreaks[0]?.Price);
+    this.productForm.controls.Price.setValue(event?.value?.PriceBreaks[0]?.Price);
   }
 
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
@@ -445,8 +447,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       superProduct = await this.uploadAsset(productID, file, 'Image');
     }
     this.imageFiles = []
+    //  need to copy the object so object.assign does not modify target
+    const copiedMarketPlaceStatic = JSON.parse(JSON.stringify(this._superMarketplaceProductStatic));
+
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
-    superProduct = Object.assign(this._superMarketplaceProductStatic || {}, superProduct);
+    superProduct = Object.assign(copiedMarketPlaceStatic || {}, superProduct);
     this.refreshProductData(superProduct);
   }
 
@@ -512,7 +517,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   handleTaxCodeSelection(event: TaxProperties): void {
     const codeUpdate = {target: {value: event.Code}};
     const descriptionUpdate = {target: {value: event.Description}};
-    this.productForm.controls["TaxCode"].setValue(event.Code);
+    this.productForm.controls.TaxCode.setValue(event.Code);
     this.handleUpdateProduct(codeUpdate, 'Product.xp.Tax.Code');
     this.handleUpdateProduct(descriptionUpdate, 'Product.xp.Tax.Description');
   }
@@ -615,7 +620,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   getProductPreviewImage(): string | SafeUrl {
-    return this.imageFiles[0]?.URL || getProductMainImageUrlOrPlaceholder(this._superMarketplaceProductEditable?.Product);
+    return this.imageFiles[0]?.URL || getProductMediumImageUrl(this._superMarketplaceProductEditable?.Product, this.appConfig.sellerID);
   }
   
   ngOnDestroy(): void {
