@@ -19,9 +19,9 @@
   <cms-page-editor class="resource-edit"
                    *ngIf="resourceInSelection && parentResourceID"
                    renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net/"
-                   [resourceID]="selectedResourceID"
+                   resourceType="ApiClients"
+                   [resourceID]="parentResourceID"
                    [document]="resourceOrEmptyDoc()"
-                   [parentResourceID]="parentResourceID"
                    (pageSaved)="onPageSaved($event)"
                    (backClicked)="back()">
   </cms-page-editor>

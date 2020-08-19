@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StorefrontsService } from '../../storefronts/storefronts.service';
-import { JDocument, HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { JDocument } from '@ordercloud/headstart-sdk';
 import { StorefrontPageService } from '../storefront-page.service';
 @Component({
   selector: 'app-storefront-page-table',
@@ -11,7 +11,6 @@ import { StorefrontPageService } from '../storefront-page.service';
 })
 export class StorefrontPageTableComponent extends ResourceCrudComponent<JDocument> {
   route = 'pages';
-  parentResourceID: string;
   constructor(
     private storefrontPageService: StorefrontPageService,
     changeDetectorRef: ChangeDetectorRef,

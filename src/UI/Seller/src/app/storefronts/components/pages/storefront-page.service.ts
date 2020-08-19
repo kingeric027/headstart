@@ -51,11 +51,6 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
   }
   // Overwritten functions
   async list(args: any[]): Promise<ListPage<JDocument>> {
-    console.group();
-    console.log(this.ocService);
-    console.log(args);
-    console.groupEnd();
-    console.log(this.route);
     return await HeadStartSDK.Documents.ListDocuments('cms-page-schema', 'ApiClients', args[0] /* The ResourceID */);
   }
 
