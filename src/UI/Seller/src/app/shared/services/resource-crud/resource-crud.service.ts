@@ -437,10 +437,13 @@ export abstract class ResourceCrudService<ResourceType> {
     return JSON.parse(JSON.stringify(resource));
   }
 
+  // TODO: Refactor to remove duplicate function (function exists in resource-table.component.ts)
   checkIfCreatingNew(): boolean {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.split('/')[2];
-    return endUrl === 'new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl =
+      this.primaryResourceLevel === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
+    return endUrl === 'new' || endUrl.startsWith('new?');
   }
 
   checkForChanges<T>(resourceEditable: T, resourceStatic: T): boolean {
