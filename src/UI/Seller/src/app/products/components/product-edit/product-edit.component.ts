@@ -190,7 +190,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         Active: new FormControl(superMarketplaceProduct.Product.Active),
         Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
         ID: new FormControl(superMarketplaceProduct.Product.ID),
-        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
+        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(2000)),
         Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
         ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
