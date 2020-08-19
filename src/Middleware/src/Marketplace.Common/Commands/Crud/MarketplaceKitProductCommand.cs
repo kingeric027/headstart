@@ -57,6 +57,8 @@ namespace Marketplace.Common.Commands.Crud
             var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
             return new MarketplaceKitProduct
             {
+                ID = _product.ID,
+                Name = _product.Name,
                 Product = _product,
                 Images = await _images,
                 Attachments = await _attachments,
@@ -76,6 +78,8 @@ namespace Marketplace.Common.Commands.Crud
                 var _attachments = GetProductAttachments(product.ID, user);
                 _kitProductList.Add(new MarketplaceKitProduct
                 {
+                    ID = parentProduct.ID,
+                    Name = parentProduct.Name,
                     Product = parentProduct,
                     Images = await _images,
                     Attachments = await _attachments,
@@ -97,6 +101,8 @@ namespace Marketplace.Common.Commands.Crud
             var _productAssignments = await _query.Create<KitProduct>("KitProduct", kitProductDoc, user);
             return new MarketplaceKitProduct
             {
+                ID = _product.ID,
+                Name = _product.Name,
                 Product = _product,
                 Images = new List<AssetForDelivery>(),
                 Attachments = new List<AssetForDelivery>(),
@@ -106,7 +112,7 @@ namespace Marketplace.Common.Commands.Crud
 
         public async Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, VerifiedUserContext user)
         {
-            var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
+            var _updatedProduct = await _oc.Products.SaveAsync<Product>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
             var kitProductDoc = new KitProductDocument();
             kitProductDoc.ID = _updatedProduct.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
@@ -115,6 +121,8 @@ namespace Marketplace.Common.Commands.Crud
             var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
             return new MarketplaceKitProduct
             {
+                ID = _updatedProduct.ID,
+                Name = _updatedProduct.Name,
                 Product = _updatedProduct,
                 Images = _images,
                 Attachments = _attachments,

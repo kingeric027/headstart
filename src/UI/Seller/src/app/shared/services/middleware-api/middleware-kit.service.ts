@@ -1,9 +1,33 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcTokenService } from '@ordercloud/angular-sdk';
-import { ListPage, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
+import { OcTokenService, Product } from '@ordercloud/angular-sdk';
+import { ListPage, Asset } from '@ordercloud/headstart-sdk';
 
+// these models can be deleted after the SDK is updated
+
+export interface MarketplaceKitProduct {
+    ID: string;
+    Name: string;
+    Product: Product;
+    Images: Asset[];
+    Attachments: Asset[];
+    ProductAssignments: KitProduct;
+}
+export interface KitProductDocument extends Document {
+    Doc: KitProduct;
+}
+export interface KitProduct {
+    ProductsInKit: ProductInKit[];
+}
+export interface ProductInKit {
+    ID: string;
+    MinQty?: number;
+    MaxQty?: number;
+    Variants?: object[];
+    SpecCombo?: string;
+    Static: boolean;
+}
 
 @Injectable({
     providedIn: 'root',

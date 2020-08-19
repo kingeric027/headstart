@@ -3,13 +3,14 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { AppAuthService } from '@app-seller/auth';
 import { KitService } from '@app-seller/kits/kits.service';
 import { faCircle, faHeart, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { ListAddress } from '@ordercloud/angular-sdk';
-import { HeadStartSDK, Asset, AssetUpload, MarketplaceKitProduct, ProductInKit } from '@ordercloud/headstart-sdk';
+import { ListAddress, Product } from '@ordercloud/angular-sdk';
+import { HeadStartSDK, Asset, AssetUpload, ListPage } from '@ordercloud/headstart-sdk';
 import { Router } from '@angular/router';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MiddlewareKitService } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
+import { MiddlewareKitService, MarketplaceKitProduct, ProductInKit } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 @Component({
     selector: 'app-kits-edit',
     templateUrl: './kits-edit.component.html',
@@ -19,7 +20,6 @@ export class KitsEditComponent implements OnInit {
     kitProductEditable: MarketplaceKitProduct;
     kitProductStatic: MarketplaceKitProduct;
     kitProductForm: FormGroup;
-    productsInKitForm: FormGroup[];
     @Input()
     set selectedKitProduct(product: MarketplaceKitProduct) {
         if (product?.Product) this.handleSelectedProductChange(product);
@@ -29,33 +29,30 @@ export class KitsEditComponent implements OnInit {
             this.kitProductStatic = this.kitService.emptyResource;
         }
     }
+    faTimes = faTimes;
+    faTrash = faTrash;
+    faCircle = faCircle;
+    faHeart = faHeart;
     @Input() readonly: boolean;
     @Input()
     filterConfig;
     @Output()
     updateResource = new EventEmitter<any>();
-    @Input()
-    addresses: ListAddress;
-    @Input()
     isCreatingNew: boolean;
-    faTimes = faTimes;
-    faTrash = faTrash;
-    faCircle = faCircle;
-    faHeart = faHeart;
+    isLoading = false;
+    dataIsSaving = false;
+    areChanges = false;
     productAssignments: ProductInKit[] = [];
     productsIncluded: any[] = [];
-    areChanges = false;
-    dataIsSaving = false;
-    productList: any;
-    isAddingNewProduct = false;
-    productToAdd: string;
+    productList: ListPage<Product>;
+    productsToAdd: string[] = [];
     newProductAssignments: ProductInKit[] = [];
-    fileType: string;
     imageFiles: FileHandle[] = [];
     images: Asset[] = [];
     staticContentFiles: FileHandle[] = [];
     staticContent: Asset[] = [];
     documentName: string;
+    searchTermInput: string;
     constructor(
         private router: Router,
         private appAuthService: AppAuthService,
@@ -65,27 +62,30 @@ export class KitsEditComponent implements OnInit {
         private modalService: NgbModal,
     ) { }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.isCreatingNew = this.kitService.checkIfCreatingNew();
-        this.getProductList();
+        this.productList = await this.getProductList();
     }
 
     setForms(kitProduct: MarketplaceKitProduct): void {
         this.kitProductForm = new FormGroup({
-            ID: new FormControl(kitProduct.Product.ID || ''),
-            Name: new FormControl(kitProduct.Product.Name || ''),
-            Active: new FormControl(kitProduct.Product.Active),
+            ID: new FormControl(kitProduct.Product.ID),
+            Name: new FormControl(kitProduct.Product.Name),
+            Active: new FormControl(kitProduct.Product.Active)
         });
     }
 
-    async getProductList() {
+    async getProductList(args?: ListArgs): Promise<ListPage<Product>> {
+        this.isLoading = true;
         const accessToken = await this.appAuthService.fetchToken().toPromise();
-        const productList = await HeadStartSDK.Products.List({ page: 1, pageSize: 100, filters: {} }, accessToken);
-        this.productList = productList?.Items.filter(p => p.PriceSchedule.ID !== null);
+        const productList = args ? await HeadStartSDK.Products.List(args, accessToken) : await HeadStartSDK.Products.List({}, accessToken);
+        this.isLoading = false;
+        return { Meta: productList.Meta, Items: productList?.Items.filter(p => p.PriceSchedule.ID !== null) };
     }
 
     async handleSelectedProductChange(product: MarketplaceKitProduct) {
-        const marketplaceKitProduct = await this.middlewareKitService.Get(product.Product.ID);
+        const marketplaceKitProduct = this.isCreatingNew ?
+            this.kitService.emptyResource : await this.middlewareKitService.Get(product.Product.ID);
         this.refreshProductData(marketplaceKitProduct);
     }
 
@@ -94,9 +94,9 @@ export class KitsEditComponent implements OnInit {
         this.kitProductStatic = JSON.parse(JSON.stringify(product));
         this.staticContent = product.Attachments;
         this.images = product.Images;
-        this.getProductsInKit(product);
         this.setForms(product);
         this.isCreatingNew = this.kitService.checkIfCreatingNew();
+        if (!this.isCreatingNew) this.getProductsInKit(product);
         this.checkForChanges();
     }
 
@@ -106,8 +106,8 @@ export class KitsEditComponent implements OnInit {
         product.ProductAssignments.ProductsInKit.forEach(async p => {
             let ocProduct = await HeadStartSDK.Products.Get(p.ID, accessToken);
             productAssignments.push({
-                ID: p.ID, Name: ocProduct.Product.Name, Price: ocProduct.PriceSchedule.PriceBreaks[0], Required: p.Required, MinQty: p.MinQty, MaxQty: p.MaxQty
-            })
+                ID: p.ID, Name: ocProduct.Product.Name, Variants: p.Variants, MinQty: p.MinQty, MaxQty: p.MaxQty, Static: p.Static
+            });
         });
         this.productsIncluded = productAssignments;
     }
@@ -139,12 +139,12 @@ export class KitsEditComponent implements OnInit {
         try {
             this.dataIsSaving = true;
             let superProduct = this.kitProductStatic;
-            this.refreshProductData(superProduct);
             if (JSON.stringify(this.kitProductEditable) !== JSON.stringify(this.kitProductStatic)) {
                 superProduct = await this.middlewareKitService.Update(this.kitProductEditable);
             }
             if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
             if (this.staticContentFiles.length > 0) { await this.addDocuments(this.staticContentFiles, superProduct.Product.ID); }
+            this.refreshProductData(superProduct);
             this.dataIsSaving = false;
         } catch (ex) {
             this.dataIsSaving = false;
@@ -167,10 +167,15 @@ export class KitsEditComponent implements OnInit {
         }
     }
 
+    async changePage(page: number) {
+        this.productList = await this.getProductList({ page })
+    }
+
     async handleSave(): Promise<void> {
         if (this.isCreatingNew) this.createNewKitProduct();
         else this.updateProduct();
     }
+
     async handleDelete(): Promise<void> {
         await this.middlewareKitService.Delete(this.kitProductStatic.Product.ID);
         this.router.navigateByUrl('/kitproducts');
@@ -186,6 +191,7 @@ export class KitsEditComponent implements OnInit {
     getSaveBtnText(): string {
         return this.kitService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
     }
+
     checkForChanges(): void {
         this.areChanges = JSON.stringify(this.kitProductEditable) !== JSON.stringify(this.kitProductStatic) ||
             this.imageFiles?.length > 0 || this.staticContentFiles?.length > 0;
@@ -196,25 +202,35 @@ export class KitsEditComponent implements OnInit {
     *********************************************/
 
     async handleCreateAssignment() {
-        this.isAddingNewProduct = false;
-        let ocProduct = await HeadStartSDK.Products.Get(this.productToAdd);
-        const newProduct = {
-            ID: this.productToAdd,
-            Name: ocProduct.Product.Name,
-            Price: ocProduct.PriceSchedule.PriceBreaks[0],
-            Required: false, MinQty: 0, MaxQty: 0
-        }
-        const productInKit = { ID: this.productToAdd, Required: false, MinQty: 0, MaxQty: 0 }
-        this.productsIncluded.push(newProduct);
-        this.newProductAssignments.push(productInKit);
-        this.kitProductEditable.ProductAssignments.ProductsInKit = this.newProductAssignments
-        this.checkForChanges();
+        let updatedAssignments = this.isCreatingNew ? [] : this.kitProductEditable.ProductAssignments.ProductsInKit;
+        const accessToken = await this.appAuthService.fetchToken().toPromise();
+        await this.asyncForEach(this.productsToAdd, async (productID) => {
+            let ocProduct = await HeadStartSDK.Products.Get(productID, accessToken);
+            const newProduct = {
+                ID: productID, Name: ocProduct.Product.Name,
+                Variants: ocProduct.Variants, SpecCombo: '',
+                MinQty: null, MaxQty: null, Static: false
+            };
+            const productInKit = { ID: productID, MinQty: null, MaxQty: null, Static: false, Variants: ocProduct.Variants, SpecCombo: '' };
+            if (!this.productsIncluded.includes(newProduct)) this.productsIncluded.push(newProduct);
+            updatedAssignments.push(productInKit);
+        });
+        const updatedProduct = { field: 'ProductAssignments.ProductsInKit', value: updatedAssignments };
+        this.updateProductResource(updatedProduct);
     }
-    handleDeleteAssignment(event: any, product: any) {
+
+    // this helper function is to ensure that each async api call is completed before continuing
+    async asyncForEach(array, cb) {
+        for (let i = 0; i < array.length; i++) {
+            await cb(array[i], i, array);
+        }
+    }
+
+    handleDeleteAssignment(product: any): void {
         const updatedAssignments = this.kitProductEditable.ProductAssignments.ProductsInKit;
         for (let i = 0; i < updatedAssignments.length; i++) {
             if (updatedAssignments[i].ID === product.ID) { updatedAssignments.splice(i, 1); }
-            if (this.productsIncluded[i].ID === product.ID) { this.productsIncluded.splice(i, 1); }
+            if (this.productsIncluded[i]?.ID === product.ID) { this.productsIncluded.splice(i, 1); }
         }
         const updatedProduct = {
             field: 'ProductAssignments.ProductsInKit',
@@ -223,11 +239,34 @@ export class KitsEditComponent implements OnInit {
         this.updateProductResource(updatedProduct);
     }
 
-    selectProductToAdd(event: any) {
-        this.productToAdd = event.target.value;
+    async searchedResources(searchText: any) {
+        this.searchTermInput = searchText;
+        this.productList = await this.getProductList({ search: searchText });
     }
-    addProductAssignment(bool: boolean) {
-        this.isAddingNewProduct = bool;
+
+    setProductConfigurability(event: any, product) {
+        product.Static = event.target.checked;
+    }
+
+    isProductInKit(productID: string): boolean {
+        for (let i = 0; i < this.productsIncluded.length; i++) {
+            if (productID === this.productsIncluded[i].ID) return true;
+        } return false;
+    }
+
+    selectProductsToAdd(event: any, productID: string): void {
+        if (event.target.checked && !this.isProductInKit(productID)) {
+            this.productsToAdd.push(productID);
+        } else if (!event.target.checked) {
+            for (let i = 0; i < this.productsToAdd.length; i++) {
+                if (productID === this.productsToAdd[i]) this.productsToAdd.splice(i, 1);
+                debugger;
+            }
+        }
+    }
+
+    openProductList(content): void {
+        this.modalService.open(content, { ariaLabelledBy: 'product-list' })
     }
 
     /*********************************************
@@ -261,11 +300,9 @@ export class KitsEditComponent implements OnInit {
         this.staticContentFiles = this.staticContentFiles.concat(files);
         this.checkForChanges();
     }
-
     stageImages(files: FileHandle[]): void {
         this.imageFiles = this.imageFiles.concat(files);
         this.checkForChanges();
-        debugger;
     }
     async addDocuments(files: FileHandle[], productID: string): Promise<void> {
         let superProduct;
@@ -277,17 +314,15 @@ export class KitsEditComponent implements OnInit {
         superProduct = Object.assign(this.kitProductStatic || {}, superProduct);
         this.refreshProductData(superProduct);
     }
-
     async addImages(files: FileHandle[], productID: string): Promise<void> {
         let superProduct;
-        // for (const file of files) {
-        //     superProduct = await this.uploadAsset(productID, file, 'Image');
-        // }
+        for (const file of files) {
+            superProduct = await this.uploadAsset(productID, file, 'Image');
+        }
         this.imageFiles = []
         // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
         superProduct = Object.assign(this.kitProductStatic || {}, superProduct);
         this.refreshProductData(superProduct);
-        debugger;
     }
     async uploadAsset(productID: string, file: FileHandle, assetType: string): Promise<MarketplaceKitProduct> {
         const accessToken = await this.appAuthService.fetchToken().toPromise();
@@ -311,7 +346,6 @@ export class KitsEditComponent implements OnInit {
         }
         this.refreshProductData(this.kitProductStatic);
     }
-
     unstageFile(index: number, fileType: string): void {
         if (fileType === 'image') {
             this.imageFiles.splice(index, 1)
@@ -324,8 +358,7 @@ export class KitsEditComponent implements OnInit {
         this.documentName = (event.target as HTMLInputElement).value;
     }
 
-    open(content): void {
+    openConfirm(content): void {
         this.modalService.open(content, { ariaLabelledBy: 'confirm-modal' });
     }
-
 }

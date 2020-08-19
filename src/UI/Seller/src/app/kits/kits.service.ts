@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OcPromotionService, Product, OcProductService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MiddlewareKitService } from '../shared/services/middleware-api/middleware-kit.service';
@@ -10,6 +9,8 @@ import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 })
 export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
     emptyResource = {
+        ID: null,
+        Name: null,
         Product: {
             OwnerID: '',
             DefaultPriceScheduleID: '',
@@ -53,15 +54,14 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
             ProductsInKit: [
                 {
                     ID: null,
-                    Required: false,
                     MinQty: null,
-                    MaxQty: null
+                    MaxQty: null,
+                    Static: false,
+                    Variants: [],
+                    SpecCombo: '',
                 },
             ]
         },
-        xp: {
-            Static: false
-        }
     };
 
     constructor(
