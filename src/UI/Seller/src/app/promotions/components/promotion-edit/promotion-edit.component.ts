@@ -102,7 +102,7 @@ export class PromotionEditComponent implements OnInit {
       StartDate: new FormControl(promotion.StartDate, Validators.required),
       ExpirationDate: new FormControl(promotion.ExpirationDate),
       CanCombine: new FormControl(promotion.CanCombine),
-      AutoApply: new FormControl(_get(promotion, 'xp.AutoApply')),
+      Automatic: new FormControl(_get(promotion, 'xp.Automatic')),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
       MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
       MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int'), Validators.min(0)),
@@ -121,7 +121,7 @@ export class PromotionEditComponent implements OnInit {
     const promoUpdate = {
       field,
       value:
-        ['Type', 'CanCombine', 'xp.AutoApply'].includes(field) ? 
+        ['Type', 'CanCombine', 'xp.Automatic'].includes(field) ? 
           event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
     };
     this.updatePromoResource(promoUpdate);

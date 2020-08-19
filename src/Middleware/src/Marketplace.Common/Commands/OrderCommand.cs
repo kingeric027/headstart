@@ -169,18 +169,38 @@ namespace Marketplace.Common.Commands
 
         public async Task AutoApplyPromotions(string orderID)
         {
-            var autoEligablePromos = await _oc.Promotions.ListAsync(filters: "xp.AutoApply: true");
+            try
+            {
+                await _oc.Orders.ValidateAsync(OrderDirection.Incoming, orderID);
+            } catch(Exception ex)
+            {
+                await RemoveOrderPromotions(orderID);
+            }
+
+            var autoEligablePromos = await _oc.Promotions.ListAsync(filters: "xp.Automatic=true");
             foreach(var promo in autoEligablePromos.Items)
             {
                 try
                 {
                     await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
-                    break;
                 } catch
                 {
                     continue;
                 }
             }
         }
+
+        private async Task RemoveOrderPromotions(string orderID)
+        {
+            var curPromos = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
+            var removeQueue = new List<Task>();
+            foreach(var promo in curPromos.Items)
+            {
+                removeQueue.Add(_oc.Orders.RemovePromotionAsync(OrderDirection.Incoming, orderID, promo.Code));
+            }
+            await Task.WhenAll(removeQueue);
+        }
+
+
     };
 }

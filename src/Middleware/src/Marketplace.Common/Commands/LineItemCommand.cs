@@ -335,13 +335,6 @@ namespace Marketplace.Common.Commands
 
             var existingLineItems = await existingLineItemsRequest;
             var li = new MarketplaceLineItem();
-
-            // If line item exists, update quantity, else create
-            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
-            if (preExistingLi != null)
-            {
-                await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
-            }
             
             var product = await productRequest;
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
@@ -350,9 +343,15 @@ namespace Marketplace.Common.Commands
             liReq.xp.StatusByQuantity = LineItemStatusConstants.EmptyStatuses;
             liReq.xp.StatusByQuantity[LineItemStatus.Open] = liReq.Quantity;
 
-            li = await _oc.LineItems
-                .CreateAsync<MarketplaceLineItem>
-                (OrderDirection.Incoming, orderID, liReq);
+            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
+            if (preExistingLi != null)
+            {
+                //await _oc.LineItems.SaveAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID);
+                li = await _oc.LineItems.SaveAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, preExistingLi.ID, liReq);
+            } else
+            {
+                li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, liReq);
+            }
             return li;
         }
 
