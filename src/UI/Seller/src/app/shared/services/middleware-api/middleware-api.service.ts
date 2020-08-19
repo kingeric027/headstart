@@ -2,8 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk';
-import { SuperMarketplaceProduct, MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk';
-import { AssetForDelivery } from 'marketplace-javascript-sdk';
+import { MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk';
 
 export interface SupplierFilterConfigDocument extends Document {
   Doc: SupplierFilterConfig;
