@@ -80,7 +80,7 @@ namespace Marketplace.Common.Commands
                         },
                         UnitOfMeasure = new UnitOfMeasure()
                         {
-                            Qty = obj.UnitOfMeasureQty,
+                            Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
                         }
                     }
@@ -191,7 +191,7 @@ namespace Marketplace.Common.Commands
                         },
                         UnitOfMeasure = new UnitOfMeasure()
                         {
-                            Qty = obj.UnitOfMeasureQty,
+                            Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
                         }
                     }
@@ -281,7 +281,7 @@ namespace Marketplace.Common.Commands
                 TaxDescription = product.xp.Tax.Description,
                 UseCumulativeQuantity = priceSchedule.UseCumulativeQuantity,
                 UnitOfMeasure = product.xp.UnitOfMeasure.Unit,
-                UnitOfMeasureQty = product.xp.UnitOfMeasure.Qty,
+                UnitOfMeasureQuantity = product.xp.UnitOfMeasure.Qty,
                 ImageTitle = asset?.Title,
                 Url = asset?.Url,
                 Type = asset?.Type ?? AssetType.Image,
