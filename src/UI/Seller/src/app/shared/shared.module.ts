@@ -47,6 +47,7 @@ import { UserGroupAssignments } from './components/user-group-assignments/user-g
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 
 @NgModule({
   imports: [
@@ -108,10 +109,11 @@ import { TranslateModule } from '@ngx-translate/core';
     ReturnForm,
     PhoneFormatPipe,
     YesNoFormatPipe,
+    SafeHTMLPipe,
     ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
-    TranslateModule
+    TranslateModule,
   ],
   declarations: [
     SearchComponent,
@@ -142,6 +144,7 @@ import { TranslateModule } from '@ngx-translate/core';
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
+    SafeHTMLPipe,
   ],
 })
 export class SharedModule {
