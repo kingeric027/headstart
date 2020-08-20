@@ -67,7 +67,6 @@ export class SupplierCategorySelectComponent {
 
   @Input()
   set categorySelectionsControl(value: FormControl) {
-    console.log(value);
     this.updateCategoryValidation(value.value);
     this._categorySelectionsControl = value;
     this._categorySelections = value.value;
