@@ -112,6 +112,10 @@ export class OrderStateService {
     this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
   }
 
+  async resetPromotions(): Promise<void> {
+    this.orderPromos = await Orders.ListPromotions('Outgoing', this.order.ID);
+  }
+
   private async getOrdersForResubmit(): Promise<ListPage<MarketplaceOrder>> {
     const orders = await Me.ListOrders({
       sortBy: '!DateCreated',

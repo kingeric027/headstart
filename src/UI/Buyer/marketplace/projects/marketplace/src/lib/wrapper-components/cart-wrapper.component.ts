@@ -2,22 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
 import { MarketplaceOrder, ListPage, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
-import { Me } from 'ordercloud-javascript-sdk';
+import { Me, Orders, OrderPromotion } from 'ordercloud-javascript-sdk';
 
 @Component({
   template: `
-    <ocm-cart [order]="order" [lineItems]="lineItems"></ocm-cart>
+    <ocm-cart [order]="order" [lineItems]="lineItems" [orderPromos]="orderPromos"></ocm-cart>
   `,
 })
 export class CartWrapperComponent implements OnInit {
   order: MarketplaceOrder;
   lineItems: ListPage<LineItemWithProduct>;
+  orderPromos: ListPage<OrderPromotion>;
   productCache: MarketplaceMeProduct[] = []; // TODO - move to cart service?
 
   constructor(private currentOrder: CurrentOrderService) {}
 
   ngOnInit(): void {
     this.currentOrder.onChange(this.setOrder);
+    this.currentOrder.onChange(this.setOrderPromos);
     this.currentOrder.cart.onChange(this.setLineItems);
   }
 
@@ -31,6 +33,10 @@ export class CartWrapperComponent implements OnInit {
     await this.updateProductCache(items.Items.map(li => li.ProductID));
     this.lineItems = this.mapToLineItemsWithProduct(items);
   };
+
+  setOrderPromos = async (order: MarketplaceOrder): Promise<void> => {
+    this.orderPromos = await Orders.ListPromotions('Outgoing', order.ID);
+  }
 
   async updateProductCache(productIDs: string[]): Promise<void> {
     const cachedIDs = this.productCache.map(p => p.ID);

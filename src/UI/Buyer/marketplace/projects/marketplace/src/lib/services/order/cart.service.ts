@@ -55,6 +55,10 @@ export class CartService {
       return await this.upsertLineItem(lineItem);
     } finally {
       this.state.reset();
+      //  need to wait two seconds and recheck if automatic promotions have updated. 
+      setTimeout(() => {
+        this.state.resetPromotions()
+      }, 2000)
     }
   }
 
