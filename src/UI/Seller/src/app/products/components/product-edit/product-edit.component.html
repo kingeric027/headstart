@@ -460,7 +460,7 @@
                   <div>
                     <p *ngIf="!productForm.controls['Description'].value">This product has no description.</p>
                   </div>
-                  <div [innerHtml]="productForm.controls['Description'].value"></div>
+                  <div [innerHtml]="productForm.controls['Description'].value | safeHTML"></div>
                   <hr />
                   <h6 class="font-weight-medium"
                       translate>ADMIN.PRODUCT_EDIT.MESSAGE_PREVIEW</h6>
