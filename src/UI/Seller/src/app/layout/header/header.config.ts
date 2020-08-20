@@ -43,7 +43,7 @@ const Promotions: MPRoute = {
 };
 
 const ProductFacets: MPRoute = {
-  rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
   title: 'ADMIN.NAV.FACETS',
   route: '/facets',
 };
@@ -221,7 +221,7 @@ const SellerUsers = {
 };
 
 const Storefronts = {
-  rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
   title: 'ADMIN.NAV.STOREFRONTS',
   route: '/storefronts',
 };
