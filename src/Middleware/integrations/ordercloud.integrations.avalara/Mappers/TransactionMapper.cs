@@ -2,6 +2,7 @@
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ordercloud.integrations.avalara
@@ -10,18 +11,18 @@ namespace ordercloud.integrations.avalara
 	{
 		public static CreateTransactionModel ToAvalaraTransationModel(this OrderWorksheet order, string companyCode, DocumentType docType)
 		{
-			var lines = new List<LineItemModel>();
-			foreach (var shipment in order.ShipEstimateResponse.ShipEstimates)
+			var shipingLines = order.ShipEstimateResponse.ShipEstimates.Select(shipment =>
 			{
 				var (shipFrom, shipTo) = shipment.GetAddresses(order.LineItems);
 				var method = shipment.GetSelectedShippingMethod();
-				lines.Add(method.ToLineItemModel(shipFrom, shipTo));
-			}
+				return method.ToLineItemModel(shipFrom, shipTo);
+			});
 
 			var hasResaleCert = ((int?) order.Order.BillingAddress.xp.AvalaraCertificateID != null);
 			var exemptionNo = hasResaleCert ? order.Order.BillingAddress.ID : null;
 
-			foreach (var lineItem in order.LineItems) lines.Add(lineItem.ToLineItemModel(lineItem.ShipFromAddress, lineItem.ShippingAddress, exemptionNo));
+			var productLines = order.LineItems.Select(lineItem =>
+				 lineItem.ToLineItemModel(lineItem.ShipFromAddress, lineItem.ShippingAddress, exemptionNo));
 
 			return new CreateTransactionModel()
 			{
@@ -29,7 +30,7 @@ namespace ordercloud.integrations.avalara
 				type = docType,
 				customerCode = order.Order.FromCompanyID,
 				date = DateTime.Now,
-				lines = lines
+				lines = productLines.Concat(shipingLines).ToList()
 			};
 		}
 
