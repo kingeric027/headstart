@@ -56,4 +56,10 @@ export class TempSdk {
       })
       .toPromise();
   }
+
+  async deleteLineItem(orderID: string, lineItemID: string): Promise<void> {
+    const url = `${this.appConfig.middlewareUrl}/order/${orderID}/lineitems/${lineItemID}`;
+    return await this.http
+      .delete<void>(url, { headers: this.buildHeaders()}).toPromise();
+  }
 }

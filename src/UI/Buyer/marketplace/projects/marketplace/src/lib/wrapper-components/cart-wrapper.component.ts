@@ -3,6 +3,7 @@ import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
 import { MarketplaceOrder, ListPage, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { Me, Orders, OrderPromotion } from 'ordercloud-javascript-sdk';
+import { PromoService } from '../services/order/promo.service';
 
 @Component({
   template: `
@@ -15,11 +16,13 @@ export class CartWrapperComponent implements OnInit {
   orderPromos: ListPage<OrderPromotion>;
   productCache: MarketplaceMeProduct[] = []; // TODO - move to cart service?
 
-  constructor(private currentOrder: CurrentOrderService) {}
+  constructor(
+    private currentOrder: CurrentOrderService,
+    private currentPromos: PromoService) {}
 
   ngOnInit(): void {
     this.currentOrder.onChange(this.setOrder);
-    this.currentOrder.onChange(this.setOrderPromos);
+    this.currentPromos.onChange(this.setOrderPromos);
     this.currentOrder.cart.onChange(this.setLineItems);
   }
 
@@ -34,8 +37,8 @@ export class CartWrapperComponent implements OnInit {
     this.lineItems = this.mapToLineItemsWithProduct(items);
   };
 
-  setOrderPromos = async (order: MarketplaceOrder): Promise<void> => {
-    this.orderPromos = await Orders.ListPromotions('Outgoing', order.ID);
+  setOrderPromos = (promos: ListPage<OrderPromotion>): void => {
+    this.orderPromos = promos;
   }
 
   async updateProductCache(productIDs: string[]): Promise<void> {

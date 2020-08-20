@@ -21,7 +21,6 @@ namespace Marketplace.Common.Commands
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task PatchOrderRequiresApprovalStatus(string orderID);
-        Task AutoApplyPromotions(string orderID);
     }
 
     public class OrderCommand : IOrderCommand
@@ -166,41 +165,5 @@ namespace Marketplace.Common.Commands
             // if function has not been exited yet we throw an insufficient access error
             Require.That(false, new ErrorCode("Insufficient Access", 403, $"User cannot access order {order.ID}"));
         }
-
-        public async Task AutoApplyPromotions(string orderID)
-        {
-            try
-            {
-                await _oc.Orders.ValidateAsync(OrderDirection.Incoming, orderID);
-            } catch(Exception ex)
-            {
-                await RemoveOrderPromotions(orderID);
-            }
-
-            var autoEligablePromos = await _oc.Promotions.ListAsync(filters: "xp.Automatic=true");
-            foreach(var promo in autoEligablePromos.Items)
-            {
-                try
-                {
-                    await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
-                } catch
-                {
-                    continue;
-                }
-            }
-        }
-
-        private async Task RemoveOrderPromotions(string orderID)
-        {
-            var curPromos = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
-            var removeQueue = new List<Task>();
-            foreach(var promo in curPromos.Items)
-            {
-                removeQueue.Add(_oc.Orders.RemovePromotionAsync(OrderDirection.Incoming, orderID, promo.Code));
-            }
-            await Task.WhenAll(removeQueue);
-        }
-
-
     };
 }

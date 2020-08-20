@@ -60,6 +60,13 @@ namespace Marketplace.Common.Controllers
             return await _lineItemCommand.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
 
+        [DocName("Delete a line item")]
+        [HttpDelete, Route("{orderID}/lineitems/{lineItemID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task DeleteLineItem(string orderID, string lineItemID)
+        {
+            await _lineItemCommand.DeleteLineItem(orderID, lineItemID);
+        }
+
         [DocName("Apply a promotion to an order")]
         [HttpPost, Route("{orderID}/promotions/{promoCode}")]
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode)

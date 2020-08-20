@@ -17,6 +17,7 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
         Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
+        Task DeleteLineItem(string orderID, string lineItemID);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -24,13 +25,15 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
         private readonly ISendgridService _sendgridService;
         private readonly IMeProductCommand _meProductCommand;
+        private readonly IPromotionCommand _promotionCommand;
 
 
-        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
+        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
             _meProductCommand = meProductCommand;
+            _promotionCommand = promotionCommand;
         }
 
         // used on post order submit
@@ -352,7 +355,14 @@ namespace Marketplace.Common.Commands
             {
                 li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, liReq);
             }
+            await _promotionCommand.AutoApplyPromotions(orderID);
             return li;
+        }
+
+        public async Task DeleteLineItem(string orderID, string lineItemID)
+        {
+            await _oc.LineItems.DeleteAsync(OrderDirection.Incoming, orderID, lineItemID);
+            await _promotionCommand.AutoApplyPromotions(orderID);
         }
 
         private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
