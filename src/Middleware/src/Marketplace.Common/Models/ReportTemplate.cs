@@ -28,11 +28,12 @@ namespace Marketplace.Common.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public List<string> Headers { get; set; }
-        public Filters Filters { get; set; }
+        public ReportFilters Filters { get; set; }
         public bool AvailableToSuppliers { get; set; }
     }
 
-    public class Filters
+    [SwaggerModel]
+    public class ReportFilters
     {
         public List<string> BuyerID { get; set; }
         public List<string> Country { get; set; }
