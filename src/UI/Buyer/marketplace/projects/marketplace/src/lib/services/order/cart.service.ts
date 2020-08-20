@@ -46,7 +46,6 @@ export class CartService {
     this.lineItems.Items = this.lineItems.Items.filter(li => li.ID !== lineItemID);
     Object.assign(this.state.order, this.calculateOrder());
     try {
-      //  await LineItems.Delete('Outgoing', this.order.ID, lineItemID);
       await this.tempSdk.deleteLineItem(this.state.order.ID, lineItemID);
     } finally {
       this.state.reset();
