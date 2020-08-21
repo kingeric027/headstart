@@ -2,13 +2,11 @@ import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angu
 import { Variant, SpecOption, Spec, OcSpecService, OcProductService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
 import { environment } from 'src/environments/environment';
 import { AppAuthService } from '@app-seller/auth';
-import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 
 @Component({
@@ -222,6 +220,7 @@ export class ProductVariations {
         Name: `${this.superProductEditable.Product.ID} ${opt.Value}`,
         Active: true,
         xp: {
+          OcID: `${this.superProductEditable.Product.ID}-${opt.ID}`,
           SpecCombo: `${opt.ID}`,
           SpecValues:[{
             SpecName: spec.Name,
