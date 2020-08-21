@@ -68,7 +68,8 @@ export class CurrentUserService {
   }
 
   async refreshSupplier(supplierID): Promise<Supplier> {
-    this.mySupplier = await HeadStartSDK.Suppliers.GetMySupplier(supplierID);
+    const token = await this.ocTokenService.GetAccess();
+    this.mySupplier = await HeadStartSDK.Suppliers.GetMySupplier(supplierID, token);
     return this.mySupplier;
   }
 
