@@ -38,7 +38,7 @@ namespace ordercloud.integrations.cms
 
 		public static ListArgs<DocumentAssignmentDO> MapTo(this ListArgs<DocumentAssignment> args)
 		{
-			return args.MapTo<DocumentAssignment, DocumentAssignmentDO>(new Dictionary<string, string>()
+			return args.MapTo<DocumentAssignment, DocumentAssignmentDO>(new ListArgMap()
 			{
 				{"ResourceID", "RsrcID" },
 				{"ParentResourceID", "ParentRsrcID" },

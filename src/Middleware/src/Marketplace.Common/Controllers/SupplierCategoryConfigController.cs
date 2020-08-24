@@ -26,7 +26,7 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("/supplierfilterconfig"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.SupplierReader)]
         public async Task<ListPage<SupplierFilterConfigDocument>> Get()
         {
-            var config = await _query.List<SupplierFilterConfig>("SupplierFilterConfig", new ListArgs<dynamic>(), VerifiedUserContext);
+            var config = await _query.List<SupplierFilterConfig>("SupplierFilterConfig", new ListArgs<Document<SupplierFilterConfig>>(), VerifiedUserContext);
             return config.Reserialize<ListPage<SupplierFilterConfigDocument>>();
         }
     }

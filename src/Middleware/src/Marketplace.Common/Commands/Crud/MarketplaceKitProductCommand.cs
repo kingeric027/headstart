@@ -14,7 +14,7 @@ namespace Marketplace.Common.Commands.Crud
     public interface IMarketplaceKitProductCommand
     {
         Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user);
-        Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
+        Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Commands.Crud
             };
         }
 
-        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, VerifiedUserContext user)
         {
             var _kitProducts = await _query.List<KitProduct>("KitProduct", args, user);
             var _kitProductList = new List<MarketplaceKitProduct>();

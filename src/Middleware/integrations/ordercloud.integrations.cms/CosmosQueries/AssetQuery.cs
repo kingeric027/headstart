@@ -18,7 +18,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface IAssetQuery
 	{
-		Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user);
+		Task<ListPage<Asset>> List(ListArgs<Asset> args, VerifiedUserContext user);
 		Task<Asset> Get(string assetInteropID, VerifiedUserContext user);
 		Task<Asset> Create(AssetUpload form, VerifiedUserContext user);
 		Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user);
@@ -45,17 +45,18 @@ namespace ordercloud.integrations.cms
 			_config = config;
 		}
 
-		public async Task<ListPage<Asset>> List(IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<Asset>> List(ListArgs<Asset> args, VerifiedUserContext user)
 		{
+			var arguments = args.MapTo();
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var query = _assetStore.Query()
 				.Where(a => a.ContainerID == container.id)
-				.Search(args)
-				.Filter(args)
-				.Sort(args);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+				.Search(arguments)
+				.Filter(arguments)
+				.Sort(arguments);
+			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			var assets = list.ToListPage(args.Page, args.PageSize, count);
+			var assets = list.ToListPage(arguments.Page, arguments.PageSize, count);
 			return AssetMapper.MapTo(_config, assets);
 		}
 
