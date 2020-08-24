@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcTokenService, Order } from '@ordercloud/angular-sdk';
-import { SuperMarketplaceProduct, MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk';
+import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk';
+import { MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk';
 
 export interface SupplierFilterConfigDocument extends Document {
   Doc: SupplierFilterConfig;
@@ -36,7 +36,7 @@ export class MiddlewareAPIService {
     private ocTokenService: OcTokenService,
     private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async acknowledgeQuoteOrder(orderID: string): Promise<Order> {
     const url = `${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;

@@ -76,7 +76,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   public async getMyResource(): Promise<any> {
-    if(this.primaryResourceLevel === 'suppliers') {
+    if (this.primaryResourceLevel === 'suppliers') {
       return this.currentUserService.getMySupplier();
     }
   }
@@ -97,8 +97,8 @@ export abstract class ResourceCrudService<ResourceType> {
         // placeholder conditional for getting the supplier order list page running
         // will need to integrate this with the filter on the order list page as a seller
         // user and potentially refactor later
-        
-        options.filters = { 'xp.Type': 'Catalog'}
+
+        options.filters = { 'xp.Type': 'Catalog' }
       }
       const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
       if (pageNumber === 1) {
@@ -188,9 +188,9 @@ export abstract class ResourceCrudService<ResourceType> {
     const queryParams = this.activatedRoute.snapshot.queryParams;
     if (this.secondaryResourceLevel) {
       const parentResourceID = await this.getParentResourceID();
-      newUrl += this.router.url.startsWith('/my-') ? 
-      `${this.myRoute}/${this.secondaryResourceLevel}` : 
-      `${this.route}/${parentResourceID}/${this.secondaryResourceLevel}`;
+      newUrl += this.router.url.startsWith('/my-') ?
+        `${this.myRoute}/${this.secondaryResourceLevel}` :
+        `${this.route}/${parentResourceID}/${this.secondaryResourceLevel}`;
     } else {
       newUrl += `${this.route}`;
     }
@@ -205,7 +205,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async getParentResourceID(): Promise<string> {
-    if(this.isMyResource()) {
+    if (this.isMyResource()) {
       const myResource = await this.getMyResource();
       return myResource.ID;
     } else {
@@ -218,7 +218,8 @@ export abstract class ResourceCrudService<ResourceType> {
   async getResourceById(resourceID: string): Promise<any> {
     const orderDirection = this.optionsSubject.value.OrderDirection;
     const args = await this.createListArgs([resourceID], orderDirection);
-    return this.ocService.Get(...args).toPromise();
+    if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
+    else return this.ocService.Get(...args).toPromise();
   }
 
   async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
@@ -253,7 +254,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const newResource =  await this.ocService.Save(...args).toPromise()
+    const newResource = await this.ocService.Save(...args).toPromise()
     this.updateResourceSubject(newResource);
     return newResource;
   }
@@ -394,7 +395,9 @@ export abstract class ResourceCrudService<ResourceType> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
       const args = await this.createListArgs([options], orderDirection);
-      const resourceResponse = await this.list(args);
+      let resourceResponse;
+      if (this.primaryResourceLevel === 'kitproducts') { resourceResponse = await this.ocService.List(); }
+      else { resourceResponse = await this.list(args); }
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
     } catch (error) {
@@ -426,8 +429,8 @@ export abstract class ResourceCrudService<ResourceType> {
   getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resourceToUpdate: T): T {
     const updatedResourceCopy: any = this.copyResource(resourceToUpdate);
     const update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
-    if(resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
-      update.Product.Inventory.QuantityAvailable = null 
+    if (resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
+      update.Product.Inventory.QuantityAvailable = null
       update.Product.Inventory.OrderCanExceed = false;
     }
     return update;

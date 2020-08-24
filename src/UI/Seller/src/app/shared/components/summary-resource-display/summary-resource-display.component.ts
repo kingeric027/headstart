@@ -71,6 +71,7 @@ export class SummaryResourceDisplay implements OnChanges {
     @Inject(applicationConfiguration) private appConfig: AppConfig) {}
 
   setDisplayValuesForResource(resource: any) {
+    if (resource.ProductAssignments) resource = resource.Product;
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
     this._secondaryHeader = this.getValueOnExistingResource(resource, 'toSecondaryHeader');
     this._shouldShowImage = !!SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType].toImage;
