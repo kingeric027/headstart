@@ -337,6 +337,8 @@ export class KitsEditComponent implements OnInit {
     }
     async removeFile(file: Asset): Promise<void> {
         const accessToken = await this.appAuthService.fetchToken().toPromise();
+        // Remove the image assignment, then remove the image
+        await HeadStartSDK.Assets.DeleteAssetAssignment(file.ID, this.kitProductStatic.ID, 'Products', null, null, accessToken);
         await HeadStartSDK.Assets.Delete(file.ID, accessToken);
         if (file.Type === 'Image') {
             this.kitProductStatic.Images = this.kitProductStatic.Images.filter(i => i.ID !== file.ID);

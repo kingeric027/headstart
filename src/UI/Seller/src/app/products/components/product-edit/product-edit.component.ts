@@ -457,6 +457,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async removeFile(file: Asset): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
+    // Remove the image assignment, then remove the image
+    await HeadStartSDK.Assets.DeleteAssetAssignment(file.ID, this._superMarketplaceProductStatic.Product.ID, 'Products', null, null, accessToken);
     await HeadStartSDK.Assets.Delete(file.ID, accessToken);
     if (file.Type === 'Image') {
       this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
