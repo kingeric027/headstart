@@ -143,11 +143,16 @@
                 (click)="handleDiscardSpecChanges()"
                 class="btn btn-link text-dark"
                 translate>ADMIN.PRODUCT_EDIT.CANCEL</button>
-        <button *ngIf="editSpecs"
+        <button *ngIf="editSpecs && areSpecChanges"
                 class="btn btn-outline-dark"
                 [disabled]="!variantsValid"
                 (click)="toggleEditSpecs()"
-                translate>{{areSpecChanges ? 'ADMIN.PRODUCT_EDIT.SAVE_CHANGES' : 'ADMIN.PRODUCT_EDIT.DONE'}}</button>
+                translate>ADMIN.PRODUCT_EDIT.SAVE_CHANGES</button>
+        <button *ngIf="editSpecs && !areSpecChanges"
+                class="btn btn-outline-dark"
+                [disabled]="!variantsValid"
+                (click)="toggleEditSpecs()"
+                translate>ADMIN.PRODUCT_EDIT.DONE</button>
       </div>
     </div>
   </div>

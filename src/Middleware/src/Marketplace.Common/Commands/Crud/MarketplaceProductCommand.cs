@@ -291,7 +291,7 @@ namespace Marketplace.Common.Commands.Crud
 				// Patch NEW variants with the User Specified ID (Name,ID), and correct xp values (SKU)
 				await Throttler.RunAsync(superProduct.Variants, 100, 5, v =>
 				{
-					var oldVariantID = v.ID;
+					var oldVariantID = v.xp.OcID;
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
 					return _oc.Products.PatchVariantAsync(id, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
