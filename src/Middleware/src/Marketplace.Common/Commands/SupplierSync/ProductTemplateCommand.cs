@@ -159,6 +159,7 @@ namespace Marketplace.Common.Commands.SupplierSync
     {
     }
 
+    [SwaggerModel]
     public class TemplateProductFlat : IMarketplaceObject
     {
         [OrderCloud.SDK.Required]

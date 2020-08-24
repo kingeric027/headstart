@@ -55,7 +55,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("{reportType}"), OrderCloudIntegrationsAuth(ApiRole.AdminUserAdmin)]
-        public async Task<ReportTemplate> PostReportTemplate([FromBody] ReportTemplate reportTemplate)
+        public async Task<ReportTemplate> PostReportTemplate(ReportTypeEnum reportType, [FromBody] ReportTemplate reportTemplate)
         {
             RequireOneOf(CustomRole.MPReportReader);
             return await _reportDataCommand.PostReportTemplate(reportTemplate, VerifiedUserContext);
