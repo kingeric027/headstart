@@ -1,5 +1,6 @@
 import { Selector, t } from 'testcafe'
 import { createRegExp } from '../../helpers/regExp-helper'
+import loadingHelper from '../../helpers/loading-helper'
 
 class MinorResourcePage {
 	createButton: Selector
@@ -18,6 +19,7 @@ class MinorResourcePage {
 
 	async clickCreateButton() {
 		await t.click(this.createButton)
+		await loadingHelper.waitForLoadingBar()
 	}
 
 	async selectParentResourceDropdown(resource: string) {
@@ -29,10 +31,16 @@ class MinorResourcePage {
 			.find('span')
 			.withText(createRegExp(resource))
 		await t.click(vendorOption)
+		await loadingHelper.waitForLoadingBar()
 	}
 
 	async resourceExists(resouce: string) {
 		return await this.resourceList.withText(resouce).exists
+	}
+
+	async clickResource(resource: string) {
+		await t.click(this.resourceList.withText(resource))
+		await loadingHelper.waitForLoadingBar()
 	}
 }
 

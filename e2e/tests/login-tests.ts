@@ -33,7 +33,6 @@ test
 	const testUser: OrderCloudSDK.User = t.ctx.testUser
 	await loginPage.login(testUser.Username, testUser.Password)
 	await t.expect(getLocation()).contains('home')
-	await t.debug()
 	await headerPage.logout()
 	await t.expect(getLocation()).contains('login')
 	await t.expect(loginPage.submitButton.exists).ok()

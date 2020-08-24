@@ -40,23 +40,13 @@ export async function deleteUser(
 	})
 }
 
-export async function deleteVendorUser(
-	userID: string,
-	vendorID: string,
-	clientAuth: string
-) {
-	await OrderCloudSDK.SupplierUsers.Delete(vendorID, userID, {
-		accessToken: clientAuth,
-	})
-}
-
-export async function getVendorUserID(
+export async function getUserID(
 	username: string,
-	vendorID: string,
+	buyerID: string,
 	clientAuth: string
 ) {
-	const searchResponse = await OrderCloudSDK.SupplierUsers.List(
-		vendorID,
+	const searchResponse = await OrderCloudSDK.Users.List(
+		buyerID,
 		{
 			search: username,
 			searchOn: 'Username',

@@ -1,6 +1,7 @@
 import { Selector, t } from 'testcafe'
 import { createRegExp } from '../../helpers/regExp-helper'
 import randomString from '../../helpers/random-string'
+import loadingHelper from '../../helpers/loading-helper'
 
 class VendorDetailsPage {
 	activeToggle: Selector
@@ -20,7 +21,9 @@ class VendorDetailsPage {
 		this.standardProductTypeCheckbox = Selector('#Standard').parent()
 		this.USCountryCheckbox = Selector('#US').parent()
 		this.freightPOPToggle = Selector('#SyncFreightPop').parent()
-		this.createButton = Selector('button').withText(createRegExp('create'))
+		this.createButton = Selector('button')
+			.withText(createRegExp('create'))
+			.withAttribute('type', 'submit')
 	}
 
 	async createDefaultVendor() {
@@ -35,6 +38,8 @@ class VendorDetailsPage {
 		await t.click(this.standardProductTypeCheckbox)
 		await t.click(this.USCountryCheckbox)
 		await t.click(this.createButton)
+
+		await loadingHelper.thisWait()
 
 		return vendorName
 	}

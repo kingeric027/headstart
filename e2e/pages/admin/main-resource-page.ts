@@ -4,12 +4,14 @@ import { createRegExp } from '../../helpers/regExp-helper'
 class MainResourcePage {
 	createButton: Selector
 	resourceList: Selector
+	standardProductButton: Selector
 
 	constructor() {
 		this.createButton = Selector('button').withText(createRegExp('create'))
-		this.resourceList = Selector('table')
-			.find('tr')
-			.withAttribute('select', 'table-body-row')
+		this.resourceList = Selector('table').find('tr.selectable-row')
+		this.standardProductButton = Selector('button').withText(
+			createRegExp('standard product')
+		)
 	}
 
 	async clickCreateButton() {
@@ -18,6 +20,11 @@ class MainResourcePage {
 
 	async resourceExists(resource: string) {
 		return await this.resourceList.withText(resource).exists
+	}
+
+	async clickCreateNewStandardProduct() {
+		await t.click(this.createButton)
+		await t.click(this.standardProductButton)
 	}
 }
 

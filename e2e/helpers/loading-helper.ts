@@ -10,17 +10,32 @@ class LoadingHelper {
 	}
 
 	async waitForLoadingBar() {
-		await t
-			.expect(this.loadingBar.exists)
-			.notOk({ timeout: this.timeoutValue })
+		try {
+			await t
+				.expect(this.loadingBar.exists)
+				.notOk({ timeout: this.timeoutValue })
+		} catch (e) {
+			//do nothing
+		}
 	}
 
 	async waitForLoadingBarToExist() {
-		await t.expect(this.loadingBar.exists).ok({ timeout: this.timeoutValue })
+		try {
+			await t
+				.expect(this.loadingBar.exists)
+				.ok({ timeout: this.timeoutValue })
+		} catch (e) {
+			//do nothing
+		}
 	}
 
 	async waitForTwoLoadingBars() {
 		await this.waitForLoadingBar()
+		await this.waitForLoadingBarToExist()
+		await this.waitForLoadingBar()
+	}
+
+	async thisWait() {
 		await this.waitForLoadingBarToExist()
 		await this.waitForLoadingBar()
 	}

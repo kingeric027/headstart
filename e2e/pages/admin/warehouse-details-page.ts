@@ -2,6 +2,7 @@ import { Selector, t } from 'testcafe'
 import faker = require('faker')
 import { createRegExp } from '../../helpers/regExp-helper'
 import randomString from '../../helpers/random-string'
+import loadingHelper from '../../helpers/loading-helper'
 
 class WarehouseDetailsPage {
 	createButton: Selector
@@ -14,7 +15,9 @@ class WarehouseDetailsPage {
 	countryCodeField: Selector
 
 	constructor() {
-		this.createButton = Selector('button').withText(createRegExp('create'))
+		this.createButton = Selector('button')
+			.withText(createRegExp('create'))
+			.withAttribute('type', 'submit')
 		this.addressNameField = Selector('#AddressName')
 		this.companyNameField = Selector('input').withAttribute(
 			'formcontrolname',
@@ -41,6 +44,8 @@ class WarehouseDetailsPage {
 		await t.typeText(this.countryCodeField, 'US')
 
 		await t.click(this.createButton)
+
+		await loadingHelper.waitForTwoLoadingBars()
 
 		return addressName
 	}
