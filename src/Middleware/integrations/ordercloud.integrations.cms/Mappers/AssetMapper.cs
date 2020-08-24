@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
 {
@@ -67,6 +68,14 @@ namespace ordercloud.integrations.cms
 				Meta = listPage.Meta,
 				Items = MapTo(config, listPage.Items).ToList()
 			};
+		}
+
+		public static ListArgs<AssetDO> MapTo(this ListArgs<Asset> args)
+		{
+			return args.MapTo<Asset, AssetDO>(new ListArgMap()
+			{
+				{"ID", "InteropID" }
+			});
 		}
 	}
 }

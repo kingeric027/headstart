@@ -11,7 +11,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface ISchemaQuery
 	{
-		Task<ListPage<DocSchema>> List(IListArgs args, VerifiedUserContext user);
+		Task<ListPage<DocSchema>> List(ListArgs<DocSchema> args, VerifiedUserContext user);
 		Task<DocSchema> Get(string schemaInteropID, VerifiedUserContext user);
 		Task<DocSchema> Create(DocSchema schema, VerifiedUserContext user);
 		Task<DocSchema> Save(string schemaInteropID, DocSchema schema, VerifiedUserContext user);
@@ -32,16 +32,17 @@ namespace ordercloud.integrations.cms
 			_settings = settings;
 		}
 
-		public async Task<ListPage<DocSchema>> List(IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<DocSchema>> List(ListArgs<DocSchema> args, VerifiedUserContext user)
 		{
+			var arguments = args.MapTo();
 			var query = _store.Query()
 				.Where(s => s.SellerOrgID == user.SellerID)
-				.Search(args)
-				.Filter(args)
-				.Sort(args);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+				.Search(arguments)
+				.Filter(arguments)
+				.Sort(arguments);
+			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			var schemas = list.ToListPage(args.Page, args.PageSize, count);
+			var schemas = list.ToListPage(arguments.Page, arguments.PageSize, count);
 			return SchemaMapper.MapTo(schemas);
 		}
 

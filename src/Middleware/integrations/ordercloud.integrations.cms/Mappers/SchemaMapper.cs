@@ -45,5 +45,13 @@ namespace ordercloud.integrations.cms
 				Items = MapTo(listPage.Items).ToList()
 			};
 		}
+
+		public static ListArgs<DocSchemaDO> MapTo(this ListArgs<DocSchema> args)
+		{
+			return args.MapTo<DocSchema, DocSchemaDO>(new ListArgMap()
+			{
+				{"ID", "InteropID" }
+			});
+		}
 	}
 }

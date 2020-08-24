@@ -16,7 +16,7 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentQuery
 	{
-		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user);
+		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, ListArgs<Document<T>> args, VerifiedUserContext user);
 		Task<Document<T>> Get<T>(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 		Task<Document<T>> Create<T>(string schemaInteropID, Document<T> document, VerifiedUserContext user);
 		Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
@@ -44,17 +44,18 @@ namespace ordercloud.integrations.cms
 			return await _store.FindMultipleAsync(documentIDs, args);
 		}
 
-		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, ListArgs<Document<T>> args, VerifiedUserContext user)
 		{
+			var arguments = args.MapTo();
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var query = _store.Query()
-				.Search(args)
-				.Filter(args)
-				.Sort(args)
+				.Search(arguments)
+				.Filter(arguments)
+				.Sort(arguments)
 				.Where(doc => doc.SchemaID == schema.id && doc.SellerOrgID == user.SellerID);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			var documents = list.ToListPage(args.Page, args.PageSize, count);
+			var documents = list.ToListPage(arguments.Page, arguments.PageSize, count);
 			return DocumentMapper.MapTo<T>(documents);
 		}
 
