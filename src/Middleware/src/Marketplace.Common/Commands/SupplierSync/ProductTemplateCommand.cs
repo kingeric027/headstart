@@ -180,7 +180,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         [OrderCloud.SDK.Required]
         public string TaxCode { get; set; }
         public string TaxDescription { get; set; }
-        public int UnitOfMeasureQty { get; set; }
+        public int UnitOfMeasureQuantity { get; set; }
         public string UnitOfMeasure { get; set; }
         public bool IsResale { get; set; }
         public bool ApplyTax { get; set; }

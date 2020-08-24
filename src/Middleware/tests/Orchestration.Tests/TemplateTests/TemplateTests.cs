@@ -186,7 +186,7 @@ namespace Orchestration.Tests
                 TaxCategory = Guid.NewGuid().ToString(),
                 TaxCode = Guid.NewGuid().ToString(),
                 TaxDescription = Guid.NewGuid().ToString(),
-                UnitOfMeasureQty = random.Next(1, 5)
+                UnitOfMeasureQuantity = random.Next(1, 5)
             };
         }
 
