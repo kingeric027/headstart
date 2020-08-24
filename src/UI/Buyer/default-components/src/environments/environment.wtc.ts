@@ -6,16 +6,16 @@ import { Environment } from './env.interface';
 import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
-  hostedApp: false,
-  appname: 'Marketplace Local',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  hostedApp: true,
+  appname: 'Wax In The City',
+  clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB',
-  baseUrl: 'https://localhost:4200',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
-  ordercloudEnv: OrdercloudEnv.Staging,
+  ordercloudEnv: OrdercloudEnv.Production,
   theme: wtcTheme,
 };
 /*

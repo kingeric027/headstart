@@ -6,16 +6,16 @@ import { Environment } from './env.interface';
 import bmTheme from '../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
-  hostedApp: false,
-  appname: 'Marketplace Local',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  hostedApp: true,
+  appname: 'The Barre Method',
+  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
-  baseUrl: 'https://localhost:4200',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
-  ordercloudEnv: OrdercloudEnv.Staging,
+  ordercloudEnv: OrdercloudEnv.Production,
   theme: bmTheme,
 };
 /*
