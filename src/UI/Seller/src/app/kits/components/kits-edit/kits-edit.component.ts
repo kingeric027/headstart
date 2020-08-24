@@ -3,8 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { AppAuthService } from '@app-seller/auth';
 import { KitService } from '@app-seller/kits/kits.service';
 import { faCircle, faHeart, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { ListAddress, Product } from '@ordercloud/angular-sdk';
-import { HeadStartSDK, Asset, AssetUpload, ListPage } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, Asset, AssetUpload, ListPage, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { Router } from '@angular/router';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -44,7 +43,7 @@ export class KitsEditComponent implements OnInit {
     areChanges = false;
     productAssignments: ProductInKit[] = [];
     productsIncluded: any[] = [];
-    productList: ListPage<Product>;
+    productList: ListPage<SuperMarketplaceProduct>;
     productsToAdd: string[] = [];
     newProductAssignments: ProductInKit[] = [];
     imageFiles: FileHandle[] = [];
@@ -75,7 +74,7 @@ export class KitsEditComponent implements OnInit {
         });
     }
 
-    async getProductList(args?: ListArgs): Promise<ListPage<Product>> {
+    async getProductList(args?: ListArgs): Promise<ListPage<SuperMarketplaceProduct>> {
         this.isLoading = true;
         const accessToken = await this.appAuthService.fetchToken().toPromise();
         const productList = args ? await HeadStartSDK.Products.List(args, accessToken) : await HeadStartSDK.Products.List({}, accessToken);
