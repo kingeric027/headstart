@@ -1,6 +1,8 @@
-﻿using OrderCloud.SDK;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,11 +50,12 @@ namespace Marketplace.Common.Commands
         {
             var curPromos = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
             var removeQueue = new List<Task>();
-            foreach (var promo in curPromos.Items)
+
+            await Throttler.RunAsync(curPromos.Items, 100, 5, promo =>
             {
-                removeQueue.Add(_oc.Orders.RemovePromotionAsync(OrderDirection.Incoming, orderID, promo.Code));
-            }
-            await Task.WhenAll(removeQueue);
+                return _oc.Orders.RemovePromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
+
+            });
         }
     }
 }
