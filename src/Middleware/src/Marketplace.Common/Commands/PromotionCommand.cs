@@ -41,6 +41,8 @@ namespace Marketplace.Common.Commands
             var autoEligablePromos = await _oc.Promotions.ListAsync(filters: "xp.Automatic=true");
             await Throttler.RunAsync(autoEligablePromos.Items, 100, 5, promo =>
             {
+                //  Not useing the sdk here because we need to ignore errors on promos that are not able to be 
+                //  applied to the order. We need to try this request on every automatic promo.
                 return $"{_settings.OrderCloudSettings.ApiUrl}/v1/orders/Incoming/{orderID}/promotions/{promo.Code}"
                     .WithOAuthBearerToken(ocAuth.AccessToken)
                     .AllowAnyHttpStatus().PostAsync(null);
