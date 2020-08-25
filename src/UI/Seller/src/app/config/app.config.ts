@@ -81,7 +81,7 @@ export const ocAppConfig: AppConfig = {
     'MPMeSupplierAddressAdmin',
     'MPMeSupplierUserAdmin',
     'MPSupplierUserGroupAdmin',
-    'MPStoreFrontAdmin',
+    'MPStorefrontAdmin',
   ] as ApiRole[],
   impersonatingBuyerScope: [
     'MeAddressAdmin',
