@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk';
-import { ListArgs } from '@ordercloud/headstart-sdk';
+import { ListArgs, MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { AppConfig, MarketplaceMeProduct, SupplierFilterConfigDocument } from '../../shopper-context';
 import { ListPage } from '@ordercloud/headstart-sdk';
 
@@ -61,5 +61,11 @@ export class TempSdk {
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/lineitems/${lineItemID}`;
     return await this.http
       .delete<void>(url, { headers: this.buildHeaders()}).toPromise();
+  }
+
+  async applyAutomaticPromotionsToOrder(orderID: string): Promise<MarketplaceOrder> {
+    const url = `${this.appConfig.middlewareUrl}/order/${orderID}/applypromotions`;
+    return await this.http
+      .post<MarketplaceOrder>(url, { headers: this.buildHeaders()}).toPromise();
   }
 }

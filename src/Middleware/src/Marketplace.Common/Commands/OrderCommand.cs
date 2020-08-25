@@ -20,6 +20,7 @@ namespace Marketplace.Common.Commands
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
+        Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
     }
 
@@ -30,14 +31,16 @@ namespace Marketplace.Common.Commands
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
         private readonly IMeProductCommand _meProductCommand;
+        private readonly IPromotionCommand _promotionCommand;
         
-        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
+        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
             _meProductCommand = meProductCommand;
+            _promotionCommand = promotionCommand;
 		}
 
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
@@ -123,6 +126,12 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
         {
             var orderPromo = await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promoCode);
+            return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+        }
+
+        public async Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID)
+        {
+            await _promotionCommand.AutoApplyPromotions(orderID);
             return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
         }
 

@@ -87,5 +87,12 @@ namespace Marketplace.Common.Controllers
         {
             return await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, orderID, lineItemStatusChanges, VerifiedUserContext);
         }
+
+        [DocName("Apply Automatic Promtions to order and remove promotions no longer valid on order")]
+        [HttpPost, Route("{orderID}/applypromotions")]
+        public async Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID)
+        {
+            return await _command.ApplyAutomaticPromotions(orderID);
+        }
     }
 }
