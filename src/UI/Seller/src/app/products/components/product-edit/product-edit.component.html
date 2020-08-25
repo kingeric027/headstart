@@ -758,17 +758,6 @@
                 type="submit"
                 [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
-        <div>
-          <span>
-            {{productForm?.status | json}}
-          </span>
-          <span>
-            {{!variantsValid | json}}
-          </span>
-          <span>
-            {{dataIsSaving | json}}
-          </span>
-        </div>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
                 *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
