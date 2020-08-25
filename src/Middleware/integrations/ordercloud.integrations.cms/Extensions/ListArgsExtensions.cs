@@ -16,13 +16,13 @@ namespace ordercloud.integrations.cms
 				PageSize = args.PageSize,
 				Search = args.Search,
 				SearchOn = args.SearchOn == null ? null : propertyMap[args.SearchOn],
-				SortBy = args.SortBy.Select(s =>
+				SortBy = args.SortBy == null ? null : args.SortBy.Select(s =>
 				{
 					var property = s.TrimStart('!');
 					s.Replace(property, propertyMap[property]);
 					return s;
 				}).ToList(),
-				Filters = args.Filters.Select(f =>
+				Filters = args.Filters == null ? null : args.Filters.Select(f =>
 				{
 					f.Name = propertyMap[f.Name];
 					f.QueryParams = f.QueryParams.Select(qp => new Tuple<string, string>(propertyMap[qp.Item1], qp.Item2)).ToList();
