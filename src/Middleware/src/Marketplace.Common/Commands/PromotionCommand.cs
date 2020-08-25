@@ -1,3 +1,5 @@
+using Flurl.Http;
+using NPOI.OpenXmlFormats.Wordprocessing;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
@@ -16,9 +18,11 @@ namespace Marketplace.Common.Commands
     public class PromotionCommand : IPromotionCommand
     {
         private readonly IOrderCloudClient _oc;
-        public PromotionCommand(IOrderCloudClient oc)
+        private readonly AppSettings _settings;
+        public PromotionCommand(IOrderCloudClient oc, AppSettings settings)
         {
             _oc = oc;
+            _settings = settings;
         }
 
         public async Task AutoApplyPromotions(string orderID)
@@ -32,18 +36,15 @@ namespace Marketplace.Common.Commands
                 await RemoveOrderPromotions(orderID);
             }
 
+            var ocAuth = await _oc.AuthenticateAsync();
+
             var autoEligablePromos = await _oc.Promotions.ListAsync(filters: "xp.Automatic=true");
-            foreach (var promo in autoEligablePromos.Items)
+            await Throttler.RunAsync(autoEligablePromos.Items, 100, 5, promo =>
             {
-                try
-                {
-                    await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
-                }
-                catch
-                {
-                    continue;
-                }
-            }
+                return $"{_settings.OrderCloudSettings.ApiUrl}/v1/orders/Incoming/{orderID}/promotions/{promo.Code}"
+                    .WithOAuthBearerToken(ocAuth.AccessToken)
+                    .AllowAnyHttpStatus().PostAsync(null);
+            });
         }
 
         private async Task RemoveOrderPromotions(string orderID)
