@@ -93,6 +93,9 @@ namespace Marketplace.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SizeTier
     {
+        // ships alone
+        G,
+        
         //2-5
         A,
 
@@ -108,8 +111,9 @@ namespace Marketplace.Models
         // 100-999
         E,
 
-        // 100+
+        // 1000+
         F
+
     }
 
     [SwaggerModel]

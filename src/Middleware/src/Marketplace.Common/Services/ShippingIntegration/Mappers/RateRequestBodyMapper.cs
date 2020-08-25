@@ -62,14 +62,14 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 
         private static List<Item> MapLineItemsIntoPackages(List<MarketplaceLineItem> lineItems)
         {
-            var lineItemsBySizeDescending = lineItems.OrderBy(lineItem => lineItem.Product.xp.SizeTier);
+            var lineItemsCanCombineBySizeDescending = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
 
             // tuple item1 = percent filled, item 2 = weight
             var packageContents = new List<Tuple<decimal, decimal>>();
             var currentPercentFilled = 0M;
             var currentWeight = 0M;
 
-            foreach (var lineItem in lineItems)
+            foreach (var lineItem in lineItemsCanCombineBySizeDescending)
             {
                 var i = 0;
                 var percentByQuantity = SIZE_FACTOR_MAP[lineItem.Product.xp.SizeTier];
@@ -96,7 +96,9 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
 
             var packages = packageContents.Select(packageContents => GetSideLengthAndWeight(packageContents));
 
-            return packages.Select((package, index) =>
+
+
+            var combinationPackages = packages.Select((package, index) =>
             {
                 return new Item()
                 {
@@ -112,6 +114,24 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
                 };
             }).ToList();
 
+            var individualLineItems = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
+            var individualPackages = individualLineItems.Select(li =>
+            {
+                return new Item()
+                {
+                    Weight = li.Product.ShipWeight ?? 0,
+                    Length = li.Product.ShipLength ?? 0,
+                    Width = li.Product.ShipWidth ?? 0,
+                    Height = li.Product.ShipHeight ?? 0,
+                    Quantity = li.Quantity,
+                    PackageId = li.ID,
+                    PackageType = PackageType.Box,
+                    FreightClass = 1,
+                    Unit = Unit.lbs_inch
+                };
+            });
+
+            return combinationPackages.Union(individualPackages).ToList();
         }
 
         private static Tuple<int, decimal> GetSideLengthAndWeight(Tuple<decimal, decimal> packageContents)
