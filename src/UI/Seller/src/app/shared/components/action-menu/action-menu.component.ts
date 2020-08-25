@@ -35,6 +35,8 @@ export class ActionMenuComponent {
   executeSaveAction = new EventEmitter<void>();
   @Output()
   executeDiscardAction = new EventEmitter<void>();
+  @Output()
+  executeDelete = new EventEmitter<void>();
 
   showConfirm = false;
 
@@ -69,5 +71,9 @@ export class ActionMenuComponent {
       return this.saveTextOverride;
     }
     return this.isCreatingNew ? 'ADMIN.DELETE.CREATE' : 'ADMIN.DELETE.SAVE_CHANGES';
+  }
+
+  handleDelete(): void {
+    this.executeDelete.emit();
   }
 }

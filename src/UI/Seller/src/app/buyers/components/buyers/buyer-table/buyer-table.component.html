@@ -17,6 +17,7 @@
   <app-buyer-edit 
     class="resource-edit"
     [labelSingular]="'ALIAS.BUYER'"
-    [orderCloudBuyer]="resourceInSelection">
+    [orderCloudBuyer]="resourceInSelection"
+    (resourceDelete)="deleteResource()">
   </app-buyer-edit>
 </resource-table-component>
