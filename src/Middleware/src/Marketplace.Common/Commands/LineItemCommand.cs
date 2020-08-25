@@ -349,7 +349,6 @@ namespace Marketplace.Common.Commands
             var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
             if (preExistingLi != null)
             {
-                //await _oc.LineItems.SaveAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID);
                 li = await _oc.LineItems.SaveAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, preExistingLi.ID, liReq);
             } else
             {
