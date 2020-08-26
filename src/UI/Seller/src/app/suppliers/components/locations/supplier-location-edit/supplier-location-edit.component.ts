@@ -34,7 +34,7 @@ export class SupplierLocationEditComponent implements OnChanges {
     if (supplierLocation.ID) {
       this.handleSelectedLocationChange(supplierLocation);
     } else {
-      this.handleSelectedLocationChange(this.supplierLocationSerivce.emptyResource);
+      this.handleSelectedLocationChange(this.supplierLocationService.emptyResource);
     }
   }
   @Input()
@@ -51,7 +51,7 @@ export class SupplierLocationEditComponent implements OnChanges {
   constructor(
     private middleware: MiddlewareAPIService,
     private activatedRoute: ActivatedRoute,
-    private supplierLocationSerivce: SupplierAddressService
+    private supplierLocationService: SupplierAddressService
   ) {
     this.countryOptions = GeographyConfig.getCountries();
   }
