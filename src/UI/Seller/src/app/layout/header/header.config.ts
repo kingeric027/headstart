@@ -42,8 +42,14 @@ const Promotions: MPRoute = {
   route: '/promotions',
 };
 
+const Kits: MPRoute = {
+  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+  title: 'Kits',
+  route: '/kitproducts',
+};
+
 const ProductFacets: MPRoute = {
-  rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
   title: 'ADMIN.NAV.FACETS',
   route: '/facets',
 };
@@ -52,7 +58,7 @@ const ProductNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
   title: 'ADMIN.NAV.PRODUCTS',
   route: '/products',
-  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets],
+  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets, Kits],
 };
 
 // Orders
@@ -221,7 +227,7 @@ const SellerUsers = {
 };
 
 const Storefronts = {
-  rolesWithAccess: [MPRoles.MPStoreFrontAdmin],
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
   title: 'ADMIN.NAV.STOREFRONTS',
   route: '/storefronts',
 };
@@ -234,7 +240,7 @@ const MySupplierProfile = {
 
 const MySupplierLocations = {
   rolesWithAccess: [MPRoles.MPMeSupplierAddressAdmin],
-  title: 'ADMIN.NAV.LOCATIONS',
+  title: 'ALIAS.SUPPLIER_LOCATIONS',
   route: '/my-supplier/locations',
 };
 

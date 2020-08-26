@@ -28,7 +28,7 @@ export const MPRoles = {
   MPMeSupplierAddressAdmin: 'MPMeSupplierAddressAdmin',
   MPMeSupplierUserAdmin: 'MPMeSupplierUserAdmin',
   MPReportReader: 'MPReportReader',
-  MPStoreFrontAdmin: 'MPStoreFrontAdmin',
+  MPStorefrontAdmin: 'MPStorefrontAdmin',
 };
 
 const OrderCloudRoles = {
@@ -230,10 +230,10 @@ const MPReportReader: MPRole = {
   RoleName: MPRoles.MPReportReader,
   OrderCloudRoles: [],
 };
-const MPStoreFrontAdmin: MPRole = {
-  RoleName: MPRoles.MPStoreFrontAdmin,
+const MPStorefrontAdmin: MPRole = {
+  RoleName: MPRoles.MPStorefrontAdmin,
   OrderCloudRoles: [OrderCloudRoles.ProductFacetAdmin, OrderCloudRoles.ProductFacetReader],
-}
+};
 
 interface UserType {
   Name: string;
@@ -250,7 +250,7 @@ const MarketPlaceManager = {
     MPSellerAdmin,
     MPSupplierAdmin,
     MPMeSupplierAdmin,
-    MPStoreFrontAdmin
+    MPStorefrontAdmin,
   ],
 };
 

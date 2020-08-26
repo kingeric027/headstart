@@ -190,7 +190,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         Active: new FormControl(superMarketplaceProduct.Product.Active),
         Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
         ID: new FormControl(superMarketplaceProduct.Product.ID),
-        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(1000)),
+        Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(2000)),
         Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
         ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
@@ -457,6 +457,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async removeFile(file: Asset): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
+    // Remove the image assignment, then remove the image
+    await HeadStartSDK.Assets.DeleteAssetAssignment(file.ID, this._superMarketplaceProductStatic.Product.ID, 'Products', null, null, accessToken);
     await HeadStartSDK.Assets.Delete(file.ID, accessToken);
     if (file.Type === 'Image') {
       this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 

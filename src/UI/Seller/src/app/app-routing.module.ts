@@ -16,6 +16,10 @@ const routes: Routes = [
         loadChildren: () => import('./products/products.module').then(m => m.ProductsModule),
       },
       {
+        path: 'kitproducts',
+        loadChildren: () => import('./kits/kits.module').then(m => m.KitsModule),
+      },
+      {
         path: 'promotions',
         loadChildren: () => import('./promotions/promotions.module').then(m => m.PromotionsModule),
       },
@@ -59,4 +63,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

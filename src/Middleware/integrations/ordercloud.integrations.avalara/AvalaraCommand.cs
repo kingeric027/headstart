@@ -105,23 +105,9 @@ namespace ordercloud.integrations.avalara
 
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
-			var items = orderWorksheet.LineItems;
-			var shipments = orderWorksheet.ShipEstimateResponse.ShipEstimates;
-			var builder = new TransactionBuilder(_avaTax, _companyCode, docType, GetCustomerCode(orderWorksheet.Order));
-			builder.WithTransactionCode(orderWorksheet.Order.ID);
-			foreach (var shipment in shipments)
-			{
-				var (shipFrom, shipTo) = shipment.GetAddresses(items);
-				var method = shipment.GetSelectedShippingMethod();
-				builder.WithShippingRate(method, shipFrom, shipTo);
-			}
-
-			foreach (var lineItem in items) builder.WithLineItem(lineItem);
-
-			var transaction = await builder.CreateAsync();
+			var createTransactionModel = orderWorksheet.ToAvalaraTransationModel(_companyCode, docType);
+			var transaction = await _avaTax.CreateTransactionAsync("", createTransactionModel);
 			return transaction;
 		}
-
-		private string GetCustomerCode(Order order) => order.FromCompanyID;
 	}
 }

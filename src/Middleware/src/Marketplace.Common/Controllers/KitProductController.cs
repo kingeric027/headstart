@@ -6,6 +6,7 @@ using ordercloud.integrations.library;
 using Marketplace.Models;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Models.Marketplace;
+using ordercloud.integrations.cms;
 
 namespace Marketplace.Common.Controllers
 {
@@ -34,7 +35,7 @@ namespace Marketplace.Common.Controllers
         }
         [DocName("LIST Kit Product")]
         [HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args)
+        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }

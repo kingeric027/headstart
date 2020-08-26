@@ -2,24 +2,8 @@ import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
 import { Address, ListPage } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { ValidatePhone, ValidateUSZip } from '@app-seller/validators/validators';
 import { SupplierAddressService } from '../supplier-address.service';
 import { SupplierService } from '../../suppliers/supplier.service';
-
-function createSupplierLocationForm(supplierLocation: Address) {
-  return new FormGroup({
-    AddressName: new FormControl(supplierLocation.AddressName, Validators.required),
-    CompanyName: new FormControl(supplierLocation.CompanyName, Validators.required),
-    Street1: new FormControl(supplierLocation.Street1, Validators.required),
-    Street2: new FormControl(supplierLocation.Street2),
-    City: new FormControl(supplierLocation.City, Validators.required),
-    State: new FormControl(supplierLocation.State, Validators.required),
-    Zip: new FormControl(supplierLocation.Zip, [Validators.required, ValidateUSZip]),
-    Country: new FormControl(supplierLocation.Country, Validators.required),
-    Phone: new FormControl(supplierLocation.Phone, ValidatePhone),
-  });
-}
 
 @Component({
   selector: 'app-supplier-location-table',
@@ -39,7 +23,7 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
     private supplierService: SupplierService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, supplierAddressService, router, activatedroute, ngZone, createSupplierLocationForm);
+    super(changeDetectorRef, supplierAddressService, router, activatedroute, ngZone);
   }
 
   handleAddressSelect(address) {
@@ -64,9 +48,10 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
       this.suggestedAddresses = null;
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex?.response?.data);
+      throw ex?.response?.data?.Message;
+    } finally {
       this.dataIsSaving = false;
-      throw ex;
     }
   }
 
@@ -78,9 +63,10 @@ export class SupplierLocationTableComponent extends ResourceCrudComponent<Addres
       this.suggestedAddresses = null;
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex);
+      this.suggestedAddresses = this.ocService.getSuggestedAddresses(ex?.response?.data);
+      throw ex?.response?.data?.Message;
+    } finally {
       this.dataIsSaving = false;
-      throw ex;
     }
   }
 }

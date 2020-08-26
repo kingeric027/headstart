@@ -32,8 +32,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("POST FlatProducts")]
+        [DocIgnore]
         [HttpPost, Route("templateproducts"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<List<TemplateProductFlat>> PostTemplateFlatProduct([FromBody] List<TemplateProductFlat> obj)
+        public async Task<List<TemplateProductFlat>> PostTemplateFlatProducts([FromBody] List<TemplateProductFlat> obj)
         {
             var result = await Throttler.RunAsync(obj, 100, 100, p => _command.SaveToQueue(p, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID));
             return result.ToList();

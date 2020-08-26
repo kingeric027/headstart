@@ -27,6 +27,7 @@ namespace Marketplace.Models.Models.Marketplace
         public List<SupplierCategory> Categories { get; set; }
     }
 
+    [SwaggerModel]
     public class SupplierCategory
     {
         public string ServiceCategory { get; set; }

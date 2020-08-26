@@ -30,6 +30,8 @@ export class BuyerEditComponent {
       this.refreshBuyerData(this.buyerService.emptyResource);
     }
   }
+  @Output()
+  resourceDelete = new EventEmitter<any>();
 
   constructor(
     private buyerService: BuyerService,
@@ -112,5 +114,9 @@ export class BuyerEditComponent {
       this.dataIsSaving = false;
       throw ex;
     }
+  }
+
+  deleteBuyer(): void {
+    this.resourceDelete.emit();
   }
 }

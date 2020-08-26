@@ -386,7 +386,7 @@
                       <div class="card-body d-flex flex-column justify-content-between bg-light">
                         <h5 class="card-title"
                             title="_superMarketplaceProductEditable?.Product?.Name">{{_superMarketplaceProductEditable?.Product?.Name}}</h5><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.ID}}</small>
-                        <p class="card-text">{{_superMarketplaceProductEditable?.Product?.DefaultSupplierID}}</p>
+                        <p class="card-text">{{_superMarketplaceProductEditable?.Product?.xp?.Facets?.supplier && _superMarketplaceProductEditable?.Product?.xp?.Facets?.supplier[0]}}</p>
                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                           <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: supplierCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
                                  for="quantity"
@@ -460,7 +460,7 @@
                   <div>
                     <p *ngIf="!productForm.controls['Description'].value">This product has no description.</p>
                   </div>
-                  <div [innerHtml]="productForm.controls['Description'].value"></div>
+                  <div [innerHtml]="productForm.controls['Description'].value | safeHTML"></div>
                   <hr />
                   <h6 class="font-weight-medium"
                       translate>ADMIN.PRODUCT_EDIT.MESSAGE_PREVIEW</h6>

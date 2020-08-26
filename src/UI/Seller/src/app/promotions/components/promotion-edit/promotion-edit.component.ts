@@ -59,18 +59,18 @@ export class PromotionEditComponent implements OnInit {
 
   refreshPromoData(promo: Promotion<PromotionXp>): void {
     const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm');
-    promo.ExpirationDate ? (this.isExpired = Date.parse(promo.ExpirationDate) < Date.parse(now)) : (this.isExpired = false);
+    this.isExpired = promo.ExpirationDate ? (Date.parse(promo.ExpirationDate) < Date.parse(now)) : false;
     // Modify the datetime to work with the UI
-    promo.StartDate && (promo.StartDate = moment(promo.StartDate).format('YYYY-MM-DD[T]hh:mm'));
+    if(promo.StartDate) promo.StartDate = moment(promo.StartDate).format('YYYY-MM-DD[T]hh:mm');
     if (promo.ExpirationDate) {
       this.hasExpiration = true;
       promo.ExpirationDate = promo.ExpirationDate = moment(promo.ExpirationDate).format('YYYY-MM-DD[T]hh:mm');
     } else {
       this.hasExpiration = false;
     }
-    promo.RedemptionLimit ? this.hasRedemptionLimit = true : this.hasRedemptionLimit = false;
-    promo.RedemptionLimitPerUser ? this.limitPerUser = true : this.limitPerUser = false;
-    promo.xp?.MaxShipCost ? this.capShipCost = true : this.capShipCost = false;
+    this.hasRedemptionLimit = promo.RedemptionLimit ? true : false;
+    this.limitPerUser = promo.RedemptionLimitPerUser ? true : false;
+    this.capShipCost = promo.xp?.MaxShipCost ? true : false;
     this._promotionEditable = JSON.parse(JSON.stringify(promo));
     this._promotionStatic = JSON.parse(JSON.stringify(promo));
     this.createPromotionForm(promo);
@@ -102,6 +102,7 @@ export class PromotionEditComponent implements OnInit {
       StartDate: new FormControl(promotion.StartDate, Validators.required),
       ExpirationDate: new FormControl(promotion.ExpirationDate),
       CanCombine: new FormControl(promotion.CanCombine),
+      Automatic: new FormControl(_get(promotion, 'xp.Automatic')),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
       MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
       MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int'), Validators.min(0)),
@@ -120,7 +121,8 @@ export class PromotionEditComponent implements OnInit {
     const promoUpdate = {
       field,
       value:
-        (field === 'Type' || field === 'CanCombine') ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
+        ['Type', 'CanCombine', 'xp.Automatic'].includes(field) ? 
+          event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
     };
     this.updatePromoResource(promoUpdate);
   }
