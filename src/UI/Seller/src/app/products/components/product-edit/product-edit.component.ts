@@ -31,6 +31,7 @@ import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
 import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
 import { takeWhile } from 'rxjs/operators';
+import { SizerTiers, SizerTiersDescriptionMap } from './size-tier.constants';
 
 @Component({
   selector: 'app-product-edit',
@@ -96,6 +97,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
   availableProductTypes = [];
+  availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
   constructor(
@@ -194,9 +196,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
         ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
-        ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight, [Validators.required, Validators.min(0)]),
-        ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth, [Validators.required, Validators.min(0)]),
-        ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength, [Validators.required, Validators.min(0)]),
+        ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight),
+        ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth),
+        ShipLength: new FormControl(superMarketplaceProduct.Product.ShipLength),
         ShipWeight: new FormControl(superMarketplaceProduct.Product.ShipWeight, [Validators.required, Validators.min(0)]),
         Price: new FormControl(_get(superMarketplaceProduct.PriceSchedule, 'PriceBreaks[0].Price', null), Validators.required),
         MinQuantity: new FormControl(superMarketplaceProduct.PriceSchedule?.MinQuantity, Validators.min(1)),
@@ -211,6 +213,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
+        SizeTier: new FormControl(_get(superMarketplaceProduct.Product, 'xp.SizeTier')),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
       }, { validators: ValidateMinMax }
       );
@@ -234,7 +237,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   setNonRequiredFields(): void {
-    const optionalFieldsArray = ['TaxCodeCategory','TaxCode','ShipLength', 'ShipWidth', 'ShipHeight', 'ShipWeight', 'ShipFromAddressID', 'Price'];
+    const optionalFieldsArray = ['TaxCodeCategory','TaxCode', 'ShipWeight', 'ShipFromAddressID', 'Price'];
     const optionalControls = optionalFieldsArray.map(item => this.productForm.get(item))
     this.productForm.get('ProductType').valueChanges
     .pipe(takeWhile(() => this.alive)).subscribe(productType => {
@@ -260,24 +263,31 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   productDetailsTabIsValid(): boolean {
-    const requiredAndValid: string[] = Object.keys(this.productForm.controls).filter((k: string) => k !== 'Price' && this.isRequired(k) && this.productForm.controls[k].valid);
-    return requiredAndValid.sort().toString() === Object.keys(this.productForm.controls).filter((k: string) => k !== 'Price' && this.isRequired(k)).sort().toString();
+    return this.isShippingValid() && this.unitOfMeasureValid() && this.productForm.controls.Name.valid &&this.productForm.controls.TaxCodeCategory.valid &&
+      this.productForm.controls.TaxCode.valid;
   }
 
-  // TODO: I'm sure there is a way to DRY this up
-  shipDimensionsValid(): boolean {
-    if (this.productForm.controls.ProductType.value === 'Quote') return false;
-    return this.isCreatingNew 
-      && this.isRequired('ShipLength') 
-      && this.isRequired('ShipWidth') 
-      && this.isRequired('ShipHeight') 
-      && this.isRequired('ShipWeight') 
-      && this.isRequired('ShipFromAddressID')
-      && this.productForm.controls.ShipLength.valid
-      && this.productForm.controls.ShipWidth.valid
-      && this.productForm.controls.ShipHeight.valid
-      && this.productForm.controls.ShipWeight.valid
-      && this.productForm.controls.ShipFromAddressID.valid
+  isShippingValid(): boolean {
+    if (this.productForm.controls.ProductType.value === 'Quote') return true;
+
+    const sizeTier = this.productForm.controls.SizeTier.value;
+
+    const formControls = this.productForm.controls;
+    const hasAlwaysRequiredFields = formControls.ShipFromAddressID.valid && formControls.SizeTier.valid &&
+     formControls.ShipWeight.valid && sizeTier;
+
+    if(!hasAlwaysRequiredFields) {
+      return false;
+    }
+
+    if(sizeTier === 'G') {
+      const hasDimensions = formControls.ShipWidth.valid && formControls.ShipHeight.valid && formControls.ShipLength.valid; 
+      return hasDimensions;
+    } else {
+      return true
+    }
+
+    return this.productForm.controls.ShipFromAddressID.valid && this.productForm.controls.SizeTier.valid
   }
 
   unitOfMeasureValid(): boolean {
