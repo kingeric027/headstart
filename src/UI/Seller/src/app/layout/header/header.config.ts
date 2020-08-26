@@ -46,7 +46,7 @@ const Kits: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
   title: 'Kits',
   route: '/kitproducts',
-}
+};
 
 const ProductFacets: MPRoute = {
   rolesWithAccess: [MPRoles.MPStorefrontAdmin],
@@ -240,7 +240,7 @@ const MySupplierProfile = {
 
 const MySupplierLocations = {
   rolesWithAccess: [MPRoles.MPMeSupplierAddressAdmin],
-  title: 'ADMIN.NAV.LOCATIONS',
+  title: 'ALIAS.SUPPLIER_LOCATIONS',
   route: '/my-supplier/locations',
 };
 

@@ -377,12 +377,14 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // TODO - move to some other file. Not related to resource crud
   getSuggestedAddresses = (ex): ListPage<Address> => {
-    for (const err of ex.error.Errors) {
+    if (ex?.Message === "Address not valid") {
+      return ex?.Data?.SuggestedAddresses;
+    }
+    for (const err of ex?.error?.Errors) {
       if (err.ErrorCode === 'blocked by web hook') {
         return err.Data?.Body?.SuggestedAddresses;
       }
     }
-    throw ex;
   };
 
   // Handle URL updates

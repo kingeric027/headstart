@@ -5,7 +5,7 @@ import {
 } from '@app-seller/suppliers/components/category-select/supplier-category-select.component';
 
 export const ErrorDictionary = {
-  name: 'Name can only contain characters Aa-Zz 0-9 - \' .',
+  name: "Name can only contain characters Aa-Zz 0-9 - ' .",
   phone: 'Phone can only contain 20 numbers or "-" chars (no spaces)',
   zip: 'Zip Code is invalid',
   DateError: 'Enter date of the form mm-dd-yyyy',
@@ -14,7 +14,7 @@ export const ErrorDictionary = {
   min: 'Please enter a higher value',
   max: 'Please enter a lower value',
   email: 'Please enter a valid email',
-  ocMatchFields: 'Passwords don\'t match',
+  ocMatchFields: "Passwords don't match",
   minGreaterThanMax: 'Minimum value cannot be greater than maximum',
   maxLessThanMin: 'Maximum value cannot be less than minimum',
   strongPassword: `Password must be at least eight characters long and include at least 
@@ -22,7 +22,7 @@ export const ErrorDictionary = {
   richTextFormatError:
     'Descriptions can only be 1000 characters. Remember the character count includes HTML formatting text.',
   supplierCategoryError: 'Supplier category selections are invalid',
-  supplierProductTypeError: 'Please select at least one product type'
+  supplierProductTypeError: 'Please select at least one product type',
 };
 
 // only alphanumic and space . '
@@ -63,7 +63,7 @@ export function ValidateDate(control: AbstractControl): ValidationErrors | null 
 }
 
 export function ValidateCAZip(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[A-Za-z]\\d[A-Za-z][ -]?\\d[A-Za-z]\\d$/.test(control.value);
+  const isValid = /^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] ?\d[A-Z]\d)$/g.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
@@ -124,7 +124,7 @@ export const ValidateMinMax: ValidatorFn = (control: FormGroup): ValidationError
     min.setErrors({ minGreaterThanMax: true });
     max.setErrors({ maxLessThanMin: true });
     return null;
-  } 
+  }
   return null;
 };
 
@@ -169,7 +169,7 @@ export function RequireCheckboxesToBeChecked(minRequired = 1): ValidatorFn {
       const control = formGroup.controls[key];
 
       if (control.value === true) {
-        checked ++;
+        checked++;
       }
     });
     return checked < minRequired ? { supplierProductTypeError: true } : null;
