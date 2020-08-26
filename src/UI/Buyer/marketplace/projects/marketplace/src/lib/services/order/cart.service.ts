@@ -5,6 +5,7 @@ import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
 import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
+import { TempSdk } from '../../services/temp-sdk/temp-sdk.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class CartService {
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
-  constructor(private state: OrderStateService) {}
+  constructor(private state: OrderStateService,
+              private tempSdk: TempSdk) {}
 
   get(): ListPage<MarketplaceLineItem> {
     return this.lineItems;
@@ -44,7 +46,7 @@ export class CartService {
     this.lineItems.Items = this.lineItems.Items.filter(li => li.ID !== lineItemID);
     Object.assign(this.state.order, this.calculateOrder());
     try {
-      await LineItems.Delete('Outgoing', this.order.ID, lineItemID);
+      await this.tempSdk.deleteLineItem(this.state.order.ID, lineItemID);
     } finally {
       this.state.reset();
     }

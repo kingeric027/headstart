@@ -60,6 +60,13 @@ namespace Marketplace.Common.Controllers
             return await _lineItemCommand.UpsertLineItem(orderID, li, VerifiedUserContext);
         }
 
+        [DocName("Delete a line item")]
+        [HttpDelete, Route("{orderID}/lineitems/{lineItemID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task DeleteLineItem(string orderID, string lineItemID)
+        {
+            await _lineItemCommand.DeleteLineItem(orderID, lineItemID);
+        }
+
         [DocName("Apply a promotion to an order")]
         [HttpPost, Route("{orderID}/promotions/{promoCode}")]
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode)
@@ -79,6 +86,13 @@ namespace Marketplace.Common.Controllers
         public async Task<List<MarketplaceLineItem>> BuyerUpdateLineItemStatusesWithNotification(string orderID, [FromBody] LineItemStatusChanges lineItemStatusChanges)
         {
             return await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, orderID, lineItemStatusChanges, VerifiedUserContext);
+        }
+
+        [DocName("Apply Automatic Promtions to order and remove promotions no longer valid on order")]
+        [HttpPost, Route("{orderID}/applypromotions")]
+        public async Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID)
+        {
+            return await _command.ApplyAutomaticPromotions(orderID);
         }
     }
 }

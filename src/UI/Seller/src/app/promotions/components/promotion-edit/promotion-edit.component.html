@@ -336,6 +336,17 @@
           <div class="custom-control custom-checkbox">
             <input type="checkbox"
                    class="custom-control-input"
+                   [resourceForm]="resourceForm"
+                   formControlName="Automatic"
+                   (input)="handleUpdatePromo($event, 'xp.Automatic')"
+                   id="Automatic"> 
+            <label class="custom-control-label"
+                   for="Automatic"
+                   translate>ADMIN.PROMOTIONS.AUTO_APPLY</label>
+          </div>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox"
+                   class="custom-control-input"
                    [checked]="hasRedemptionLimit"
                    (input)="toggleHasRedemptionLimit()"
                    id="HasRedemptionLimit">

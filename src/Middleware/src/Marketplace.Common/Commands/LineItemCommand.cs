@@ -17,6 +17,7 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
         Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
+        Task DeleteLineItem(string orderID, string lineItemID);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -24,13 +25,15 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
         private readonly ISendgridService _sendgridService;
         private readonly IMeProductCommand _meProductCommand;
+        private readonly IPromotionCommand _promotionCommand;
 
 
-        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand)
+        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
             _meProductCommand = meProductCommand;
+            _promotionCommand = promotionCommand;
         }
 
         // used on post order submit
@@ -335,13 +338,6 @@ namespace Marketplace.Common.Commands
 
             var existingLineItems = await existingLineItemsRequest;
             var li = new MarketplaceLineItem();
-
-            // If line item exists, update quantity, else create
-            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
-            if (preExistingLi != null)
-            {
-                await _oc.LineItems.DeleteAsync(OrderDirection.Outgoing, orderID, preExistingLi.ID, user.AccessToken);
-            }
             
             var product = await productRequest;
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
@@ -350,10 +346,22 @@ namespace Marketplace.Common.Commands
             liReq.xp.StatusByQuantity = LineItemStatusConstants.EmptyStatuses;
             liReq.xp.StatusByQuantity[LineItemStatus.Open] = liReq.Quantity;
 
-            li = await _oc.LineItems
-                .CreateAsync<MarketplaceLineItem>
-                (OrderDirection.Incoming, orderID, liReq);
+            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems.Items).Find(eli => LineItemsMatch(eli, liReq));
+            if (preExistingLi != null)
+            {
+                li = await _oc.LineItems.SaveAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, preExistingLi.ID, liReq);
+            } else
+            {
+                li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, liReq);
+            }
+            await _promotionCommand.AutoApplyPromotions(orderID);
             return li;
+        }
+
+        public async Task DeleteLineItem(string orderID, string lineItemID)
+        {
+            await _oc.LineItems.DeleteAsync(OrderDirection.Incoming, orderID, lineItemID);
+            await _promotionCommand.AutoApplyPromotions(orderID);
         }
 
         private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
