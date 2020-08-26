@@ -91,7 +91,6 @@ namespace Marketplace.Models
 	[SwaggerModel]
     public class MarketplaceVariantXp
     {
-        public string OcID { get; set; }
         public string SpecCombo { get; set; }
         public List<SpecValue> SpecValues { get; set; }
         public string NewID { get; set; }

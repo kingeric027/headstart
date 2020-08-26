@@ -220,7 +220,6 @@ export class ProductVariations {
         Name: `${this.superProductEditable.Product.ID} ${opt.Value}`,
         Active: true,
         xp: {
-          OcID: `${this.superProductEditable.Product.ID}-${opt.ID}`,
           SpecCombo: `${opt.ID}`,
           SpecValues:[{
             SpecName: spec.Name,
