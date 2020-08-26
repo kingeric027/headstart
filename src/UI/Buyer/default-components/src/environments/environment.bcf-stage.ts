@@ -1,26 +1,25 @@
 // This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --configuration=demo` replaces `environment.ts` with `environment.demo.ts`.
-// The list of file replacements can be found in `angular.json`.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
 import { Environment } from './env.interface';
-import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
+import bcfTheme from '../styles/themes/basecamp/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Marketplace Staging',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  appname: 'Basecamp Fitness',
+  clientID: '997F5753-4C11-4F5F-9B40-6AC843638BA2',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui-staging.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: wtcTheme,
+  theme: bcfTheme,
 };
-
 /*
+
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *

@@ -93,6 +93,38 @@
                 }
               ]
             },
+            "af-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/anytime-fitness"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.af-stage.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
             "bcf": {
               "stylePreprocessorOptions": {
                 "includePaths": [
@@ -103,6 +135,38 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.bcf.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bcf-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/basecamp"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.bcf-stage.ts"
                 }
               ],
               "optimization": true,
@@ -157,6 +221,38 @@
                 }
               ]
             },
+            "wtc-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/waxing-the-city"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.wtc-stage.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
             "bm": {
               "stylePreprocessorOptions": {
                 "includePaths": [
@@ -167,6 +263,38 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.bm.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bm-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/bar-method"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.bm-stage.ts"
                 }
               ],
               "optimization": true,
@@ -220,38 +348,6 @@
                   "maximumError": "10kb"
                 }
               ]
-            },
-            "staging": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                }
-              ],
-              "stylePreprocessorOptions": {
-                "includePaths": [
-                  "src/styles/themes/waxing-the-city"
-                ]
-              },
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "6mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
-                }
-              ]
             }
           }
         },
@@ -271,20 +367,29 @@
             "af": {
               "browserTarget": "default-components:build:af"
             },
+            "af-stage": {
+              "browserTarget": "default-components:build:af-stage"
+            },
             "bcf": {
               "browserTarget": "default-components:build:bcf"
+            },
+            "bcf-stage": {
+              "browserTarget": "default-components:build:bcf-stage"
             },
             "wtc": {
               "browserTarget": "default-components:build:wtc"
             },
+            "wtc-stage": {
+              "browserTarget": "default-components:build:wtc-stage"
+            },
             "bm": {
               "browserTarget": "default-components:build:bm"
             },
+            "bm-stage": {
+              "browserTarget": "default-components:build:bm-stage"
+            },
             "test": {
               "browserTarget": "default-components:build:test"
-            },
-            "staging": {
-              "browserTarget": "default-components:build:staging"
             }
           }
         },

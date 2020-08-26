@@ -15,8 +15,6 @@
     "build-bm": "ng build --configuration=bm",
     "serve-test": "ng serve --configuration=test",
     "build-test": "ng build --configuration=test",
-    "serve-staging": "ng serve --configuration=staging",
-    "build-staging": "ng build --configuration=staging",
     "preinstall": "npm run build-marketplace",
     "lint": "eslint src/**/*.ts --quiet",
     "build-marketplace": "cd ../marketplace && npm run build"
