@@ -21,20 +21,20 @@ const AllProducts: MPRoute = {
   title: 'ADMIN.NAV.ALL_PRODUCTS',
   route: '/products',
 };
+// TODO: Reimplement once UI is added to address these xp values
+// const LiveProducts: MPRoute = {
+//   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+//   title: 'ADMIN.NAV.LIVE_PRODUCTS',
+//   route: '/products',
+//   queryParams: { 'xp.Status': 'Published' },
+// };
 
-const LiveProducts: MPRoute = {
-  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.LIVE_PRODUCTS',
-  route: '/products',
-  queryParams: { 'xp.Status': 'Published' },
-};
-
-const PendingProducts: MPRoute = {
-  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.PENDING_PRODUCTS',
-  route: '/products',
-  queryParams: { 'xp.Status': 'Draft' },
-};
+// const PendingProducts: MPRoute = {
+//   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+//   title: 'ADMIN.NAV.PENDING_PRODUCTS',
+//   route: '/products',
+//   queryParams: { 'xp.Status': 'Draft' },
+// };
 
 const Promotions: MPRoute = {
   rolesWithAccess: [MPRoles.MPPromotionAdmin, MPRoles.MPPromotionReader],
@@ -58,7 +58,7 @@ const ProductNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
   title: 'ADMIN.NAV.PRODUCTS',
   route: '/products',
-  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets, Kits],
+  subRoutes: [AllProducts, Promotions, ProductFacets, Kits],
 };
 
 // Orders
