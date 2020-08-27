@@ -12,13 +12,13 @@ interface SupplierCategorySelection {
 }
 
 export const areAllCategoriesComplete = (categorySelections: SupplierCategorySelection[]): boolean => {
-  return !categorySelections.some(category => {
+  return !categorySelections?.some(category => {
     return !category.ServiceCategory || !category.VendorLevel;
   });
 };
 
 export const areDuplicateCategories = (categorySelections: SupplierCategorySelection[]): boolean => {
-  return categorySelections.some(selection => isADuplicateCategory(selection, categorySelections));
+  return categorySelections?.some(selection => isADuplicateCategory(selection, categorySelections));
 };
 
 export const isADuplicateCategory = (
@@ -92,7 +92,7 @@ export class SupplierCategorySelectComponent {
   }
 
   addCategory(): void {
-    const newCategorySelection = [...this._categorySelections, { ServiceCategory: '', VendorLevel: '' }];
+    const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: '', VendorLevel: '' }];
     this.updateCategory(newCategorySelection);
   }
 
@@ -109,7 +109,7 @@ export class SupplierCategorySelectComponent {
   }
 
   updateCategoryValidation(newCategorySelection: SupplierCategorySelection[]): void {
-    this.areNoCategories = !newCategorySelection.length;
+    this.areNoCategories = !newCategorySelection?.length;
     this.canAddAnotherCategory = areAllCategoriesComplete(newCategorySelection);
   }
 }
