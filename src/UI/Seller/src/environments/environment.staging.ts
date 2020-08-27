@@ -9,6 +9,7 @@ export const environment = {
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   appname: 'Marketplace Admin Staging',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+  blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
   orderCloudApiUrl: 'https://api.ordercloud.io',
   orderCloudApiVersion: 'v1',
   buyerUrl: 'https://marketplace-buyer-ui-staging.azurewebsites.net/',

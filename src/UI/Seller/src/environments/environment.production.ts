@@ -9,6 +9,7 @@ export const environment = {
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   appname: 'Self Esteem Brands',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+  blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
   orderCloudApiUrl: 'https://api.ordercloud.io',
   orderCloudApiVersion: 'v1',
   buyerUrl: 'https://marketplace-buyer-ui.azurewebsites.net/',

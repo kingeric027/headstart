@@ -89,12 +89,11 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
         this.setIsCreatingNew();
         const resourceIDSelected =
           params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
-        if (resourceIDSelected) {
-          this.setResourceSelectionFromID(resourceIDSelected);
-        }
-        if (this.isCreatingNew) {
-          this.setResoureObjectsForCreatingNew();
-        }
+          if (this.isCreatingNew) {
+            this.setResoureObjectsForCreatingNew();
+          } else if (resourceIDSelected) {
+            this.setResourceSelectionFromID(resourceIDSelected);
+          }
       }
     });
   }
@@ -143,7 +142,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async selectResource(resource: any): Promise<void> {
-    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(resource.ID || '');
+    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(resource.ID || resource.id || '');
     this.navigate(newURL, { queryParams });
   }
 

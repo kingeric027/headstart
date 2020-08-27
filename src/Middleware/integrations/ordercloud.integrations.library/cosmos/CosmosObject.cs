@@ -14,7 +14,7 @@ namespace ordercloud.integrations.library
 	public abstract class CosmosObject : ICosmosObject
 	{
 		[ApiIgnore]
-		[JsonProperty("id")]
+		//[JsonProperty("id")] Oliver, let's discuss this!  Had to comment this out today as a workaround (though it was working before as is).
 		public string id { get; set; } = Guid.NewGuid().ToString();
 		[ApiIgnore]
 		public DateTimeOffset timeStamp { get; set; } = DateTimeOffset.Now;

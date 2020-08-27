@@ -18,6 +18,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { Address } from '@ordercloud/angular-sdk';
+import { singular } from 'pluralize';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -38,7 +39,7 @@ export abstract class ResourceCrudService<ResourceType> {
   private itemsPerPage = 100;
 
   constructor(
-    private router: Router,
+    protected router: Router,
     private activatedRoute: ActivatedRoute,
     public ocService: any,
     public currentUserService: CurrentUserService,
@@ -242,7 +243,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find((i: any) => i.ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) => (i.ID === resourceID) || (i.id === resourceID));
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -460,5 +461,9 @@ export abstract class ResourceCrudService<ResourceType> {
     if (dataIsSaving) return 'Saving...';
     if (isCreatingNew) return 'Create';
     if (!isCreatingNew) return 'Save Changes';
+  }
+
+  getParentIDParamName(): string {
+    return `${singular(this.primaryResourceLevel)}ID`;
   }
 }

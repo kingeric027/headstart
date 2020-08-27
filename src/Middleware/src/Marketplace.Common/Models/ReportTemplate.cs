@@ -2,9 +2,6 @@
 using Newtonsoft.Json;
 using ordercloud.integrations.library;
 using System.Collections.Generic;
-//using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
-using OrderCloud.SDK;
 using Newtonsoft.Json.Converters;
 
 namespace Marketplace.Common.Models
@@ -17,13 +14,6 @@ namespace Marketplace.Common.Models
         public string ID { get; set; }
         [CosmosPartitionKey]
         public string SellerID { get; set; }
-        //public string ReportType { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
-        public enum ReportTypeEnum
-        {
-            BuyerLocation
-        }
-
         public ReportTypeEnum ReportType { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -32,7 +22,12 @@ namespace Marketplace.Common.Models
         public bool AvailableToSuppliers { get; set; }
     }
 
-    [SwaggerModel]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ReportTypeEnum
+    {
+        BuyerLocation
+    }
+
     public class ReportFilters
     {
         public List<string> BuyerID { get; set; }

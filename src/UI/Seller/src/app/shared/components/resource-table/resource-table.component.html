@@ -34,7 +34,7 @@
   </div>
   <!-- /Page Title -->
   <!-- Filter Bar -->
-  <div *ngIf="!isMyResource || (_currentResourceNamePlural !== 'suppliers')"
+  <div *ngIf="(!isMyResource || (_currentResourceNamePlural !== 'suppliers')) && !excludeFromFilterBar"
        class="row additional-item-edit-resource additional-item-table">
     <div *ngIf="parentResourceService && !isMyResource"
          class="col-lg-3 col-md-4 col-sm-5 parent-resources">
@@ -45,7 +45,8 @@
       </resource-select-dropdown-component>
       <!-- /parent resource dropdown -->
       <!-- sub resource dropdown -->
-      <div ngbDropdown
+      <div *ngIf="!excludeFromSubResourceView"
+           ngbDropdown
            class="d-inline-block parent-resource-dropdown btn-block mt-0 mb-1">
         <!-- change to currently selected option  -->
         <button class="btn btn-block btn-outline-dark"
@@ -195,7 +196,7 @@
   <div class="row">
     <div class="col-md-12">
       <!-- full table view -->
-      <div *ngIf="!selectedResourceID && !isCreatingNew && (!isMyResource || shouldDisplayList)">
+      <div *ngIf="!selectedResourceID && !isCreatingNew && (!isMyResource || shouldDisplayList) && !excludeFromFullTableView">
         <perfect-scrollbar id="perfectScroll"
                            class="scrollbar-top"
                            style="width: 100%;"
@@ -279,7 +280,7 @@
                 New {{resourceType | titlecase}} {{labelSingular | translate}}
               </h3>
               <h3 *ngIf="!isCreatingNew"
-                  class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName}}</h3>
+                  class="d-inline-block ml-1 mb-0">{{_resourceInSelection?.Name || _resourceInSelection?.Username || _resourceInSelection?.AddressName}}</h3>
             </span>
             <button *ngIf="canImpersonateResource && !isCreatingNew" (click)="impersonateUser()" class="btn brand-button--orange">Impersonate</button>
             <span class="d-flex align-items-center"
@@ -301,7 +302,7 @@
       <!-- ng content can only be used once for transclusion, ngTemplatOutlets are required so that 
       we are only using the component once in the resource table -->
 
-      <ng-container *ngIf="isMyResource && !shouldDisplayList">
+      <ng-container *ngIf="(isMyResource && !shouldDisplayList) || excludeFromFullTableView">
         <div *ngTemplateOutlet="editUnwrapped"></div>
       </ng-container>
       <ng-template #editUnwrapped>
