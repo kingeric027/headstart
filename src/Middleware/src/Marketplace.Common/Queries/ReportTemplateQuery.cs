@@ -17,7 +17,7 @@ namespace Marketplace.Common.Queries
         Task<List<ReportTemplate>> List(ReportTypeEnum reportType, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> Post(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> Put(string id, ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
-        Task Delete(string id, VerifiedUserContext verifiedUser);
+        Task Delete(string id);
         Task<ReportTemplate> Get(string id, VerifiedUserContext verifiedUser);
     }
 
@@ -53,18 +53,20 @@ namespace Marketplace.Common.Queries
 
         public async Task<ReportTemplate> Put(string id, ReportTemplate reportTemplate, VerifiedUserContext verifiedUser)
         {
+            var templateToPut = await _store.Query().FirstOrDefaultAsync(template => template.TemplateID == id);
+            reportTemplate.id = templateToPut.id;
             var updatedTemplate = await _store.UpdateAsync(reportTemplate);
             return updatedTemplate;
         }
 
-        public async Task Delete(string id, VerifiedUserContext verifiedUser)
+        public async Task Delete(string id)
         {
-            await _store.RemoveByIdAsync(id, verifiedUser.SellerID);
+            await _store.RemoveAsync(template => template.TemplateID == id);
         }
 
         public async Task<ReportTemplate> Get(string id, VerifiedUserContext verifiedUser)
         {
-            var template = await _store.FindAsync(id, verifiedUser.SellerID);
+            var template = await _store.Query().FirstOrDefaultAsync(template => template.TemplateID == id);
             return template;
         }
     }

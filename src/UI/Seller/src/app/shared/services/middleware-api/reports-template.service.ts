@@ -7,9 +7,10 @@ import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { ListPage } from '@ordercloud/headstart-sdk';
+import { singular } from 'pluralize';
 
 export interface ReportTemplate {
-  id?: string;
+  TemplateID?: string;
   SellerID?: string;
   ReportType?: ReportType;
   Name: string;
@@ -33,7 +34,7 @@ export interface ReportFilters {
 })
 export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> {
   emptyResource = {
-    id: '',
+    TemplateID: '',
     Name: '',
     Description: '',
     AvailableToSuppliers: false,
@@ -96,7 +97,7 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   async updateResource(originalID: string, resource: any): Promise<ReportTemplate> {
-    originalID = resource.id;
+    originalID = resource.TemplateID;
     const url = `${this.appConfig.middlewareUrl}/reports/${originalID}`;
     const newResource = await this.http.put<ReportTemplate>(url, resource, { headers: this.buildHeaders() }).toPromise();
     this.updateResourceSubject(newResource);
@@ -109,12 +110,12 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   async previewReport(template: any): Promise<object[]> {
-    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.id}`;
+    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.TemplateID}`;
     return await this.http.get<object[]>(url, { headers: this.buildHeaders() }).toPromise();
   }
 
   async downloadReport(template: any): Promise<void> {
-    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/download/${template.id}`;
+    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/download/${template.TemplateID}`;
     const file = await this.http.post<string>(url, template, { headers: this.buildHeaders() }).toPromise();
     this.getSharedAccessSignature(file).subscribe(sharedAccessSignature => {
       const uri = `${this.appConfig.blobStorageUrl}/downloads/${file}${sharedAccessSignature}`;
@@ -129,5 +130,21 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
 
   private getSharedAccessSignature(fileName: string): Observable<string> {
     return this.http.get<string>(`${this.appConfig.middlewareUrl}/reports/download-shared-access/${fileName}`);
+  }
+
+  public getParentOrSecondaryIDParamName(): string {
+    return 'TemplateID'
+  }
+
+  public getResourceID(resource: any): string {
+    return resource.TemplateID;
+  }
+
+  public checkForResourceMatch(i: any, resourceID: string): boolean {
+    return i.TemplateID === resourceID;
+  }
+
+  public checkForNewResourceMatch(i: any, newResource: any): boolean {
+    return i.TemplateID === newResource.TemplateID
   }
 }

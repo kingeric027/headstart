@@ -93,7 +93,7 @@ namespace Marketplace.Common.Controllers
         public async Task DeleteReportTemplate(string id)
         {
             RequireOneOf(CustomRole.MPReportAdmin);
-            await _reportDataCommand.DeleteReportTemplate(id, VerifiedUserContext);
+            await _reportDataCommand.DeleteReportTemplate(id);
         }
     }
 }

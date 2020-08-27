@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
         Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> GetReportTemplate(string id, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> UpdateReportTemplate(string id, ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
-        Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser);
+        Task DeleteReportTemplate(string id);
     }
     
     public class MarketplaceReportCommand : IMarketplaceReportCommand
@@ -130,9 +130,9 @@ namespace Marketplace.Common.Commands
             return template;
         }
 
-        public async Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser)
+        public async Task DeleteReportTemplate(string id)
         {
-            await _template.Delete(id, verifiedUser);
+            await _template.Delete(id);
         }
 
         private bool PassesFilters(object data, Dictionary<PropertyInfo, List<string>> filtersToEvaluate)

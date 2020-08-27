@@ -8,7 +8,7 @@ import { TemplateTableComponent } from './components/reports-template/template-t
 const routes: Routes = [{ path: 'logs', component: OrchestrationLogsTableComponent },
                         { path: 'reports', component: ReportsTableComponent},
                         { path: ':ReportType/templates', component: TemplateTableComponent},
-                        { path: ':ReportType/templates/:templateID', component: TemplateTableComponent},
+                        { path: ':ReportType/templates/:TemplateID', component: TemplateTableComponent},
                         { path: ':ReportType/templates/new', component: TemplateTableComponent }];
 
 @NgModule({

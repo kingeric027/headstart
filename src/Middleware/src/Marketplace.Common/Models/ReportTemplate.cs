@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using ordercloud.integrations.library;
 using System.Collections.Generic;
 using Newtonsoft.Json.Converters;
+using ordercloud.integrations.library.Cosmos;
 
 namespace Marketplace.Common.Models
 {
@@ -10,8 +11,8 @@ namespace Marketplace.Common.Models
     [CosmosCollection("reporttemplates")]
     public class ReportTemplate : CosmosObject
     {
-        [JsonProperty("id")]
-        public string ID { get; set; }
+        [CosmosInteropID]
+        public string TemplateID { get; set; }
         [CosmosPartitionKey]
         public string SellerID { get; set; }
         public ReportTypeEnum ReportType { get; set; }

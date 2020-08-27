@@ -37,13 +37,13 @@
                             disabled 
                             [ngValue]="null">Select a report template</option>
                     <option *ngFor="let reportTemplate of reportTemplates" 
-                            [value]="reportTemplate.id">
+                            [value]="reportTemplate.TemplateID">
                         {{reportTemplate.Name}}
                     </option>
                 </select>
             </form>
         </div>
-        <div *ngIf="selectedTemplate?.id" 
+        <div *ngIf="selectedTemplate?.TemplateID" 
               class="col-md-12">
             <div class="mt-3">
                 <h6>Description</h6>
