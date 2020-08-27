@@ -163,9 +163,9 @@ export class TemplateEditComponent implements OnChanges {
   }
 
   handleSelectAllHeaders(): void {
-    this.updatedResource.Headers = this.headers.map(header => header.path);
-    this.resourceForm.controls['Headers'].setValue(this.updatedResource.Headers);
-    this.updateResource.emit({ value: this.updatedResource.Headers, field: 'Headers'});
+    let headersPaths = this.headers.map(header => header.path);
+    this.resourceForm.controls['Headers'].setValue(headersPaths);
+    this.updateResource.emit({ value: headersPaths, field: 'Headers'});
   }
 
   handleUnselectAllHeaders(): void {
