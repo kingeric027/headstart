@@ -29,7 +29,7 @@ export const MPRoles = {
   MPMeSupplierUserAdmin: 'MPMeSupplierUserAdmin',
   MPReportReader: 'MPReportReader',
   MPReportAdmin: 'MPReportAdmin',
-  MPStoreFrontAdmin: 'MPStoreFrontAdmin',
+  MPStorefrontAdmin: 'MPStorefrontAdmin',
 };
 
 const OrderCloudRoles = {
@@ -234,6 +234,7 @@ const MPReportReader: MPRole = {
 const MPReportAdmin: MPRole = {
   RoleName: MPRoles.MPReportAdmin,
   OrderCloudRoles: [OrderCloudRoles.AdminUserAdmin],
+};
 const MPStorefrontAdmin: MPRole = {
   RoleName: MPRoles.MPStorefrontAdmin,
   OrderCloudRoles: [OrderCloudRoles.ProductFacetAdmin, OrderCloudRoles.ProductFacetReader],
