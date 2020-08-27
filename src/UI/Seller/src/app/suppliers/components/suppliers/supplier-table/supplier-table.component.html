@@ -21,5 +21,6 @@
                      [resourceForm]="resourceForm"
                      [filterConfig]="filterConfig"
                      [supplierEditable]="updatedResource"
-                     (updateResource)="updateResource($event)"></app-supplier-edit>
+                     (updateResource)="updateResource($event)"
+                     (logoStaged)="handleStagedFile($event)"></app-supplier-edit>
 </resource-table-component>
