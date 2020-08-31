@@ -1,4 +1,4 @@
-import { Component, Input, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Inject, Output, EventEmitter, OnInit } from '@angular/core';
 import { groupBy as _groupBy } from 'lodash';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { MarketplaceLineItem, HeadStartSDK } from '@ordercloud/headstart-sdk';
@@ -6,17 +6,21 @@ import { LineItemTableStatus } from '../order-details/order-details.component';
 import { NumberCanChangeTo, CanChangeTo, CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
 import { FormArray, Validators, FormControl } from '@angular/forms';
+import { getPrimaryLineItemImage } from '@app-seller/products/product-image.helper';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { MeUser } from '@ordercloud/angular-sdk';
 
 @Component({
   selector: 'app-line-item-table',
   templateUrl: './line-item-table.component.html',
   styleUrls: ['./line-item-table.component.scss'],
 })
-export class LineItemTableComponent {
+export class LineItemTableComponent implements OnInit {
   _lineItems: MarketplaceLineItem[] = [];
   _liGroupedByShipFrom: MarketplaceLineItem[][];
   _statusChangeForm = new FormArray([]);
   _tableStatus = LineItemTableStatus.Default;
+  _user: MeUser;
   @Input() orderID: string;
   @Input() orderDirection: 'Incoming' | 'Outgoing';
   @Output() orderChange = new EventEmitter();
@@ -31,8 +35,13 @@ export class LineItemTableComponent {
   }
 
   constructor(
+    private currentUserService: CurrentUserService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
+
+  async ngOnInit() {
+    this._user = await this.currentUserService.getUser();
+  }
 
   changeTableStatus(newStatus: string): void {
     this._tableStatus = newStatus;
@@ -123,5 +132,9 @@ export class LineItemTableComponent {
     });
 
     return lineItemChanges;
+  }
+
+  getImageUrl(lineItemID: string): string {
+    return getPrimaryLineItemImage(lineItemID, this._lineItems, this._user)
   }
 }
