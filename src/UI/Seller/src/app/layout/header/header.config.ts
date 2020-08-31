@@ -43,7 +43,7 @@ const Promotions: MPRoute = {
 };
 
 const Kits: MPRoute = {
-  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
   title: 'Kits',
   route: '/kitproducts',
 };
