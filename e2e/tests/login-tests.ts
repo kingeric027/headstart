@@ -38,7 +38,7 @@ test
 	await t.expect(loginPage.submitButton.exists).ok()
 })
 
-test('Admin Log In And Out', async t => {
+test('Admin Log In And Out | 19966', async t => {
 	await t.maximizeWindow()
 	await loginPage.login(
 		testConfig.adminSellerUsername,

@@ -17,13 +17,29 @@ import {
 	createDefaultSupplierUser,
 	getSupplierUser,
 	deleteSupplierUser,
+	createDefaultSupplierUserWithoutRoles,
 } from '../../api-utils.ts/supplier-users-util'
 import adminHeaderPage from '../../pages/admin/admin-header-page'
 import mainResourcePage from '../../pages/admin/main-resource-page'
 import productDetailsPage from '../../pages/admin/product-details-page'
-import { getProductID, deleteProduct } from '../../api-utils.ts/product-util'
+import {
+	getProductID,
+	deleteProduct,
+	createDefaultProduct,
+} from '../../api-utils.ts/product-util'
+import { delay } from '../../helpers/wait-helper'
+import { createDefaultBuyer, deleteBuyer } from '../../api-utils.ts/buyer-util'
+import {
+	createDefaultCatalog,
+	deleteCatalog,
+} from '../../api-utils.ts/catalog-util'
+import {
+	createDefaultBuyerLocation,
+	deleteBuyerLocation,
+} from '../../api-utils.ts/buyer-locations-util'
+import { userClientAuth, vendorUserRoles } from '../../api-utils.ts/auth-util'
 
-fixture`Product Tests`
+fixture.skip`Product Tests`
 	.meta('TestRun', '1')
 	.before(async ctx => {
 		ctx.clientAuth = await adminClientSetup()
@@ -36,6 +52,19 @@ fixture`Product Tests`
 			ctx.supplierID,
 			ctx.clientAuth
 		)
+		const supplierUser = await getSupplierUser(
+			ctx.supplierUserID,
+			ctx.supplierID,
+			ctx.clientAuth
+		)
+		ctx.supplierUserAuth = await userClientAuth(
+			testConfig.adminAppClientID,
+			supplierUser.Username,
+			'Test123!',
+			vendorUserRoles
+		)
+		//wait 20 seconds to let everything get setup
+		await delay(20000)
 	})
 	.after(async ctx => {
 		await deleteSupplierAddress(
@@ -53,17 +82,14 @@ fixture`Product Tests`
 	.page(testConfig.adminAppUrl)
 
 //Product not being shown in UI after create, new to reload page to see
+//Still WIP, running into a bug with authentication as a supplier user
 test
 	.before(async t => {
-		//wait 10 seconds for user roles to be updated after creating the user
-		await t.wait(10000)
 		const vendorUser = await getSupplierUser(
 			t.fixtureCtx.supplierUserID,
 			t.fixtureCtx.supplierID,
 			t.fixtureCtx.clientAuth
 		)
-		console.log(vendorUser)
-		await t.debug()
 		await vendorTestSetup(vendorUser.Username, 'Test123!')
 	})
 	.after(async () => {
@@ -74,7 +100,7 @@ test
 			)
 			await deleteProduct(createdProductID, t.ctx.userAuth)
 		}
-	})('Create Product', async t => {
+	})('Create Product | 19215', async t => {
 	await adminHeaderPage.selectAllProducts()
 	await mainResourcePage.clickCreateNewStandardProduct()
 	const createdProductName = await productDetailsPage.createDefaultProduct()
@@ -86,19 +112,64 @@ test
 
 test
 	.before(async () => {
-		await adminTestSetup()
-		//Create Vendor
-		//Create Vendor User
-		//Create Vendor Warehouse
 		//Create Product
-		//Create Brand + Catalog + Location + User
+		try {
+			t.ctx.productID = await createDefaultProduct(
+				t.fixtureCtx.warehouseID,
+				t.fixtureCtx.supplierUserAuth
+			)
+		} catch (e) {
+			console.log(e)
+		}
+
+		//Create Brand
+		try {
+			t.ctx.buyerID = await createDefaultBuyer(t.fixtureCtx.clientAuth)
+		} catch (e) {
+			console.log(e)
+		}
+		//Create Brand Catalog
+		const catalog = await createDefaultCatalog(
+			t.ctx.buyerID,
+			t.fixtureCtx.clientAuth
+		)
+		t.ctx.catalogID = catalog.ID
+
+		//Create Brand Location
+		try {
+			const location = await createDefaultBuyerLocation(
+				t.ctx.buyerID,
+				t.fixtureCtx.supplierUserAuth
+			)
+			t.ctx.locationID = location.Address.ID
+		} catch (e) {
+			console.log(e)
+		}
+
+		await adminTestSetup()
 	})
 	.after(async () => {
 		//Delete Product
-		//Delete Vendor
-		//Delete Vendor User
-		//Delete Vendor Warehouse
-		//Delete Brand + Catalog + Location + User
-	})('Assign Product', async () => {}) //as seller user
+		await deleteProduct(t.ctx.productID, t.fixtureCtx.clientAuth)
+		//Delete Brand Catalog
+		await deleteCatalog(
+			t.ctx.catalogID,
+			t.ctx.buyerID,
+			t.fixtureCtx.clientAuth
+		)
+		//Delete Brand Location
+		await deleteBuyerLocation(
+			t.ctx.buyerID,
+			t.ctx.locationID,
+			t.fixtureCtx.clientAuth
+		)
+		//Delete Brand
+		await deleteBuyer(t.ctx.buyerID, t.fixtureCtx.clientAuth)
+	})('Assign Product to Catalog | 19976', async t => {
+	console.log(t.ctx.productID)
+	console.log(t.ctx.buyerID)
+	console.log(t.ctx.catalogID)
+	await t.debug()
+}) //as seller user (automation admin user)
 
 //Check that new product shows up on buyer side

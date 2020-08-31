@@ -64,6 +64,36 @@ export async function createDefaultSupplierUser(
 	return createdUser.ID
 }
 
+export async function createDefaultSupplierUserWithoutRoles(
+	supplierID: string,
+	clientAuth: string
+) {
+	const firstName = faker.name.firstName()
+	const lastName = faker.name.lastName()
+	const firstNameReplaced = firstName.replace(/'/g, '')
+	const lastNameReplaced = lastName.replace(/'/g, '')
+	const email = `${firstNameReplaced}${lastNameReplaced}.hpmqx9la@mailosaur.io`
+
+	const user: OrderCloudSDK.User = {
+		Email: email,
+		Username: email,
+		FirstName: firstNameReplaced,
+		LastName: lastNameReplaced,
+		Active: true,
+		Password: 'Test123!',
+	}
+
+	const createdUser = await OrderCloudSDK.SupplierUsers.Create(
+		supplierID,
+		user,
+		{
+			accessToken: clientAuth,
+		}
+	)
+
+	return createdUser.ID
+}
+
 export async function getSupplierUserID(
 	username: string,
 	vendorID: string,

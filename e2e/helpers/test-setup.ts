@@ -46,7 +46,30 @@ const adminRoles: ApiRole[] = [
 	'AddressAdmin',
 	'ApiClientAdmin',
 	'ApiClientReader',
+	'SupplierUserGroupAdmin',
+	'ProductReader',
+	'ProductAdmin',
 	'FullAccess',
+	//@ts-ignore
+	'MPProductAdmin',
+	//@ts-ignore
+	'MPPromotionAdmin',
+	//@ts-ignore
+	'MPCategoryAdmin',
+	//@ts-ignore
+	'MPOrderAdmin',
+	//@ts-ignore
+	'MPShipmentAdmin',
+	//@ts-ignore
+	'MPBuyerAdmin',
+	//@ts-ignore
+	'MPSellerAdmin',
+	//@ts-ignore
+	'MPReportReader',
+	//@ts-ignore
+	'MPSupplierAdmin',
+	//@ts-ignore
+	'MPSupplierUserGroupAdmin',
 ]
 
 export function setStagingUrl() {

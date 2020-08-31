@@ -53,6 +53,7 @@ export async function createSupplier(clientAuth: string) {
 			CountriesServicing: ['US'],
 			Currency: 'USD',
 			Description: '',
+			Images: [],
 			ProductTypes: ['Standard'],
 			SupportContact: {
 				Name: '',

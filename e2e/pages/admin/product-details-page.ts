@@ -18,14 +18,13 @@ class ProductDetailsPage {
 	taxCodeDropdown: Selector
 	taxCodeOptions: Selector
 	productWeightField: Selector
-	shipLengthField: Selector
-	shipWidthField: Selector
-	shipHeightField: Selector
 	shipAddressDropdown: Selector
 	shipAddressOptions: Selector
 	pricingTab: Selector
 	priceField: Selector
 	createButton: Selector
+	sizeTierDropdown: Selector
+	sizeTierOptions: Selector
 
 	constructor() {
 		this.nameField = Selector('#Name')
@@ -38,9 +37,6 @@ class ProductDetailsPage {
 		this.taxCategoryDropdown = Selector('#TaxCodeCategory')
 		this.taxCategoryOptions = this.taxCategoryDropdown.find('option')
 		this.productWeightField = Selector('#ShipWeight')
-		this.shipLengthField = Selector('#ShipLength')
-		this.shipWidthField = Selector('#ShipWidth')
-		this.shipHeightField = Selector('#ShipHeight')
 		this.taxCodeDropdown = Selector('#productTaxCodeDropdown')
 		this.taxCodeOptions = this.taxCodeDropdown.parent().find('button')
 		this.shipAddressDropdown = Selector('#ShipFromAddressID')
@@ -50,6 +46,8 @@ class ProductDetailsPage {
 		this.createButton = Selector('button')
 			.withText(createRegExp('create'))
 			.withAttribute('type', 'submit')
+		this.sizeTierDropdown = Selector('#SizeTier')
+		this.sizeTierOptions = this.sizeTierDropdown.find('option')
 	}
 
 	async createDefaultProduct() {
@@ -66,18 +64,21 @@ class ProductDetailsPage {
 				createRegExp('delivery by company vehicle')
 			)
 		)
-		await t.typeText(this.productWeightField, '5')
-		await t.typeText(this.shipLengthField, '5')
-		await t.typeText(this.shipWidthField, '5')
-		await t.typeText(this.shipHeightField, '5')
 		await t.click(this.shipAddressDropdown)
 		await t.click(
 			this.shipAddressOptions.withText(createRegExp('automation'))
 		)
+		await t.typeText(this.productWeightField, '5')
+		await t.click(this.sizeTierDropdown)
+		await t.click(
+			this.sizeTierOptions.withText(createRegExp('2 - 5 units will fit'))
+		)
 		await t.click(this.pricingTab)
 		await t.typeText(this.priceField, '5')
 		await clickLeftOfElement(this.priceField)
+		await t.debug()
 		await t.click(this.createButton)
+		await t.debug()
 		await loadingHelper.waitForLoadingBar()
 
 		return productName

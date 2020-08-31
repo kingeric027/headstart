@@ -12,7 +12,8 @@ class WarehouseDetailsPage {
 	cityField: Selector
 	stateField: Selector
 	zipField: Selector
-	countryCodeField: Selector
+	countryDropdown: Selector
+	countryOptions: Selector
 
 	constructor() {
 		this.createButton = Selector('button')
@@ -30,19 +31,22 @@ class WarehouseDetailsPage {
 		this.cityField = Selector('#City')
 		this.stateField = Selector('#State')
 		this.zipField = Selector('#Zip')
-		this.countryCodeField = Selector('#CountryCode')
+		this.countryDropdown = Selector('#Country')
+		this.countryOptions = this.countryDropdown.find('option')
 	}
 
 	async createDefaultWarehouse() {
 		const addressName = `AutomationAddress_${randomString(5)}`
 		await t.typeText(this.addressNameField, addressName)
 		await t.typeText(this.companyNameField, addressName)
+		await t.click(this.countryDropdown)
+		await t.click(
+			this.countryOptions.withText(createRegExp('united states of america'))
+		)
 		await t.typeText(this.street1Field, '700 American Ave #200')
 		await t.typeText(this.cityField, 'King Of Prussia')
 		await t.typeText(this.stateField, 'PA')
 		await t.typeText(this.zipField, '19406')
-		await t.typeText(this.countryCodeField, 'US')
-
 		await t.click(this.createButton)
 
 		await loadingHelper.waitForTwoLoadingBars()

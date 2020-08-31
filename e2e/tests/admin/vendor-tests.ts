@@ -16,21 +16,25 @@ import {
 	getSupplierUserID,
 	deleteSupplierUser,
 	createDefaultSupplierUser,
+	createDefaultSupplierUserWithoutRoles,
 } from '../../api-utils.ts/supplier-users-util'
 import {
 	cleanupVendorWithName,
 	cleanupVendorWithID,
 } from '../../helpers/test-cleanup'
+import { delay } from '../../helpers/wait-helper'
 
 fixture`Vendor Tests`
 	.meta('TestRun', '1')
 	.before(async ctx => {
 		ctx.clientAuth = await adminClientSetup()
 		ctx.supplierID = await createSupplier(ctx.clientAuth)
-		ctx.supplierUserID = await createDefaultSupplierUser(
+		ctx.supplierUserID = await createDefaultSupplierUserWithoutRoles(
 			ctx.supplierID,
 			ctx.clientAuth
 		)
+		//wait 5 seconds to let everything get setup
+		await delay(5000)
 	})
 	.beforeEach(async t => {
 		await adminTestSetup()
@@ -47,7 +51,7 @@ fixture`Vendor Tests`
 
 test.after(async t => {
 	await cleanupVendorWithName(t.ctx.vendorName, t.fixtureCtx.clientAuth)
-})('Create Vendor', async t => {
+})('Create Vendor | 19967', async t => {
 	await adminHeaderPage.selectAllVendors()
 	await mainResourcePage.clickCreateButton()
 	const vendorName = await vendorDetailsPage.createDefaultVendor()
@@ -66,7 +70,7 @@ test.after(async t => {
 		t.fixtureCtx.supplierID,
 		t.fixtureCtx.clientAuth
 	)
-})('Create Vendor User', async t => {
+})('Create Vendor User | 19968', async t => {
 	await adminHeaderPage.selectVendorUsers()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.supplierID)
 	await minorResourcePage.clickCreateButton()
@@ -86,8 +90,7 @@ test.after(async t => {
 		t.fixtureCtx.supplierID,
 		t.fixtureCtx.clientAuth
 	)
-})('Create Vendor Warehouse', async t => {
-	console.log(t.fixtureCtx.supplierID)
+})('Create Vendor Warehouse | 19969', async t => {
 	await adminHeaderPage.selectVendorWarehouses()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.supplierID)
 	await minorResourcePage.clickCreateButton()
@@ -96,7 +99,7 @@ test.after(async t => {
 	await t.expect(await minorResourcePage.resourceExists(warehouseName)).ok()
 })
 
-test('Assign Roles to Vendor User', async t => {
+test('Assign Roles to Vendor User | 19970', async t => {
 	await adminHeaderPage.selectVendorUsers()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.supplierID)
 	await minorResourcePage.clickResource(t.fixtureCtx.supplierUserID)

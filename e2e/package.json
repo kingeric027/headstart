@@ -25,6 +25,6 @@
 		"testcafe": "^1.8.6",
 		"testcafe-reporter-html": "^1.4.4",
 		"testcafe-reporter-testcafe-to-testrail": "^1.0.0-alpha.0",
-		"@ordercloud/headstart-sdk": "^1.6.5"
+		"@ordercloud/headstart-sdk": "^1.6.9"
 	}
 }

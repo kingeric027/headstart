@@ -55,7 +55,7 @@ fixture`Brand Tests`
 
 test.after(async () => {
 	await deleteBuyerWithName(t.ctx.brandName, t.fixtureCtx.clientAuth)
-})('Create Brand', async () => {
+})('Create Brand | 19971', async () => {
 	await adminHeaderPage.selectAllBrands()
 	await mainResourcePage.clickCreateButton()
 	const brandName = await brandDetailsPage.createDefaultBrand()
@@ -63,15 +63,14 @@ test.after(async () => {
 	await t.expect(await mainResourcePage.resourceExists(brandName)).ok()
 })
 
-//failing because of bug, create works but object is not shown until page is refreshed
-//NEED to create JIRA ticket for this issue
+//failing because: https://four51.atlassian.net/browse/SEB-725, bug in comment
 test.after(async () => {
 	await deleteCatalogWithName(
 		t.ctx.createdCatalogName,
 		t.fixtureCtx.buyerID,
 		t.fixtureCtx.clientAuth
 	)
-})('Create Brand Catalog', async () => {
+})('Create Brand Catalog | 19972', async () => {
 	await adminHeaderPage.selectBrandCatalogs()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.buyerID)
 	await minorResourcePage.clickCreateButton()
@@ -82,14 +81,13 @@ test.after(async () => {
 		.ok('Brand Catalog not found in resource list')
 })
 
-//failing because of https://four51.atlassian.net/browse/SEB-933
 test.after(async () => {
 	await deleteBuyerLocationWithName(
 		t.ctx.createdLocationName,
 		t.fixtureCtx.buyerID,
 		t.fixtureCtx.clientAuth
 	)
-})('Create Brand Location', async () => {
+})('Create Brand Location | 19973', async () => {
 	await adminHeaderPage.selectBrandLocations()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.buyerID)
 	await minorResourcePage.clickCreateButton()
@@ -100,7 +98,7 @@ test.after(async () => {
 		.ok('Brand Location not found in resource list')
 })
 
-test('Assign Brand Location to Brand Catalog', async t => {
+test('Assign Brand Location to Brand Catalog | 19974', async t => {
 	await adminHeaderPage.selectBrandLocations()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.buyerID)
 	await minorResourcePage.clickResource(t.fixtureCtx.locationID)
@@ -119,7 +117,7 @@ test.after(async t => {
 		t.fixtureCtx.buyerID,
 		t.fixtureCtx.clientAuth
 	)
-})('Create And Assign Brand User To Location', async t => {
+})('Create And Assign Brand User To Location | 19975', async t => {
 	await adminHeaderPage.selectBrandUsers()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.buyerID)
 	await minorResourcePage.clickCreateButton()

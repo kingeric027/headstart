@@ -61,6 +61,16 @@ class VendorDetailsPage {
 		)
 		await t.click(this.freightPOPToggle)
 		await t.click(this.standardProductTypeCheckbox)
+		await await scrollIntoView('supplier-category-select-component')
+		await t.click(this.addCategoryButton)
+		await t.click(this.mainCatgorySelector)
+		await t.click(
+			this.mainCategoryOptionsSelector.withText(createRegExp('fans'))
+		)
+		await t.click(this.subCategorySelector)
+		await t.click(
+			this.subCategoryOptionsSelector.withText(createRegExp('mandated'))
+		)
 		await t.click(this.USCountryCheckbox)
 		await t.click(this.createButton)
 

@@ -64,10 +64,10 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
-"@ordercloud/headstart-sdk@^1.6.5":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@ordercloud/headstart-sdk/-/headstart-sdk-1.6.5.tgz#54d9d0ea0f84e40baf0f3055602b7b9ba0fbe07b"
-  integrity sha512-JkrDgpGEd0wgsm3wav75lO4NVZG1usat76gYO0mcZi3vxrTXsAoijJ5qyjOf3EXutovSI6fDdMUEYe+gpzVFXQ==
+"@ordercloud/headstart-sdk@^1.6.9":
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/@ordercloud/headstart-sdk/-/headstart-sdk-1.6.9.tgz#6eb8323c80657164b0d6e68010177656a6a770f9"
+  integrity sha512-yIhMF6WIz/HbO5xPJFBmL28GSPFtdtWk4jz/WA2wtg5980dUD5Kjcg+Y9Egi6PYeA4wPc+7CnwxNQopmpqn0iQ==
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
