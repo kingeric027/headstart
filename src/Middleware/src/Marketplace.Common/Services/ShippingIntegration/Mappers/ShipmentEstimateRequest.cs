@@ -2,6 +2,7 @@
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Mappers
@@ -16,7 +17,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Mappers
                 {
                     ID = obj[0].ShipFromAddressID,
                     ShipEstimateItems = shipmentEstimateItems,
-                    RateRequestBody = RateRequestBodyMapper.Map(obj),
+                    RateRequestBody = RateRequestBodyMapper.Map(obj.Reserialize<List<MarketplaceLineItem>>())
                 };
         }
     }

@@ -74,6 +74,7 @@ namespace Marketplace.Models
         public TaxProperties Tax { get; set; }
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
+        public SizeTier SizeTier { get; set; }
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
@@ -88,10 +89,36 @@ namespace Marketplace.Models
 		PurchaseOrder
 	}
 
-	[SwaggerModel]
+    // measured in how many of the product fit in a 22x22x22 box
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SizeTier
+    {
+        // ships alone
+        G,
+        
+        //2-5
+        A,
+
+        // 5-15
+        B,
+
+        //15-49
+        C,
+
+        //50-99
+        D,
+
+        // 100-999
+        E,
+
+        // 1000+
+        F
+
+    }
+
+    [SwaggerModel]
     public class MarketplaceVariantXp
     {
-        public string OcID { get; set; }
         public string SpecCombo { get; set; }
         public List<SpecValue> SpecValues { get; set; }
         public string NewID { get; set; }
