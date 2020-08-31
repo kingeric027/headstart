@@ -13,8 +13,9 @@ import {
 } from '@app-seller/validators/validators';
 import { SupplierService } from '../supplier.service';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { MarketplaceSupplier, HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { MarketplaceSupplier, HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import { AppAuthService } from '@app-seller/auth';
 export interface SupplierCategoryConfigFilters {
   Display: string;
   Path: string;
@@ -31,7 +32,6 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
   return new FormGroup({
     ID: new FormControl({ value: supplier.ID, disabled: !this.isCreatingNew || this.isSupplierUser }),
     Name: new FormControl(supplier.Name, Validators.required),
-    LogoUrl: new FormControl(_get(supplier, 'xp.Images') && _get(supplier, 'xp.Images')[0]?.URL),
     Description: new FormControl(_get(supplier, 'xp.Description'), ValidateRichTextDescription),
     // need to figure out strucure of free string array
     // StaticContentLinks: new FormControl(_get(supplier, 'xp.StaticContentLinks'), Validators.required),
@@ -64,6 +64,7 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
 })
 export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
   filterConfig: {};
+  file: File;
   constructor(
     private supplierService: SupplierService,
     changeDetectorRef: ChangeDetectorRef,
@@ -71,11 +72,16 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     activatedroute: ActivatedRoute,
     ngZone: NgZone,
     private middleWareApiService: MiddlewareAPIService,
+    private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     super(changeDetectorRef, supplierService, router, activatedroute, ngZone, createSupplierForm);
     this.router = router;
     this.setUpfilter()
+  }
+  
+  handleStagedFile(event: File): void {
+    this.file = event;
   }
 
   async setUpfilter(): Promise<void> {
@@ -86,5 +92,31 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     const supplierFilterConfig = await this.middleWareApiService.getSupplierFilterConfig();
     const filterConfig = { Filters: supplierFilterConfig.Items.map(filter => filter.Doc)};
     this.filterConfig = filterConfig;
+  }
+
+  async createNewResource() {
+    try {
+      this.dataIsSaving = true;
+      // Create Supplier
+      const supplier = await this.supplierService.createNewResource(this.updatedResource);
+      if (this.file) {
+        // Upload their logo, if there is one.  Then, make the assignment
+        const accessToken = await this.appAuthService.fetchToken().toPromise();
+        const asset: AssetUpload = {
+          Active: true,
+          File: this.file,
+          Type: ("Image" as AssetUpload['Type']),
+          FileName: this.file.name,
+          Tags: ["Logo"]
+        }
+        const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
+        await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Suppliers', ResourceID: supplier.ID, AssetID: newAsset.ID }, accessToken);
+      }
+      this.selectResource(supplier);
+      this.dataIsSaving = false;
+    } catch (ex) {
+      this.dataIsSaving = false;
+      throw ex;
+    }
   }
 }

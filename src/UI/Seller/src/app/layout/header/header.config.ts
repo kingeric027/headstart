@@ -234,7 +234,7 @@ const Storefronts = {
 
 const MySupplierProfile = {
   rolesWithAccess: [MPRoles.MPMeSupplierAdmin],
-  title: 'ADMIN.NAV.MY_PROFILE',
+  title: 'ALIAS.SUPPLIER_PROFILE',
   route: '/my-supplier',
 };
 
