@@ -43,7 +43,7 @@ namespace Marketplace.Common.Commands
             buyerLocation.Address.ID = buyerLocationID;
             var buyerAddress = await _oc.Addresses.CreateAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address, accessToken: user.AccessToken);
             var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
-            await CreateUserGroupAndAssignments(token, buyerID, buyerLocationID);
+            await CreateUserGroupAndAssignments(token, buyerID, buyerAddress.ID);
             await CreateLocationUserGroupsAndApprovalRule(token, buyerAddress.ID, buyerAddress.AddressName);
 
             return new MarketplaceBuyerLocation
