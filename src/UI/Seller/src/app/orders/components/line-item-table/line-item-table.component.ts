@@ -15,7 +15,7 @@ import { MeUser } from '@ordercloud/angular-sdk';
   templateUrl: './line-item-table.component.html',
   styleUrls: ['./line-item-table.component.scss'],
 })
-export class LineItemTableComponent implements OnInit {
+export class LineItemTableComponent {
   _lineItems: MarketplaceLineItem[] = [];
   _liGroupedByShipFrom: MarketplaceLineItem[][];
   _statusChangeForm = new FormArray([]);
@@ -35,13 +35,8 @@ export class LineItemTableComponent implements OnInit {
   }
 
   constructor(
-    private currentUserService: CurrentUserService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
-
-  async ngOnInit() {
-    this._user = await this.currentUserService.getUser();
-  }
 
   changeTableStatus(newStatus: string): void {
     this._tableStatus = newStatus;
@@ -135,6 +130,6 @@ export class LineItemTableComponent implements OnInit {
   }
 
   getImageUrl(lineItemID: string): string {
-    return getPrimaryLineItemImage(lineItemID, this._lineItems, this._user)
+    return getPrimaryLineItemImage(lineItemID, this._lineItems, this.appConfig.sellerID)
   }
 }

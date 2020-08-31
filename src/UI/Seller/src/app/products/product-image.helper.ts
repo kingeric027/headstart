@@ -19,8 +19,8 @@ export function getProductMediumImageUrl(product: MarketplaceProduct, sellerID: 
 export const getPrimaryLineItemImage = (
   lineItemID: string,
   lineItems: MarketplaceLineItem[],
-  user: MeUser
+  sellerID: string
 ): string => {
   const li = lineItems.find(item => item.ID === lineItemID);
-  return getProductMediumImageUrl(li.Product, user.Seller.ID);
+  return getProductMediumImageUrl(li.Product, sellerID);
 };
