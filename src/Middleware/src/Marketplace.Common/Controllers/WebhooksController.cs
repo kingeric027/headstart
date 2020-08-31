@@ -49,36 +49,11 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderRequiresApprovalEmail(payload);
         }
 
-        [HttpPost, Route("orderapproved")]
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderApproved([FromBody] MarketplaceOrderApprovePayload payload)
-        {
-            await _sendgridService.SendOrderApprovedEmail(payload);
-        }
-
         [HttpPost, Route("orderdeclined")]
         [OrderCloudWebhookAuth]
         public async void HandleOrderDeclined([FromBody] MarketplaceOrderDeclinePayload payload)
         {
             await _sendgridService.SendOrderDeclinedEmail(payload);
-        }
-
-/*      [HttpPost, Route("ordershipped")] --- not currently in use
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderShipped([FromBody] WebhookPayloads.Orders.Ship payload) { }*/
-
-        [HttpPost, Route("orderdelivered")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderDelivered(JObject payload)
-        {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Delivered", "<h1>this is a test email for order delivered</h1>");
-        }
-
-        [HttpPost, Route("ordercancelled")] 
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderCancelled([FromBody] WebhookPayloads.Orders.Cancel payload)
-        {
-            await _orderCommand.PatchOrderCanceledStatus(payload.Response.Body.ID);
         }
 
         [HttpPost, Route("newuser")] // TO DO: send email to mp manager

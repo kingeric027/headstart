@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using ordercloud.integrations.library.Cosmos;
+using OrderCloud.SDK;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
 {
 	public static class AssetMapper
 	{
-		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
-
-		public static (Asset, IFormFile) MapFromUpload(CMSConfig config, AssetContainer container, AssetUpload form)
+		public static AssetDO MapFromUpload(AssetContainerDO container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
-				throw new AssetUploadValidationException("Asset upload must include either File or Url override but not both.");
+				throw new AssetCreateValidationException("Asset create must include either File or Url override but not both.");
 			}
-			var asset = new Asset()
+			var asset = new AssetDO()
 			{
 				InteropID = form.ID ?? CosmosInteropID.New(),
 				ContainerID = container.id,
@@ -32,9 +32,7 @@ namespace ordercloud.integrations.cms
 					IsUrlOverridden = form.Url != null
 				}
 			};
-			asset.Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{container.id}/{asset.id}";
-			TypeSpecificMapping(ref asset, form);
-			return (asset, form.File);
+			return asset;
 		}
 
 		private static List<string> MapTags(string tags)
@@ -42,37 +40,42 @@ namespace ordercloud.integrations.cms
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
-		private static void TypeSpecificMapping(ref Asset asset, AssetUpload form)
+		public static Asset MapTo(CMSConfig config, AssetDO asset)
 		{
-			switch (asset.Type)
+			return new Asset()
 			{
-				case AssetType.Image:
-					ImageSpecificMapping(ref asset, form);
-					return;
-				case AssetType.Attachment:
-				case AssetType.Structured:
-				case AssetType.Theme:
-				default:
-					return;
-			}
+				ID = asset.InteropID,
+				Title = asset.Title,
+				Active = asset.Active,
+				Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}",
+				Type = asset.Type,
+				Tags = asset.Tags,
+				FileName = asset.FileName,
+				Metadata = asset.Metadata,
+				History = asset.History
+			};
 		}
 
-		private static void ImageSpecificMapping(ref Asset asset, AssetUpload form)
+		public static IEnumerable<Asset> MapTo(CMSConfig config, IEnumerable<AssetDO> assets)
 		{
-			if (form.File == null) return;
-			if (!ValidImageFormats.Contains(form.File.ContentType)) 
-			{
-				throw new AssetUploadValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
-			}
-			using (var image = Image.FromStream(form.File.OpenReadStream()))
-			{
-				asset.Metadata.ImageWidth = image.Width;
-				asset.Metadata.ImageHeight = image.Height;
-				asset.Metadata.ImageHorizontalResolution = (decimal) image.HorizontalResolution;
-				asset.Metadata.ImageVerticalResolution = (decimal) image.VerticalResolution;
+			return assets.Select(asset => MapTo(config, asset));
+		}
 
-				// TODO - potentially image resizing?
-			}
+		public static ListPage<Asset> MapTo(CMSConfig config, ListPage<AssetDO> listPage)
+		{
+			return new ListPage<Asset>
+			{
+				Meta = listPage.Meta,
+				Items = MapTo(config, listPage.Items).ToList()
+			};
+		}
+
+		public static ListArgs<AssetDO> MapTo(this ListArgs<Asset> args)
+		{
+			return args.MapTo<Asset, AssetDO>(new ListArgMap()
+			{
+				{"ID", "InteropID" }
+			});
 		}
 	}
 }

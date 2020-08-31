@@ -3,7 +3,7 @@ import { OrderStatus, OrderFilters, ShopperContextService, OrderViewContext } fr
 import { ListPage } from 'ordercloud-javascript-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './order-history.component.html',

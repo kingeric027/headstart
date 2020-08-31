@@ -13,7 +13,7 @@ import { AppAuthService, TokenRefreshAttemptNotPossible } from '@app-seller/auth
 import { AppStateService } from '../app-state/app-state.service';
 import { UserContext } from '@app-seller/config/user-context';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -45,11 +45,11 @@ export class CurrentUserService {
       this.ocTokenService.SetRefresh(accessToken.refresh_token);
       this.appAuthService.setRememberStatus(true);
     }
-    MarketplaceSDK.Tokens.SetAccessToken(accessToken.access_token);
+    HeadStartSDK.Tokens.SetAccessToken(accessToken.access_token);
     this.ocTokenService.SetAccess(accessToken.access_token);
     this.appStateService.isLoggedIn.next(true);
     this.me = await this.ocMeService.Get().toPromise();
-    if (this.me?.Supplier) this.mySupplier = await MarketplaceSDK.Suppliers.GetMySupplier(this.me?.Supplier?.ID);
+    if (this.me?.Supplier) this.mySupplier = await HeadStartSDK.Suppliers.GetMySupplier(this.me?.Supplier?.ID);
   }
 
   async getUser(): Promise<MeUser> {
@@ -63,11 +63,13 @@ export class CurrentUserService {
 
   async getMySupplier(): Promise<Supplier> {
     const me = await this.getUser();
+    if (!me.Supplier) return;
     return this.mySupplier && this.mySupplier.ID === me.Supplier.ID ? this.mySupplier : await this.refreshSupplier(me.Supplier.ID); 
   }
 
   async refreshSupplier(supplierID): Promise<Supplier> {
-    this.mySupplier = await MarketplaceSDK.Suppliers.GetMySupplier(supplierID);
+    const token = await this.ocTokenService.GetAccess();
+    this.mySupplier = await HeadStartSDK.Suppliers.GetMySupplier(supplierID, token);
     return this.mySupplier;
   }
 

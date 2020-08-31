@@ -38,8 +38,6 @@ namespace Marketplace.Common.Services.ShippingIntegration
         {
             var orderWorksheet = orderCalculatePayload.OrderWorksheet;
             var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
-            var productIDsWithInvalidDimensions = GetProductsWithInvalidDimensions(lineItemsForShippingEstimates);
-            Require.That(productIDsWithInvalidDimensions.Count == 0, Checkout.MissingProductDimensions, new MissingProductDimensionsError(productIDsWithInvalidDimensions));
 
             var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(lineItemsForShippingEstimates);
             proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
@@ -58,6 +56,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 ShipEstimates = shipEstimates as IList<ShipEstimate>
             };
         }
+
 
         private List<LineItem> GetLineItemsToIncludeInShipping(IList<LineItem> lineItems, CheckoutIntegrationConfiguration configData)
         {

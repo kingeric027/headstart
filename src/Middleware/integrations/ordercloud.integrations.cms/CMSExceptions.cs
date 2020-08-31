@@ -11,9 +11,9 @@ namespace ordercloud.integrations.cms
 		public StorageConnectionException(string containerInteropID, object ex) : base("Storage Connection", $"Container \"{containerInteropID}\" storage connection failed.", null) { }
 	}
 
-	public class AssetUploadValidationException : OrderCloudIntegrationException
+	public class AssetCreateValidationException : OrderCloudIntegrationException
 	{
-		public AssetUploadValidationException(string message) : base("Asset Upload Validation", message, null) { }
+		public AssetCreateValidationException(string message) : base("Asset Create Validation", message, null) { }
 	}
 
 	public class TokenExpiredException : OrderCloudIntegrationException
@@ -38,7 +38,18 @@ namespace ordercloud.integrations.cms
 
 	public class InvalidAssignmentException : OrderCloudIntegrationException
 	{
-		public InvalidAssignmentException(List<ResourceType> allowed) : 
+		public InvalidAssignmentException(List<ResourceType> allowed) :
 			base("Invalid Assignment", $"This type of document can only be assigned the following resources. This is set on the schema.", allowed.Select(r => Enum.GetName(r.GetType(), r))) { }
+	}
+
+	public class InvalidPropertyException : OrderCloudIntegrationException
+	{
+		public InvalidPropertyException(string model, string error) : base("Invalid Query Param", $"{model} does not contain this property.", error) { }
+	}
+
+	public class ValidationException : OrderCloudIntegrationException
+	{
+		public ValidationException(string field, string message) : base(field, message, null) { }
+
 	}
 }

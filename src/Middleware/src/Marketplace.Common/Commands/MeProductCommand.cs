@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
@@ -83,7 +83,8 @@ namespace Marketplace.Common.Commands
 
 		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
-			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), accessToken: user.AccessToken);
+			var searchText = args.Search ?? "";
+			var meProductsRequest = searchText.Length > 0 ? _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken) : _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, accessToken: user.AccessToken);
 
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = GetExchangeRates(user);
@@ -99,30 +100,35 @@ namespace Marketplace.Common.Commands
 
 		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
-			/* if the price schedule Id matches the product ID we 
-			 * we mark up the produc
-			 * if they dont match we just convert for currecny as the 
-			 * seller has set custom pricing */
-			var shouldMarkupProduct = product.PriceSchedule.ID == product.ID;
-			if (shouldMarkupProduct)
-			{
-				product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+			
+			if(product.PriceSchedule != null)
+            {
+				/* if the price schedule Id matches the product ID we 
+				 * we mark up the produc
+				 * if they dont match we just convert for currecny as the 
+				 * seller has set custom pricing */
+				var shouldMarkupProduct = product.PriceSchedule.ID == product.ID;
+				if (shouldMarkupProduct)
 				{
-					var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
-					var convertedPrice = ConvertPrice(markedupPrice, product.xp.Currency, exchangeRates);
-					priceBreak.Price = convertedPrice;
-					return priceBreak;
-				}).ToList();
-			} else
-			{
-				product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+					{
+						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
+						var convertedPrice = ConvertPrice(markedupPrice, product.xp.Currency, exchangeRates);
+						priceBreak.Price = convertedPrice;
+						return priceBreak;
+					}).ToList();
+				}
+				else
 				{
-					// price on price schedule will be in USD as it is set by the seller
-					// may be different rates in the future
-					// refactor to save price on the price schedule not product xp?
-					priceBreak.Price = ConvertPrice(priceBreak.Price, CurrencySymbol.USD, exchangeRates);
-					return priceBreak;
-				}).ToList();
+					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
+					{
+						// price on price schedule will be in USD as it is set by the seller
+						// may be different rates in the future
+						// refactor to save price on the price schedule not product xp?
+						priceBreak.Price = ConvertPrice(priceBreak.Price, CurrencySymbol.USD, exchangeRates);
+						return priceBreak;
+					}).ToList();
+				}
 			}
 			return product;
 		}
@@ -136,7 +142,9 @@ namespace Marketplace.Common.Commands
 		private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
 		{
 			var buyer = await _marketplaceBuyerCommand.Get(user.BuyerID);
-			var markupPercent = (decimal)(buyer.Markup.Percent / 100);
+
+			// must convert markup to decimal before division to prevent rouding error
+			var markupPercent = (decimal)buyer.Markup.Percent / 100;
 			var markupMultiplier = markupPercent + 1;
 			return markupMultiplier;
 		}

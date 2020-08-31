@@ -10,8 +10,8 @@ namespace CMS.Tests
 {
 	public class SchemaTests
 	{
-		private DocumentSchema GetSchema(string json) => new DocumentSchema() { Schema = JObject.Parse(json) };
-		private Document GetDocument(string json) => new Document() { Doc = JObject.Parse(json) };
+		private DocSchemaDO GetSchema(string json) => new DocSchemaDO() { Schema = JObject.Parse(json) };
+		private DocumentDO GetDocument(string json) => new DocumentDO() { Doc = JObject.Parse(json) };
 
 		private const string ValidSchema = @"{ 
 										'type': 'object',
@@ -26,7 +26,7 @@ namespace CMS.Tests
 
 		[Test, TestCase(@"{
                 'name': 'Spider Man',
-				'roles': ['superhero', 'arachnid']
+				'roles': ['superhero', 'chnid']
 				}")]
 		public async Task valid_documents_produce_no_errors(string document)
 		{

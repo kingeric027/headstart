@@ -1,14 +1,12 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { Variant, SpecOption, Spec, OcSpecService, OcProductService, PartialVariant } from '@ordercloud/angular-sdk';
+import { Variant, SpecOption, Spec, OcSpecService, OcProductService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk/dist/models';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK, SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
 import { environment } from 'src/environments/environment';
 import { AppAuthService } from '@app-seller/auth';
-import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 
 @Component({
@@ -34,8 +32,8 @@ export class ProductVariations {
   @Input() checkForChanges;
   @Input() copyProductResource;
   @Input() isCreatingNew = false;
-  get specsWithVariations() {
-    return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant);
+  get specsWithVariations()  {
+    return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant) as Spec[];
   };
   get specsWithoutVariations() {
     return this.superProductEditable?.Specs?.filter(s => !s.DefinesVariant);
@@ -303,7 +301,7 @@ export class ProductVariations {
     // Queue up image/content requests, then send them all at aonce
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    const requests = this.superProductEditable.Images.map(i => MarketplaceSDK.Assets.Update(i.ID, i, accessToken));
+    const requests = this.superProductEditable.Images.map(i => HeadStartSDK.Assets.Save(i.ID, i, accessToken));
     await Promise.all(requests);
     // Ensure there is no mistaken change detection
     Object.assign(this.superProductStatic.Images, this.superProductEditable.Images);
@@ -320,31 +318,31 @@ export class ProductVariations {
   }
 
   async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
-    let partialVariant: PartialVariant = {};
+    let partialVariant: Variant = {};
     // If there's no value, or the value didn't change, don't send request.
     if (event.target.value === '') return;
     if (Number(event.target.value) === this.variantInSelection[field]) return;
     const value = Number(event.target.value);
     switch(field) {
-      case "ShipWeight": 
+      case 'ShipWeight': 
         partialVariant = { ShipWeight: value}
         break;
-      case "ShipHeight":
+      case 'ShipHeight':
         partialVariant = { ShipHeight: value}
         break;
-      case "ShipWidth":
+      case 'ShipWidth':
         partialVariant = { ShipWidth: value }
         break;
-      case "ShipLength":
+      case 'ShipLength':
         partialVariant = { ShipLength: value }
         break;
     }
     try {
       await this.ocProductService.PatchVariant(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant).toPromise();
-      this.toasterService.success("Shipping dimensions updated", "OK");
+      this.toasterService.success('Shipping dimensions updated', 'OK');
     } catch (err) {
       console.log(err)
-      this.toasterService.error("Something went wrong", "Error");
+      this.toasterService.error('Something went wrong', 'Error');
     }
   }
 }

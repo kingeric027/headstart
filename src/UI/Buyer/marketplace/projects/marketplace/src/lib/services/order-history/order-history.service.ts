@@ -9,10 +9,11 @@ import {
   MarketplaceLineItem,
   OrderDetails,
   MarketplaceShipmentWithItems,
-  MarketplaceSDK,
-} from 'marketplace-javascript-sdk';
+  HeadStartSDK,
+} from '@ordercloud/headstart-sdk';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { ClaimStatus, LineItemStatus } from '../../../lib/shopper-context';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +24,8 @@ export class OrderHistoryService {
     public filters: OrderFilterService,
     private reorderHelper: ReorderHelperService,
     private httpClient: HttpClient,
-    private appConfig: AppConfig
+    private appConfig: AppConfig,
+    private tempSdk: TempSdk
   ) {}
 
   async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
@@ -60,7 +62,7 @@ export class OrderHistoryService {
   }
 
   async getOrderDetails(orderID: string = this.activeOrderID): Promise<OrderDetails> {
-    return await MarketplaceSDK.Orders.GetOrderDetails(orderID);
+    return await HeadStartSDK.Orders.GetOrderDetails(orderID);
   }
 
   async getLineItemSuppliers(liGroups: MarketplaceLineItem[][]): Promise<LineItemGroupSupplier[]> {
@@ -87,37 +89,7 @@ export class OrderHistoryService {
       .toPromise();
   }
 
-  async returnOrder(orderID: string): Promise<MarketplaceOrder> {
-    const order = await Orders.Patch('Outgoing', orderID, {
-      xp: {
-        OrderReturnInfo: {
-          HasReturn: true,
-          Resolved: false,
-        },
-        ClaimStatus: ClaimStatus.Pending
-      },
-    });
-    return order as MarketplaceOrder;
-  }
-
-  async returnLineItem(
-    orderID: string,
-    lineItemID: string,
-    quantityToReturn: number,
-    returnReason: string
-  ): Promise<MarketplaceLineItem> {
-    const patch = {
-      xp: {
-        LineItemReturnInfo: {
-          QuantityToReturn: quantityToReturn,
-          ReturnReason: returnReason,
-          Resolved: false,
-        },
-        LineItemStatus: LineItemStatus.ReturnRequested
-      },
-    };
-    const line = await LineItems.Patch('Outgoing', orderID, lineItemID, patch);
-    await MarketplaceSDK.Orders.RequestReturnEmail(orderID);
-    return line;
+  async submitCancelOrReturn(orderID: string, lineItemStatusChange: any): Promise<void> {
+    return HeadStartSDK.Orders.BuyerUpdateLineItemStatusesWithNotification(orderID, lineItemStatusChange);
   }
 }

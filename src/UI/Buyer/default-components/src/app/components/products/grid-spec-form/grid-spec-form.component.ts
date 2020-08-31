@@ -3,7 +3,7 @@ import { Spec, PriceSchedule, ListPage } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
-import { MarketplaceLineItem, SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
     templateUrl: `./grid-spec-form.component.html`,
@@ -76,7 +76,7 @@ export class OCMGridSpecForm {
             ProductID: this._product.ID,
             Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray),
             xp: {
-                LineItemImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+                ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
             }
         };
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));

@@ -1,6 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { SupplierCategoryConfig } from '../suppliers/supplier-table/supplier-table.component';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import {
+  SupplierCategoryConfig,
+  SupplierCategoryConfigFilters,
+} from '../suppliers/supplier-table/supplier-table.component';
 import { FormControl } from '@angular/forms';
+import { SupplierFilterConfigDocument } from '@ordercloud/headstart-sdk';
 
 interface SupplierCategorySelection {
   ServiceCategory: string;
@@ -8,13 +12,13 @@ interface SupplierCategorySelection {
 }
 
 export const areAllCategoriesComplete = (categorySelections: SupplierCategorySelection[]): boolean => {
-  return !categorySelections.some((category) => {
+  return !categorySelections?.some(category => {
     return !category.ServiceCategory || !category.VendorLevel;
   });
 };
 
 export const areDuplicateCategories = (categorySelections: SupplierCategorySelection[]): boolean => {
-  return categorySelections.some((selection) => isADuplicateCategory(selection, categorySelections));
+  return categorySelections?.some(selection => isADuplicateCategory(selection, categorySelections));
 };
 
 export const isADuplicateCategory = (
@@ -22,11 +26,11 @@ export const isADuplicateCategory = (
   categorySelections: SupplierCategorySelection[]
 ): boolean => {
   const categorySelectionsFlat = categorySelections.map(
-    (selection) => `${selection.ServiceCategory}${selection.VendorLevel}`
+    selection => `${selection.ServiceCategory}${selection.VendorLevel}`
   );
   return (
     categorySelectionsFlat.filter(
-      (selectionFlat) => selectionFlat === `${categorySelection.ServiceCategory}${categorySelection.VendorLevel}`
+      selectionFlat => selectionFlat === `${categorySelection.ServiceCategory}${categorySelection.VendorLevel}`
     ).length > 1
   );
 };
@@ -37,7 +41,7 @@ export const isSecondDuplicateCategory = (
   index: number
 ): boolean => {
   const categorySelectionsFlat = categorySelections.map(
-    (selection) => `${selection.ServiceCategory}${selection.VendorLevel}`
+    selection => `${selection.ServiceCategory}${selection.VendorLevel}`
   );
   const indexOfFirstAppearanceOfCategory = categorySelectionsFlat.indexOf(
     `${categorySelection.ServiceCategory}${categorySelection.VendorLevel}`
@@ -55,6 +59,9 @@ export class SupplierCategorySelectComponent {
   _categorySelectionsControl: FormControl;
   _categorySelections: SupplierCategorySelection[];
 
+  _vendorLevelConfig: SupplierCategoryConfigFilters;
+  _serviceCatagoryConfig: SupplierCategoryConfigFilters;
+
   isSecondDuplicateCategory = isSecondDuplicateCategory;
   areNoCategories = false;
 
@@ -63,13 +70,18 @@ export class SupplierCategorySelectComponent {
     this.updateCategoryValidation(value.value);
     this._categorySelectionsControl = value;
     this._categorySelections = value.value;
-    this._categorySelectionsControl.valueChanges.subscribe((categorySelections) => {
+    this._categorySelectionsControl.valueChanges.subscribe(categorySelections => {
       this._categorySelections = categorySelections;
       this.updateCategoryValidation(categorySelections);
     });
   }
   @Input()
-  filterConfig: SupplierCategoryConfig;
+  set filterConfig(value: SupplierCategoryConfig) {
+    if (value?.Filters) {
+      this._vendorLevelConfig = value.Filters.find(filter => filter.Display === 'Vendor Level');
+      this._serviceCatagoryConfig = value.Filters.find(filter => filter.Display === 'Service Category');
+    }
+  }
   @Output()
   selectionsChanged = new EventEmitter();
 
@@ -80,7 +92,7 @@ export class SupplierCategorySelectComponent {
   }
 
   addCategory(): void {
-    const newCategorySelection = [...this._categorySelections, { ServiceCategory: '', VendorLevel: '' }];
+    const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: '', VendorLevel: '' }];
     this.updateCategory(newCategorySelection);
   }
 
@@ -97,7 +109,7 @@ export class SupplierCategorySelectComponent {
   }
 
   updateCategoryValidation(newCategorySelection: SupplierCategorySelection[]): void {
-    this.areNoCategories = !newCategorySelection.length;
+    this.areNoCategories = !newCategorySelection?.length;
     this.canAddAnotherCategory = areAllCategoriesComplete(newCategorySelection);
   }
 }

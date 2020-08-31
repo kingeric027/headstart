@@ -1,112 +1,135 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Cosmonaut;
+using Cosmonaut.Extensions;
 using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cms
 {
 	public interface IAssetedResourceQuery
 	{
-		Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user);
-		Task<string> GetFirstImage(Resource resource, VerifiedUserContext user);
-		Task SaveAssignment(Resource resource, string assetInteropID, VerifiedUserContext user);
-		Task DeleteAssignment(Resource resource, string assetInteropID, VerifiedUserContext user);
-		Task MoveAssignment(Resource resource, string assetInteropID, int listOrderWithinType, VerifiedUserContext user);
+		Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user);
+		Task<string> GetThumbnail(Resource resource, ThumbSize size, string sellerID);
+		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
+		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
+		Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user);
 	}
 
 	public class AssetedResourceQuery : IAssetedResourceQuery
 	{
-		private readonly ICosmosStore<AssetedResource> _store;
+		private readonly ICosmosStore<AssetedResourceDO> _store;
 		private readonly IAssetQuery _assets;
-		private readonly IBlobStorage _blob;
+		private readonly CMSConfig _config;
 
-		public AssetedResourceQuery(ICosmosStore<AssetedResource> store, IAssetQuery assets, IBlobStorage blob)
+		public AssetedResourceQuery(ICosmosStore<AssetedResourceDO> store, IAssetQuery assets, CMSConfig config)
 		{
 			_store = store;
 			_assets = assets;
-			_blob = blob;
+			_config = config;
 		}
 
-		public async Task<List<AssetForDelivery>> ListAssets(Resource resource, VerifiedUserContext user)
+		public async Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user)
 		{
+			resource.Validate();
+			args = args ?? new ListArgsPageOnly();
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
-			var assetedResource = await GetExisting(resource);
-			if (assetedResource == null) return new List<AssetForDelivery>();
+			var assetedResource = await GetExisting(resource, user.SellerID);
+			if (assetedResource == null) return new ListPage<Asset>().Empty();
 			var assetIDs = assetedResource.ImageAssetIDs
 				.Concat(assetedResource.ThemeAssetIDs)
 				.Concat(assetedResource.AttachmentAssetIDs)
 				.Concat(assetedResource.StructuredAssetsIDs)
 				.ToList();
-			var assets = await _assets.ListByInternalIDs(assetIDs);
-			return assets.Select(asset => {
-				int indexWithinType = GetAssetIDs(assetedResource, asset.Type).IndexOf(asset.id);
-				return new AssetForDelivery(asset, indexWithinType);
-			}).OrderBy(c => c.Type).ThenBy(c => c.ListOrderWithinType).ToList();
+			var assets = await _assets.ListByInternalIDs(assetIDs, args);
+			var items = assets.Items.Select(a => {
+				int indexWithinType = GetAssetIDs(assetedResource, a.Type).IndexOf(a.id);
+				var asset = AssetMapper.MapTo(_config, a);
+				return (asset, indexWithinType);
+			}).OrderBy(c => c.asset.Type).ThenBy(c => c.indexWithinType).Select(x => x.asset).ToList();
+			return new ListPage<Asset>()
+			{
+				Items = items,
+				Meta = assets.Meta
+			};
 		}
 
-		public async Task<string> GetFirstImage(Resource resource, VerifiedUserContext user)
+		public async Task<string> GetThumbnail(Resource resource, ThumbSize size, string sellerID)
 		{
-			var assetedResource = await GetExisting(resource);
+			resource.Validate();
+			var assetedResource = await GetExisting(resource, sellerID);
 			if (assetedResource?.ImageAssetIDs == null || assetedResource.ImageAssetIDs.Count == 0)
 			{
-				return GetPlaceholderImageUrl(resource.Type);
+				return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
 			}
 			var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
-			return asset.Url;
+			return asset.Url ?? $"{_config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}-{size.ToString().ToLower()}";
 		}
 
-		public async Task SaveAssignment(Resource resource, string assetInteropID, VerifiedUserContext user)
+		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetInteropID, user);
-			var assetedResource = await GetExistingOrDefault(resource);
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
+			var asset = await _assets.GetDO(assignment.AssetID, user);
+			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
 		}
 
-		public async Task DeleteAssignment(Resource resource, string assetInteropID, VerifiedUserContext user)
+		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
 		{
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetInteropID, user);
-			var assetedResource = await GetExistingOrDefault(resource);
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
+			var asset = await _assets.GetDO(assignment.AssetID, user);
+			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		public async Task MoveAssignment(Resource resource, string assetInteropID, int listOrderWithinType, VerifiedUserContext user)
+		public async Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user)
 		{
-			await new OrderCloudClientWithContext(user).EmptyPatch(resource);
-			var asset = await _assets.Get(assetInteropID, user);
-			var assetedResource = await GetExistingOrDefault(resource);
+			assignment.Validate();
+			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
+			var asset = await _assets.GetDO(assignment.AssetID, user);
+			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
 			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		private async Task<AssetedResource> GetExistingOrDefault(Resource resource)
+		private async Task<AssetedResourceDO> GetExistingOrDefault(Resource resource, string sellerID)
 		{
-			return await GetExisting(resource) ?? new AssetedResource() { Resource = resource };
+			return await GetExisting(resource, sellerID) ?? new AssetedResourceDO() { 
+				SellerOrgID = sellerID,
+				ResourceID = resource.ResourceID, 
+				ResourceParentID = resource.ParentResourceID, 
+				ResourceType = resource.ResourceType ?? 0 // "Required" validation should prevent null ResourceType
+			};
 		}
 
-		private async Task<AssetedResource> GetExisting(Resource resource)
+		private async Task<AssetedResourceDO> GetExisting(Resource resource, string sellerID)
 		{
-			var query = $"select top 1 * from c where c.Resource.Type = @Type AND c.Resource.ID = @ID AND c.Resource.ParentID = @ParentID";
-			var assetedResource = await _store.QuerySingleAsync(query, resource);
+			var assetedResource = await _store.Query().FirstOrDefaultAsync(a => 
+				a.SellerOrgID == sellerID &&
+				a.ResourceType == resource.ResourceType && 
+				a.ResourceID == resource.ResourceID && 
+				a.ResourceParentID == resource.ParentResourceID);
 			return assetedResource;
 		}
 
-		private List<string> GetAssetIDs(AssetedResource assetedResource, AssetType assetType)
+		private List<string> GetAssetIDs(AssetedResourceDO assetedResource, AssetType assetType)
 		{
-			var property = assetedResource.GetType().GetProperty($"{assetType.ToString()}AssetIDs");
+			var property = assetedResource.GetType().GetProperty($"{assetType}AssetIDs");
 			var list = (List<string>)property.GetValue(assetedResource, null) ?? new List<string>();
 			return list;
 		}
 
 		private string GetPlaceholderImageUrl(ResourceType type)
 		{
-			var url = $"{_blob.Config.BlobStorageHostUrl}/placeholder-images";
+			var url = $"{_config.BlobStorageHostUrl}/placeholder-images";
 			switch (type)
 			{
 				case ResourceType.Products:

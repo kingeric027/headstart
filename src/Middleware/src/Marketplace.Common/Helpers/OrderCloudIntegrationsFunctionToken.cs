@@ -12,6 +12,7 @@ namespace Marketplace.Common.Helpers
     public interface IOrderCloudIntegrationsFunctionToken
     {
         Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles, IOrderCloudClient oc = null);
+        Task<VerifiedUserContext> Authorize(string token, ApiRole[] roles, IOrderCloudClient oc = null);
     }
 
     /// <summary>
@@ -28,13 +29,22 @@ namespace Marketplace.Common.Helpers
             _settings = settings;
         }
 
+        public async Task<VerifiedUserContext> Authorize(string token, ApiRole[] roles, IOrderCloudClient oc = null)
+        {
+            return await ParseJwt(token, roles, oc);
+        }
+
         public async Task<VerifiedUserContext> Authorize(HttpRequest request, ApiRole[] roles, IOrderCloudClient oc = null)
         {
             Require.That(request.Headers.ContainsKey(AUTH_HEADER_NAME), new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
             Require.That(request.Headers[AUTH_HEADER_NAME].ToString().StartsWith(BEARER_PREFIX), new ErrorCode("Authorization.InvalidToken", 401, "Authorization.InvalidToken: Access token is invalid or expired."));
             // Get the token from the header
             var token = request.Headers[AUTH_HEADER_NAME].ToString().Substring(BEARER_PREFIX.Length);
+            return await ParseJwt(token, roles, oc);
+        }
 
+        private async Task<VerifiedUserContext> ParseJwt(string token, ApiRole[] roles, IOrderCloudClient oc = null)
+        {
             var jwt = new JwtSecurityToken(token);
             var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
             var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;

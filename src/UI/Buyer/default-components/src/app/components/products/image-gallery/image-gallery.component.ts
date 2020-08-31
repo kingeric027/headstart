@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
-import { AssetForDelivery } from 'marketplace-javascript-sdk';
+import { Asset } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './image-gallery.component.html',
@@ -9,7 +9,7 @@ import { AssetForDelivery } from 'marketplace-javascript-sdk';
 })
 export class OCMImageGallery implements OnInit, OnChanges {
   @Input() imgUrls: string[] = [];
-  @Input() imgs: AssetForDelivery[] = [];
+  @Input() imgs: Asset[] = [];
   @Input() specs: any[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
@@ -44,11 +44,11 @@ export class OCMImageGallery implements OnInit, OnChanges {
     this.selectedIndex = this.imgUrls.indexOf(url);
   }
 
-  isSelected(image: AssetForDelivery): boolean {
+  isSelected(image: Asset): boolean {
     return this.imgUrls.indexOf(image.Url) === this.selectedIndex;
   }
 
-  isImageMatchingSpecs(image: AssetForDelivery): boolean {
+  isImageMatchingSpecs(image: Asset): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
     return this.specs.every(spec => image.Tags.find(tag => tag?.split('-').includes(spec.replace(/\s/g, ''))));
   }
@@ -68,7 +68,7 @@ export class OCMImageGallery implements OnInit, OnChanges {
     }
   }
 
-  getGallery(): AssetForDelivery[] {
+  getGallery(): Asset[] {
     return this.imgs.slice(this.startIndex, this.endIndex + 1);
   }
 

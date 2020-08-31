@@ -1,12 +1,3 @@
-@import '../../../../styles/secondary.scss';
-
-.navbar-brand {
-  .logo {
-    content: url($logo);
-    max-height: 40px;
-  }
-}
-
 .badge__counter--large {
   ::ng-deep {
     .fa-layers-counter {

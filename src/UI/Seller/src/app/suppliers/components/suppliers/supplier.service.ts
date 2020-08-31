@@ -4,13 +4,10 @@ import {
   Supplier,
   OcSupplierService,
   OcMeService,
-  UserGroupAssignment,
   OcSupplierUserGroupService,
-  ListUserGroup,
-  ListUserGroupAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 
@@ -52,7 +49,7 @@ export class SupplierService extends ResourceCrudService<Supplier> {
   async createNewResource(resource: any): Promise<any> {
     resource.ID = '{supplierIncrementor}';
     if (!resource.xp?.Images[0]?.URL) resource.xp.Images = [];
-    const newSupplier = await MarketplaceSDK.Suppliers.Create(resource);
+    const newSupplier = await HeadStartSDK.Suppliers.Create(resource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newSupplier];
     this.resourceSubject.next(this.resourceSubject.value);
     return newSupplier;

@@ -176,17 +176,17 @@ namespace Orchestration.Tests
                 RestrictedQuantity = false,
                 Url = Guid.NewGuid().ToString(),
                 MinQuantity = random.Next(1, 999),
-                Price = Math.Round(random.NextDouble() * 99, 2, MidpointRounding.AwayFromZero),
+                Price = Math.Round(random.NextDouble() * 99, 2, MidpointRounding.AwayFromZero).To<decimal>(),
                 QuantityMultiplier = random.Next(1, 100),
                 ShipHeight = (decimal?)Math.Round(random.NextDouble() * 5, 1, MidpointRounding.AwayFromZero),
                 ShipLength = (decimal?)Math.Round(random.NextDouble() * 5, 1, MidpointRounding.AwayFromZero),
                 ShipWeight = (decimal?)Math.Round(random.NextDouble() * 5, 1, MidpointRounding.AwayFromZero),
                 ShipWidth = (decimal?)Math.Round(random.NextDouble() * 5, 1, MidpointRounding.AwayFromZero),
-                Tags = new List<string>() { Guid.NewGuid().ToString() },
+                Tags = Guid.NewGuid().ToString(),
                 TaxCategory = Guid.NewGuid().ToString(),
                 TaxCode = Guid.NewGuid().ToString(),
                 TaxDescription = Guid.NewGuid().ToString(),
-                UnitOfMeasureQty = random.Next(1, 5).ToString()
+                UnitOfMeasureQuantity = random.Next(1, 5)
             };
         }
 

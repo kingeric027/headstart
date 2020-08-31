@@ -30,17 +30,47 @@
               "src/web.config"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles/main.scss"
             ],
             "scripts": []
           },
           "configurations": {
-            "test": {
+            "dev": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/waxing-the-city"
+                ]
+              },
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "af": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/anytime-fitness"
+                ]
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
+                  "with": "src/environments/environment.af.ts"
                 }
               ],
               "optimization": true,
@@ -63,11 +93,240 @@
                 }
               ]
             },
-            "staging": {
+            "af-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/anytime-fitness"
+                ]
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
+                  "with": "src/environments/environment.af-stage.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bcf": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/basecamp"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.bcf.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bcf-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/basecamp"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.bcf-stage.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "wtc": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/waxing-the-city"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.wtc.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "wtc-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/waxing-the-city"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.wtc-stage.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bm": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/bar-method"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.bm.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "bm-stage": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/bar-method"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.bm-stage.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/waxing-the-city"
+                ]
+              },
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
                 }
               ],
               "optimization": true,
@@ -102,11 +361,35 @@
             }
           },
           "configurations": {
+            "dev": {
+              "browserTarget": "default-components:build:dev"
+            },
+            "af": {
+              "browserTarget": "default-components:build:af"
+            },
+            "af-stage": {
+              "browserTarget": "default-components:build:af-stage"
+            },
+            "bcf": {
+              "browserTarget": "default-components:build:bcf"
+            },
+            "bcf-stage": {
+              "browserTarget": "default-components:build:bcf-stage"
+            },
+            "wtc": {
+              "browserTarget": "default-components:build:wtc"
+            },
+            "wtc-stage": {
+              "browserTarget": "default-components:build:wtc-stage"
+            },
+            "bm": {
+              "browserTarget": "default-components:build:bm"
+            },
+            "bm-stage": {
+              "browserTarget": "default-components:build:bm-stage"
+            },
             "test": {
               "browserTarget": "default-components:build:test"
-            },
-            "staging": {
-              "browserTarget": "default-components:build:staging"
             }
           }
         },
@@ -130,7 +413,7 @@
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss"
+              "src/styles/main.scss"
             ],
             "scripts": []
           }

@@ -1,147 +1,160 @@
 <div class="mb-3 col-sm-10">
- <div class="d-print-none">
-  <button *ngIf="!isQuoteOrder(order) && !isSellerUser"
-          class="btn btn-outline-dark"
-          (click)="toggleCreateShipment()">
-    <fa-icon [icon]="getCreateButtonIcon()"></fa-icon> {{getCreateButtonAction()}} Shipment
-  </button>
-  <button *ngIf="shipments?.Items.length > 0"
-          class="ml-3 btn btn-outline-dark"
-          (click)="toggleViewShipments()">
-    <fa-icon [icon]="getViewButtonIcon()"></fa-icon> {{getViewButtonAction()}} Shipments ({{shipments.Items.length}})
-  </button>
-</div>
-  <div *ngIf="viewShipments" class="d-inline-flex mt-3 col-sm-12">
+  <div class="d-print-none">
+    <button *ngIf="!this.isQuoteOrder(this.order) &&
+    !this.isSellerUser && canShipLineItems()"
+            class="btn btn-outline-dark"
+            (click)="toggleCreateShipment()">
+      <fa-icon [icon]="getCreateButtonIcon()"></fa-icon> {{getCreateButtonAction()}} Shipment
+    </button>
+    <button *ngIf="shipments?.Items.length > 0"
+            class="ml-3 btn btn-outline-dark"
+            (click)="toggleViewShipments()">
+      <fa-icon [icon]="getViewButtonIcon()"></fa-icon> {{getViewButtonAction()}} Shipments ({{shipments.Items.length}})
+    </button>
+  </div>
+  <div *ngIf="viewShipments"
+       class="d-inline-flex mt-3 col-sm-12">
     <div class="col-sm-2 mt-3">
-        <button *ngFor="let shipment of shipments?.Items; let i = index"
-                class="mb-3 btn btn-outline-primary"
-                [ngClass]="{'active': shipment.ID === selectedShipment.ID}"
-                (click)="setSelectedShipment(i)">
-            Shipment {{i + 1}}
-        </button>
+      <button *ngFor="let shipment of shipments?.Items; let i = index"
+              class="mb-3 btn btn-outline-primary"
+              [ngClass]="{'active': shipment.ID === selectedShipment.ID}"
+              (click)="setSelectedShipment(i)">
+        Shipment {{i + 1}}
+      </button>
     </div>
     <div class="col-sm-10 mt-3 border bg-light">
-        <div *ngIf="selectedShipment" class="mt-3">
-            <span class="d-block mb-3"><h4>Shipment ID: {{selectedShipment.ID}}</h4></span>
-            <span class="d-block"><b>Tracking Number:</b> {{selectedShipment.TrackingNumber}}</span>
-            <span class="d-block"><b>Date Shipped:</b> {{selectedShipment.DateShipped | date}}</span>
-            <span class="d-block" *ngIf="selectedShipment.Cost"><b>Cost:</b> {{selectedShipment.Cost | currency}}</span>
-            <span class="d-block" *ngIf="selectedShipment.Shipper"><b>Carrier:</b> {{selectedShipment.Shipper}}</span>
-            <span class="d-block" *ngIf="selectedShipment.xp.Service"><b>Shipping Service:</b> {{selectedShipment.xp.Service}}</span>
-            <!-- TO-DO: Work on formatting for this once we can update Ship From/Ship To address in the Portal -->
-            <!-- <span class="d-block" *ngIf="selectedShipment.FromAddress">Ship From: {{selectedShipment.FromAddress}}</span>
+      <div *ngIf="selectedShipment"
+           class="mt-3">
+        <span class="d-block mb-3">
+          <h4>Shipment ID: {{selectedShipment.ID}}</h4>
+        </span>
+        <span class="d-block"><b>Tracking Number:</b> {{selectedShipment.TrackingNumber}}</span>
+        <span class="d-block"><b>Date Shipped:</b> {{selectedShipment.DateShipped | date}}</span>
+        <span class="d-block"
+              *ngIf="selectedShipment.Cost"><b>Cost:</b> {{selectedShipment.Cost | currency}}</span>
+        <span class="d-block"
+              *ngIf="selectedShipment.Shipper"><b>Carrier:</b> {{selectedShipment.Shipper}}</span>
+        <span class="d-block"
+              *ngIf="selectedShipment.xp.Service"><b>Shipping Service:</b> {{selectedShipment.xp.Service}}</span>
+        <!-- TO-DO: Work on formatting for this once we can update Ship From/Ship To address in the Portal -->
+        <!-- <span class="d-block" *ngIf="selectedShipment.FromAddress">Ship From: {{selectedShipment.FromAddress}}</span>
             <span class="d-block" *ngIf="selectedShipment.ToAddress">Ship To: {{selectedShipment.ToAddress}}</span> -->
-            <div class="mt-5">
-                <h5 class="mb-3">Items included in this order:</h5>
-                    <div class="d-block mb-3" *ngFor="let li of shipmentItems?.Items; let i = index"> 
-                        <div class="col-sm-12">
-                          <div class="row align-top">
-                                <h6 class="d-inline col-sm-2">Qty: {{ li.QuantityShipped }}</h6>
-                                <span class="d-inline col-sm-10">
-                                    <h6>
-                                        <span>{{ li.Product.Name }}</span>
-                                        <small class="text-muted d-block">{{ li.Product.ID }}</small>
-                                    </h6>
-                                    <img [id]="i"
-                                         [src]="getImageUrl(li)"
-                                         width="auto"
-                                         height="100px"
-                                         class="d-print-none">
-                                </span>
-                         </div>
-                         <hr *ngIf="i !== shipmentItems.Items.length - 1"/>
-                    </div>
-                </div>
-            </div> 
+        <div class="mt-5">
+          <h5 class="mb-3">Items included in this order:</h5>
+          <div class="d-block mb-3"
+               *ngFor="let li of shipmentItems?.Items; let i = index">
+            <div class="col-sm-12">
+              <div class="row align-top">
+                <h6 class="d-inline col-sm-2">Qty: {{ li.QuantityShipped }}</h6>
+                <span class="d-inline col-sm-10">
+                  <h6>
+                    <span>{{ li.Product.Name }}</span>
+                    <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                  </h6>
+                  <img [id]="i"
+                       [src]="getImageUrl(li)"
+                       width="auto"
+                       height="100px"
+                       class="d-print-none">
+                </span>
+              </div>
+              <hr *ngIf="i !== shipmentItems.Items.length - 1" />
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<div *ngIf="createShipment && canCreateShipment()" class="p-3 mt-3 mb-2 border bg-light text-dark">
- <h5 class="mb-3 font-weight-bold">1) Enter Shipment Data</h5>
- <form (ngSubmit)="onSubmit()"
-        novalidate
-        [formGroup]="shipmentForm"
-        name="ShipmentForm">
-    <div class="form-group row">
-     <div class="col-sm-12">
-    <label for="TrackingNumber"
-           class="control-label font-weight-bold mt-1">Tracking Number</label>
-      <input type="text"
-             required
-             showErrors
-             formControlName="TrackingNumber"
-             class="form-control"
-             id="trackingNumber"
-             placeholder="Enter tracking number" />
-    </div>
-</div>
-<div class="form-group row">
-    <div class="col-sm-6">
-        <label for="Ship Date"
-               class="control-label font-weight-bold mt-1">Ship Date</label>
-        <input type="date"
-               required
-               showErrors
-               formControlName="ShipDate"
-               class="form-control"
-               id="shipDate"
-               placeholder="Enter ship date" />
-    </div>
-    <div class="col-sm-6">
-        <label for="Cost"
-               class="control-label font-weight-bold mt-1">Cost</label>
-        <div class="input-group">
+  </div>
+  <div *ngIf="createShipment && canShipLineItems()"
+       class="p-3 mt-3 mb-2 border bg-light text-dark">
+    <h5 class="mb-3 font-weight-bold">1) Enter Shipment Data</h5>
+    <form (ngSubmit)="onSubmit()"
+          novalidate
+          [formGroup]="shipmentForm"
+          name="ShipmentForm">
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <label for="TrackingNumber"
+                 class="control-label font-weight-bold mt-1">Tracking Number</label>
+          <input type="text"
+                 required
+                 showErrors
+                 formControlName="TrackingNumber"
+                 class="form-control"
+                 id="trackingNumber"
+                 placeholder="Enter tracking number" />
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-6">
+          <label for="Ship Date"
+                 class="control-label font-weight-bold mt-1">Ship Date</label>
+          <input type="date"
+                 required
+                 showErrors
+                 formControlName="ShipDate"
+                 class="form-control"
+                 id="shipDate"
+                 placeholder="Enter ship date" />
+        </div>
+        <div class="col-sm-6">
+          <label for="Cost"
+                 class="control-label font-weight-bold mt-1">Cost</label>
+          <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text">$</span>
             </div>
-          <input type="number"
-                 formControlName="Cost"
-                 class="form-control"
-                 id="cost"
-                 placeholder="Enter shipping cost" />
+            <input type="number"
+                   formControlName="Cost"
+                   class="form-control"
+                   id="cost"
+                   placeholder="Enter shipping cost" />
+          </div>
         </div>
-    </div>
-</div>
-    <div class="form-group row">
-    <div class="col-sm-6">
-        <label for="Shipper"
-                class="control-label font-weight-bold mt-1">Carrier</label>
-            <input type="text"
-                   required
-                   showErrors
-                   formControlName="Shipper"
-                   class="form-control"
-                   id="Shipper"
-                   placeholder="Enter carrier name" />
-    </div>
-    <div class="col-sm-6">
-        <label for="Service"
-                class="control-label font-weight-bold mt-1">Shipping Service</label>
-            <input type="text"
-                   formControlName="Service"
-                   class="form-control"
-                   id="Service"
-                   placeholder="Enter shipping service" />
-    </div>
-  </div>
-  <div class="form-group row mb-5">
-    <div *ngIf="!editShipFromAddress" class="col-sm-6">
-        <span class="font-weight-bold d-block">Ship From</span>
-        <span *ngIf="lineItems[0].ShipFromAddress?.CompanyName" class="d-block">{{lineItems[0].ShipFromAddress.CompanyName}}</span>
-        <span class="d-block">{{lineItems[0].ShipFromAddress.Street1}}</span>
-        <span *ngIf="lineItems[0].ShipFromAddress?.Street2" class="d-block">{{lineItems[0].ShipFromAddress.Street2}}</span>
-        <span class="d-block">{{lineItems[0].ShipFromAddress.City}}, {{lineItems[0].ShipFromAddress.State}} {{lineItems[0].ShipFromAddress.Zip}}</span>
-       
-        <!-- TO-DO: Code to change the Ship From address on a shipment.  Waiting for platform issue to be resolved to allow post of supplier FromAddressID. -->
-        <!-- <button class="d-block mt-3 btn btn-outline-dark"
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-6">
+          <label for="Shipper"
+                 class="control-label font-weight-bold mt-1">Carrier</label>
+          <input type="text"
+                 required
+                 showErrors
+                 formControlName="Shipper"
+                 class="form-control"
+                 id="Shipper"
+                 placeholder="Enter carrier name" />
+        </div>
+        <div class="col-sm-6">
+          <label for="Service"
+                 class="control-label font-weight-bold mt-1">Shipping Service</label>
+          <input type="text"
+                 formControlName="Service"
+                 class="form-control"
+                 id="Service"
+                 placeholder="Enter shipping service" />
+        </div>
+      </div>
+      <div class="form-group row mb-5">
+        <div *ngIf="!editShipFromAddress"
+             class="col-sm-6">
+          <span class="font-weight-bold d-block">Ship From</span>
+          <span *ngIf="lineItems[0].ShipFromAddress?.CompanyName"
+                class="d-block">{{lineItems[0].ShipFromAddress.CompanyName}}</span>
+          <span class="d-block">{{lineItems[0].ShipFromAddress.Street1}}</span>
+          <span *ngIf="lineItems[0].ShipFromAddress?.Street2"
+                class="d-block">{{lineItems[0].ShipFromAddress.Street2}}</span>
+          <span class="d-block">{{lineItems[0].ShipFromAddress.City}}, {{lineItems[0].ShipFromAddress.State}} {{lineItems[0].ShipFromAddress.Zip}}</span>
+
+          <!-- TO-DO: Code to change the Ship From address on a shipment.  Waiting for platform issue to be resolved to allow post of supplier FromAddressID. -->
+          <!-- <button class="d-block mt-3 btn btn-outline-dark"
                 (click)="toggleEditShipFromAddress()">
                 <fa-icon [icon]="faCog"></fa-icon> Edit Ship From Address
         </button> -->
 
-    </div>
+        </div>
 
-    <!-- TO-DO: Code to change the Ship From address on a shipment.  Waiting for platform issue to be resolved to allow post of supplier FromAddressID. -->
-    <!-- <div *ngIf="editShipFromAddress" class="col-sm-6">
+        <!-- TO-DO: Code to change the Ship From address on a shipment.  Waiting for platform issue to be resolved to allow post of supplier FromAddressID. -->
+        <!-- <div *ngIf="editShipFromAddress" class="col-sm-6">
         <span class="font-weight-bold d-block">Ship From</span>
             <select type="dropdown"
                     class="form-control"
@@ -161,23 +174,26 @@
         </div>
     </div> -->
 
-    <div *ngIf="!editShipToAddress" class="col-sm-6">
-        <span class="font-weight-bold d-block">Ship To</span>
-        <span *ngIf="lineItems[0].ShippingAddress?.CompanyName" class="d-block">{{lineItems[0].ShippingAddress.CompanyName}}</span>
-        <span class="d-block">{{lineItems[0].ShippingAddress?.Street1}}</span>
-        <span *ngIf="lineItems[0].ShippingAddress?.Street2" class="d-block">{{lineItems[0].ShippingAddress.Street2}}</span>
-        <span class="d-block">{{lineItems[0].ShippingAddress?.City}}, {{lineItems[0].ShippingAddress?.State}} {{lineItems[0].ShippingAddress?.Zip}}</span>
-       
-        <!-- TO-DO: Some starting code to allow a supplier to override the Ship To address, but we need a way to identify the buyer of the order. -->
-        <!-- <button class="d-block mt-3 btn btn-outline-dark"
+        <div *ngIf="!editShipToAddress"
+             class="col-sm-6">
+          <span class="font-weight-bold d-block">Ship To</span>
+          <span *ngIf="lineItems[0].ShippingAddress?.CompanyName"
+                class="d-block">{{lineItems[0].ShippingAddress.CompanyName}}</span>
+          <span class="d-block">{{lineItems[0].ShippingAddress?.Street1}}</span>
+          <span *ngIf="lineItems[0].ShippingAddress?.Street2"
+                class="d-block">{{lineItems[0].ShippingAddress.Street2}}</span>
+          <span class="d-block">{{lineItems[0].ShippingAddress?.City}}, {{lineItems[0].ShippingAddress?.State}} {{lineItems[0].ShippingAddress?.Zip}}</span>
+
+          <!-- TO-DO: Some starting code to allow a supplier to override the Ship To address, but we need a way to identify the buyer of the order. -->
+          <!-- <button class="d-block mt-3 btn btn-outline-dark"
                 (click)="toggleEditShipToAddress()">
                 <fa-icon [icon]="faCog"></fa-icon> Edit Ship To Address
         </button> -->
 
-    </div>
+        </div>
 
-    <!-- TO-DO: Some starting code to allow a supplier to override the Ship To address, but we need a way to identify the buyer of the order. -->
-    <!-- <div *ngIf="editShipToAddress" class="col-sm-6">
+        <!-- TO-DO: Some starting code to allow a supplier to override the Ship To address, but we need a way to identify the buyer of the order. -->
+        <!-- <div *ngIf="editShipToAddress" class="col-sm-6">
         <span class="font-weight-bold d-block">Ship To</span>
             <select type="dropdown"
                     class="form-control"
@@ -197,58 +213,65 @@
             </div>
     </div> -->
 
-  </div>
-  <hr/>
-  <h5 class="mt-4 mb-3 font-weight-bold inline-header">2) Set Quantity to Ship</h5>
-  <mat-checkbox class="align-right"
-                aria-describedby="shipAllItems"
-                color="primary"
-                aria-checked="shipAllItems"
-                (change)="toggleShipAllItems()">Ship All Items</mat-checkbox>
-  <div *ngFor="let li of lineItems; let i = index" formGroupName="Quantities">
-    <div *ngIf="li.Quantity !== li.QuantityShipped" 
-          class="mt-5 row align-items-center">
-      <div class="col-sm-12">
-        <div class="row align-top">
-          <div class="col-sm-9">
-            <div class="ml-3">
-            <h6>
-                <span>{{ li.Product.Name }}</span>
-                <small class="text-muted d-block">{{ li.Product.ID }}</small>
-            </h6>
-            <img [id]="i"
-                 [src]="getImageUrl(li)"
-                 width="auto"
-                 height="100px"
-                 class="d-print-none">
-            </div>
-         </div>
-          <div class="col-sm-3">
-              <div class="float-right mr-2">
-              <h6>Quantity</h6>
-            <select type="dropdown"
-                    [attr.disabled]="shipAllItems ? true : null"
-                    class="form-control"
-                    formControlName="{{li.ID}}"
-                    id="{{li.ID}}">
-                <option [value]="0">Do Not Ship</option>
-                <option *ngFor="let j of getQuantityDropdown(li.Quantity - li.QuantityShipped)"
-                        [value]="j">{{j}}
-                </option>
-            </select>
+      </div>
+      <hr />
+      <h5 class="mt-4 mb-3 font-weight-bold inline-header">2) Set Quantity to Ship</h5>
+      <div class="custom-control custom-checkbox align-right">
+        <input type="checkbox"
+               class="custom-control-input"
+               id="shipAllItems"
+               [checked]="shipAllItems"
+               aria-describedby="shipAllItems"
+               (input)="toggleShipAllItems()">
+        <label class="custom-control-label"
+               for="shipAllItems">Ship All Items</label>
+      </div>
+      <div *ngFor="let li of lineItems; let i = index"
+           formGroupName="Quantities">
+        <div *ngIf="li.Quantity !== li.QuantityShipped"
+             class="mt-5 row align-items-center">
+          <div class="col-sm-12">
+            <div class="row align-top">
+              <div class="col-sm-9">
+                <div class="ml-3">
+                  <h6>
+                    <span>{{ li.Product.Name }}</span>
+                    <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                  </h6>
+                  <img [id]="i"
+                       [src]="getImageUrl(li)"
+                       width="auto"
+                       height="100px"
+                       class="d-print-none">
+                </div>
               </div>
+              <div class="col-sm-3">
+                <div class="float-right mr-2">
+                  <h6>Quantity</h6>
+                  <select type="dropdown"
+                          [attr.disabled]="shipAllItems ? true : null"
+                          class="form-control"
+                          formControlName="{{li.ID}}"
+                          id="{{li.ID}}">
+                    <option [value]="0">Do Not Ship</option>
+                    <option *ngFor="let j of getQuantityDropdown(li)"
+                            [value]="j">{{j}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-   </div>
-  <button type="submit"
-          id="submitBtn"
-          [disabled]="shouldDisableSave(shipmentForm)"
-          class="btn btn-primary mt-4 w-100">Create Shipment</button>
-</form>
-</div>
-<div *ngIf="createShipment && !canCreateShipment()" class="p-3 mt-3 mb-2 border bg-light text-dark d-flex justify-content-center">
+      <button type="submit"
+              id="submitBtn"
+              [disabled]="shouldDisableSave(shipmentForm)"
+              class="btn btn-primary mt-4 w-100">Create Shipment</button>
+    </form>
+  </div>
+  <div *ngIf="createShipment && !canShipLineItems()"
+       class="p-3 mt-3 mb-2 border bg-light text-dark d-flex justify-content-center">
     <span class="text-align-center">All items have been shipped for this order.</span>
-</div>
+  </div>
 </div>

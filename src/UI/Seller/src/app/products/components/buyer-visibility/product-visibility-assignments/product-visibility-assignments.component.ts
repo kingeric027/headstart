@@ -8,7 +8,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceProduct } from 'marketplace-javascript-sdk';
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'product-visibility-assignments-component',

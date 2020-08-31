@@ -20,7 +20,7 @@ import { CookieService } from 'ngx-cookie';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { AppConfig } from '../../shopper-context';
 import { CurrentOrderService } from '../order/order.service';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 
 @Injectable({
@@ -102,27 +102,30 @@ export class AuthService {
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
-    MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
-    this.setToken(creds.access_token);
-    if (rememberMe && creds.refresh_token) {
+    this.loginWithTokens(creds.access_token, creds.refresh_token, rememberMe);
+    return creds;
+  }
+
+  loginWithTokens(token: string, refreshToken?: string, rememberMe: boolean = false): void {
+    HeadStartSDK.Tokens.SetAccessToken(token);
+    this.setToken(token);
+    if (rememberMe && refreshToken) {
       /**
        * set the token duration in the dashboard - https://developer.ordercloud.io/dashboard/settings
        * refresh tokens are configured per clientID and initially set to 0
        * a refresh token of 0 means no refresh token is returned in OAuth response
        */
-      Tokens.SetRefreshToken(creds.refresh_token);
+      Tokens.SetRefreshToken(refreshToken);
       this.setRememberMeStatus(true);
     }
     this.router.navigateByUrl('/home');
     this.ordersToApproveStateService.alertIfOrdersToApprove();
-
-    return creds;
   }
 
   async anonymousLogin(): Promise<AccessToken> {
     try {
       const creds = await Auth.Anonymous(this.appConfig.clientID, this.appConfig.scope);
-      MarketplaceSDK.Tokens.SetAccessToken(creds.access_token);
+      HeadStartSDK.Tokens.SetAccessToken(creds.access_token);
       this.setToken(creds.access_token);
       return creds;
     } catch (err) {
@@ -133,7 +136,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     Tokens.RemoveAccessToken();
-    MarketplaceSDK.Tokens.RemoveAccessToken();
+    HeadStartSDK.Tokens.RemoveAccessToken();
     this.isLoggedIn = false;
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Me, Inventory, PriceSchedule } from 'ordercloud-javascript-sdk';
 import { partition as _partition } from 'lodash';
 import { OrderReorderResponse, MarketplaceMeProduct } from '../../shopper-context';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 @Injectable({

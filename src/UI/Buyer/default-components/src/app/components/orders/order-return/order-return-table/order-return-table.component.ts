@@ -2,11 +2,14 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ShopperContextService, LineItemStatus } from 'marketplace';
-import { Supplier } from 'ordercloud-javascript-sdk'
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { ShopperContextService } from 'marketplace';
+import { Supplier } from 'ordercloud-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { FormGroup, FormArray } from '@angular/forms';
-import { ReturnReason } from './return-reason-enum';
+import { CancelReturnTranslations } from './models/cancel-return-translations.model';
+import { returnHeaders, returnReasons, cancelReasons, cancelHeaders } from './constants/cancel-return-table.constants';
+import { CancelReturnReason } from './models/cancel-return-translations.enum';
+import { CanReturnOrCancel, NumberCanCancelOrReturn } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-return-table.component.html',
@@ -17,46 +20,57 @@ export class OCMOrderReturnTable {
   selection = new SelectionModel<FormGroup>(true, []);
   _liGroup: MarketplaceLineItem[];
   quantitiesToReturn: number[] = [];
-  returnReasons: ReturnReason[] = [
-    ReturnReason.IncorrectSizeOrStyle, 
-    ReturnReason.IncorrectShipment, 
-    ReturnReason.DoesNotMatchDescription, 
-    ReturnReason.ProductDefective, 
-    ReturnReason.PackagingDamaged, 
-    ReturnReason.ReceivedExtraProduct, 
-    ReturnReason.ArrivedLate, 
-    ReturnReason.PurchaseMistake, 
-    ReturnReason.NotNeeded, 
-    ReturnReason.NotApproved, 
-    ReturnReason.UnappliedDiscount, 
-    ReturnReason.ProductMissing
-  ];
+  translationData: CancelReturnTranslations;
   lineItems: FormArray;
-  
+  columnsToDisplay: string[] = [
+    'select',
+    'product',
+    'id',
+    'price',
+    'quantityOrdered',
+    'quantityReturned',
+    'quantityToReturnOrCancel',
+    'returnReason',
+  ];
+  _action: string;
+
   @Input() set liGroup(value: MarketplaceLineItem[]) {
     this._liGroup = value;
   }
-  @Input() columnsToDisplay: string[];
   @Input() supplier: Supplier;
   @Input() set liGroupForm(value: FormGroup) {
     this.lineItems = value.controls.lineItems as FormArray;
     this.dataSource = new MatTableDataSource<any>(this.lineItems.controls);
   }
+  @Input() set action(value: string) {
+    this._action = value;
+    if (value === 'return') {
+      this.translationData = {
+        Headers: returnHeaders,
+        AvailableReasons: returnReasons,
+      };
+    } else {
+      this.translationData = {
+        Headers: cancelHeaders,
+        AvailableReasons: cancelReasons,
+      };
+    }
+  }
   @Output()
   quantitiesToReturnEvent = new EventEmitter<number>();
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   getImageUrl(lineItemID: string): string {
-    return getPrimaryLineItemImage(lineItemID, this._liGroup)
+    return getPrimaryLineItemImage(lineItemID, this._liGroup, this.context.currentUser.get());
   }
 
   toProductDetails(productID: string): void {
     this.context.router.toProductDetails(productID);
   }
 
-  getReasonCode(reason: ReturnReason): string {
-    const reasonCode = Object.keys(ReturnReason).find(key => ReturnReason[key] === reason);
+  getReasonCode(reason: CancelReturnReason): string {
+    const reasonCode = Object.keys(CancelReturnReason).find(key => CancelReturnReason[key] === reason);
     return reasonCode;
   }
 
@@ -76,37 +90,40 @@ export class OCMOrderReturnTable {
   }
 
   isRowEnabled(row: FormGroup): boolean {
-    return row.controls.lineItem.value.Quantity !== row.controls.lineItem.value.xp?.LineItemReturnInfo?.QuantityToReturn && row.controls.lineItem.value.QuantityShipped === row.controls.lineItem.value.Quantity;
+    return CanReturnOrCancel(row.controls.lineItem.value, this._action);
+  }
 
+  getQuantityReturnedCanceled(lineItem: MarketplaceLineItem): number {
+    return NumberCanCancelOrReturn(lineItem, this._action);
   }
 
   selectRow(row: FormGroup): void {
     this.selection.select(row);
-    row.controls.quantityToReturn.enable();
+    row.controls.quantityToReturnOrCancel.enable();
     row.controls.returnReason.enable();
     row.controls.selected.setValue(true);
   }
 
   deselectRow(row: FormGroup): void {
     this.selection.deselect(row);
-    row.controls.quantityToReturn.disable();
+    row.controls.quantityToReturnOrCancel.disable();
     row.controls.returnReason.disable();
     row.controls.selected.setValue(false);
   }
-  
+
   /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle(): void {    
+  masterToggle(): void {
     if (this.isAllEnabledSelected()) {
       this.dataSource.data.forEach(row => {
         if (this.isRowEnabled(row)) {
           this.deselectRow(row);
-       }
+        }
       });
     } else {
       this.dataSource.data.forEach(row => {
         if (this.isRowEnabled(row)) {
           this.selectRow(row);
-       }
+        }
       });
     }
   }
@@ -118,7 +135,7 @@ export class OCMOrderReturnTable {
       this.selectRow(row);
     }
   }
-  
+
   /** The label for the checkbox on the passed row */
   checkboxLabel(i: number, row?: FormGroup): string {
     if (!row) {

@@ -37,8 +37,9 @@ namespace Marketplace.Common.Commands
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
         private readonly IOrderCommand _orderCommand;
+        private readonly ILineItemCommand _lineItemCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -49,8 +50,8 @@ namespace Marketplace.Common.Commands
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
             _orderCommand = orderCommand;
-
-		}
+            _lineItemCommand = lineItemCommand;
+        }
 
         private class PostSubmitErrorResponse
         {
@@ -183,7 +184,7 @@ namespace Marketplace.Common.Commands
                 return new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
-                    UnhandledErrorBody = JsonConvert.SerializeObject(ex),
+                    UnhandledErrorBody = "Failure handling failure marking process"
                 };
             }
         }
@@ -277,7 +278,7 @@ namespace Marketplace.Common.Commands
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
-            await _orderCommand.PatchLineItemStatus(buyerOrder.ID, LineItemStatus.Submitted);
+            await _lineItemCommand.SetInitialSubmittedLineItemStatuses(buyerOrder.ID);
 
             var buyerOrderPatch = new PartialOrder()
             {
@@ -286,7 +287,8 @@ namespace Marketplace.Common.Commands
                     ShipFromAddressIDs = shipFromAddressIDs,
                     SupplierIDs = supplierIDs,
                     ClaimStatus = ClaimStatus.NoClaim,
-                    ShippingStatus = ShippingStatus.Processing
+                    ShippingStatus = ShippingStatus.Processing,
+                    SubmittedOrderStatus = SubmittedOrderStatus.Open
                 }
             };
             
@@ -303,7 +305,10 @@ namespace Marketplace.Common.Commands
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
                 QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
-				Currency = supplier.xp.Currency
+				Currency = supplier.xp.Currency,
+                ClaimStatus = ClaimStatus.NoClaim,
+                ShippingStatus = ShippingStatus.Processing,
+                SubmittedOrderStatus = SubmittedOrderStatus.Open
             };
             return supplierOrderXp;
         }

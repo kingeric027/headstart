@@ -13,7 +13,9 @@
     "serve-test": "ng serve --configuration=test",
     "build-test": "ng build --configuration=test",
     "serve-staging": "ng serve --configuration=staging",
-    "build-staging": "ng build --configuration=staging"
+    "build-staging": "ng build --configuration=staging",
+    "serve-production": "ng serve --configuration=production",
+    "build-production": "ng build --configuration=production"
   },
   "private": true,
   "dependencies": {
@@ -39,7 +41,8 @@
     "@ngx-progressbar/http": "^5.2.1",
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^5.0.0",
-    "@ordercloud/angular-sdk": "0.0.1-29",
+    "@ordercloud/angular-sdk": "1.0.0-12",
+    "@ordercloud/headstart-sdk": "^1.6.8",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",
     "@typescript-eslint/eslint-plugin": "^2.19.2",

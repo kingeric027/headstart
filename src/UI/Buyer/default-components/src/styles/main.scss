@@ -1,7 +1,7 @@
 @charset 'UTF-8';
 
 // Theme Variables - must come before vendor
-@import 'themes/waxing-the-city/variables.scss';
+@import '_theme_variables';
 
 // Vendors
 @import 'vendor/bootstrap', 'vendor/normalize', 'vendor/ngx-toastr';
@@ -25,7 +25,7 @@
 @import '_shame';
 
 // Theme Styles
-@import 'themes/waxing-the-city/styles';
+@import '_theme_styles';
 
 //@import '../app/ocm-default-components/shared.scss';
 
@@ -41,12 +41,6 @@
     text-transform: uppercase;
     font-size: 0.8rem;
   }
-}
-
-.btn-link {
-  // The amount of padding-left in a button
-  // So the text aligns with things rather than the invisible button edge
-  margin-left: -10.8px;
 }
 
 .switch {

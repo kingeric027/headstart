@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Address, BuyerAddress, LineItem, ListPage } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
-import { MarketplaceOrder, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 // TODO - Make this component "Dumb" by removing the dependence on context service 

@@ -1,10 +1,19 @@
 import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
-import { Address, LineItem, OcLineItemService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import {
+  Address,
+  LineItem,
+  OcLineItemService,
+  OcPaymentService,
+  Order,
+  Payment,
+  OcOrderService,
+  OrderDirection,
+} from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
 
 // temporarily any with sdk update
-// import { ProductImage } from 'marketplace-javascript-sdk';
+// import { ProductImage } from '@ordercloud/headstart-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
 import { faDownload, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
@@ -12,6 +21,16 @@ import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { AppAuthService } from '@app-seller/auth';
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
+import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
+
+export const LineItemTableStatus = {
+  Default: 'Default',
+  Canceled: 'Canceled',
+  Returned: 'Returned',
+  Backorered: 'Backorered',
+};
 
 @Component({
   selector: 'app-order-details',
@@ -22,12 +41,10 @@ export class OrderDetailsComponent {
   faDownload = faDownload;
   faUndo = faUndo;
   _order: Order = {};
-  _lineItems: LineItem[] = [];
+  _lineItems: MarketplaceLineItem[] = [];
   _payments: Payment[] = [];
-  _liGroupedByShipFrom: LineItem[][];
-  _liGroups: any;
   images: any[] = [];
-  orderDirection: string;
+  orderDirection: OrderDirection;
   cardType: string;
   createShipment: boolean;
   isSellerUser = false;
@@ -42,6 +59,7 @@ export class OrderDetailsComponent {
   }
   constructor(
     private ocLineItemService: OcLineItemService,
+    private ocOrderService: OcOrderService,
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
     private pdfService: PDFService,
@@ -75,7 +93,9 @@ export class OrderDetailsComponent {
   }
 
   async setOrderStatus() {
-    await this.middleware.acknowledgeQuoteOrder(this._order.ID).then(completedOrder => this.handleSelectedOrderChange(completedOrder));
+    await this.middleware
+      .acknowledgeQuoteOrder(this._order.ID)
+      .then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
   isQuoteOrder(order: Order) {
@@ -86,15 +106,14 @@ export class OrderDetailsComponent {
     this._order = order;
     this.getIncomingOrOutgoing();
     const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID).toPromise();
-    this._lineItems = lineItemsResponse.Items;
+    this._lineItems = lineItemsResponse.Items as MarketplaceLineItem[];
     const paymentsResponse = await this.ocPaymentService.List(this.orderDirection, order.ID).toPromise();
     this._payments = paymentsResponse.Items;
-    this._liGroups = _groupBy(this._lineItems, li => li.ShipFromAddressID);
-    this._liGroupedByShipFrom = Object.values(this._liGroups);
   }
 
-  handleLineItemUpdate() {
-    this.handleSelectedOrderChange(this._order);
+  async refreshOrder(): Promise<void> {
+    const order = await this.ocOrderService.Get(this.orderDirection, this._order.ID).toPromise();
+    this.handleSelectedOrderChange(order);
   }
 
   toggleCreateShipment(createShipment: boolean) {

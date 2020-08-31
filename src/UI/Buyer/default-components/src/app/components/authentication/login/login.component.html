@@ -4,7 +4,8 @@
             class="btn btn-link"
             routerLink="/register"
             translate>AUTHENTICATION.LOGIN.SIGN_UP</button></p>
-  <img class="logo" />
+  <img class="logo"
+       [src]="appConfig.theme.logoSrc" />
 </div>
 <div class="mx-auto mt-4"
      style="max-width:350px;">
@@ -55,7 +56,7 @@
           class="btn btn-link btn-block text-center"
           routerLink="/forgot-password"
           translate>AUTHENTICATION.LOGIN.RESET_PASS</button>
-  <a class="btn btn-link btn-block text-center"
+  <!-- <a class="btn btn-link btn-block text-center"
      [href]="ssoLink"
-     translate>AUTHENTICATION.LOGIN.LOGIN</a>
+     translate>AUTHENTICATION.LOGIN.LOGIN</a> -->
 </div>

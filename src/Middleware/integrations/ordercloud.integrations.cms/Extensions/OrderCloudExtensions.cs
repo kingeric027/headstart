@@ -20,11 +20,11 @@ namespace ordercloud.integrations.cms
 		// Used to confirm resource exists and user has READ access
 		public static async Task Get(this OrderCloudClient oc, Resource resource)
 		{
-			var sdk = (OrderCloudResource)oc.GetType().GetProperty(resource.Type.ToString()).GetValue(oc);
+			var sdk = (OrderCloudResource)oc.GetType().GetProperty(resource.ResourceType.ToString()).GetValue(oc);
 			var getMethod = sdk.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.FirstOrDefault(method => method.Name == "GetAsync" && method.IsGenericMethod == false);
 			var paramCount = getMethod.GetParameters().Length;
-			var parameters = paramCount == 2 ? new object[] { resource.ID, null } : new object[] { resource.ParentID, resource.ID, null };
+			var parameters = paramCount == 2 ? new object[] { resource.ResourceID, null } : new object[] { resource.ParentResourceID, resource.ResourceID, null };
 			try
 			{
 				await (Task)getMethod.Invoke(sdk, parameters);
@@ -38,12 +38,12 @@ namespace ordercloud.integrations.cms
 		// Used to confirm resource exists and user has WRITE access
 		public static async Task EmptyPatch(this OrderCloudClient oc, Resource resource)
 		{
-			var sdk = (OrderCloudResource)oc.GetType().GetProperty(resource.Type.ToString()).GetValue(oc);
+			var sdk = (OrderCloudResource)oc.GetType().GetProperty(resource.ResourceType.ToString()).GetValue(oc);
 			var getMethod = sdk.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
 				.FirstOrDefault(method => method.Name == "PatchAsync" && method.IsGenericMethod == false);
 			var paramInfo = getMethod.GetParameters();
 			var emptyPatch = Activator.CreateInstance(paramInfo[paramInfo.Length - 2].ParameterType);
-			var parameters = paramInfo.Length == 3 ? new object[] { resource.ID, emptyPatch, null } : new object[] { resource.ParentID, resource.ID, emptyPatch, null };
+			var parameters = paramInfo.Length == 3 ? new object[] { resource.ResourceID, emptyPatch, null } : new object[] { resource.ParentResourceID, resource.ResourceID, emptyPatch, null };
 			try
 			{
 				await (Task)getMethod.Invoke(sdk, parameters);
@@ -52,6 +52,21 @@ namespace ordercloud.integrations.cms
 				if (ex.Message == "username is required.") throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
 				throw ex;
 			}
+		}
+
+		public static ListPage<T> Empty<T>(this ListPage<T> list)
+		{
+			return new ListPage<T>()
+			{
+				Items = new List<T>(),
+				Meta = new ListPageMeta()
+				{
+					Page = 1,
+					PageSize = 20,
+					TotalCount = 0,
+					TotalPages = 0
+				}
+			};
 		}
 	}
 }

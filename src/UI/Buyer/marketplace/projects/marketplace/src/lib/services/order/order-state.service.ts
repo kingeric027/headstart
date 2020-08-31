@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ListPage, MarketplaceLineItem, MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { ListPage, MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { LineItems, Me, Order, Orders, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { BehaviorSubject } from 'rxjs';
 import { listAll } from '../../functions/listAll';
@@ -25,8 +25,10 @@ export class OrderStateService {
       OrderType: 'Standard',
       QuoteOrderInfo: null,
       Currency: 'USD', // Default value, overriden in reset() when app loads
-      OrderReturnInfo: {
-        HasReturn: false,
+      Returns: {
+        HasClaims: false,
+        HasUnresolvedClaims: false,
+        Resolutions: []
       },
       ClaimStatus: ClaimStatus.NoClaim,
       ShippingStatus: ShippingStatus.Processing,

@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk'
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk'
 import { ShipEstimate, ListPage, ShipMethodSelection } from 'ordercloud-javascript-sdk';
 
 @Component({

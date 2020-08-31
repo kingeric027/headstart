@@ -7,11 +7,8 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 // ordercloud
-import { OcPasswordResetService } from '@ordercloud/angular-sdk';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { OcForgottenPasswordService } from '@ordercloud/angular-sdk';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 
 @Component({
   selector: 'auth-forgot-password',
@@ -22,7 +19,7 @@ export class ForgotPasswordComponent implements OnInit {
   resetEmailForm: FormGroup;
 
   constructor(
-    private ocPasswordResetService: OcPasswordResetService,
+    private ocPasswordResetService: OcForgottenPasswordService,
     private router: Router,
     private formBuilder: FormBuilder,
     private toasterService: ToastrService,
@@ -45,7 +42,7 @@ export class ForgotPasswordComponent implements OnInit {
           this.toasterService.success('Password Reset Email Sent!');
           this.router.navigateByUrl('/login');
         },
-        (error) => {
+        error => {
           throw error;
         }
       );

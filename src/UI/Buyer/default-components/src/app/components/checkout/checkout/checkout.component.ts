@@ -9,7 +9,7 @@ import {
   BuyerCreditCard,
   OrderPromotion,
 } from 'ordercloud-javascript-sdk';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
@@ -63,6 +63,7 @@ export class OCMCheckout implements OnInit {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
     this.lineItems = this.context.order.cart.get();
+    this.orderPromotions = this.context.order.promos.get().Items;
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.reIDLineItems();
@@ -93,7 +94,7 @@ export class OCMCheckout implements OnInit {
   async doneWithShippingRates(): Promise<void> {
     await this.checkout.calculateOrder();
     this.cards = await this.context.currentUser.cards.List();
-    await this.context.order.reset();
+    await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
     this.lineItems = this.context.order.cart.get();
     this.toSection('payment');
@@ -189,8 +190,9 @@ export class OCMCheckout implements OnInit {
     this.currentPanel = $event.panelId;
   }
 
-  updateOrderMeta(): void {
+  updateOrderMeta(promos?: CustomEvent<OrderPromotion[]>): void {
     this.orderPromotions = this.context.order.promos.get().Items;
+    this.orderPromotions = promos.detail;
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
   }
 }

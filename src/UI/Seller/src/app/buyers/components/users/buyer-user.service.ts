@@ -6,8 +6,8 @@ import {
   OcUserService,
   UserGroupAssignment,
   OcUserGroupService,
-  ListUserGroup,
-  ListUserGroupAssignment,
+  ListPage,
+  UserGroup,
 } from '@ordercloud/angular-sdk';
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
@@ -97,13 +97,12 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
       .toPromise();
   }
 
-  async getUserGroups(buyerID: string, options: ListArgs): Promise<ListUserGroup> {
-    
+  async getUserGroups(buyerID: string, options: ListArgs): Promise<ListPage<UserGroup>> {
     // temporarily as any until changed to js sdk
     return await this.ocBuyerUserGroupService.List(buyerID, options as any).toPromise();
   }
 
-  async listUserAssignments(userID: string, buyerID: string): Promise<ListUserGroupAssignment> {
+  async listUserAssignments(userID: string, buyerID: string): Promise<ListPage<UserGroupAssignment>> {
     return await this.ocBuyerUserGroupService.ListUserAssignments(buyerID, { userID }).toPromise();
   }
 

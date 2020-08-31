@@ -7,8 +7,9 @@ import { PromotionService } from '@app-seller/promotions/promotion.service';
 import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility } from '@app-seller/shared/models/marketplace-promo.interface';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
-import { MarketplaceSupplier } from 'marketplace-javascript-sdk';
+import { MarketplaceSupplier } from '@ordercloud/headstart-sdk';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-promotion-edit',
   templateUrl: './promotion-edit.component.html',
@@ -50,8 +51,7 @@ export class PromotionEditComponent implements OnInit {
   faExclamationCircle = faExclamationCircle;
   faQuestionCircle = faQuestionCircle;
   faCalendar = faCalendar;
-  scopeToSupplier: boolean = false;
-  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router,) {}
+  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.isCreatingNew = this.promotionService.checkIfCreatingNew();
@@ -59,18 +59,18 @@ export class PromotionEditComponent implements OnInit {
 
   refreshPromoData(promo: Promotion<PromotionXp>): void {
     const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm');
-    promo.ExpirationDate ? (this.isExpired = Date.parse(promo.ExpirationDate) < Date.parse(now)) : (this.isExpired = false);
+    this.isExpired = promo.ExpirationDate ? (Date.parse(promo.ExpirationDate) < Date.parse(now)) : false;
     // Modify the datetime to work with the UI
-    promo.StartDate && (promo.StartDate = moment(promo.StartDate).format('YYYY-MM-DD[T]hh:mm'));
+    if(promo.StartDate) promo.StartDate = moment(promo.StartDate).format('YYYY-MM-DD[T]hh:mm');
     if (promo.ExpirationDate) {
       this.hasExpiration = true;
       promo.ExpirationDate = promo.ExpirationDate = moment(promo.ExpirationDate).format('YYYY-MM-DD[T]hh:mm');
     } else {
       this.hasExpiration = false;
     }
-    promo.RedemptionLimit ? this.hasRedemptionLimit = true : this.hasRedemptionLimit = false;
-    promo.RedemptionLimitPerUser ? this.limitPerUser = true : this.limitPerUser = false;
-    promo.xp?.MaxShipCost ? this.capShipCost = true : this.capShipCost = false;
+    this.hasRedemptionLimit = promo.RedemptionLimit ? true : false;
+    this.limitPerUser = promo.RedemptionLimitPerUser ? true : false;
+    this.capShipCost = promo.xp?.MaxShipCost ? true : false;
     this._promotionEditable = JSON.parse(JSON.stringify(promo));
     this._promotionStatic = JSON.parse(JSON.stringify(promo));
     this.createPromotionForm(promo);
@@ -85,7 +85,7 @@ export class PromotionEditComponent implements OnInit {
   async selectSupplier(supplierID: string): Promise<void> {
     const s = await this.ocSupplierService.Get(supplierID).toPromise();
     this.selectedSupplier = s;
-    if (this._promotionEditable?.xp?.ScopeToSupplier) this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
+    if (this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier') this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
   }
 
   createPromotionForm(promotion: Promotion) {
@@ -94,7 +94,6 @@ export class PromotionEditComponent implements OnInit {
       Type: new FormControl(_get(promotion, 'xp.Type')),
       Value: new FormControl(_get(promotion, 'xp.Value'), Validators.min(0)),
       AppliesTo: new FormControl(_get(promotion, 'xp.AppliesTo')),
-      ScopeToSupplier: new FormControl(_get(promotion, 'xp.ScopeToSupplier')),
       Supplier: new FormControl(_get(promotion, 'xp.Supplier')),
       RedemptionLimit: new FormControl(promotion.RedemptionLimit, Validators.min(0)),
       RedemptionLimitPerUser: new FormControl(promotion.RedemptionLimitPerUser, Validators.min(0)),
@@ -103,6 +102,7 @@ export class PromotionEditComponent implements OnInit {
       StartDate: new FormControl(promotion.StartDate, Validators.required),
       ExpirationDate: new FormControl(promotion.ExpirationDate),
       CanCombine: new FormControl(promotion.CanCombine),
+      Automatic: new FormControl(_get(promotion, 'xp.Automatic')),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
       MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
       MinReqInt: new FormControl(_get(promotion, 'xp.MinReq.Int'), Validators.min(0)),
@@ -121,7 +121,8 @@ export class PromotionEditComponent implements OnInit {
     const promoUpdate = {
       field,
       value:
-        (field === 'Type' || field === 'CanCombine' || field === 'xp.ScopeToSupplier') ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
+        ['Type', 'CanCombine', 'xp.Automatic'].includes(field) ? 
+          event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value,
     };
     this.updatePromoResource(promoUpdate);
   }
@@ -143,51 +144,41 @@ export class PromotionEditComponent implements OnInit {
   }
 
   getValueDisplay(): string {
-    let valueString = "off entire order";
     const promo = this._promotionEditable;
+    let valueString = promo?.xp?.AppliesTo === 'SpecificSupplier' ? `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}` : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
     if (promo?.xp?.Type === "FixedAmount") valueString = `$${promo?.xp?.Value} ${valueString}`;
     if (promo?.xp?.Type === "Percentage") valueString = `${promo?.xp?.Value}% ${valueString}`;
-    if (promo?.xp?.Type === "FreeShipping") valueString = `Free shipping on entire order`;
-    if (promo?.xp?.MinReq?.Type === "MinPurchase" && promo?.xp?.MinReq?.Int) {
-      promo?.xp?.ScopeToSupplier ? 
-      valueString = `${valueString} when you purhcase $${promo?.xp?.MinReq?.Int} or more worth of ${this.selectedSupplier?.Name} products`
-        :
-      valueString = `${valueString} over $${promo?.xp?.MinReq?.Int}`;
-    }
-    if (promo?.xp?.MinReq?.Type === "MinItemQty" && promo?.xp?.MinReq?.Int) {
-      valueString = promo?.xp?.ScopeToSupplier ? 
-      `${valueString} when you purchase ${this._promotionEditable?.xp?.MinReq?.Int} or more ${this.selectedSupplier?.Name} products`
-        :
-      `${valueString} over ${this._promotionEditable?.xp?.MinReq?.Int} items`
-    }
+    if (promo?.xp?.Type === "FreeShipping") valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
+    if (promo?.xp?.MinReq?.Type === "MinPurchase" && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
+    if (promo?.xp?.MinReq?.Type === "MinItemQty" && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
     // Update `promotion.Description` with this value string
     this.handleUpdatePromo({target: {value: valueString}}, 'Description');
     return valueString;
   }
 
   getDateRangeDisplay(): string {
-    let dateRangeString = "Valid from";
+    let dateRangeString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.DATE.VALID_FROM');
     const formattedStart = this._promotionEditable.StartDate.substr(0, 4) === moment().format('YYYY') ? moment(this._promotionEditable.StartDate).format('MMM Do') : moment(this._promotionEditable.StartDate).format('MMM Do, YYYY');
     const formattedExpiry = this._promotionEditable.ExpirationDate.substr(0, 4) === moment().format('YYYY') ? moment(this._promotionEditable.ExpirationDate).format('MMM Do') : moment(this._promotionEditable.ExpirationDate).format('MMM Do, YYYY');
     moment(this._promotionEditable.StartDate).format('MM-DD-YYYY') === moment().format('MM-DD-YYYY') ?
-      dateRangeString = `${dateRangeString} today to ${formattedExpiry}`
+      dateRangeString = `${dateRangeString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.DATE.TODAY_TO')} ${formattedExpiry}`
     :
-      dateRangeString = `${dateRangeString} ${formattedStart} to ${formattedExpiry}`;
+      dateRangeString = `${dateRangeString} ${formattedStart} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.DATE.TO')} ${formattedExpiry}`;
     return dateRangeString;
   }
 
   getEligibilityDisplay(): string {
-    let eligibilityString = "For";
-    if (this._promotionEditable.AllowAllBuyers) eligibilityString = `${eligibilityString} all buyers`;
+    let eligibilityString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.ELIGIBILITY.FOR');
+    if (this._promotionEditable.AllowAllBuyers) eligibilityString = `${eligibilityString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.ELIGIBILITY.ALL_BUYERS')}`;
     // In the future, there will be other considerations for finer grained eligibility
     return eligibilityString;
   }
 
   getUsageLimitDisplay(): string {
-    let usageLimitString = "Limit of";
-    if (this._promotionEditable.RedemptionLimit) usageLimitString = `${usageLimitString} ${this._promotionEditable.RedemptionLimit} ${this._promotionEditable.RedemptionLimit > 1 ? 'uses' : 'use'}`;
-    if (this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `${usageLimitString} ${this._promotionEditable.RedemptionLimitPerUser} per user`
-    if (this._promotionEditable.RedemptionLimit && this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `Limit of ${this._promotionEditable.RedemptionLimit} uses, ${this._promotionEditable.RedemptionLimitPerUser} per user`
+    let usageLimitString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.LIMIT_OF');
+    if (this._promotionEditable.RedemptionLimit) usageLimitString = `${usageLimitString} ${this._promotionEditable.RedemptionLimit} ${this._promotionEditable.RedemptionLimit > 1 ? this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.USES') : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.USE')}`;
+    if (this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `${usageLimitString} ${this._promotionEditable.RedemptionLimitPerUser} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.PER_USER')}`
+    if (this._promotionEditable.RedemptionLimit && this._promotionEditable.RedemptionLimitPerUser) usageLimitString = `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.LIMIT_OF')} ${this._promotionEditable.RedemptionLimit} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.USES')}, ${this._promotionEditable.RedemptionLimitPerUser} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.USAGE.PER_USER')}`
     return usageLimitString;
   }
 
@@ -215,6 +206,10 @@ export class PromotionEditComponent implements OnInit {
     if (!this.capShipCost) this._promotionEditable.xp.MaxShipCost = null;
   }
 
+  toggleApplyToSpecificSupplier(): void {
+    (this._promotionEditable as any).LineItemLevel = !(this._promotionEditable as any).LineItemLevel;
+  }
+
   getSaveBtnText(): string {
     return this.promotionService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
   }
@@ -222,7 +217,6 @@ export class PromotionEditComponent implements OnInit {
   handleClearMinReq(): void {
     this._promotionEditable.EligibleExpression = "true";
     this.handleUpdatePromo({target: { value: {Type: null, Int: null} }}, "xp.MinReq");
-    this.handleUpdatePromo({target: { value: false }}, "xp.ScopeToSupplier");
   }
 
   handleDiscardChanges(): void {
@@ -230,10 +224,13 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildValueExpression(): void {
-    let valueExpression: string = "Order.Subtotal";
+    let valueExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? "item.LineSubtotal" : "Order.Subtotal";
     switch(this._promotionEditable.xp?.Type) {
       case 'FixedAmount':
-        valueExpression = `${this._promotionEditable.xp?.Value}`
+        valueExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
+        `${this._promotionEditable.xp?.Value} / items.count(SupplierID = '${this.selectedSupplier?.ID}')` 
+          : 
+        `${this._promotionEditable.xp?.Value}`
         break;
       case 'Percentage':
         valueExpression = `${valueExpression} * ${(this._promotionEditable.xp?.Value / 100)}`
@@ -246,23 +243,23 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildEligibleExpression(): void {
-    let eligibleExpression: string;
+    let eligibleExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? `item.SupplierID = '${this.selectedSupplier?.ID}'` : `true`;
     switch (this._promotionEditable.xp?.MinReq?.Type) {
       case 'MinPurchase':
-        eligibleExpression = this._promotionEditable?.xp?.ScopeToSupplier ? 
-        `items.total(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
+        eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
+        `${eligibleExpression} and items.total(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
           :
         `Order.Subtotal >= ${this._promotionEditable.xp?.MinReq?.Int}`;
         break;
       case 'MinItemQty':
-        eligibleExpression = this._promotionEditable?.xp?.ScopeToSupplier ? 
-        `items.Quantity(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
+        eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
+        `${eligibleExpression} and items.Quantity(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
           :
         `Order.LineItemCount >= ${this._promotionEditable.xp?.MinReq?.Int}`
         break;
     }
     if (this._promotionEditable.xp?.MaxShipCost) {
-      this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `${eligibleExpression} and Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
+      this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
       :
       eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
     }

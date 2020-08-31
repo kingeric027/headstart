@@ -7,6 +7,7 @@ using Marketplace.Models.Attributes;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
 using Marketplace.Models.Models.Marketplace;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Controllers
 {
@@ -17,9 +18,11 @@ namespace Marketplace.Common.Controllers
     {
         
         private readonly IOrderCommand _command;
-        public OrderController(IOrderCommand command, AppSettings settings) : base(settings)
+        private readonly ILineItemCommand _lineItemCommand;
+        public OrderController(IOrderCommand command, ILineItemCommand lineItemCommand, AppSettings settings) : base(settings)
         {
             _command = command;
+            _lineItemCommand = lineItemCommand;
         }
 
         [DocName("POST Acknowledge Quote Order")]
@@ -27,13 +30,6 @@ namespace Marketplace.Common.Controllers
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
             return await _command.AcknowledgeQuoteOrder(orderID);
-        }
-
-        [DocName("Send return requested email")]
-        [HttpPost, Route("requestreturn/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task RequestReturnEmail(string orderID)
-        {
-            await _command.RequestReturnEmail(orderID);
         }
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
@@ -61,7 +57,14 @@ namespace Marketplace.Common.Controllers
         [HttpPut, Route("{orderID}/lineitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, [FromBody] MarketplaceLineItem li)
         {
-            return await _command.UpsertLineItem(orderID, li, VerifiedUserContext);
+            return await _lineItemCommand.UpsertLineItem(orderID, li, VerifiedUserContext);
+        }
+
+        [DocName("Delete a line item")]
+        [HttpDelete, Route("{orderID}/lineitems/{lineItemID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task DeleteLineItem(string orderID, string lineItemID)
+        {
+            await _lineItemCommand.DeleteLineItem(orderID, lineItemID);
         }
 
         [DocName("Apply a promotion to an order")]
@@ -69,6 +72,27 @@ namespace Marketplace.Common.Controllers
         public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode)
         {
             return await _command.AddPromotion(orderID, promoCode, VerifiedUserContext);
+        }
+
+        [DocName("Seller or Supplier Set Line Item Statuses On Order with Related Notification")]
+        [HttpPost, Route("{orderID}/{orderDirection}/lineitem/status"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin)]
+        public async Task<List<MarketplaceLineItem>> SellerSupplierUpdateLineItemStatusesWithNotification(string orderID, OrderDirection orderDirection, [FromBody] LineItemStatusChanges lineItemStatusChanges)
+        {
+            return await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(orderDirection, orderID, lineItemStatusChanges, VerifiedUserContext);
+        }
+
+        [DocName("Buyer Set Line Item Statuses On Order with Related Notification")]
+        [HttpPost, Route("{orderID}/lineitem/status"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<List<MarketplaceLineItem>> BuyerUpdateLineItemStatusesWithNotification(string orderID, [FromBody] LineItemStatusChanges lineItemStatusChanges)
+        {
+            return await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, orderID, lineItemStatusChanges, VerifiedUserContext);
+        }
+
+        [DocName("Apply Automatic Promtions to order and remove promotions no longer valid on order")]
+        [HttpPost, Route("{orderID}/applypromotions")]
+        public async Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID)
+        {
+            return await _command.ApplyAutomaticPromotions(orderID);
         }
     }
 }

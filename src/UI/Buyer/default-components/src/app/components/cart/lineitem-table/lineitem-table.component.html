@@ -26,20 +26,26 @@
     <div class="px-3 pt-2 d-none d-sm-block border-bottom"
          *ngIf="orderType !== 'Quote'">
       <div class="row">
-        <div class="col-sm-7"></div>
-        <div class="col-sm-5">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6">
           <div class="row">
             <div *ngIf="!hasReturnInfo()"
-                 class="col-3 text-center"></div>
+                 class="col-2 text-center"></div>
+            <div *ngIf="!hasCancelInfo()"
+                 class="col-2 text-center"></div>
             <div class="col-3 text-center">
               <h4 translate>CART.LINEITEM_TABLE.PRICE</h4>
             </div>
-            <div class="col-3 text-center">
+            <div class="col-2 text-center">
               <h4 translate>CART.LINEITEM_TABLE.QTY</h4>
             </div>
             <div *ngIf="hasReturnInfo()"
-                 class="col-3 text-center">
+                 class="col-2 text-center">
               <h4 translate>CART.LINEITEM_TABLE.QTY_RETURNED</h4>
+            </div>
+            <div *ngIf="hasCancelInfo()"
+                 class="col-2 text-center">
+              <h4 translate>CART.LINEITEM_TABLE.QTY_CANCELED</h4>
             </div>
             <div class="col-3 text-center">
               <h4 translate>CART.LINEITEM_TABLE.TOTAL</h4>
@@ -51,12 +57,12 @@
     <div class="flex-none">
       <div *ngFor="let li of liGroup; let i = index">
         <div class="m-2 row align-items-center">
-          <div class="col-sm-7"
+          <div class="col-sm-6"
                *ngIf="li">
             <div class="row align-items-sm-center">
               <div class="col-3 p-0">
                 <img class="img-thumbnail"
-                     [src]="li.xp?.LineItemImageUrl || getImageUrl(li.ID)" 
+                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
                      alt="{{ li.Product.ID }}" />
               </div>
               <div class="col-9">
@@ -83,7 +89,19 @@
                         badge-pill
                         badge-primary">Purchase Order</span>
                 </h4>
-                <div *ngIf="readOnly && !hideStatus"><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="li.xp?.LineItemStatus"></ocm-order-status-icon> {{ li.xp?.LineItemStatus | orderStatusDisplay }}</div>
+                <div *ngIf="readOnly && !hideStatus"><span translate>ORDERS.DETAIL.STATUS</span>:
+                  <span *ngFor="let entry of li.xp.StatusByQuantity | keyvalue">
+                    <span *ngIf="entry.value">
+                      <ocm-order-status-icon [status]="entry.key"></ocm-order-status-icon>
+                      <span>
+                        {{entry.value}}
+                      </span>
+                      <span>
+                        {{ entry.key | orderStatusDisplay }}
+                      </span>
+                    </span>
+                  </span>
+                </div>
                 <a class="text-danger btn btn-link px-0 link"
                    *ngIf="!readOnly"
                    (click)="removeLineItem(li.ID)"
@@ -91,11 +109,13 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-5">
+          <div class="col-sm-6">
             <div class="row align-items-center pt-3 pt-sm-0"
                  *ngIf="orderType !== 'Quote'">
               <div *ngIf="!hasReturnInfo()"
-                   class="col-3 text-center"></div>
+                   class="col-2 text-center"></div>
+              <div *ngIf="!hasCancelInfo()"
+                   class="col-2 text-center"></div>
               <div class="
                  col-3
                  text-center">
@@ -103,7 +123,7 @@
                       translate>CART.LINEITEM_TABLE.UNIT_PRICE</span>
                 <span class="text-nowrap">{{ li.UnitPrice | currency: _orderCurrency }}</span>
               </div>
-              <div class="col-3 text-center">
+              <div class="col-2 text-center">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.QTY</span>
                 <ocm-quantity-input *ngIf="!readOnly"
@@ -116,11 +136,18 @@
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
               <div *ngIf="hasReturnInfo()"
-                   class="col-3 text-center">
+                   class="col-2 text-center">
                 <span class="d-block d-sm-none"
                       translate>CART.LINEITEM_TABLE.QTY_RETURNED</span>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ (li.xp?.LineItemReturnInfo?.QuantityToReturn | number) || 0 }}</span>
+              </div>
+              <div *ngIf="hasCancelInfo()"
+                   class="col-2 text-center">
+                <span class="d-block d-sm-none"
+                      translate>CART.LINEITEM_TABLE.QTY_CANCELED</span>
+                <span class="text-nowrap"
+                      *ngIf="readOnly">&times;{{ (li.xp?.LineItemCancelInfo?.QuantityToCancel | number) || 0 }}</span>
               </div>
               <div class="col-3 text-right">
                 <span class="d-block d-sm-none"

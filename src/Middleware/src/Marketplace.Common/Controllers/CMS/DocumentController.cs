@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using IDocumentQuery = ordercloud.integrations.cms.IDocumentQuery;
+using Newtonsoft.Json.Linq;
+using Marketplace.Models.Misc;
 
 namespace Marketplace.Common.Controllers.CMS
 {
@@ -18,46 +20,98 @@ namespace Marketplace.Common.Controllers.CMS
 	public class DocumentController : BaseController
 	{
 		private readonly IDocumentQuery _documents;
+		private readonly IDocumentAssignmentQuery _assignments;
 
-		public DocumentController(AppSettings settings, IDocumentQuery schemas) : base(settings)
+		public DocumentController(AppSettings settings, IDocumentQuery schemas, IDocumentAssignmentQuery assignments) : base(settings)
 		{
 			_documents = schemas;
+			_assignments = assignments;
 		}
 
 		[DocName("List Documents")]
 		[HttpGet, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<ListPage<Document>> List(string schemaID, ListArgs<Document> args)
+		public async Task<ListPage<JDocument>> List(string schemaID, ListArgs<Document<JObject>> args)
 		{
-			return await _documents.List(schemaID, args, VerifiedUserContext);
+			RequireOneOf(CustomRole.DocumentAdmin, CustomRole.DocumentReader);
+			var docs = await _documents.List<JObject>(schemaID, args, VerifiedUserContext);
+			return docs.Reserialize<ListPage<JDocument>>();
 		}
 
 		[DocName("Get a Document")]
 		[HttpGet, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<Document> Get(string schemaID, string documentID)
+		public async Task<JDocument> Get(string schemaID, string documentID)
 		{
-			return await _documents.Get(schemaID, documentID, VerifiedUserContext);
+			RequireOneOf(CustomRole.DocumentAdmin, CustomRole.DocumentReader);
+			var doc = await _documents.Get<JObject>(schemaID, documentID, VerifiedUserContext);
+			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Create a Document")]
-		[DocIgnore] // For now, hide from swagger reflection b/c it doesn't handle file uploads well. 
 		[HttpPost, Route(""), OrderCloudIntegrationsAuth]
-		public async Task<Document> Create(string schemaID, [FromBody] Document document)
+		public async Task<JDocument> Create(string schemaID, [FromBody] JDocument document)
 		{
-			return await _documents.Create(schemaID, document, VerifiedUserContext);
+			RequireOneOf(CustomRole.DocumentAdmin);
+			var doc = await _documents.Create(schemaID, document, VerifiedUserContext);
+			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Update a Document")]
 		[HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<Document> Update(string schemaID, string documentID, [FromBody] Document document)
+		public async Task<JDocument> Save(string schemaID, string documentID, [FromBody] JDocument document)
 		{
-			return await _documents.Update(schemaID, documentID, document, VerifiedUserContext);
+			RequireOneOf(CustomRole.DocumentAdmin);
+			var doc =  await _documents.Save(schemaID, documentID, document, VerifiedUserContext);
+			return doc.Reserialize<JDocument>();
 		}
 
 		[DocName("Delete a Document")]
 		[HttpDelete, Route("{documentID}"), OrderCloudIntegrationsAuth]
 		public async Task Delete(string schemaID, string documentID)
 		{
+			RequireOneOf(CustomRole.DocumentAdmin);
 			await _documents.Delete(schemaID, documentID, VerifiedUserContext);
+		}
+
+		[DocName("List Document Assignments")]
+		[HttpGet, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task<ListPage<DocumentAssignment>> ListAssignments(string schemaID, ListArgs<DocumentAssignment> args)
+		{
+			RequireOneOf(CustomRole.DocumentReader, CustomRole.DocumentAdmin);
+			return await _assignments.ListAssignments(schemaID, args, VerifiedUserContext);
+		}
+
+		[DocName("Create Document Assignment")]
+		[HttpPost, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task SaveAssignment(string schemaID, [FromBody] DocumentAssignment assignment)
+		{
+			RequireOneOf(CustomRole.DocumentAdmin);
+			await _assignments.SaveAssignment(schemaID, assignment, VerifiedUserContext);
+		}
+
+		[DocName("Delete Document Assignment")]
+		[HttpDelete, Route("assignments"), OrderCloudIntegrationsAuth]
+		public async Task DeleteAssignment(string schemaID, [FromQuery] DocumentAssignment assignment)
+		{
+			RequireOneOf(CustomRole.DocumentAdmin);
+			await _assignments.DeleteAssignment(schemaID, assignment, VerifiedUserContext);
+		}
+
+		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
+		[HttpGet, Route("{type}/{ID}")]
+		public async Task<ListPage<JDocument>> ListDocuments(string schemaID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
+		{
+			var resource = new Resource(type, ID);
+			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, args, VerifiedUserContext);
+			return docs.Reserialize<ListPage<JDocument>>();
+		}
+
+		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
+		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}")]
+		public async Task<ListPage<JDocument>> ListDocumentsOnChild(string schemaID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
+		{
+			var resource = new Resource(type, ID, parentType, parentID);
+			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, args, VerifiedUserContext);
+			return docs.Reserialize<ListPage<JDocument>>();
 		}
 	}
 }

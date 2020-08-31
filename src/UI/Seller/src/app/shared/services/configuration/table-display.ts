@@ -1,4 +1,5 @@
 import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
+import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper';
 
 export interface SummaryResourceInfoPaths {
   toPrimaryHeader: string;
@@ -15,7 +16,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   suppliers: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
-    toImage: 'xp.LogoUrl',
+    toImage: SUPPLIER_LOGO_PATH_STRATEGY,
     toExpandable: false,
   },
   users: {
@@ -25,6 +26,12 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toExpandable: false,
   },
   products: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ID',
+    toImage: PRODUCT_IMAGE_PATH_STRATEGY,
+    toExpandable: false,
+  },
+  kitproducts: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
     toImage: PRODUCT_IMAGE_PATH_STRATEGY,
@@ -80,7 +87,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   },
   orders: {
     toPrimaryHeader: 'ID',
-    toSecondaryHeader: 'Status',
+    toSecondaryHeader: 'xp.SubmittedOrderStatus',
     toImage: '',
     toExpandable: false,
   },
@@ -120,6 +127,7 @@ export const BASIC_STRING = 'BASIC_STRING';
 export const DATE_TIME = 'DATE_TIME';
 export const CURRENCY = 'CURRENCY';
 export const COPY_OBJECT = 'COPY_OBJECT';
+export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON';
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -145,6 +153,23 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: PRODUCT_IMAGE_PATH_STRATEGY,
   },
+  kitproducts: {
+    fields: [
+      {
+        path: 'Product.Name',
+        header: 'ADMIN.HEADERS.NAME',
+        type: STRING_WITH_IMAGE,
+        sortable: true,
+      },
+      {
+        path: 'Product.ID',
+        header: 'ADMIN.HEADERS.ID',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+    ],
+    imgPath: PRODUCT_IMAGE_PATH_STRATEGY,
+  },
   suppliers: {
     fields: [
       {
@@ -166,7 +191,7 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         sortable: false,
       },
     ],
-    imgPath: 'xp.LogoUrl',
+    imgPath: SUPPLIER_LOGO_PATH_STRATEGY,
   },
   users: {
     fields: [
@@ -181,6 +206,12 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
         sortable: true,
+      },
+      {
+        path: 'Impersonate',
+        header: '',
+        type: IMPERSONATE_BUTTON,
+        sortable: false,
       },
     ],
     imgPath: '',

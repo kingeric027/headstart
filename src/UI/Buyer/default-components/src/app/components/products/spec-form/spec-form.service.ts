@@ -2,8 +2,7 @@ import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { SpecOption, Spec, LineItemSpec, ListPage, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
-import { SuperMarketplaceProduct, AssetForDelivery } from 'marketplace-javascript-sdk';
-import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
+import { SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -78,7 +77,7 @@ export class SpecFormService {
     return image?.Url;
   }
 
-  private isImageMatchingSpecs(image: AssetForDelivery, product: SuperMarketplaceProduct): boolean {
+  private isImageMatchingSpecs(image: Asset, product: SuperMarketplaceProduct): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
   const specs = this.getLineItemSpecs({Meta: {}, Items: product.Specs as any});
   return specs.

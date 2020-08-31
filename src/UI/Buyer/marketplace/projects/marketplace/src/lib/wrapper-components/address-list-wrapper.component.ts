@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ListPage, Address } from 'marketplace-javascript-sdk';
+import { ListPage, Address } from '@ordercloud/headstart-sdk';
 
 @Component({
   template: `

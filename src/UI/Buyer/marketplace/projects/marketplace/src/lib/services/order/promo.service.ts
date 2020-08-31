@@ -4,7 +4,8 @@ import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK, ListPage } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ export class PromoService {
   public onChange = this.state.onPromosChange.bind(this.state);
   private initializingOrder = false;
 
-  constructor(private state: OrderStateService) {}
+  constructor(private state: OrderStateService, private tempsdk: TempSdk) {}
 
   get(): ListPage<OrderPromotion> {
     return this.promos;
@@ -35,6 +36,14 @@ export class PromoService {
       this.onAdd.next(newPromo);
       return newPromo;
     } finally {
+      await this.state.reset();
+    }
+  }
+
+  public async applyAutomaticPromos(): Promise<void> {
+    try {
+      await this.tempsdk.applyAutomaticPromotionsToOrder(this.order.ID)
+    } finally{
       await this.state.reset();
     }
   }
