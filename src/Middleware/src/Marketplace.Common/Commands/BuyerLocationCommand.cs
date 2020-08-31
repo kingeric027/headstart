@@ -39,9 +39,10 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user, string token)
         {
             var buyerLocationID = CreateBuyerLocationID(buyerID, buyerLocation.Address.ID);
-            buyerLocation.UserGroup.ID = buyerLocationID;
             buyerLocation.Address.ID = buyerLocationID;
             var buyerAddress = await _oc.Addresses.CreateAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address, accessToken: user.AccessToken);
+
+            buyerLocation.UserGroup.ID = buyerAddress.ID;
             var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
             await CreateUserGroupAndAssignments(token, buyerID, buyerAddress.ID);
             await CreateLocationUserGroupsAndApprovalRule(token, buyerAddress.ID, buyerAddress.AddressName);
