@@ -39,3 +39,22 @@ export async function deleteUser(
 		accessToken: clientAuth,
 	})
 }
+
+export async function getUserID(
+	username: string,
+	buyerID: string,
+	clientAuth: string
+) {
+	const searchResponse = await OrderCloudSDK.Users.List(
+		buyerID,
+		{
+			search: username,
+			searchOn: 'Username',
+		},
+		{ accessToken: clientAuth }
+	)
+
+	const user = searchResponse.Items.find(x => x.Username === username)
+
+	if (user.Username.includes('.hpmqx9la@mailosaur.io')) return user.ID
+}
