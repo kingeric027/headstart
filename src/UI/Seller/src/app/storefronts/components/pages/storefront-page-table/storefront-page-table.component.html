@@ -1,14 +1,15 @@
-<resource-breadcrumbs-component></resource-breadcrumbs-component>
+<resource-breadcrumbs-component class="additional-item-resource"></resource-breadcrumbs-component>
 <div class="container-fluid">
-  <div class="py-3">
+  <div class="py-3 additional-item-resource">
     <h1 class="resource-name mb-0">Pages</h1>
   </div>
-  <cms-page-list class="full-height"
+  <cms-page-list [ngStyle]="{'height.px': resourceHeight}"
                  *ngIf="parentResourceID"
                  resourceType="ApiClients"
                  [resourceID]="parentResourceID"
-                 renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net/">
-    <resource-select-dropdown-component class="cms-toolbar-additions"
+                 renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net">
+    <!-- TODO: The `renderSiteUrl` prop needs to be dynamic, based on which Api Client is selected -->
+    <resource-select-dropdown-component class="cms-toolbar-additions additional-item-edit-resource"
                                         [parentService]="storefrontsService"
                                         [ocService]="ocService">
     </resource-select-dropdown-component>
