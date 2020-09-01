@@ -4,10 +4,11 @@
         <div class="row pt-3">
             <div class="col-md-5">
                 <h5>Report Details</h5>
-                <p>Provide a name for this template, and indicate if suppliers should access it.</p>
+                <p>Provide a name and description for this template.</p>
             </div>
             <div class="col-md-7 form-group">
-                <div class="form-row">
+                <div *ngIf="reportType !== 'SalesOrderDetail'"
+                     class="form-row">
                     <div class="form-group col-md-12">
                         <p class="mb-1">Available to Suppliers</p>
                         <label class="switch mb-0"
@@ -114,7 +115,7 @@
                                          class="chip editable"
                                          (click)="toggleFilter(filter, filterValue)"
                                          [ngClass]="{'active': isFilterValueSelected(filter, filterValue)}">
-                                          {{ filterValue.Name || filterValue.label }}
+                                          {{ filterValue.Name || filterValue.label || filterValue }}
                                         <fa-icon *ngIf="isFilterValueSelected(filter, filterValue)"
                                                  [icon]="faCheckCircle">
                                         </fa-icon>

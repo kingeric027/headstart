@@ -11,6 +11,8 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Linq;
 using Marketplace.Common.Models;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
 {
@@ -69,12 +71,23 @@ namespace Marketplace.Common.Commands
                     ICell cell = sheetRow.CreateCell(j++);
                     if (header.Contains("."))
                     {
-                        var cellValue = dataJSON[header.Split(".")[0]][header.Split(".")[1]];
-                        cell.SetCellValue(cellValue.ToString());
+                        if (dataJSON[header.Split(".")[0]].ToString() != "")
+                        {
+                            cell.SetCellValue(dataJSON[header.Split(".")[0]][header.Split(".")[1]].ToString());
+                        } else
+                        {
+                            cell.SetCellValue("");
+                        }
                     }
                     else
                     {
-                        cell.SetCellValue(dataJSON[header].ToString());
+                        if (header == "Status")
+                        {
+                            cell.SetCellValue(Enum.GetName(typeof(OrderStatus), Convert.ToInt32(dataJSON[header])));
+                        } else
+                        {
+                            cell.SetCellValue(dataJSON[header].ToString());
+                        }
                     }
                 }
             }

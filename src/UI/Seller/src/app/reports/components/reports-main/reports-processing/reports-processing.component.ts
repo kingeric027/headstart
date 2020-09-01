@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'reports-processing-component',
@@ -12,18 +13,38 @@ export class ReportsProcessingComponent {
   reportDownloading: boolean;
   @Input()
   fetchingPreview: boolean;
+  @Input()
+  reportSelectionForm: FormGroup;
+  @Input()
+  adHocFilters: string[];
   @Output()
-  handlePreviewReport = new EventEmitter<string>();
+  handlePreviewReport = new EventEmitter<any>();
   @Output()
   handleDownloadReport = new EventEmitter<string>();
 
   constructor() {}
 
-  previewReport(event: any): void {
-    this.handlePreviewReport.emit(event);
+  previewReport(selectedTemplateID: string): void {
+    const reportRequestBody = this.retrieveReportRequestBody(selectedTemplateID);
+    this.handlePreviewReport.emit(reportRequestBody);
   }
 
-  downloadReport(event: any): void {
-    this.handleDownloadReport.emit(event);
+  downloadReport(selectedTemplateID: string): void {
+    const reportRequestBody = this.retrieveReportRequestBody(selectedTemplateID);
+    this.handleDownloadReport.emit(reportRequestBody);
+  }
+
+  retrieveReportRequestBody(selectedTemplateID: string): any {
+    let adHocFilterValues: any[] = [];
+    if (this.adHocFilters?.length) {
+      this.adHocFilters.forEach(filter => {
+        adHocFilterValues.push(this.reportSelectionForm.controls[filter].value);
+      });
+    }
+    const reportRequestBody = {
+      selectedTemplateID: selectedTemplateID,
+      adHocFilterValues: adHocFilterValues,
+    };
+    return reportRequestBody;
   }
 }

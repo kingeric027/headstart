@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import * as moment from 'moment';
 
 @Component({
   selector: 'reports-preview-component',
@@ -24,9 +25,22 @@ export class ReportsPreviewComponent implements OnChanges {
     }
   }
 
+  formatData(item: any, header: string): string {
+    if (header.toLowerCase().includes('date')) {;
+      return moment(item[header]).format('MM/DD/YYYY');
+    } else if (header.includes('.')) {
+      return (this.getNestedValue(item, header));
+    } else return item[header];
+  }
+
   requiresPipe(header: string): boolean {
     if (header.toLowerCase().includes('phone')) {
       this.pipeName = 'phone';
+      return true;
+    } else if (header.toLowerCase().includes('total') ||
+              header.toLowerCase().includes('cost') ||
+              header.toLowerCase().includes('discount')) 
+    { this.pipeName = 'currency';
       return true;
     } else {
       return false;
@@ -36,6 +50,9 @@ export class ReportsPreviewComponent implements OnChanges {
   //TO-DO - Will need refactoring for future data values that are more deeply nested.
   getNestedValue(item: {}, header: string): string {
     const props = header.split('.');
-    return item[props[0]][props[1]];
+    const first = item[props[0]];
+    if (first) {
+      return first[props[1]];
+    }
   }
 }

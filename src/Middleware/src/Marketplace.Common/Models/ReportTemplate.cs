@@ -4,6 +4,7 @@ using ordercloud.integrations.library;
 using System.Collections.Generic;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library.Cosmos;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Models
 {
@@ -26,7 +27,8 @@ namespace Marketplace.Common.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ReportTypeEnum
     {
-        BuyerLocation
+        BuyerLocation,
+        SalesOrderDetail
     }
 
     public class ReportFilters
@@ -34,5 +36,7 @@ namespace Marketplace.Common.Models
         public List<string> BuyerID { get; set; }
         public List<string> Country { get; set; }
         public List<string> State { get; set; }
+        public List<string> Status { get; set; }
+        public List<string> OrderType { get; set; }
     }
 }

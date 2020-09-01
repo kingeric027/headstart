@@ -21,12 +21,15 @@ export interface ReportTemplate {
 }
 export enum ReportType {
   BuyerLocation,
+  SalesOrderDetail,
 }
 
 export interface ReportFilters {
   BuyerID: string[];
   Country: string[];
   State: string[];
+  Status: string[];
+  Type: string[];
 }
 
 @Injectable({
@@ -71,7 +74,7 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   async list(args: any[]): Promise<ListPage<ReportTemplate>> {
-    var list = await this.listReportTemplatesByReportType('BuyerLocation');
+    var list = await this.listReportTemplatesByReportType(this.router.url.split('/')[2]);
     var listPage = {
       Meta: {
         Page: 1,
@@ -99,7 +102,9 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   async updateResource(originalID: string, resource: any): Promise<ReportTemplate> {
     originalID = resource.TemplateID;
     const url = `${this.appConfig.middlewareUrl}/reports/${originalID}`;
-    const newResource = await this.http.put<ReportTemplate>(url, resource, { headers: this.buildHeaders() }).toPromise();
+    const newResource = await this.http
+      .put<ReportTemplate>(url, resource, { headers: this.buildHeaders() })
+      .toPromise();
     this.updateResourceSubject(newResource);
     return newResource;
   }
@@ -109,13 +114,23 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
     return await this.http.get<any[]>(url, { headers: this.buildHeaders() }).toPromise();
   }
 
-  async previewReport(template: any): Promise<object[]> {
-    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.TemplateID}`;
+  async previewReport(template: any, reportRequestBody: any): Promise<object[]> {
+    let url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.TemplateID}`;
+    if (reportRequestBody.adHocFilterValues.length) {
+      reportRequestBody.adHocFilterValues.forEach(value => {
+        url += `/${value}`;
+      });
+    }
     return await this.http.get<object[]>(url, { headers: this.buildHeaders() }).toPromise();
   }
 
-  async downloadReport(template: any): Promise<void> {
-    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/download/${template.TemplateID}`;
+  async downloadReport(template: any, reportRequestBody: any): Promise<void> {
+    let url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/download/${template.TemplateID}`;
+    if (reportRequestBody.adHocFilterValues.length) {
+      reportRequestBody.adHocFilterValues.forEach(value => {
+        url += `/${value}`;
+      });
+    }
     const file = await this.http.post<string>(url, template, { headers: this.buildHeaders() }).toPromise();
     this.getSharedAccessSignature(file).subscribe(sharedAccessSignature => {
       const uri = `${this.appConfig.blobStorageUrl}/downloads/${file}${sharedAccessSignature}`;
@@ -133,7 +148,7 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   public getParentOrSecondaryIDParamName(): string {
-    return 'TemplateID'
+    return 'TemplateID';
   }
 
   public getResourceID(resource: any): string {
@@ -145,6 +160,6 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   public checkForNewResourceMatch(i: any, newResource: any): boolean {
-    return i.TemplateID === newResource.TemplateID
+    return i.TemplateID === newResource.TemplateID;
   }
 }

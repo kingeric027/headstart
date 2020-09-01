@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { ReportTemplate } from '@ordercloud/headstart-sdk';
 import { FormGroup } from '@angular/forms';
 
@@ -16,24 +16,33 @@ export class ReportsSelectionComponent {
   reportSelectionForm: FormGroup;
   @Input()
   displayHeaders: string[];
+  @Input()
+  adHocFilters: string[];
   @Output()
   handleReportTypeSelection = new EventEmitter<string>();
   @Output()
   handleReportTemplateSelection = new EventEmitter<string>();
+  @Output()
+  handleReportAdHocFiltersSelection = new EventEmitter<any>();
   selectedTemplate: ReportTemplate = {};
   showDetails = false;
   filterEntries: string[][];
 
   constructor() {}
 
-  updateReportType(event): void {
+  updateReportType(event: string): void {
     this.handleReportTypeSelection.emit(event);
   }
 
-  updateReportTemplate(event): void {
+  updateReportTemplate(event: string): void {
     this.handleReportTemplateSelection.emit(event);
     this.selectedTemplate = this.reportTemplates.find(template => template.TemplateID === event);
     this.filterEntries = Object.entries(this.selectedTemplate.Filters);
+  }
+
+  updateReportAdHocFilters(event: string, filter: string): void {
+    let filterSelection = { event: event, filter: filter };
+    this.handleReportAdHocFiltersSelection.emit(filterSelection);
   }
 
   toggleShowDetails(): void {
@@ -42,5 +51,9 @@ export class ReportsSelectionComponent {
 
   getDetailsDisplayVerb(): string {
     return this.showDetails ? 'Hide' : 'Show';
+  }
+
+  getFilterType(filter: string): string {
+    if (filter.includes('Date')) return 'date';
   }
 }

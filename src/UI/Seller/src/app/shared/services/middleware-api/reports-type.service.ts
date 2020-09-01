@@ -40,7 +40,7 @@ export class ReportsTypeService extends ResourceCrudService<ReportTypeResource>{
     });
   }
 
-  async list(args: any[]): Promise<ListPage<ReportTypeResource>> {
+    async list(): Promise<ListPage<ReportTypeResource>> {
     const url = `${this.appConfig.middlewareUrl}/reports/fetchAllReportTypes`;
     return await this.http.get<ListPage<ReportTypeResource>>(url, { headers: this.buildHeaders() }).toPromise();
   }

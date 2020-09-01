@@ -1,14 +1,15 @@
 import { Component, ChangeDetectorRef, NgZone, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { ReportsTemplateService, ReportTemplate } from '@app-seller/shared/services/middleware-api/reports-template.service';
+import { ReportsTemplateService, ReportTemplate, ReportType } from '@app-seller/shared/services/middleware-api/reports-template.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup } from '@angular/forms';
-import { buyerLocation as buyerLocationHeaders } from '../models/headers';
-import { buyerLocation as buyerLocationFilters, Filter } from '../models/filters';
+import { buyerLocation as buyerLocationHeaders, salesOrderDetail as salesOrderDetailHeaders } from '../models/headers';
+import { buyerLocation as buyerLocationFilters, salesOrderDetail as salesOrderDetailFilters, Filter } from '../models/filters';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-import { OcBuyerService } from '@ordercloud/angular-sdk';
+import { OcBuyerService, OrderStatus } from '@ordercloud/angular-sdk';
 import { cloneDeep } from 'lodash';
 import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
 import { AppGeographyService } from '@app-seller/shared';
+import { OrderType } from '@app-seller/shared/models/MarketPlaceOrder.interface';
 
 @Component({
   selector: 'template-edit-component',
@@ -21,16 +22,17 @@ export class TemplateEditComponent implements OnChanges {
   @Input()
   reportType: string;
   @Input()
+  updatedResource: ReportTemplate;
+  @Input()
   set resourceInSelection (template: ReportTemplate) {
     this.reportTemplate = template;
     this.setHeadersAndFilters(this.reportType);
+    this.updateResource.emit({ value: this.reportType, field: 'ReportType'});
     if (this.reportsTemplateService.checkIfCreatingNew()) {
       this.isCreatingNew = true;
       this.handleSelectAllHeaders();
     } 
   }
-  @Input()
-  updatedResource: ReportTemplate;
   @Output()
   updateResource = new EventEmitter<any>();
   reportTemplate: ReportTemplate;
@@ -40,7 +42,6 @@ export class TemplateEditComponent implements OnChanges {
   filters: Filter[];
   filterChipsToDisplay: Filter[] = [];
   faCheckCircle = faCheckCircle;
-  countryOptions: SupportedCountries[]
 
   constructor(
       private reportsTemplateService: ReportsTemplateService,
@@ -75,6 +76,9 @@ export class TemplateEditComponent implements OnChanges {
         this.headers = buyerLocationHeaders;
         this.filters = buyerLocationFilters;
         break;
+      case 'SalesOrderDetail':
+        this.headers = salesOrderDetailHeaders;
+        this.filters = salesOrderDetailFilters;
     }
     if (this.filters?.length) {
       this.populateFilters();
@@ -83,24 +87,27 @@ export class TemplateEditComponent implements OnChanges {
 
   async populateFilters(): Promise<void> {
     for (let filter of this.filters) {
-      let data;
       switch (filter.sourceType) {
         case 'oc':
-          data = await this[filter.source].List().toPromise();
+          let data = await this[filter.source].List().toPromise();
           filter.filterValues = data.Items;
           break;
         case 'model':
           if (filter.name === 'Country') {
-            data = this.countryOptions = GeographyConfig.getCountries();
-            filter.filterValues = data;
+            filter.filterValues = GeographyConfig.getCountries();
           }
           if (filter.name === 'State') {
             //For now, filtering is setup only for US states.  Will eventually need a way to get all states relevant to Seller organization.
-            data = this.geographyService.getStates('US');
-            filter.filterValues = data;
+            filter.filterValues = this.geographyService.getStates('US');
+          }
+          if (filter.name === 'Order Type') {
+            filter.filterValues = Object.values(OrderType);
+          }
+          if (filter.name === 'Order Status') {
+            filter.filterValues = ['Unsubmitted', 'AwaitingApproval', 'Declined', 'Open', 'Completed', 'Canceled'];
+          }
         }
       }
-    }
   }
 
   isHeaderSelected(header: string): boolean {
@@ -108,7 +115,7 @@ export class TemplateEditComponent implements OnChanges {
   }
 
   isFilterValueSelected(filter: Filter, filterValue: any): boolean {
-    return this.updatedResource.Filters[filter?.path]?.includes(filterValue[filter.dataKey]);
+    return this.updatedResource.Filters[filter?.path]?.includes(filter.dataKey ? filterValue[filter.dataKey] : filterValue);
   }
 
   toggleHeader(selectedHeader: string): void {
@@ -129,15 +136,17 @@ export class TemplateEditComponent implements OnChanges {
     let filters = cloneDeep(this.updatedResource.Filters);
     var selectedFilterValues = filters[filter.path];
     if (!selectedFilterValues || !selectedFilterValues.length) {
-      filters[filter.path] = [filterValue[filter.dataKey]];
+      filters[filter.path] = filter.dataKey ? [filterValue[filter.dataKey]] : [filterValue];
     } else {
-      const i = selectedFilterValues.indexOf(filterValue[filter.dataKey]);
+      let selectedValue = filter.dataKey ? filterValue[filter.dataKey] : filterValue;
+      const i = selectedFilterValues.indexOf(selectedValue);
       if (i > -1) {
         selectedFilterValues.splice(i, 1);
       } else {
-        selectedFilterValues.push(filterValue[filter.dataKey]);
+        selectedFilterValues.push(selectedValue);
       }
     }
+    selectedFilterValues?.sort();
     this.resourceForm.controls['Filters'].setValue(filters);
     this.updateResource.emit({ value: filters, field: 'Filters'});
   }
@@ -147,7 +156,9 @@ export class TemplateEditComponent implements OnChanges {
       const i = this.filterChipsToDisplay.indexOf(filter);
       this.filterChipsToDisplay.splice(i, 1);
       let filterValues = this.filters.find(f => f.path === filter.path).filterValues;
-      this.updatedResource.Filters[filter.path] = filterValues.map(value => value[filter.dataKey]);
+      this.updatedResource.Filters[filter.path] = filterValues.map(value => {
+        return filter.dataKey ? value[filter.dataKey] : filter;
+      });
       this.resourceForm.controls['Filters'].setValue(this.updatedResource.Filters);
       this.updateResource.emit({ value: this.updatedResource.Filters, field: 'Filters'});
     } else {
