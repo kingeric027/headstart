@@ -27,7 +27,8 @@
                 <div class="card py-2 px-3 mt-3 bg-white">
                   <!-- Product Name -->
                   <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="font-weight-medium">Details</h6>
+                    <h6 class="font-weight-medium"
+                        translate>ADMIN.PRODUCT_EDIT.DETAILS</h6>
                     <fa-icon class="tab-status-icon text-danger"
                              [icon]="faAsterisk"
                              *ngIf="isCreatingNew && isRequired('Name') && !this.productForm.controls['Name']?.valid">
@@ -72,13 +73,30 @@
                       </select>
                     </div>
                   </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             formControlName="ArtworkRequired"
+                             (input)="handleUpdateProduct($event, 'Product.xp.ArtworkRequired')"
+                             id="ArtworkRequired">
+                      <label class="custom-control-label"
+                             for="ArtworkRequired"
+                             translate>ADMIN.PRODUCT_EDIT.ARTWORK_REQUIRED</label>
+                    </div>
+                    <small>
+                      <fa-icon style="color: #cccccc"
+                               [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.ARTWORK_REQUIRED_INFO</span>
+                    </small>
+                  </div>
                   <!-- /Product Name -->
                   <hr />
-                  <h6 class="font-weight-medium">Product Sku</h6>
+                  <h6 class="font-weight-medium"
+                      translate>ADMIN.PRODUCT_EDIT.PRODUCT_SKU</h6>
                   <small *ngIf="isCreatingNew"
                          class="mb-2">
                     <fa-icon style="color: #cccccc"
-                             [icon]="faExclamationCircle"></fa-icon> <span> If you do not provide a SKU, you cannot create variants and a SKU will be generated for you.</span>
+                             [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.NO_PROVIDED_SKU</span>
                   </small>
                   <div class="form-group w-50"
                        *ngIf="isCreatingNew">
@@ -115,7 +133,8 @@
                 <!-- Unit Of Measure -->
                 <div class="card py-2 px-3 mt-3 bg-white">
                   <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="font-weight-medium">Unit of Measure</h6>
+                    <h6 class="font-weight-medium"
+                        translate>ADMIN.PRODUCT_EDIT.UNIT_OF_MEASURE</h6>
                     <fa-icon class="tab-status-icon text-danger"
                              [icon]="faAsterisk"
                              *ngIf="isCreatingNew && !unitOfMeasureValid()">
@@ -158,7 +177,8 @@
                 <!-- /Unit Of Measure -->
                 <!-- Order Limitations -->
                 <div class="card py-2 px-3 mt-3 bg-white">
-                  <h6 class="font-weight-medium">Order Limitations</h6>
+                  <h6 class="font-weight-medium"
+                      translate>ADMIN.PRODUCT_EDIT.ORDER_LIMITATIONS</h6>
                   <div class="form-row">
                     <div class="form-group col-md-6">
                       <label for="MinQuantity"
@@ -195,7 +215,8 @@
                 <!-- /Order Limitations -->
                 <!-- Inventory Tracking -->
                 <div class="card py-2 px-3 mt-3 bg-white">
-                  <h6 class="font-weight-medium">Inventory Tracking</h6>
+                  <h6 class="font-weight-medium"
+                      translate>ADMIN.PRODUCT_EDIT.INVENTORY_TRACKING</h6>
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox"
@@ -259,7 +280,8 @@
                 <div class="card py-2 px-3 mt-3 bg-white">
                   <div class="form-group">
                     <div class="d-flex justify-content-between align-items-center">
-                      <h6 class="font-weight-medium">Shipping</h6>
+                      <h6 class="font-weight-medium"
+                          translate>ADMIN.PRODUCT_EDIT.SHIPPING</h6>
                       <ng-container *ngIf="productForm.controls.ProductType.value !== 'Quote'">
                         <fa-icon class="tab-status-icon text-danger"
                                  [icon]="faAsterisk"
@@ -289,8 +311,9 @@
                     </select>
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
-                    <label for="ShipFromAddressID">
-                      Weight per Quantity
+                    <label for="ShipWeight"
+                           translate>
+                      ADMIN.PRODUCT_EDIT.WEIGHT_PER_QTY
                     </label>
                   </div>
                   <div class="form-row">
@@ -311,8 +334,9 @@
                   </div>
                   <hr />
                   <div class="form-group">
-                    <label for="SizeTier"
-                           translate>Size Tier (choose approximately how many units of this product fit in a 22inch x 22inch x22inch box)</label>
+                    <label class="d-block"
+                           for="SizeTier"
+                           translate>ADMIN.PRODUCT_EDIT.SIZE_TIER_LABEL</label>
                     <select [attr.disabled]="readonly ? true : null"
                             type="dropdown"
                             class="form-control"
@@ -322,11 +346,15 @@
                             (change)="handleUpdateProduct($event, 'Product.xp.SizeTier')">
                       <option [ngValue]="null"
                               disabled
-                              translate>Choose Size Tier</option>
+                              translate>ADMIN.PRODUCT_EDIT.SIZE_TIER_CHOOSE</option>
                       <option *ngFor="let tier of availableSizeTiers"
                               [selected]="_superMarketplaceProductEditable?.xp?.SizeTier === tier.Tier"
                               value="{{tier.Tier}}">{{tier.Description}}</option>
                     </select>
+                    <small>
+                      <fa-icon style="color: #cccccc"
+                               [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.SIZE_TIER_INFO</span>
+                    </small>
                   </div>
                   <ng-container *ngIf="productForm.controls['SizeTier'].value === 'G'">
                     <div class="form-group mb-0">
@@ -444,7 +472,8 @@
             <div class="row pt-3">
               <div class="col-md-7">
                 <div class="card py-2 px-3 bg-white">
-                  <h6 class="font-weight-medium">Product Description</h6>
+                  <h6 class="font-weight-medium"
+                      translate>ADMIN.PRODUCT_EDIT.DESCRIPTION</h6>
                   <reactive-quill-editor-component [readonly]="readonly"
                                                    [resourceInSelection]="resourceInSelection"
                                                    [formControlForText]="productForm?.controls?.Description"
@@ -470,16 +499,19 @@
               </div>
               <div class="col-md-5">
                 <div class="card py-2 px-3 bg-white">
-                  <h6 class="font-weight-medium">Description Preview</h6>
+                  <h6 class="font-weight-medium"
+                      translate>ADMIN.PRODUCT_EDIT.DESCRIPTION_PREVIEW</h6>
                   <div>
-                    <p *ngIf="!productForm.controls['Description'].value">This product has no description.</p>
+                    <p *ngIf="!productForm.controls['Description'].value"
+                       translate>ADMIN.PRODUCT_EDIT.NO_DESCRIPTION</p>
                   </div>
                   <div [innerHtml]="productForm.controls['Description'].value | safeHTML"></div>
                   <hr />
                   <h6 class="font-weight-medium"
                       translate>ADMIN.PRODUCT_EDIT.MESSAGE_PREVIEW</h6>
                   <div>
-                    <p *ngIf="!productForm.controls['Note'].value">This product has no note.</p>
+                    <p *ngIf="!productForm.controls['Note'].value"
+                       translate>ADMIN.PRODUCT_EDIT.NO_NOTE</p>
                   </div>
                   <div *ngIf="productForm.controls['Note'].value"
                        class="alert alert-info">
@@ -544,7 +576,8 @@
           id="5">
         <a [fragment]="variants"
            class="text-muted"
-           ngbNavLink>Variants <span class="badge badge-pill badge-info">{{_superMarketplaceProductEditable?.Variants?.length || 0}}</span></a>
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.VARIANTS <span class="badge badge-pill badge-info">{{_superMarketplaceProductEditable?.Variants?.length || 0}}</span></a>
         <ng-template ngbNavContent>
           <product-variations-component [readonly]="readonly"
                                         [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
@@ -565,13 +598,15 @@
           id="6">
         <a [fragment]="images-and-documents"
            class="text-muted"
-           ngbNavLink>Images & Documents <span class="badge badge-pill badge-info">{{_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Attachments?.length + imageFiles?.length + staticContentFiles?.length}}</span></a>
+           ngbNavLink
+           translate>ADMIN.PRODUCT_EDIT.IMAGES_AND_DOCUMENTS <span class="badge badge-pill badge-info">{{_superMarketplaceProductEditable?.Images?.length + _superMarketplaceProductEditable?.Attachments?.length + imageFiles?.length + staticContentFiles?.length}}</span></a>
         <ng-template ngbNavContent>
           <div class="container-fluid">
             <div class="row pt-3">
               <div class="col-md-5">
-                <h5>Product Images</h5>
-                <p class="font-italic">Drag and Drop or upload your product images to display on the buyer site.</p>
+                <h5 translate>ADMIN.PRODUCT_EDIT.PRODUCT_IMAGES</h5>
+                <p class="font-italic"
+                   translate>ADMIN.PRODUCT_EDIT.PRODUCT_IMAGES_DESC</p>
               </div>
               <div class="col-md-7">
                 <!--droped image preview-->
@@ -584,8 +619,9 @@
                            width="auto"
                            height="100px">
                       <span *ngIf="i === 0"
-                            class="badge badge-primary primary-badge position-absolute mt-1 ml-1">
-                        Primary
+                            class="badge badge-primary primary-badge position-absolute mt-1 ml-1"
+                            translate>
+                        ADMIN.PRODUCT_EDIT.PRIMARY
                       </span>
                     </div>
                     <div *ngIf="!readonly"
@@ -606,11 +642,12 @@
                                        description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
                           <button type="button"
                                   class="btn btn-link text-dark"
-                                  (click)="modal.dismiss()">Cancel</button>
+                                  (click)="modal.dismiss()">ADMIN.PRODUCT_EDIT.CANCEL</button>
                           <button type="button"
                                   class="btn brand-button--danger"
                                   (click)="removeFile(image)"
-                                  (click)="modal.dismiss()">Yes, Delete</button>
+                                  (click)="modal.dismiss()"
+                                  translate>ADMIN.PRODUCT_EDIT.YES_DELETE</button>
                         </confirm-modal>
                       </ng-template>
                     </div>
@@ -649,8 +686,9 @@
             </div>
             <div class="row pt-3 mt-5 border-top">
               <div class="col-md-5">
-                <h5>Product Documents</h5>
-                <p class="font-italic">Name and upload your product documents to display and dowload on the buyer site.</p>
+                <h5 translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_PRODUCT</h5>
+                <p class="font-italic"
+                   translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_DESC</p>
               </div>
               <div class="col-md-7">
                 <!--droped doc preview-->
@@ -669,8 +707,9 @@
                       <label *ngIf="documentName?.length"
                              class="btn btn-outline-primary"
                              for="documentUpload"
-                             (files)="stageDocuments($event)">
-                        choose file
+                             (files)="stageDocuments($event)"
+                             translate>
+                        ADMIN.PRODUCT_EDIT.CHOOSE_FILE
                         <input id="documentUpload"
                                class="d-none"
                                type="file"
@@ -696,7 +735,7 @@
                          *ngIf="staticContent?.length > 0">
                     <thead>
                       <tr>
-                        <th>Documents</th>
+                        <th translate>ADMIN.PRODUCT_EDIT.DOCUMENTS</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -705,7 +744,8 @@
                         <td><a class="btn-link"
                              href="{{file.Url}}"
                              target="_blank"
-                             download="file.FileName">download</a></td>
+                             download="file.FileName"
+                             translate>ADMIN.PRODUCT_EDIT.DOWNLOAD</a></td>
                         <td>
                           <button title="Delete file"
                                   class="btn btn-light btn-group-item"
@@ -722,11 +762,13 @@
                                          description="Deleting this document cannot be reversed.">
                             <button type="button"
                                     class="btn btn-link text-dark"
-                                    (click)="modal.dismiss()">Cancel</button>
+                                    (click)="modal.dismiss()"
+                                    translate>COMMON.CANCEL</button>
                             <button type="button"
                                     class="btn brand-button--danger"
                                     (click)="removeFile(file)"
-                                    (click)="modal.dismiss()">Yes, Delete</button>
+                                    (click)="modal.dismiss()"
+                                    translate>COMMON.YES_DELETE</button>
                           </confirm-modal>
                         </ng-template>
                       </tr>
@@ -751,7 +793,8 @@
     </delete-confirm-modal-component>
     <div class="d-flex flex-column justify-content-end">
       <p *ngIf="!variantsValid"
-         class="text-danger">There are problems with the product variations.</p>
+         class="text-danger"
+         translate>ADMIN.PRODUCT_EDIT.VARIATION_ISSUES</p>
       <div>
         <button *ngIf="areChanges"
                 class="btn btn-primary"
@@ -760,7 +803,8 @@
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
-                *ngIf="areChanges && !isCreatingNew">Discard Changes</button>
+                *ngIf="areChanges && !isCreatingNew"
+                translate>COMMON.DISCARD_CHANGES</button>
       </div>
     </div>
   </div>

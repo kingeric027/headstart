@@ -56,6 +56,7 @@ export class ProductService extends ResourceCrudService<Product> {
         },
         ProductType: null,
         StaticContent: null,
+        ArtworkRequired: false,
       },
     },
     PriceSchedule: {
