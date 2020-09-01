@@ -11,6 +11,7 @@ namespace ordercloud.integrations.avalara
 	{
 		public static CreateTransactionModel ToAvalaraTransationModel(this OrderWorksheet order, string companyCode, DocumentType docType)
 		{
+			var buyerLocationID = order.Order.BillingAddress.ID;
 			var shipingLines = order.ShipEstimateResponse.ShipEstimates.Select(shipment =>
 			{
 				var (shipFrom, shipTo) = shipment.GetAddresses(order.LineItems);
@@ -19,7 +20,7 @@ namespace ordercloud.integrations.avalara
 			});
 
 			var hasResaleCert = ((int?) order.Order.BillingAddress.xp.AvalaraCertificateID != null);
-			var exemptionNo = hasResaleCert ? order.Order.BillingAddress.ID : null;
+			var exemptionNo = hasResaleCert ? buyerLocationID : null;
 
 			var productLines = order.LineItems.Select(lineItem =>
 				 lineItem.ToLineItemModel(lineItem.ShipFromAddress, lineItem.ShippingAddress, exemptionNo));
@@ -28,7 +29,7 @@ namespace ordercloud.integrations.avalara
 			{
 				companyCode = companyCode,
 				type = docType,
-				customerCode = order.Order.FromCompanyID,
+				customerCode = buyerLocationID,
 				date = DateTime.Now,
 				lines = productLines.Concat(shipingLines).ToList()
 			};
