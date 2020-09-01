@@ -113,45 +113,25 @@ namespace Marketplace.Common.Commands
             return filteredBuyerLocations;
         }
 
-
-
-
-
-
-
-
-
-
-
-        //CREATING SPACE 1 OF 2
-
         public async Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
         {
-            //Get stored template from Cosmos DB container
             var template = await _template.Get(templateID, verifiedUser);
-            //var allSalesOrders = new List<MarketplaceOrder>();
-
             var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
                 OrderDirection.Incoming,
                 filters: $"from={lowDateRange}&to={highDateRange}",
-                //filters: $"DateSubmitted=>{lowDateRange}&DateSubmitted=<{highDateRange}",
                 page: page,
                 pageSize: 100
                  ));
-            //Use reflection to determine available filters from model
             var filterClassProperties = template.Filters.GetType().GetProperties();
-            //Create dictionary of key/value pairings of filters, where provided in the template
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
             {
-                //See if there are filters provided on the property.  If no values supplied, do not evaluate the filter.
                 List<string> propertyFilters = (List<string>)property.GetValue(template.Filters);
                 if (propertyFilters != null && propertyFilters.Count > 0)
                 {
                     filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
                 }
             }
-            //Filter through collected records, adding only those that pass the PassesFilters check.
             var filteredOrders = new List<MarketplaceOrder>();
             foreach (var order in orders)
             {
@@ -163,33 +143,6 @@ namespace Marketplace.Common.Commands
             }
             return filteredOrders;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //CREATING SPACE 2 OF 2
-
-
-
-
-
-
-
-
-
 
         public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser)
         {
