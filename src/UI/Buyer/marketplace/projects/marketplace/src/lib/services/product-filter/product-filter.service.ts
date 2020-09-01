@@ -6,7 +6,7 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { ProductFilters, MarketplaceMeProduct } from '../../shopper-context';
 import { Me, Product, ListPageWithFacets, BuyerProduct } from 'ordercloud-javascript-sdk';
 import { ProductCategoriesService } from '../product-categories/product-categories.service';
-import { ListPage } from '@ordercloud/headstart-sdk';
+import { ListPage, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
@@ -43,6 +43,22 @@ export class ProductFilterService {
     activeFacets.categoryID = model.categoryID;
     activeFacets.favorites = showOnlyFavorites ? 'true' : undefined;
     return { page, sortBy, search, ...activeFacets };
+  }
+
+  async listKitProducts(): Promise<ListPage<MarketplaceKitProduct>> {
+    const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
+    const facets = _transform(
+      activeFacets,
+      (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value),
+      {}
+    );
+    const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;
+    return await this.tempSdk.listKitProducts({
+      page,
+      search,
+      sortBy,
+      filters: {},
+    });
   }
 
   async listProducts(): Promise<ListPageWithFacets<MarketplaceMeProduct>> {

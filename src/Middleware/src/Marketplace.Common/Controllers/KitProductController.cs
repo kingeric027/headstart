@@ -33,9 +33,15 @@ namespace Marketplace.Common.Controllers
         {
             return await _command.Post(kitProduct, VerifiedUserContext);
         }
-        [DocName("LIST Kit Product")]
+        [DocName("LIST Kit Products")]
         [HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args)
+        {
+            return await _command.List(args, VerifiedUserContext);
+        }
+        [DocName("LIST Me Kit Products")]
+        [HttpGet, Route("me"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<ListPage<MarketplaceKitProduct>> ListMeKits(ListArgs<Document<KitProduct>> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }

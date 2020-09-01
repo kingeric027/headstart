@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk';
-import { ListArgs, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import { ListArgs, MarketplaceOrder, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 import { AppConfig, MarketplaceMeProduct, SupplierFilterConfigDocument } from '../../shopper-context';
 import { ListPage } from '@ordercloud/headstart-sdk';
 
@@ -42,6 +42,16 @@ export class TempSdk {
     const url = `${this.appConfig.middlewareUrl}/me/products`;
     return await this.http
       .get<ListPageWithFacets<MarketplaceMeProduct>>(url, {
+        headers: this.buildHeaders(),
+        params: this.createHttpParams(args),
+      })
+      .toPromise();
+  }
+
+  async listKitProducts(args?: ListArgs): Promise<ListPage<MarketplaceKitProduct>> {
+    const url = `${this.appConfig.middlewareUrl}/kitproducts/me`;
+    return await this.http
+      .get<ListPage<MarketplaceKitProduct>>(url, {
         headers: this.buildHeaders(),
         params: this.createHttpParams(args),
       })
