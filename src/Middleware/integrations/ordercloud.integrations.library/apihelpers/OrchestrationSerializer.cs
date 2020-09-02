@@ -15,7 +15,8 @@ namespace Marketplace.Common.Helpers
         public static JsonSerializer Serializer =>
             new JsonSerializer()
             {
-                ContractResolver = new OrchestrationJsonSerializer()
+                ContractResolver = new OrchestrationJsonSerializer(),
+                Converters = { new PartialConverter() }
             };
 
         private class OrchestrationJsonSerializer : DefaultContractResolver

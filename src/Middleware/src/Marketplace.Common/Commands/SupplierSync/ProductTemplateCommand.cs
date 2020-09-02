@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using Npoi.Mapper;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using IPartial = ordercloud.integrations.library.IPartial;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
@@ -154,10 +156,12 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string ErrorMessage { get; set; }
     }
 
-    [SwaggerModel]
-    public class PartialTemplateProductFlat : PartialProduct<ProductXp>
+    public class PartialTemplateProductFlat : TemplateProductFlat, IPartial
     {
+        public JObject Values { get; set; }
     }
+
+
 
     public class TemplateProductFlat : IMarketplaceObject
     {
