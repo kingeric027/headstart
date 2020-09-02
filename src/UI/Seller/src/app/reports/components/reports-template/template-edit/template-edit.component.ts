@@ -2,8 +2,8 @@ import { Component, ChangeDetectorRef, NgZone, Input, Output, EventEmitter, OnCh
 import { ReportsTemplateService, ReportTemplate, ReportType } from '@app-seller/shared/services/middleware-api/reports-template.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup } from '@angular/forms';
-import { buyerLocation as buyerLocationHeaders, salesOrderDetail as salesOrderDetailHeaders } from '../models/headers';
-import { buyerLocation as buyerLocationFilters, salesOrderDetail as salesOrderDetailFilters, Filter } from '../models/filters';
+import { buyerLocation as buyerLocationHeaders, salesOrderDetail as salesOrderDetailHeaders, purchaseOrderDetail as purchaseOrderDetailHeaders } from '../models/headers';
+import { buyerLocation as buyerLocationFilters, salesOrderDetail as salesOrderDetailFilters, purchaseOrderDetail as purchaseOrderDetailFilters, Filter } from '../models/filters';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { OcBuyerService, OrderStatus } from '@ordercloud/angular-sdk';
 import { cloneDeep } from 'lodash';
@@ -79,6 +79,10 @@ export class TemplateEditComponent implements OnChanges {
       case 'SalesOrderDetail':
         this.headers = salesOrderDetailHeaders;
         this.filters = salesOrderDetailFilters;
+        break;
+      case 'PurchaseOrderDetail':
+        this.headers = purchaseOrderDetailHeaders;
+        this.filters = purchaseOrderDetailFilters;
     }
     if (this.filters?.length) {
       this.populateFilters();

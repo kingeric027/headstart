@@ -28,7 +28,8 @@ namespace Marketplace.Common.Models
     public enum ReportTypeEnum
     {
         BuyerLocation,
-        SalesOrderDetail
+        SalesOrderDetail,
+        PurchaseOrderDetail
     }
 
     public class ReportFilters

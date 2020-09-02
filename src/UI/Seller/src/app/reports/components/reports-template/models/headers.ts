@@ -38,3 +38,23 @@ export const salesOrderDetail = [
     //  and getNestedValue() and middleware report download will need to be refactored
     //  to accommodate their depth.
 ]
+
+export const purchaseOrderDetail = [
+  { value: 'ID', path: 'ID' },
+  { value: 'Supplier ID', path: 'ToCompanyID'},
+  { value: 'Order Date', path: 'DateSubmitted' },
+  { value: 'Total', path: 'Total' },
+  { value: 'Order Currency', path: 'xp.Currency' },
+  { value: 'Order Status', path: 'Status' },
+  { value: 'Shipping Status', path: 'xp.ShippingStatus' },
+  { value: 'Payment Method', path: 'xp.PaymentMethod'},
+  { value: 'User ID', path: 'FromUser.ID' },
+  { value: 'Username', path: 'FromUser.Username' },
+  { value: 'First Name', path: 'FromUser.FirstName' },
+  { value: 'Last Name', path: 'FromUser.LastName' },
+  { value: 'Email', path: 'FromUser.Email' },
+  { value: 'Phone', path: 'FromUser.Phone' },
+  //  TO-DO - Shipping Address Details will be needed, 
+  //  and getNestedValue() and middleware report download will need to be refactored
+  //  to accommodate their depth.
+]
