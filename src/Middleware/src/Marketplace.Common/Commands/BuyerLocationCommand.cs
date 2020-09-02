@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using Marketplace.Common.Constants;
+using System;
 
 namespace Marketplace.Common.Commands
 {
@@ -86,7 +87,11 @@ namespace Marketplace.Common.Commands
         {
             buyerLocation.Address.ID = buyerLocationID;
             buyerLocation.UserGroup.ID = buyerLocationID;
-            var existingLocation = await _oc.UserGroups.GetAsync(buyerID, buyerLocationID, user.AccessToken);
+            UserGroup existingLocation = null;
+            try
+            {
+                existingLocation = await _oc.UserGroups.GetAsync(buyerID, buyerLocationID, user.AccessToken);
+            } catch (Exception e) { } // Do nothing if not found
             var updatedBuyerAddress = _oc.Addresses.SaveAsync<MarketplaceAddressBuyer>(buyerID, buyerLocationID, buyerLocation.Address, accessToken: user.AccessToken);
             var updatedBuyerUserGroup = _oc.UserGroups.SaveAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocationID, buyerLocation.UserGroup, accessToken: user.AccessToken);
             var location = new MarketplaceBuyerLocation
