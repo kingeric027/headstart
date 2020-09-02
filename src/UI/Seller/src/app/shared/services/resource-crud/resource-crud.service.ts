@@ -12,13 +12,11 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
-import { BuyerAddress, ListBuyerAddress, ListAddress, Address,  } from '@ordercloud/angular-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { Address } from '@ordercloud/angular-sdk';
+import { BuyerAddress, ListPage, Address } from 'ordercloud-javascript-sdk';
 import { singular } from 'pluralize';
 
 export abstract class ResourceCrudService<ResourceType> {
@@ -387,7 +385,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   // TODO - move to some other file. Not related to resource crud
-  getSuggestedAddresses = (ex): ListPage<Address> => {
+  getSuggestedAddresses = (ex): ListPage<BuyerAddress<any>> => {
     if (ex?.Message === "Address not valid") {
       return ex?.Data?.SuggestedAddresses;
     }

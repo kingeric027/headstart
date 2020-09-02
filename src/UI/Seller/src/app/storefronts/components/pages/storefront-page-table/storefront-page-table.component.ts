@@ -25,22 +25,22 @@ export class StorefrontPageTableComponent extends ResourceCrudComponent<JDocumen
   }
   resourceOrEmptyDoc(): JDocument {
     if (!this.resourceInSelection.ID) {
-      console.log(this.storefrontPageService.emptyResource);
+      // console.log(this.storefrontPageService.emptyResource);
       return this.storefrontPageService.emptyResource;
     } else {
-      console.log(this.resourceInSelection);
+      // console.log(this.resourceInSelection);
       return this.resourceInSelection;
     }
   }
 
   onPageSaved(event): void {
     console.log(event);
-    HeadStartSDK.Documents.SaveAssignment('cms-page-schema', {
-      DocumentID: event.ID,
-      ParentResourceID: null,
-      ResourceID: this.parentResourceID,
-      ResourceType: 'ApiClients',
-    });
+    // HeadStartSDK.Documents.SaveAssignment('cms-page-schema', {
+    //   DocumentID: event.ID,
+    //   ParentResourceID: null,
+    //   ResourceID: this.parentResourceID,
+    //   ResourceType: 'ApiClients',
+    // });
     this.selectResource(event);
   }
 

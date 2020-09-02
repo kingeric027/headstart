@@ -1,21 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import {
-  User,
-  OcUserService,
-  UserGroupAssignment,
-  OcUserGroupService,
-  ListUserGroup,
-  ListUserGroupAssignment,
-} from '@ordercloud/angular-sdk';
 import { JDocument, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
 import { STOREFRONTS_SUB_RESOURCE_LIST } from '../storefronts/storefronts.service';
-import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
-import { ResourceType } from '@ordercloud/angular-cms-components/shared/models/resource-type.interface';
 import { ocAppConfig } from '@app-seller/config/app.config';
 
 // TODO - this service is only relevent if you're already on the storefronts details page. How can we enforce/inidcate that?
@@ -68,22 +56,7 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
     console.log(args);
     console.groupEnd();
     console.log(this.route);
-    const DocResponse = (await HeadStartSDK.Documents.ListDocuments(
-      'cms-page-schema',
-      args[0] /* The ResourceID */,
-      null,
-      'ApiClients'
-    )) as any;
-    return {
-      Meta: {
-        ItemRange: [1, DocResponse.length],
-        Page: 1,
-        PageSize: 1,
-        TotalCount: DocResponse.length,
-        TotalPages: 1,
-      },
-      Items: DocResponse,
-    };
+    return await HeadStartSDK.Documents.ListDocuments('cms-page-schema', 'ApiClients', args[0] /* The ResourceID */);
   }
 
   async getResourceById(resourceID: string): Promise<any> {
