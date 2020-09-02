@@ -222,7 +222,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const orderDirection = this.optionsSubject.value.OrderDirection;
     const args = await this.createListArgs([resourceID], orderDirection);
     if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
-    return this.ocService.Get(...args);
+    else return this.ocService.Get(...args);
   }
 
   async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
