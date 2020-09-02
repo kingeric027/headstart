@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router, Params } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
@@ -19,19 +19,13 @@ import { Options, RequestStatus } from '@app-seller/shared/services/resource-cru
 import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
-import { filter, takeWhile } from 'rxjs/operators';
+import { takeWhile } from 'rxjs/operators';
 import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
-import { pipe } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-
-interface BreadCrumb {
-  displayText: string;
-  route: string;
-}
 
 @Component({
   selector: 'resource-table-component',
@@ -63,7 +57,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   requestStatus: RequestStatus;
   selectedParentResourceName: string;
   selectedParentResourceID = '';
-  breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
   isCreatingSubResource = false;
   isMyResource = false;
@@ -285,15 +278,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setUrlSubscription() {
-    this.router.events
-      .pipe(takeWhile(() => this.alive))
-      // only need to set the breadcrumbs on nav end events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.setBreadCrumbs();
-      });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
       this.checkIfCreatingNew();
     });
   }
@@ -342,29 +327,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.resourceType = splitUrl[splitUrl.length - 1].split('-').join(' ');
     }
     this.isCreatingSubResource = endUrl.includes('new?');
-  }
-
-  private setBreadCrumbs() {
-    // basically we are just taking off the portion of the url after the selected route piece
-    // in the future breadcrumb logic might need to be more complicated than this
-    const urlPieces = this.router.url
-      .split('/')
-      .filter(p => p)
-      .map(p => {
-        if (p.includes('?')) {
-          return p.slice(0, p.indexOf('?'));
-        } else {
-          return p;
-        }
-      });
-    this.breadCrumbs = urlPieces.map((piece, index) => {
-      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
-      return {
-        displayText: piece,
-        route,
-      };
-    });
-    this.changeDetectorRef.detectChanges();
   }
 
   setFilterForm() {

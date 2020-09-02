@@ -1,31 +1,16 @@
-<resource-table-component [resourceList]="resourceList"
-                          [selectedResourceID]="selectedResourceID"
-                          [updatedResource]="updatedResource"
-                          [resourceInSelection]="resourceInSelection"
-                          [ocService]="ocService"
-                          [dataIsSaving]="dataIsSaving"
-                          [parentResourceService]="storefrontsService"
-                          [resourceForm]="resourceForm"
-                          (searched)="searchResources($event)"
-                          (hitScrollEnd)="handleScrollEnd()"
-                          (changesSaved)="saveUpdates()"
-                          (changesDiscarded)="discardChanges()"
-                          (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)"
-                          [shouldShowResourceActions]="false"
-                          [shouldShowTitleContainer]="false"
-                          [labelSingular]="'Page'"
-                          [labelPlural]="'Pages'">
-  <cms-page-editor class="resource-edit"
-                   *ngIf="resourceInSelection && parentResourceID"
-                   renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net/"
-                   resourceType="ApiClients"
-                   [resourceID]="parentResourceID"
-                   [document]="resourceOrEmptyDoc()"
-                   (pageSaved)="onPageSaved($event)"
-                   (backClicked)="back()">
-  </cms-page-editor>
-</resource-table-component>
-<!-- <cms-page-list *ngIf="parentResourceID"
-               [resourceType]="'ApiClients'"
-               [resourceID]="parentResourceID"></cms-page-list> -->
+<resource-breadcrumbs-component></resource-breadcrumbs-component>
+<div class="container-fluid">
+  <div class="py-3">
+    <h1 class="resource-name mb-0">Pages</h1>
+  </div>
+  <cms-page-list class="full-height"
+                 *ngIf="parentResourceID"
+                 resourceType="ApiClients"
+                 [resourceID]="parentResourceID"
+                 renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net/">
+    <resource-select-dropdown-component class="cms-toolbar-additions"
+                                        [parentService]="storefrontsService"
+                                        [ocService]="ocService">
+    </resource-select-dropdown-component>
+  </cms-page-list>
+</div>

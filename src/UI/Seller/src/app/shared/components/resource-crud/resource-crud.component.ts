@@ -83,11 +83,11 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  async subscribeToResourceSelection(): Promise<void> {
-    const parentResourceID = await this.ocService.getParentResourceID();
-    this.parentResourceID = parentResourceID;
-    this.activatedRoute.params.subscribe(params => {
-      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
+  subscribeToResourceSelection(): void {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.activatedRoute.params.subscribe(async params => {
+      this.parentResourceID = await this.ocService.getParentResourceID();
+      if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
           params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID

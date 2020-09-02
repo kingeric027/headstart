@@ -49,6 +49,7 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
 import { TranslateModule } from '@ngx-translate/core';
 import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { CmsAdminModule } from '@ordercloud/angular-cms-components';
+import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
 
 @NgModule({
   imports: [
@@ -121,6 +122,7 @@ import { CmsAdminModule } from '@ordercloud/angular-cms-components';
     ConfirmModal,
     UserGroupAssignments,
     TranslateModule,
+    ResourceBreadcrumbsComponent,
   ],
   declarations: [
     SearchComponent,
@@ -151,7 +153,7 @@ import { CmsAdminModule } from '@ordercloud/angular-cms-components';
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
-    SafeHTMLPipe,
+    ResourceBreadcrumbsComponent,
   ],
 })
 export class SharedModule {
