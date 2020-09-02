@@ -182,17 +182,7 @@ export class OCMProductDetails implements OnInit {
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
       lineItem.xp = {
         ImageUrl: this.specFormService.getLineItemImageUrl(this._product),
-        StatusByQuantity: {
-          Submitted: 0,
-          Open: 1,
-          Backordered: 0,
-          Canceled: 0,
-          CancelRequested: 0,
-          Returned: 0,
-          ReturnRequested: 0,
-          Complete: 0
-        }
-      } as any;
+      };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;
       this.showRequestSubmittedMessage = true;
