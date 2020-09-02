@@ -166,7 +166,6 @@ export class CheckoutService {
       DateCreated: new Date().toDateString(),
       Type: 'PurchaseOrder',
     };
-    await Orders.Patch('Outgoing', this.order.ID, { xp: { PaymentMethod: 'Purchase Order' } })
     return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 
@@ -202,7 +201,6 @@ export class CheckoutService {
         cardType,
       },
     };
-    await Orders.Patch('Outgoing', this.order.ID, { xp: { PaymentMethod: 'Credit Card' } })
     return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 
