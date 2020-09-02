@@ -10,6 +10,9 @@ using static Marketplace.Common.Models.ReportTemplate;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Linq;
+using Marketplace.Common.Models;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
 {
@@ -25,19 +28,22 @@ namespace Marketplace.Common.Commands
             _container = _blob.BlobClient.GetContainerReference("downloads");
         }
 
-        public async Task ExportToExcel(ReportTypeEnum reportType, string[] headers, IEnumerable<object> data)
+        public async Task<string> ExportToExcel(ReportTypeEnum reportType, ReportTemplate reportTemplate, IEnumerable<object> data)
         {
+            var headers = reportTemplate.Headers.ToArray();
             var excel = new XSSFWorkbook();
             var worksheet = excel.CreateSheet(reportType.ToString());
             var date = DateTime.UtcNow.ToString("MMddyyyy");
             var time = DateTime.Now.ToString("hmmss.ffff");
-            var fileReference = _container.GetAppendBlobReference($"{reportType}-{date}-{time}.xlsx");
+            var fileName = $"{reportType}-{date}-{time}.xlsx";
+            var fileReference = _container.GetAppendBlobReference(fileName);
             SetHeaders(headers, worksheet);
             SetValues(data, headers, worksheet);
             using (Stream stream = await fileReference.OpenWriteAsync(true))
             {
                 excel.Write(stream);
             }
+            return fileName;
         }
 
         private void SetHeaders(string[] headers, ISheet worksheet)
@@ -47,7 +53,7 @@ namespace Marketplace.Common.Commands
             {
                 var cell = header.CreateCell(i);
                 var concatHeader = headers[i].Contains(".") ? headers[i].Split('.')[0] == "xp" ? headers[i].Split('.')[1] : $"{headers[i].Split('.')[0]} {headers[i].Split('.')[1]}" : headers[i];
-                var humanizedHeader = Regex.Replace(concatHeader, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+                var humanizedHeader = Regex.Replace(concatHeader, "([a-z](?=[0-9A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
                 cell.SetCellValue(humanizedHeader);
             }
         }
@@ -65,15 +71,39 @@ namespace Marketplace.Common.Commands
                     ICell cell = sheetRow.CreateCell(j++);
                     if (header.Contains("."))
                     {
-                        var cellValue = dataJSON[header.Split(".")[0]][header.Split(".")[1]];
-                        cell.SetCellValue(cellValue.ToString());
+                        if (dataJSON[header.Split(".")[0]].ToString() != "")
+                        {
+                            cell.SetCellValue(dataJSON[header.Split(".")[0]][header.Split(".")[1]].ToString());
+                        } else
+                        {
+                            cell.SetCellValue("");
+                        }
                     }
                     else
                     {
-                        cell.SetCellValue(dataJSON[header].ToString());
+                        if (header == "Status")
+                        {
+                            cell.SetCellValue(Enum.GetName(typeof(OrderStatus), Convert.ToInt32(dataJSON[header])));
+                        } else
+                        {
+                            cell.SetCellValue(dataJSON[header].ToString());
+                        }
                     }
                 }
             }
         }
+
+        public string GetSharedAccessSignature(string fileName)
+        {
+            var fileReference = _container.GetBlobReference(fileName);
+            var sharedAccessPolicy = new SharedAccessBlobPolicy()
+            {
+                SharedAccessStartTime = DateTimeOffset.UtcNow.AddMinutes(-5),
+                SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddMinutes(20),
+                Permissions = SharedAccessBlobPermissions.Read
+            };
+            return fileReference.GetSharedAccessSignature(sharedAccessPolicy);
+        }
+
     }
 }

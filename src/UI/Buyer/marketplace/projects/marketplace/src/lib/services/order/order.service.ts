@@ -40,7 +40,26 @@ export class CurrentOrderService {
   }
 
   async submitQuoteOrder(info: QuoteOrderInfo, lineItem: MarketplaceLineItem): Promise<Order> {
-    const order = {
+    const order = this.buildQuoteOrder(info);
+    lineItem.xp.StatusByQuantity = {
+      Submitted: 0,
+      Open: 1,
+      Backordered: 0,
+      Canceled: 0,
+      CancelRequested: 0,
+      Returned: 0,
+      ReturnRequested: 0,
+      Complete: 0
+    } as any;
+    const quoteOrder = await Orders.Create('Outgoing', order);
+    await LineItems.Create('Outgoing', quoteOrder.ID, lineItem as LineItem);
+    await IntegrationEvents.Calculate('Outgoing', quoteOrder.ID);
+    const submittedQuoteOrder = await Orders.Submit('Outgoing', quoteOrder.ID);
+    return submittedQuoteOrder;
+  }
+
+  buildQuoteOrder(info: QuoteOrderInfo): Order {
+    return {
       ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
       xp: {
         AvalaraTaxTransactionCode: '',
@@ -54,10 +73,5 @@ export class CurrentOrderService {
         },
       },
     };
-    const quoteOrder = await Orders.Create('Outgoing', order);
-    await LineItems.Create('Outgoing', quoteOrder.ID, lineItem as LineItem);
-    await IntegrationEvents.Calculate('Outgoing', quoteOrder.ID);
-    const submittedQuoteOrder = await Orders.Submit('Outgoing', quoteOrder.ID);
-    return submittedQuoteOrder;
   }
 }

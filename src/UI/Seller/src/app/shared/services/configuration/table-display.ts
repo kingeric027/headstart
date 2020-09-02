@@ -1,4 +1,5 @@
 import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
+import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper';
 
 export interface SummaryResourceInfoPaths {
   toPrimaryHeader: string;
@@ -15,7 +16,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   suppliers: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ID',
-    toImage: 'xp.LogoUrl',
+    toImage: SUPPLIER_LOGO_PATH_STRATEGY,
     toExpandable: false,
   },
   users: {
@@ -87,6 +88,18 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   orders: {
     toPrimaryHeader: 'ID',
     toSecondaryHeader: 'xp.SubmittedOrderStatus',
+    toImage: '',
+    toExpandable: false,
+  },
+  templates: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ReportCategory',
+    toImage: '',
+    toExpandable: false,
+  },
+  reports: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ReportCategory',
     toImage: '',
     toExpandable: false,
   },
@@ -190,7 +203,7 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         sortable: false,
       },
     ],
-    imgPath: 'xp.LogoUrl',
+    imgPath: SUPPLIER_LOGO_PATH_STRATEGY,
   },
   users: {
     fields: [
@@ -455,6 +468,17 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         header: 'ADMIN.HEADERS.COPY',
         type: COPY_OBJECT,
         sortable: false,
+      },
+    ],
+    imgPath: '',
+  },
+  templates: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: true,
       },
     ],
     imgPath: '',

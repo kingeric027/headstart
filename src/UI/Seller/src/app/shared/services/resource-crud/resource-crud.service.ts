@@ -18,6 +18,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { Address } from '@ordercloud/angular-sdk';
+import { singular } from 'pluralize';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -38,7 +39,7 @@ export abstract class ResourceCrudService<ResourceType> {
   private itemsPerPage = 100;
 
   constructor(
-    private router: Router,
+    protected router: Router,
     private activatedRoute: ActivatedRoute,
     public ocService: any,
     public currentUserService: CurrentUserService,
@@ -242,7 +243,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find((i: any) => i.ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) => this.checkForResourceMatch(i, resourceID));
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -250,6 +251,10 @@ export abstract class ResourceCrudService<ResourceType> {
         return await this.getResourceById(resourceID);
       }
     }
+  }
+
+  checkForResourceMatch(i: any, resourceID: string): boolean {
+    return i.ID === resourceID;
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
@@ -260,9 +265,13 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   updateResourceSubject(newResource: any): void {
-    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
+    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => this.checkForNewResourceMatch(i, newResource));
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
+  }
+
+  checkForNewResourceMatch(i: any, newResource: any): boolean {
+    return i.ID === newResource.ID;
   }
 
   async deleteResource(resourceID: string): Promise<null> {
@@ -460,5 +469,17 @@ export abstract class ResourceCrudService<ResourceType> {
     if (dataIsSaving) return 'Saving...';
     if (isCreatingNew) return 'Create';
     if (!isCreatingNew) return 'Save Changes';
+  }
+
+  getParentIDParamName(): string {
+    return `${singular(this.primaryResourceLevel)}ID`;
+  }
+
+  getParentOrSecondaryIDParamName(): string {
+    return `${singular(this.secondaryResourceLevel || this.primaryResourceLevel)}ID`;
+  }
+
+  getResourceID(resource: any): string {
+    return resource.ID;
   }
 }

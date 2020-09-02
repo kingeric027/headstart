@@ -176,9 +176,8 @@ export class OrderShipmentsComponent implements OnChanges {
     this.shipmentItems = await this.ocShipmentService.ListItems(shipmentID).toPromise();
   }
 
-  async getImageUrl(lineItem: LineItem): Promise<string> {
+  getImageUrl(lineItem: LineItem): string {
     const product = lineItem.Product;
-    const user = await this.currentUser.getUser();
     return getProductMediumImageUrl(product, this.appConfig.sellerID);
   }
 

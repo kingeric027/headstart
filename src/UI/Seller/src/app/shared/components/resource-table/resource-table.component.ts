@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, Params } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
@@ -145,6 +145,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   labelSingular: string;
   @Input()
   labelPlural: string;
+  @Input()
+  excludeFromFilterBar = false;
+  @Input()
+  excludeFromFullTableView = false;
+  @Input()
+  excludeFromSubResourceView = false;
   availableProductTypes = [];
 
   async ngOnInit(): Promise<void> {
@@ -289,7 +295,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
-        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentIDParamName = this.getParentIDParamName(params);
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
         if (this.isMyResource) {
@@ -301,6 +307,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
       });
+  }
+
+  getParentIDParamName(params: Params): string {
+    if (params?.ReportType) {
+      return 'ReportType';
+    }
+    return `${singular(this._ocService.primaryResourceLevel)}ID`;
   }
 
   private setListRequestStatusSubscription() {

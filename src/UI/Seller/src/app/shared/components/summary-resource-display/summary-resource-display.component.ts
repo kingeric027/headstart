@@ -6,6 +6,7 @@ import { faChevronDown, faChevronRight, faPlus } from '@fortawesome/free-solid-s
 import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductSmallImageUrl } from '@app-seller/products/product-image.helper';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { SUPPLIER_LOGO_PATH_STRATEGY, getSupplierLogoSmallUrl } from '@app-seller/suppliers/supplier-logo.helper';
 
 @Component({
   selector: 'summary-resource-display-component',
@@ -46,6 +47,7 @@ export class SummaryResourceDisplay implements OnChanges {
   set resource(value: any) {
     this._resource = value;
   }
+
   @Input()
   set parentResourceID(value: any) {
     this._parentResourceID = value;
@@ -85,6 +87,8 @@ export class SummaryResourceDisplay implements OnChanges {
     if (pathToValue) {
       if (pathToValue === PRODUCT_IMAGE_PATH_STRATEGY) {
         return getProductSmallImageUrl(value, this.appConfig.sellerID);
+      } else if (pathToValue === SUPPLIER_LOGO_PATH_STRATEGY) {
+        return getSupplierLogoSmallUrl(value, this.appConfig.sellerID);
       } else {
         let currentObject = value;
         piecesOfPath.forEach(piece => {

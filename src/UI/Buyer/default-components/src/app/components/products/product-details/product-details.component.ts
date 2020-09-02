@@ -181,7 +181,7 @@ export class OCMProductDetails implements OnInit {
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
       lineItem.xp = {
-        ImageUrl: this.specFormService.getLineItemImageUrl(this._product)
+        ImageUrl: this.specFormService.getLineItemImageUrl(this._product),
       };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;

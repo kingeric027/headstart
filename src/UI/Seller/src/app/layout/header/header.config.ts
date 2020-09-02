@@ -21,20 +21,20 @@ const AllProducts: MPRoute = {
   title: 'ADMIN.NAV.ALL_PRODUCTS',
   route: '/products',
 };
+// TODO: Reimplement once UI is added to address these xp values
+// const LiveProducts: MPRoute = {
+//   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+//   title: 'ADMIN.NAV.LIVE_PRODUCTS',
+//   route: '/products',
+//   queryParams: { 'xp.Status': 'Published' },
+// };
 
-const LiveProducts: MPRoute = {
-  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.LIVE_PRODUCTS',
-  route: '/products',
-  queryParams: { 'xp.Status': 'Published' },
-};
-
-const PendingProducts: MPRoute = {
-  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
-  title: 'ADMIN.NAV.PENDING_PRODUCTS',
-  route: '/products',
-  queryParams: { 'xp.Status': 'Draft' },
-};
+// const PendingProducts: MPRoute = {
+//   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+//   title: 'ADMIN.NAV.PENDING_PRODUCTS',
+//   route: '/products',
+//   queryParams: { 'xp.Status': 'Draft' },
+// };
 
 const Promotions: MPRoute = {
   rolesWithAccess: [MPRoles.MPPromotionAdmin, MPRoles.MPPromotionReader],
@@ -43,7 +43,7 @@ const Promotions: MPRoute = {
 };
 
 const Kits: MPRoute = {
-  rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
   title: 'Kits',
   route: '/kitproducts',
 };
@@ -58,7 +58,7 @@ const ProductNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPProductAdmin, MPRoles.MPProductReader, MPRoles.MPMeProductAdmin],
   title: 'ADMIN.NAV.PRODUCTS',
   route: '/products',
-  subRoutes: [AllProducts, LiveProducts, PendingProducts, Promotions, ProductFacets, Kits],
+  subRoutes: [AllProducts, Promotions, ProductFacets, Kits],
 };
 
 // Orders
@@ -213,11 +213,23 @@ const OrchestrationLogs = {
   route: 'reports/logs',
 };
 
-const ReportsNavGrouping = {
+const ProcessReports = {
   rolesWithAccess: [MPRoles.MPReportReader],
+  title: 'Process Reports',
+  route: 'reports/reports',
+};
+
+const ReportTemplates = {
+  rolesWithAccess: [MPRoles.MPReportAdmin],
+  title: 'Report Templates',
+  route: `reports/${REDIRECT_TO_FIRST_PARENT}/templates`,
+};
+
+const ReportsNavGrouping = {
+  rolesWithAccess: [MPRoles.MPReportAdmin, MPRoles.MPReportReader],
   title: 'ADMIN.NAV.REPORTS',
   route: '/reports',
-  subRoutes: [OrchestrationLogs],
+  subRoutes: [OrchestrationLogs, ProcessReports, ReportTemplates],
 };
 
 const SellerUsers = {
@@ -234,7 +246,7 @@ const Storefronts = {
 
 const MySupplierProfile = {
   rolesWithAccess: [MPRoles.MPMeSupplierAdmin],
-  title: 'ADMIN.NAV.MY_PROFILE',
+  title: 'ALIAS.SUPPLIER_PROFILE',
   route: '/my-supplier',
 };
 

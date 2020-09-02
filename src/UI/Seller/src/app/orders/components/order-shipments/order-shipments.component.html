@@ -65,7 +65,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="createShipment && canCreateShipment()"
+  <div *ngIf="createShipment && canShipLineItems()"
        class="p-3 mt-3 mb-2 border bg-light text-dark">
     <h5 class="mb-3 font-weight-bold">1) Enter Shipment Data</h5>
     <form (ngSubmit)="onSubmit()"
@@ -270,7 +270,7 @@
               class="btn btn-primary mt-4 w-100">Create Shipment</button>
     </form>
   </div>
-  <div *ngIf="createShipment && !canCreateShipment()"
+  <div *ngIf="createShipment && !canShipLineItems()"
        class="p-3 mt-3 mb-2 border bg-light text-dark d-flex justify-content-center">
     <span class="text-align-center">All items have been shipped for this order.</span>
   </div>
