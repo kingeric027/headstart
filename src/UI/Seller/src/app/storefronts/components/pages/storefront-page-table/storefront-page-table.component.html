@@ -1,0 +1,28 @@
+<resource-table-component [resourceList]="resourceList"
+                          [selectedResourceID]="selectedResourceID"
+                          [updatedResource]="updatedResource"
+                          [resourceInSelection]="resourceInSelection"
+                          [ocService]="ocService"
+                          [dataIsSaving]="dataIsSaving"
+                          [parentResourceService]="storefrontsService"
+                          [resourceForm]="resourceForm"
+                          (searched)="searchResources($event)"
+                          (hitScrollEnd)="handleScrollEnd()"
+                          (changesSaved)="saveUpdates()"
+                          (changesDiscarded)="discardChanges()"
+                          (resourceDelete)="deleteResource()"
+                          (resourceSelected)="selectResource($event)"
+                          [shouldShowResourceActions]="false"
+                          [labelSingular]="'Page'"
+                          [labelPlural]="'Pages'">
+  <cms-page-editor class="resource-edit"
+                   *ngIf="resourceInSelection && parentResourceID"
+                   renderSiteUrl="https://marketplace-buyer-ui-test.azurewebsites.net/"
+                   [resourceID]="selectedResourceID"
+                   [document]="resourceOrEmptyDoc()"
+                   [parentResourceID]="parentResourceID">
+  </cms-page-editor>
+</resource-table-component>
+<!-- <cms-page-list *ngIf="parentResourceID"
+               [resourceType]="'ApiClients'"
+               [resourceID]="parentResourceID"></cms-page-list> -->

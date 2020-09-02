@@ -20,6 +20,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceForm: FormGroup;
   isMyResource = false;
   isSupplierUser = false;
+  parentResourceID: string;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -84,6 +85,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async subscribeToResourceSelection(): Promise<void> {
     const parentResourceID = await this.ocService.getParentResourceID();
+    this.parentResourceID = parentResourceID;
     this.activatedRoute.params.subscribe(params => {
       if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
@@ -124,8 +126,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async setResourceSelectionFromID(resourceID: string): Promise<void> {
     this.selectedResourceID = resourceID || '';
+    console.log('selectedResourceID', this.selectedResourceID);
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
     this.resourceInSelection = this.ocService.copyResource(resource);
+    console.log('resourceInSelection', this.resourceInSelection);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 

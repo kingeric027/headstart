@@ -14,6 +14,7 @@ import { AppStateService } from '../app-state/app-state.service';
 import { UserContext } from '@app-seller/config/user-context';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { Tokens } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -46,6 +47,7 @@ export class CurrentUserService {
       this.appAuthService.setRememberStatus(true);
     }
     HeadStartSDK.Tokens.SetAccessToken(accessToken.access_token);
+    Tokens.SetAccessToken(accessToken.access_token);
     this.ocTokenService.SetAccess(accessToken.access_token);
     this.appStateService.isLoggedIn.next(true);
     this.me = await this.ocMeService.Get().toPromise();

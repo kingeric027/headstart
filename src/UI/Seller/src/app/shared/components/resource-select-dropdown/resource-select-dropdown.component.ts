@@ -61,7 +61,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
         if (params && resourceID) {
           const resource = await this.parentService.findOrGetResourceByID(resourceID);
           if (resource) {
-            this.selectedParentResourceName = resource.Name;
+          this.selectedParentResourceName = resource.Name || resource.AppName;
           }
         }
       }

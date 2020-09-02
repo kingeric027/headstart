@@ -5,6 +5,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { SuperMarketplaceBuyer, BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
+import { Buyers } from 'ordercloud-javascript-sdk';
 
 export const BUYER_SUB_RESOURCE_LIST = [
   { route: 'users', display: 'ADMIN.NAV.USERS' },
@@ -32,10 +33,9 @@ export class BuyerService extends ResourceCrudService<Buyer> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocBuyerService: OcBuyerService,
     currentUserService: CurrentUserService,
     private buyerTempService: BuyerTempService
   ) {
-    super(router, activatedRoute, ocBuyerService, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
+    super(router, activatedRoute, Buyers, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
   }
 }

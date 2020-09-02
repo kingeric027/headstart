@@ -5,21 +5,17 @@ import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 import { BUYER_SUB_RESOURCE_LIST } from '@app-seller/buyers/components/buyers/buyer.service';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { Categories } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BuyerCategoryService extends ResourceCrudService<Category> {
-  constructor(
-    router: Router,
-    activatedRoute: ActivatedRoute,
-    private ocCategoryService: OcCategoryService,
-    currentUserService: CurrentUserService
-  ) {
+  constructor(router: Router, activatedRoute: ActivatedRoute, currentUserService: CurrentUserService) {
     super(
       router,
       activatedRoute,
-      ocCategoryService,
+      Categories,
       currentUserService,
       '/buyers',
       'buyers',
@@ -61,7 +57,7 @@ export class BuyerCategoryService extends ResourceCrudService<Category> {
     if (numberOfChecks === 3) {
       return false;
     }
-    const parentOfResource = await this.ocCategoryService.Get(parentResourceID, resourceParentID).toPromise();
+    const parentOfResource = await Categories.Get(parentResourceID, resourceParentID);
     return !parentOfResource.ParentID
       ? true
       : await this.checkForDepth(parentResourceID, parentOfResource.ParentID, numberOfChecks);

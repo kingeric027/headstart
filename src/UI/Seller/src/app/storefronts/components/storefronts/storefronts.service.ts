@@ -5,6 +5,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { SuperMarketplaceBuyer, BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
+import { ApiClients } from 'ordercloud-javascript-sdk';
 
 export const STOREFRONTS_SUB_RESOURCE_LIST = [{ route: 'pages', display: 'Pages' }];
 
@@ -31,16 +32,11 @@ export class StorefrontsService extends ResourceCrudService<ApiClient> {
     OrderCheckoutIntegrationEventID: null,
     OrderCheckoutIntegrationEventName: null,
   };
-  constructor(
-    router: Router,
-    activatedRoute: ActivatedRoute,
-    ocApiClientsService: OcApiClientService,
-    currentUserService: CurrentUserService
-  ) {
+  constructor(router: Router, activatedRoute: ActivatedRoute, currentUserService: CurrentUserService) {
     super(
       router,
       activatedRoute,
-      ocApiClientsService,
+      ApiClients,
       currentUserService,
       '/storefronts',
       'storefronts',

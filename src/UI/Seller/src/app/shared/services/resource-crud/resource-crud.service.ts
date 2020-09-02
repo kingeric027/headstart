@@ -74,7 +74,10 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Can Override
   async list(args: any[]): Promise<ListPage<ResourceType>> {
-    return await this.ocService.List(...args).toPromise();
+    console.group();
+    console.log(this.ocService);
+    console.groupEnd();
+    return await this.ocService.List(...args);
   }
 
   public async getMyResource(): Promise<any> {
@@ -219,7 +222,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const orderDirection = this.optionsSubject.value.OrderDirection;
     const args = await this.createListArgs([resourceID], orderDirection);
     if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
-    else return this.ocService.Get(...args).toPromise();
+    return this.ocService.Get(...args);
   }
 
   async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
@@ -258,7 +261,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const newResource = await this.ocService.Save(...args).toPromise()
+    const newResource =  await this.ocService.Save(...args);
     this.updateResourceSubject(newResource);
     return newResource;
   }
@@ -275,7 +278,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async deleteResource(resourceID: string): Promise<null> {
     const args = await this.createListArgs([resourceID]);
-    await this.ocService.Delete(...args).toPromise();
+    await this.ocService.Delete(...args);
     this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
     this.resourceSubject.next(this.resourceSubject.value);
     return;
@@ -283,7 +286,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async createNewResource(resource: any): Promise<any> {
     const args = await this.createListArgs([resource]);
-    const newResource = await this.ocService.Create(...args).toPromise();
+    const newResource = await this.ocService.Create(...args);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;

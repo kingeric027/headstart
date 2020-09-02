@@ -94,7 +94,11 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
   @Input()
   set ocService(service: ResourceCrudService<any>) {
-    console.log(service.primaryResourceLevel)
+    console.group()
+    console.log(service)
+    console.log('primary', service.primaryResourceLevel)
+    console.log('secondary', service.secondaryResourceLevel)
+    console.groupEnd();
     this._ocService = service;
     this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
     this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
@@ -200,6 +204,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   subscribeToOptions() {
     this._ocService.optionsSubject.pipe(takeWhile(() => this.alive)).subscribe(options => {
       this.resourceOptions = options;
+      console.log(this.resourceOptions)
       this.searchTerm = (options && options.search) || '';
       this.activeFilterCount = options.filters ? Object.keys(options.filters).length : 0;
       this.setFilterForm();
