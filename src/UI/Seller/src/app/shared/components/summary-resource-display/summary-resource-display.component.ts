@@ -47,6 +47,7 @@ export class SummaryResourceDisplay implements OnChanges {
   set resource(value: any) {
     this._resource = value;
   }
+
   @Input()
   set parentResourceID(value: any) {
     this._parentResourceID = value;

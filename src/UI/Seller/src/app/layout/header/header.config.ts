@@ -213,11 +213,23 @@ const OrchestrationLogs = {
   route: 'reports/logs',
 };
 
-const ReportsNavGrouping = {
+const ProcessReports = {
   rolesWithAccess: [MPRoles.MPReportReader],
+  title: 'Process Reports',
+  route: 'reports/reports',
+};
+
+const ReportTemplates = {
+  rolesWithAccess: [MPRoles.MPReportAdmin],
+  title: 'Report Templates',
+  route: `reports/${REDIRECT_TO_FIRST_PARENT}/templates`,
+};
+
+const ReportsNavGrouping = {
+  rolesWithAccess: [MPRoles.MPReportAdmin, MPRoles.MPReportReader],
   title: 'ADMIN.NAV.REPORTS',
   route: '/reports',
-  subRoutes: [OrchestrationLogs],
+  subRoutes: [OrchestrationLogs, ProcessReports, ReportTemplates],
 };
 
 const SellerUsers = {

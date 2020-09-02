@@ -91,6 +91,18 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
+  templates: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ReportCategory',
+    toImage: '',
+    toExpandable: false,
+  },
+  reports: {
+    toPrimaryHeader: 'Name',
+    toSecondaryHeader: 'ReportCategory',
+    toImage: '',
+    toExpandable: false,
+  },
 };
 
 export interface ResourceColumnConfiguration {
@@ -456,6 +468,17 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         header: 'ADMIN.HEADERS.COPY',
         type: COPY_OBJECT,
         sortable: false,
+      },
+    ],
+    imgPath: '',
+  },
+  templates: {
+    fields: [
+      {
+        path: 'Name',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: true,
       },
     ],
     imgPath: '',

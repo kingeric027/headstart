@@ -74,11 +74,11 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
-    this.isSupplierUser = await this.ocService.isSupplierUser(); 
+    this.isSupplierUser = await this.ocService.isSupplierUser();
     if (this.isMyResource) {
       const myResource = await this.ocService.getMyResource();
       const shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
-      if(!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
+      if (!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
     }
   }
 
@@ -88,12 +88,11 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
         const resourceIDSelected =
-          params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
-        if (resourceIDSelected) {
-          this.setResourceSelectionFromID(resourceIDSelected);
-        }
+          params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
+        } else if (resourceIDSelected) {
+          this.setResourceSelectionFromID(resourceIDSelected);
         }
       }
     });
@@ -143,7 +142,9 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async selectResource(resource: any): Promise<void> {
-    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(resource.ID || '');
+    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(
+      this.ocService.getResourceID(resource) || ''
+    );
     this.navigate(newURL, { queryParams });
   }
 
