@@ -453,11 +453,11 @@ namespace Marketplace.Common.Commands
             {
                 var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
-                var assn = await _assignment.GetFirstImage(
+                var assn = await _assignment.GetThumbnail(
                     new Resource()
                     {
                         ParentResourceID = product.ID, ResourceType = ResourceType.Products, ResourceID = product.ID
-                    }, _user);
+                    }, ThumbSize.M, _user.SellerID);
                 Asset image = null;
                 if (assn != null)
                     image = await _assets.Get(wi.RecordId, _user);

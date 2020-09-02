@@ -172,9 +172,9 @@ namespace ordercloud.integrations.library.Cosmos
                         if (value.WildcardPositions.Count == 2)
                             term = "Contains";
                         else if (value.WildcardPositions[0] == 0)
-                            term = "StartsWith";
-                        else if (value.WildcardPositions[0] > 0)
                             term = "EndsWith";
+                        else if (value.WildcardPositions[0] > 0)
+                            term = "StartsWith";
                         var method = typeof(string).GetMethod(term, new[] { propertyType });
                         return Expression.Call(member, method, constant);
                     }

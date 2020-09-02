@@ -98,7 +98,7 @@ namespace Marketplace.Common.Services
                 lineItem.ProductID,
                 lineItem.Quantity,
                 lineItem.LineTotal,
-                QuantityChanged = lineItemStatusChange.PreviousQuantities.Aggregate(0, (currentValue, previousQuantity) => currentValue + previousQuantity.Value).ToString()
+                QuantityChanged = lineItemStatusChange.Quantity
             };
         }
 
@@ -115,7 +115,8 @@ namespace Marketplace.Common.Services
                 lineItemEmailDisplayText.StatusChangeDetail,
                 lineItemEmailDisplayText.StatusChangeDetail2,
                 DateSubmitted = order.DateSubmitted.ToString(),
-                Comments = "PLACEHOLDERFORCOMMENTS"
+                OrderID = order.ID,
+                order.Comments
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }

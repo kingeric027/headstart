@@ -54,13 +54,15 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
 
   setParentResourceSelectionSubscription() {
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(async params => {
-      const parentResourceID = await this.parentService.getParentResourceID()
+      const parentResourceID = await this.parentService.getParentResourceID();
       if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
-        const parentIDParamName = `${singular(this.parentService.primaryResourceLevel)}ID`;
+        const parentIDParamName = this.parentService.getParentIDParamName();
         const resourceID = params[parentIDParamName];
         if (params && resourceID) {
           const resource = await this.parentService.findOrGetResourceByID(resourceID);
-          this.selectedParentResourceName = resource.Name;
+          if (resource) {
+            this.selectedParentResourceName = resource.Name;
+          }
         }
       }
     });

@@ -24,5 +24,13 @@ namespace Marketplace.Models.Models.Marketplace
 		public CurrencySymbol? Currency { get; set; } = null;
         public List<ProductType> ProductTypes { get; set; }
         public List<string> CountriesServicing { get; set; }
+        public List<SupplierCategory> Categories { get; set; }
+    }
+
+    [SwaggerModel]
+    public class SupplierCategory
+    {
+        public string ServiceCategory { get; set; }
+        public string VendorLevel { get; set; }
     }
 }

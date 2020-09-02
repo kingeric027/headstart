@@ -16,13 +16,13 @@ namespace ordercloud.integrations.cms
 {
 	public interface IDocumentQuery
 	{
-		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user);
+		Task<ListPage<Document<T>>> List<T>(string schemaInteropID, ListArgs<Document<T>> args, VerifiedUserContext user);
 		Task<Document<T>> Get<T>(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 		Task<Document<T>> Create<T>(string schemaInteropID, Document<T> document, VerifiedUserContext user);
 		Task<Document<T>> Save<T>(string schemaInteropID, string documentInteropID, Document<T> document, VerifiedUserContext user);
 		Task Delete(string schemaInteropID, string documentInteropID, VerifiedUserContext user);
 
-		Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs);
+		Task<ListPage<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs, ListArgsPageOnly args = null);
 		Task<DocumentDO> GetDOByInternalID(string documentID); // real id
 		Task<DocumentDO> GetDOByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user);
 	}
@@ -38,23 +38,24 @@ namespace ordercloud.integrations.cms
 			_schemas = schemas;
 		}
 
-		public async Task<List<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs)
+		public async Task<ListPage<DocumentDO>> ListByInternalIDs(IEnumerable<string> documentIDs, ListArgsPageOnly args = null)
 		{
-			return (await _store.FindMultipleAsync(documentIDs)).ToList();
+			args = args ?? new ListArgsPageOnly(1, documentIDs.Count());
+			return await _store.FindMultipleAsync(documentIDs, args);
 		}
 
-
-		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, IListArgs args, VerifiedUserContext user)
+		public async Task<ListPage<Document<T>>> List<T>(string schemaInteropID, ListArgs<Document<T>> args, VerifiedUserContext user)
 		{
+			var arguments = args.MapTo();
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var query = _store.Query()
-				.Search(args)
-				.Filter(args)
-				.Sort(args)
+				.Search(arguments)
+				.Filter(arguments)
+				.Sort(arguments)
 				.Where(doc => doc.SchemaID == schema.id && doc.SellerOrgID == user.SellerID);
-			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
+			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
-			var documents = list.ToListPage(args.Page, args.PageSize, count);
+			var documents = list.ToListPage(arguments.Page, arguments.PageSize, count);
 			return DocumentMapper.MapTo<T>(documents);
 		}
 

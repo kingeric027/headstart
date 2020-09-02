@@ -2,7 +2,7 @@
     <div *ngIf="allowDelete">
         <delete-confirm-modal-component *ngIf="isDeletable"
           buttonText="{{labelSingular | translate}}"
-          (deleteConfirmed)="handleDelete($event)">
+          (deleteConfirmed)="handleDelete()">
         </delete-confirm-modal-component>
     </div>
     <div *ngIf="!allowDelete"></div>

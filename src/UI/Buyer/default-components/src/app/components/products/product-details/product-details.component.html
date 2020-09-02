@@ -132,7 +132,7 @@
         <span translate>PRODUCTS.DETAILS.DESCRIPTION</span>:
       </strong>
       <div class="p-2 border border-medium border-radius">
-        <p [innerHTML]="_product.Description || 'This product has no description.'">
+        <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
         </p>
       </div>
       <div *ngIf="_attachments.length > 0">

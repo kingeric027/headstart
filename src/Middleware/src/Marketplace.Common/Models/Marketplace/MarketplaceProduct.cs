@@ -20,8 +20,8 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
-        public IList<AssetForDelivery> Images { get; set; }
-        public IList<AssetForDelivery> Attachments { get; set; }
+        public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
     [SwaggerModel]
@@ -32,8 +32,8 @@ namespace Marketplace.Models
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
-        public IList<AssetForDelivery> Images { get; set; }
-        public IList<AssetForDelivery> Attachments { get; set; }
+        public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
 
@@ -71,9 +71,10 @@ namespace Marketplace.Models
         public bool HasVariants { get; set; }
         [MaxLength(500), OrchestrationIgnore]
         public string Note { get; set; }
-        public TaxProperties Tax { get; set; } = new TaxProperties();
+        public TaxProperties Tax { get; set; }
         public UnitOfMeasure UnitOfMeasure { get; set; } = new UnitOfMeasure();
         public ProductType ProductType { get; set; }
+        public SizeTier SizeTier { get; set; }
         public bool IsResale { get; set; } = false;
         public List<ProductAccessorial> Accessorials { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
@@ -88,7 +89,34 @@ namespace Marketplace.Models
 		PurchaseOrder
 	}
 
-	[SwaggerModel]
+    // measured in how many of the product fit in a 22x22x22 box
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SizeTier
+    {
+        // ships alone
+        G,
+        
+        //2-5
+        A,
+
+        // 5-15
+        B,
+
+        //15-49
+        C,
+
+        //50-99
+        D,
+
+        // 100-999
+        E,
+
+        // 1000+
+        F
+
+    }
+
+    [SwaggerModel]
     public class MarketplaceVariantXp
     {
         public string SpecCombo { get; set; }

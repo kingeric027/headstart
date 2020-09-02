@@ -264,14 +264,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 customer_name = contact.contact_name,
                 sub_total = decimal.ToDouble(order.Subtotal),
                 total = decimal.ToDouble(order.Total),
-                taxes = new List<ZohoTax>() //TODO: consult with Oliver on taxes
-                    {
-                        new ZohoTax()
-                        {
-                            tax_id = order.xp.AvalaraTaxTransactionCode,
-                            tax_amount = decimal.ToDouble(order.TaxCost)
-                        }
-                    },
+                //TODO: consult with Oliver on taxes
                 customer_id = contact.contact_id,
                 currency_code = contact.currency_code,
                 currency_symbol = contact.currency_symbol,

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit, Inject } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup, FormControl } from '@angular/forms';
 import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
@@ -8,8 +8,14 @@ import {
   MiddlewareAPIService,
   SupplierFilterConfigDocument,
 } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import { ListPage, MarketplaceSupplier, HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { ListPage, MarketplaceSupplier, HeadStartSDK, AssetUpload, Asset } from '@ordercloud/headstart-sdk';
 import { HeaderComponent } from '@app-seller/layout/header/header.component';
+import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { AppAuthService } from '@app-seller/auth';
+import { faTimes, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -22,6 +28,8 @@ export class SupplierEditComponent implements OnInit {
   filterConfig;
   @Output()
   updateResource = new EventEmitter<any>();
+  @Output()
+  logoStaged = new EventEmitter<File>();
   @Input() set supplierEditable(value: MarketplaceSupplier) {
     this._supplierEditable = value;
 
@@ -36,10 +44,19 @@ export class SupplierEditComponent implements OnInit {
   isSupplierUser: boolean;
   countriesServicingOptions = [];
   countriesServicingForm:  FormGroup;
+  hasLogo = false;
+  logoUrl: string = "";
+  stagedLogoUrl: SafeUrl = null;
+  logoLoading = false;
+  faTimes = faTimes;
+  faSpinner = faSpinner;
 
   constructor(
     public supplierService: SupplierService,
-    private currentUserService: CurrentUserService
+    private currentUserService: CurrentUserService,
+    private sanitizer: DomSanitizer,
+    private appAuthService: AppAuthService,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isCreatingNew = this.supplierService.checkIfCreatingNew();
   }
@@ -51,7 +68,10 @@ export class SupplierEditComponent implements OnInit {
     );
     this.isSupplierUser = await this.currentUserService.isSupplierUser();
     this.setUpSupplierCountrySelectIfNeeded();
+    this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0;
+    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`;
   }
+
 
   setUpSupplierCountrySelectIfNeeded(): void {
     const indexOfCountriesServicingConfig = this.filterConfig.Filters?.findIndex(
@@ -91,5 +111,95 @@ export class SupplierEditComponent implements OnInit {
       const value = ['Active', 'xp.SyncFreightPop'].includes(field) ? event.target.checked : event.target.value;
       this.updateResource.emit({ value, field });
     }
+  }
+
+  async dropFileUpload(event: FileHandle[]): Promise<void> {
+    if (this.isCreatingNew) {
+      this.logoStaged.emit(event[0].File);
+      this.hasLogo = true;
+      this.stagedLogoUrl = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(event[0].File));
+    } else {
+      this.logoLoading = true;
+      try {
+        await this.uploadAsset(this._supplierEditable?.ID, event[0].File, 'Image');
+      } catch (err) {
+        this.hasLogo = false;
+        this.logoLoading = false;
+        throw err;
+      } finally {
+        this.hasLogo = true;
+        this.logoLoading = false;
+        // Reset the img src for logo
+        this.setLogoSrc();
+      }
+    }
+  }
+
+  // TODO: Some work to be done around 'isCreatingNew
+  async manualFileUpload(event): Promise<void> {
+    if (this.isCreatingNew) {
+      this.logoStaged.emit(event?.target?.files[0]);
+      this.hasLogo = true;
+      this.stagedLogoUrl = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(event?.target?.files[0]));
+    } else {
+      this.logoLoading = true;
+      const file: File = event?.target?.files[0];
+      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}});
+      if (logoAssets?.Items?.length > 0) {
+        // If logo exists, remove the assignment, then the logo itself
+        await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, "Suppliers", null, null);
+        await HeadStartSDK.Assets.Delete(logoAssets.Items[0].ID);
+      }
+      // Then upload logo asset
+      try {
+        await this.uploadAsset(this._supplierEditable?.ID, file, 'Image');
+      } catch (err) {
+        this.hasLogo = false;
+        this.logoLoading = false;
+        throw err;
+      } finally {
+        this.hasLogo = true;
+        this.logoLoading = false;
+        // Reset the img src for logo
+        this.setLogoSrc();
+      }
+    }
+  }
+
+  async uploadAsset(supplierID: string, file: File, assetType: string): Promise<void> {
+    const accessToken = await this.appAuthService.fetchToken().toPromise();
+    const asset: AssetUpload = {
+      Active: true,
+      File: file,
+      Type: (assetType as AssetUpload['Type']),
+      FileName: file.name,
+      Tags: ["Logo"]
+    }
+    // Upload the asset, then make the asset assignment to Suppliers
+    const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
+    await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Suppliers', ResourceID: supplierID, AssetID: newAsset.ID }, accessToken);
+  }
+
+  async removeLogo(): Promise<void> {
+    this.logoLoading = true;
+    try {
+      // Get the logo asset
+      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}});
+      // Remove the logo asset assignment
+      await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, "Suppliers", null, null);
+      // Remove the logo asset
+      await HeadStartSDK.Assets.Delete(logoAssets.Items[0].ID);
+    } catch (err) {
+      throw err;
+    } finally {
+      this.hasLogo = false;
+      this.logoLoading = false;
+      // Reset the img src for logo
+      this.setLogoSrc();
+    }
+  }
+
+  setLogoSrc(): void {
+    document.getElementById('supplier-logo')?.setAttribute('src', `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`);
   }
 }

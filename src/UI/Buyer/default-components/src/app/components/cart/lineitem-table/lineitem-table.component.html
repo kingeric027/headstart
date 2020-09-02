@@ -62,7 +62,7 @@
             <div class="row align-items-sm-center">
               <div class="col-3 p-0">
                 <img class="img-thumbnail"
-                     [src]="li.xp?.LineItemImageUrl || getImageUrl(li.ID)" 
+                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
                      alt="{{ li.Product.ID }}" />
               </div>
               <div class="col-9">
@@ -89,7 +89,19 @@
                         badge-pill
                         badge-primary">Purchase Order</span>
                 </h4>
-                <div *ngIf="readOnly && !hideStatus"><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="li.xp?.LineItemStatus"></ocm-order-status-icon> {{ li.xp?.LineItemStatus | orderStatusDisplay }}</div>
+                <div *ngIf="readOnly && !hideStatus"><span translate>ORDERS.DETAIL.STATUS</span>:
+                  <span *ngFor="let entry of li.xp.StatusByQuantity | keyvalue">
+                    <span *ngIf="entry.value">
+                      <ocm-order-status-icon [status]="entry.key"></ocm-order-status-icon>
+                      <span>
+                        {{entry.value}}
+                      </span>
+                      <span>
+                        {{ entry.key | orderStatusDisplay }}
+                      </span>
+                    </span>
+                  </span>
+                </div>
                 <a class="text-danger btn btn-link px-0 link"
                    *ngIf="!readOnly"
                    (click)="removeLineItem(li.ID)"

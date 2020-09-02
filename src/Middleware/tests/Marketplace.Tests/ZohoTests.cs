@@ -1,4 +1,11 @@
-﻿using NUnit.Framework;
+﻿using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Common.Services.Zoho;
+using Newtonsoft.Json;
+using NUnit.Framework;
+using OrderCloud.SDK;
+using System;
+using System.Threading.Tasks;
 
 namespace Marketplace.Tests
 {
@@ -653,6 +660,377 @@ namespace Marketplace.Tests
 		'OrderSubmitResponse': null
 	}";
 
+		// taxes were failing from writing tax on order which caused this worksheet to fail
+		private const string WORKSHEET_WITH_TAX_COST = @"{
+	'Order': {
+		'ID': 'SEB000388X3',
+		'FromUser': {
+			'ID': '0005-00011',
+			'Username': 'SarahWTC',
+			'Password': null,
+			'FirstName': 'Sarah',
+			'LastName': 'Ennis',
+			'Email': 'sennis@four51.com',
+			'Phone': '',
+			'TermsAccepted': null,
+			'Active': true,
+			'xp': {
+				'Country': 'US'
+			},
+			'AvailableRoles': null,
+			'DateCreated': '2020-07-07T16:13:54.84+00:00',
+			'PasswordLastSetDate': '2020-07-07T16:14:47.377+00:00'
+		},
+		'FromCompanyID': '0005',
+		'ToCompanyID': 'rQYR6T6ZTEqVrgv8x_ei0g',
+		'FromUserID': '0005-00011',
+		'BillingAddressID': '0005-0001',
+		'BillingAddress': {
+			'ID': '0005-0001',
+			'DateCreated': null,
+			'CompanyName': 'Waxing the City - Maple Grove',
+			'FirstName': '',
+			'LastName': '',
+			'Street1': '7895 Main St',
+			'Street2': '',
+			'City': 'Maple Grove',
+			'State': 'MN',
+			'Zip': '55369',
+			'Country': 'US',
+			'Phone': '7634162082',
+			'AddressName': 'Maple Grove, MN',
+			'xp': {
+				'Coordinates': null,
+				'Accessorials': null,
+				'Email': 'wtcMG@test.com',
+				'LocationID': 'W7',
+				'AvalaraCertificateID': 61,
+				'AvalaraCertificateExpiration': '2021-07-01T00:00:00+00:00'
+			}
+		},
+		'ShippingAddressID': '0005-0001',
+		'Comments': '',
+		'LineItemCount': 2,
+		'Status': 'Open',
+		'DateCreated': '2020-08-28T15:29:04.07+00:00',
+		'DateSubmitted': '2020-08-28T15:32:06.12+00:00',
+		'DateApproved': null,
+		'DateDeclined': null,
+		'DateCanceled': null,
+		'DateCompleted': null,
+		'Subtotal': 426.95,
+		'ShippingCost': 280.51,
+		'TaxCost': 53.23,
+		'PromotionDiscount': 0,
+		'Total': 760.69,
+		'IsSubmitted': true,
+		'xp': {
+			'AvalaraTaxTransactionCode': '41a74fb6-6364-42d8-82d6-63f6e968ba16',
+			'OrderType': 'Standard',
+			'QuoteOrderInfo': null,
+			'Currency': 'USD',
+			'Returns': {
+				'HasClaims': false,
+				'HasUnresolvedClaims': false,
+				'Resolutions': []
+			},
+			'ClaimStatus': 'NoClaim',
+			'ShippingStatus': 'Processing',
+			'ApprovalNeeded': '',
+			'ShipFromAddressIDs': [
+				'019-01'
+			],
+			'SupplierIDs': [
+				'019'
+			],
+			'SubmittedOrderStatus': 'Open',
+			'NeedsAttention': true
+		}
+	},
+	'LineItems': [
+		{
+			'ID': 'X001',
+			'ProductID': '27832',
+			'Quantity': 1,
+			'DateAdded': '2020-08-28T15:30:44.08+00:00',
+			'QuantityShipped': 0,
+			'UnitPrice': 224.7094,
+			'PromotionDiscount': 0,
+			'LineTotal': 224.71,
+			'LineSubtotal': 224.71,
+			'CostCenter': null,
+			'DateNeeded': null,
+			'ShippingAccount': null,
+			'ShippingAddressID': '0005-0001',
+			'ShipFromAddressID': '019-01',
+			'Product': {
+				'ID': '27832',
+				'Name': 'Granite Series Sled',
+				'Description': '',
+				'QuantityMultiplier': 1,
+				'ShipWeight': 45,
+				'ShipHeight': 1,
+				'ShipWidth': 1,
+				'ShipLength': 1,
+				'xp': {
+					'Facets': {
+						'supplier': [
+							'Power Systems'
+						],
+						'Color': [
+							'Black'
+						]
+					},
+					'IntegrationData': null,
+					'Status': 'Draft',
+					'HasVariants': false,
+					'Note': '',
+					'Tax': {
+						'Category': 'P0000000',
+						'Code': 'PC030204',
+						'Description': 'Clothing And Related Products (Business-To-Business)-Handbags'
+					},
+					'UnitOfMeasure': {
+						'Qty': 1,
+						'Unit': 'sled'
+					},
+					'ProductType': 'Standard',
+					'IsResale': false,
+					'Accessorials': null,
+					'Currency': 'USD'
+				}
+			},
+			'Variant': null,
+			'ShippingAddress': {
+				'ID': '0005-0001',
+				'DateCreated': null,
+				'CompanyName': 'Waxing the City - Maple Grove',
+				'FirstName': '',
+				'LastName': '',
+				'Street1': '7895 Main St',
+				'Street2': '',
+				'City': 'Maple Grove',
+				'State': 'MN',
+				'Zip': '55369',
+				'Country': 'US',
+				'Phone': '7634162082',
+				'AddressName': 'Maple Grove, MN',
+				'xp': {
+					'Coordinates': null,
+					'Accessorials': null,
+					'Email': 'wtcMG@test.com',
+					'LocationID': 'W7',
+					'AvalaraCertificateID': 61,
+					'AvalaraCertificateExpiration': '2021-07-01T00:00:00+00:00'
+				}
+			},
+			'ShipFromAddress': {
+				'ID': '019-01',
+				'DateCreated': null,
+				'CompanyName': 'Power Systems',
+				'FirstName': '',
+				'LastName': '',
+				'Street1': '5700 Casey Dr',
+				'Street2': null,
+				'City': 'Knoxville',
+				'State': 'TN',
+				'Zip': '37909-1803',
+				'Country': 'US',
+				'Phone': '',
+				'AddressName': 'Power Systems',
+				'xp': null
+			},
+			'SupplierID': '019',
+			'Specs': [],
+			'xp': {
+				'StatusByQuantity': {
+					'Submitted': 1,
+					'Backordered': 0,
+					'CancelRequested': 0,
+					'Complete': 0,
+					'ReturnRequested': 0,
+					'Returned': 0,
+					'Canceled': 0,
+					'Open': 0
+				},
+				'Returns': [],
+				'Cancelations': [],
+				'ImageUrl': 'https://marketplace-middleware-staging.azurewebsites.net/assets/rQYR6T6ZTEqVrgv8x_ei0g/products/27832/thumbnail?size=M'
+			}
+		},
+		{
+			'ID': 'X002',
+			'ProductID': '70085',
+			'Quantity': 1,
+			'DateAdded': '2020-08-28T15:30:44.643+00:00',
+			'QuantityShipped': 0,
+			'UnitPrice': 202.2374,
+			'PromotionDiscount': 0,
+			'LineTotal': 202.24,
+			'LineSubtotal': 202.24,
+			'CostCenter': null,
+			'DateNeeded': null,
+			'ShippingAccount': null,
+			'ShippingAddressID': '0005-0001',
+			'ShipFromAddressID': '019-01',
+			'Product': {
+				'ID': '70085',
+				'Name': 'Power Systems Deck',
+				'Description': '',
+				'QuantityMultiplier': 1,
+				'ShipWeight': 28,
+				'ShipHeight': 20,
+				'ShipWidth': 35,
+				'ShipLength': 30,
+				'xp': {
+					'Facets': {
+						'Color': [
+							'Black'
+						],
+						'supplier': [
+							'Power Systems'
+						]
+					},
+					'IntegrationData': null,
+					'Status': 'Draft',
+					'HasVariants': false,
+					'Note': '',
+					'Tax': {
+						'Category': 'P0000000',
+						'Code': 'P0000000',
+						'Description': 'Tangible Personal Property (TPP)'
+					},
+					'UnitOfMeasure': {
+						'Qty': 1,
+						'Unit': 'per'
+					},
+					'ProductType': 'Standard',
+					'IsResale': false,
+					'Accessorials': null,
+					'Currency': 'USD'
+				}
+			},
+			'Variant': null,
+			'ShippingAddress': {
+				'ID': '0005-0001',
+				'DateCreated': null,
+				'CompanyName': 'Waxing the City - Maple Grove',
+				'FirstName': '',
+				'LastName': '',
+				'Street1': '7895 Main St',
+				'Street2': '',
+				'City': 'Maple Grove',
+				'State': 'MN',
+				'Zip': '55369',
+				'Country': 'US',
+				'Phone': '7634162082',
+				'AddressName': 'Maple Grove, MN',
+				'xp': {
+					'Coordinates': null,
+					'Accessorials': null,
+					'Email': 'wtcMG@test.com',
+					'LocationID': 'W7',
+					'AvalaraCertificateID': 61,
+					'AvalaraCertificateExpiration': '2021-07-01T00:00:00+00:00'
+				}
+			},
+			'ShipFromAddress': {
+				'ID': '019-01',
+				'DateCreated': null,
+				'CompanyName': 'Power Systems',
+				'FirstName': '',
+				'LastName': '',
+				'Street1': '5700 Casey Dr',
+				'Street2': null,
+				'City': 'Knoxville',
+				'State': 'TN',
+				'Zip': '37909-1803',
+				'Country': 'US',
+				'Phone': '',
+				'AddressName': 'Power Systems',
+				'xp': null
+			},
+			'SupplierID': '019',
+			'Specs': [],
+			'xp': {
+				'StatusByQuantity': {
+					'Submitted': 1,
+					'Backordered': 0,
+					'CancelRequested': 0,
+					'Complete': 0,
+					'ReturnRequested': 0,
+					'Returned': 0,
+					'Canceled': 0,
+					'Open': 0
+				},
+				'Returns': [],
+				'Cancelations': [],
+				'ImageUrl': 'https://marketplace-middleware-staging.azurewebsites.net/assets/rQYR6T6ZTEqVrgv8x_ei0g/products/70085/thumbnail?size=M'
+			}
+		}
+	],
+	'ShipEstimateResponse': {
+		'ShipEstimates': [
+			{
+				'ID': '019-01',
+				'xp': {},
+				'SelectedShipMethodID': 'FedexParcel-1a1b4d6f-02de-4042-b4bc-d073b43a920d',
+				'ShipEstimateItems': [
+					{
+						'LineItemID': 'X001',
+						'Quantity': 1
+					},
+					{
+						'LineItemID': 'X002',
+						'Quantity': 1
+					}
+				],
+				'ShipMethods': [
+					{
+						'ID': 'FedexParcel-1a1b4d6f-02de-4042-b4bc-d073b43a920d',
+						'Name': 'FEDEX_GROUND',
+						'Cost': 280.51,
+						'EstimatedTransitDays': 2,
+						'xp': {
+							'OriginalShipCost': 280.51,
+							'OriginalCurrency': 'USD',
+							'ExchangeRate': 1,
+							'OrderCurrency': 'USD'
+						}
+					},
+					{
+						'ID': 'FedexParcel-97f45367-b2bc-43bf-950a-8a1fe2038bde',
+						'Name': 'FEDEX_EXPRESS_SAVER',
+						'Cost': 629.26,
+						'EstimatedTransitDays': 3,
+						'xp': {
+							'OriginalShipCost': 629.26,
+							'OriginalCurrency': 'USD',
+							'ExchangeRate': 1,
+							'OrderCurrency': 'USD'
+						}
+					},
+					{
+						'ID': 'FedexParcel-ef6f22e0-c909-4e9e-9db7-91803014ccd9',
+						'Name': 'STANDARD_OVERNIGHT',
+						'Cost': 1322.68,
+						'EstimatedTransitDays': 1,
+						'xp': {
+							'OriginalShipCost': 1322.68,
+							'OriginalCurrency': 'USD',
+							'ExchangeRate': 1,
+							'OrderCurrency': 'USD'
+						}
+					}
+				]
+			}
+		],
+		'HttpStatusCode': 200,
+		'UnhandledErrorBody': null,
+		'xp': {}
+	}
+}";
+
 		[SetUp]
         public void Setup()
         {
@@ -661,26 +1039,33 @@ namespace Marketplace.Tests
         //[Test]
         //public async Task Test()
         //{
-        //var zoho_config = new ZohoClientConfig()
-        //{
-        //	ClientId = "1000.LYTODQT800N5C6UWEMRKKRS3VM7RPH",
-        //	ClientSecret = "d6c6960a7d742efd8230bd010e83eb86fae6c2dc87",
-        //	AccessToken = "1000.e9b088c5a817701588daf498a8231d69.467c7b3949d6d37a9982c18d865a2749",
-        //	ApiUrl = "https://books.zoho.com/api/v3",
-        //	OrganizationID = "708781679"
-        //};
-        //var oc_config = new OrderCloudClientConfig()
-        //{
-        //	AuthUrl = "https://stagingauth.ordercloud.io",
-        //	ApiUrl = "https://stagingapi.ordercloud.io",
-        //	ClientId = "0CC8282F-8EA9-4040-B1D9-BC03AC9FBB6B",
-        //	ClientSecret = "ulhq0P2DrdvzjBngQhv3DLus15V3VZEGYG0vYuVtBCRrruDNCpQXl11Sfinb",
-        //	GrantType = GrantType.ClientCredentials,
-        //	Roles = new[] { ApiRole.FullAccess }
-        //};
-        //var command = new ZohoCommand(zoho_config, oc_config);
-        //var wk = JsonConvert.DeserializeObject<MarketplaceOrderWorksheet>(TWO_LINEITEMS_SAME_PRODUCT_ID);
-        //var order = await command.CreateSalesOrder(wk);
-        //	}
+        //    var zoho_config = new ZohoClientConfig()
+        //    {
+        //        ClientId = "1000.LYTODQT800N5C6UWEMRKKRS3VM7RPH",
+        //        ClientSecret = "d6c6960a7d742efd8230bd010e83eb86fae6c2dc87",
+        //        AccessToken = "1000.e9b088c5a817701588daf498a8231d69.467c7b3949d6d37a9982c18d865a2749",
+        //        ApiUrl = "https://books.zoho.com/api/v3",
+        //        OrganizationID = "708781679"
+        //    };
+        //    var oc_config = new OrderCloudClientConfig()
+        //    {
+        //        AuthUrl = "https://stagingauth.ordercloud.io",
+        //        ApiUrl = "https://stagingapi.ordercloud.io",
+        //        ClientId = "0CC8282F-8EA9-4040-B1D9-BC03AC9FBB6B",
+        //        ClientSecret = "ulhq0P2DrdvzjBngQhv3DLus15V3VZEGYG0vYuVtBCRrruDNCpQXl11Sfinb",
+        //        GrantType = GrantType.ClientCredentials,
+        //        Roles = new[] { ApiRole.FullAccess }
+        //    };
+        //    var command = new ZohoCommand(zoho_config, oc_config);
+        //    var wk = JsonConvert.DeserializeObject<MarketplaceOrderWorksheet>(CURRENTLY_FAILING_WORKSHEET_2);
+        //    try
+        //    {
+        //        var order = await command.CreateSalesOrder(wk);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("hi");
+        //    }
+        //}
     }
 }

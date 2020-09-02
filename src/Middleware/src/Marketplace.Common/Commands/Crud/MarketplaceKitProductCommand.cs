@@ -14,12 +14,12 @@ namespace Marketplace.Common.Commands.Crud
     public interface IMarketplaceKitProductCommand
     {
         Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user);
-        Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
+        Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task Delete(string id, VerifiedUserContext user);
-        Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user);
-        Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user);
+        Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
+        Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
     }
 
     public class MarketplaceKitProductCommand : IMarketplaceKitProductCommand
@@ -37,26 +37,28 @@ namespace Marketplace.Common.Commands.Crud
             _query = query;
         }
 
-        public async Task<List<AssetForDelivery>> GetProductImages(string productID, VerifiedUserContext user)
+        public async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
         {
-            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
-            var images = assets.Where(a => a.Type == AssetType.Image).ToList();
+            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100},  user);
+            var images = assets.Items.Where(a => a.Type == AssetType.Image).ToList();
             return images;
         }
-        public async Task<List<AssetForDelivery>> GetProductAttachments(string productID, VerifiedUserContext user)
+        public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
         {
-            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), user);
-            var attachments = assets.Where(a => a.Type == AssetType.Attachment).ToList();
+            var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
+            var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
             return attachments;
         }
         public async Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user)
         {
-            var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
+            var _product = await _oc.Products.GetAsync<Product>(id, user.AccessToken);
             var _images = GetProductImages(id, user);
             var _attachments = GetProductAttachments(id, user);
             var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
             return new MarketplaceKitProduct
             {
+                ID = _product.ID,
+                Name = _product.Name,
                 Product = _product,
                 Images = await _images,
                 Attachments = await _attachments,
@@ -64,14 +66,8 @@ namespace Marketplace.Common.Commands.Crud
             };
         }
 
-        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, VerifiedUserContext user)
         {
-            var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
-                filters: args.ToFilterString(),
-                search: args.Search,
-                pageSize: args.PageSize,
-                page: args.Page,
-                accessToken: user.AccessToken);
             var _kitProducts = await _query.List<KitProduct>("KitProduct", args, user);
             var _kitProductList = new List<MarketplaceKitProduct>();
 
@@ -82,6 +78,8 @@ namespace Marketplace.Common.Commands.Crud
                 var _attachments = GetProductAttachments(product.ID, user);
                 _kitProductList.Add(new MarketplaceKitProduct
                 {
+                    ID = parentProduct.ID,
+                    Name = parentProduct.Name,
                     Product = parentProduct,
                     Images = await _images,
                     Attachments = await _attachments,
@@ -90,29 +88,31 @@ namespace Marketplace.Common.Commands.Crud
             });
             return new ListPage<MarketplaceKitProduct>
             {
-                Meta = _productsList.Meta,
+                Meta = _kitProducts.Meta,
                 Items = _kitProductList
             };
         }
         public async Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user)
         {
-            var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(kitProduct.Product, user.AccessToken);
+            var _product = await _oc.Products.CreateAsync<Product>(kitProduct.Product, user.AccessToken);
             var kitProductDoc = new KitProductDocument();
             kitProductDoc.ID = _product.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
             var _productAssignments = await _query.Create<KitProduct>("KitProduct", kitProductDoc, user);
             return new MarketplaceKitProduct
             {
+                ID = _product.ID,
+                Name = _product.Name,
                 Product = _product,
-                Images = new List<AssetForDelivery>(),
-                Attachments = new List<AssetForDelivery>(),
+                Images = new List<Asset>(),
+                Attachments = new List<Asset>(),
                 ProductAssignments = _productAssignments.Doc
             };
         }
 
         public async Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, VerifiedUserContext user)
         {
-            var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
+            var _updatedProduct = await _oc.Products.SaveAsync<Product>(kitProduct.Product.ID, kitProduct.Product, user.AccessToken);
             var kitProductDoc = new KitProductDocument();
             kitProductDoc.ID = _updatedProduct.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
@@ -121,6 +121,8 @@ namespace Marketplace.Common.Commands.Crud
             var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
             return new MarketplaceKitProduct
             {
+                ID = _updatedProduct.ID,
+                Name = _updatedProduct.Name,
                 Product = _updatedProduct,
                 Images = _images,
                 Attachments = _attachments,

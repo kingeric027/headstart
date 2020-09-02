@@ -16,7 +16,21 @@
                  [value]="_promotionEditable?.Code"
                  (input)="handleUpdatePromo($event, 'Code')"
                  placeholder="{{'ADMIN.PROMOTIONS.PROMO_CODE_EXAMPLE' | translate}}">
-          <small translate>ADMIN.PROMOTIONS.PROMO_CODE_EXPLANATION</small>
+          <small *ngIf="_promotionEditable?.xp?.Automatic"
+                 translate>ADMIN.PROMOTIONS.AUTOMATIC_PROMO_CODE_EXPLANATION</small>
+          <small *ngIf="!_promotionEditable?.xp?.Automatic"
+                 translate>ADMIN.PROMOTIONS.PROMO_CODE_EXPLANATION</small>
+          <div class="custom-control custom-checkbox mt-3">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   [resourceForm]="resourceForm"
+                   formControlName="Automatic"
+                   (input)="handleUpdatePromo($event, 'xp.Automatic')"
+                   id="Automatic">
+            <label class="custom-control-label"
+                   for="Automatic"
+                   translate>ADMIN.PROMOTIONS.AUTO_APPLY</label>
+          </div>
         </div>
         <div class="card py-2 px-3 mt-3 bg-white">
           <h6 class="font-weight-medium"
@@ -433,12 +447,23 @@
             translate>ADMIN.PROMOTIONS.SUMMARY</h6>
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="font-weight-bold">{{_promotionEditable?.Code}}</h5>
-          <span *ngIf="!isCreatingNew"
-                class="badge badge-pill"
-                [ngClass]="{'badge-success': !isExpired, 'badge-light': isExpired}"
-                translate>
-            {{isExpired ? 'ADMIN.PROMOTIONS.EXPIRED' : 'ADMIN.PROMOTIONS.ACTIVE'}}
-          </span>
+          <div class="d-flex justify-content-start align-items-center">
+            <span *ngIf="_promotionEditable?.xp?.Automatic"
+                  class="badge badge-pill badge-warning mr-1"
+                  translate>
+              ADMIN.PROMOTIONS.AUTOMATIC
+            </span>
+            <span *ngIf="!isCreatingNew && !isExpired"
+                  class="badge badge-pill badge-success"
+                  translate>
+              ADMIN.PROMOTIONS.ACTIVE
+            </span>
+            <span *ngIf="!isCreatingNew && isExpired"
+                  class="badge badge-pill badge-light"
+                  translate>
+              ADMIN.PROMOTIONS.EXPIRED
+            </span>
+          </div>
         </div>
         <p *ngIf="!_promotionEditable?.Code && !_promotionEditable?.xp?.Value"
            translate>ADMIN.PROMOTIONS.NO_INFO_ENTERED</p>

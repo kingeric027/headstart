@@ -1,21 +1,18 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import {
   FULL_TABLE_RESOURCE_DICTIONARY,
   ResourceRow,
   ResourceConfiguration,
 } from '@app-seller/shared/services/configuration/table-display';
 import { RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types';
-import {
-  PRODUCT_IMAGE_PATH_STRATEGY,
-  getProductMainImageUrlOrPlaceholder,
-  PLACEHOLDER_URL,
-} from '@app-seller/products/product-image.helper';
 import { faCopy, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SortDirection } from './sort-direction.enum';
 import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 
 @Component({
   selector: 'full-resource-table-component',
@@ -52,7 +49,10 @@ export class FullResourceTableComponent {
   resourceSelected = new EventEmitter();
 
   constructor(private router: Router,
-              private toastrService: ToastrService) {}
+              private toastrService: ToastrService,
+              private activatedRoute: ActivatedRoute,
+              @Inject(applicationConfiguration) private appConfig: AppConfig,
+              private impersonationService: ImpersonationService) {}
 
   setDisplayValuesForResource(resources: any[] = []) {
     this.headers = this.getHeaders();
@@ -90,7 +90,7 @@ export class FullResourceTableComponent {
     return {
       resource,
       cells: resourceCells,
-      imgPath: resourceConfiguration.imgPath ? this.getImage(resource, resourceConfiguration) : '',
+      imgPath: resourceConfiguration.imgPath ? this.getImage(resource) : '',
     };
   }
 
@@ -100,7 +100,7 @@ export class FullResourceTableComponent {
       closeButton: true,
       tapToDismiss: true,
     });
-    let copy = document.createElement('textarea');
+    const copy = document.createElement('textarea');
     document.body.appendChild(copy);
     copy.value = JSON.stringify(resource);
     copy.select();
@@ -112,8 +112,8 @@ export class FullResourceTableComponent {
     this.objectPreviewText = JSON.stringify(resource);
   }
 
-  getImage(resource: any, resourceConfiguration: ResourceConfiguration): string {
-    return `${environment.middlewareUrl}/${this.resourceType}/${resource.ID}/image`;
+  getImage(resource: any): string {
+    return `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/${this.resourceType}/${resource.ID}/thumbnail?size=s`;
   }
 
   selectResource(value: any) {
@@ -139,7 +139,7 @@ export class FullResourceTableComponent {
     if (this.sortDirection === SortDirection.None) {
       this.activeSort = '';
     }
-    let sortInverse = this.sortDirection === SortDirection.Desc ? '!' : '';
+    const sortInverse = this.sortDirection === SortDirection.Desc ? '!' : '';
     this.ocService.sortBy(sortInverse + this.activeSort);
   }
 
@@ -151,5 +151,11 @@ export class FullResourceTableComponent {
     } else {
       return faSort;
     }
+  }
+
+  async impersonateUser(resource: any) {
+    event.stopPropagation();
+    const buyerID = this.activatedRoute.snapshot.params?.buyerID;
+    await this.impersonationService.impersonateUser(buyerID, resource);
   }
 }

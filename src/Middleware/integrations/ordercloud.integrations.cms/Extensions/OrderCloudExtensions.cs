@@ -53,5 +53,20 @@ namespace ordercloud.integrations.cms
 				throw ex;
 			}
 		}
+
+		public static ListPage<T> Empty<T>(this ListPage<T> list)
+		{
+			return new ListPage<T>()
+			{
+				Items = new List<T>(),
+				Meta = new ListPageMeta()
+				{
+					Page = 1,
+					PageSize = 20,
+					TotalCount = 0,
+					TotalPages = 0
+				}
+			};
+		}
 	}
 }

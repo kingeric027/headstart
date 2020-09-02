@@ -102,21 +102,24 @@ export class AuthService {
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
-    HeadStartSDK.Tokens.SetAccessToken(creds.access_token);
-    this.setToken(creds.access_token);
-    if (rememberMe && creds.refresh_token) {
+    this.loginWithTokens(creds.access_token, creds.refresh_token, rememberMe);
+    return creds;
+  }
+
+  loginWithTokens(token: string, refreshToken?: string, rememberMe: boolean = false): void {
+    HeadStartSDK.Tokens.SetAccessToken(token);
+    this.setToken(token);
+    if (rememberMe && refreshToken) {
       /**
        * set the token duration in the dashboard - https://developer.ordercloud.io/dashboard/settings
        * refresh tokens are configured per clientID and initially set to 0
        * a refresh token of 0 means no refresh token is returned in OAuth response
        */
-      Tokens.SetRefreshToken(creds.refresh_token);
+      Tokens.SetRefreshToken(refreshToken);
       this.setRememberMeStatus(true);
     }
     this.router.navigateByUrl('/home');
     this.ordersToApproveStateService.alertIfOrdersToApprove();
-
-    return creds;
   }
 
   async anonymousLogin(): Promise<AccessToken> {

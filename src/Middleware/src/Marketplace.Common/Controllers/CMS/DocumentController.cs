@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 using ordercloud.integrations.cms;
 using IDocumentQuery = ordercloud.integrations.cms.IDocumentQuery;
 using Newtonsoft.Json.Linq;
-using System.Linq;
 using Marketplace.Models.Misc;
-using Avalara.AvaTax.RestClient;
 
 namespace Marketplace.Common.Controllers.CMS
 {
@@ -59,7 +57,7 @@ namespace Marketplace.Common.Controllers.CMS
 
 		[DocName("Update a Document")]
 		[HttpPut, Route("{documentID}"), OrderCloudIntegrationsAuth]
-		public async Task<JDocument> SAve(string schemaID, string documentID, [FromBody] JDocument document)
+		public async Task<JDocument> Save(string schemaID, string documentID, [FromBody] JDocument document)
 		{
 			RequireOneOf(CustomRole.DocumentAdmin);
 			var doc =  await _documents.Save(schemaID, documentID, document, VerifiedUserContext);
@@ -99,11 +97,21 @@ namespace Marketplace.Common.Controllers.CMS
 		}
 
 		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
-		[HttpGet, Route("resource")]
-		public async Task<List<JDocument>> ListDocuments(string schemaID, [FromQuery] Resource resource)
+		[HttpGet, Route("{type}/{ID}")]
+		public async Task<ListPage<JDocument>> ListDocuments(string schemaID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
 		{
-			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, VerifiedUserContext);
-			return docs.Reserialize<List<JDocument>>();
+			var resource = new Resource(type, ID);
+			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, args, VerifiedUserContext);
+			return docs.Reserialize<ListPage<JDocument>>();
+		}
+
+		[DocName("List Documents Assigned to Resource"), OrderCloudIntegrationsAuth]
+		[HttpGet, Route("{parentType}/{parentID}/{type}/{ID}")]
+		public async Task<ListPage<JDocument>> ListDocumentsOnChild(string schemaID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ListArgsPageOnly args)
+		{
+			var resource = new Resource(type, ID, parentType, parentID);
+			var docs = await _assignments.ListDocuments<JObject>(schemaID, resource, args, VerifiedUserContext);
+			return docs.Reserialize<ListPage<JDocument>>();
 		}
 	}
 }

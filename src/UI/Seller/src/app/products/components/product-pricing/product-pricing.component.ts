@@ -23,8 +23,13 @@ export class ProductPricingComponent {
   @Input()
   sellerCurrency: SupportedRates;
   @Input()
+  isRequired: boolean;
+  @Input()
   set superMarketplaceProductStatic(value: SuperMarketplaceProduct) {
     this.superProduct = value;
+    if (value.Product?.xp?.ProductType === 'Quote' && value.PriceSchedule.PriceBreaks === null) {
+      this.superProduct.PriceSchedule.PriceBreaks = [{Price: null, Quantity: null}];
+    }
     if (value) {
       this.supplierPriceSchedule = JSON.parse(JSON.stringify(value.PriceSchedule));
       if(this.readonly) {
@@ -51,14 +56,14 @@ export class ProductPricingComponent {
   isUsingPriceOverride = false;
   areChangesToBuyerVisibility = false;
   
-  emptyPriceSchedule: PriceSchedule = {
+  emptyPriceSchedule = {
     UseCumulativeQuantity: true,
     PriceBreaks: [{
       Price: 0,
       Quantity: 1,
     }
   ]
-};
+} as PriceSchedule;
 
   isSavedOverride = false;
   overridePriceScheduleEditable = this.emptyPriceSchedule;

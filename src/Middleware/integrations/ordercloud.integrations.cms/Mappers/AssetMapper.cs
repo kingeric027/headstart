@@ -4,14 +4,13 @@ using System.Drawing;
 using System.Linq;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.cms
 {
 	public static class AssetMapper
 	{
-		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
-
-		public static (AssetDO, IFormFile) MapFromUpload(CMSConfig config, AssetContainerDO container, AssetUpload form)
+		public static AssetDO MapFromUpload(AssetContainerDO container, AssetUpload form)
 		{
 			if (!(form.File == null ^ form.Url == null))
 			{
@@ -33,9 +32,7 @@ namespace ordercloud.integrations.cms
 					IsUrlOverridden = form.Url != null
 				}
 			};
-			asset.Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{container.id}/{asset.id}";
-			TypeSpecificMapping(ref asset, form);
-			return (asset, form.File);
+			return asset;
 		}
 
 		private static List<string> MapTags(string tags)
@@ -43,47 +40,14 @@ namespace ordercloud.integrations.cms
 			return tags == null ? new List<string>() : tags.Split(",").Select(t => t.Trim()).Where(t => t != "").ToList();
 		}
 
-		private static void TypeSpecificMapping(ref AssetDO asset, AssetUpload form)
-		{
-			switch (asset.Type)
-			{
-				case AssetType.Image:
-					ImageSpecificMapping(ref asset, form);
-					return;
-				case AssetType.Attachment:
-				case AssetType.Structured:
-				case AssetType.Theme:
-				default:
-					return;
-			}
-		}
-
-		private static void ImageSpecificMapping(ref AssetDO asset, AssetUpload form)
-		{
-			if (form.File == null) return;
-			if (!ValidImageFormats.Contains(form.File.ContentType)) 
-			{
-				throw new AssetCreateValidationException($"Image Uploads must be one of these file types - {string.Join(", ", ValidImageFormats)}");
-			}
-			using (var image = Image.FromStream(form.File.OpenReadStream()))
-			{
-				asset.Metadata.ImageWidth = image.Width;
-				asset.Metadata.ImageHeight = image.Height;
-				asset.Metadata.ImageHorizontalResolution = (decimal) image.HorizontalResolution;
-				asset.Metadata.ImageVerticalResolution = (decimal) image.VerticalResolution;
-
-				// TODO - potentially image resizing?
-			}
-		}
-
-		public static Asset MapTo(AssetDO asset)
+		public static Asset MapTo(CMSConfig config, AssetDO asset)
 		{
 			return new Asset()
 			{
 				ID = asset.InteropID,
 				Title = asset.Title,
 				Active = asset.Active,
-				Url = asset.Url,
+				Url = asset.Url ?? $"{config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}",
 				Type = asset.Type,
 				Tags = asset.Tags,
 				FileName = asset.FileName,
@@ -92,18 +56,26 @@ namespace ordercloud.integrations.cms
 			};
 		}
 
-		public static IEnumerable<Asset> MapTo(IEnumerable<AssetDO> assets)
+		public static IEnumerable<Asset> MapTo(CMSConfig config, IEnumerable<AssetDO> assets)
 		{
-			return assets.Select(asset => MapTo(asset));
+			return assets.Select(asset => MapTo(config, asset));
 		}
 
-		public static ListPage<Asset> MapTo(ListPage<AssetDO> listPage)
+		public static ListPage<Asset> MapTo(CMSConfig config, ListPage<AssetDO> listPage)
 		{
 			return new ListPage<Asset>
 			{
 				Meta = listPage.Meta,
-				Items = MapTo(listPage.Items).ToList()
+				Items = MapTo(config, listPage.Items).ToList()
 			};
+		}
+
+		public static ListArgs<AssetDO> MapTo(this ListArgs<Asset> args)
+		{
+			return args.MapTo<Asset, AssetDO>(new ListArgMap()
+			{
+				{"ID", "InteropID" }
+			});
 		}
 	}
 }

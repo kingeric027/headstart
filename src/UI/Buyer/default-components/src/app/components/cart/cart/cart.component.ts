@@ -10,23 +10,19 @@ import { OrderSummaryMeta, getOrderSummaryMeta } from 'src/app/services/purchase
 })
 export class OCMCart {
   _order: MarketplaceOrder;
-  _orderPromos: OrderPromotion[] = [];
+  _orderPromos: ListPage<OrderPromotion>;
   _lineItems: ListPage<LineItemWithProduct>;
   orderSummaryMeta: OrderSummaryMeta;
   @Input() set order(value: MarketplaceOrder) {
     this._order = value;
     this.setOrderSummaryMeta();
-    const existingPromoArr = this.context.order.promos.get().Items.map(async promo => {
-      this.context.order.promos.removePromo(promo.Code);
-    });
-    Promise.all(existingPromoArr);
   }
   @Input() set lineItems(value: ListPage<LineItemWithProduct>) {
     this._lineItems = value;
     this.setOrderSummaryMeta();
   }
 
-  @Input() set orderPromos(value: OrderPromotion[]) {
+  @Input() set orderPromos(value: ListPage<OrderPromotion>) {
     this._orderPromos = value;
     this.setOrderSummaryMeta();
   }
@@ -35,7 +31,7 @@ export class OCMCart {
 
   setOrderSummaryMeta(): void {
     if (this._order && this._lineItems) {
-      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos, this._lineItems.Items, 'cart');
+      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos?.Items, this._lineItems.Items, 'cart');
     }
   }
   toProductList(): void {
@@ -51,6 +47,6 @@ export class OCMCart {
   }
 
   updateOrderMeta(): void {
-    this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos, this._lineItems.Items, 'cart');
+    this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos?.Items, this._lineItems.Items, 'cart');
   }
 }

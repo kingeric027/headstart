@@ -23,6 +23,7 @@ import {
   MarketplaceOrder,
   ListPage,
   MarketplaceLineItem,
+  MarketplaceAddressBuyer,
 } from '@ordercloud/headstart-sdk';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -73,9 +74,10 @@ export class CheckoutService {
     return this.order;
   }
 
-  async setShippingAddressByID(addressID: string): Promise<MarketplaceOrder> {
+  async setShippingAddressByID(address: MarketplaceAddressBuyer, ): Promise<MarketplaceOrder> {
     try {
-      return await this.patch({ ShippingAddressID: addressID });
+      await Orders.Patch('Outgoing', this.order.ID, { xp: { ShippingAddress: address } })
+      return await this.patch({ ShippingAddressID: address.ID });
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
@@ -164,6 +166,7 @@ export class CheckoutService {
       DateCreated: new Date().toDateString(),
       Type: 'PurchaseOrder',
     };
+    await Orders.Patch('Outgoing', this.order.ID, { xp: { PaymentMethod: 'Purchase Order' } })
     return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 
@@ -199,6 +202,7 @@ export class CheckoutService {
         cardType,
       },
     };
+    await Orders.Patch('Outgoing', this.order.ID, { xp: { PaymentMethod: 'Credit Card' } })
     return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 

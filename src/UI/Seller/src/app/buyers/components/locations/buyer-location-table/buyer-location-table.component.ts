@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { BuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
+import { BuyerAddress, ListPage, Address } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ValidateUSZip, ValidatePhone, ValidateEmail } from '@app-seller/validators/validators';
@@ -13,7 +13,7 @@ import { BuyerService } from '../../buyers/buyer.service';
   styleUrls: ['./buyer-location-table.component.scss'],
 })
 export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddress> {
-  suggestedAddresses: ListAddress;
+  suggestedAddresses: ListPage<Address>;
   selectedAddress: Address;
 
   constructor(

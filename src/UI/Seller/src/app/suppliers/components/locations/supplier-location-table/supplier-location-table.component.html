@@ -16,10 +16,9 @@
                           [labelSingular]="'ALIAS.SUPPLIER_LOCATION'"
                           [labelPlural]="'ALIAS.SUPPLIER_LOCATIONS'">
   <app-supplier-location-edit class="resource-edit"
-                              *ngIf="resourceForm"
-                              [resourceForm]="resourceForm"
                               [suggestedAddresses]="suggestedAddresses"
                               [filterConfig]="filterConfig"
+                              [location]="resourceInSelection"
                               (updateResource)="updateResource($event)"
                               (selectAddress)="handleAddressSelect($event)"
                               (canDelete)="determineIfDeletable($event)">

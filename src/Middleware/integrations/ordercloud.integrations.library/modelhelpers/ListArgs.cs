@@ -17,7 +17,25 @@ namespace ordercloud.integrations.library
         void ValidateAndNormalize();
     }
 
-    [ModelBinder(typeof(ListArgsModelBinder))]
+    public class ListArgsPageOnly
+	{
+        public ListArgsPageOnly()
+        {
+            Page = 1;
+            PageSize = 100;
+        }
+
+        public ListArgsPageOnly(int page, int pageSize)
+        {
+            Page = page;
+            PageSize = pageSize;
+        }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+    }
+
+
+   [ModelBinder(typeof(ListArgsModelBinder))]
     public class ListArgs<T> : IListArgs
     {
         public ListArgs()
