@@ -94,6 +94,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
   @Input()
   set ocService(service: ResourceCrudService<any>) {
+    console.log(service.primaryResourceLevel)
     this._ocService = service;
     this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
     this._currentResourceNameSingular = singular(this._currentResourceNamePlural);

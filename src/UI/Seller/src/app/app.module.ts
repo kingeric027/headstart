@@ -33,6 +33,8 @@ import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-inte
 import { AppErrorHandler } from './config/error-handling.config';
 import { Configuration } from '@ordercloud/headstart-sdk';
 import { applicationConfiguration, AppConfig, ocAppConfig } from './config/app.config';
+import 'tinymce/tinymce';
+import '@ordercloud/angular-cms-components/plugin.min.js';
 
 export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, ocAppConfig.translateBlobUrl);

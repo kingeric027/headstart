@@ -91,6 +91,12 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
+  storefronts: {
+    toPrimaryHeader: 'AppName',
+    toSecondaryHeader: 'ID',
+    toImage: '',
+    toExpandable: false,
+  },
   templates: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ReportCategory',
@@ -430,6 +436,22 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
       },
     ],
     imgPath: '',
+  },
+  storefronts: {
+    fields: [
+      {
+        path: 'AppName',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: false,
+      },
+      {
+        path: 'ID',
+        header: 'ADMIN.HEADERS.ID',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+    ],
   },
   logs: {
     fields: [

@@ -18,6 +18,8 @@ export const ocAppConfig: AppConfig = {
   scope: [
     // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
     // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
+    'ApiClientAdmin',
+    'ApiClientReader',
     'AdminAddressReader',
     'MeAddressAdmin',
     'MeAdmin',
@@ -93,8 +95,8 @@ export const ocAppConfig: AppConfig = {
     'MeXpAdmin',
     'UserGroupAdmin',
     'ApprovalRuleAdmin',
-    'Shopper',
     'BuyerUserAdmin',
+    'Shopper',
     'BuyerReader',
     'PasswordReset',
     'SupplierReader',

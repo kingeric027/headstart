@@ -12,6 +12,7 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
+import { BuyerAddress, ListBuyerAddress, ListAddress, Address,  } from '@ordercloud/angular-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
@@ -86,7 +87,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const shouldList = await this.shouldListResources();
     if (shouldList) {
       const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
-      const options = {
+      let options: ListArgs = {
         page: pageNumber,
         // allows a list call to pass in a search term that will not appear in the query params
         search: searchText || search,
@@ -94,13 +95,7 @@ export abstract class ResourceCrudService<ResourceType> {
         pageSize: this.itemsPerPage,
         filters,
       };
-      if (this.secondaryResourceLevel === 'catalogs') {
-        // placeholder conditional for getting the supplier order list page running
-        // will need to integrate this with the filter on the order list page as a seller
-        // user and potentially refactor later
-
-        options.filters = { 'xp.Type': 'Catalog' }
-      }
+      options = this.addIntrinsicListArgs(options);
       const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);
@@ -108,6 +103,10 @@ export abstract class ResourceCrudService<ResourceType> {
         this.addResources(resourceResponse);
       }
     }
+  }
+
+  addIntrinsicListArgs(options: ListArgs): ListArgs {
+    return options;
   }
 
   getFetchStatus(options: Options): RequestStatus {
