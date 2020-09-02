@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OcBuyerService, Buyer } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { SuperMarketplaceBuyer, BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
-import { Buyers } from 'ordercloud-javascript-sdk';
+import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
+import { Buyer, Buyers } from 'ordercloud-javascript-sdk';
 
 export const BUYER_SUB_RESOURCE_LIST = [
   { route: 'users', display: 'ADMIN.NAV.USERS' },
