@@ -4,16 +4,14 @@ import { ShopperContextService } from '../services/shopper-context/shopper-conte
 import { takeWhile } from 'rxjs/operators';
 import { MarketplaceMeProduct } from '../shopper-context';
 import { ListPage } from 'ordercloud-javascript-sdk';
-import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
   template: `
-    <ocm-product-list [products]="products" [kitProducts]="kitProducts"></ocm-product-list>
+    <ocm-product-list [products]="products"></ocm-product-list>
   `,
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {
   products: ListPage<MarketplaceMeProduct>;
-  kitProducts: ListPage<MarketplaceKitProduct>;
   alive = true;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) { }
@@ -40,6 +38,5 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
 
   private handleFiltersChange = async (): Promise<void> => {
     this.products = await this.context.productFilters.listProducts();
-    this.kitProducts = await this.context.productFilters.listKitProducts();
   };
 }

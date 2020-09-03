@@ -45,22 +45,6 @@ export class ProductFilterService {
     return { page, sortBy, search, ...activeFacets };
   }
 
-  async listKitProducts(): Promise<ListPage<MarketplaceKitProduct>> {
-    const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
-    const facets = _transform(
-      activeFacets,
-      (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value),
-      {}
-    );
-    const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;
-    return await this.tempSdk.listKitProducts({
-      page,
-      search,
-      sortBy,
-      filters: {},
-    });
-  }
-
   async listProducts(): Promise<ListPageWithFacets<MarketplaceMeProduct>> {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
     const facets = _transform(

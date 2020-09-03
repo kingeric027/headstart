@@ -12,11 +12,6 @@ import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 })
 export class OCMProductList implements OnInit, OnDestroy {
   @Input() products: ListPage<MarketplaceMeProduct>;
-  @Input() set kitProducts(value: ListPage<MarketplaceKitProduct>) {
-    value.Items.forEach(kit => {
-      this.products.Items.push(kit.Product);
-    });
-  };
   alive = true;
   facets: ListFacet[];
   categoryCrumbs: Category[];
