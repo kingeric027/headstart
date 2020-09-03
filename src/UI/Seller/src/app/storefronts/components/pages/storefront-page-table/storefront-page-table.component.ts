@@ -23,7 +23,6 @@ export class StorefrontPageTableComponent extends ResourceCrudComponent<JDocumen
     ngZone: NgZone
   ) {
     super(changeDetectorRef, storefrontPageService, router, activatedRoute, ngZone);
-    console.log('resource in selection', this.resourceInSelection);
     this.redirectToFirstParentIfNeeded();
   }
 
@@ -39,30 +38,5 @@ export class StorefrontPageTableComponent extends ResourceCrudComponent<JDocumen
         this.ocService.selectParentResource(this.storefrontsService.resourceSubject.value.Items[0]);
       }
     }
-  }
-
-  resourceOrEmptyDoc(): JDocument {
-    if (!this.resourceInSelection.ID) {
-      // console.log(this.storefrontPageService.emptyResource);
-      return this.storefrontPageService.emptyResource;
-    } else {
-      // console.log(this.resourceInSelection);
-      return this.resourceInSelection;
-    }
-  }
-
-  onPageSaved(event): void {
-    console.log(event);
-    // HeadStartSDK.Documents.SaveAssignment('cms-page-schema', {
-    //   DocumentID: event.ID,
-    //   ParentResourceID: null,
-    //   ResourceID: this.parentResourceID,
-    //   ResourceType: 'ApiClients',
-    // });
-    this.selectResource(event);
-  }
-
-  back(): void {
-    this.selectResource({});
   }
 }

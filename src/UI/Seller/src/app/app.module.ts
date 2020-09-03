@@ -110,7 +110,6 @@ export class AppModule {
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
     const version = config.orderCloudApiVersion;
     const apiUrl = config.orderCloudApiUrl;
-    console.log('config', config);
     return {
       baseApiUrl: `${apiUrl}/${version}`,
       baseAuthUrl: `${apiUrl}/oauth/token`,

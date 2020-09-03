@@ -89,8 +89,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
       this.parentResourceID = await this.ocService.getParentResourceID();
       if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
-        const resourceIDSelected =
-          params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
+        const resourceIDSelected = params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
         } else if (resourceIDSelected) {
@@ -126,10 +125,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async setResourceSelectionFromID(resourceID: string): Promise<void> {
     this.selectedResourceID = resourceID || '';
-    console.log('selectedResourceID', this.selectedResourceID);
     const resource = await this.ocService.findOrGetResourceByID(resourceID);
     this.resourceInSelection = this.ocService.copyResource(resource);
-    console.log('resourceInSelection', this.resourceInSelection);
     this.setUpdatedResourceAndResourceForm(resource);
   }
 

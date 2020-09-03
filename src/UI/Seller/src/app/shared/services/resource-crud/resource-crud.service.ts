@@ -72,9 +72,6 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Can Override
   async list(args: any[]): Promise<ListPage<ResourceType>> {
-    console.group();
-    console.log(this.ocService);
-    console.groupEnd();
     return await this.ocService.List(...args);
   }
 
