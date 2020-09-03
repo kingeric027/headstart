@@ -95,9 +95,10 @@
         </div>
         <div class="row pt-3">
             <div class="col-md-5">
-                <h5>Filters</h5>
-                <p>Select which values are allowed to display on a report.</p>
-                <p class="font-italic">If no filters are selected for a field, all values will be included.</p>
+                <h5 translate>ADMIN.REPORTS.FILTERS</h5>
+                <p translate>ADMIN.REPORTS.SELECT_WHICH_VALUES</p>
+                <p class="font-italic"
+                   translate>ADMIN.REPORTS.IF_NO_FILTERS</p>
             </div>
             <div class="col-md-7 form-group">
                 <div class="form-row">
@@ -112,7 +113,8 @@
                                        id="{{filter.name}}"
                                        [checked]="filter?.path && !checkForChipDisplay(filter)">
                                 <label class="custom-control-label"
-                                       for="{{filter.name}}">Include All Values</label>
+                                       for="{{filter.name}}"
+                                       translate>ADMIN.REPORTS.INCLUDE_ALL_VALUES</label>
                               </div>
                                 <ng-container *ngFor="let filterValue of filter.filterValues">
                                     <div *ngIf="filter?.path && checkForChipDisplay(filter)"
