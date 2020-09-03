@@ -215,6 +215,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         UnitOfMeasureUnit: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'), Validators.required),
         SizeTier: new FormControl(_get(superMarketplaceProduct.Product, 'xp.SizeTier')),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
+        ArtworkRequired: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ArtworkRequired'))
       }, { validators: ValidateMinMax }
       );
       this.setInventoryValidator();
@@ -370,7 +371,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const productUpdate = {
       field,
       value:
-        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed'].includes(field)
+        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed', 'Product.xp.ArtworkRequired'].includes(field)
           ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
