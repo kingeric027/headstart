@@ -63,7 +63,7 @@ export class ReportsComponent implements OnInit {
 
   handleReportTemplateSelection(event: string): void {
     this.selectedTemplateID = event;
-    this.selectedTemplate = this.reportTemplates.find(template => template.TemplateID === event);
+    this.selectedTemplate = this.reportTemplates.find(template => template.id === event);
     const headers = this.selectedTemplate.Headers;
     this.displayHeaders = headers.map(header => this.humanizeHeader(header));
     this.reportSelectionForm.controls['ReportTemplate'].setValue(event);

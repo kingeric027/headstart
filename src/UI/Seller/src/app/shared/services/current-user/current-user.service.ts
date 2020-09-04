@@ -58,6 +58,12 @@ export class CurrentUserService {
     return this.me ? this.me : await this.refreshUser();
   }
 
+  async patchUser(patchObj: Partial<MeUser>): Promise<MeUser> {
+    const patchedUser = await this.ocMeService.Patch(patchObj).toPromise();
+    this.me = patchedUser;
+    return this.me;
+  }
+
   async refreshUser(): Promise<MeUser> {
     this.me = await this.ocMeService.Get().toPromise();
     return this.me;

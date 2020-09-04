@@ -55,6 +55,10 @@ const routes: Routes = [
         path: 'storefronts',
         loadChildren: () => import('./storefronts/storefronts.module').then(m => m.StorefrontsModule),
       },
+      {
+        path: 'account',
+        loadChildren: () => import('./account/account.module').then(m => m.AccountModule),
+      },
     ],
   },
 ];
@@ -63,4 +67,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -1,0 +1,90 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3 bg-white border-right">
+      <account-menu></account-menu>
+    </div>
+    <div class="col-md-9 bg-light">
+      <perfect-scrollbar style="width: 100%;"
+                         [ngStyle]="{'height.px': contentHeight}">
+        <div class="container-fluid py-3">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="d-flex justify-content-between align-items-center">
+                <h1 class="resource-name mb-0"
+                    translate>Email Notifications</h1>
+                <div>
+                  <button class="btn btn-primary btn-sm"
+                          *ngIf="areChanges"
+                          (click)="patchUser(['xp'])">Save Changes</button>
+                  <button class="btn btn-outline-teal btn-sm ml-2"
+                          *ngIf="areChanges"
+                          (click)="discardChanges()">Discard Changes</button>
+                </div>
+              </div>
+              <div class="card py-2 px-3 mt-3 bg-white">
+                <h6 class="font-weight-medium"
+                    translate>Choose which email notifications you would like to recieve.</h6>
+                <form *ngIf="userForm"
+                      [formGroup]="userForm">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox"
+                           class="custom-control-input"
+                           formControlName="OrderEmails"
+                           (click)="toggleOrderEmails($event)"
+                           id="OrderEmails">
+                    <label class="custom-control-label"
+                           for="OrderEmails"
+                           translate>Order Updates (line item, etc)</label>
+                  </div>
+                </form>
+                <ng-container *ngIf="userEditable?.xp?.OrderEmails">
+                  <hr />
+                  <label for="AdditionalEmails"
+                         class="h6 font-weight-medium">Additional Recipients</label>
+                  <div class="input-group">
+                    <input id="AdditionalEmail"
+                           class="form-control"
+                           type="text"
+                           placeholder="Enter additional email">
+                    <div class="input-group-append rounded-right">
+                      <button (click)="addAddtlRcpt()"
+                              class="btn btn-teal">Add</button>
+                    </div>
+                  </div>
+                  <small class="d-block">
+                    <fa-icon style="color: #cccccc"
+                             [icon]="faExclamationCircle"></fa-icon> <span translate> Enter additional emails you would like to recieve notifications.</span>
+                  </small>
+                  <div *ngFor="let rcpt of userEditable?.xp?.AddtlRcpts; let i = index"
+                       class="email-tile d-flex justify-content-between align-items-center">
+                    <span class="d-block p">{{rcpt}}</span>
+                    <div class="icon-button icon-button-sm ripple hover-btn"
+                         (click)="removeAddtlRcpt(i)">
+                      <div class="icon-wrapper">
+                        <fa-icon [icon]="faTimesCircle"></fa-icon>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <account-summary [user]="userEditable"></account-summary>
+              <!-- <div class="card py-2 px-3 mt-3 bg-white">
+                <div class="col-md-9">
+                  <h6 class="font-weight-medium"
+                      translate>Summary</h6>
+                  <p class="mb-0">Recieves x-y-z emails</p>
+                  <hr />
+                  <h6 class="font-weight-medium">Additional Recipients</h6>
+                  <p *ngFor="let rcpt of userEditable?.xp?.AddtlRcpts"
+                     class="mb-0">{{rcpt}}</p>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </perfect-scrollbar>
+    </div>
+  </div>
+</div>

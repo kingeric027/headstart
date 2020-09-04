@@ -1,5 +1,18 @@
 @import "../../.././styles/main.scss";
 
+.nav-link {
+    text-align:right;
+    &__user {
+        color: white;
+        font-weight: 500;
+        &[aria-expanded="true"] {
+            background-color: lighten($primary, 3%);
+        }
+    }
+    &::after {
+        display: none;
+    }
+}
 .resource-nav-link-container{
     width: 800px;
     margin-left: 100px;
@@ -23,12 +36,13 @@
 }
 
 .current-user {
-    color: rgba(255, 255, 255, 0.50);
+    color: white;
+    transition: 200ms ease all;
     &:hover {
-        color: rgba(255, 255, 255, 0.75);
-        text-decoration: none;
+        background-color: lighten($primary, 3%);
     }
 }
+
 
 .account-dropdown-alignment {
     right: 0;
@@ -48,3 +62,11 @@
 //         }
 //     }
 // }
+.avatar {
+    vertical-align: middle;
+    object-fit: cover;
+    width: 34px;
+    height: 34px;
+    border-radius: 0.25rem;
+  }
+  

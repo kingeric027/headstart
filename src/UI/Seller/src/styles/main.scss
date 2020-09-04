@@ -41,6 +41,13 @@ body > [uib-modal-window]:not([modal-render]) {
     background-color: rgba($gray-900, 0.1);
     cursor: pointer;
   }
+  &-sm {
+    padding: .5rem !important;
+    .icon-wrapper {
+      width: 14px !important;
+      height: 14px !important;
+    }
+  }
   .icon-wrapper {
     display: flex;
     align-items: center;
@@ -499,5 +506,12 @@ body > [uib-modal-window]:not([modal-render]) {
   .alert-icon {
       color: $light;
       font-size: 1.4rem;
+  }
+}
+
+.resource-name {
+  font-size: 22px;
+  @include media-breakpoint-up(sm) {
+    font-size: 28px;
   }
 }
