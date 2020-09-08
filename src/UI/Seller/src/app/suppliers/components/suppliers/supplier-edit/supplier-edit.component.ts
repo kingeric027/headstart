@@ -13,9 +13,11 @@ import { HeaderComponent } from '@app-seller/layout/header/header.component';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppAuthService } from '@app-seller/auth';
-import { faTimes, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faSpinner, faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { environment } from 'src/environments/environment';
+import { ToastrService } from 'ngx-toastr';
+import { User, OcSupplierUserService } from '@ordercloud/angular-sdk';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -31,13 +33,15 @@ export class SupplierEditComponent implements OnInit {
   @Output()
   logoStaged = new EventEmitter<File>();
   @Input() set supplierEditable(value: MarketplaceSupplier) {
+    !value?.xp?.ReceivesEmails && (value.xp.ReceivesEmails = []);
     this._supplierEditable = value;
+    console.log(this._supplierEditable)
 
     // called here so that the form updates on supplier change, 
     // otherwise stale values remain
     this.setUpSupplierCountrySelectIfNeeded();
   }
-
+  supplierUsers: ListPage<User>;
   _supplierEditable: MarketplaceSupplier;
   availableCurrencies: SupportedRates[] = [];
   isCreatingNew: boolean;
@@ -50,13 +54,17 @@ export class SupplierEditComponent implements OnInit {
   logoLoading = false;
   faTimes = faTimes;
   faSpinner = faSpinner;
+  faExclamationCircle = faExclamationCircle;
+  faTimesCircle = faTimesCircle;
 
   constructor(
     public supplierService: SupplierService,
     private currentUserService: CurrentUserService,
     private sanitizer: DomSanitizer,
     private appAuthService: AppAuthService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private toastrService: ToastrService,
+    private ocSupplierUserService: OcSupplierUserService
   ) {
     this.isCreatingNew = this.supplierService.checkIfCreatingNew();
   }
@@ -70,6 +78,7 @@ export class SupplierEditComponent implements OnInit {
     this.setUpSupplierCountrySelectIfNeeded();
     this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0;
     this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`;
+    this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise();
   }
 
 
@@ -201,5 +210,28 @@ export class SupplierEditComponent implements OnInit {
 
   setLogoSrc(): void {
     document.getElementById('supplier-logo')?.setAttribute('src', `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`);
+  }
+
+  addAddtlRcpt(): void {
+    const addtlEmail = (document.getElementById('AdditionalEmail') as any).value;
+    console.log('addtl email', addtlEmail)
+    const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(addtlEmail);
+    if (!isValid) {
+      this.toastrService.error(`"${addtlEmail}" is not a valid email.`)
+    } else {
+      const existingRcpts = this._supplierEditable?.xp?.ReceivesEmails || [];
+      const constructedEvent = {target: {value: [...existingRcpts, addtlEmail]}};
+      console.log('constructed event', constructedEvent)
+      this.updateResourceFromEvent(constructedEvent, 'xp.ReceivesEmails');
+    };
+    console.log(this._supplierEditable);
+    (document.getElementById('AdditionalEmail') as any).value = null;
+    document.getElementById('AdditionalEmail').focus();
+  }
+
+  removeAddtlRcpt(index: number): void {
+    const copiedResource = JSON.parse(JSON.stringify(this._supplierEditable));
+    const editedArr = copiedResource.xp?.ReceivesEmails.filter(e => e !== copiedResource.xp?.ReceivesEmails[index]);
+    this.updateResourceFromEvent({target: {value: editedArr}}, 'xp.ReceivesEmails');
   }
 }

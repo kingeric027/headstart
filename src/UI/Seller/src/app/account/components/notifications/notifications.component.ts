@@ -28,8 +28,7 @@ export class NotificationsComponent extends AccountContent {
   faExclamationCircle = faExclamationCircle;
   faTimesCircle = faTimesCircle;
 
-  toggleOrderEmails(event: any): void {
-    const value: boolean = event.target.checked;
+  toggleOrderEmails(value: boolean): void {
     if (value === false) {
       this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
     }

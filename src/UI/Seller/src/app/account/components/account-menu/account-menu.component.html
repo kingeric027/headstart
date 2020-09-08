@@ -8,7 +8,8 @@
                [icon]="faUserCircle"></fa-icon>Account
     </a>
   </li>
-  <li class="seller-nav__item">
+  <li *ngIf="isSeller"
+      class="seller-nav__item">
     <a [ngClass]="{'seller-nav__active': activePage === 'notifications'}"
        (click)="toPage('notifications')"
        class="seller-nav__link">

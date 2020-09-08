@@ -14,7 +14,6 @@
                    class="form-check-input"
                    id="Active"
                    showErrors
-                   [resourceForm]="resourceForm"
                    aria-describedby="Active"
                    formControlName="Active"
                    (input)="updateResourceFromEvent($event, 'Active')">
@@ -29,7 +28,6 @@
                  showErrors
                  aria-describedby="Name"
                  maxlength="100"
-                 [resourceForm]="resourceForm"
                  formControlName="Name"
                  (input)="updateResourceFromEvent($event, 'Name')"
                  placeholder="Enter Name">
@@ -102,7 +100,6 @@
                      class="form-check-input"
                      id="SyncFreightPop"
                      showErrors
-                     [resourceForm]="resourceForm"
                      aria-describedby="SyncFreightPop"
                      formControlName="SyncFreightPop"
                      (input)="updateResourceFromEvent($event, 'xp.SyncFreightPop')">
@@ -117,7 +114,6 @@
               <div class="custom-control custom-checkbox mr-3">
                 <input type="checkbox"
                        class="custom-control-input"
-                       [resourceForm]="resourceForm"
                        formControlName="Standard"
                        (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')"
                        id="Standard">
@@ -127,7 +123,6 @@
               <div class="custom-control custom-checkbox mr-3">
                 <input type="checkbox"
                        class="custom-control-input"
-                       [resourceForm]="resourceForm"
                        formControlName="Quote"
                        (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')"
                        id="Quote">
@@ -137,7 +132,6 @@
               <div class="custom-control custom-checkbox">
                 <input type="checkbox"
                        class="custom-control-input"
-                       [resourceForm]="resourceForm"
                        formControlName="PurchaseOrder"
                        (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')"
                        id="PurchaseOrder">
@@ -186,6 +180,53 @@
         </div>
       </div>
     </div>
+    <div *ngIf="isSupplierUser"
+         class="row pt-3">
+      <div class="col-md-5">
+        <h5>Email Notifications</h5>
+        <p>Choose which {{_supplierEditable?.Name}} users will recieve email notifications, and add emails for additional recipients who may not be users.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <label for="AdditionalEmails"
+               class="h6 font-weight-medium">Additional Recipients</label>
+        <div class="input-group">
+          <input id="AdditionalEmail"
+                 class="form-control"
+                 type="text"
+                 placeholder="Enter additional email">
+          <div class="input-group-append rounded-right">
+            <button (click)="addAddtlRcpt()"
+                    class="btn btn-teal">Add</button>
+          </div>
+        </div>
+        <small class="d-block">
+          <fa-icon style="color: #cccccc"
+                   [icon]="faExclamationCircle"></fa-icon> <span translate> Enter additional emails you would like to recieve notifications.</span>
+        </small>
+        <div class="card py-2 px-3 bg-white">
+          <div *ngFor="let rcpt of _supplierEditable?.xp?.ReceivesEmails; let i = index"
+               class="email-tile d-flex justify-content-between align-items-center">
+            <span class="d-block p">{{rcpt}}</span>
+            <div class="icon-button icon-button-sm ripple hover-btn"
+                 (click)="removeAddtlRcpt(i)">
+              <div class="icon-wrapper">
+                <fa-icon [icon]="faTimesCircle"></fa-icon>
+              </div>
+            </div>
+          </div>
+          <div *ngFor="let rcpt of supplierUsers?.Items; let i = index"
+               class="email-tile d-flex justify-content-between align-items-center">
+            <span class="d-block p">{{rcpt.Email}}</span>
+            <div class="icon-button icon-button-sm ripple hover-btn"
+                 (click)="removeAddtlRcpt(i)">
+              <div class="icon-wrapper">
+                <fa-icon [icon]="faTimesCircle"></fa-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row pt-3">
       <div class="col-md-5">
         <h5>Support Contact</h5>
@@ -198,7 +239,6 @@
                  class="form-control"
                  id="Support Contact Name"
                  showErrors
-                 [resourceForm]="resourceForm"
                  aria-describedby="Support Contact Name"
                  formControlName="SupportContactName"
                  (input)="updateResourceFromEvent($event, 'xp.SupportContact.Name')"
@@ -211,7 +251,6 @@
                    class="form-control"
                    id="Support Contact Email"
                    showErrors
-                   [resourceForm]="resourceForm"
                    aria-describedby="Support Contact Email"
                    formControlName="SupportContactEmail"
                    (input)="updateResourceFromEvent($event, 'xp.SupportContact.Email')"
@@ -223,7 +262,6 @@
             <input type="text"
                    class="form-control"
                    showErrors
-                   [resourceForm]="resourceForm"
                    id="Support Contact Phone"
                    aria-describedby="Support Contact Phone"
                    formControlName="SupportContactPhone"

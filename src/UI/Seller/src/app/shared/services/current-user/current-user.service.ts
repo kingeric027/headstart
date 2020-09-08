@@ -7,13 +7,14 @@ import {
   OcTokenService,
   MeUser,
   OcSupplierService,
+  ListPage,
 } from '@ordercloud/angular-sdk';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { AppAuthService, TokenRefreshAttemptNotPossible } from '@app-seller/auth/services/app-auth.service';
 import { AppStateService } from '../app-state/app-state.service';
 import { UserContext } from '@app-seller/config/user-context';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
-import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, Asset } from '@ordercloud/headstart-sdk';
 import { Tokens } from 'ordercloud-javascript-sdk';
 
 @Injectable({
@@ -22,6 +23,8 @@ import { Tokens } from 'ordercloud-javascript-sdk';
 export class CurrentUserService {
   me: MeUser;
   mySupplier: Supplier;
+  public userSubject: BehaviorSubject<MeUser<any>> = new BehaviorSubject<MeUser<any>>({});
+  public profileImgSubject: BehaviorSubject<Asset> = new BehaviorSubject<Asset>({});
   constructor(
     private ocMeService: OcMeService,
     private ocAuthService: OcAuthService,
@@ -51,6 +54,14 @@ export class CurrentUserService {
     this.ocTokenService.SetAccess(accessToken.access_token);
     this.appStateService.isLoggedIn.next(true);
     this.me = await this.ocMeService.Get().toPromise();
+    this.userSubject.next(this.me);
+    let imgAssets: ListPage<Asset>;
+    if (this.me.Supplier) {
+      imgAssets = await HeadStartSDK.Assets.ListAssetsOnChild("Suppliers", this.me.Supplier.ID, "SupplierUsers", this.me?.ID, {filters: {Tags: ["ProfileImg"]}});
+    } else {
+      imgAssets = await HeadStartSDK.Assets.ListAssets("AdminUsers", this.me.ID, {filters: {Tags: ["ProfileImg"]}});
+    }
+    if (imgAssets.Items.length > 0) this.profileImgSubject.next(imgAssets.Items[0])
     if (this.me?.Supplier) this.mySupplier = await HeadStartSDK.Suppliers.GetMySupplier(this.me?.Supplier?.ID);
   }
 
@@ -60,12 +71,14 @@ export class CurrentUserService {
 
   async patchUser(patchObj: Partial<MeUser>): Promise<MeUser> {
     const patchedUser = await this.ocMeService.Patch(patchObj).toPromise();
+    this.userSubject.next(patchedUser);
     this.me = patchedUser;
     return this.me;
   }
 
   async refreshUser(): Promise<MeUser> {
     this.me = await this.ocMeService.Get().toPromise();
+    this.userSubject.next(this.me);
     return this.me;
   }
 
@@ -100,5 +113,17 @@ export class CurrentUserService {
   async isSupplierUser() {
     const me = await this.getUser();
     return me.Supplier ? true : false;
+  }
+
+  onChange(callback: (user: MeUser) => void): void {
+    this.userSubject.subscribe(callback);
+  }
+
+  private get user(): MeUser {
+    return this.userSubject.value;
+  }
+
+  private set user(value: MeUser) {
+    this.userSubject.next(value);
   }
 }

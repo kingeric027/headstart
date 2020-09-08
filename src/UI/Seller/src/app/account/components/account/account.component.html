@@ -23,11 +23,14 @@
               </div>
               <div class="card mt-3 bg-white">
                 <div class="card-header py-4 px-3 bg-white d-flex align-items-center">
-                  <img *ngIf="!profileImgLoading"
+                  <img *ngIf="!profileImgLoading && hasProfileImg"
                        class="avatar"
                        [src]="myProfileImg"
                        alt="ProfileImg"
                        id="ProfileImgThumb">
+                  <div *ngIf="!hasProfileImg && !profileImgLoading && (dataLtrs !== 'undefinedundefined')"
+                       [attr.data-letters]="dataLtrs"
+                       class="avatar avatar-sm"></div>
                   <div *ngIf="profileImgLoading"
                        class="spinner-border"
                        role="status">
@@ -35,7 +38,7 @@
                           translate>ADMIN.COMMON.LOADING</span>
                   </div>
                   <label for="imageUpload"
-                         class="btn btn-outline-dark ml-2 mb-0">Update Photo</label>
+                         class="btn btn-outline-dark ml-2 mb-0">{{hasProfileImg ? 'Update Photo' : 'Upload Photo'}}</label>
                   <button *ngIf="hasProfileImg"
                           (click)="removeProfileImg()"
                           class="btn btn-outline-dark ml-2">Remove Photo</button>

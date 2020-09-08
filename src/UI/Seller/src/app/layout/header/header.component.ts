@@ -36,7 +36,9 @@ export class HeaderComponent implements OnInit {
   faUserCircle = faUserCircle;
   activeTitle = '';
   headerConfig: MPRoute[];
+  hasProfileImg: boolean = false;
   myProfileImg: string;
+  dataLtrs: string;
 
   constructor(
     private ocTokenService: OcTokenService,
@@ -45,20 +47,21 @@ export class HeaderComponent implements OnInit {
     private appAuthService: AppAuthService,
     private currentUserService: CurrentUserService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
-  ) {}
+  ) {
+    this.setUpSubs();
+  }
 
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.headerConfig = getHeaderConfig(
       this.appAuthService.getUserRoles(),
       this.appAuthService.getOrdercloudUserType()
     );
-    this.getCurrentUser();
-    this.subscribeToRouteEvents();
+    await this.getCurrentUser();
+    this.setDataLtrs(this.user);
     this.urlChange(this.router.url);
   }
 
   async getCurrentUser() {
-    this.user = await this.currentUserService.getUser();
     this.isSupplierUser = await this.currentUserService.isSupplierUser();
     if (this.isSupplierUser) {
       this.myProfileImg = `${environment.middlewareUrl}/assets/${environment.sellerID}/Suppliers/${
@@ -78,7 +81,14 @@ export class HeaderComponent implements OnInit {
     this.organizationName = mySupplier.Name;
   }
 
-  subscribeToRouteEvents() {
+  setUpSubs(): void {
+    this.currentUserService.userSubject.subscribe(user => {
+      this.user = user;
+      this.setDataLtrs(this.user);
+    });
+    this.currentUserService.profileImgSubject.subscribe(img => {
+      this.hasProfileImg = Object.keys(img).length > 0;
+    });
     this.router.events.subscribe(ev => {
       if (ev instanceof NavigationEnd) {
         this.urlChange(ev.url);
@@ -101,6 +111,12 @@ export class HeaderComponent implements OnInit {
 
   toAccount(): void {
     this.router.navigate(['account']);
+  }
+
+  setDataLtrs(user: MeUser): void {
+    const firstFirst = user?.FirstName?.substr(0,1);
+    const firstLast = user?.LastName?.substr(0,1);
+    this.dataLtrs = `${firstFirst}${firstLast}`;
   }
 }
 

@@ -10,9 +10,11 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { isEqual as _isEqual, set as _set, get as _get } from 'lodash';
 import { HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
+import { first } from 'rxjs/operators';
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string;
+  dataLtrs: string;
   hasProfileImg: boolean = false;
   contentHeight: number;
   userContext: UserContext;
@@ -20,6 +22,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   profileImgLoading: boolean = false;
   organizationName: string;
   areChanges: boolean;
+  user: MeUser;
   userForm: FormGroup;
   userStatic: MeUser;
   userEditable: MeUser;
@@ -30,7 +33,9 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     private currentUserService: CurrentUserService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private appAuthService: AppAuthService
-  ) {}
+  ) {
+    this.setUpSubs();
+  }
 
   ngAfterViewChecked(): void {
     this.contentHeight = getPsHeight(/* No additional class to pass */);
@@ -38,19 +43,26 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-      await this.setUser();
-      this.userContext.Me.Supplier ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
-      this.refresh(this.userContext.Me);
-      const commerceRole = this.userContext.UserType;
-      if (commerceRole === 'SELLER') {
-        this.hasProfileImg = (await await HeadStartSDK.Assets.ListAssets("AdminUsers", this.userContext.Me.ID, {filters: {Tags: ["ProfileImg"]}})).Items?.length > 0;
-        this.myProfileImg = `${environment.middlewareUrl}/assets/${environment.sellerID}/AdminUsers/${this.userContext.Me.ID}/thumbnail?size=s`;
-    } else {
-      this.hasProfileImg = (await await HeadStartSDK.Assets.ListAssetsOnChild("Suppliers", this.userContext.Me.Supplier.ID, "SupplierUsers", this.userContext.Me?.ID, {filters: {Tags: ["ProfileImg"]}})).Items?.length > 0;
-      this.myProfileImg = `${environment.middlewareUrl}/assets/${environment.sellerID}/Suppliers/${
-        this.userContext.Me.Supplier.ID
-      }/SupplierUsers/${this.userContext.Me.ID}/thumbnail?size=s`;
-    }
+    await this.setUser();
+    this.userContext.Me.Supplier ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
+    this.refresh(this.userContext.Me);
+    this.setProfileImgSrc();
+}
+
+setUpSubs(): void {
+    this.currentUserService.userSubject.subscribe(user => {
+        this.user = user;
+        this.setDataLtrs(this.user);
+    });
+    this.currentUserService.profileImgSubject.subscribe(img => {
+        this.hasProfileImg = Object.keys(img).length > 0;
+    })
+  }
+
+  setDataLtrs(user: MeUser): void {
+    const firstFirst = user?.FirstName?.substr(0,1);
+    const firstLast = user?.LastName?.substr(0,1);
+    this.dataLtrs = `${firstFirst}${firstLast}`;
   }
 
   async getSupplierOrg() {
@@ -66,7 +78,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.userStatic = this.copyResource(user);
     this.userEditable = this.copyResource(user);
     this.createUserForm(user);
-    this.checkForChanges();
+    this.areChanges = this.checkIfAreChanges(this.userStatic, this.userEditable);
   }
 
   createUserForm(me: MeUser): void {
@@ -80,16 +92,14 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     });
   }
 
-  checkForChanges(): void {
-    this.areChanges = !_isEqual(this.userEditable, this.userStatic);
-  }
+  checkIfAreChanges = <T>(_static: T, _editable: T): boolean => !_isEqual(_editable, _static);
 
   updateUserFromEvent(event: any, field: string): void {
     const value = event.target.value;
     const userUpdate = { field, value };
     const updateUserCopy: MeUser = JSON.parse(JSON.stringify(this.userEditable));
     this.userEditable = _set(updateUserCopy, userUpdate.field, userUpdate.value);
-    this.checkForChanges();
+    this.areChanges = this.checkIfAreChanges(this.userStatic, this.userEditable);
   }
 
   copyResource<T>(resource: T): T {
@@ -98,7 +108,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
 
   discardChanges(): void {
     this.refresh(this.userStatic);
-    this.checkForChanges();
+    this.areChanges = this.checkIfAreChanges(this.userStatic, this.userEditable);
   }
 
   async patchUser(fieldsToPatch: string[]): Promise<void> {
@@ -113,27 +123,26 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   async manualFileUpload(event): Promise<void> {
       this.profileImgLoading = true;
       const file: File = event?.target?.files[0];
-      let profileImgAssets: ListPage<Asset>;
       if (this.userContext.UserType === 'SELLER') {
         // seller stuff
-        profileImgAssets = await HeadStartSDK.Assets.ListAssets("AdminUsers", this.userContext.Me.ID, {filters: {Tags: ["ProfileImg"]}});
-        if (profileImgAssets?.Items?.length > 0) {
+        if (Object.keys(this.currentUserService.profileImgSubject.value).length > 0) {
           // If logo exists, remove the assignment, then the logo itself
-          await HeadStartSDK.Assets.DeleteAssetAssignment(profileImgAssets?.Items[0]?.ID, this.userContext?.Me?.ID, "AdminUsers", null, null);
-          await HeadStartSDK.Assets.Delete(profileImgAssets.Items[0].ID);
+          await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "AdminUsers", null, null);
+          await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
         }
     } else {
         // supplier stuff
-        profileImgAssets = await HeadStartSDK.Assets.ListAssetsOnChild("Suppliers", this.userContext.Me.Supplier.ID, "SupplierUsers", this.userContext.Me?.ID, {filters: {Tags: ["ProfileImg"]}});
-        if (profileImgAssets?.Items?.length > 0) {
+        if (Object.keys(this.currentUserService.profileImgSubject.value).length > 0) {
           // If logo exists, remove the assignment, then the logo itself
-          await HeadStartSDK.Assets.DeleteAssetAssignment(profileImgAssets?.Items[0]?.ID, this.userContext?.Me?.ID, "SupplierUsers", this.userContext?.Me?.Supplier?.ID, "Suppliers");
-          await HeadStartSDK.Assets.Delete(profileImgAssets.Items[0].ID);
+          await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "SupplierUsers", this.userContext?.Me?.Supplier?.ID, "Suppliers");
+          await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
         }
       }
       // Then upload logo asset
       try {
-        await this.uploadProfileImg(this.userContext?.Me?.ID, file, 'Image');
+        await this.uploadProfileImg(this.userContext?.Me?.ID, file, 'Image').then(img => {
+            this.currentUserService.profileImgSubject.next(img);
+        });
       } catch (err) {
         this.hasProfileImg = false;
         this.profileImgLoading = false;
@@ -146,7 +155,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
       }
   }
 
-  async uploadProfileImg(userID: string, file: File, assetType: string): Promise<void> {
+  async uploadProfileImg(userID: string, file: File, assetType: string): Promise<Asset> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const asset: AssetUpload = {
       Active: true,
@@ -162,34 +171,29 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     } else {
         await HeadStartSDK.Assets.SaveAssetAssignment({ParentResourceType: 'Suppliers', ParentResourceID: this.userContext.Me.Supplier.ID, ResourceType: "SupplierUsers", ResourceID: userID, AssetID: newAsset.ID }, accessToken);
     }
+    return newAsset;
   }
 
   async removeProfileImg(): Promise<void> {
     this.profileImgLoading = true;
     try {
-      let profileImgAssets: ListPage<Asset>;
       if (this.userContext.UserType === 'SELLER') {
-          // Get the profile img asset
-          profileImgAssets = await HeadStartSDK.Assets.ListAssets("AdminUsers", this.userContext.Me.ID, {filters: {Tags: ["ProfileImg"]}});
           // Remove the profile img asset assignment
-          await HeadStartSDK.Assets.DeleteAssetAssignment(profileImgAssets?.Items[0]?.ID, this.userContext?.Me?.ID, "AdminUsers", null, null);
+          await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "AdminUsers", null, null);
           // Remove the profile img asset
-          await HeadStartSDK.Assets.Delete(profileImgAssets.Items[0].ID);
-      } else {
-         // Get the profile img asset
-         profileImgAssets = await HeadStartSDK.Assets.ListAssetsOnChild("Suppliers", this.userContext.Me.Supplier.ID, "SupplierUsers", this.userContext.Me?.ID, {filters: {Tags: ["ProfileImg"]}});
-        // Remove the profile img asset assignment
-        await HeadStartSDK.Assets.DeleteAssetAssignment(profileImgAssets?.Items[0]?.ID, this.userContext?.Me?.ID, "SupplierUsers", this.userContext?.Me?.Supplier?.ID, "Suppliers");
-        // Remove the profile img asset
-        await HeadStartSDK.Assets.Delete(profileImgAssets.Items[0].ID);
-      }
+          await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
+        } else {
+            // Remove the profile img asset assignment
+            await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "SupplierUsers", this.userContext?.Me?.Supplier?.ID, "Suppliers");
+            // Remove the profile img asset
+            await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
+        }
+      this.currentUserService.profileImgSubject.next({});
     } catch (err) {
       throw err;
     } finally {
       this.hasProfileImg = false;
       this.profileImgLoading = false;
-      // Reset the img src for logo
-      this.setProfileImgSrc();
     }
   }
 
@@ -197,13 +201,9 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     if (this.userContext.UserType === 'SELLER') {
         const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/AdminUsers/${this.userContext.Me.ID}/thumbnail?size=m`;
         this.myProfileImg = url;
-        document.getElementById('ProfileImgThumb')?.setAttribute('src', url);
-        document.getElementById('ProfileImg')?.setAttribute('src', url);
     } else {
         const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this.userContext.Me.Supplier.ID}/SupplierUsers/${this.userContext.Me.ID}/thumbnail?size=m`;
         this.myProfileImg = url;
-        document.getElementById('ProfileImgThumb')?.setAttribute('src', url);
-        document.getElementById('ProfileImg')?.setAttribute('src', url);
     }
   }
 }
