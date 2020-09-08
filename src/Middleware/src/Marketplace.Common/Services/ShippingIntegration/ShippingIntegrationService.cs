@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,6 +36,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
         {
+
             var orderWorksheet = orderCalculatePayload.OrderWorksheet;
             var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
 
@@ -51,6 +52,12 @@ namespace Marketplace.Common.Services.ShippingIntegration
             CurrencySymbol orderCurrency = (CurrencySymbol)Enum.Parse(typeof(CurrencySymbol), orderWorksheet.Order.xp.Currency);
             var rates = (await _exchangeRates.Get(orderCurrency)).Rates;
             var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
+
+            //  iterate over lineitems to figure out subtotal by suppliers and figure out if any of suppliers also have free shipping threshold and if that threshold is met.
+            //  if threshold is met look at first item on shipEstimate and figure out which supplier that relates to.
+            //  look through the shipMethods if there is a relevant ship estimate that it applies to modify the cost to 0.
+            //  save original cost on the ship method (which is in the ShipEstimate model)
+            //  also want to keep track of algorithm version
             return new ShipEstimateResponse()
             {
                 ShipEstimates = shipEstimates as IList<ShipEstimate>

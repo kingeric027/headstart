@@ -34,6 +34,9 @@ namespace Marketplace.Common.Controllers
 		{
 			var orderCalculationResponse = await _OCShippingIntegration.CalculateOrder(orderCalculatePayload);
 			return orderCalculationResponse;
+
+			//	given a free shipping cutoff value (supplier.xp.FreeShippingCutoff) set shipping cost to 0.
+			//	Need to keep track of monetary value that was removed and what the threshold was (save it somewhere)
 		}
 
 		[HttpPost, Route("ordersubmit")]
