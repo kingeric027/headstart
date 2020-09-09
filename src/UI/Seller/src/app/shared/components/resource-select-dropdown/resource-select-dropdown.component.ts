@@ -44,6 +44,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
   ngAfterViewChecked() {
     // TODO: Magic number ... the 'search' element doesn't exist in the DOM at time of instantiation
     this.resourceSelectDropdownHeight = getPsHeight('additional-item-resource-select-dropdown') - 75;
+    this.changeDetectorRef.detectChanges();
   }
   private setParentResourceSubscription() {
     this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
@@ -61,7 +62,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
         if (params && resourceID) {
           const resource = await this.parentService.findOrGetResourceByID(resourceID);
           if (resource) {
-            this.selectedParentResourceName = resource.Name;
+          this.selectedParentResourceName = resource.Name || resource.AppName;
           }
         }
       }

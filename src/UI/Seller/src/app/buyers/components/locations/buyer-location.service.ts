@@ -13,6 +13,7 @@ import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { BuyerUserService } from '../users/buyer-user.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { Addresses } from 'ordercloud-javascript-sdk';
 
 export interface PermissionType {
   UserGroupSuffix: string;
@@ -67,7 +68,6 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocAddressService: OcAddressService,
     private ocUserGroupService: OcUserGroupService,
     private ocUserService: OcUserService,
     private buyerUserService: BuyerUserService,
@@ -76,7 +76,7 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
     super(
       router,
       activatedRoute,
-      ocAddressService,
+      Addresses,
       currentUserService,
       '/buyers',
       'buyers',
