@@ -215,13 +215,13 @@ const OrchestrationLogs = {
 
 const ProcessReports = {
   rolesWithAccess: [MPRoles.MPReportReader],
-  title: 'Process Reports',
+  title: 'ADMIN.NAV.PROCESS_REPORTS',
   route: 'reports/reports',
 };
 
 const ReportTemplates = {
   rolesWithAccess: [MPRoles.MPReportAdmin],
-  title: 'Report Templates',
+  title: 'ADMIN.NAV.REPORT_TEMPLATES',
   route: `reports/${REDIRECT_TO_FIRST_PARENT}/templates`,
 };
 

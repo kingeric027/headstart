@@ -144,10 +144,11 @@ export class OCMCheckout implements OnInit {
         MerchantID: merchant.cardConnectMerchantID
       }
       cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
+      await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
     } else {
       cleanOrderID = await this.checkout.submitWithoutCreditCard();
+      await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
     }
-
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
   }
