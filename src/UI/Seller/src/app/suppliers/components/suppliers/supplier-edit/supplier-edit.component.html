@@ -180,51 +180,43 @@
         </div>
       </div>
     </div>
-    <div *ngIf="isSupplierUser"
+    <div *ngIf="!isCreatingNew"
          class="row pt-3">
       <div class="col-md-5">
         <h5>Email Notifications</h5>
         <p>Choose which {{_supplierEditable?.Name}} users will recieve email notifications, and add emails for additional recipients who may not be users.</p>
       </div>
       <div class="col-md-7 form-group">
-        <label for="AdditionalEmails"
-               class="h6 font-weight-medium">Additional Recipients</label>
-        <div class="input-group">
-          <input id="AdditionalEmail"
-                 class="form-control"
-                 type="text"
-                 placeholder="Enter additional email">
-          <div class="input-group-append rounded-right">
-            <button (click)="addAddtlRcpt()"
-                    class="btn btn-teal">Add</button>
-          </div>
-        </div>
-        <small class="d-block">
-          <fa-icon style="color: #cccccc"
-                   [icon]="faExclamationCircle"></fa-icon> <span translate> Enter additional emails you would like to recieve notifications.</span>
-        </small>
-        <div class="card py-2 px-3 bg-white">
-          <div *ngFor="let rcpt of _supplierEditable?.xp?.ReceivesEmails; let i = index"
-               class="email-tile d-flex justify-content-between align-items-center">
-            <span class="d-block p">{{rcpt}}</span>
-            <div class="icon-button icon-button-sm ripple hover-btn"
-                 (click)="removeAddtlRcpt(i)">
-              <div class="icon-wrapper">
-                <fa-icon [icon]="faTimesCircle"></fa-icon>
-              </div>
-            </div>
-          </div>
-          <div *ngFor="let rcpt of supplierUsers?.Items; let i = index"
-               class="email-tile d-flex justify-content-between align-items-center">
-            <span class="d-block p">{{rcpt.Email}}</span>
-            <div class="icon-button icon-button-sm ripple hover-btn"
-                 (click)="removeAddtlRcpt(i)">
-              <div class="icon-wrapper">
-                <fa-icon [icon]="faTimesCircle"></fa-icon>
-              </div>
-            </div>
-          </div>
-        </div>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Receives Emails</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!supplierUsers?.Items?.length">
+              <td>
+                <span class="font-italic">{{_supplierEditable?.Name}} does not have any users.</span>
+              </td>
+            </tr>
+            <tr class="cursor-pointer"
+                *ngFor="let user of supplierUsers?.Items">
+              <td class="d-flex justify-content-start align-items-center">
+                <label class="switch mb-0">
+                  <input class="form-check-input"
+                         type="checkbox"
+                         (click)="assignSupplierUser(user.Email)"
+                         [checked]="isAssigned(user.Email)">
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td>{{user.FirstName}} {{user.LastName}}</td>
+              <td>{{user.Email}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="row pt-3">

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit, Inject, SimpleChanges } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup, FormControl } from '@angular/forms';
 import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
@@ -23,7 +23,7 @@ import { User, OcSupplierUserService } from '@ordercloud/angular-sdk';
   templateUrl: './supplier-edit.component.html',
   styleUrls: ['./supplier-edit.component.scss'],
 })
-export class SupplierEditComponent implements OnInit {
+export class SupplierEditComponent implements OnInit, OnChanges {
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -33,19 +33,12 @@ export class SupplierEditComponent implements OnInit {
   @Output()
   logoStaged = new EventEmitter<File>();
   @Input() set supplierEditable(value: MarketplaceSupplier) {
-    !value?.xp?.ReceivesEmails && (value.xp.ReceivesEmails = []);
     this._supplierEditable = value;
-    console.log(this._supplierEditable)
-
-    // called here so that the form updates on supplier change, 
-    // otherwise stale values remain
-    this.setUpSupplierCountrySelectIfNeeded();
   }
   supplierUsers: ListPage<User>;
   _supplierEditable: MarketplaceSupplier;
   availableCurrencies: SupportedRates[] = [];
   isCreatingNew: boolean;
-  isSupplierUser: boolean;
   countriesServicingOptions = [];
   countriesServicingForm:  FormGroup;
   hasLogo = false;
@@ -74,13 +67,20 @@ export class SupplierEditComponent implements OnInit {
     this.availableCurrencies = this.availableCurrencies.filter(c =>
       Object.values(SupportedCurrencies).includes(SupportedCurrencies[c.Currency])
     );
-    this.isSupplierUser = await this.currentUserService.isSupplierUser();
-    this.setUpSupplierCountrySelectIfNeeded();
-    this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0;
-    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`;
-    this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise();
   }
 
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes?.supplierEditable?.currentValue?.ID !== changes?.supplierEditable?.previousValue?.ID) {
+      await this.handleSelectedSupplierChange(changes.supplierEditable.currentValue);
+    }
+  }
+
+  async handleSelectedSupplierChange(supplier: MarketplaceSupplier): Promise<void> {
+    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`;
+    !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0);
+    !this.isCreatingNew && (this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise());
+    this.setUpSupplierCountrySelectIfNeeded();
+  }
 
   setUpSupplierCountrySelectIfNeeded(): void {
     const indexOfCountriesServicingConfig = this.filterConfig.Filters?.findIndex(
@@ -212,26 +212,24 @@ export class SupplierEditComponent implements OnInit {
     document.getElementById('supplier-logo')?.setAttribute('src', `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`);
   }
 
-  addAddtlRcpt(): void {
-    const addtlEmail = (document.getElementById('AdditionalEmail') as any).value;
-    console.log('addtl email', addtlEmail)
-    const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(addtlEmail);
-    if (!isValid) {
-      this.toastrService.error(`"${addtlEmail}" is not a valid email.`)
-    } else {
-      const existingRcpts = this._supplierEditable?.xp?.ReceivesEmails || [];
-      const constructedEvent = {target: {value: [...existingRcpts, addtlEmail]}};
-      console.log('constructed event', constructedEvent)
-      this.updateResourceFromEvent(constructedEvent, 'xp.ReceivesEmails');
-    };
-    console.log(this._supplierEditable);
-    (document.getElementById('AdditionalEmail') as any).value = null;
-    document.getElementById('AdditionalEmail').focus();
+  assignSupplierUser(email: string): void {
+    const index = this._supplierEditable?.xp?.NotificationRcpts.indexOf(email);
+    if (index !== -1) {
+      this.removeAddtlRcpt(index);
+      return;
+    }
+    const existingRcpts = this._supplierEditable?.xp?.NotificationRcpts || [];
+    const constructedEvent = {target: {value: [...existingRcpts, email]}};
+    this.updateResourceFromEvent(constructedEvent, 'xp.NotificationRcpts');
   }
 
   removeAddtlRcpt(index: number): void {
     const copiedResource = JSON.parse(JSON.stringify(this._supplierEditable));
-    const editedArr = copiedResource.xp?.ReceivesEmails.filter(e => e !== copiedResource.xp?.ReceivesEmails[index]);
-    this.updateResourceFromEvent({target: {value: editedArr}}, 'xp.ReceivesEmails');
+    const editedArr = copiedResource.xp?.NotificationRcpts.filter(e => e !== copiedResource.xp?.NotificationRcpts[index]);
+    this.updateResourceFromEvent({target: {value: editedArr}}, 'xp.NotificationRcpts');
+  }
+
+  isAssigned(email: string): boolean {
+    return this._supplierEditable?.xp?.NotificationRcpts?.includes(email);
   }
 }
