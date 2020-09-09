@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 // 3rd party
-import { OrderCloudModule } from '@ordercloud/angular-sdk';
+import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk';
 import { OcSDKConfig } from '@app-seller/config/ordercloud-sdk.config';
 import { CookieModule } from 'ngx-cookie';
 import { ToastrModule } from 'ngx-toastr';
@@ -31,13 +31,20 @@ import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-inte
 
 // error handler config
 import { AppErrorHandler } from './config/error-handling.config';
-import { Configuration } from '@ordercloud/headstart-sdk';
+import { Configuration as HeadstartConfiguration } from '@ordercloud/headstart-sdk';
+import { Configuration as OcConfiguration, SdkConfiguration } from 'ordercloud-javascript-sdk';
 import { applicationConfiguration, AppConfig, ocAppConfig } from './config/app.config';
+import 'tinymce/tinymce';
+import '@ordercloud/angular-cms-components/plugin.min.js';
 
 export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, ocAppConfig.translateBlobUrl);
 }
-
+export enum OrdercloudEnv {
+  Production = 'Production',
+  Staging = 'Staging',
+  Sandbox = 'Sandbox',
+}
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -95,8 +102,19 @@ export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): Tra
 export class AppModule {
   constructor(@Inject(applicationConfiguration) private appConfig: AppConfig, public translate: TranslateService) {
     translate.setDefaultLang('en');
-    Configuration.Set({
+    HeadstartConfiguration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
     });
+    OcConfiguration.Set(this.getOrdercloudSDKConfig(appConfig));
+  }
+  private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
+    const version = config.orderCloudApiVersion;
+    const apiUrl = config.orderCloudApiUrl;
+    return {
+      baseApiUrl: `${apiUrl}/${version}`,
+      baseAuthUrl: `${apiUrl}/oauth/token`,
+      clientID: config.clientID,
+      cookieOptions: { prefix: config.appname.replace(/ /g, '_').toLowerCase() },
+    };
   }
 }

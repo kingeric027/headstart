@@ -13,6 +13,7 @@ import {
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { SupplierUsers } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
@@ -30,14 +31,13 @@ export class SupplierUserService extends ResourceCrudService<User> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocSupplierUserService: OcSupplierUserService,
     private ocSupplierUserGroupService: OcSupplierUserGroupService,
     public currentUserService: CurrentUserService
   ) {
     super(
       router,
       activatedRoute,
-      ocSupplierUserService,
+      SupplierUsers,
       currentUserService,
       '/suppliers',
       'suppliers',

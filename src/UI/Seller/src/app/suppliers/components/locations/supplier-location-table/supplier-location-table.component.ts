@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Address, ListPage } from '@ordercloud/angular-sdk';
+import { BuyerAddress, ListPage, Address } from 'ordercloud-javascript-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SupplierAddressService } from '../supplier-address.service';
 import { SupplierService } from '../../suppliers/supplier.service';
@@ -11,7 +11,7 @@ import { SupplierService } from '../../suppliers/supplier.service';
   styleUrls: ['./supplier-location-table.component.scss'],
 })
 export class SupplierLocationTableComponent extends ResourceCrudComponent<Address> {
-  suggestedAddresses: ListPage<Address>;
+  suggestedAddresses: ListPage<BuyerAddress>;
   selectedAddress: Address;
   canBeDeleted: boolean;
 

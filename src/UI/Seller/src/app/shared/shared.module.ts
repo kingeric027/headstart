@@ -48,6 +48,8 @@ import { LocationIDInputDirective } from './directives/location-id-input.directi
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { SafeHTMLPipe } from './pipes/safe-html.pipe';
+import { CmsAdminModule } from '@ordercloud/angular-cms-components';
+import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
 
 @NgModule({
   imports: [
@@ -71,6 +73,9 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 
     // Quill
     QuillModule.forRoot(),
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
   ],
   exports: [
     // angular
@@ -83,6 +88,9 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
 
     // app components
     SearchComponent,
@@ -114,6 +122,7 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     ConfirmModal,
     UserGroupAssignments,
     TranslateModule,
+    ResourceBreadcrumbsComponent,
   ],
   declarations: [
     SearchComponent,
@@ -144,7 +153,7 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
-    SafeHTMLPipe,
+    ResourceBreadcrumbsComponent,
   ],
 })
 export class SharedModule {
