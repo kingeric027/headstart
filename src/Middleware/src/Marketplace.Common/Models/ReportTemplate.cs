@@ -32,6 +32,7 @@ namespace Marketplace.Common.Models
         PurchaseOrderDetail
     }
 
+    [SwaggerModel]
     public class ReportFilters
     {
         public List<string> BuyerID { get; set; }

@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP2_2
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore;
@@ -39,4 +38,3 @@ namespace ordercloud.integrations.library
                 });
     }
 }
-#endif
