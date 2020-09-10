@@ -117,7 +117,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       });
       this.updateResource.emit({ field: 'xp.ProductTypes', value: valueToArray });
     } else {
-      const value = ['Active', 'xp.SyncFreightPop'].includes(field) ? event.target.checked : event.target.value;
+      const value = ['Active', 'xp.SyncFreightPop', 'xp.FreeShipping.Enabled'].includes(field) ? event.target.checked : event.target.value;
       this.updateResource.emit({ value, field });
     }
   }
