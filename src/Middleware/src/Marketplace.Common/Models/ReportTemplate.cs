@@ -28,9 +28,11 @@ namespace Marketplace.Common.Models
     public enum ReportTypeEnum
     {
         BuyerLocation,
-        SalesOrderDetail
+        SalesOrderDetail,
+        PurchaseOrderDetail
     }
 
+    [SwaggerModel]
     public class ReportFilters
     {
         public List<string> BuyerID { get; set; }

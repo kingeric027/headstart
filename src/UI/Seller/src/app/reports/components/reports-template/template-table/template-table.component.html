@@ -15,8 +15,8 @@
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)"
                           [canBeDeleted]="!isSupplierUser"
-                          [labelSingular]="'Template'"
-                          [labelPlural]="'Templates'">
+                          [labelSingular]="'ADMIN.NAV.TEMPLATE'"
+                          [labelPlural]="'ADMIN.NAV.TEMPLATES'">
     <div class="resource-edit">
         <template-edit-component *ngIf="resourceForm"
                                  class="resource-edit"

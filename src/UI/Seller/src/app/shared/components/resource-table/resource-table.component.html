@@ -1,25 +1,4 @@
-<!-- Breadcrumbs -->
-<div class="d-flex justify-content-between align-items-center bg-primary-dark base-layout-item">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb breadcrumb-oc">
-      <!-- make this the home icon -->
-      <li class="breadcrumb-item">
-        <a class="breadcrumb-link"
-           [routerLink]="'/'">
-          <fa-icon [icon]="faHome">
-          </fa-icon>
-        </a>
-      </li>
-      <li *ngFor="let breadCrumb of breadCrumbs"
-          class="breadcrumb-item">
-        <a class="breadcrumb-link"
-           [routerLink]="[breadCrumb.route]">{{breadCrumb.displayText | titlecase}}
-        </a>
-      </li>
-    </ol>
-  </nav>
-</div>
-<!-- /Breadcrumbs -->
+<resource-breadcrumbs-component></resource-breadcrumbs-component>
 <div class="container-fluid">
   <!-- Page Title -->
   <div class="row base-layout-item">
@@ -265,7 +244,8 @@
           </perfect-scrollbar>
         </div>
         <div class="col-md-9 col-sm-12 bg-light contents">
-          <div class="py-1 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
+          <div *ngIf="shouldShowTitleContainer"
+               class="py-1 d-flex flex-row justify-content-between resource-title-container additional-item-edit-resource">
             <span class="d-flex flex-row justify-content-start align-items-center">
               <div class="icon-button ripple hover-btn"
                    (click)="handleSelectResource({})">
@@ -280,9 +260,11 @@
                 New {{resourceType | titlecase}} {{labelSingular | translate}}
               </h3>
               <h3 *ngIf="!isCreatingNew"
-                  class="d-inline-block ml-1 mb-0">{{_resourceInSelection?.Name || _resourceInSelection?.Username || _resourceInSelection?.AddressName}}</h3>
+                  class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName || _resourceInSelection.AppName}}</h3>
             </span>
-            <button *ngIf="canImpersonateResource && !isCreatingNew" (click)="impersonateUser()" class="btn brand-button--orange">Impersonate</button>
+            <button *ngIf="canImpersonateResource && !isCreatingNew"
+                    (click)="impersonateUser()"
+                    class="btn brand-button--orange">Impersonate</button>
             <span class="d-flex align-items-center"
                   *ngIf="!parentResourceService && _ocService.subResourceList && _ocService.subResourceList.length && !isCreatingNew">
               <a class="btn btn-outline-info ml-3"

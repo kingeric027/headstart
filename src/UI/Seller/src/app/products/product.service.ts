@@ -14,6 +14,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { Products } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -83,13 +84,12 @@ export class ProductService extends ResourceCrudService<Product> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    private ocProductsService: OcProductService,
     private ocCategoryService: OcCategoryService,
     private ocPriceScheduleService: OcPriceScheduleService,
     private ocCatalogService: OcCatalogService,
     public currentUserService: CurrentUserService
   ) {
-    super(router, activatedRoute, ocProductsService, currentUserService, '/products', 'products');
+    super(router, activatedRoute, Products, currentUserService, '/products', 'products');
   }
 
   async updateProductCatalogAssignments(
@@ -102,11 +102,9 @@ export class ProductService extends ResourceCrudService<Product> {
       a.PriceScheduleID = priceScheduleID;
       return a;
     });
-    const addRequests = add.map(newAssignment => this.ocProductsService.SaveAssignment(newAssignment).toPromise());
+    const addRequests = add.map(newAssignment => Products.SaveAssignment(newAssignment));
     const deleteRequests = del.map(assignmentToRemove =>
-      this.ocProductsService
-        .DeleteAssignment(assignmentToRemove.ProductID, buyerID, { userGroupID: assignmentToRemove.UserGroupID })
-        .toPromise()
+      Products.DeleteAssignment(assignmentToRemove.ProductID, buyerID, { userGroupID: assignmentToRemove.UserGroupID })
     );
     await Promise.all([...addRequests, ...deleteRequests]);
   }
