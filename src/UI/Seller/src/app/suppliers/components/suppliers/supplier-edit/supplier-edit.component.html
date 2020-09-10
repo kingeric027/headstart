@@ -14,7 +14,6 @@
                    class="form-check-input"
                    id="Active"
                    showErrors
-                   [resourceForm]="resourceForm"
                    aria-describedby="Active"
                    formControlName="Active"
                    (input)="updateResourceFromEvent($event, 'Active')">
@@ -29,7 +28,6 @@
                  showErrors
                  aria-describedby="Name"
                  maxlength="100"
-                 [resourceForm]="resourceForm"
                  formControlName="Name"
                  (input)="updateResourceFromEvent($event, 'Name')"
                  placeholder="Enter Name">
@@ -102,7 +100,6 @@
                      class="form-check-input"
                      id="SyncFreightPop"
                      showErrors
-                     [resourceForm]="resourceForm"
                      aria-describedby="SyncFreightPop"
                      formControlName="SyncFreightPop"
                      (input)="updateResourceFromEvent($event, 'xp.SyncFreightPop')">
@@ -117,7 +114,6 @@
               <div class="custom-control custom-checkbox mr-3">
                 <input type="checkbox"
                        class="custom-control-input"
-                       [resourceForm]="resourceForm"
                        formControlName="Standard"
                        (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')"
                        id="Standard">
@@ -127,7 +123,6 @@
               <div class="custom-control custom-checkbox mr-3">
                 <input type="checkbox"
                        class="custom-control-input"
-                       [resourceForm]="resourceForm"
                        formControlName="Quote"
                        (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')"
                        id="Quote">
@@ -137,7 +132,6 @@
               <div class="custom-control custom-checkbox">
                 <input type="checkbox"
                        class="custom-control-input"
-                       [resourceForm]="resourceForm"
                        formControlName="PurchaseOrder"
                        (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')"
                        id="PurchaseOrder">
@@ -186,6 +180,45 @@
         </div>
       </div>
     </div>
+    <div *ngIf="!isCreatingNew"
+         class="row pt-3">
+      <div class="col-md-5">
+        <h5>Email Notifications</h5>
+        <p>Choose which {{_supplierEditable?.Name}} users will recieve email notifications, and add emails for additional recipients who may not be users.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Receives Emails</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!supplierUsers?.Items?.length">
+              <td>
+                <span class="font-italic">{{_supplierEditable?.Name}} does not have any users.</span>
+              </td>
+            </tr>
+            <tr class="cursor-pointer"
+                *ngFor="let user of supplierUsers?.Items">
+              <td class="d-flex justify-content-start align-items-center">
+                <label class="switch mb-0">
+                  <input class="form-check-input"
+                         type="checkbox"
+                         (click)="assignSupplierUser(user.Email)"
+                         [checked]="isAssigned(user.Email)">
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td>{{user.FirstName}} {{user.LastName}}</td>
+              <td>{{user.Email}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div class="row pt-3">
       <div class="col-md-5">
         <h5>Support Contact</h5>
@@ -198,7 +231,6 @@
                  class="form-control"
                  id="Support Contact Name"
                  showErrors
-                 [resourceForm]="resourceForm"
                  aria-describedby="Support Contact Name"
                  formControlName="SupportContactName"
                  (input)="updateResourceFromEvent($event, 'xp.SupportContact.Name')"
@@ -211,7 +243,6 @@
                    class="form-control"
                    id="Support Contact Email"
                    showErrors
-                   [resourceForm]="resourceForm"
                    aria-describedby="Support Contact Email"
                    formControlName="SupportContactEmail"
                    (input)="updateResourceFromEvent($event, 'xp.SupportContact.Email')"
@@ -223,7 +254,6 @@
             <input type="text"
                    class="form-control"
                    showErrors
-                   [resourceForm]="resourceForm"
                    id="Support Contact Phone"
                    aria-describedby="Support Contact Phone"
                    formControlName="SupportContactPhone"

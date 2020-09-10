@@ -48,3 +48,20 @@ export let salesOrderDetail: Filter[] = [
     filterValues: [],
   }
 ];
+
+export let purchaseOrderDetail: Filter[] = [
+  {
+    name: 'Order Status',
+    path: 'Status',
+    sourceType: 'model',
+    source: 'OrderStatus',
+    filterValues: [],
+  },
+  {
+    name: 'Order Type',
+    path: 'OrderType',
+    sourceType: 'model',
+    source: 'OrderType',
+    filterValues: [],
+  }
+];

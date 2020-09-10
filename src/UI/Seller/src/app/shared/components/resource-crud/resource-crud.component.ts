@@ -20,6 +20,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceForm: FormGroup;
   isMyResource = false;
   isSupplierUser = false;
+  parentResourceID: string;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -82,13 +83,13 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  async subscribeToResourceSelection(): Promise<void> {
-    const parentResourceID = await this.ocService.getParentResourceID();
-    this.activatedRoute.params.subscribe(params => {
-      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
+  subscribeToResourceSelection(): void {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.activatedRoute.params.subscribe(async params => {
+      this.parentResourceID = await this.ocService.getParentResourceID();
+      if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
-        const resourceIDSelected =
-          params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
+        const resourceIDSelected = params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
         } else if (resourceIDSelected) {

@@ -5,6 +5,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { OrchestrationLog, ListPage, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { Buyers } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -13,13 +14,8 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 export class OrchestrationLogsService extends ResourceCrudService<OrchestrationLog> {
   primaryResourceLevel = 'logs';
 
-  constructor(
-    router: Router,
-    activatedRoute: ActivatedRoute,
-    service: OcBuyerService,
-    currentUserService: CurrentUserService
-  ) {
-    super(router, activatedRoute, service, currentUserService, '/reports/logs', 'Logs');
+  constructor(router: Router, activatedRoute: ActivatedRoute, currentUserService: CurrentUserService) {
+    super(router, activatedRoute, Buyers, currentUserService, '/reports/logs', 'Logs');
   }
 
   async list(args: any[]): Promise<ListPage<OrchestrationLog>> {

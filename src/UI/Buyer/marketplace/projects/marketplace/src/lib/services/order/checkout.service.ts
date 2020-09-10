@@ -49,6 +49,11 @@ export class CheckoutService {
     return orderID;
   }
 
+  async appendPaymentMethodToOrderXp(orderID: string, ccPayment?: any): Promise<void> {
+    const paymentMethod = ccPayment?.CreditCardID ? 'Credit Card' : 'Purchase Order';
+    await Orders.Patch('Outgoing', orderID, { xp: { PaymentMethod: paymentMethod } });
+  }
+
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
   }

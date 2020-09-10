@@ -17,6 +17,7 @@ namespace Marketplace.Common.Commands
         ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser);
         Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
         Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> GetReportTemplate(string id, VerifiedUserContext verifiedUser);
@@ -118,6 +119,38 @@ namespace Marketplace.Common.Commands
             var template = await _template.Get(templateID, verifiedUser);
             var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
                 OrderDirection.Incoming,
+                filters: $"from={lowDateRange}&to={highDateRange}",
+                page: page,
+                pageSize: 100
+                 ));
+            var filterClassProperties = template.Filters.GetType().GetProperties();
+            var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
+            foreach (var property in filterClassProperties)
+            {
+                List<string> propertyFilters = (List<string>)property.GetValue(template.Filters);
+                if (propertyFilters != null && propertyFilters.Count > 0)
+                {
+                    filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
+                }
+            }
+            var filteredOrders = new List<MarketplaceOrder>();
+            foreach (var order in orders)
+            {
+
+                if (PassesFilters(order, filtersToEvaluateMap))
+                {
+                    filteredOrders.Add(order);
+                }
+            }
+            return filteredOrders;
+        }
+
+        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
+        {
+            var template = await _template.Get(templateID, verifiedUser);
+            var orderDirection = verifiedUser.UsrType == "admin" ? OrderDirection.Outgoing : OrderDirection.Incoming;
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+                orderDirection,
                 filters: $"from={lowDateRange}&to={highDateRange}",
                 page: page,
                 pageSize: 100

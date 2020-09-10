@@ -70,6 +70,22 @@ namespace Marketplace.Common.Controllers
 
         }
 
+        [HttpGet, Route("PurchaseOrderDetail/preview/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
+        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange)
+        {
+            RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
+            return await _reportDataCommand.PurchaseOrderDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+        }
+
+        [HttpPost, Route("PurchaseOrderDetail/download/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
+        public async Task<string> DownloadPurchaseOrderDetail([FromBody] ReportTemplate reportTemplate, string templateID, string lowDateRange, string highDateRange)
+        {
+            RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
+            var reportData = await _reportDataCommand.PurchaseOrderDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            return await _downloadReportCommand.ExportToExcel(ReportTypeEnum.PurchaseOrderDetail, reportTemplate, reportData);
+
+        }
+
         [HttpGet, Route("download-shared-access/{fileName}"), OrderCloudIntegrationsAuth]
         public string GetSharedAccessSignature(string fileName)
         {
