@@ -43,11 +43,11 @@ import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { CmsAdminModule } from '@ordercloud/angular-cms-components';
 import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
 
@@ -154,6 +154,7 @@ import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/
     PhoneFormatPipe,
     YesNoFormatPipe,
     ResourceBreadcrumbsComponent,
+    SafeHTMLPipe,
   ],
 })
 export class SharedModule {
