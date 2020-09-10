@@ -5,6 +5,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
+using ordercloud.integrations.tecra;
 
 namespace Marketplace.Common
 {
@@ -26,6 +27,7 @@ namespace Marketplace.Common
         // party shipping on FreigthPOP prd
         public FreightPopSettings FreightPopSettingsProd { get; set; }
         public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
+        public OrderCloudTecraConfig TecraSettings { get; set; } = new OrderCloudTecraConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }

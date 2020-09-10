@@ -14,6 +14,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { ChiliService, ChiliDocuments, ChiliSpecs } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -87,7 +88,8 @@ export class ProductService extends ResourceCrudService<Product> {
     private ocCategoryService: OcCategoryService,
     private ocPriceScheduleService: OcPriceScheduleService,
     private ocCatalogService: OcCatalogService,
-    public currentUserService: CurrentUserService
+    public currentUserService: CurrentUserService,
+    public chiliService: ChiliService
   ) {
     super(router, activatedRoute, ocProductsService, currentUserService, '/products', 'products');
   }
@@ -125,5 +127,17 @@ export class ProductService extends ResourceCrudService<Product> {
         .toPromise()
     );
     await Promise.all([...addRequests, ...deleteRequests]);
-  }
+    }
+
+    async getChiliDocuments(
+        folder: string
+    ): Promise<ChiliDocuments> {
+        return this.chiliService.getDocuments(folder);
+    }
+
+    async getChiliSpecs(
+        docID: string
+    ): Promise<ChiliSpecs> {
+        return this.chiliService.getSpecs(docID);
+    }
 }

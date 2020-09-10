@@ -6,6 +6,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ProductTableComponent } from './components/product-table/product-table.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
 import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
+import { VariablePrintConfiguration } from './components/buyer-visibility/variable-print-configuration/variable-print-configuration.component';
 import { ProductTaxCodeSelect } from './components/product-tax-code-select/product-tax-code-select.component';
 import { ProductTaxCodeSelectDropdown } from './components/product-tax-code-select-dropdown/product-tax-code-select-dropdown.component';
 import { ProductVariations } from './components/product-variations/product-variations.component';
@@ -25,6 +26,7 @@ import { NgbTabset, NgbModule } from '@ng-bootstrap/ng-bootstrap';
     PriceBreakEditor,
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
+    VariablePrintConfiguration,
     ProductCategoryAssignment,
     ProductTaxCodeSelect,
     ProductTaxCodeSelectDropdown,

@@ -145,7 +145,7 @@ export class BuyerVisibilityConfiguration {
     this.catalogs = catalogsResponse.Items;
   }
 
-  async getCatalogAssignments(): Promise<void> {
+    async getCatalogAssignments(): Promise<void> {
     const catalogAssignmentRequests = this.catalogs.map(c =>
       this.ocProductService.ListAssignments({ userGroupID: c.ID, productID: this._product.ID }).toPromise()
     );
