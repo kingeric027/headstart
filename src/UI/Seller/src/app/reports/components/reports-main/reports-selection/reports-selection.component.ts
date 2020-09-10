@@ -36,7 +36,7 @@ export class ReportsSelectionComponent {
 
   updateReportTemplate(event: string): void {
     this.handleReportTemplateSelection.emit(event);
-    this.selectedTemplate = this.reportTemplates.find(template => template.id === event);
+    this.selectedTemplate = this.reportTemplates.find(template => template.TemplateID === event);
     this.filterEntries = Object.entries(this.selectedTemplate.Filters);
   }
 
