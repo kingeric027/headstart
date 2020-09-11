@@ -9,7 +9,6 @@ export class MeProductResolver implements Resolve<SuperMarketplaceProduct> {
   constructor(private tempSdk: TempSdk) { }
 
   resolve(route: ActivatedRouteSnapshot): Promise<SuperMarketplaceProduct> {
-    return this.tempSdk.getKitProduct(route.params.productID);
-    // return HeadStartSDK.Mes.GetSuperProduct(route.params.productID);
+    return HeadStartSDK.Mes.GetSuperProduct(route.params.productID);
   }
 }
