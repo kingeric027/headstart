@@ -54,10 +54,8 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
       PurchaseOrder: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser})
     }, RequireCheckboxesToBeChecked()),
     Categories: new FormControl(_get(supplier, 'xp.Categories', []), ValidateSupplierCategorySelection),
-    FreeShipping: new FormGroup({
-      Enabled: new FormControl((supplier as any).xp?.FreeShipping?.Enabled),
-      Threshold: new FormControl({value: (supplier as any).xp?.FreeShipping?.Enabled})
-    })
+    FreeShippingEnabled: new FormControl((supplier as any).xp?.FreeShippingThreshold != null),
+    FreeShippingThreshold: new FormControl((supplier as any).xp?.FreeShippingThreshold)
   });
 }
 

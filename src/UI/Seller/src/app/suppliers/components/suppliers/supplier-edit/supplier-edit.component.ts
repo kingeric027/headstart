@@ -117,10 +117,17 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       });
       this.updateResource.emit({ field: 'xp.ProductTypes', value: valueToArray });
     } else {
-      const value = ['Active', 'xp.SyncFreightPop', 'xp.FreeShipping.Enabled'].includes(field) ? event.target.checked : event.target.value;
+      let value;
+      if(field === 'xp.FreeShippingThreshold') {
+        value = parseInt(event.target.value, 10) ? parseInt(event.target.value, 10) : 
+                event.target.checked ? 0 : null;
+      } else {
+        value = ['Active', 'xp.SyncFreightPop'].includes(field) ? event.target.checked : event.target.value;
+      }
       this.updateResource.emit({ value, field });
     }
   }
+
 
   async dropFileUpload(event: FileHandle[]): Promise<void> {
     if (this.isCreatingNew) {
