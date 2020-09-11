@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
 import { ListPage, MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
-import { LineItems, Me, Order, Orders, OrderPromotion } from 'ordercloud-javascript-sdk';
+import {
+  LineItems,
+  Me,
+  Order,
+  Orders,
+  OrderPromotion,
+  OrderWorksheet,
+  ShipEstimate,
+  IntegrationEvents,
+} from 'ordercloud-javascript-sdk';
 import { BehaviorSubject } from 'rxjs';
 import { listAll } from '../../functions/listAll';
 import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context';
@@ -28,13 +37,14 @@ export class OrderStateService {
       Returns: {
         HasClaims: false,
         HasUnresolvedClaims: false,
-        Resolutions: []
+        Resolutions: [],
       },
       ClaimStatus: ClaimStatus.NoClaim,
       ShippingStatus: ShippingStatus.Processing,
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
+  private shipEstimatesSubject = new BehaviorSubject<ShipEstimate[]>([]);
   private orderPromosSubject = new BehaviorSubject<ListPage<OrderPromotion>>(this.DefaultOrderPromos);
   private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(this.DefaultLineItems);
 
@@ -42,7 +52,7 @@ export class OrderStateService {
     private tokenHelper: TokenHelperService,
     private currentUserService: CurrentUserService,
     private appConfig: AppConfig
-  ) { }
+  ) {}
 
   get order(): MarketplaceOrder {
     return this.orderSubject.value;
@@ -50,6 +60,14 @@ export class OrderStateService {
 
   set order(value: MarketplaceOrder) {
     this.orderSubject.next(value);
+  }
+
+  get shipEstimates(): ShipEstimate[] {
+    return this.shipEstimatesSubject.value;
+  }
+
+  set shipEstimates(value: ShipEstimate[]) {
+    this.shipEstimatesSubject.next(value);
   }
 
   get lineItems(): ListPage<MarketplaceLineItem> {
@@ -106,6 +124,16 @@ export class OrderStateService {
       await this.resetLineItems();
     }
     this.orderPromos = await Orders.ListPromotions('Outgoing', this.order.ID);
+
+    await this.getShipEstimates();
+  }
+
+  async getShipEstimates(): Promise<void> {
+    const orderWorksheet = await IntegrationEvents.GetWorksheet('Outgoing', this.order.ID);
+
+    if (orderWorksheet?.ShipEstimateResponse?.ShipEstimates) {
+      this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
+    }
   }
 
   async resetLineItems(): Promise<void> {

@@ -49,7 +49,7 @@ export class CurrentOrderService {
       CancelRequested: 0,
       Returned: 0,
       ReturnRequested: 0,
-      Complete: 0
+      Complete: 0,
     } as any;
     const quoteOrder = await Orders.Create('Outgoing', order);
     await LineItems.Create('Outgoing', quoteOrder.ID, lineItem as LineItem);

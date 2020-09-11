@@ -66,7 +66,7 @@
     </h3>
     <div class="text-right">
       <b class="float-left"
-         translate>ORDERS.SUMMARY.SUBTOTAL</b><span class="sub-total">{{ orderSummaryMeta.POTotal | currency: _orderCurrency }}</span>
+         translate>ORDERS.SUMMARY.SUBTOTAL</b><span class="sub-total">{{ orderSummaryMeta.POSubtotal | currency: _orderCurrency }}</span>
     </div>
     <div class="text-right">
       <b class="float-left"
@@ -77,9 +77,15 @@
     <div class="text-right">
       <b class="float-left"
          translate>ORDERS.SUMMARY.SHIPPING</b>
-      <span class="tax-cost"
-            translate>ORDERS.SUMMARY.POTAXANDSHIPPINGOVERRIDE</span>
+      <span *ngIf="orderSummaryMeta.ShippingAndTaxOverrideText"
+            class="shipping-cost">{{
+     orderSummaryMeta.ShippingAndTaxOverrideText
+   }}</span>
+      <span *ngIf="!orderSummaryMeta.ShippingAndTaxOverrideText"
+            class="tax-cost"
+            translate>{{ orderSummaryMeta.POShippingCost | currency: _orderCurrency }}</span>
     </div>
+
     <hr />
     <div class="text-right lead">
       <b class="float-left"

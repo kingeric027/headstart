@@ -10,8 +10,11 @@ namespace Marketplace.Common.Controllers
     [Route("swagger")]
     public class SwaggerController : BaseController
     {
+        private readonly AppSettings _settings;
+
         public SwaggerController(AppSettings settings) : base(settings)
         {
+            _settings = settings;
         }
 
         [HttpGet]
@@ -25,7 +28,7 @@ namespace Marketplace.Common.Controllers
                     Name = "Marketplace",
                     ContactEmail = "oheywood@four51.com",
                     Description = "Marketplace API",
-                    Host = "https://marketplace-api-qa.azurewebsites.net",
+                    Host = _settings.EnvironmentSettings.BaseUrl,
                     Title = "Marketplace API",
                     Url = "https://ordercloud.io",
                     Version = "1.0"
