@@ -30,7 +30,7 @@ export class OCMCheckout implements OnInit {
   payments: ListPage<Payment>;
   cards: ListPage<BuyerCreditCard>;
   selectedCard: SelectedCreditCard;
-  shipEstimates: ShipEstimate[] = null;
+  shipEstimates: ShipEstimate[] = [];
   currentPanel: string;
   faCheck = faCheck;
   checkout: CheckoutService = this.context.order.checkout;
@@ -62,12 +62,13 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
+
     this.lineItems = this.context.order.cart.get();
     this.orderPromotions = this.context.order.promos.get().Items;
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
     this.reIDLineItems();
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, this.currentPanel)
     this.setValidation('login', !this.isAnon);
   }
 
@@ -79,11 +80,7 @@ export class OCMCheckout implements OnInit {
   async doneWithShipToAddress(): Promise<void> {
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
-    if(!this.orderSummaryMeta.StandardLineItemCount) {
-      this.toSection('payment');
-    } else {
-      this.toSection('shippingSelection');
-    }
+    this.toSection('shippingSelection');
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
@@ -162,7 +159,7 @@ export class OCMCheckout implements OnInit {
   }
 
   toSection(id: string): void {
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, id)
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     
     // set validation to true on all previous sections
@@ -194,6 +191,6 @@ export class OCMCheckout implements OnInit {
   updateOrderMeta(promos?: CustomEvent<OrderPromotion[]>): void {
     this.orderPromotions = this.context.order.promos.get().Items;
     this.orderPromotions = promos.detail;
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.currentPanel)
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, this.currentPanel)
   }
 }
