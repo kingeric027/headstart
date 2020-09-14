@@ -62,7 +62,7 @@ namespace Marketplace.Common.Constants
                 return shippingStatusOccurances.First();
             }
 
-            if (shippingStatusOccurances.Contains(ShippingStatus.Processing) && shippingStatusOccurances.Contains(ShippingStatus.Processing))
+            if (shippingStatusOccurances.Contains(ShippingStatus.Processing) && shippingStatusOccurances.Contains(ShippingStatus.Shipped))
             {
                 return ShippingStatus.PartiallyShipped;
             }

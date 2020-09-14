@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk';
-import { ListArgs, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import { ListArgs, MarketplaceOrder, MarketplaceKitProduct, SuperMarketplaceMeProduct } from '@ordercloud/headstart-sdk';
 import { AppConfig, MarketplaceMeProduct, SupplierFilterConfigDocument } from '../../shopper-context';
 import { ListPage } from '@ordercloud/headstart-sdk';
 
@@ -15,7 +15,7 @@ interface MarketplaceCatalogAssignmentRequest {
   providedIn: 'root',
 })
 export class TempSdk {
-  constructor(private http: HttpClient, private appConfig: AppConfig) {}
+  constructor(private http: HttpClient, private appConfig: AppConfig) { }
 
   buildHeaders(): HttpHeaders {
     return new HttpHeaders({
@@ -48,6 +48,18 @@ export class TempSdk {
       .toPromise();
   }
 
+  async getKitProduct(id: string): Promise<MarketplaceKitProduct> {
+    const url = `${this.appConfig.middlewareUrl}/kitproducts/me/${id}`;
+    return await this.http
+      .get<MarketplaceKitProduct>(url, { headers: this.buildHeaders() }).toPromise();
+  }
+
+  async getMeProduct(id: string): Promise<SuperMarketplaceMeProduct> {
+    const url = `${this.appConfig.middlewareUrl}/me/products/${id}`;
+    return await this.http
+      .get<SuperMarketplaceMeProduct>(url, { headers: this.buildHeaders() }).toPromise();
+  }
+
   async getSupplierFilterConfig(): Promise<ListPage<SupplierFilterConfigDocument>> {
     const url = `${this.appConfig.middlewareUrl}/supplierfilterconfig`;
     return await this.http
@@ -60,12 +72,12 @@ export class TempSdk {
   async deleteLineItem(orderID: string, lineItemID: string): Promise<void> {
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/lineitems/${lineItemID}`;
     return await this.http
-      .delete<void>(url, { headers: this.buildHeaders()}).toPromise();
+      .delete<void>(url, { headers: this.buildHeaders() }).toPromise();
   }
 
   async applyAutomaticPromotionsToOrder(orderID: string): Promise<MarketplaceOrder> {
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/applypromotions`;
     return await this.http
-      .post<MarketplaceOrder>(url, { headers: this.buildHeaders()}).toPromise();
+      .post<MarketplaceOrder>(url, { headers: this.buildHeaders() }).toPromise();
   }
 }

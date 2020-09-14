@@ -31,7 +31,7 @@ export class OCMCart {
 
   setOrderSummaryMeta(): void {
     if (this._order && this._lineItems) {
-      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos?.Items, this._lineItems.Items, 'cart');
+      this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos?.Items, this._lineItems.Items, [], 'cart');
     }
   }
   toProductList(): void {
@@ -47,6 +47,6 @@ export class OCMCart {
   }
 
   updateOrderMeta(): void {
-    this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos?.Items, this._lineItems.Items, 'cart');
+    this.orderSummaryMeta = getOrderSummaryMeta(this._order, this._orderPromos?.Items, this._lineItems.Items, [], 'cart');
   }
 }
