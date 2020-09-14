@@ -13,6 +13,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -56,23 +57,16 @@ namespace Marketplace.Common.Services.ShippingIntegration
             var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
             var shipEstimatesWithFreeShippingApplied = await ApplyFreeShipping(orderWorksheet, shipEstimates);
 
-            Console.WriteLine(shipEstimatesWithFreeShippingApplied);
-            //  iterate over lineitems to figure out subtotal by suppliers and figure out if any of suppliers also have free shipping threshold and if that threshold is met.
-            //  if threshold is met look at first item on shipEstimate and figure out which supplier that relates to.
-            //  look through the shipMethods if there is a relevant ship estimate that it applies to modify the cost to 0.
-            //  save original cost on the ship method (which is in the ShipEstimate model)
-            //  also want to keep track of algorithm version
-            var elementToReturn = new ShipEstimateResponse()
+            return new ShipEstimateResponse()
             {
                 ShipEstimates = shipEstimatesWithFreeShippingApplied as IList<ShipEstimate>
             };
-            return elementToReturn;
         }
 
         private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, List<ShipEstimate> shipEstimates)
         {
             var supplierIDs = orderWorksheet.LineItems.Select(li => li.SupplierID);
-            var suppliers = await _oc.Suppliers.ListAsync(filters: $"ID={string.Join("|", supplierIDs)}");
+            var suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
             var updatedEstimates = new List<ShipEstimate>();
 
             foreach(var estimate in shipEstimates)
@@ -82,9 +76,9 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 var supplier = suppliers.Items.Where(supplier => supplier.ID == supplierID).FirstOrDefault();
                 var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier.ID);
                 var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
-                if (supplier.xp.FreeShippingThreshold != null && supplier.xp.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
+                if (supplier.xp?.FreeShippingThreshold != null && supplier.xp?.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
                 {
-                    foreach(var method in estimate.ShipMethods)
+                    foreach (var method in estimate.ShipMethods)
                     {
                         if (method.Name.Contains("GROUND")) //  free shipping on ground shipping
                         {
@@ -96,6 +90,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                     }
                 }
                 updatedEstimates.Add(estimate);
+                
             }
             return updatedEstimates;
 
