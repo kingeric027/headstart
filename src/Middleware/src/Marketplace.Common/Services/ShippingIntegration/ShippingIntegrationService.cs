@@ -83,7 +83,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                         if (method.Name.Contains("GROUND")) //  free shipping on ground shipping
                         {
                             method.xp.FreeShippingApplied = true;
-                            method.xp.FreeShippingCutoff = supplier.xp.FreeShippingThreshold;
+                            method.xp.FreeShippingThreshold = supplier.xp.FreeShippingThreshold;
                             method.xp.CostBeforeDiscount = method.Cost;
                             method.Cost = 0;
                         }
