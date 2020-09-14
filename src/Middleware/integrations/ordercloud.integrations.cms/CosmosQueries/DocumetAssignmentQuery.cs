@@ -107,6 +107,7 @@ namespace ordercloud.integrations.cms
 
 		private bool isValidAssignment(List<ResourceType> restrictedAssignmentTypes, ResourceType thisType)
 		{
+			restrictedAssignmentTypes = restrictedAssignmentTypes ?? new List<ResourceType>();
 			return restrictedAssignmentTypes.Count == 0 || restrictedAssignmentTypes.Contains(thisType);
 		}
 	}
