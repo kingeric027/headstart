@@ -14,7 +14,7 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
   products: ListPage<MarketplaceMeProduct>;
   alive = true;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, public context: ShopperContextService) { }
 
   ngOnInit(): void {
     this.products = this.activatedRoute.snapshot.data.products;
