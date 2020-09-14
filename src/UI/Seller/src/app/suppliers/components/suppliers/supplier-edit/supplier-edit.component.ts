@@ -120,6 +120,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       let value;
       if(field === 'xp.FreeShippingThreshold') {
         value = parseInt(event.target.value, 10) ? parseInt(event.target.value, 10) : 
+            event.target.value === '' ? 0 :
                 event.target.checked ? 0 : null;
       } else {
         value = ['Active', 'xp.SyncFreightPop'].includes(field) ? event.target.checked : event.target.value;
