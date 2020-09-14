@@ -4,6 +4,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ProductFilters, ShopperContextService, MarketplaceMeProduct } from 'marketplace';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { takeWhile } from 'rxjs/operators';
+import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './product-list.component.html',
@@ -14,6 +15,7 @@ export class OCMProductList implements OnInit, OnDestroy {
   alive = true;
   facets: ListFacet[];
   categoryCrumbs: Category[];
+  _kitProucts: ListPage<MarketplaceKitProduct>;
   favoriteProducts: string[] = [];
   hasFilters = false;
   showingFavoritesOnly = false;
@@ -21,7 +23,7 @@ export class OCMProductList implements OnInit, OnDestroy {
   numberOfItemsInPagination = 10;
   searchTermForProducts = '';
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   ngOnInit(): void {
     this.context.productFilters.activeFiltersSubject
