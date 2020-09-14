@@ -54,7 +54,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             CurrencySymbol orderCurrency = (CurrencySymbol)Enum.Parse(typeof(CurrencySymbol), orderWorksheet.Order.xp.Currency);
             var rates = (await _exchangeRates.Get(orderCurrency)).Rates;
             var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
-            var shipEstimatesWithFreeShippingApplied = ApplyFreeShipping(orderWorksheet, shipEstimates);
+            var shipEstimatesWithFreeShippingApplied = await ApplyFreeShipping(orderWorksheet, shipEstimates);
 
             Console.WriteLine(shipEstimatesWithFreeShippingApplied);
             //  iterate over lineitems to figure out subtotal by suppliers and figure out if any of suppliers also have free shipping threshold and if that threshold is met.
@@ -62,10 +62,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
             //  look through the shipMethods if there is a relevant ship estimate that it applies to modify the cost to 0.
             //  save original cost on the ship method (which is in the ShipEstimate model)
             //  also want to keep track of algorithm version
-            return new ShipEstimateResponse()
+            var elementToReturn = new ShipEstimateResponse()
             {
                 ShipEstimates = shipEstimatesWithFreeShippingApplied as IList<ShipEstimate>
             };
+            return elementToReturn;
         }
 
         private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, List<ShipEstimate> shipEstimates)
@@ -81,14 +82,14 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 var supplier = suppliers.Items.Where(supplier => supplier.ID == supplierID).FirstOrDefault();
                 var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier.ID);
                 var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
-                if (supplier.xp.FreeShippingCutoff != null && supplier.xp.FreeShippingCuttoff < supplierSubTotal) // free shipping for this supplier
+                if (supplier.xp.FreeShippingThreshold != null && supplier.xp.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
                 {
                     foreach(var method in estimate.ShipMethods)
                     {
-                        if (method.Name == "ground")
+                        if (method.Name.Contains("GROUND")) //  free shipping on ground shipping
                         {
                             method.xp.FreeShippingApplied = true;
-                            method.xp.FreeShippingCutoff = supplier.xp.FreeShippingCutoff;
+                            method.xp.FreeShippingCutoff = supplier.xp.FreeShippingThreshold;
                             method.xp.CostBeforeDiscount = method.Cost;
                             method.Cost = 0;
                         }
