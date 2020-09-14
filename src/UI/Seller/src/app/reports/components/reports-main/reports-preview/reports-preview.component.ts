@@ -47,12 +47,12 @@ export class ReportsPreviewComponent implements OnChanges {
     }
   }
 
-  //TO-DO - Will need refactoring for future data values that are more deeply nested.
-  getNestedValue(item: {}, header: string): string {
+  getNestedValue(item: any, header: string): string {
     const props = header.split('.');
-    const first = item[props[0]];
-    if (first) {
-      return first[props[1]];
+    let nestedValue = item;
+    for (let i = 0; i < props.length; i++) {
+      nestedValue = nestedValue[props[i]];
     }
+    return nestedValue;
   }
 }

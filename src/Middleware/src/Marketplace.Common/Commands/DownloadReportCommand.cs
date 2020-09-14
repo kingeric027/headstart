@@ -52,7 +52,13 @@ namespace Marketplace.Common.Commands
             for (var i = 0; i < headers.Count(); i++)
             {
                 var cell = header.CreateCell(i);
-                var concatHeader = headers[i].Contains(".") ? headers[i].Split('.')[0] == "xp" ? headers[i].Split('.')[1] : $"{headers[i].Split('.')[0]} {headers[i].Split('.')[1]}" : headers[i];
+                //var concatHeader = headers[i].Contains(".") ? headers[i].Split('.')[0] == "xp" ? headers[i].Split('.')[1] : $"{headers[i].Split('.')[0]} {headers[i].Split('.')[1]}" : headers[i];
+                var concatHeader = headers[i];
+                if (headers[i].Contains("."))
+                {
+                    var split = headers[i].Split('.');
+                    concatHeader = split[split.Length - 1];
+                }
                 var humanizedHeader = Regex.Replace(concatHeader, "([a-z](?=[0-9A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
                 cell.SetCellValue(humanizedHeader);
             }
@@ -73,7 +79,21 @@ namespace Marketplace.Common.Commands
                     {
                         if (dataJSON[header.Split(".")[0]].ToString() != "")
                         {
-                            cell.SetCellValue(dataJSON[header.Split(".")[0]][header.Split(".")[1]].ToString());
+                            //cell.SetCellValue(dataJSON[header.Split(".")[0]][header.Split(".")[1]].ToString());
+                            var split = header.Split(".");
+                            var dataValue = dataJSON;
+                            //bool valueNotFound = false;
+                            for (var k = 0; k < split.Length-1; k++)
+                            {
+                                var prop = split[k];
+                                //if (!dataValue.ContainsKey(prop))
+                                //{
+                                //    valueNotFound = true;
+                                //    break;
+                                //}
+                                dataValue = JObject.Parse(dataValue[prop].ToString());
+                            }
+                            cell.SetCellValue(/*(valueNotFound || !dataValue.ContainsKey(split[split.Length - 1])) ? "" : */dataValue[split[split.Length-1]].ToString());
                         } else
                         {
                             cell.SetCellValue("");

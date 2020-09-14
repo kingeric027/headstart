@@ -4,6 +4,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ReportsTemplateService } from '@app-seller/shared/services/middleware-api/reports-template.service';
 import { ReportTemplate } from '@ordercloud/headstart-sdk';
 import { ReportsTypeService } from '@app-seller/shared/services/middleware-api/reports-type.service';
+import { buyerLocation, salesOrderDetail, purchaseOrderDetail } from '../../reports-template/models/headers';
 
 @Component({
   selector: 'app-reports',
@@ -16,6 +17,7 @@ export class ReportsComponent implements OnInit {
   reportTemplates: ReportTemplate[] = [];
   selectedTemplateID: string;
   selectedTemplate: ReportTemplate;
+  selectedReportType: string;
   reportData: object[];
   displayHeaders: string[];
   adHocFilters: string[];
@@ -41,14 +43,15 @@ export class ReportsComponent implements OnInit {
 
   async handleReportTypeSelection(event: string): Promise<void> {
     this.resetForm();
-    this.reportSelectionForm.controls['ReportType'].setValue(event);
-    this.adHocFilters = this.setAdHocFilters(event);
+    this.selectedReportType = event;
+    this.reportSelectionForm.controls['ReportType'].setValue(this.selectedReportType);
+    this.adHocFilters = this.setAdHocFilters(this.selectedReportType);
     if (this.adHocFilters?.length) {
       this.adHocFilters.forEach(filter => {
         this.reportSelectionForm.addControl(filter, new FormControl(null, Validators.required));
       })
     }
-    this.reportTemplates = await this.reportsTemplateService.listReportTemplatesByReportType(event);
+    this.reportTemplates = await this.reportsTemplateService.listReportTemplatesByReportType(this.selectedReportType);
   }
 
   resetForm(): void {
@@ -65,7 +68,7 @@ export class ReportsComponent implements OnInit {
     this.selectedTemplateID = event;
     this.selectedTemplate = this.reportTemplates.find(template => template.TemplateID === event);
     const headers = this.selectedTemplate.Headers;
-    this.displayHeaders = headers.map(header => this.humanizeHeader(header));
+    this.displayHeaders = headers.map(header => this.fetchDisplayHeader(header));
     this.reportSelectionForm.controls['ReportTemplate'].setValue(event);
   }
 
@@ -85,9 +88,18 @@ export class ReportsComponent implements OnInit {
     this.reportDownloading = false;
   }
 
-  humanizeHeader(header: string): string {
-    let newHeader = header.includes('.') ? header.split('.')[1] : header;
-    newHeader = newHeader.replace(/([a-z](?=[0-9A-Z])|[A-Z](?=[A-Z][a-z]))/, '$1 ');
-    return newHeader;
+  fetchDisplayHeader(header: string): string {
+    let column;
+    switch(this.selectedReportType) {
+      case 'BuyerLocation':
+        column = buyerLocation.find(c => c.path === header);
+        return column.value;
+      case 'SalesOrderDetail':
+        column = salesOrderDetail.find(c => c.path === header);
+        return column.value;
+      case 'PurchaseOrderDetail':
+        column = purchaseOrderDetail.find(c => c.path === header);
+        return column.value;
+    }
   }
 }

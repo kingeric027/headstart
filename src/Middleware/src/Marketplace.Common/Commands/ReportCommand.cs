@@ -214,7 +214,7 @@ namespace Marketplace.Common.Commands
                 var dataPropertyStrings = dataProperties.Select(property => property.Name).ToArray();
                 if (!dataPropertyStrings.Contains(filterKey))
                 {
-                    filterKey = "xp." + filterKey;
+                    filterKey = ReportFilters.NestedLocations[filterKey];
                 }
                 var filterValues = filterProps.Value;
                 var dataValue = GetDataValue(filterKey, data);

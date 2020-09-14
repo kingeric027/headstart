@@ -28,13 +28,21 @@ export const salesOrderDetail = [
     { value: 'Billing City', path: 'BillingAddress.City' },
     { value: 'Billing State', path: 'BillingAddress.State' },
     { value: 'Billing Zip', path: 'BillingAddress.Zip' },
+    { value: 'Billing Country', path: 'BillingAddress.Country'},
     { value: 'User ID', path: 'FromUser.ID' },
     { value: 'Username', path: 'FromUser.Username' },
     { value: 'First Name', path: 'FromUser.FirstName' },
     { value: 'Last Name', path: 'FromUser.LastName' },
     { value: 'Email', path: 'FromUser.Email' },
     { value: 'Phone', path: 'FromUser.Phone' },
-    //  TO-DO - Shipping Address Details will be needed, 
+    { value: 'Shipping First Name', path: 'xp.ShippingAddress.FirstName'},
+    { value: 'Shipping Last Name', path: 'xp.ShippingAddress.LastName'},
+    { value: 'Shipping Street 1', path: 'xp.ShippingAddress.Street1'},
+    { value: 'Shipping Street 2', path: 'xp.ShippingAddress.Street2'},
+    { value: 'Shipping City', path: 'xp.ShippingAddress.City'},
+    { value: 'Shipping State', path: 'xp.ShippingAddress.State'},
+    { value: 'Shipping Zip', path: 'xp.ShippingAddress.Zip'},
+    { value: 'Shipping Country', path: 'xp.ShippingAddress.Country'}
     //  and getNestedValue() and middleware report download will need to be refactored
     //  to accommodate their depth.
 ]

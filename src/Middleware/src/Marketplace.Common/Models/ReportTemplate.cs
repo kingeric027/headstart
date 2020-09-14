@@ -40,5 +40,9 @@ namespace Marketplace.Common.Models
         public List<string> State { get; set; }
         public List<string> Status { get; set; }
         public List<string> OrderType { get; set; }
+        public static readonly Dictionary<string, string> NestedLocations = new Dictionary<string, string>
+        {
+            { "OrderType", "xp.OrderType" }
+        };
     }
 }

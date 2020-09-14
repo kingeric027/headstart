@@ -1,6 +1,7 @@
 export interface Filter {
   name: string;
   path: string;
+  nestedDataPath?: string;
   dataKey?: string;
   sourceType: string;
   source: string;
