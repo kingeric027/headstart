@@ -93,38 +93,6 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 
             }
             return updatedEstimates;
-
-
-
-
-            //foreach (var supplier in suppliers.Items)
-            //{
-            //    var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier.ID);
-            //    var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
-            //    if (supplier.xp.FreeShippingCutoff != null && supplier.xp.FreeShippingCuttoff < supplierSubTotal) // free shipping for this supplier
-            //    {
-
-            //        //  now loop through shipEstimates and set cost to 0 (for ground) if the estimate is for this supplier
-            //        foreach (var estimate in shipEstimates)
-            //        {
-            //            if (supplierLineItems.Select(li => li.ID).Contains(estimate.ShipEstimateItems.FirstOrDefault().LineItemID))
-            //            {
-            //                //  var groundEstimate = estimate.ShipMethods.FindIndex(estimate => estimate.Name == "ground"); //    what is real name for ground?
-            //                foreach (var method in estimate.ShipMethods)
-            //                {
-            //                    if (method.Name == "ground")
-            //                    {
-            //                        method.xp.FreeShippingApplied = true;
-            //                        method.xp.FreeShippingCutoff = supplier.xp.FreeShippingCutoff;
-            //                        method.xp.CostBeforeDiscount = method.Cost;
-            //                        method.Cost = 0;
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-            //return shipEstimates;
         }
 
 
