@@ -4,7 +4,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ReportsTemplateService } from '@app-seller/shared/services/middleware-api/reports-template.service';
 import { ReportTemplate } from '@ordercloud/headstart-sdk';
 import { ReportsTypeService } from '@app-seller/shared/services/middleware-api/reports-type.service';
-import { buyerLocation, salesOrderDetail, purchaseOrderDetail } from '../../reports-template/models/headers';
+import { buyerLocation, salesOrderDetail, purchaseOrderDetail, lineItemDetail } from '../../reports-template/models/headers';
 
 @Component({
   selector: 'app-reports',
@@ -99,6 +99,9 @@ export class ReportsComponent implements OnInit {
         return column.value;
       case 'PurchaseOrderDetail':
         column = purchaseOrderDetail.find(c => c.path === header);
+        return column.value;
+      case 'LineItemDetail':
+        column = lineItemDetail.find(c => c.path === header);
         return column.value;
     }
   }

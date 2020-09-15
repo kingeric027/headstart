@@ -66,3 +66,20 @@ export let purchaseOrderDetail: Filter[] = [
     filterValues: [],
   }
 ];
+
+export let lineItemDetail: Filter[] = [
+  {
+    name: 'Order Status',
+    path: 'Status',
+    sourceType: 'model',
+    source: 'OrderStatus',
+    filterValues: [],
+  },
+  {
+    name: 'Order Type',
+    path: 'OrderType',
+    sourceType: 'model',
+    source: 'OrderType',
+    filterValues: [],
+  }
+];

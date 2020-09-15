@@ -26,11 +26,11 @@ export class ReportsPreviewComponent implements OnChanges {
   }
 
   formatData(item: any, header: string): string {
-    if (header.toLowerCase().includes('date')) {;
-      return moment(item[header]).format('MM/DD/YYYY');
-    } else if (header.includes('.')) {
+    if (header.includes('.')) {
       return (this.getNestedValue(item, header));
-    } else return item[header];
+    } else if (header.toLowerCase().includes('date')) {
+        return moment(item[header]).format('MM/DD/YYYY');
+      } else return item[header];
   }
 
   requiresPipe(header: string): boolean {
@@ -49,10 +49,19 @@ export class ReportsPreviewComponent implements OnChanges {
 
   getNestedValue(item: any, header: string): string {
     const props = header.split('.');
-    let nestedValue = item;
+    let nestedValue = {...item};
     for (let i = 0; i < props.length; i++) {
-      nestedValue = nestedValue[props[i]];
+      if (Object.keys(nestedValue).includes(props[i])) {
+        nestedValue = nestedValue[props[i]];
+        if (nestedValue === (undefined || null)) return null;
+      } else {
+        return null;
+      }
     }
+    if (header.toLowerCase().includes('date')) {;
+      return moment(nestedValue).format('MM/DD/YYYY');
+    }
+    if (typeof nestedValue === 'boolean') return nestedValue.toString();
     return nestedValue;
   }
 }
