@@ -4,7 +4,7 @@
       <select class="form-control input-sm"
               type="select"
               required
-              disabled="_categoriesDisabled"
+              [disabled]="_categoriesDisabled"
               (change)="makeSelection($event, 'ServiceCategory', i)"
               [value]="categorySelection.ServiceCategory">
         <option *ngFor="let option of _serviceCatagoryConfig?.Items"
@@ -16,7 +16,7 @@
       <select class="form-control input-sm"
               type="select"
               (change)="makeSelection($event, 'VendorLevel', i)"
-              disabled="_categoriesDisabled"
+              [disabled]="_categoriesDisabled"
               required
               [value]="categorySelection.VendorLevel">
         <option *ngFor="let option of _vendorLevelConfig?.Items"
@@ -25,7 +25,7 @@
       </select>
     </span>
     <button class="btn brand-button--danger"
-            disabled="_categoriesDisabled"
+            [disabled]="_categoriesDisabled"
             (click)="removeCategory(i)">remove</button>
   </div>
   <span class="error-message"
