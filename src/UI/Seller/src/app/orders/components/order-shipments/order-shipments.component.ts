@@ -254,7 +254,7 @@ export class OrderShipmentsComponent implements OnChanges {
     const superShipment = {
       Shipment: {
         TrackingNumber: shipment.TrackingNumber,
-        ShipDate: shipment.ShipDate,
+        DateShipped: shipment.ShipDate,
         Cost: shipment.Cost,
         Shipper: shipment.Shipper,
         xp: { Service: this.shipmentForm.value.Service },
@@ -269,7 +269,6 @@ export class OrderShipmentsComponent implements OnChanges {
     const postedShipment: any = await this.httpClient
       .post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions)
       .toPromise();
-    await this.ocShipmentService.Patch(postedShipment.Shipment.ID, { DateShipped: shipDate }).toPromise();
     this.getShipments();
     this.getLineItems();
     this.createShipment = false;
