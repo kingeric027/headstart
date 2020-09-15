@@ -10,6 +10,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
+import {Suppliers} from 'ordercloud-javascript-sdk';
 
 export const SUPPLIER_SUB_RESOURCE_LIST = [{route: 'users', display: 'ADMIN.NAV.USERS'},
                                            {route: 'locations', display: 'ALIAS.SUPPLIER_LOCATIONS'}];
@@ -36,14 +37,12 @@ export class SupplierService extends ResourceCrudService<Supplier> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocSupplierService: OcSupplierService,
     private ocSupplierUserGroupService: OcSupplierUserGroupService,
     private ocMeService: OcMeService,
     public currentUserService: CurrentUserService,
     private middleware: MiddlewareAPIService,
   ) {
-    super(router, activatedRoute, ocSupplierService, currentUserService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
-    this.ocSupplierService = ocSupplierService;
+    super(router, activatedRoute, Suppliers, currentUserService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);
   }
 
   async createNewResource(resource: any): Promise<any> {

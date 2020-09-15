@@ -15,6 +15,7 @@ import { AppStateService } from '@app-seller/shared';
 import { getHeaderConfig, MPRoute } from './header.config';
 import { AppAuthService } from '@app-seller/auth';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'layout-header',
@@ -35,6 +36,9 @@ export class HeaderComponent implements OnInit {
   faUserCircle = faUserCircle;
   activeTitle = '';
   headerConfig: MPRoute[];
+  hasProfileImg: boolean = false;
+  myProfileImg: string;
+  dataLtrs: string;
 
   constructor(
     private ocTokenService: OcTokenService,
@@ -43,22 +47,33 @@ export class HeaderComponent implements OnInit {
     private appAuthService: AppAuthService,
     private currentUserService: CurrentUserService,
     @Inject(applicationConfiguration) protected appConfig: AppConfig
-  ) {}
+  ) {
+    this.setUpSubs();
+  }
 
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.headerConfig = getHeaderConfig(
       this.appAuthService.getUserRoles(),
       this.appAuthService.getOrdercloudUserType()
     );
-    this.getCurrentUser();
-    this.subscribeToRouteEvents();
+    await this.getCurrentUser();
+    this.setDataLtrs(this.user);
     this.urlChange(this.router.url);
   }
 
   async getCurrentUser() {
-    this.user = await this.currentUserService.getUser();
     this.isSupplierUser = await this.currentUserService.isSupplierUser();
-    this.isSupplierUser ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
+    if (this.isSupplierUser) {
+      this.myProfileImg = `${environment.middlewareUrl}/assets/${environment.sellerID}/Suppliers/${
+        this.user.Supplier.ID
+      }/SupplierUsers/${this.user.ID}/thumbnail?size=s`;
+      this.getSupplierOrg();
+    } else {
+      this.myProfileImg = `${environment.middlewareUrl}/assets/${environment.sellerID}/AdminUsers/${
+        this.user.ID
+      }/thumbnail?size=s`;
+      this.organizationName = this.appConfig.sellerName;
+    }
   }
 
   async getSupplierOrg() {
@@ -66,7 +81,14 @@ export class HeaderComponent implements OnInit {
     this.organizationName = mySupplier.Name;
   }
 
-  subscribeToRouteEvents() {
+  setUpSubs(): void {
+    this.currentUserService.userSubject.subscribe(user => {
+      this.user = user;
+      this.setDataLtrs(this.user);
+    });
+    this.currentUserService.profileImgSubject.subscribe(img => {
+      this.hasProfileImg = Object.keys(img).length > 0;
+    });
     this.router.events.subscribe(ev => {
       if (ev instanceof NavigationEnd) {
         this.urlChange(ev.url);
@@ -85,6 +107,16 @@ export class HeaderComponent implements OnInit {
     this.ocTokenService.RemoveAccess();
     this.appStateService.isLoggedIn.next(false);
     this.router.navigate(['/login']);
+  }
+
+  toAccount(): void {
+    this.router.navigate(['account']);
+  }
+
+  setDataLtrs(user: MeUser): void {
+    const firstFirst = user?.FirstName?.substr(0,1);
+    const firstLast = user?.LastName?.substr(0,1);
+    this.dataLtrs = `${firstFirst}${firstLast}`;
   }
 }
 

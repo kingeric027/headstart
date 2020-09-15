@@ -79,6 +79,7 @@ namespace Marketplace.Models
         public List<ProductAccessorial> Accessorials { get; set; }
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
+        public bool? ArtworkRequired { get; set; } = false;
     }
 
 	[JsonConverter(typeof(StringEnumConverter))]

@@ -11,7 +11,16 @@ namespace ordercloud.integrations.avalara
 	{
 		public static CreateTransactionModel ToAvalaraTransationModel(this OrderWorksheet order, string companyCode, DocumentType docType)
 		{
-			var shipingLines = order.ShipEstimateResponse.ShipEstimates.Select(shipment =>
+			var buyerLocationID = order.Order.BillingAddress.ID;
+
+			var standardLineItems = order.LineItems.Where(li => li.Product.xp.ProductType == "Standard").ToList();
+			var poLineItemIDs = order.LineItems.Where(li => li.Product.xp.ProductType == "PurchaseOrder").Select(li => li.ID).ToList();
+			var standardShipEstimates = order.ShipEstimateResponse.ShipEstimates.Where(estimate =>
+			{
+				return !estimate.ShipEstimateItems.Any(item => poLineItemIDs.Contains(item.LineItemID));
+			});
+
+			var shipingLines = standardShipEstimates.Select(shipment =>
 			{
 				var (shipFrom, shipTo) = shipment.GetAddresses(order.LineItems);
 				var method = shipment.GetSelectedShippingMethod();
@@ -19,16 +28,16 @@ namespace ordercloud.integrations.avalara
 			});
 
 			var hasResaleCert = ((int?) order.Order.BillingAddress.xp.AvalaraCertificateID != null);
-			var exemptionNo = hasResaleCert ? order.Order.BillingAddress.ID : null;
+			var exemptionNo = hasResaleCert ? buyerLocationID : null;
 
-			var productLines = order.LineItems.Select(lineItem =>
+			var productLines = standardLineItems.Select(lineItem =>
 				 lineItem.ToLineItemModel(lineItem.ShipFromAddress, lineItem.ShippingAddress, exemptionNo));
 
 			return new CreateTransactionModel()
 			{
 				companyCode = companyCode,
 				type = docType,
-				customerCode = order.Order.FromCompanyID,
+				customerCode = buyerLocationID,
 				date = DateTime.Now,
 				lines = productLines.Concat(shipingLines).ToList()
 			};

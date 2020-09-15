@@ -57,7 +57,7 @@ export class OCMLocationManagement {
     const state = GeographyConfig.getStates('US').find(s => this.address.State === s.abbreviation); 
     const certificate: TaxCertificate = {
       ExpirationDate: formOutput.ExpirationDate,
-      SignedDate: formOutput.ExpirationDate,
+      SignedDate: formOutput.SignedDate,
       Base64UrlEncodedPDF: formOutput.Base64UrlEncodedPDF,
       ExposureZoneName: state.label,
       ExemptionNumber: this.address.ID

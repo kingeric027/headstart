@@ -25,6 +25,7 @@ namespace Marketplace.Models.Models.Marketplace
         public List<ProductType> ProductTypes { get; set; }
         public List<string> CountriesServicing { get; set; }
         public List<SupplierCategory> Categories { get; set; }
+        public List<string> NotificationRcpts { get; set; }
     }
 
     [SwaggerModel]

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, OnInit, Inject, SimpleChanges } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup, FormControl } from '@angular/forms';
 import { SupportedRates, SupportedCurrencies } from '@app-seller/shared/models/supported-rates.interface';
@@ -13,15 +13,17 @@ import { HeaderComponent } from '@app-seller/layout/header/header.component';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppAuthService } from '@app-seller/auth';
-import { faTimes, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faSpinner, faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { environment } from 'src/environments/environment';
+import { ToastrService } from 'ngx-toastr';
+import { User, OcSupplierUserService } from '@ordercloud/angular-sdk';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
   styleUrls: ['./supplier-edit.component.scss'],
 })
-export class SupplierEditComponent implements OnInit {
+export class SupplierEditComponent implements OnInit, OnChanges {
   @Input()
   resourceForm: FormGroup;
   @Input()
@@ -32,16 +34,11 @@ export class SupplierEditComponent implements OnInit {
   logoStaged = new EventEmitter<File>();
   @Input() set supplierEditable(value: MarketplaceSupplier) {
     this._supplierEditable = value;
-
-    // called here so that the form updates on supplier change, 
-    // otherwise stale values remain
-    this.setUpSupplierCountrySelectIfNeeded();
   }
-
+  supplierUsers: ListPage<User>;
   _supplierEditable: MarketplaceSupplier;
   availableCurrencies: SupportedRates[] = [];
   isCreatingNew: boolean;
-  isSupplierUser: boolean;
   countriesServicingOptions = [];
   countriesServicingForm:  FormGroup;
   hasLogo = false;
@@ -50,13 +47,17 @@ export class SupplierEditComponent implements OnInit {
   logoLoading = false;
   faTimes = faTimes;
   faSpinner = faSpinner;
+  faExclamationCircle = faExclamationCircle;
+  faTimesCircle = faTimesCircle;
 
   constructor(
     public supplierService: SupplierService,
     private currentUserService: CurrentUserService,
     private sanitizer: DomSanitizer,
     private appAuthService: AppAuthService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private toastrService: ToastrService,
+    private ocSupplierUserService: OcSupplierUserService
   ) {
     this.isCreatingNew = this.supplierService.checkIfCreatingNew();
   }
@@ -66,12 +67,20 @@ export class SupplierEditComponent implements OnInit {
     this.availableCurrencies = this.availableCurrencies.filter(c =>
       Object.values(SupportedCurrencies).includes(SupportedCurrencies[c.Currency])
     );
-    this.isSupplierUser = await this.currentUserService.isSupplierUser();
-    this.setUpSupplierCountrySelectIfNeeded();
-    this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0;
-    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`;
   }
 
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes?.supplierEditable?.currentValue?.ID !== changes?.supplierEditable?.previousValue?.ID) {
+      await this.handleSelectedSupplierChange(changes.supplierEditable.currentValue);
+    }
+  }
+
+  async handleSelectedSupplierChange(supplier: MarketplaceSupplier): Promise<void> {
+    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`;
+    !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0);
+    !this.isCreatingNew && (this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise());
+    this.setUpSupplierCountrySelectIfNeeded();
+  }
 
   setUpSupplierCountrySelectIfNeeded(): void {
     const indexOfCountriesServicingConfig = this.filterConfig.Filters?.findIndex(
@@ -201,5 +210,26 @@ export class SupplierEditComponent implements OnInit {
 
   setLogoSrc(): void {
     document.getElementById('supplier-logo')?.setAttribute('src', `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`);
+  }
+
+  assignSupplierUser(email: string): void {
+    const index = this._supplierEditable?.xp?.NotificationRcpts.indexOf(email);
+    if (index !== -1) {
+      this.removeAddtlRcpt(index);
+      return;
+    }
+    const existingRcpts = this._supplierEditable?.xp?.NotificationRcpts || [];
+    const constructedEvent = {target: {value: [...existingRcpts, email]}};
+    this.updateResourceFromEvent(constructedEvent, 'xp.NotificationRcpts');
+  }
+
+  removeAddtlRcpt(index: number): void {
+    const copiedResource = JSON.parse(JSON.stringify(this._supplierEditable));
+    const editedArr = copiedResource.xp?.NotificationRcpts.filter(e => e !== copiedResource.xp?.NotificationRcpts[index]);
+    this.updateResourceFromEvent({target: {value: editedArr}}, 'xp.NotificationRcpts');
+  }
+
+  isAssigned(email: string): boolean {
+    return this._supplierEditable?.xp?.NotificationRcpts?.includes(email);
   }
 }

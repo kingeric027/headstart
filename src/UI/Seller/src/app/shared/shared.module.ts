@@ -43,11 +43,13 @@ import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { SafeHTMLPipe } from './pipes/safe-html.pipe';
+import { CmsAdminModule } from '@ordercloud/angular-cms-components';
+import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
 
 @NgModule({
   imports: [
@@ -71,6 +73,9 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 
     // Quill
     QuillModule.forRoot(),
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
   ],
   exports: [
     // angular
@@ -83,6 +88,9 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
 
     // app components
     SearchComponent,
@@ -114,6 +122,7 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     ConfirmModal,
     UserGroupAssignments,
     TranslateModule,
+    ResourceBreadcrumbsComponent,
   ],
   declarations: [
     SearchComponent,
@@ -144,6 +153,7 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
+    ResourceBreadcrumbsComponent,
     SafeHTMLPipe,
   ],
 })

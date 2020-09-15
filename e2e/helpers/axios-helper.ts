@@ -49,3 +49,12 @@ export async function logApiErrorInfo(error: any) {
 	}
 	console.log('\n')
 }
+
+export function getAxiosHeaders(clientAuth: string) {
+	return {
+		headers: {
+			Authorization: `Bearer ${clientAuth}`,
+			'Content-Type': 'application/json',
+		},
+	}
+}
