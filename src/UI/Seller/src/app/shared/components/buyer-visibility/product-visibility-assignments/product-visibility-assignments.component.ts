@@ -8,7 +8,8 @@ import {
 } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
+import { MarketplaceProduct, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
+import { MiddlewareKitService } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
 
 @Component({
   selector: 'product-visibility-assignments-component',
@@ -23,6 +24,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
   del: ProductAssignment[];
   _productCatalogAssignmentsStatic: ProductCatalogAssignment[];
   _productCatalogAssignmentsEditable: ProductCatalogAssignment[];
+  kitProductCatalogAssignments: ProductCatalogAssignment[];
   areChanges = false;
   requestedUserConfirmation = false;
   faExclamationCircle = faExclamationCircle;
@@ -31,7 +33,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     private ocBuyerService: OcBuyerService,
     private ocCatalogService: OcCatalogService,
     private productService: ProductService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getBuyers();
@@ -51,30 +53,14 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
     this.buyers = buyers.Items;
   }
 
+
+
   async getProductCatalogAssignments(product: MarketplaceProduct): Promise<void> {
     const productCatalogAssignments = await this.ocCatalogService
       .ListProductAssignments({ productID: product && product.ID })
       .toPromise();
     this._productCatalogAssignmentsStatic = productCatalogAssignments.Items;
     this._productCatalogAssignmentsEditable = productCatalogAssignments.Items;
-  }
-
-  toggleProductCatalogAssignment(buyer: Buyer): void {
-    if (this.isAssigned(buyer)) {
-      this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsEditable.filter(
-        productAssignment => productAssignment.CatalogID !== buyer.DefaultCatalogID
-      );
-    } else {
-      const newProductCatalogAssignment = {
-        CatalogID: buyer.DefaultCatalogID,
-        ProductID: this.product.ID,
-      };
-      this._productCatalogAssignmentsEditable = [
-        ...this._productCatalogAssignmentsEditable,
-        newProductCatalogAssignment,
-      ];
-    }
-    this.checkForProductCatalogAssignmentChanges();
   }
 
   isAssigned(buyer: Buyer): boolean {
@@ -88,8 +74,10 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
 
   checkForProductCatalogAssignmentChanges(): void {
     this.add = this._productCatalogAssignmentsEditable.filter(
-      assignment => !JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID)
+      assignment => !JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID) ||
+        !JSON.stringify(this.kitProductCatalogAssignments).includes(assignment.CatalogID)
     );
+    debugger;
     this.del = this._productCatalogAssignmentsStatic.filter(
       assignment => !JSON.stringify(this._productCatalogAssignmentsEditable).includes(assignment.CatalogID)
     );

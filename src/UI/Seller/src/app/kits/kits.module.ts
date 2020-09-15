@@ -6,10 +6,9 @@ import { KitsRoutingModule } from './kits-routing.module';
 import { KitsTableComponent } from './components/kits-table/kits-table.component';
 import { KitsEditComponent } from './components/kits-edit/kits-edit.component';
 import { NgbDatepickerModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { ProductVisibilityAssignments } from '../products/components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
-import { BuyerVisibilityConfiguration } from '../products/components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
-    imports: [SharedModule, KitsRoutingModule, PerfectScrollbarModule, NgbDatepickerModule, NgbPopoverModule, ProductVisibilityAssignments, BuyerVisibilityConfiguration],
+    imports: [SharedModule, KitsRoutingModule, PerfectScrollbarModule, NgbDatepickerModule, NgbPopoverModule, NgbModule],
     declarations: [KitsTableComponent, KitsEditComponent],
 })
 export class KitsModule { }
