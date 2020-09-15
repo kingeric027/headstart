@@ -23,7 +23,11 @@ namespace Marketplace.Models
         public Coordinates Coordinates;
 		public int? AvalaraCertificateID { get; set; } // default value is null if no certificate
 		public DateTimeOffset? AvalaraCertificateExpiration { get; set; } // default value is null if no certificate 
-	}
+        public DateTimeOffset? OpeningDate { get; set; }
+        public string BillingNumber { get; set; }
+        public string Status { get; set; }
+        public string LegalEntity { get; set; }
+    }
 
     public enum DestinationAddressAccessorial
     {
