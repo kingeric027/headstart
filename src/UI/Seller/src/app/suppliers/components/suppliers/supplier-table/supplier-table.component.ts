@@ -53,7 +53,7 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
       Quote: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser}),
       PurchaseOrder: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser})
     }, RequireCheckboxesToBeChecked()),
-    Categories: new FormControl(_get(supplier, 'xp.Categories', []), ValidateSupplierCategorySelection),
+    Categories: new FormControl({value: _get(supplier, 'xp.Categories', []), disabled: this.isSupplierUser}, ValidateSupplierCategorySelection),
   });
 }
 
