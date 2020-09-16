@@ -89,6 +89,7 @@ export class OrderShipmentsComponent implements OnChanges {
       // FromAddressID: new FormControl(''),
       Shipper: new FormControl(''),
       Service: new FormControl(''),
+      Comment: new FormControl(''),
       Quantities: new FormGroup({}),
     });
     const group = this.shipmentForm.get('Quantities') as FormGroup;
@@ -257,7 +258,8 @@ export class OrderShipmentsComponent implements OnChanges {
         ShipDate: shipment.ShipDate,
         Cost: shipment.Cost,
         Shipper: shipment.Shipper,
-        xp: { Service: this.shipmentForm.value.Service },
+        xp: { Service: this.shipmentForm.value.Service,
+              Comment: this.shipmentForm.value.Comment },
       },
       ShipmentItems: this.lineItems
         .map(li => {
