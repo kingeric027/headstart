@@ -8,7 +8,7 @@ import bcfTheme from '../styles/themes/basecamp/theme-config';
 export const environment: Environment = {
   hostedApp: true,
   appname: 'Basecamp Fitness',
-  clientID: '997F5753-4C11-4F5F-9B40-6AC843638BA2',
+  clientID: 'A2E62264-B6FB-4C25-8507-79A58A35BE85',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
