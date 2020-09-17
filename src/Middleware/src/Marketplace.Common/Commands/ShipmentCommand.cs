@@ -31,19 +31,26 @@ namespace Marketplace.Common.Commands
             var supplierOrderID = firstShipmentItem.OrderID;
             var buyerOrderID = supplierOrderID.Split("-").First();
             
+            // in the platform, in order to make sure the order has the proper Order.Status, you must 
+            // create a shipment without a DateShipped and then patch the DateShipped after
+            var dateShipped = superShipment.Shipment.DateShipped;
+            superShipment.Shipment.DateShipped = null;
+
+
             await PatchLineItemStatuses(supplierOrderID, superShipment);
             var buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
-            
+
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
             var shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems, 
                 100, 
                 5, 
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
+            var ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
             return new ShipmentCreateResponse()
             {
-                Shipment = ocShipment,
+                Shipment = ocShipmentWithDateShipped,
                 ShipmentItems = shipmentItemResponses.ToList()
             };
         }
