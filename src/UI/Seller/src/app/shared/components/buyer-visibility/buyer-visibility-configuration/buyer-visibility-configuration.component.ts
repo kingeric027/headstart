@@ -79,7 +79,8 @@ export class BuyerVisibilityConfiguration {
       await this.getCatalogs();
       await this.getCatalogAssignments();
       await this.getCategoryAssignments();
-      if (!this._product.DefaultPriceScheduleID) await this.getKitProductCatalogAssignments(this._product);
+      if (!this._product.DefaultPriceScheduleID &&
+        this._product?.xp?.ProductType !== 'Quote') await this.getKitProductCatalogAssignments(this._product);
       this.isFetching = false;
     }
   }
