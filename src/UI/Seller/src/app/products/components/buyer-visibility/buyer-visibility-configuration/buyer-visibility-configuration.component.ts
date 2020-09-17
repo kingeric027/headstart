@@ -30,7 +30,7 @@ export class BuyerVisibilityConfiguration {
 
   @Input()
   set product(value: MarketplaceProduct) {
-    this._product = value;
+      this._product = value;
     this.fetchData();
   }
 
@@ -82,7 +82,7 @@ export class BuyerVisibilityConfiguration {
 
   resetCatalogAssignments(catalogAssignments: ProductAssignment[]): void {
     this.catalogAssignmentsEditable = catalogAssignments;
-    this.catalogAssignmentsStatic = catalogAssignments;
+      this.catalogAssignmentsStatic = catalogAssignments;
   }
 
   resetCategoryAssignments(categoryAssignments: Category[][]): void {

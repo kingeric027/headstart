@@ -14,8 +14,9 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
-import { Products } from 'ordercloud-javascript-sdk';
-import { ChiliService, ChiliDocuments, ChiliSpecs } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
+import { Products, ListPage } from 'ordercloud-javascript-sdk';
+import { ChiliService, TecraDocument, TecraSpec } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
+import { ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -127,15 +128,35 @@ export class ProductService extends ResourceCrudService<Product> {
     await Promise.all([...addRequests, ...deleteRequests]);
     }
 
-    async getChiliDocuments(
+    async getTecraDocuments(
         folder: string
-    ): Promise<ChiliDocuments> {
+    ): Promise<TecraDocument[]> {
         return this.chiliService.getDocuments(folder);
     }
 
-    async getChiliSpecs(
+    async getTecraSpecs(
         docID: string
-    ): Promise<ChiliSpecs> {
+    ): Promise<TecraSpec[]> {
         return this.chiliService.getSpecs(docID);
+    }
+
+    async listChiliConfigs(): Promise<ListPage<ChiliConfig>>
+    {
+        return this.chiliService.listChiliConfigs();
+    }
+
+    async saveChiliConfig(config: ChiliConfig): Promise<ChiliConfig>
+    {
+        return this.chiliService.saveChiliConfig(config);
+    }
+    async deleteChiliConfig(id: string)
+    {
+        this.chiliService.deleteChiliConfig(id);
+    }
+    async saveChiliSpec(spec: ChiliSpec): Promise<ChiliSpec> {
+        return this.chiliService.saveChiliSpec(spec);
+    }
+    async deleteChiliSpec(id: string) {
+        this.chiliService.deleteChiliSpec(id);
     }
 }

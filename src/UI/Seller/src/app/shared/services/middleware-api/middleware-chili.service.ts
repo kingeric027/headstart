@@ -2,30 +2,28 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
+import { ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';
+import { ListPage } from 'marketplace-javascript-sdk/dist/models/ListPage';
 
 // WHOLE FILE TO BE REPLACED BY SDK
 
-export interface ChiliDocuments {
-    Documents: TDocument[];
-}
 
-export interface ChiliSpecs {
-    Specs: TSpec[];
-}
-
-interface TDocument {
+export interface TecraDocument {
     id: string;
     name: string;
     pages: number;
 }
-
-interface TSpec {
+export interface TecraSpec {
     name: string;
+    dataType: string;
     displayName: string;
-    type: string;
-    value: string;
     displayValue: string;
+    required: string;
+    value: string;
+    visible: string;
 }
+
+
 
 @Injectable({
     providedIn: 'root',
@@ -43,13 +41,41 @@ export class ChiliService {
         });
     }
 
-    async getDocuments(folderName: string): Promise<ChiliDocuments> {
+    //Tecra
+    async getDocuments(folderName: string): Promise<TecraDocument[]> {
         const url = `${this.appConfig.middlewareUrl}/tecra/documents`;
-        return await this.http.get<ChiliDocuments>(url, { headers: this.buildHeaders(), params: {folder: folderName}}).toPromise();
+        return await this.http.get<TecraDocument[]>(url, { headers: this.buildHeaders(), params: {folder: folderName}}).toPromise();
+    }
+    async getSpecs(docID: string): Promise<TecraSpec[]> {
+        const url = `${this.appConfig.middlewareUrl}/tecra/specs`;
+        return await this.http.get<TecraSpec[]>(url, { headers: this.buildHeaders(), params: {id: docID}}).toPromise();
     }
 
-    async getSpecs(docID: string): Promise<ChiliSpecs> {
-        const url = `${this.appConfig.middlewareUrl}/tecra/specs`;
-        return await this.http.get<ChiliSpecs>(url, { headers: this.buildHeaders(), params: {id: docID}}).toPromise();
+    //Chili Config
+    async listChiliConfigs(): Promise<ListPage<ChiliConfig>> {
+        const url = `${this.appConfig.middlewareUrl}/chili/config`;
+        return await this.http.get<ListPage<ChiliConfig>>(url, { headers: this.buildHeaders() }).toPromise();
+    }
+    async getChiliConfig(id: string): Promise<ChiliConfig> {
+        const url = `${this.appConfig.middlewareUrl}/chili/config`;
+        return await this.http.get<ChiliConfig>(url, { headers: this.buildHeaders(), params: { id: id } }).toPromise();
+    }
+    async saveChiliConfig(config: ChiliConfig): Promise<ChiliConfig> {
+        const url = `${this.appConfig.middlewareUrl}/chili/config`;
+        return await this.http.post<ChiliConfig>(url, config, { headers: this.buildHeaders() }).toPromise();
+    }
+    async deleteChiliConfig(id: string) {
+        const url = `${this.appConfig.middlewareUrl}/chili/config/${id}`;
+        return await this.http.delete<ChiliConfig>(url, { headers: this.buildHeaders() }).toPromise();
+    }
+
+    //Chili Specs
+    async saveChiliSpec(spec: ChiliSpec): Promise<ChiliSpec> {
+        const url = `${this.appConfig.middlewareUrl}/chili/specs`;
+        return await this.http.post<ChiliSpec>(url, spec, { headers: this.buildHeaders() }).toPromise();
+    }
+    async deleteChiliSpec(id: string) {
+        const url = `${this.appConfig.middlewareUrl}/chili/specs/${id}`;
+        return await this.http.delete<ChiliSpec>(url, { headers: this.buildHeaders() }).toPromise();
     }
 }
