@@ -22,6 +22,7 @@ import { AppConfig } from '../../shopper-context';
 import { CurrentOrderService } from '../order/order.service';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
+import { TokenHelperService } from '../token-helper/token-helper.service';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +40,8 @@ export class AuthService {
     private currentOrder: CurrentOrderService,
     private currentUser: CurrentUserService,
     private ordersToApproveStateService: OrdersToApproveStateService,
-    private appConfig: AppConfig
+    private appConfig: AppConfig,
+    private tokenHelper: TokenHelperService
   ) {}
 
   // All this isLoggedIn stuff is only used in the header wrapper component
@@ -102,11 +104,12 @@ export class AuthService {
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
-    this.loginWithTokens(creds.access_token, creds.refresh_token, rememberMe);
+    this.loginWithTokens(creds.access_token, creds.refresh_token, false, rememberMe);
     return creds;
   }
 
-  loginWithTokens(token: string, refreshToken?: string, rememberMe: boolean = false): void {
+  loginWithTokens(token: string, refreshToken?: string, isSSO: boolean = false, rememberMe: boolean = false): void {
+    this.tokenHelper.setIsSSO(isSSO);
     HeadStartSDK.Tokens.SetAccessToken(token);
     this.setToken(token);
     if (rememberMe && refreshToken) {
