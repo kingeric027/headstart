@@ -26,11 +26,11 @@ export class ReportsPreviewComponent implements OnChanges {
   }
 
   formatData(item: any, header: string): string {
-    if (header.toLowerCase().includes('date')) {;
-      return moment(item[header]).format('MM/DD/YYYY');
-    } else if (header.includes('.')) {
+    if (header.includes('.')) {
       return (this.getNestedValue(item, header));
-    } else return item[header];
+    } else if (header.toLowerCase().includes('date')) {
+        return moment(item[header]).format('MM/DD/YYYY');
+      } else return item[header];
   }
 
   requiresPipe(header: string): boolean {
@@ -47,12 +47,21 @@ export class ReportsPreviewComponent implements OnChanges {
     }
   }
 
-  //TO-DO - Will need refactoring for future data values that are more deeply nested.
-  getNestedValue(item: {}, header: string): string {
+  getNestedValue(item: any, header: string): string {
     const props = header.split('.');
-    const first = item[props[0]];
-    if (first) {
-      return first[props[1]];
+    let nestedValue = {...item};
+    for (let i = 0; i < props.length; i++) {
+      if (Object.keys(nestedValue).includes(props[i])) {
+        nestedValue = nestedValue[props[i]];
+        if (nestedValue === (undefined || null)) return null;
+      } else {
+        return null;
+      }
     }
+    if (header.toLowerCase().includes('date')) {;
+      return moment(nestedValue).format('MM/DD/YYYY');
+    }
+    if (typeof nestedValue === 'boolean') return nestedValue.toString();
+    return nestedValue;
   }
 }
