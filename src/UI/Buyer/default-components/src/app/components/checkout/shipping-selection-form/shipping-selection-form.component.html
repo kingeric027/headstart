@@ -13,7 +13,7 @@
             translate>CHECKOUT.SHIPPING_SELECTION_FORM.HOW_FAST</option>
     <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods"
             [ngValue]="shipMethod.ID">
-      {{ shipMethod.EstimatedTransitDays }} <span translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{ detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.Cost | currency: _orderCurrency }}
+      {{ shipMethod.EstimatedTransitDays }} <span translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.xp.FreeShippingApplied ? 'FREE' : (shipMethod.Cost | currency: _orderCurrency) }}
     </option>
   </select>
 </form>

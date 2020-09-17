@@ -53,6 +53,8 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
       Quote: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser}),
       PurchaseOrder: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser})
     }, RequireCheckboxesToBeChecked()),
+    FreeShippingEnabled: new FormControl((supplier as any).xp?.FreeShippingThreshold != null),
+    FreeShippingThreshold: new FormControl((supplier as any).xp?.FreeShippingThreshold)
     Categories: new FormControl({value: _get(supplier, 'xp.Categories', []), disabled: this.isSupplierUser}, ValidateSupplierCategorySelection),
   });
 }

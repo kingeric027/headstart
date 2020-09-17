@@ -48,8 +48,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-    ssoLink:
-      'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+    ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: afTheme,
   },
@@ -61,8 +60,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-    ssoLink:
-      'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+    ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: wtcTheme,
   },
@@ -74,8 +72,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-    ssoLink:
-      'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+    ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bcfTheme,
   },
@@ -87,8 +84,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-    ssoLink:
-      'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+    ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bmTheme,
   },

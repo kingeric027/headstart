@@ -2,8 +2,8 @@ import { Component, ChangeDetectorRef, NgZone, Input, Output, EventEmitter, OnCh
 import { ReportsTemplateService, ReportTemplate, ReportType } from '@app-seller/shared/services/middleware-api/reports-template.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup } from '@angular/forms';
-import { buyerLocation as buyerLocationHeaders, salesOrderDetail as salesOrderDetailHeaders, purchaseOrderDetail as purchaseOrderDetailHeaders } from '../models/headers';
-import { buyerLocation as buyerLocationFilters, salesOrderDetail as salesOrderDetailFilters, purchaseOrderDetail as purchaseOrderDetailFilters, Filter } from '../models/filters';
+import { buyerLocation as buyerLocationHeaders, salesOrderDetail as salesOrderDetailHeaders, purchaseOrderDetail as purchaseOrderDetailHeaders, lineItemDetail as lineItemDetailHeaders } from '../models/headers';
+import { buyerLocation as buyerLocationFilters, salesOrderDetail as salesOrderDetailFilters, purchaseOrderDetail as purchaseOrderDetailFilters, lineItemDetail as lineItemDetailFilters, Filter } from '../models/filters';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { OcBuyerService, OrderStatus } from '@ordercloud/angular-sdk';
 import { cloneDeep } from 'lodash';
@@ -83,6 +83,10 @@ export class TemplateEditComponent implements OnChanges {
       case 'PurchaseOrderDetail':
         this.headers = purchaseOrderDetailHeaders;
         this.filters = purchaseOrderDetailFilters;
+        break;
+      case 'LineItemDetail':
+        this.headers = lineItemDetailHeaders;
+        this.filters = lineItemDetailFilters;
     }
     if (this.filters?.length) {
       this.populateFilters();
