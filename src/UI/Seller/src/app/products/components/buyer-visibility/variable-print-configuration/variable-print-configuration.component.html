@@ -4,105 +4,11 @@
 </h5>
 <ng-container>
     <div class="card shadow-sm p-4 my-3">
-        <div class="row">
-            <div class="col-md-5">
-                <div *ngIf="showChiliDocuments">
-                    <label>Select Chili Template</label>
-                    <select class="form-control"
-                            (change)="selectChiliTemplate($event)">
-                        <option selected
-                                disabled
-                                [ngValue]="null">
-                            Select
-                        </option>
-                        <option *ngFor="let document of tecraDocuments"
-                                [value]="document.id">
-                            {{document.name}}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div *ngIf="showAvailableCategories">
-                    <label>Catalog Assignment</label>
-                    <select class="form-control"
-                            (change)="setCatalogSelection($event)">
-                        <option selected
-                                disabled
-                                [ngValue]="null">
-                            Select
-                        </option>
-                        <option *ngFor="let cat of catalogAssignments"
-                                [value]="cat.ID">
-                            {{cat.Name}}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div *ngIf="showAssignmentButton">
-                    <button class="btn btn-primary btn-chili"
-                            type="submit"
-                            (click)="executeChiliConfigAssignmentRequest()">
-                        Save Chili Config
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div *ngIf="showChiliConfigs" class="selected-configs">
-            <label>Selected Chili Configurations</label>
-            <div class="row" *ngFor="let config of chiliConfigs">
-                <div class="col-md-5">
-                    <div>
-                        <label>Select Chili Template</label>
-                        <select class="form-control"
-                                disabled>
-                            <option *ngFor="let document of tecraDocuments"
-                                    [selected]="config.ChiliTemplateID"
-                                    [value]="document.id">
-                                {{document.name}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div>
-                        <label>Catalog Assignment</label>
-                        <select class="form-control"
-                                [disabled]="config.ReadOnly">
-                            <option *ngFor="let cat of catalogAssignments"
-                                    [selected]="config.CatalogID"
-                                    [value]="cat.ID">
-                                {{cat.Name}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-warning btn-chili"
-                                type="submit"
-                                (click)="editChiliConfig(config)">
-                            Edit
-                        </button>
-                        <button class="btn btn-danger btn-chili"
-                                type="submit"
-                                (click)="deleteChiliConfig(config)">
-                            Delete
-                        </button>
-                        <button class="btn btn-primary btn-chili" *ngIf="!config.ReadOnly"
-                                type="submit"
-                                (click)="updateChiliConfig(config)">
-                            Save Changes
-                        </button>
-                        <button class="btn btn-info btn-chili" *ngIf="!config.ReadOnly"
-                                type="submit"
-                                (click)="cancelChiliConfigEdit(config)">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <chili-publish-configuration-component 
+            [productID]="_productID"
+            [catalogID]="_buyerID"
+            [availableCatelogs]="catalogs"
+            [productAssignments]="catalogAssignments">
+        </chili-publish-configuration-component>
     </div>
 </ng-container>
