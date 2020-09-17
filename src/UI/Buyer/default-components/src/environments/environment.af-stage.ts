@@ -11,7 +11,7 @@ export const environment: Environment = {
   clientID: 'ACE199F7-CC6D-403A-B833-9B0C8D84E7C8',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=7f9257b2-8a27-4527-9efa-225f4cb172da&redirect_uri=https://seb-four51-integration-stage.azurewebsites.net/api/anytime/authorize',

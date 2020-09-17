@@ -11,7 +11,7 @@ export const environment: Environment = {
   clientID: 'A2E62264-B6FB-4C25-8507-79A58A35BE85',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
