@@ -50,6 +50,9 @@ import { ActionMenuComponent } from './components/action-menu/action-menu.compon
 import { TranslateModule } from '@ngx-translate/core';
 import { CmsAdminModule } from '@ordercloud/angular-cms-components';
 import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
+import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
+import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
+import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 
 @NgModule({
   imports: [
@@ -123,6 +126,9 @@ import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/
     UserGroupAssignments,
     TranslateModule,
     ResourceBreadcrumbsComponent,
+    ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
+    ProductCategoryAssignment,
   ],
   declarations: [
     SearchComponent,
@@ -150,6 +156,9 @@ import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/
     ConfirmModal,
     ActionMenuComponent,
     UserGroupAssignments,
+    ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
+    ProductCategoryAssignment,
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
