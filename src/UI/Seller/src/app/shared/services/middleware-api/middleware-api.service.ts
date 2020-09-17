@@ -50,7 +50,7 @@ export class MiddlewareAPIService {
 
   async updateSupplier(supplierID: string, supplier: any): Promise<any> {
     const url = `${this.appConfig.middlewareUrl}/supplier/${supplierID}`;
-    return await this.http.patch<MarketplaceSupplier>(url, supplier, this.headers).toPromise();
+    return await this.http.patch(url, supplier, this.headers).toPromise(); 
   }
 
   async getSupplierFilterConfig(): Promise<ListPage<SupplierFilterConfigDocument>> {
