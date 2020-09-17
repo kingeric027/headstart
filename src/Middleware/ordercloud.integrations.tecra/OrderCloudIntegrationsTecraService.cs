@@ -75,7 +75,7 @@ namespace ordercloud.integrations.tecra
             request.username = Config.Username;
             request.password = Config.Password;
             request.folder = "";
-            return await this.Request($"api/chili/{id}/variables", token).PostJsonAsync(request).ReceiveJson<TecraSpec[]>();
+            return await this.Request($"api/chili/{id}/variabledefinitions", token).PostJsonAsync(request).ReceiveJson<TecraSpec[]>();
         }
     }
 }

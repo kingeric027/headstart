@@ -27,12 +27,15 @@ namespace Marketplace.Common.Commands
     {
         public string SupplierProductID { get; set; }
         public string ChiliTemplateID { get; set; }
+        public string ChiliTemplateName { get; set; }
         public List<string> Specs { get; set; }
         [JsonProperty(PropertyName = "ID")]
         public string id { get; set; }
         public DateTimeOffset timeStamp { get; set; }
         [CosmosPartitionKey, ApiIgnore]
         public string OwnerClientID { get; set; }
+        public string BuyerID { get; set; }
+        public string CatalogID { get; set; }
     }
 
     [SwaggerModel]
@@ -96,6 +99,8 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _config = new OrderCloudClientConfig
             {
+                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
+                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                 ClientId = _settings.ChiliPublishSettings.ClientId,
                 ClientSecret = _settings.ChiliPublishSettings.ClientSecret,
                 GrantType = GrantType.ClientCredentials,
@@ -169,6 +174,8 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _config = new OrderCloudClientConfig
             {
+                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
+                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                 ClientId = _settings.ChiliPublishSettings.ClientId,
                 ClientSecret = _settings.ChiliPublishSettings.ClientSecret,
                 GrantType = GrantType.ClientCredentials,
@@ -241,6 +248,8 @@ namespace Marketplace.Common.Commands
             _query = query;
             _config = new OrderCloudClientConfig
             {
+                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
+                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                 ClientId = _settings.ChiliPublishSettings.ClientId,
                 ClientSecret = _settings.ChiliPublishSettings.ClientSecret,
                 GrantType = GrantType.ClientCredentials,
@@ -298,6 +307,8 @@ namespace Marketplace.Common.Commands
             _query = query;
             _config = new OrderCloudClientConfig
             {
+                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
+                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                 ClientId = _settings.ChiliPublishSettings.ClientId,
                 ClientSecret = _settings.ChiliPublishSettings.ClientSecret,
                 GrantType = GrantType.ClientCredentials,
