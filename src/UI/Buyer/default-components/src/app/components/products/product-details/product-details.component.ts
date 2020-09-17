@@ -210,7 +210,7 @@ export class OCMProductDetails implements OnInit {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
-    if (!this._priceBreaks.length) return;
+    if (!this._priceBreaks?.length) return;
 
     const priceBreaks = this._priceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
