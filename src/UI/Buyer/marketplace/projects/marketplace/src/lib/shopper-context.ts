@@ -188,9 +188,9 @@ export interface LineItemWithProduct extends LineItem {
 }
 
 export enum OrdercloudEnv {
-  Production = 'Production',
-  Staging = 'Staging',
-  Sandbox = 'Sandbox',
+  Production = 'Production', // production and staging sites
+  Staging = 'Staging', // test site && local dev
+  Sandbox = 'Sandbox', // not using currently
 }
 
 export interface Theme {
