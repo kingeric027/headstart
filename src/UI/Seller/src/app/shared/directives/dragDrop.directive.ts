@@ -41,7 +41,9 @@ export class DragDirective {
 
   // Drop listener
   @HostListener('drop', ['$event'])
-  public onDrop(evt: DragEvent) {
+
+  // onDrop argument typed as any because DragEvent was breaking Safarai
+  public onDrop(evt: any) {
     evt.preventDefault();
     evt.stopPropagation();
     this.background = '#eee';
@@ -50,7 +52,7 @@ export class DragDirective {
     Array.from(evt.dataTransfer.files).map(file => {
       const File = file;
       const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(File));
-      files.push({ File, URL });
+      files.push({ File, URL } as any);
     });
     if (files.length > 0) {
       this.files.emit(files);

@@ -14,6 +14,7 @@ import { IUserPermissionsService } from '@app-seller/shared/models/user-permissi
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { Users } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the buyer details page. How can we enforce/inidcate that?
 @Injectable({
@@ -31,21 +32,11 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    private ocUserService: OcUserService,
     private ocBuyerUserGroupService: OcUserGroupService,
     public currentUserService: CurrentUserService,
     private catalogsTempService: CatalogsTempService
   ) {
-    super(
-      router,
-      activatedRoute,
-      ocUserService,
-      currentUserService,
-      '/buyers',
-      'buyers',
-      BUYER_SUB_RESOURCE_LIST,
-      'users'
-    );
+    super(router, activatedRoute, Users, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'users');
   }
 
   async updateUserUserGroupAssignments(

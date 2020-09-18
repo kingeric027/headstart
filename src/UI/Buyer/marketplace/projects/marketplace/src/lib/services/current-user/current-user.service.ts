@@ -44,6 +44,10 @@ export class CurrentUserService {
     return this.isAnon !== null ? this.isAnon : this.tokenHelper.isTokenAnonymous();
   }
 
+  isSSO(): boolean {
+    return this.tokenHelper.getIsSSO();
+  }
+
   onChange(callback: (user: CurrentUser) => void): void {
     this.userSubject.subscribe(callback);
   }

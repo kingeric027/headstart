@@ -69,21 +69,37 @@
 
   </div>
 
-  <div class="nav-item dropdown cursor-pointer"
+  <div class="nav-item dropdown cursor-pointer current-user"
        ngbDropdown>
-
-    <a class="current-user nav-link navbarDropdown"
-       data-toggle="dropdown"
-       ngbDropdownToggle
-       aria-haspopup="true"
-       aria-expanded="false">
-      <fa-icon [icon]="faUserCircle"></fa-icon>
-      {{ user?.FirstName }} {{ user?.LastName }}
-    </a>
+    <div>
+      <a class="nav-link navbarDropdown nav-link__user"
+         data-toggle="dropdown"
+         ngbDropdownToggle
+         aria-haspopup="true"
+         aria-expanded="false">
+        <span>
+          {{ user?.FirstName }} {{ user?.LastName }}
+          <small class="d-block">{{organizationName}}</small>
+        </span>
+        <img *ngIf="hasProfileImg"
+             class="avatar ml-2"
+             [src]="myProfileImg"
+             alt="ProfileImg"
+             id="ProfileImgThumb">
+        <div *ngIf="!hasProfileImg && (dataLtrs !== 'undefinedundefined')"
+             [attr.data-letters]="dataLtrs"
+             class="avatar avatar-sm ml-2"></div>
+      </a>
+    </div>
     <div class="dropdown-menu account-dropdown-alignment"
          aria-labelledby="user-dropdown"
          ngbDropdownMenu>
-      <h6 class="dropdown-header">{{ organizationName }}</h6>
+      <!-- <h6 class="dropdown-header">{{ organizationName }}</h6> -->
+      <a class="dropdown-item"
+         (click)="toAccount()"
+         translate>
+        <fa-icon [icon]="faUserCircle"></fa-icon> ADMIN.COMMON.MY_ACCOUNT
+      </a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item"
          (click)="logout()"
@@ -92,6 +108,5 @@
         <fa-icon [icon]="faSignOutAlt"></fa-icon> ADMIN.COMMON.LOGOUT
       </a>
     </div>
-
   </div>
 </nav>

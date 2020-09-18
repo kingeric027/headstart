@@ -13,11 +13,11 @@ import {
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { Address } from '@ordercloud/angular-sdk';
+import { BuyerAddress, ListPage, Address } from 'ordercloud-javascript-sdk';
+import { singular } from 'pluralize';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -38,7 +38,7 @@ export abstract class ResourceCrudService<ResourceType> {
   private itemsPerPage = 100;
 
   constructor(
-    private router: Router,
+    protected router: Router,
     private activatedRoute: ActivatedRoute,
     public ocService: any,
     public currentUserService: CurrentUserService,
@@ -72,7 +72,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Can Override
   async list(args: any[]): Promise<ListPage<ResourceType>> {
-    return await this.ocService.List(...args).toPromise();
+    return await this.ocService.List(...args);
   }
 
   public async getMyResource(): Promise<any> {
@@ -85,7 +85,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const shouldList = await this.shouldListResources();
     if (shouldList) {
       const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
-      const options = {
+      let options: ListArgs = {
         page: pageNumber,
         // allows a list call to pass in a search term that will not appear in the query params
         search: searchText || search,
@@ -93,13 +93,7 @@ export abstract class ResourceCrudService<ResourceType> {
         pageSize: this.itemsPerPage,
         filters,
       };
-      if (this.secondaryResourceLevel === 'catalogs') {
-        // placeholder conditional for getting the supplier order list page running
-        // will need to integrate this with the filter on the order list page as a seller
-        // user and potentially refactor later
-
-        options.filters = { 'xp.Type': 'Catalog' }
-      }
+      options = this.addIntrinsicListArgs(options);
       const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);
@@ -107,6 +101,10 @@ export abstract class ResourceCrudService<ResourceType> {
         this.addResources(resourceResponse);
       }
     }
+  }
+
+  addIntrinsicListArgs(options: ListArgs): ListArgs {
+    return options;
   }
 
   getFetchStatus(options: Options): RequestStatus {
@@ -219,7 +217,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const orderDirection = this.optionsSubject.value.OrderDirection;
     const args = await this.createListArgs([resourceID], orderDirection);
     if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
-    else return this.ocService.Get(...args).toPromise();
+    else return this.ocService.Get(...args);
   }
 
   async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
@@ -242,7 +240,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find((i: any) => i.ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) => this.checkForResourceMatch(i, resourceID));
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -252,22 +250,30 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
+  checkForResourceMatch(i: any, resourceID: string): boolean {
+    return i.ID === resourceID;
+  }
+
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const newResource = await this.ocService.Save(...args).toPromise()
+    const newResource =  await this.ocService.Save(...args);
     this.updateResourceSubject(newResource);
     return newResource;
   }
 
   updateResourceSubject(newResource: any): void {
-    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
+    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => this.checkForNewResourceMatch(i, newResource));
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
   }
 
+  checkForNewResourceMatch(i: any, newResource: any): boolean {
+    return i.ID === newResource.ID;
+  }
+
   async deleteResource(resourceID: string): Promise<null> {
     const args = await this.createListArgs([resourceID]);
-    await this.ocService.Delete(...args).toPromise();
+    await this.ocService.Delete(...args);
     this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
     this.resourceSubject.next(this.resourceSubject.value);
     return;
@@ -275,7 +281,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async createNewResource(resource: any): Promise<any> {
     const args = await this.createListArgs([resource]);
-    const newResource = await this.ocService.Create(...args).toPromise();
+    const newResource = await this.ocService.Create(...args);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
@@ -376,7 +382,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   // TODO - move to some other file. Not related to resource crud
-  getSuggestedAddresses = (ex): ListPage<Address> => {
+  getSuggestedAddresses = (ex): ListPage<BuyerAddress<any>> => {
     if (ex?.Message === "Address not valid") {
       return ex?.Data?.SuggestedAddresses;
     }
@@ -460,5 +466,17 @@ export abstract class ResourceCrudService<ResourceType> {
     if (dataIsSaving) return 'Saving...';
     if (isCreatingNew) return 'Create';
     if (!isCreatingNew) return 'Save Changes';
+  }
+
+  getParentIDParamName(): string {
+    return `${singular(this.primaryResourceLevel)}ID`;
+  }
+
+  getParentOrSecondaryIDParamName(): string {
+    return `${singular(this.secondaryResourceLevel || this.primaryResourceLevel)}ID`;
+  }
+
+  getResourceID(resource: any): string {
+    return resource.ID;
   }
 }

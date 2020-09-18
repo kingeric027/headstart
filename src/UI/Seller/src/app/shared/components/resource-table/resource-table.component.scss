@@ -28,6 +28,14 @@
   }
 }
 
+.resource-name {
+  font-size: 22px;
+  @include media-breakpoint-up(sm) {
+    font-size: 28px;
+  }
+  // margin-top: -24px;
+}
+
 .breadcrumb {
   background: transparent;
   margin-bottom: 0;
@@ -58,14 +66,6 @@
       }
     }
   }
-}
-
-.resource-name {
-  font-size: 22px;
-  @include media-breakpoint-up(sm) {
-    font-size: 28px;
-  }
-  // margin-top: -24px;
 }
 
 .parent-resources {

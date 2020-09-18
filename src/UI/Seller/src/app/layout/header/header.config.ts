@@ -213,11 +213,23 @@ const OrchestrationLogs = {
   route: 'reports/logs',
 };
 
-const ReportsNavGrouping = {
+const ProcessReports = {
   rolesWithAccess: [MPRoles.MPReportReader],
+  title: 'ADMIN.NAV.PROCESS_REPORTS',
+  route: 'reports/reports',
+};
+
+const ReportTemplates = {
+  rolesWithAccess: [MPRoles.MPReportAdmin],
+  title: 'ADMIN.NAV.REPORT_TEMPLATES',
+  route: `reports/${REDIRECT_TO_FIRST_PARENT}/templates`,
+};
+
+const ReportsNavGrouping = {
+  rolesWithAccess: [MPRoles.MPReportAdmin, MPRoles.MPReportReader],
   title: 'ADMIN.NAV.REPORTS',
   route: '/reports',
-  subRoutes: [OrchestrationLogs],
+  subRoutes: [OrchestrationLogs, ProcessReports, ReportTemplates],
 };
 
 const SellerUsers = {
@@ -226,10 +238,23 @@ const SellerUsers = {
   route: '/seller-users',
 };
 
-const Storefronts = {
+const AllStorefronts = {
   rolesWithAccess: [MPRoles.MPStorefrontAdmin],
-  title: 'ADMIN.NAV.STOREFRONTS',
+  title: 'All Storefronts',
   route: '/storefronts',
+};
+
+const Pages = {
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
+  title: 'Pages',
+  route: `/storefronts/${REDIRECT_TO_FIRST_PARENT}/pages`,
+};
+
+const StorefrontNavGrouping = {
+  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
+  title: 'Storefronts',
+  route: '/storefronts',
+  subRoutes: [AllStorefronts, Pages],
 };
 
 const MySupplierProfile = {
@@ -258,7 +283,7 @@ const AllNavGroupings: MPRoute[] = [
   SupplierNavGrouping,
   ReportsNavGrouping,
   SellerUsers,
-  Storefronts,
+  StorefrontNavGrouping,
   MySupplierProfile,
   MySupplierLocations,
   MySupplerUsers,

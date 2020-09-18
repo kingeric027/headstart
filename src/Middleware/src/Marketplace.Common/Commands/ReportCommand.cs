@@ -8,17 +8,24 @@ using Marketplace.Common.Queries;
 using System;
 using System.Linq;
 using System.Reflection;
-using static Marketplace.Common.Models.ReportTemplate;
 using ordercloud.integrations.library.helpers;
+using Marketplace.Common.Models.Marketplace;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceReportCommand
     {
+        ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser);
         Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
         Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
-        Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser);
+        Task<ReportTemplate> GetReportTemplate(string id, VerifiedUserContext verifiedUser);
+        Task<ReportTemplate> UpdateReportTemplate(string id, ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
+        Task DeleteReportTemplate(string id);
     }
     
     public class MarketplaceReportCommand : IMarketplaceReportCommand
@@ -32,11 +39,47 @@ namespace Marketplace.Common.Commands
             _template = template;
         }
 
+        public ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser)
+        {
+            var types = ReportTypeResource.ReportTypes.ToList();
+            if (verifiedUser.UsrType == "supplier")
+            {
+                types = types.Where(type => type.AvailableToSuppliers).ToList();
+            }
+            var listPage = new ListPage<ReportTypeResource>
+            {
+                Items = types,
+                Meta = new ListPageMeta
+                {
+                    Page = 1,
+                    PageSize = 100,
+                    TotalCount = types.Count,
+                    TotalPages = 1
+                }
+            };
+            return listPage;
+        }
+
         public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser)
         {
             //Get stored template from Cosmos DB container
             var template = await _template.Get(templateID, verifiedUser);
             var allBuyerLocations = new List<MarketplaceAddressBuyer>();
+
+            //Logic if no Buyer ID is supplied
+            if (template.Filters.BuyerID.Count == 0)
+            {
+                var buyers = await ListAllAsync.List((page) => _oc.Buyers.ListAsync<MarketplaceBuyer>(
+                    filters: null,
+                    page: page,
+                    pageSize: 100
+                 ));
+                foreach (var buyer in buyers)
+                {
+                    template.Filters.BuyerID.Add(buyer.ID);
+                }
+            }
+
             foreach (var buyerID in template.Filters.BuyerID)
             {
                 //For every buyer included in the template filters, grab all buyer locations (exceeding 100 maximum)
@@ -54,7 +97,9 @@ namespace Marketplace.Common.Commands
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
             {
-                if (property.GetValue(template.Filters) != null && property.Name != "BuyerID")
+                //See if there are filters provided on the property.  If no values supplied, do not evaluate the filter.
+                List<string> propertyFilters = (List<string>)property.GetValue(template.Filters);
+                if (propertyFilters != null && propertyFilters.Count > 0 && property.Name != "BuyerID")
                 {
                     filtersToEvaluateMap.Add(property, (List<string>) property.GetValue(template.Filters));
                 }
@@ -72,6 +117,123 @@ namespace Marketplace.Common.Commands
             return filteredBuyerLocations;
         }
 
+        public async Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
+        {
+            var template = await _template.Get(templateID, verifiedUser);
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+                OrderDirection.Incoming,
+                filters: $"from={lowDateRange}&to={highDateRange}",
+                page: page,
+                pageSize: 100
+                 ));
+            var filterClassProperties = template.Filters.GetType().GetProperties();
+            var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
+            foreach (var property in filterClassProperties)
+            {
+                List<string> propertyFilters = (List<string>)property.GetValue(template.Filters);
+                if (propertyFilters != null && propertyFilters.Count > 0)
+                {
+                    filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
+                }
+            }
+            var filteredOrders = new List<MarketplaceOrder>();
+            foreach (var order in orders)
+            {
+
+                if (PassesFilters(order, filtersToEvaluateMap))
+                {
+                    filteredOrders.Add(order);
+                }
+            }
+            return filteredOrders;
+        }
+
+        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
+        {
+            var template = await _template.Get(templateID, verifiedUser);
+            var orderDirection = verifiedUser.UsrType == "admin" ? OrderDirection.Outgoing : OrderDirection.Incoming;
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+                orderDirection,
+                filters: $"from={lowDateRange}&to={highDateRange}",
+                page: page,
+                pageSize: 100,
+                accessToken: verifiedUser.AccessToken
+                 ));
+            var filterClassProperties = template.Filters.GetType().GetProperties();
+            var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
+            foreach (var property in filterClassProperties)
+            {
+                List<string> propertyFilters = (List<string>)property.GetValue(template.Filters);
+                if (propertyFilters != null && propertyFilters.Count > 0)
+                {
+                    filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
+                }
+            }
+            var filteredOrders = new List<MarketplaceOrder>();
+            foreach (var order in orders)
+            {
+
+                if (PassesFilters(order, filtersToEvaluateMap))
+                {
+                    filteredOrders.Add(order);
+                }
+            }
+            return filteredOrders;
+        }
+
+        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
+        {
+            var template = await _template.Get(templateID, verifiedUser);
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+                OrderDirection.Incoming,
+                filters: $"from={lowDateRange}&to={highDateRange}",
+                page: page,
+                pageSize: 100,
+                accessToken: verifiedUser.AccessToken
+                 ));
+            var filterClassProperties = template.Filters.GetType().GetProperties();
+            var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
+            foreach (var property in filterClassProperties)
+            {
+                List<string> propertyFilters = (List<string>)property.GetValue(template.Filters);
+                if (propertyFilters != null && propertyFilters.Count > 0)
+                {
+                    filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
+                }
+            }
+            var filteredOrders = new List<MarketplaceOrder>();
+            foreach (var order in orders)
+            {
+
+                if (PassesFilters(order, filtersToEvaluateMap))
+                {
+                    filteredOrders.Add(order);
+                }
+            }
+            var lineItemOrders = new List<MarketplaceLineItemOrder>();
+            foreach (var order in filteredOrders)
+            {
+                var lineItems = new List<MarketplaceLineItem>();
+                lineItems.AddRange(await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(
+                    OrderDirection.Incoming,
+                    order.ID,
+                    page: page,
+                    pageSize: 100,
+                    accessToken: verifiedUser.AccessToken
+                    )));
+                foreach (var lineItem in lineItems)
+                {
+                    lineItemOrders.Add(new MarketplaceLineItemOrder()
+                    {
+                        MarketplaceOrder = order,
+                        MarketplaceLineItem = lineItem
+                    });
+                }
+            }
+
+            return lineItemOrders;
+        }
+
         public async Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser)
         {
             var template = await _template.List(reportType, verifiedUser);
@@ -83,10 +245,20 @@ namespace Marketplace.Common.Commands
             var template = await _template.Post(reportTemplate, verifiedUser);
             return template;
         }
-
-        public async Task DeleteReportTemplate(string id, VerifiedUserContext verifiedUser)
+        public async Task<ReportTemplate> GetReportTemplate(string id, VerifiedUserContext verifiedUser)
         {
-            await _template.Delete(id, verifiedUser);
+            return await _template.Get(id, verifiedUser);
+        }
+
+        public async Task<ReportTemplate> UpdateReportTemplate(string id, ReportTemplate reportTemplate, VerifiedUserContext verifiedUser)
+        {
+            var template = await _template.Put(id, reportTemplate, verifiedUser);
+            return template;
+        }
+
+        public async Task DeleteReportTemplate(string id)
+        {
+            await _template.Delete(id);
         }
 
         private bool PassesFilters(object data, Dictionary<PropertyInfo, List<string>> filtersToEvaluate)
@@ -94,14 +266,47 @@ namespace Marketplace.Common.Commands
             foreach (var filterProps in filtersToEvaluate)
             {
                 var filterKey = filterProps.Key.Name;
+                var dataType = data.GetType();
+                var dataProperties = new List<PropertyInfo>(dataType.GetProperties());
+                var dataPropertyStrings = dataProperties.Select(property => property.Name).ToArray();
+                if (!dataPropertyStrings.Contains(filterKey))
+                {
+                    filterKey = ReportFilters.NestedLocations[filterKey];
+                }
                 var filterValues = filterProps.Value;
-                var dataValue = data.GetType().GetProperty(filterKey).GetValue(data);
-                if (!filterValues.Contains(dataValue))
+                var dataValue = GetDataValue(filterKey, data);
+                if (!filterValues.Contains(dataValue.ToString()))
                 {
                     return false;
                 }
             }
             return true;
+        }
+
+        private object GetDataValue(string filterKey, object data)
+        {
+            var filterKeys = filterKey.Split('.');
+            for (var i = 0; i < filterKeys.Length; i++)
+            {
+                var properties = data.GetType().GetProperties();
+                for (var j = 0; j < properties.Length; j++)
+                {
+                    var property = properties[j].Name;
+                    if (property == filterKeys[i])
+                    {
+                       data = properties[j].GetValue(data);
+                       if (i < filterKeys.Length - 1)
+                        {
+                            string[] remainingLevels = new string[filterKeys.Length - i - 1];
+                            Array.Copy(filterKeys, i + 1, remainingLevels, 0, filterKeys.Length - i - 1);
+                            string remainingKeys = string.Join("", remainingLevels);
+                            return GetDataValue(remainingKeys, data);
+                        }
+                       return data;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

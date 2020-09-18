@@ -20,6 +20,7 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceForm: FormGroup;
   isMyResource = false;
   isSupplierUser = false;
+  parentResourceID: string;
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -74,26 +75,25 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
-    this.isSupplierUser = await this.ocService.isSupplierUser(); 
+    this.isSupplierUser = await this.ocService.isSupplierUser();
     if (this.isMyResource) {
       const myResource = await this.ocService.getMyResource();
       const shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
-      if(!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
+      if (!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
     }
   }
 
-  async subscribeToResourceSelection(): Promise<void> {
-    const parentResourceID = await this.ocService.getParentResourceID();
-    this.activatedRoute.params.subscribe(params => {
-      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
+  subscribeToResourceSelection(): void {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.activatedRoute.params.subscribe(async params => {
+      this.parentResourceID = await this.ocService.getParentResourceID();
+      if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
-        const resourceIDSelected =
-          params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
-        if (resourceIDSelected) {
-          this.setResourceSelectionFromID(resourceIDSelected);
-        }
+        const resourceIDSelected = params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
+        } else if (resourceIDSelected) {
+          this.setResourceSelectionFromID(resourceIDSelected);
         }
       }
     });
@@ -143,7 +143,9 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   }
 
   async selectResource(resource: any): Promise<void> {
-    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(resource.ID || '');
+    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(
+      this.ocService.getResourceID(resource) || ''
+    );
     this.navigate(newURL, { queryParams });
   }
 

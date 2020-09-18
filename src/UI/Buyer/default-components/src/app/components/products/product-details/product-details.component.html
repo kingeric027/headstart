@@ -37,6 +37,44 @@
            class="alert alert-info my-3"><b>
         </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
       </div>
+      <!-- KIT PRODUCTS -->
+      <div *ngIf="isKitProduct && productsIncludedInKit">
+        <strong>
+          <span translate>Products Included</span>:
+        </strong>
+        <table class="table">
+          <thead>
+            <th>Quantity</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of ocProductsInKit; let i = index">
+              <td *ngIf="productsIncludedInKit[i].MinQty !== productsIncludedInKit[i].MaxQty">
+                <ocm-quantity-input [existingQty]="null"
+                                    [gridDisplay]="true"
+                                    [product]="product"
+                                    [priceSchedule]="priceSchedule"
+                                    (qtyChange)="changeQuantity(product.Product.ID, $event.detail)"></ocm-quantity-input>
+              </td>
+              <td *ngIf="productsIncludedInKit[i].MinQty === productsIncludedInKit[i].MaxQty">{{productsIncludedInKit[i].MinQty}}</td>
+              <td>{{product.ID}}</td>
+              <td>{{product.Name}}</td>
+              <td>{{product.PriceSchedule.PriceBreaks[0].Price}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn btn-block btn-primary mb-3"
+                type="submit"
+                [disabled]="this.isAddingToCart || !this.qtyValid || !isKitStatic"
+                (click)="addKitToCart()"
+                translate>
+          PRODUCTS.DETAILS.ADD_TO_CART
+          <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
+        </button>
+      </div>
+      <!-- KIT PRODUCTS -->
       <div>
         <div>
           <div class="d-flex justify-content-between align-items-center">

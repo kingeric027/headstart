@@ -1,3 +1,4 @@
+using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -7,6 +8,17 @@ namespace Marketplace.Common.Models.Marketplace
 {
     [SwaggerModel]
     public class KitProductDocument : Document<KitProduct> { }
+
+    [SwaggerModel]
+    public class MarketplaceMeKitProduct
+    {
+        public string ID { get; set; }
+        public string Name { get; set; }
+        public MarketplaceMeProduct Product { get; set; }
+        public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
+        public KitProduct ProductAssignments { get; set; }
+    }
 
     [SwaggerModel]
     public class MarketplaceKitProduct

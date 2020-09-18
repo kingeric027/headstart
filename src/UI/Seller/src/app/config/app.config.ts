@@ -10,6 +10,7 @@ export const ocAppConfig: AppConfig = {
   orderCloudApiUrl: environment.orderCloudApiUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
+  blobStorageUrl: environment.blobStorageUrl,
   buyerUrl: environment.buyerUrl,
   buyerClientID: environment.buyerClientID,
   // sellerName is being hard-coded until this is available to store in OrderCloud
@@ -17,6 +18,8 @@ export const ocAppConfig: AppConfig = {
   scope: [
     // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
     // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
+    'ApiClientAdmin',
+    'ApiClientReader',
     'AdminAddressReader',
     'MeAddressAdmin',
     'MeAdmin',
@@ -76,6 +79,7 @@ export const ocAppConfig: AppConfig = {
     'MPBuyerReader',
     'MPSellerAdmin',
     'MPReportReader',
+    'MPReportAdmin',
     'MPSupplierAdmin',
     'MPMeSupplierAdmin',
     'MPMeSupplierAddressAdmin',
@@ -91,8 +95,8 @@ export const ocAppConfig: AppConfig = {
     'MeXpAdmin',
     'UserGroupAdmin',
     'ApprovalRuleAdmin',
-    'Shopper',
     'BuyerUserAdmin',
+    'Shopper',
     'BuyerReader',
     'PasswordReset',
     'SupplierReader',
@@ -125,6 +129,7 @@ export interface AppConfig {
   middlewareUrl: string;
 
   translateBlobUrl: string;
+  blobStorageUrl: string;
 
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: string;

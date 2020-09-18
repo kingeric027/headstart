@@ -43,6 +43,7 @@ export const MarketplaceRoutes: Routes = [
       // { path: 'faq', component: FaqComponent },
       // { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
       { path: 'impersonation', redirectTo: '/home' },
+      { path: 'sso', redirectTo: '/home' },
 
       { path: 'checkout', component: CheckoutWrapperComponent },
       { path: 'cart', component: CartWrapperComponent },

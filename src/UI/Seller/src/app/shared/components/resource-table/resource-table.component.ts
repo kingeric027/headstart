@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
@@ -19,19 +19,13 @@ import { Options, RequestStatus } from '@app-seller/shared/services/resource-cru
 import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
-import { filter, takeWhile } from 'rxjs/operators';
+import { takeWhile } from 'rxjs/operators';
 import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
-import { pipe } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-
-interface BreadCrumb {
-  displayText: string;
-  route: string;
-}
 
 @Component({
   selector: 'resource-table-component',
@@ -63,7 +57,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   requestStatus: RequestStatus;
   selectedParentResourceName: string;
   selectedParentResourceID = '';
-  breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
   isCreatingSubResource = false;
   isMyResource = false;
@@ -79,7 +72,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   fromDate: string;
   toDate: string;
   resourceType: string | null = null;
-
+  
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -88,33 +81,33 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private impersonationService: ImpersonationService,
     private currentUserService: CurrentUserService,
     ngZone: NgZone
-  ) {}
-
-  @Input()
-  resourceList: ListPage<any> = { Meta: {}, Items: [] };
-  @Input()
-  set ocService(service: ResourceCrudService<any>) {
-    this._ocService = service;
-    this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
-    this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
-  }
-  @Input()
-  parentResourceService?: ResourceCrudService<any>;
-  @Output()
-  searched: EventEmitter<any> = new EventEmitter();
-  @Output()
-  hitScrollEnd: EventEmitter<any> = new EventEmitter();
-  @Output()
-  changesSaved: EventEmitter<any> = new EventEmitter();
-  @Output()
-  resourceDelete: EventEmitter<any> = new EventEmitter();
-  @Output()
-  changesDiscarded: EventEmitter<any> = new EventEmitter();
-  @Output()
-  resourceSelected: EventEmitter<any> = new EventEmitter();
-  @Input()
-  set updatedResource(value: any) {
-    this._updatedResource = value;
+    ) {}
+    
+    @Input()
+    resourceList: ListPage<any> = { Meta: {}, Items: [] };
+    @Input()
+    set ocService(service: ResourceCrudService<any>) {
+      this._ocService = service;
+      this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
+      this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
+    }
+    @Input()
+    parentResourceService?: ResourceCrudService<any>;
+    @Output()
+    searched: EventEmitter<any> = new EventEmitter();
+    @Output()
+    hitScrollEnd: EventEmitter<any> = new EventEmitter();
+    @Output()
+    changesSaved: EventEmitter<any> = new EventEmitter();
+    @Output()
+    resourceDelete: EventEmitter<any> = new EventEmitter();
+    @Output()
+    changesDiscarded: EventEmitter<any> = new EventEmitter();
+    @Output()
+    resourceSelected: EventEmitter<any> = new EventEmitter();
+    @Input()
+    set updatedResource(value: any) {
+      this._updatedResource = value;
     if (this._resourceInSelection && this._updatedResource && this._ocService)
       this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
@@ -122,7 +115,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   set resourceInSelection(value: any) {
     this._resourceInSelection = value;
     if (this._resourceInSelection && this._updatedResource && this._ocService)
-      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
+    this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   selectedResourceID: string;
@@ -135,6 +128,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   resourceForm: FormGroup;
   @Input()
   shouldShowCreateNew = true;
+  @Input() 
+  shouldShowTitleContainer = true;
   @Input()
   shouldShowResourceActions = true;
   @Input()
@@ -145,6 +140,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   labelSingular: string;
   @Input()
   labelPlural: string;
+  @Input()
+  excludeFromFilterBar = false;
+  @Input()
+  excludeFromFullTableView = false;
+  @Input()
+  excludeFromSubResourceView = false;
   availableProductTypes = [];
 
   async ngOnInit(): Promise<void> {
@@ -271,15 +272,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setUrlSubscription() {
-    this.router.events
-      .pipe(takeWhile(() => this.alive))
-      // only need to set the breadcrumbs on nav end events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.setBreadCrumbs();
-      });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
       this.checkIfCreatingNew();
     });
   }
@@ -289,7 +282,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
-        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentIDParamName = this.getParentIDParamName(params);
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
         if (this.isMyResource) {
@@ -301,6 +294,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
       });
+  }
+
+  getParentIDParamName(params: Params): string {
+    if (params?.ReportType) {
+      return 'ReportType';
+    }
+    return `${singular(this._ocService.primaryResourceLevel)}ID`;
   }
 
   private setListRequestStatusSubscription() {
@@ -321,29 +321,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.resourceType = splitUrl[splitUrl.length - 1].split('-').join(' ');
     }
     this.isCreatingSubResource = endUrl.includes('new?');
-  }
-
-  private setBreadCrumbs() {
-    // basically we are just taking off the portion of the url after the selected route piece
-    // in the future breadcrumb logic might need to be more complicated than this
-    const urlPieces = this.router.url
-      .split('/')
-      .filter(p => p)
-      .map(p => {
-        if (p.includes('?')) {
-          return p.slice(0, p.indexOf('?'));
-        } else {
-          return p;
-        }
-      });
-    this.breadCrumbs = urlPieces.map((piece, index) => {
-      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
-      return {
-        displayText: piece,
-        route,
-      };
-    });
-    this.changeDetectorRef.detectChanges();
   }
 
   setFilterForm() {

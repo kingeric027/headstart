@@ -43,11 +43,16 @@ import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
 import { ActionMenuComponent } from './components/action-menu/action-menu.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { SafeHTMLPipe } from './pipes/safe-html.pipe';
+import { CmsAdminModule } from '@ordercloud/angular-cms-components';
+import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
+import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
+import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
+import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 
 @NgModule({
   imports: [
@@ -71,6 +76,9 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 
     // Quill
     QuillModule.forRoot(),
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
   ],
   exports: [
     // angular
@@ -83,6 +91,9 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
 
     // app components
     SearchComponent,
@@ -114,6 +125,10 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     ConfirmModal,
     UserGroupAssignments,
     TranslateModule,
+    ResourceBreadcrumbsComponent,
+    ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
+    ProductCategoryAssignment,
   ],
   declarations: [
     SearchComponent,
@@ -141,9 +156,13 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
     ConfirmModal,
     ActionMenuComponent,
     UserGroupAssignments,
+    ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
+    ProductCategoryAssignment,
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
+    ResourceBreadcrumbsComponent,
     SafeHTMLPipe,
   ],
 })
