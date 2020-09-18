@@ -14,27 +14,27 @@ namespace Marketplace.Common.Queries
 {
     public interface IProductUpdateQuery
     {
-        Task<List<ProductUpdate>> List(string supplierID, DateTime reporttime);
-        Task<ProductUpdate> Post(ProductUpdate productUpdate);
+        Task<List<ProductHistory>> List(string supplierID, DateTime reporttime);
+        Task<ProductHistory> Post(ProductHistory productUpdate);
     }
 
     public class ProductUpdateQuery : IProductUpdateQuery
     {
-        private readonly ICosmosStore<ProductUpdate> _store;
-        public ProductUpdateQuery(ICosmosStore<ProductUpdate> store)
+        private readonly ICosmosStore<ProductHistory> _productStore;
+        public ProductUpdateQuery(ICosmosStore<ProductHistory> productStore)
         {
-            _store = store;
+            _productStore = productStore;
         }
 
-        public async Task<List<ProductUpdate>> List(string supplierID, DateTime reporttime)
+        public async Task<List<ProductHistory>> List(string productID, DateTime reporttime)
         {
-            var feedOptions = new FeedOptions() { PartitionKey = new PartitionKey(supplierID) };
-            return await _store.Query(feedOptions).Where(x => x.timeStamp <= reporttime.AddHours(-24)).ToListAsync();
+            // list product history given product ID. TODO: get the most RECENT record.
+            return await _productStore.Query().Where(x => x.Product.ID == productID).ToListAsync();
         }
 
-        public async Task<ProductUpdate> Post(ProductUpdate productUpdate)
+        public async Task<ProductHistory> Post(ProductHistory update)
         {
-            var newProductUpdate = await _store.AddAsync(productUpdate);
+            var newProductUpdate = await _productStore.AddAsync(update);
             return newProductUpdate;
         }
     }
