@@ -9,6 +9,7 @@ import {
 	loginTestCleanup,
 } from '../helpers/test-setup'
 import adminHeaderPage from '../pages/admin/admin-header-page'
+import { refreshPage } from '../helpers/page-helper'
 
 const getLocation = ClientFunction(() => document.location.href)
 
@@ -44,6 +45,9 @@ test('Admin Log In And Out | 19966', async t => {
 		testConfig.adminSellerUsername,
 		testConfig.adminSellerPassword
 	)
+	//need to refresh page because getting header too large error from logging in
+	//this is because of three large tokens being set in the cookies when logging in
+	await refreshPage()
 	await t.expect(getLocation()).contains('home')
 	await adminHeaderPage.logout()
 	await t.expect(getLocation()).contains('login')

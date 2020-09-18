@@ -11,7 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 export class OCMLogin implements OnInit {
   form: FormGroup;
   appName: string;
-  ssoLink: string; // TODO - remove from marketplace generic. Should be SEB specific.
+  ssoLink: string; // null indicates no sso
 
   constructor(
     private context: ShopperContextService,

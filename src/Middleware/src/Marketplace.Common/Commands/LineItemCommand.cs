@@ -9,6 +9,7 @@ using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Constants;
+using SendGrid.Helpers.Mail;
 
 namespace Marketplace.Common.Commands
 {
@@ -254,27 +255,43 @@ namespace Marketplace.Common.Commands
                     await _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                 }
                 else if (userType == VerifiedUserType.admin) {
-                    firstName = "PlaceHolderFirstName";
-                    lastName = "PlaceHolderLastName";
-                    email = "bhickey@four51.com";
+                    // Loop over seller users, pull out THEIR boolean, as well as the List<string> of AddtlRcpts
+                    var sellerUsers = await _oc.AdminUsers.ListAsync<MarketplaceSellerUser>();
+                    var tos = new List<EmailAddress>();
+                    foreach (var seller in sellerUsers.Items)
+                    {
+                        if (seller?.xp?.OrderEmails ?? false)
+                        {
+                            tos.Add(new EmailAddress(seller.Email));
+                        };
+                        if (seller?.xp?.AddtlRcpts?.Any() ?? false)
+                        {
+                            foreach (var rcpt in seller.xp.AddtlRcpts) {
+                                tos.Add(new EmailAddress(rcpt));
+                            };
+                        };
+                    };
                     var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.admin);
                     if (shouldNotify)
                     {
-                        await _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                        await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
                     }
                 } else
                 {
                     var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.supplier);
                     if (shouldNotify)
                     {
-                        await Throttler.RunAsync(suppliers, 100, 5, supplier =>
+                        await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
                         {
-                            firstName = supplier.xp.SupportContact.Name;
-                            lastName = "";
-                            email = supplier.xp.SupportContact.Email;
-
-                            // todo consider getting the supplierOrder or modifying orderID in here
-                            return _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
+                            if (supplier.xp.NotificationRcpts.Any())
+                            {
+                                var tos = new List<EmailAddress>();
+                                foreach (var rcpt in supplier.xp.NotificationRcpts)
+                                {
+                                    tos.Add(new EmailAddress(rcpt));
+                                };
+                                await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
+                            }
                         });
                     }
                 }

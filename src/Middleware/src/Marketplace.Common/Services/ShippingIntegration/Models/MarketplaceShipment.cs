@@ -17,5 +17,6 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
         // storing full freightPopShipmentRate for potential reference later
         public ShipmentRate FreightPopShipmentRate { get; set; }
         public string Service { get; set; }
+        public string Comment { get; set; }
     }
 }

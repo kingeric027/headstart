@@ -582,6 +582,7 @@ namespace Marketplace.Common.Commands
 			CustomRole.MPSupplierAdmin,
 			CustomRole.MPSupplierUserGroupAdmin,
 			CustomRole.MPReportReader,
+			CustomRole.MPReportAdmin,
 			CustomRole.MPContentAdmin
 		};
 	}

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
+import { StaticPageService } from 'marketplace';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,12 @@ export class AppComponent implements OnInit {
   // TODO: this shouln't have hard coded routes. its gross.
   hiddenRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
 
-  constructor(public context: ShopperContextService) {}
+  constructor(public context: ShopperContextService, private staticPages: StaticPageService) { }
 
   ngOnInit(): void {
     this.context.router.onUrlChange(url => {
       this.showHeader = !this.hiddenRoutes.some(el => url.includes(el));
     });
+    this.staticPages.initialize();
   }
 }

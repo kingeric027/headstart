@@ -21,6 +21,7 @@ class ProductDetailsPage {
 	shipAddressDropdown: Selector
 	shipAddressOptions: Selector
 	pricingTab: Selector
+	buyerVisibilityTab: Selector
 	priceField: Selector
 	createButton: Selector
 	sizeTierDropdown: Selector
@@ -42,6 +43,9 @@ class ProductDetailsPage {
 		this.shipAddressDropdown = Selector('#ShipFromAddressID')
 		this.shipAddressOptions = this.shipAddressDropdown.find('option')
 		this.pricingTab = Selector('a').withText(createRegExp('pricing'))
+		this.buyerVisibilityTab = Selector('a').withText(
+			createRegExp('buyer visibility')
+		)
 		this.priceField = Selector('#Price')
 		this.createButton = Selector('button')
 			.withText(createRegExp('create'))
@@ -76,12 +80,14 @@ class ProductDetailsPage {
 		await t.click(this.pricingTab)
 		await t.typeText(this.priceField, '5')
 		await clickLeftOfElement(this.priceField)
-		await t.debug()
 		await t.click(this.createButton)
-		await t.debug()
 		await loadingHelper.waitForLoadingBar()
 
 		return productName
+	}
+
+	async clickBuyerVisibilityTab() {
+		await t.click(this.buyerVisibilityTab)
 	}
 }
 

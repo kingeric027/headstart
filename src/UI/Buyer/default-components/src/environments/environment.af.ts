@@ -13,8 +13,7 @@ export const environment: Environment = {
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  ssoLink:
-    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+  ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
   theme: afTheme,
 };
