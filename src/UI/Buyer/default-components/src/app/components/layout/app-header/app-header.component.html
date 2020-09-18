@@ -39,6 +39,13 @@
             >ALIAS.SUPPLIERS</a
           >
         </li>
+        <li class="nav-item clickable cursor-pointer"
+            *ngFor="let page of staticPages">
+          <a class="nav-link"
+             [ngClass]="{ active: activePath === '/' + page.Doc.Url }"
+             (click)="isCollapsed = !isCollapsed"
+             routerLink="{{ '/' + page.Doc.Url}}">{{page.Doc.NavigationTitle}}</a>
+        </li>
         <!-- Mobile Profile Menu Items -->
         <div *ngIf="screenSize === 'xs' || screenSize === 'sm'">
           <div class="dropdown-divider"></div>

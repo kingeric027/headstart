@@ -44,6 +44,7 @@ import { ExchangeRatesService } from './services/exchange-rates/exchange-rates.s
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component';
 import { OrdercloudEnv } from './shopper-context';
 import { TempSdk } from './services/temp-sdk/temp-sdk.service';
+import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -78,6 +79,7 @@ import { TempSdk } from './services/temp-sdk/temp-sdk.service';
     LocationManagementWrapperComponent,
     ForgotPasswordWrapperComponent,
     HomeWrapperComponent,
+    StaticPageWrapperComponent,
     LoginWrapperComponent,
     MeChangePasswordWrapperComponent,
     PaymentListWrapperComponent,

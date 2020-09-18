@@ -6,4 +6,4 @@ import { MarketplaceRoutes } from 'marketplace';
   imports: [RouterModule.forRoot(MarketplaceRoutes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
