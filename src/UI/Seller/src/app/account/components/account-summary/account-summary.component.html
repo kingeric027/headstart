@@ -41,8 +41,9 @@
   <ng-container *ngIf="!user?.xp?.OrderEmails">
     <p>Notifications are turned off.</p>
   </ng-container>
-  <ng-container *ngIf="user?.xp?.OrderEmails">
-    <li>Order Updates</li>
+  <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails">
+    <li *ngIf="user?.xp?.OrderEmails">Order Updates</li>
+    <li *ngIf="user?.xp?.RequestInfoEmails">Product Information Requests</li>
     <h6 *ngIf="user?.xp?.AddtlRcpts?.length > 0"
         class="font-weight-medium mt-3">Additional Recipients</h6>
     <li *ngFor="let rcpt of user?.xp?.AddtlRcpts">{{rcpt}}</li>
