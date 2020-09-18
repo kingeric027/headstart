@@ -24,6 +24,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { OCMCategoryDropdown } from './components/layout/category-dropdown/category-dropdown.component';
+import { CmsBuyerModule } from '@ordercloud/angular-cms-components';
+
 import {
   NgbCarouselModule,
   NgbTooltipModule,
@@ -138,6 +140,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 import { SafeHTMLPipe } from './pipes/safe-html.pipe';
+import { OCMStaticPage } from './components/layout/static-page/static-page.component';
 
 export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
@@ -158,6 +161,7 @@ const components = [
   OCMLineitemTable,
   OCMCart,
   OCMHomePage,
+  OCMStaticPage,
   OCMProductSort,
   OCMSupplierSort,
   OCMSupplierCard,
@@ -247,6 +251,7 @@ const components = [
     ...components,
   ],
   imports: [
+    CmsBuyerModule,
     BrowserModule,
     MarketplaceModule,
     AppRoutingModule,
@@ -313,6 +318,7 @@ export class AppModule {
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
+    this.buildWebComponent(OCMStaticPage, 'ocm-static-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
     this.buildWebComponent(OCMSupplierSort, 'ocm-supplier-sort');
     this.buildWebComponent(OCMSupplierCard, 'ocm-supplier-card');

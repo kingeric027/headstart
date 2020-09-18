@@ -18,6 +18,7 @@ import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
 import { CurrentUser } from 'marketplace';
+import { StaticPageService } from 'marketplace';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -57,7 +58,7 @@ export class OCMAppHeader implements OnInit {
   faBoxOpen = faBoxOpen;
   flagIcon: string;
 
-  constructor(public context: ShopperContextService, public appConfig: AppConfig) {
+  constructor(public context: ShopperContextService, public appConfig: AppConfig, public staticPageService: StaticPageService) {
     this.profileRoutes = context.router.getProfileRoutes();
     this.orderRoutes = context.router.getOrderRoutes();
   }
@@ -77,6 +78,14 @@ export class OCMAppHeader implements OnInit {
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
     this.flagIcon = this.getCurrencyFlag();
+  }
+
+  // TODO: add PageDocument type to cms library so this is strongly typed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get staticPages(): any[] {
+    return this.staticPageService.pages.filter(page => {
+      return page.Doc.Active && page.Doc.NavigationTitle;
+    });
   }
 
   getCurrencyFlag(): string {
