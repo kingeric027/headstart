@@ -1,8 +1,7 @@
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
 import { Component, OnInit } from '@angular/core';
 import { ShopperContextService, MarketplaceMeProduct } from 'marketplace';
-import { BuyerProduct } from 'ordercloud-javascript-sdk';
-import { ProductXp } from '@ordercloud/headstart-sdk';
+import { StaticPageService } from 'marketplace';
 
 @Component({
   templateUrl: './home.component.html',
@@ -13,25 +12,17 @@ export class OCMHomePage implements OnInit {
   faBullhorn = faBullhorn;
   URL = '../../../assets/jumbotron.svg';
 
-  // TODO - this content may need to be managed externally somehow.
-  annoucement = 'This is an announcements areas whose content gets displayed on Homepage of Buyer Site.';
-  carouselSlides = [
-    {
-      URL: '../../../assets/carousel2.jpg',
-      headerText: 'Carousel Image Two',
-      bodyText: 'Welcome to the home page',
-    },
-    {
-      URL: '../../../assets/carousel3.jpg',
-      headerText: 'Carousel Image Three',
-      bodyText: 'This is the third image',
-    },
-  ];
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService, public staticPageService: StaticPageService) { }
 
   async ngOnInit(): Promise<void> {
     const products = await this.context.tempSdk.listMeProducts({ filters: { 'xp.Featured': true } });
     this.featuredProducts = products.Items;
+  }
+
+  // TODO: add PageDocument type to cms library so this is strongly typed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get homePageDoc(): any {
+    return this.staticPageService.pages.find(page => page.Doc.Url === 'home');
   }
 
   toSupplier(supplier: string): void {

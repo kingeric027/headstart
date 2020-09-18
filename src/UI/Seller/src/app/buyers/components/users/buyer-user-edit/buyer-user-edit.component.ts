@@ -57,10 +57,10 @@ export class BuyerUserEditComponent {
   userHasAssignments(event: boolean): void {
     this.isUserAssignedToGroups = event;
     if (event && !this.isCreatingNew) {
-      this.resourceForm.controls['Country'].disable();
+      this.resourceForm.controls.Country.disable();
     }
     if (!event && !this.isCreatingNew) {
-      this.resourceForm.controls['Country'].enable();
+      this.resourceForm.controls.Country.enable();
     }
   }
 }

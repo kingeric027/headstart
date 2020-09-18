@@ -71,7 +71,7 @@ class VendorDetailsPage {
 		await t.click(
 			this.subCategoryOptionsSelector.withText(createRegExp('mandated'))
 		)
-		await t.click(this.USCountryCheckbox)
+		// await t.click(this.USCountryCheckbox)
 		await t.click(this.createButton)
 
 		await loadingHelper.thisWait()

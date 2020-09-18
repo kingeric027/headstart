@@ -50,7 +50,7 @@ export async function createSupplier(clientAuth: string) {
 		ID: vendorName,
 		Active: true,
 		xp: {
-			CountriesServicing: ['US'],
+			// CountriesServicing: ['US'], this was removed from the UI
 			Currency: 'USD',
 			Description: '',
 			Images: [],

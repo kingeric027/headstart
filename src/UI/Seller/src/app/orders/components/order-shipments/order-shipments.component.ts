@@ -89,6 +89,7 @@ export class OrderShipmentsComponent implements OnChanges {
       // FromAddressID: new FormControl(''),
       Shipper: new FormControl(''),
       Service: new FormControl(''),
+      Comment: new FormControl(''),
       Quantities: new FormGroup({}),
     });
     const group = this.shipmentForm.get('Quantities') as FormGroup;
@@ -254,10 +255,11 @@ export class OrderShipmentsComponent implements OnChanges {
     const superShipment = {
       Shipment: {
         TrackingNumber: shipment.TrackingNumber,
-        ShipDate: shipment.ShipDate,
+        DateShipped: shipment.ShipDate,
         Cost: shipment.Cost,
         Shipper: shipment.Shipper,
-        xp: { Service: this.shipmentForm.value.Service },
+        xp: { Service: this.shipmentForm.value.Service,
+              Comment: this.shipmentForm.value.Comment },
       },
       ShipmentItems: this.lineItems
         .map(li => {
@@ -269,7 +271,6 @@ export class OrderShipmentsComponent implements OnChanges {
     const postedShipment: any = await this.httpClient
       .post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions)
       .toPromise();
-    await this.ocShipmentService.Patch(postedShipment.Shipment.ID, { DateShipped: shipDate }).toPromise();
     this.getShipments();
     this.getLineItems();
     this.createShipment = false;
