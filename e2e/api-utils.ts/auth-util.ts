@@ -46,6 +46,7 @@ export async function authAdminBrowser(user: Partial<OrderCloudSDK.User>) {
 	)
 
 	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.token')
+	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.access-token')
 	//Below cookie is set on the browser when logging in, but does not seem to be needed
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
@@ -61,6 +62,7 @@ export async function authVendorBrowser(user: Partial<OrderCloudSDK.User>) {
 	)
 
 	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.token')
+	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.access-token')
 	//Below cookie is set on the browser when logging in, but does not seem to be needed
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
@@ -76,48 +78,8 @@ export async function setBrowserAuthCookie(token: string, tokenName: string) {
 }
 
 export const adminUserRoles: ApiRole[] = [
-	'AdminAddressReader',
-	'BuyerUserAdmin',
-	'UserGroupAdmin',
-	'ProductAdmin',
-	'PriceScheduleAdmin',
-	'SupplierReader',
-	'BuyerAdmin',
-	'OrderAdmin',
-	'AddressAdmin',
-	'CategoryAdmin',
-	'CatalogAdmin',
-	'PromotionAdmin',
-	'ApprovalRuleAdmin',
-	'CreditCardAdmin',
-	'SupplierAdmin',
-	'SupplierUserAdmin',
-	'SupplierUserGroupAdmin',
-	'SupplierAddressAdmin',
-	'AdminUserAdmin',
-	'ProductFacetAdmin',
-	'ShipmentAdmin',
-	// @ts-ignore
-	'MPProductAdmin',
-	// @ts-ignore
-	'MPPromotionAdmin',
-	// @ts-ignore
-	'MPCategoryAdmin',
-	// @ts-ignore
-	'MPOrderAdmin',
-	// @ts-ignore
-	'MPShipmentAdmin',
-	// @ts-ignore
-	'MPBuyerAdmin',
-	// @ts-ignore
-	'MPSellerAdmin',
-	// @ts-ignore
-	'MPSupplierAdmin',
-	// @ts-ignore
-	'MPSupplierUserGroupAdmin',
-]
-
-export const vendorUserRoles: ApiRole[] = [
+	'ApiClientAdmin',
+	'ApiClientReader',
 	'AdminAddressReader',
 	'MeAddressAdmin',
 	'MeAdmin',
@@ -188,6 +150,8 @@ export const vendorUserRoles: ApiRole[] = [
 	// @ts-ignore
 	'MPReportReader',
 	// @ts-ignore
+	'MPReportAdmin',
+	// @ts-ignore
 	'MPSupplierAdmin',
 	// @ts-ignore
 	'MPMeSupplierAdmin',
@@ -198,5 +162,38 @@ export const vendorUserRoles: ApiRole[] = [
 	// @ts-ignore
 	'MPSupplierUserGroupAdmin',
 	// @ts-ignore
-	'MPStoreFrontAdmin',
+	'MPStorefrontAdmin',
+]
+
+export const vendorUserRoles: ApiRole[] = [
+	'MeAdmin',
+	'MeXpAdmin',
+	'ProductAdmin',
+	'PriceScheduleAdmin',
+	'SupplierReader',
+	'OrderAdmin',
+	'SupplierAdmin',
+	'SupplierUserAdmin',
+	'SupplierUserGroupAdmin',
+	'SupplierAddressAdmin',
+	'ProductFacetReader',
+	'ShipmentAdmin',
+	// @ts-ignore
+	'AssetAdmin',
+	// @ts-ignore
+	'MPMeProductAdmin',
+	// @ts-ignore
+	'MPOrderAdmin',
+	// @ts-ignore
+	'MPShipmentAdmin',
+	// @ts-ignore
+	'MPReportAdmin',
+	// @ts-ignore
+	'MPMeSupplierAdmin',
+	// @ts-ignore
+	'MPMeSupplierAddressAdmin',
+	// @ts-ignore
+	'MPMeSupplierUserAdmin',
+	// @ts-ignore
+	'MPSupplierUserGroupAdmin',
 ]

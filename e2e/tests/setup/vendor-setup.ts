@@ -3,6 +3,8 @@ import testConfig from '../../testConfig'
 import adminHeaderPage from '../../pages/admin/admin-header-page'
 import mainResourcePage from '../../pages/admin/main-resource-page'
 import vendorDetailsPage from '../../pages/admin/vendor-details-page'
+import minorResourcePage from '../../pages/admin/minor-resource-page'
+import userDetailsPage from '../../pages/admin/user-details-page'
 
 fixture`Vendor Setup`
 	.meta('TestRun', 'Setup')
