@@ -22,7 +22,7 @@ export class OCMHomePage implements OnInit {
   // TODO: add PageDocument type to cms library so this is strongly typed
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   get homePageDoc(): any {
-    return this.staticPageService.pages.find(page => page.Doc.Url === '');
+    return this.staticPageService.pages.find(page => page.Doc.Url === 'home');
   }
 
   toSupplier(supplier: string): void {
