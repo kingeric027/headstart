@@ -1,4 +1,5 @@
 import { Selector, t } from 'testcafe'
+import loadingHelper from '../helpers/loading-helper'
 
 class LoginPage {
 	usernameInput: Selector
@@ -15,6 +16,7 @@ class LoginPage {
 		await t.typeText(this.usernameInput, username)
 		await t.typeText(this.passwordInput, password)
 		await t.click(this.submitButton)
+		await loadingHelper.waitForLoadingBar()
 	}
 }
 
