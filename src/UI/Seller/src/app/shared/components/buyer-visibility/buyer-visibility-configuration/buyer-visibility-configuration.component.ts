@@ -118,7 +118,7 @@ export class BuyerVisibilityConfiguration {
   }
 
   async assignProductsInKitToCatalog() {
-    if (this.kitProductCatalogAssignments.length) {
+    if (this.kitProductCatalogAssignments?.length) {
       this.kitProductCatalogAssignments.forEach(async product => {
         await this.asyncForEach(product, async (cat) => {
           await this.ocCatalogService
