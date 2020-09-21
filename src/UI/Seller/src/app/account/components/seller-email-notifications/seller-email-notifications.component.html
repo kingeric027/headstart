@@ -6,6 +6,16 @@
     <div class="custom-control custom-checkbox">
       <input type="checkbox"
              class="custom-control-input"
+             formControlName="RequestInfoEmails"
+             (click)="toggleRequestInfoEmails($event)"
+             id="RequestInfoEmails">
+        <label class="custom-control-label"
+               for="RequestInfoEmails"
+               translate>Product Information Requests</label>
+        </div>
+    <div class="custom-control custom-checkbox">
+      <input type="checkbox"
+             class="custom-control-input"
              formControlName="OrderEmails"
              (click)="toggleOrderEmails($event)"
              id="OrderEmails">
@@ -14,7 +24,7 @@
              translate>Order Updates (line item, etc)</label>
     </div>
   </form>
-  <ng-container *ngIf="user?.xp?.OrderEmails">
+  <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails">
     <hr />
     <label for="AdditionalEmails"
            class="h6 font-weight-medium">Additional Recipients</label>

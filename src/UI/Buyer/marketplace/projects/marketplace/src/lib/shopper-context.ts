@@ -14,6 +14,7 @@ import {
   ProductXp,
   TaxCertificate,
   MarketplaceAddressBuyer,
+  MarketplaceProduct,
 } from '@ordercloud/headstart-sdk';
 
 // todo replace with sdk
@@ -38,6 +39,20 @@ export enum BuyerAppFilterType {
 export interface Filter {
   Text: string;
   Value: string;
+}
+
+export interface ContactSupplierBody {
+  Product: MarketplaceProduct;
+  BuyerRequest: BuyerRequestForInfo;
+}
+
+export interface BuyerRequestForInfo {
+  FirstName: string;
+  LastName: string;
+  BuyerLocation: string;
+  Email: string;
+  Phone: string;
+  Comments: string;
 }
 // end todo replace with sdk
 

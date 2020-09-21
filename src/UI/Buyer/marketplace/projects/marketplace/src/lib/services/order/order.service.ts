@@ -67,6 +67,7 @@ export class CurrentOrderService {
         QuoteOrderInfo: {
           FirstName: info.FirstName,
           LastName: info.LastName,
+          BuyerLocation: (info as any).BuyerLocation,
           Phone: info.Phone,
           Email: info.Email,
           Comments: info.Comments,

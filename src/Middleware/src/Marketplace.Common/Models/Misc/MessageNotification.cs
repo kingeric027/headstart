@@ -45,4 +45,21 @@ namespace Marketplace.Models.Misc
         public string TemplateName { get; set; }
         public string Name { get; set; }
     }
+
+    public class ContactSupplierBody
+    {
+        public MarketplaceProduct Product { get; set; }
+        public BuyerRequestForInfo BuyerRequest { get; set; }
+
+    }
+
+    public class BuyerRequestForInfo
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string BuyerLocation { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Comments { get; set; }
+    }
 }
