@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -26,11 +27,14 @@ namespace ordercloud.integrations.library.Cosmos
             member = filter.Name.Split(".").Aggregate(member, Expression.Property); // takes X.X notation and gets to the nested property member
 
             var propertyType = ((PropertyInfo)member.To<MemberExpression>().Member).PropertyType;
-            var converter = TypeDescriptor.GetConverter(propertyType);
+            if (propertyType.GetInterface(nameof(IEnumerable)) != null) {
+                var elementType = propertyType.GetTypeInfo().GenericTypeArguments[0];
+                return GetEnumerableExpression<T>(elementType, member, filter);
+            }
 
             if (propertyType.IsEnum || (propertyType.IsNullable() && Nullable.GetUnderlyingType(propertyType).IsEnum))
                 return GetEnumExpression<T>(propertyType, member, filter);
-            return GetStringExpression<T>(converter, propertyType, member, filter);
+            return GetStringExpression<T>(propertyType, member, filter);
         }
 
         private static BinaryExpression GetExpression<T>(Expression param, ListFilter filter1, ListFilter filter2)
@@ -122,40 +126,63 @@ namespace ordercloud.integrations.library.Cosmos
             return Tuple.Create(Expression.Lambda(exp.Item1, param) as Expression, exp.Item2);
         }
 
-        private static Expression GetEnumExpression<T>(Type propertyType, Expression member, ListFilter filter)
-        {
-            // TODO: this can't handle multiple values for single filter. ex: Action: Get|Ignore|Update
-            var value = filter.Values.FirstOrDefault();
-            if (value == null)
-                return Expression.Empty();
+		private static Expression GetEnumExpression<T>(Type propertyType, Expression member, ListFilter filter)
+		{
+			// TODO: this can't handle multiple values for single filter. ex: Action: Get|Ignore|Update
+			var value = filter.Values.FirstOrDefault();
+			if (value == null)
+				return Expression.Empty();
 
-            ConstantExpression right = null;
-            if (propertyType.IsEnum)
-                right = Expression.Constant((int)Enum.Parse(propertyType, value?.Term).To(propertyType));
-            else if (Nullable.GetUnderlyingType(propertyType).IsEnum)
-                right = Expression.Constant((int)Enum.Parse(propertyType.GenericTypeArguments[0], value?.Term).To(propertyType));
+			ConstantExpression right = null;
+			if (propertyType.IsEnum)
+				right = Expression.Constant((int)Enum.Parse(propertyType, value?.Term).To(propertyType));
+			else if (Nullable.GetUnderlyingType(propertyType).IsEnum)
+				right = Expression.Constant((int)Enum.Parse(propertyType.GenericTypeArguments[0], value?.Term).To(propertyType));
 
-            //var right = Expression.Constant((int)Enum.Parse(propertyType, filter.Values.FirstOrDefault()?.Term).To(propertyType));
-            var left = Expression.Convert(member, typeof(int));
+			//var right = Expression.Constant((int)Enum.Parse(propertyType, filter.Values.FirstOrDefault()?.Term).To(propertyType));
+			var left = Expression.Convert(member, typeof(int));
 
-            switch (value.Operator)
-            {
-                // doesn't yet support the | OR operator
-                case ListFilterOperator.Equal:
-                    return Expression.Equal(left, right);
-                case ListFilterOperator.NotEqual:
-                    return Expression.NotEqual(left, right);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+			switch (value.Operator)
+			{
+				// doesn't yet support the | OR operator
+				case ListFilterOperator.Equal:
+					return Expression.Equal(left, right);
+				case ListFilterOperator.NotEqual:
+					return Expression.NotEqual(left, right);
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+		}
+
+        // May not handle objects inside of arrays correctly. Only arrays of simple types like strings and numbers
+		public static Expression GetEnumerableExpression<T>(Type elementType, Expression member, ListFilter filter)
+		{
+			var value = filter.Values.FirstOrDefault();
+			if (value == null)
+				return Expression.Empty();
+
+            var converter = TypeDescriptor.GetConverter(elementType);
+			var elementValue = converter.ConvertFromInvariantString(value?.Term);
+            var constant = Expression.Constant(elementValue?.ToString().To(elementType));
+            var method = (typeof(Enumerable))
+                .GetMethods()
+                .Where(m => m.Name == "Any" && m.GetParameters().Length == 2)
+                .FirstOrDefault()
+                .MakeGenericMethod(elementType);
+			var lambdaParam = Expression.Parameter(elementType, elementType.Name);
+            var lambdaBody = GetStringExpression<T>(elementType, lambdaParam, filter);  // If any element of the array matches the filter expression, return that record.
+
+             return Expression.Call(method, member, Expression.Lambda(lambdaBody, lambdaParam));
         }
 
-        public static Expression GetStringExpression<T>(TypeConverter converter, Type propertyType, Expression member, ListFilter filter)
+        public static Expression GetStringExpression<T>(Type propertyType, Expression member, ListFilter filter)
         {
             // TODO: this can't handle multiple values for single filter. ex: Action: Get|Ignore|Update
             var value = filter.Values.FirstOrDefault();
-            if (value == null)
-                return Expression.Empty();
+			if (value == null)
+				return Expression.Empty();
+
+            var converter = TypeDescriptor.GetConverter(propertyType);
             // works for strings and probably any non-complex object
             var propertyValue = converter.ConvertFromInvariantString(value?.Term);
             var constant = Expression.Constant(propertyValue?.ToString().To(propertyType));
