@@ -81,7 +81,7 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
 
     async getChiliDocs(): Promise<void> {
         //TODO Update Buyer xp to associate folder(s) available to search on.
-        const docs = await this.productService.getTecraDocuments("root");
+        const docs = await this.productService.getTecraDocuments("4511001");
         this.tecraDocuments = docs;
         this.showChiliDocuments = true;
     }
