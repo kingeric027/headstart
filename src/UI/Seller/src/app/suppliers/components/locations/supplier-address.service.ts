@@ -5,6 +5,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { SupplierAddresses } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,7 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     super(
       router,
       activatedRoute,
-      ocSupplierAddressService,
+      SupplierAddresses,
       currentUserService,
       '/suppliers',
       'suppliers',
@@ -32,7 +33,7 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
   async createNewResource(resource: any): Promise<any> {
     // special iding process for supplier addresses
     const parentResourceID = await this.getParentResourceID();
-    const existingAddresses = await this.ocSupplierAddressService.List(parentResourceID).toPromise();
+    const existingAddresses = await SupplierAddresses.List(parentResourceID);
     const newID = this.getIncrementedID(parentResourceID, existingAddresses);
     resource.ID = newID;
 

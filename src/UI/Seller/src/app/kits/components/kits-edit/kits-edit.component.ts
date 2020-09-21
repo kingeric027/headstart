@@ -8,8 +8,11 @@ import { Router } from '@angular/router';
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Location } from '@angular/common'
 import { MiddlewareKitService, MarketplaceKitProduct, ProductInKit } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { Buyer, OcBuyerService } from '@ordercloud/angular-sdk';
+import { TabIndexMapper } from './tab-mapper';
 @Component({
     selector: 'app-kits-edit',
     templateUrl: './kits-edit.component.html',
@@ -52,9 +55,12 @@ export class KitsEditComponent implements OnInit {
     staticContent: Asset[] = [];
     documentName: string;
     searchTermInput: string;
+    buyers: Buyer[];
     constructor(
         private router: Router,
         private appAuthService: AppAuthService,
+        private location: Location,
+        private ocBuyerService: OcBuyerService,
         private kitService: KitService,
         private middlewareKitService: MiddlewareKitService,
         private sanitizer: DomSanitizer,
@@ -64,6 +70,7 @@ export class KitsEditComponent implements OnInit {
     async ngOnInit() {
         this.isCreatingNew = this.kitService.checkIfCreatingNew();
         this.productList = await this.getProductList();
+        this.getBuyers();
     }
 
     setForms(kitProduct: MarketplaceKitProduct): void {
@@ -72,6 +79,11 @@ export class KitsEditComponent implements OnInit {
             Name: new FormControl(kitProduct.Product.Name),
             Active: new FormControl(kitProduct.Product.Active)
         });
+    }
+
+    async getBuyers(): Promise<void> {
+        const buyers = await this.ocBuyerService.List().toPromise();
+        this.buyers = buyers.Items;
     }
 
     async getProductList(args?: ListArgs): Promise<ListPage<SuperMarketplaceProduct>> {
@@ -259,13 +271,19 @@ export class KitsEditComponent implements OnInit {
         } else if (!event.target.checked) {
             for (let i = 0; i < this.productsToAdd.length; i++) {
                 if (productID === this.productsToAdd[i]) this.productsToAdd.splice(i, 1);
-                debugger;
             }
         }
     }
 
     openProductList(content): void {
         this.modalService.open(content, { ariaLabelledBy: 'product-list' })
+    }
+
+    tabChanged(event: any, productID: string): void {
+        const nextIndex = Number(event.nextId);
+        if (productID === null || this.isCreatingNew) return;
+        const newLocation = nextIndex === 0 ? `kitproducts/${productID}` : `kitproducts/${productID}/${TabIndexMapper[nextIndex]}`;
+        this.location.replaceState(newLocation);
     }
 
     /*********************************************

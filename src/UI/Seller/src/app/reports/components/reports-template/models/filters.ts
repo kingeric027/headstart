@@ -1,6 +1,7 @@
 export interface Filter {
   name: string;
   path: string;
+  nestedDataPath?: string;
   dataKey?: string;
   sourceType: string;
   source: string;
@@ -33,6 +34,40 @@ export let buyerLocation: Filter[] = [
 ];
 
 export let salesOrderDetail: Filter[] = [
+  {
+    name: 'Order Status',
+    path: 'Status',
+    sourceType: 'model',
+    source: 'OrderStatus',
+    filterValues: [],
+  },
+  {
+    name: 'Order Type',
+    path: 'OrderType',
+    sourceType: 'model',
+    source: 'OrderType',
+    filterValues: [],
+  }
+];
+
+export let purchaseOrderDetail: Filter[] = [
+  {
+    name: 'Order Status',
+    path: 'Status',
+    sourceType: 'model',
+    source: 'OrderStatus',
+    filterValues: [],
+  },
+  {
+    name: 'Order Type',
+    path: 'OrderType',
+    sourceType: 'model',
+    source: 'OrderType',
+    filterValues: [],
+  }
+];
+
+export let lineItemDetail: Filter[] = [
   {
     name: 'Order Status',
     path: 'Status',

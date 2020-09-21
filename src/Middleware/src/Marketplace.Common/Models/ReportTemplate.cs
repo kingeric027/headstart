@@ -28,9 +28,12 @@ namespace Marketplace.Common.Models
     public enum ReportTypeEnum
     {
         BuyerLocation,
-        SalesOrderDetail
+        SalesOrderDetail,
+        PurchaseOrderDetail,
+        LineItemDetail
     }
 
+    [SwaggerModel]
     public class ReportFilters
     {
         public List<string> BuyerID { get; set; }
@@ -38,5 +41,10 @@ namespace Marketplace.Common.Models
         public List<string> State { get; set; }
         public List<string> Status { get; set; }
         public List<string> OrderType { get; set; }
+        //Only properties that are nested and being used as filters need to be setup here with their relative path and their full path.
+        public static readonly Dictionary<string, string> NestedLocations = new Dictionary<string, string>
+        {
+            { "OrderType", "xp.OrderType" }
+        };
     }
 }

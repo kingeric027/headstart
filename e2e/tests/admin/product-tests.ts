@@ -38,8 +38,10 @@ import {
 	deleteBuyerLocation,
 } from '../../api-utils.ts/buyer-locations-util'
 import { userClientAuth, vendorUserRoles } from '../../api-utils.ts/auth-util'
+import headerPage from '../../pages/header-page'
+import { scrollIntoView } from '../../helpers/element-helper'
 
-fixture.skip`Product Tests`
+fixture`Product Tests`
 	.meta('TestRun', '1')
 	.before(async ctx => {
 		ctx.clientAuth = await adminClientSetup()
@@ -82,7 +84,7 @@ fixture.skip`Product Tests`
 	.page(testConfig.adminAppUrl)
 
 //Product not being shown in UI after create, new to reload page to see
-//Still WIP, running into a bug with authentication as a supplier user
+//failing because of https://four51.atlassian.net/browse/SEB-725
 test
 	.before(async t => {
 		const vendorUser = await getSupplierUser(
@@ -110,24 +112,17 @@ test
 		.ok()
 })
 
-test
+//still WIP, getting error when I try to do this locally
+test.skip
 	.before(async () => {
 		//Create Product
-		try {
-			t.ctx.productID = await createDefaultProduct(
-				t.fixtureCtx.warehouseID,
-				t.fixtureCtx.supplierUserAuth
-			)
-		} catch (e) {
-			console.log(e)
-		}
+		t.ctx.productID = await createDefaultProduct(
+			t.fixtureCtx.warehouseID,
+			t.fixtureCtx.supplierUserAuth
+		)
 
 		//Create Brand
-		try {
-			t.ctx.buyerID = await createDefaultBuyer(t.fixtureCtx.clientAuth)
-		} catch (e) {
-			console.log(e)
-		}
+		t.ctx.buyerID = await createDefaultBuyer(t.fixtureCtx.clientAuth)
 		//Create Brand Catalog
 		const catalog = await createDefaultCatalog(
 			t.ctx.buyerID,
@@ -136,21 +131,17 @@ test
 		t.ctx.catalogID = catalog.ID
 
 		//Create Brand Location
-		try {
-			const location = await createDefaultBuyerLocation(
-				t.ctx.buyerID,
-				t.fixtureCtx.supplierUserAuth
-			)
-			t.ctx.locationID = location.Address.ID
-		} catch (e) {
-			console.log(e)
-		}
+		const location = await createDefaultBuyerLocation(
+			t.ctx.buyerID,
+			t.fixtureCtx.clientAuth
+		)
+		t.ctx.locationID = location.Address.ID
 
 		await adminTestSetup()
 	})
 	.after(async () => {
 		//Delete Product
-		await deleteProduct(t.ctx.productID, t.fixtureCtx.clientAuth)
+		await deleteProduct(t.ctx.productID, t.fixtureCtx.supplierUserAuth)
 		//Delete Brand Catalog
 		await deleteCatalog(
 			t.ctx.catalogID,
@@ -170,6 +161,12 @@ test
 	console.log(t.ctx.buyerID)
 	console.log(t.ctx.catalogID)
 	await t.debug()
+	await adminHeaderPage.selectAllProducts()
+	await mainResourcePage.searchForResource(t.ctx.productID)
+	await mainResourcePage.selectResource(t.ctx.productID)
+	await productDetailsPage.clickBuyerVisibilityTab()
+	await t.debug()
+	await scrollIntoView('.list-group-item')
 }) //as seller user (automation admin user)
 
 //Check that new product shows up on buyer side

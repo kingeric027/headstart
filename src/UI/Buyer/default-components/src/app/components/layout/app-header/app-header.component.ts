@@ -14,10 +14,11 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Category } from 'ordercloud-javascript-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ProductFilters, ShopperContextService, AppConfig } from 'marketplace';
-import { MarketplaceOrder, MarketplaceLineItem} from '@ordercloud/headstart-sdk'
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper';
 import { RouteConfig } from 'marketplace/projects/marketplace/src/lib/services/route/route-config';
 import { CurrentUser } from 'marketplace';
+import { StaticPageService } from 'marketplace';
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -26,6 +27,7 @@ import { CurrentUser } from 'marketplace';
 export class OCMAppHeader implements OnInit {
   isCollapsed = true;
   isAnonymous: boolean;
+  isSSO: boolean;
   user: CurrentUser;
   order: MarketplaceOrder;
   alive = true;
@@ -56,7 +58,7 @@ export class OCMAppHeader implements OnInit {
   faBoxOpen = faBoxOpen;
   flagIcon: string;
 
-  constructor(public context: ShopperContextService, public appConfig: AppConfig) {
+  constructor(public context: ShopperContextService, public appConfig: AppConfig, public staticPageService: StaticPageService) {
     this.profileRoutes = context.router.getProfileRoutes();
     this.orderRoutes = context.router.getOrderRoutes();
   }
@@ -66,6 +68,7 @@ export class OCMAppHeader implements OnInit {
     this.screenSize = getScreenSizeBreakPoint();
     this.categories = this.context.categories.all;
     this.appName = this.context.appSettings.appname;
+    this.isSSO = this.context.currentUser.isSSO();
     this.isAnonymous = this.context.currentUser.isAnonymous();
     this.context.order.onChange(order => (this.order = order));
     this.context.currentUser.onChange(user => (this.user = user));
@@ -75,6 +78,14 @@ export class OCMAppHeader implements OnInit {
     this.context.router.onUrlChange(path => (this.activePath = path));
     this.buildAddToCartListener();
     this.flagIcon = this.getCurrencyFlag();
+  }
+
+  // TODO: add PageDocument type to cms library so this is strongly typed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get staticPages(): any[] {
+    return this.staticPageService.pages.filter(page => {
+      return page.Doc.Active && page.Doc.NavigationTitle;
+    });
   }
 
   getCurrencyFlag(): string {

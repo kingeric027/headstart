@@ -61,6 +61,7 @@ export class SupplierCategorySelectComponent {
 
   _vendorLevelConfig: SupplierCategoryConfigFilters;
   _serviceCatagoryConfig: SupplierCategoryConfigFilters;
+  _categoriesDisabled: boolean;
 
   isSecondDuplicateCategory = isSecondDuplicateCategory;
   areNoCategories = false;
@@ -70,8 +71,10 @@ export class SupplierCategorySelectComponent {
     this.updateCategoryValidation(value.value);
     this._categorySelectionsControl = value;
     this._categorySelections = value.value;
+    this._categoriesDisabled = value.status === 'DISABLED';
     this._categorySelectionsControl.valueChanges.subscribe(categorySelections => {
       this._categorySelections = categorySelections;
+      this._categoriesDisabled = categorySelections.status === 'DISABLED';
       this.updateCategoryValidation(categorySelections);
     });
   }

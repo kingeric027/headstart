@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StorefrontListComponent } from './storefront-list.component';
+import { StaticPageComponent } from './static-page.component';
 
-describe('StorefrontListComponent', () => {
-  let component: StorefrontListComponent;
-  let fixture: ComponentFixture<StorefrontListComponent>;
+describe('StaticPageComponent', () => {
+  let component: StaticPageComponent;
+  let fixture: ComponentFixture<StaticPageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ StorefrontListComponent ]
+      declarations: [ StaticPageComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StorefrontListComponent);
+    fixture = TestBed.createComponent(StaticPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

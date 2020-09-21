@@ -3,14 +3,16 @@
          [formGroup]="resourceForm">
         <div class="row pt-3">
             <div class="col-md-5">
-                <h5>Report Details</h5>
-                <p>Provide a name and description for this template.</p>
+                <h5 translate>ADMIN.REPORTS.REPORT_DETAILS</h5>
+                <p translate>ADMIN.REPORTS.REPORT_DETAILS_DESC</p>
             </div>
             <div class="col-md-7 form-group">
                 <div *ngIf="reportType !== 'SalesOrderDetail'"
                      class="form-row">
                     <div class="form-group col-md-12">
-                        <p class="mb-1">Available to Suppliers</p>
+                        <p class="mb-1" translate>ADMIN.REPORTS.AVAILABLE_TO
+                            <span translate>ALIAS.SUPPLIERS</span>
+                        </p>
                         <label class="switch mb-0"
                                for="AvailableToSuppliers">
                           <input type="checkbox"
@@ -28,7 +30,8 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-12">
-                        <label for="Name">Template Name</label>
+                        <label for="Name"
+                               translate>ADMIN.REPORTS.TEMPLATE_NAME</label>
                         <input type="text"
                                class="form-control"
                                id="Name"
@@ -37,29 +40,30 @@
                                [resourceForm]="resourceForm"
                                formControlName="Name"
                                (input)="handleUpdateReportTemplate($event, 'Name')"
-                               placeholder="Enter template name"
+                               placeholder="{{'ADMIN.REPORTS.ENTER_TEMPLATE_NAME' | translate}}"
                         >
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-12">
-                        <label for="Description">Template Description</label>
+                        <label for="Description"
+                               translate>ADMIN.REPORTS.TEMPLATE_DESC</label>
                         <textarea type="text"
                                   class="form-control"
                                   formControlName="Description"
                                   (input)="handleUpdateReportTemplate($event, 'Description')"
-                                  placeholder="Optional: Enter a template description"
+                                  placeholder="{{'ADMIN.REPORTS.ENTER_TEMPLATE_DESC' | translate}}"
                                   rows="3"
                                   maxLength="300"></textarea>
-                            <small translate>Optional: Enter a short description to help explain what data is expected from this report, limit 300 characters</small>
+                            <small translate>ADMIN.REPORTS.TEMPLATE_DESC_EXPLANATION</small>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row pt-3">
             <div class="col-md-5">
-                <h5>Headers</h5>
-                <p>Select which fields to display as headers.</p>
+                <h5 translate>ADMIN.REPORTS.HEADERS</h5>
+                <p translate>ADMIN.REPORTS.HEADERS_DESC</p>
             </div>
             <div class="col-md-7 form-group">
                 <div class="form-row">
@@ -68,11 +72,11 @@
                       <div class="d-block">
                          <button class="btn btn-link text-info mr-2"
                                 (click)="handleSelectAllHeaders()">
-                            Select All
+                            <span translate>ADMIN.REPORTS.SELECT_ALL</span>
                         </button>
                         <button class="btn btn-link text-info"
                                 (click)="handleUnselectAllHeaders()">
-                            Unselect All
+                            <span translate>ADMIN.REPORTS.UNSELECT_ALL</span>
                         </button>
                       </div>
                         <ng-container *ngFor="let header of headers">
@@ -91,9 +95,10 @@
         </div>
         <div class="row pt-3">
             <div class="col-md-5">
-                <h5>Filters</h5>
-                <p>Select which values are allowed to display on a report.</p>
-                <p class="font-italic">If no filters are selected for a field, all values will be included.</p>
+                <h5 translate>ADMIN.REPORTS.FILTERS</h5>
+                <p translate>ADMIN.REPORTS.SELECT_WHICH_VALUES</p>
+                <p class="font-italic"
+                   translate>ADMIN.REPORTS.IF_NO_FILTERS</p>
             </div>
             <div class="col-md-7 form-group">
                 <div class="form-row">
@@ -108,7 +113,8 @@
                                        id="{{filter.name}}"
                                        [checked]="filter?.path && !checkForChipDisplay(filter)">
                                 <label class="custom-control-label"
-                                       for="{{filter.name}}">Include All Values</label>
+                                       for="{{filter.name}}"
+                                       translate>ADMIN.REPORTS.INCLUDE_ALL_VALUES</label>
                               </div>
                                 <ng-container *ngFor="let filterValue of filter.filterValues">
                                     <div *ngIf="filter?.path && checkForChipDisplay(filter)"

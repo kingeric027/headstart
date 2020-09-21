@@ -4,7 +4,6 @@ import { faFilter, faHome } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
-import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight } from '@app-seller/shared/services/dom.helper';
 import { ListPage } from '@ordercloud/headstart-sdk';
@@ -34,7 +33,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.setParentResourceSubscription();
@@ -44,6 +43,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
   ngAfterViewChecked() {
     // TODO: Magic number ... the 'search' element doesn't exist in the DOM at time of instantiation
     this.resourceSelectDropdownHeight = getPsHeight('additional-item-resource-select-dropdown') - 75;
+    this.changeDetectorRef.detectChanges();
   }
   private setParentResourceSubscription() {
     this.parentService.resourceSubject.pipe(takeWhile(() => this.alive)).subscribe(resourceList => {
@@ -61,7 +61,7 @@ export class ResourceSelectDropdown implements OnInit, OnDestroy, AfterViewCheck
         if (params && resourceID) {
           const resource = await this.parentService.findOrGetResourceByID(resourceID);
           if (resource) {
-            this.selectedParentResourceName = resource.Name;
+            this.selectedParentResourceName = resource.Name || resource.AppName;
           }
         }
       }

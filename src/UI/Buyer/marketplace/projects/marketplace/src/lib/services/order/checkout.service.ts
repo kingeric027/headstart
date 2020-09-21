@@ -49,6 +49,11 @@ export class CheckoutService {
     return orderID;
   }
 
+  async appendPaymentMethodToOrderXp(orderID: string, ccPayment?: any): Promise<void> {
+    const paymentMethod = ccPayment?.CreditCardID ? 'Credit Card' : 'Purchase Order';
+    await Orders.Patch('Outgoing', orderID, { xp: { PaymentMethod: paymentMethod } });
+  }
+
   async addComment(comment: string): Promise<MarketplaceOrder> {
     return await this.patch({ Comments: comment });
   }
@@ -166,7 +171,6 @@ export class CheckoutService {
       DateCreated: new Date().toDateString(),
       Type: 'PurchaseOrder',
     };
-    await Orders.Patch('Outgoing', this.order.ID, { xp: { PaymentMethod: 'Purchase Order' } })
     return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 
@@ -202,7 +206,6 @@ export class CheckoutService {
         cardType,
       },
     };
-    await Orders.Patch('Outgoing', this.order.ID, { xp: { PaymentMethod: 'Credit Card' } })
     return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Marketplace.Models.Marketplace.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -25,6 +26,8 @@ namespace Marketplace.Models.Models.Marketplace
         public List<ProductType> ProductTypes { get; set; }
         public List<string> CountriesServicing { get; set; }
         public List<SupplierCategory> Categories { get; set; }
+        public List<string> NotificationRcpts { get; set; }
+        public Nullable<int> FreeShippingThreshold { get; set; }
     }
 
     [SwaggerModel]

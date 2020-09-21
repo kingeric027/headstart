@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, NgZone, OnInit, AfterViewInit, ViewChild, Inject } from '@angular/core';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Supplier } from '@ordercloud/angular-sdk';
+import { Supplier, OcSupplierUserService, OcSupplierService } from '@ordercloud/angular-sdk';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { get as _get } from 'lodash';
@@ -45,15 +45,17 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     SupportContactPhone: new FormControl(
       (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Phone')) || ''
     ),
-    Active: new FormControl({value: supplier.Active, disabled: this.isSupplierUser || !this.isCreatingNew}), 
-    SyncFreightPop: new FormControl({value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser}),
-    Currency: new FormControl({value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser}, Validators.required),
+    Active: new FormControl({ value: supplier.Active, disabled: this.isSupplierUser || !this.isCreatingNew }),
+    SyncFreightPop: new FormControl({ value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser }),
+    Currency: new FormControl({ value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser }, Validators.required),
     ProductTypes: new FormGroup({
-      Standard: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('Standard') || false, disabled: this.isSupplierUser}),
-      Quote: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser}),
-      PurchaseOrder: new FormControl({value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser})
+      Standard: new FormControl({ value: (supplier as any).xp?.ProductTypes?.includes('Standard') || false, disabled: this.isSupplierUser }),
+      Quote: new FormControl({ value: (supplier as any).xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser }),
+      PurchaseOrder: new FormControl({ value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser })
     }, RequireCheckboxesToBeChecked()),
-    Categories: new FormControl(_get(supplier, 'xp.Categories', []), ValidateSupplierCategorySelection),
+    FreeShippingEnabled: new FormControl((supplier as any).xp?.FreeShippingThreshold != null),
+    FreeShippingThreshold: new FormControl((supplier as any).xp?.FreeShippingThreshold),
+    Categories: new FormControl({ value: _get(supplier, 'xp.Categories', []), disabled: this.isSupplierUser }, ValidateSupplierCategorySelection),
   });
 }
 
@@ -73,13 +75,15 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
     ngZone: NgZone,
     private middleWareApiService: MiddlewareAPIService,
     private appAuthService: AppAuthService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private ocSupplierUserService: OcSupplierUserService,
+    private ocSupplierService: OcSupplierService
   ) {
     super(changeDetectorRef, supplierService, router, activatedroute, ngZone, createSupplierForm);
     this.router = router;
     this.setUpfilter()
   }
-  
+
   handleStagedFile(event: File): void {
     this.file = event;
   }
@@ -90,7 +94,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
 
   async buildFilterConfig(): Promise<void> {
     const supplierFilterConfig = await this.middleWareApiService.getSupplierFilterConfig();
-    const filterConfig = { Filters: supplierFilterConfig.Items.map(filter => filter.Doc)};
+    const filterConfig = { Filters: supplierFilterConfig.Items.map(filter => filter.Doc) };
     this.filterConfig = filterConfig;
   }
 
@@ -105,14 +109,22 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
         const asset: AssetUpload = {
           Active: true,
           File: this.file,
-          Type: ("Image" as AssetUpload['Type']),
+          Type: ('Image' as AssetUpload['Type']),
           FileName: this.file.name,
-          Tags: ["Logo"]
+          Tags: ['Logo']
         }
         const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-        await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Suppliers', ResourceID: supplier.ID, AssetID: newAsset.ID }, accessToken);
+        await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Suppliers', ResourceID: supplier.ID, AssetID: newAsset.ID }, accessToken);
       }
-      this.selectResource(supplier);
+      // Default the NotificationRcpts to initial user
+      const users = await this.ocSupplierUserService.List(supplier.ID).toPromise();
+      const patch = {
+        xp: {
+          NotificationRcpts: [users.Items[0].Email]
+        }
+      };
+      const patchedSupplier: MarketplaceSupplier = await this.ocSupplierService.Patch(supplier.ID, patch).toPromise();
+      this.selectResource(patchedSupplier);
       this.dataIsSaving = false;
     } catch (ex) {
       this.dataIsSaving = false;

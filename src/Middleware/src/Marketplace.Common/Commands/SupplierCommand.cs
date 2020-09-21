@@ -105,6 +105,13 @@ namespace Marketplace.Common.Commands
     
         public async Task CreateUserTypeUserGroupsAndSecurityProfileAssignments(User user, string token, string supplierID)
         {
+            // Assign supplier to MPMeAdmin security profile
+            await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+            {
+                SupplierID = supplierID,
+                SecurityProfileID = "MPMeAdmin"
+            });
+
             foreach(var userType in SEBUserTypes.Supplier())
             {
                 var userGroupID = $"{supplierID}{userType.UserGroupIDSuffix}";

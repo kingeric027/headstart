@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CurrentUserService } from '../services/current-user/current-user.service';
-import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
+import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 
 @Component({
   template: `
@@ -9,11 +10,14 @@ import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
   `,
 })
 export class ProductDetailWrapperComponent implements OnInit {
-  product: SuperMarketplaceProduct;
+  product: any;
+  constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService, private tempSdk: TempSdk) { }
 
-  constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService) {}
-
-  ngOnInit(): void {
-    this.product = this.activatedRoute.snapshot.data.product;
+  async ngOnInit(): Promise<void> {
+    if (this.activatedRoute.snapshot.data.product.PriceSchedule) {
+      this.product = this.activatedRoute.snapshot.data.product;
+    } else {
+      this.product = await this.tempSdk.getKitProduct(this.activatedRoute.snapshot.data.product.ID);
+    }
   }
 }

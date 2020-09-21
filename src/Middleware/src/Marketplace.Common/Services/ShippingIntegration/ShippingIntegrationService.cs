@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +13,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -27,15 +28,18 @@ namespace Marketplace.Common.Services.ShippingIntegration
         readonly IFreightPopService _freightPopService;
         private readonly IAvalaraCommand _avalara;
         private readonly IExchangeRatesCommand _exchangeRates;
-        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates)
+        private readonly IOrderCloudClient _oc;
+        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud)
         {
             _freightPopService = freightPopService;
 			_avalara = avalara;
             _exchangeRates = exchangeRates;
+            _oc = orderCloud;
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
         {
+
             var orderWorksheet = orderCalculatePayload.OrderWorksheet;
             var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
 
@@ -51,10 +55,44 @@ namespace Marketplace.Common.Services.ShippingIntegration
             CurrencySymbol orderCurrency = (CurrencySymbol)Enum.Parse(typeof(CurrencySymbol), orderWorksheet.Order.xp.Currency);
             var rates = (await _exchangeRates.Get(orderCurrency)).Rates;
             var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
+            var shipEstimatesWithFreeShippingApplied = await ApplyFreeShipping(orderWorksheet, shipEstimates);
+
             return new ShipEstimateResponse()
             {
-                ShipEstimates = shipEstimates as IList<ShipEstimate>
+                ShipEstimates = shipEstimatesWithFreeShippingApplied as IList<ShipEstimate>
             };
+        }
+
+        private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, List<ShipEstimate> shipEstimates)
+        {
+            var supplierIDs = orderWorksheet.LineItems.Select(li => li.SupplierID);
+            var suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
+            var updatedEstimates = new List<ShipEstimate>();
+
+            foreach(var estimate in shipEstimates)
+            {
+                //  get supplier and supplier subtotal
+                var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault().LineItemID).SupplierID;
+                var supplier = suppliers.Items.Where(supplier => supplier.ID == supplierID).FirstOrDefault();
+                var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier.ID);
+                var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
+                if (supplier.xp?.FreeShippingThreshold != null && supplier.xp?.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
+                {
+                    foreach (var method in estimate.ShipMethods)
+                    {
+                        if (method.Name.Contains("GROUND")) //  free shipping on ground shipping
+                        {
+                            method.xp.FreeShippingApplied = true;
+                            method.xp.FreeShippingThreshold = supplier.xp.FreeShippingThreshold;
+                            method.xp.CostBeforeDiscount = method.Cost;
+                            method.Cost = 0;
+                        }
+                    }
+                }
+                updatedEstimates.Add(estimate);
+                
+            }
+            return updatedEstimates;
         }
 
 

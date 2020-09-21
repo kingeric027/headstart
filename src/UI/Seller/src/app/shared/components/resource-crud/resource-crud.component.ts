@@ -3,11 +3,10 @@ import { takeWhile } from 'rxjs/operators';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { ListPage } from '@ordercloud/headstart-sdk';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { BehaviorSubject } from 'rxjs';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -20,6 +19,8 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceForm: FormGroup;
   isMyResource = false;
   isSupplierUser = false;
+  parentResourceID: string;
+  parentResourceIDSubject = new BehaviorSubject<string>(undefined);
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -82,13 +83,14 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  async subscribeToResourceSelection(): Promise<void> {
-    const parentResourceID = await this.ocService.getParentResourceID();
-    this.activatedRoute.params.subscribe(params => {
-      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
+  subscribeToResourceSelection(): void {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.activatedRoute.params.subscribe(async params => {
+      this.parentResourceID = await this.ocService.getParentResourceID();
+      this.parentResourceIDSubject.next(this.parentResourceID);
+      if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
-        const resourceIDSelected =
-          params[this.ocService.getParentOrSecondaryIDParamName()]; //Example - Reports uses a different prefix to ID
+        const resourceIDSelected = params[this.ocService.getParentOrSecondaryIDParamName()]; // Example - Reports uses a different prefix to ID
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
         } else if (resourceIDSelected) {

@@ -91,6 +91,18 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
+  storefronts: {
+    toPrimaryHeader: 'AppName',
+    toSecondaryHeader: 'ID',
+    toImage: '',
+    toExpandable: false,
+  },
+  pages: {
+    toPrimaryHeader: 'Doc.Title',
+    toSecondaryHeader: 'Doc.Author',
+    toImage: '',
+    toExpandable: false,
+  },
   templates: {
     toPrimaryHeader: 'Name',
     toSecondaryHeader: 'ReportCategory',
@@ -430,6 +442,44 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
       },
     ],
     imgPath: '',
+  },
+  storefronts: {
+    fields: [
+      {
+        path: 'AppName',
+        header: 'Name',
+        type: BASIC_STRING,
+        sortable: false,
+      },
+      {
+        path: 'ID',
+        header: 'ADMIN.HEADERS.ID',
+        type: BASIC_STRING,
+        sortable: true,
+      },
+    ],
+  },
+  pages: {
+    fields: [
+      {
+        path: 'Doc.Title',
+        header: 'Title',
+        type: BASIC_STRING,
+        sortable: false,
+      },
+      {
+        path: 'Doc.Author',
+        header: 'Author',
+        type: BASIC_STRING,
+        sortable: false,
+      },
+      {
+        path: 'Doc.DateLastUpdated',
+        header: 'Last Updated',
+        type: DATE_TIME,
+        sortable: false,
+      },
+    ],
   },
   logs: {
     fields: [

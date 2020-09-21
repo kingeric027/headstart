@@ -1,12 +1,13 @@
 <div class="row pt-3">
     <div class="col-md-5">
-        <h5>Report Selection</h5>
-        <p>Choose the report type and template to process.</p>
+        <h5 translate>ADMIN.REPORTS.REPORT_SELECTION</h5>
+        <p translate>ADMIN.REPORTS.CHOOSE_REPORT_TYPE</p>
     </div>
     <div class="col-md-7 form-row">
         <div class="form-group col-md-6">
             <form [formGroup]="reportSelectionForm">
-                <label for="ReportType">Report Type</label>
+                <label for="ReportType"
+                       translate>ADMIN.REPORTS.REPORT_TYPE</label>
                 <select class="form-control" 
                         type="dropdown" 
                         id="ReportType" 
@@ -15,7 +16,8 @@
                         (change)="updateReportType($event.target.value)">
                     <option default 
                             disabled 
-                            [ngValue]="null">Select a report type</option>
+                            [ngValue]="null"
+                            translate>ADMIN.REPORTS.SELECT_REPORT_TYPE</option>
                     <option *ngFor="let reportType of reportTypes" 
                             [value]="reportType.Value">
                         {{reportType.Name}}
@@ -25,7 +27,8 @@
         </div>
         <div class="form-group col-md-6">
             <form [formGroup]="reportSelectionForm">
-                <label for="ReportTemplate">Report Template</label>
+                <label for="ReportTemplate"
+                       translate>ADMIN.REPORTS.REPORT_TEMPLATE</label>
                 <select class="form-control" 
                         type="dropdown" 
                         id="ReportTemplate" 
@@ -35,7 +38,8 @@
                         (change)="updateReportTemplate($event.target.value)">
                     <option default 
                             disabled 
-                            [ngValue]="null">Select a report template</option>
+                            [ngValue]="null"
+                            translate>ADMIN.REPORTS.SELECT_REPORT_TEMPLATE</option>
                     <option *ngFor="let reportTemplate of reportTemplates" 
                             [value]="reportTemplate.TemplateID">
                         {{reportTemplate.Name}}
@@ -62,29 +66,32 @@
         <div *ngIf="reportSelectionForm.controls.ReportTemplate.value" 
               class="col-md-12">
             <div class="mt-3">
-                <h6>Description</h6>
+                <h6 translate>ADMIN.REPORTS.DESCRIPTION</h6>
                 <p>{{selectedTemplate.Description}}</p>
             </div>
             <div class="form-row">
               <div class="col-md-12">
                 <button class="btn btn-link text-info"
-                        (click)="toggleShowDetails()">
+                        (click)="toggleShowDetails()"
+                        translate>
                     {{getDetailsDisplayVerb()}} Details
                 </button>
                 <div *ngIf="showDetails">
-                    <h6 class="mt-3">Headers</h6>
+                    <h6 class="mt-3"
+                        translate>ADMIN.REPORTS.HEADERS</h6>
                     <ng-container *ngFor="let header of displayHeaders">
                         <div class="chip readonly active">
                             {{header}}
                         </div>
                     </ng-container>
-                    <h6 class="mt-3">Filters</h6>
+                    <h6 class="mt-3"
+                        translate>ADMIN.REPORTS.FILTERS</h6>
                     <perfect-scrollbar style="width: 100%">
                         <table class="table table-sm table-hover">
                           <thead>
                             <tr>
-                              <th translate>Name</th>
-                              <th translate>Values</th>
+                              <th translate>ADMIN.REPORTS.NAME</th>
+                              <th translate>ADMIN.REPORTS.VALUES</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -95,8 +102,9 @@
                                 </td>
                                 <td>
                                   <ng-container *ngIf="!filter[1].length">
-                                    <div class="chip readonly">
-                                      All Values
+                                    <div class="chip readonly"
+                                         translate>
+                                      ADMIN.REPORTS.ALL_VALUES
                                   </div>
                                   </ng-container>
                                   <ng-container *ngFor="let value of filter[1]">

@@ -39,5 +39,7 @@ export const ocAppConfig: AppConfig = {
     'MPLocationCreditCardAdmin',
     'MPLocationAddressAdmin',
     'MPLocationResaleCertAdmin',
+
+    'DocumentReader' // might be able to get rid of this if we assign to buyer, talk to team first
   ] as ApiRole[],
 };

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut.Extensions;
@@ -14,6 +14,7 @@ namespace Marketplace.Common.Commands.Crud
     public interface IMarketplaceKitProductCommand
     {
         Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user);
+        Task<MarketplaceMeKitProduct> GetMeKit(string id, VerifiedUserContext user);
         Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, VerifiedUserContext user);
         Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, VerifiedUserContext user);
@@ -56,6 +57,22 @@ namespace Marketplace.Common.Commands.Crud
             var _attachments = GetProductAttachments(id, user);
             var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
             return new MarketplaceKitProduct
+            {
+                ID = _product.ID,
+                Name = _product.Name,
+                Product = _product,
+                Images = await _images,
+                Attachments = await _attachments,
+                ProductAssignments = _productAssignments.Doc
+            };
+        }
+        public async Task<MarketplaceMeKitProduct> GetMeKit(string id, VerifiedUserContext user)
+        {
+            var _product = await _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
+            var _images = GetProductImages(id, user);
+            var _attachments = GetProductAttachments(id, user);
+            var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
+            return new MarketplaceMeKitProduct
             {
                 ID = _product.ID,
                 Name = _product.Name,

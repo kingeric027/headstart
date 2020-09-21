@@ -30,6 +30,24 @@ namespace Marketplace.Common.Models
                 AvailableToSuppliers = false,
                 Value = "SalesOrderDetail",
                 AdHocFilters = new string[] {"Date Submitted (Low)", "Date Submitted (High)"}
+            },
+            new ReportTypeResource
+            {
+                ID = ReportTypeEnum.PurchaseOrderDetail,
+                Name = "Purchase Order Detail Report",
+                ReportCategory = "Order",
+                AvailableToSuppliers = true,
+                Value = "PurchaseOrderDetail",
+                AdHocFilters = new string[] {"Date Submitted (Low)", "Date Submitted (High)"}
+            },
+            new ReportTypeResource
+            {
+                ID = ReportTypeEnum.LineItemDetail,
+                Name = "Line Item Detail Report",
+                ReportCategory = "Order",
+                AvailableToSuppliers = true,
+                Value = "LineItemDetail",
+                AdHocFilters = new string[] {"Date Submitted (Low)", "Date Submitted (High)"}
             }
         };
     }
