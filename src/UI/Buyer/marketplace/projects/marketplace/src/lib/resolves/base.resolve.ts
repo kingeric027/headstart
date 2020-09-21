@@ -5,6 +5,7 @@ import { ProductCategoriesService } from '../services/product-categories/product
 import { CurrentOrderService } from '../services/order/order.service';
 import { OrdersToApproveStateService } from '../services/order-history/order-to-approve-state.service';
 import { ExchangeRatesService } from '../services/exchange-rates/exchange-rates.service';
+import { StaticPageService } from '../services/static-page/static-page.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,8 @@ export class BaseResolve implements Resolve<any> {
     private currentUser: CurrentUserService,
     private exchangeRates: ExchangeRatesService,
     private ordersToApprove: OrdersToApproveStateService,
-    private productCategories: ProductCategoriesService
+    private productCategories: ProductCategoriesService,
+    private staticPageService: StaticPageService
   ) {}
 
   async resolve(): Promise<void> {
@@ -24,6 +26,7 @@ export class BaseResolve implements Resolve<any> {
     const ordersToApprove = this.ordersToApprove.reset();
     const categories = this.productCategories.setCategories();
     const exchangeRates = this.exchangeRates.reset();
+    this.staticPageService.initialize();
     await Promise.all([order, ordersToApprove, categories, exchangeRates]);
   }
 }

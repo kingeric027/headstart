@@ -1,19 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
-  OcProductService,
   Product,
   OcPriceScheduleService,
   OcCatalogService,
   ProductAssignment,
-  ProductCatalogAssignment,
   OcCategoryService,
   CategoryProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 import { Products, ListPage } from 'ordercloud-javascript-sdk';
 import { ChiliService, TecraDocument, TecraSpec } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
 import { ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';

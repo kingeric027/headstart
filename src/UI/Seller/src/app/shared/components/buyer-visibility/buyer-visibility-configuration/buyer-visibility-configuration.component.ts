@@ -13,6 +13,7 @@ import {
 import { ProductService } from '@app-seller/products/product.service';
 import { MarketplaceBuyer, MarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { MiddlewareKitService } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
 
 @Component({
   selector: 'buyer-visibility-configuration-component',
@@ -45,6 +46,7 @@ export class BuyerVisibilityConfiguration {
 
   catalogAssignmentsEditable: ProductAssignment[] = [];
   catalogAssignmentsStatic: ProductAssignment[] = [];
+  kitProductCatalogAssignments: ProductAssignment[];
 
   assignedCategoriesStatic: Category[][] = [];
   assignedCategoriesEditable: Category[][] = [];
@@ -65,9 +67,10 @@ export class BuyerVisibilityConfiguration {
     private ocCatalogService: OcCatalogService,
     private ocUserGroupService: OcUserGroupService,
     private ocProductService: OcProductService,
+    private kitService: MiddlewareKitService,
     private productService: ProductService,
     public catalogsTempService: CatalogsTempService
-  ) {}
+  ) { }
 
   async fetchData(): Promise<void> {
     if (Object.keys(this._product) && Object.keys(this._buyer) && this._buyer.ID) {
@@ -76,6 +79,8 @@ export class BuyerVisibilityConfiguration {
       await this.getCatalogs();
       await this.getCatalogAssignments();
       await this.getCategoryAssignments();
+      if (!this._product.DefaultPriceScheduleID &&
+        this._product?.xp?.ProductType !== 'Quote') await this.getKitProductCatalogAssignments(this._product);
       this.isFetching = false;
     }
   }
@@ -94,7 +99,37 @@ export class BuyerVisibilityConfiguration {
     return this.catalogAssignmentsEditable.some(c => c.UserGroupID === userGroupID);
   }
 
-  toggleProductCatalogAssignment(catalog: UserGroup): void {
+  async getKitProductCatalogAssignments(product: MarketplaceProduct) {
+    let productCatalogAssignments = [];
+    const kitProduct = await this.kitService.Get(product.ID);
+    kitProduct.ProductAssignments.ProductsInKit.forEach(async prod => {
+      let catalogs = await this.ocCatalogService
+        .ListProductAssignments({ productID: prod && prod.ID })
+        .toPromise();
+      productCatalogAssignments.push(catalogs.Items);
+    });
+    this.kitProductCatalogAssignments = productCatalogAssignments;
+  }
+
+  async asyncForEach(array, cb) {
+    for (let i = 0; i < array.length; i++) {
+      await cb(array[i], i, array);
+    }
+  }
+
+  async assignProductsInKitToCatalog() {
+    if (this.kitProductCatalogAssignments?.length) {
+      this.kitProductCatalogAssignments.forEach(async product => {
+        await this.asyncForEach(product, async (cat) => {
+          await this.ocCatalogService
+            .SaveProductAssignment({ CatalogID: this._buyer.ID, ProductID: cat.ProductID })
+            .toPromise();
+        });
+      })
+    }
+  }
+
+  async toggleProductCatalogAssignment(catalog: UserGroup) {
     if (this.isAssigned(catalog.ID)) {
       this.catalogAssignmentsEditable = this.catalogAssignmentsEditable.filter(c => c.UserGroupID !== catalog.ID);
     } else {
@@ -105,6 +140,7 @@ export class BuyerVisibilityConfiguration {
       };
       this.catalogAssignmentsEditable = [...this.catalogAssignmentsEditable, newCatalogAssignment];
     }
+    await this.assignProductsInKitToCatalog();
     this.checkForProductCatalogAssignmentChanges();
   }
 

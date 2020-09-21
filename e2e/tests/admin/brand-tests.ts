@@ -63,7 +63,6 @@ test.after(async () => {
 	await t.expect(await mainResourcePage.resourceExists(brandName)).ok()
 })
 
-//failing because: https://four51.atlassian.net/browse/SEB-725, bug in comment
 test.after(async () => {
 	await deleteCatalogWithName(
 		t.ctx.createdCatalogName,
@@ -105,7 +104,7 @@ test('Assign Brand Location to Brand Catalog | 19974', async t => {
 	await locationDetailsPage.assignCatalogToLocation(t.fixtureCtx.catalogName)
 })
 
-//https://four51.atlassian.net/browse/SEB-944
+//failing because of https://four51.atlassian.net/browse/SEB-924
 test.after(async t => {
 	const createdUserID = await getUserID(
 		t.ctx.createdUserEmail,

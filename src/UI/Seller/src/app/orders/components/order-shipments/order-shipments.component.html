@@ -36,6 +36,8 @@
               *ngIf="selectedShipment.Shipper"><b>Carrier:</b> {{selectedShipment.Shipper}}</span>
         <span class="d-block"
               *ngIf="selectedShipment.xp.Service"><b>Shipping Service:</b> {{selectedShipment.xp.Service}}</span>
+        <span class="d-block"
+              *ngIf="selectedShipment.xp.Comment"><b>Comment:</b> {{selectedShipment.xp.Comment}}</span>
         <!-- TO-DO: Work on formatting for this once we can update Ship From/Ship To address in the Portal -->
         <!-- <span class="d-block" *ngIf="selectedShipment.FromAddress">Ship From: {{selectedShipment.FromAddress}}</span>
             <span class="d-block" *ngIf="selectedShipment.ToAddress">Ship To: {{selectedShipment.ToAddress}}</span> -->
@@ -132,6 +134,18 @@
                  class="form-control"
                  id="Service"
                  placeholder="Enter shipping service" />
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <label for="Comment"
+                 class="control-label font-weight-bold mt-1">Comment</label>
+        <textarea type="text"
+                  class="form-control"
+                  formControlName="Comment"
+                  placeholder="Enter comment"
+                  rows="3"
+                  maxLength="300"></textarea>
         </div>
       </div>
       <div class="form-group row mb-5">

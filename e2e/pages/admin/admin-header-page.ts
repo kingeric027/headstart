@@ -17,7 +17,7 @@ class AdminHeaderPage {
 	allProductsLink: Selector
 
 	constructor() {
-		this.accountDropdown = Selector('a.current-user')
+		this.accountDropdown = Selector('a.nav-link__user')
 		this.logoutButton = Selector('a').withAttribute('href', '/login')
 		this.vendorsDropdown = Selector('a').withText(createRegExp('vendor'))
 		this.allVendorsLink = Selector('a').withText(createRegExp('all vendors'))
