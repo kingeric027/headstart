@@ -5,8 +5,6 @@ import { ProductsRoutingModule } from '@app-seller/products/products-routing.mod
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ProductTableComponent } from './components/product-table/product-table.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-import { VariablePrintConfiguration } from './components/buyer-visibility/variable-print-configuration/variable-print-configuration.component';
-import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-publish-configuration/chili-publish-configuration.componant';
 import { ProductTaxCodeSelect } from './components/product-tax-code-select/product-tax-code-select.component';
 import { ProductTaxCodeSelectDropdown } from './components/product-tax-code-select-dropdown/product-tax-code-select-dropdown.component';
 import { ProductVariations } from './components/product-variations/product-variations.component';
@@ -22,8 +20,6 @@ import { NgbTabset, NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ProductEditComponent,
     ProductPricingComponent,
     PriceBreakEditor,
-    VariablePrintConfiguration,
-    ChiliPublishConfiguration,
     ProductTaxCodeSelect,
     ProductTaxCodeSelectDropdown,
     ProductVariations,
