@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
@@ -8,6 +9,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using SendGrid;
@@ -77,6 +79,18 @@ namespace Marketplace.Common.Services
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             await client.SendEmailAsync(msg);
+        }
+
+        public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
+        {
+            var client = new SendGridClient(_settings.SendgridApiKey);
+            var fromEmail = new EmailAddress(from);
+            var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
+            using (Stream stream = await fileReference.OpenReadAsync())
+            {
+                await msg.AddAttachmentAsync(fileName, stream);
+            }
+                await client.SendEmailAsync(msg);
         }
 
         public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
