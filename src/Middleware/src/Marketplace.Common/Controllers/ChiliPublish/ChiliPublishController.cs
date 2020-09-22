@@ -220,9 +220,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Get Tecra Specs")]
         [HttpGet, Route("")]
-        public async Task<IEnumerable<TecraSpec>> Get(string id)
+        public async Task<IEnumerable<TecraSpec>> Get(string id, string folder)
         {
-            var result = await _tecra.TecraSpecs(id);
+            var result = await _tecra.TecraSpecs(id, folder);
             return result;
         }
     }

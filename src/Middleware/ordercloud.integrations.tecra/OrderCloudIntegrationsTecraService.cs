@@ -11,7 +11,7 @@ namespace ordercloud.integrations.tecra
     {
         Task<TecraToken> GetToken();
         Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string folder);
-        Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id);
+        Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder);
 
     }
     public class OrderCloudTecraConfig
@@ -61,15 +61,10 @@ namespace ordercloud.integrations.tecra
         {
             return await this.Request("api/chili/alldocuments", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraDocument[]>();
         }
-        public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id)
+        public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder)
         {
             TecraDocumentRequest request = new TecraDocumentRequest();
-            request.chiliurl = Config.ChiliUrl;
-            request.environment = Config.Environment;
-            request.username = Config.Username;
-            request.password = Config.Password;
-            request.folder = "";
-            return await this.Request($"api/chili/{id}/variabledefinitions", token).PostJsonAsync(request).ReceiveJson<TecraSpec[]>();
+            return await this.Request($"api/chili/{id}/variabledefinitions", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraSpec[]>();
         }
     }
 }
