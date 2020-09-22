@@ -7,8 +7,12 @@ import { ShopperContextService } from 'marketplace';
   styleUrls: ['./supplier-card.component.scss'],
 })
 export class OCMSupplierCard {
-  @Input() supplier = {} as Supplier;
-
+  _supplier: Supplier;
+  @Input() set supplier(s: Supplier) {
+    this._supplier = s;
+    this.logoUrl = `${this.context.appSettings.middlewareUrl}/assets/${this.context.appSettings.sellerID}/Suppliers/${s.ID}/thumbnail?size=s`;
+  }
+  logoUrl: string = '';
   constructor(private context: ShopperContextService) {}
 
   shopSupplier(supplier: Supplier): void {

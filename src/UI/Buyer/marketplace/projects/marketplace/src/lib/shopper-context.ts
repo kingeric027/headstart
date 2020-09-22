@@ -243,6 +243,10 @@ export class AppConfig {
   avalaraCompanyId: number;
   middlewareUrl: string;
   /**
+   *  The ID of the seller organization.
+   */
+  sellerID: string;
+  /**
    *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
    */
   ssoLink: string;
