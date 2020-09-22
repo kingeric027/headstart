@@ -34,7 +34,11 @@ namespace Orchestration.Tests
                     ApiUrl = "api"
                 }
             };
-            _command = new SyncCommand(_settings, new OrderCloudClient(), Substitute.For<AssetQuery>(Substitute.For<ICosmosStore<Asset>>()), Substitute.For<LogQuery>(Substitute.For<ICosmosStore<OrchestrationLog>>()));
+            _command = new SyncCommand(_settings, 
+                new OrderCloudClient(), 
+                Substitute.For<AssetQuery>(Substitute.For<ICosmosStore<Asset>>()), 
+                Substitute.For<AssetedResourceQuery>(Substitute.For<ICosmosStore<AssetedResourceDO>>()), 
+                Substitute.For<LogQuery>(Substitute.For<ICosmosStore<OrchestrationLog>>()));
         }
 
         [Test]
