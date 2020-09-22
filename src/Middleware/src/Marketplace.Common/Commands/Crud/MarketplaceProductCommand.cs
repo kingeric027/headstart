@@ -123,8 +123,15 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
 		{
 			var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
-			// Once data is good, switch away from DefaultPriceScheduleID. See comment in Delete().
-			var _priceSchedule = _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.DefaultPriceScheduleID, user.AccessToken); 
+			// Get the price schedule, if it exists, if not - send empty price schedule
+			var _priceSchedule = new PriceSchedule();
+			try
+            {
+				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, user.AccessToken); 
+            } catch
+            {
+				_priceSchedule = new PriceSchedule();
+            }
 			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _images = GetProductImages(id, user);
@@ -134,7 +141,7 @@ namespace Marketplace.Common.Commands.Crud
 				return new SuperMarketplaceProduct
 				{
 					Product = _product,
-					PriceSchedule = await _priceSchedule,
+					PriceSchedule = _priceSchedule,
 					Specs = (await _specs).Items,
 					Variants = (await _variants).Items,
 					Images = await _images,

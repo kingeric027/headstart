@@ -526,7 +526,8 @@
       <!-- /Description -->
       <!-- Pricing -->
       <li [ngbNavItem]="3"
-          id="3">
+          id="3"
+          [disabled]="readonly && !_superMarketplaceProductEditable?.PriceSchedule?.ID">
         <a [fragment]="price"
            class="text-muted d-flex justify-content-center align-items-center"
            ngbNavLink
