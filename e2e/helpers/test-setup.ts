@@ -2,6 +2,7 @@ import * as OrderCloudSDK from 'ordercloud-javascript-sdk'
 import {
 	adminClientAuth,
 	authAdminBrowser,
+	authBuyerBrowser,
 	authVendorBrowser,
 } from '../api-utils.ts/auth-util'
 import testConfig from '../testConfig'
@@ -93,6 +94,30 @@ export async function loginTestCleanup(
 	authToken: string
 ) {
 	await deleteUser(userID, buyerID, authToken)
+}
+
+export async function buyerTestSetup(authToken: string) {
+	await t.maximizeWindow()
+	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
+	await saveUserAssignment(user.ID, '0005-0002', '0005', authToken)
+	await saveUserAssignment(
+		user.ID,
+		'Dxd1cuubXU2BJkdnLf3v1A',
+		'0005',
+		authToken
+	)
+	await saveUserAssignment(
+		user.ID,
+		'iJhQ4uM-1UaFruXemXNZaw',
+		'0005',
+		authToken
+	) //move this stuff to a create buyer user method, and explain the user group IDs
+
+	await authBuyerBrowser(user)
+
+	await t.navigateTo(`${testConfig.buyerAppUrl}home`)
+
+	return user
 }
 
 export async function adminTestSetup() {

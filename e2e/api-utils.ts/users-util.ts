@@ -12,7 +12,7 @@ export async function createUser(clientAuth: string, buyerID: string) {
 		Active: true,
 		Email: email,
 		FirstName: firstNameReplaced,
-		LastName: firstNameReplaced,
+		LastName: lastNameReplaced,
 		Username: email,
 		ID: `${buyerID}-{${buyerID}-UserIncrementor}`,
 		xp: {

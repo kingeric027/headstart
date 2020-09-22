@@ -103,5 +103,5 @@ test('Assign Roles to Vendor User | 19970', async t => {
 	await adminHeaderPage.selectVendorUsers()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.supplierID)
 	await minorResourcePage.clickResource(t.fixtureCtx.supplierUserID)
-	await userDetailsPage.enableUserPermissions()
+	await userDetailsPage.updateUserPermissions()
 })

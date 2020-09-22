@@ -86,8 +86,7 @@ class VendorDetailsPage {
 		currency: string,
 		productType: string[],
 		mainCategory: string,
-		subCategory: string,
-		countries: string[]
+		subCategory: string
 	) {
 		if (active) {
 			await t.click(this.activeToggle)
@@ -115,12 +114,6 @@ class VendorDetailsPage {
 		await t.click(
 			this.subCategoryOptionsSelector.withText(createRegExp(subCategory))
 		)
-		if (countries.includes('UnitedStates')) {
-			await t.click(this.USCountryCheckbox)
-		}
-		if (countries.includes('Canada')) {
-			await t.click(this.CACountryCheckbox)
-		}
 
 		await t.click(this.createButton)
 
