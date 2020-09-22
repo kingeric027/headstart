@@ -104,8 +104,11 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
         this.showAvailableCategories = false;
         this._documentID = event.target.value;
         this._documentName = this.tecraDocuments.find(x => x.id === this._documentID).name;
-        const specs = await this.productService.getTecraSpecs(this._documentID);
+
+        //TODO - Update to only get configs assosociated to this buyer and product
+        const specs = await this.productService.getTecraSpecs(this._documentID, "4511001");
         this.tecraSpecs = specs;
+
         console.log(this.tecraSpecs);
         this.showAvailableCategories = true;
     }

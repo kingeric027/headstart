@@ -131,9 +131,10 @@ export class ProductService extends ResourceCrudService<Product> {
     }
 
     async getTecraSpecs(
-        docID: string
+        docID: string,
+        folder: string
     ): Promise<TecraSpec[]> {
-        return this.chiliService.getSpecs(docID);
+        return this.chiliService.getSpecs(docID, folder);
     }
 
     async listChiliConfigs(): Promise<ListPage<ChiliConfig>>
