@@ -13,11 +13,31 @@ namespace Marketplace.Common.Models
     [CosmosCollection("productupdates")]
     public class ProductHistory : CosmosObject
     {
+        [CosmosPartitionKey]
+        public string ProductID { get; set; }
+        public ActionType Action { get; set; }
+
+        public Product Product { get; set; }
+        public DateTime DateLastUpdated { get; set; }
+
+    }
+
+    public class PriceScheduleHistory : CosmosObject
+    {
+        public ActionType Action { get; set; }
+        public string PriceScheduleID { get; set; }
+        public MarketplacePriceSchedule PriceSchedule { get; set; }
+        public DateTime DateLastUpdated { get; set; }
+
+    }
+
+    public class ProductAssignmentHistory : CosmosObject
+    {
         public ActionType Action { get; set; }
         public string ProductID { get; set; }
-        public string PriceScheduleID { get; set; }
-        public List<MarketplacePriceSchedule> PriceSchedulesAssigned { get; set; }
-        public MarketplaceProduct Product { get; set; }
+        public ProductAssignment ProductAssignment { get; set; }
+        public DateTime DateLastUpdated { get; set; }
+
     }
 
     public class ProductUpdateData
@@ -25,13 +45,13 @@ namespace Marketplace.Common.Models
         public string Supplier { get; set; }
         public DateTime TimeOfUpdate { get; set; }
         public string ProductID { get; set; }
-        public string Action { get; set; }
+        public ActionType Action { get; set; }
         public string OldProductType { get; set; }
         public string OldUnitMeasure { get; set; }
-        public bool OldActiveStatus { get; set; }
+        public bool? OldActiveStatus { get; set; }
         public string NewProductType { get; set; }
         public string NewUnitMeasure { get; set; }
-        public bool NewActiveStatus { get; set; }
+        public bool? NewActiveStatus { get; set; }
         public string PriceScheduleID { get; set; }
         public string Buyer { get; set; }
         public int OldMinQty { get; set; }

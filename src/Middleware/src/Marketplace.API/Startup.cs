@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avalara.AvaTax.RestClient;
 using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
@@ -83,6 +83,7 @@ namespace Marketplace.API
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
+                .InjectCosmosStore<ProductHistoryQuery, ProductHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
