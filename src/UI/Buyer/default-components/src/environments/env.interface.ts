@@ -7,6 +7,7 @@ export interface Environment {
   marketplaceID: string;
   baseUrl: string;
   middlewareUrl: string;
+  sellerID: string;
   ssoLink: string;
   translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;

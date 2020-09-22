@@ -13,6 +13,7 @@ export const environment: Environment = {
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+  sellerID: 'rQYR6T6ZTEqVrqv8x_ei0g',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
   theme: afTheme,

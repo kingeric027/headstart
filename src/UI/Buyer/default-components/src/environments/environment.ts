@@ -27,7 +27,7 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const appName: AppName = BASECAMP_FITNESS;
+const appName: AppName = WAXING_THE_CITY;
 const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
 const localMiddlewareURL = 'https://localhost:44334';
 // ====================================================================
@@ -48,6 +48,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: afTheme,
@@ -60,6 +61,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: wtcTheme,
@@ -72,6 +74,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bcfTheme,
@@ -84,6 +87,7 @@ const devEnvironments = {
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bmTheme,
