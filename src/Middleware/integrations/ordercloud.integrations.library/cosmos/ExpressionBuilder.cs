@@ -27,9 +27,9 @@ namespace ordercloud.integrations.library.Cosmos
             member = filter.Name.Split(".").Aggregate(member, Expression.Property); // takes X.X notation and gets to the nested property member
 
             var propertyType = ((PropertyInfo)member.To<MemberExpression>().Member).PropertyType;
-            if (propertyType.GetInterface(nameof(IEnumerable)) != null) {
+            if (propertyType.GetInterface(nameof(IList)) != null) {
                 var elementType = propertyType.GetTypeInfo().GenericTypeArguments[0];
-                return GetEnumerableExpression<T>(elementType, member, filter);
+                return GetListExpression<T>(elementType, member, filter);
             }
 
             if (propertyType.IsEnum || (propertyType.IsNullable() && Nullable.GetUnderlyingType(propertyType).IsEnum))
@@ -155,7 +155,7 @@ namespace ordercloud.integrations.library.Cosmos
 		}
 
         // May not handle objects inside of arrays correctly. Only arrays of simple types like strings and numbers
-		public static Expression GetEnumerableExpression<T>(Type elementType, Expression member, ListFilter filter)
+		public static Expression GetListExpression<T>(Type elementType, Expression member, ListFilter filter)
 		{
 			var value = filter.Values.FirstOrDefault();
 			if (value == null)
