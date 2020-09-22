@@ -1,28 +1,31 @@
 <!-- User Permissions -->
-<div *ngIf="userGroups"  
+<div *ngIf="userGroups?.Items?.length > 0"  
      class="row pt-3 mt-3 bg-white shadow-sm card-highlight-border">
   <div class="col-md-5">
     <h5>{{displayText.Title}}</h5>
     <p class="font-italic">{{displayText.InfoText}}</p>
   </div>
   <div class="col-md-7">
+    <search-component class="mr-3 w-100 additional-item-resource-select-dropdown"
+                      id="resource-search"
+                      [placeholderText]="''"
+                      [searchTermInput]="searchTerm"
+                      (searched)="searchedResources($event)">
+    </search-component>
+    <perfect-scrollbar style="max-width: 600px; max-height: 400px;">
     <table class="table table-hover">
       <thead>
         <tr>
           <th scope="col">Assigned</th>
           <th scope="col">{{displayText.Column2}}</th>
+          <th scope="col">ID</th>
           <th scope="col"
               *ngIf="userGroupType === 'UserPermissions'">Description</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngIf="!userGroups?.length">
-          <td>
-             <span class="font-italic">There are no locations for this user's Home Country.</span>
-          </td>
-        </tr>
         <tr class="cursor-pointer"
-            *ngFor="let group of userGroups">
+            *ngFor="let group of userGroups.Items">
           <td class="d-flex justify-content-start align-items-center">
             <label class="switch mb-0">
               <input class="form-check-input"
@@ -34,9 +37,32 @@
           </td>
           <td>{{group.Name}}</td>
           <td *ngIf="userGroupType === 'UserPermissions'">{{group.Description}}</td>
+          <td>{{group.ID}}</td>
+        </tr>
+          <!-- <button ngbDropdownItem
+                  *ngFor="let group of userGroups"
+                  (click)="selectParentResource(resource)">
+            <summary-resource-display-component [resource]="resource"
+                                                [resourceType]="ocService.primaryResourceLevel">
+            </summary-resource-display-component>
+            </button> -->
+        <tr *ngIf="!userGroups?.Items?.length">
+          <td>
+             <span class="font-italic">There are no locations for this user's Home Country.</span>
+          </td>
         </tr>
       </tbody>
     </table>
+    </perfect-scrollbar>
+    <ngb-pagination *ngIf="userGroups?.Meta.TotalPages > 1"
+                     maxSize="10"
+                     class="d-flex justify-content-center mt-3"
+                     [collectionSize]="userGroups.Meta.TotalCount"
+                     [pageSize]="userGroups.Meta.PageSize"
+                     [(page)]="userGroups.Meta.Page"
+                     (pageChange)="changePage($event)"
+                     [rotate]="true">
+    </ngb-pagination>
     <div *ngIf="!isCreatingNew"
          class="pb-3">
       <button [disabled]="!areChanges"
@@ -65,4 +91,4 @@
     </div>
   </div>
 </div>
-<!-- /Supplier User Permissions  -->
+<!-- /User Permissions  -->

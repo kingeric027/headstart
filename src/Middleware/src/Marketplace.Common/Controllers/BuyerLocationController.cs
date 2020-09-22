@@ -104,5 +104,19 @@ namespace Marketplace.Common.Controllers
         {
             return await _locationPermissionCommand.SetLocationApprovalThreshold(buyerID, buyerLocationID, locationApprovalThresholdUpdate.Threshold, VerifiedUserContext);
         }
+
+        [DocName("LIST user groups for home country")]
+        [HttpGet, Route("{buyerID}/usergroups/{homeCountry}/{pageNumber}/{searchTerm}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(string buyerID, string homeCountry, int pageNumber = 1, string searchTerm = null)
+        {
+            return await _locationPermissionCommand.ListUserGroupsByCountry(buyerID, homeCountry, pageNumber, searchTerm, VerifiedUserContext);
+        }
+
+        //[DocName("LIST user groups for home country")]
+        //[HttpGet, Route("{buyerID}/usergroups/{homeCountry}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        //public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry)
+        //{
+        //    return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, homeCountry, VerifiedUserContext);
+        //}
     }
 }

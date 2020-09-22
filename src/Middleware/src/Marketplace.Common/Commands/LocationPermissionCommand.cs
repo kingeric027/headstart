@@ -8,6 +8,7 @@ using Marketplace.Models;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using Marketplace.Common.Constants;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,6 +21,8 @@ namespace Marketplace.Common.Commands
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(string buyerID, string homeCountry, int pageNumber, string searchTerm, VerifiedUserContext verifiedUser);
+        //Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext verifiedUser);
     }
 
     public class LocationPermissionCommand : ILocationPermissionCommand
@@ -111,7 +114,32 @@ namespace Marketplace.Common.Commands
             return await IsUserInUserGroup(buyerID, userGroupID, verifiedUser);
         }
 
-        private async Task<bool> IsUserInUserGroup(string buyerID, string userGroupID, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(string buyerID, string homeCountry, int pageNumber, string searchTerm, VerifiedUserContext verifiedUser)
+        {
+            var userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+                buyerID,
+                search: searchTerm,
+                filters: $"xp.Country={homeCountry}",
+                page: pageNumber,
+                pageSize: 100
+                );
+
+            return userGroups;
+        }
+
+        //public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext user)
+        //{
+        //    var userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+        //        buyerID,
+        //        filters: $"xp.Country={homeCountry}",
+        //        search: args.Search,
+        //        pageSize: 100,
+        //        page: args.Page);
+
+        //    return userGroups;
+        //}
+
+    private async Task<bool> IsUserInUserGroup(string buyerID, string userGroupID, VerifiedUserContext verifiedUser)
         {
             var userGroupAssignmentForAccess = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID, verifiedUser.UserID);
             return userGroupAssignmentForAccess.Items.Count > 0;

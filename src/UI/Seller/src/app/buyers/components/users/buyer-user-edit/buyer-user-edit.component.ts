@@ -23,6 +23,8 @@ export class BuyerUserEditComponent {
   updateResource = new EventEmitter<any>();
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
+  @Output()
+  hitScrollEnd: EventEmitter<any> = new EventEmitter();
   isCreatingNew: boolean;
   resourceForm: FormGroup;
   selectedResource: User;
@@ -62,5 +64,9 @@ export class BuyerUserEditComponent {
     if (!event && !this.isCreatingNew) {
       this.resourceForm.controls.Country.enable();
     }
+  }
+
+  incrementPageNumber(event: any): void {
+    console.log('what is the event', event);
   }
 }

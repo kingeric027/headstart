@@ -1,10 +1,15 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { User, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService } from '@ordercloud/angular-sdk';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, Inject, ChangeDetectorRef } from '@angular/core';
+import { User, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService, OcTokenService, ListPage } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { GetDisplayText } from './user-group-assignments.constants';
 import { Router } from '@angular/router';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { MarketplaceLocationUserGroup } from '@ordercloud/headstart-sdk';
+import { List } from 'lodash';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 interface AssignmentsToAddUpdate {
   UserGroupType: string;
@@ -27,7 +32,8 @@ export class UserGroupAssignments implements OnChanges {
 
   userOrgID: string;
   userID: string;
-  userGroups: UserGroup[];
+  userGroups: ListPage<MarketplaceLocationUserGroup>;
+  pageNumber = 1;
   add: UserGroupAssignment[];
   del: UserGroupAssignment[];
   _userUserGroupAssignmentsStatic: UserGroupAssignment[] = [];
@@ -37,15 +43,22 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
+  searchTermInput: string;
+  args: ListArgs;
 
   constructor(
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private ocTokenService: OcTokenService,
+    private changeDetection: ChangeDetectorRef,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
   
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
-    await this.getUserGroups(this.userOrgID);
+    if (this.user.xp?.Country) {
+      await this.getUserGroups(this.userOrgID);
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
@@ -56,6 +69,7 @@ export class UserGroupAssignments implements OnChanges {
       this.userID = this.user.ID
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
+  }
   }
 
   updateForUserGroupAssignmentType() {
@@ -68,17 +82,21 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroups(ID: string): Promise<void> {
-    const groups = await this.userPermissionsService.getUserGroups(ID, this.options);
-    const groupsInHomeCountry = groups.Items.filter(group => 
+    if (this.user.xp?.Country) {
+      const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, this.pageNumber);
+      this.userGroups = groups;
+    }
+    const groups2 = await this.userPermissionsService.getUserGroups(ID, this.options);
+    console.log('these are the groups', groups2);
+    const groupsInHomeCountry = groups2.Items.filter(group => 
     this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
-    this.userGroups = groupsInHomeCountry;
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
     const userGroupAssignments = await this.userPermissionsService.listUserAssignments(userID, userOrgID);
     this._userUserGroupAssignmentsStatic = userGroupAssignments.Items;
     this._userUserGroupAssignmentsEditable = userGroupAssignments.Items;
-    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => this.userGroups.find(ug => ug.ID === assignedUG.UserGroupID));
+    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => this.userGroups.Items?.find(ug => ug.ID === assignedUG.UserGroupID));
     this.hasAssignments.emit(match);
   }
 
@@ -149,4 +167,50 @@ export class UserGroupAssignments implements OnChanges {
     await this.getUserGroupAssignments(this.userID, this.userOrgID);
     this.checkForUserUserGroupAssignmentChanges();
   }
+
+  async getUserGroupsByCountry(buyerID: string, homeCountry: string, pageNumber?: number, searchTerm?: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${homeCountry}/${pageNumber}/${searchTerm}`;
+    return await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
+  }
+
+  private buildHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+  }
+
+  private createHttpParams(args: ListArgs): HttpParams {
+    let params = new HttpParams();
+    Object.entries(args).forEach(([key, value]) => {
+      if (key !== 'filters' && value) {
+        params = params.append(key, value.toString());
+      }
+    });
+    Object.entries(args.filters).forEach(([key, value]) => {
+      if ((typeof value !== 'object' && value) || (value && value.length)) {
+        params = params.append(key, value.toString());
+      }
+    });
+    return params;
+  }
+
+  // async handleScrollEnd(): Promise<void> {
+    // if (this.userGroups?.Meta.TotalPages > this.pageNumber) {
+    //   this.pageNumber += 1;
+    //   const newGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, this.pageNumber);
+    //   this.userGroups.Items = this.userGroups.Items.concat(newGroups.Items);
+    //   this.changeDetection.detectChanges();
+    // }
+  // }
+
+  async changePage(page: number) {
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, page);
+  }
+
+  async searchedResources(searchText: any) {
+    this.searchTermInput = searchText;
+    this.args = { search: searchText }
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, null, searchText);
+}
 }
