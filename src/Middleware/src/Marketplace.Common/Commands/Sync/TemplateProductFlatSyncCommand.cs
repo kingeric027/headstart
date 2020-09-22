@@ -101,7 +101,7 @@ namespace Marketplace.Common.Commands
                     await _assignment.SaveAssignment(new AssetAssignment()
                     {
                         AssetID = image.ID,
-                        ParentResourceID = product.ID,
+                        //ParentResourceID = product.ID,
                         ResourceType = ResourceType.Products,
                         ResourceID = product.ID
                     }, _user);
