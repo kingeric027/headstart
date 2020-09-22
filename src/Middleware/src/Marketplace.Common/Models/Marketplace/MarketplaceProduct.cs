@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
 using Newtonsoft.Json;
@@ -28,7 +29,7 @@ namespace Marketplace.Models
     public class SuperMarketplaceMeProduct : IMarketplaceObject
     {
         public string ID { get; set; }
-        public MarketplaceMeProduct Product { get; set; }
+        public MarketplaceMeKitProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
