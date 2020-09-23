@@ -123,21 +123,22 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceProduct product)
+        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceProduct product, MarketplaceVariant variant)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
             {
                 item_type = "sales_and_purchases",
-                name = product.Name,
+                name = variant?.Name ?? product.Name,
                 rate = decimal.ToDouble(item.UnitPrice.Value),
-                purchase_description = $"{product.Name} from {item.SupplierID}", // debug removal
-                description = $"{product.Name} from {item.SupplierID}",
-                sku = product.ID, // debug removal
+                purchase_description = $"{variant?.Name ?? product.Name} from {item.SupplierID}", // debug removal
+                description = $"{variant?.Name ?? product.Name} from {item.SupplierID}",
+                sku = variant?.ID ?? product.ID, // debug removal
                 unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value * .5M),
                 product_type = "goods", //TODO: MODEL ~ evaluate // debug removal
-                is_taxable = true //TODO: MODEL ~ evaluate with Tax authority
+                is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
+                //tax_exemption_id = "",
                 //quantity = item.Quantity, // debug removal
                 //item_total = decimal.ToDouble(item.LineTotal), // debug removal
                 //status = "active", // debug removal
@@ -151,23 +152,23 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceProduct product)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceProduct product, MarketplaceVariant variant)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
             {
                 item_id = zItem.item_id,
                 item_type = "sales_and_purchases",
-                name = product.Name,
+                name = variant?.Name ?? product.Name,
                 rate = decimal.ToDouble(item.UnitPrice.Value),
-                purchase_description = $"{product.Name} from {item.SupplierID}", // debug removal
-                description = $"{product.Name} from {item.SupplierID}",
-                sku = product.ID, // debug removal
-                unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
+                purchase_description = $"{variant?.Name ?? product.Name} from {item.SupplierID}", // debug removal
+                description = $"{variant?.Name ?? product.Name} from {item.SupplierID}",
+                sku = variant?.ID ?? product.ID,
+                unit = product.xp?.UnitOfMeasure?.Unit, 
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value * .5M),
-                product_type = "goods", //TODO: MODEL ~ evaluate // debug removal
-                is_taxable = true //TODO: MODEL ~ evaluate with Tax authority
-                //quantity = item.Quantity, // debug removal
+                product_type = "goods",
+                is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
+                //tax_exemption_id = "",
                 //item_total = decimal.ToDouble(item.LineTotal), // debug removal
                 //status = "active", // debug removal
                 //line_item_id = item.ID, // debug removal

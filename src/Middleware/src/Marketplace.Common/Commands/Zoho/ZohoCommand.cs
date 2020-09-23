@@ -125,14 +125,18 @@ namespace Marketplace.Common.Commands.Zoho
         private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(IList<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items
-            var products = await Throttler.RunAsync(lineitems.Select(item => item.ProductID).Distinct().ToList(), 100, 5,
-                s => _oc.Products.GetAsync<MarketplaceProduct>(s));
+            // Overview: variants will be saved in Zoho as the Item. If the variant is null save the Product as the Item
 
-            var zItems = await Throttler.RunAsync(products.ToList(), 100, 5, product => _zoho.Items.ListAsync(new ZohoFilter()
+            // gather IDs either at the product or variant level to search Zoho for existing Items 
+            var itemIds = lineitems.Select(item => item.Variant == null ? item.Product.ID : item.Variant.ID);
+
+            var zItems = await Throttler.RunAsync(itemIds, 100, 5, id => _zoho.Items.ListAsync(new ZohoFilter()
             {
                 Key = "sku",
-                Value = product.ID
+                Value = id
             }));
+            // the search api returns a list always. if no item was found the list will be empty
+            // so we want to get found items into a pared down list
             var z_items = new Dictionary<string, ZohoLineItem>();
             foreach (var list in zItems)
                 list.Items.ForEach(item => z_items.Add(item.sku, item));
@@ -140,11 +144,12 @@ namespace Marketplace.Common.Commands.Zoho
             var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
             {
                 var marketplaceProduct = lineItem.Product.Reserialize<MarketplaceProduct>();
-                var z_item = z_items.FirstOrDefault(z => z.Key == marketplaceProduct.ID);
+                var marketplaceVariant = lineItem.Variant?.Reserialize<MarketplaceVariant>();
+                var z_item = z_items.FirstOrDefault(z => marketplaceVariant != null ? z.Key == marketplaceVariant.ID : z.Key == marketplaceProduct.ID);
                 if (z_item.Key != null)
                     return await _zoho.Items.SaveAsync(
-                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct));
-                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct));
+                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct, marketplaceVariant));
+                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct, marketplaceVariant));
             });
             return items.ToList();
         }
