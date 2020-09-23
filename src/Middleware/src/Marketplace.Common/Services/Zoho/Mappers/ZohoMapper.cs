@@ -123,7 +123,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceProduct product, MarketplaceVariant variant)
+        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
@@ -152,7 +152,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceProduct product, MarketplaceVariant variant)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()

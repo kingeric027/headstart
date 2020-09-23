@@ -143,13 +143,10 @@ namespace Marketplace.Common.Commands.Zoho
 
             var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
             {
-                var marketplaceProduct = lineItem.Product.Reserialize<MarketplaceProduct>();
-                var marketplaceVariant = lineItem.Variant?.Reserialize<MarketplaceVariant>();
-                var z_item = z_items.FirstOrDefault(z => marketplaceVariant != null ? z.Key == marketplaceVariant.ID : z.Key == marketplaceProduct.ID);
+                var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
                 if (z_item.Key != null)
-                    return await _zoho.Items.SaveAsync(
-                        ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct, marketplaceVariant));
-                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == marketplaceProduct.ID), marketplaceProduct, marketplaceVariant));
+                    return await _zoho.Items.SaveAsync(ZohoLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
+                return await _zoho.Items.CreateAsync(ZohoLineItemMapper.Map(lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
             });
             return items.ToList();
         }
