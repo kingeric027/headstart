@@ -111,7 +111,7 @@ namespace Marketplace.Common.Commands.Zoho
                 items.AddRange(await ApplyShipping(orderWorksheet));
 
                 // Step 4: create sales order with all objects from above
-                var salesOrder = await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact, orderWorksheet.LineItems));
+                var salesOrder = await CreateSalesOrder(orderWorksheet, items, contact);
 
                 return salesOrder;
             }
@@ -121,6 +121,14 @@ namespace Marketplace.Common.Commands.Zoho
                 throw new OrderCloudIntegrationException(ErrorCodes.All["ZohoIntegrationError"], ex.Message);
             }
         }
+
+        private async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet, IEnumerable<ZohoLineItem> items, ZohoContact contact)
+        {
+            // promotions aren't part of the order worksheet, so we have to get them from OC
+            var promotions = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderWorksheet.Order.ID);
+            var order = ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact, orderWorksheet.LineItems, promotions.Items);
+            return await _zoho.SalesOrders.CreateAsync(order);
+        } 
 
         private async Task<List<ZohoLineItem>> CreateOrUpdateLineItems(IList<MarketplaceLineItem> lineitems)
         {
@@ -200,6 +208,7 @@ namespace Marketplace.Common.Commands.Zoho
             var ocBuyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(order.FromCompanyID);
             var buyerAddress = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(order.FromCompanyID, order.BillingAddressID);
             var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(order.FromCompanyID, order.BillingAddressID);
+            var ocUsers = await _oc.Users.ListAsync<MarketplaceUser>(ocBuyer.ID, buyerUserGroup.ID);
             var location = new MarketplaceBuyerLocation
             {
                 Address = buyerAddress,
@@ -207,18 +216,17 @@ namespace Marketplace.Common.Commands.Zoho
             };
             
             // TODO: MODEL update ~ eventually add a filter to get the primary contact user
-            var ocUsers = await _oc.Users.ListAsync<MarketplaceUser>(ocBuyer.ID);
             var currencies = await _zoho.Currencies.ListAsync();
 
             // TODO: MODEL update ~ right now we don't have actual groups set up for locations, so this isn't accurate or complete
-            var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = ocBuyer.Name });
+            var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = location.Address.CompanyName });
             if (zContact.Items.Any())
             {
                return await _zoho.Contacts.SaveAsync<ZohoContact>(
                     ZohoContactMapper.Map(
                         zContact.Items.FirstOrDefault(),
                         ocBuyer,
-                        ocUsers.Items.FirstOrDefault(),
+                        ocUsers.Items,
                         currencies.Items.FirstOrDefault(c => c.currency_code == (location.UserGroup.xp.Currency != null ? location.UserGroup.xp.Currency.ToString() : "USD")),
                         location));
             }
@@ -227,7 +235,7 @@ namespace Marketplace.Common.Commands.Zoho
                 return await _zoho.Contacts.CreateAsync<ZohoContact>(
                     ZohoContactMapper.Map(
                         ocBuyer,
-                        ocUsers.Items.FirstOrDefault(),
+                        ocUsers.Items,
                         currencies.Items.FirstOrDefault(c => c.currency_code == (location.UserGroup.xp.Currency != null ? location.UserGroup.xp.Currency.ToString() : "USD")),
                         location));
             }

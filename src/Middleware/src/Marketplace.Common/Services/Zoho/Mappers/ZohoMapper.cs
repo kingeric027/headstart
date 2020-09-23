@@ -5,6 +5,7 @@ using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.EntityFrameworkCore.Internal;
+using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.Zoho.Mappers
@@ -27,8 +28,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                         email = user.Email,
                         first_name = user.FirstName,
                         last_name = user.LastName,
-                        phone = user.Phone,
-                        is_primary_contact = true
+                        phone = user.Phone
                     }
                 },
                 currency_id = currency.currency_id
@@ -56,7 +56,6 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                             email = user.Email,
                             first_name = user.FirstName,
                             last_name = user.LastName,
-                            is_primary_contact = false,
                             phone = user.Phone
                         }
                     } : null,
@@ -67,57 +66,73 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(MarketplaceBuyer buyer, MarketplaceUser user,ZohoCurrency currency, MarketplaceBuyerLocation location)
+        public static ZohoContact Map(MarketplaceBuyer buyer, IList<MarketplaceUser> users, ZohoCurrency currency, MarketplaceBuyerLocation location)
         {
             return new ZohoContact()
             {
-                company_name = buyer.ID,
-                contact_name = buyer.Name,
+                company_name = $"{buyer.Name}",
+                contact_name = $"{location.Address?.AddressName}",
                 contact_type = "customer",
                 billing_address = ZohoAddressMapper.Map(location.Address),
                 shipping_address = ZohoAddressMapper.Map(location.Address),
-                contact_persons = new List<ZohoContactPerson>()
-                {
-                    new ZohoContactPerson()
-                    {
-                        email = user.Email,
-                        first_name = user.FirstName,
-                        last_name = user.LastName,
-                        phone = user.Phone,
-                        is_primary_contact = true
-                    }
-                },
-                currency_id = currency.currency_id
+                contact_persons = ZohoContactMapper.Map(users),
+                currency_id = currency.currency_id,
+                notes = $"Franchise ID: {buyer.ID} ~ Location ID: {location.Address?.xp.LocationID}"
+                //tax_authority_id = location.Address?.State,
+                //tax_id = location.Address?.xp?.AvalaraCertificateID.ToString()
                 //TODO: Evaluate model concerns with Avalara integration
                 //avatax_use_code = "use code",
                 //avatax_exempt_no = "exempt no"
             };
         }
 
-        public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, MarketplaceUser user, ZohoCurrency currency, MarketplaceBuyerLocation location)
+        public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, IList<MarketplaceUser> users, ZohoCurrency currency, MarketplaceBuyerLocation location)
         {
-            contact.company_name = buyer.ID;
-            contact.contact_name = buyer.Name;
+            contact.company_name = $"{buyer.Name}";
+            contact.contact_name = $"{location.Address?.AddressName}";
             contact.contact_type = "customer";
             contact.billing_address = ZohoAddressMapper.Map(location.Address);
             contact.shipping_address = ZohoAddressMapper.Map(location.Address);
-            contact.tax_authority_id = contact.tax_authority_id;
-            contact.contact_persons = (contact.contact_persons != null && contact.contact_persons.Any(c => c.email == user.Email))
-                ? new List<ZohoContactPerson>()
+            //contact.tax_authority_id ??= location.Address?.State;
+            contact.contact_persons = ZohoContactMapper.Map(users, contact);
+            contact.currency_id = currency.currency_id;
+            contact.notes = $"Franchise ID: {buyer.ID} ~ Location ID: {location.Address?.xp.LocationID}";
+            //contact.tax_id = location.Address?.xp?.AvalaraCertificateID.ToString();
+            //avatax_use_code = "use code",
+            //avatax_exempt_no = "exempt no"
+            return contact;
+        }
+
+        public static List<ZohoContactPerson> Map(IList<MarketplaceUser> users, ZohoContact contact = null)
+        {
+            // there is no property at this time for primary contact in OC, so we'll go with the first in the list
+            var isFirst = true;
+            var list = new List<ZohoContactPerson>();
+            foreach (var user in users)
+            {
+                if (contact?.contact_persons != null && contact.contact_persons.Any(p => p.email == user.Email))
                 {
-                    new ZohoContactPerson()
+                    var c = contact.contact_persons.FirstOrDefault(p => p.email == user.Email);
+                    c.email = user.Email;
+                    c.first_name = user.FirstName;
+                    c.last_name = user.LastName;
+                    c.phone = user.Phone;
+                    list.Add(c);
+                }
+                else
+                {
+                    list.Add(new ZohoContactPerson()
                     {
                         email = user.Email,
                         first_name = user.FirstName,
                         last_name = user.LastName,
-                        is_primary_contact = false,
-                        phone = user.Phone
-                    }
-                } : null;
-            contact.currency_id = currency.currency_id;
-            //avatax_use_code = "use code",
-            //avatax_exempt_no = "exempt no"
-            return contact;
+                        phone = user.Phone,
+                    });
+                }
+
+                isFirst = false;
+            }
+            return list.DistinctBy(u => u.email).ToList();
         }
     }
 
@@ -236,13 +251,16 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems)
+        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems, IList<OrderPromotion> promotions)
         {
             return new ZohoSalesOrder()
             {
                 reference_number = order.ID,
                 salesorder_number = order.ID,
                 date = order.DateSubmitted?.ToString("yyyy-MM-dd"),
+                is_discount_before_tax = true,
+                discount_amount = decimal.ToDouble(promotions.Sum(p => p.Amount)),
+                discount_type = "item_level",
                 line_items = items.Select(item =>
                 {
                     if (item.sku == "shipping")
@@ -254,11 +272,13 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                             rate = item.rate
                         };
                     }
+
+                    var line_item = lineitems.FirstOrDefault(li =>li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
                     return new ZohoLineItem()
                     {
                         item_id = item.item_id,
-                        quantity = lineitems.FirstOrDefault(li => li.ProductID == item.sku)?.Quantity,
-                        rate = decimal.ToDouble(lineitems.FirstOrDefault(li => li.ProductID == item.sku).UnitPrice.Value)
+                        quantity = line_item.Quantity,
+                        rate = decimal.ToDouble(line_item.UnitPrice.Value)
                     };
                 }).ToList(),
                 tax_total = decimal.ToDouble(order.TaxCost),

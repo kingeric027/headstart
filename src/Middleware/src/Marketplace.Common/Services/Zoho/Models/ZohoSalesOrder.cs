@@ -64,5 +64,8 @@ namespace Marketplace.Common.Services.Zoho.Models
         public bool can_send_in_mail { get; set; }
         public string salesperson_id { get; set; }
         public string salesperson_name { get; set; }
+        public bool is_discount_before_tax { get; set; }
+        public double discount_amount { get; set; }
+        public string discount_type { get; set; }
     }
 }
