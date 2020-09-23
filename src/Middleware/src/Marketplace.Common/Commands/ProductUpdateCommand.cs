@@ -11,6 +11,7 @@ using NPOI.XSSF.UserModel;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
 using OrderCloud.SDK;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IProductUpdateCommand
     {
-        Task CleanUpProductHistoryData();
+        Task CleanUpProductHistoryData(List<ProductHistory> products);
         Task SendAllProductUpdateEmails();
        //    Task SendProductUpdateEmail(string supplierID);
         ISheet SetHeaders(List<string> headers, ISheet worksheet);
@@ -50,9 +51,8 @@ namespace Marketplace.Common.Commands
             var productUpdateData = await BuildProductUpdateData();
             var excel = new XSSFWorkbook();
             var worksheet = excel.CreateSheet("ProductUpdate");
-            var date = DateTime.UtcNow.ToString("MMddyyyy");
-            var time = DateTime.Now.ToString("hmmss.ffff");
-            var fileName = $"ProductUpdate-{date}-{time}.xlsx";
+            var yesterday = DateTime.UtcNow.AddDays(-1).ToString("MMddyyyy");
+            var fileName = $"ProductUpdate-{yesterday}.xlsx";
             var fileReference = _container.GetAppendBlobReference(fileName);
             var headers = typeof(ProductUpdateData).GetProperties().Select(p => p.Name).ToList(); //    Use the property names as column headers
             var worksheetWithHeaders = SetHeaders(headers, worksheet);
@@ -63,16 +63,20 @@ namespace Marketplace.Common.Commands
             {
                 excel.Write(stream);
             }
-            
-        }
-
-        public async Task SendDataToUsers(CloudAppendBlob fileReference, string fileName)
-        {
             var usersToSend = await _oc.AdminUsers.ListAsync(filters: "xp.ProductEmails=true");
-            foreach(var user in usersToSend.Items) 
+            var userEmailList = new List<EmailAddress>();
+            foreach(var user in usersToSend.Items)
             {
-                
+                var userEmail = new EmailAddress()
+                {
+                    Email = user.Email,
+                    Name = user.FirstName
+                };
+                userEmailList.Add(userEmail);
             }
+            //  var userEmails = usersToSend.Items.Select(user => user.Email);
+            await _sendgridService.SendProductUpdateEmail(userEmailList, fileReference, fileName);
+            
         }
 
         public ISheet SetHeaders(List<string> headers, ISheet worksheet)
@@ -111,6 +115,7 @@ namespace Marketplace.Common.Commands
             var yesterday = DateTime.Now.AddDays(-1);
             var yesterDaysUpdates = await _productUpdate.ListProductsByDate(new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0));
             var dataToSend = new List<ProductUpdateData>();
+            var dataToDelete = new List<ProductHistory>();
             foreach (var update in yesterDaysUpdates)
             {
                 var productUpdates = (await _productUpdate.ListProducts(update.ProductID));
@@ -118,6 +123,7 @@ namespace Marketplace.Common.Commands
                 ProductHistory mostRecentUpdate = null;
                 if (previousUpdates.Count != 0)
                 {
+                    dataToDelete = (List<ProductHistory>)dataToDelete.Concat(previousUpdates);
                     var mostRecentUpdateDate = previousUpdates.Max(p => p.DateLastUpdated);
                     mostRecentUpdate = previousUpdates.Where(p => p.DateLastUpdated == mostRecentUpdateDate).FirstOrDefault();
                 }
@@ -135,15 +141,20 @@ namespace Marketplace.Common.Commands
                 }
                 else
                 {
-                    if (update.Product.xp.ProductType != mostRecentUpdate.Product.xp.ProductType)
+                    if (update.Product?.xp?.ProductType != mostRecentUpdate.Product?.xp?.ProductType)
                     {
                         productUpdate.OldProductType = mostRecentUpdate.Product.xp.ProductType;
                         productUpdate.NewProductType = update.Product.xp.ProductType;
                     }
-                    if (update.Product.xp.UnitOfMeasure != mostRecentUpdate.Product.xp.UnitOfMeasure)
+                    if (update.Product?.xp?.UnitOfMeasure?.Unit != mostRecentUpdate.Product?.xp?.UnitOfMeasure?.Unit)
                     {
-                        productUpdate.OldUnitMeasure = mostRecentUpdate.Product.xp.UnitOfMeasure;
-                        productUpdate.NewUnitMeasure = update.Product.xp.UnitOfMeasure;
+                        productUpdate.OldUnitMeasure = mostRecentUpdate.Product.xp.UnitOfMeasure.Unit;
+                        productUpdate.NewUnitMeasure = update.Product.xp.UnitOfMeasure.Unit;
+                    }
+                    if (update.Product?.xp?.UnitOfMeasure?.Qty != mostRecentUpdate.Product?.xp?.UnitOfMeasure?.Qty)
+                    {
+                        productUpdate.OldUnitQty = mostRecentUpdate.Product.xp.UnitOfMeasure.Qty;
+                        productUpdate.NewUnitQty = update.Product.xp.UnitOfMeasure.Qty;
                     }
                     if (update.Product.Active != mostRecentUpdate.Product.Active)
                     {
@@ -153,6 +164,7 @@ namespace Marketplace.Common.Commands
                 }
                 dataToSend.Add(productUpdate);
             }
+            //  await CleanUpProductHistoryData(dataToDelete); //   delete old updates of products.
             return dataToSend;
         }
 
@@ -164,10 +176,12 @@ namespace Marketplace.Common.Commands
         //    //  now we need to just send an email
         //}
 
-        public async Task CleanUpProductHistoryData()
+        public async Task CleanUpProductHistoryData(List<ProductHistory> products)
         {
-            var yesterday = DateTime.Now.AddDays(-1);
-            var yesterDaysUpdates = _productUpdate.ListProductsByDate(new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0));
+            await Throttler.RunAsync(products, 100, 5, async product =>
+            {
+                await _productUpdate.DeleteProduct(product.id);
+            });
         }
     }
 

@@ -23,15 +23,18 @@ namespace Marketplace.Common.Controllers
         private readonly IOrderCommand _orderCommand;
         private readonly IOrderCloudClient _oc;
         private readonly ProductHistoryQuery _productHistory;
+        private readonly PriceScheduleHistoryQuery _priceScheduleHistory;
         private readonly IProductUpdateCommand _productUpdateCommand;
 
         public WebhooksController(AppSettings settings, ISendgridService sendgridService, IOrderCommand orderCommand, 
-            ProductHistoryQuery productHistory, IOrderCloudClient orderCloud, IProductUpdateCommand productUpdateCommand) : base(settings)
+            ProductHistoryQuery productHistory, PriceScheduleHistoryQuery priceScheduleHistory, IOrderCloudClient orderCloud, 
+            IProductUpdateCommand productUpdateCommand) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
             _orderCommand = orderCommand;
             _productHistory = productHistory;
+            _priceScheduleHistory = priceScheduleHistory;
             _productUpdateCommand = productUpdateCommand;
             _oc = orderCloud;
         }
@@ -108,36 +111,40 @@ namespace Marketplace.Common.Controllers
             //await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
         }
 
-        //[HttpPost, Route("priceschedulecreated")]
-        //[OrderCloudWebhookAuth]
-        //public async void HandlePriceScheduleCreate([FromBody] WebhookPayloads.PriceSchedules.Create payload)
-        //{
-        //    var update = new ProductHistory()
-        //    {
-        //        Action = ActionType.CreatePriceSchedule,
-        //        PriceScheduleID = payload.Response.Body.ID,
-        //        PriceSchedule = (MarketplacePriceSchedule)payload.Response.Body,
-        //    };
-        //    await _productUpdate.Post(update);
-        //    // to mp manager when a product is created
-        //    //await _sendgridService.SendSingleEmail("noreply@four51.com", "noreply@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
-        //}
+        [HttpPost, Route("priceschedulecreated")]
+        [OrderCloudWebhookAuth]
+        public async void HandlePriceScheduleCreation([FromBody] WebhookPayloads.PriceSchedules.Create payload)
+        {
+            var update = new PriceScheduleHistory()
+            {
+                Action = ActionType.CreatePriceSchedule,
+                PriceScheduleID = payload.Response.Body.ID,
+                PriceSchedule = payload.Response.Body,
+            };
+            await _priceScheduleHistory.PostPriceSchedule(update);
+            // to mp manager when a product is created
+            //await _sendgridService.SendSingleEmail("noreply@four51.com", "noreply@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
+        }
 
-        //[HttpPost, Route("pricescheduleupdate")]
-        //[OrderCloudWebhookAuth]
-        //public async void HandlePriceScheduleUpdate([FromBody] WebhookPayloads.PriceSchedules.Patch payload)
-        //{
-        //    var update = new ProductHistory()
-        //    {
-        //        Action = ActionType.UpdatePriceSchedule,
-        //        PriceScheduleID = payload.Response.Body.ID,
-        //        PriceSchedule = (MarketplacePriceSchedule)payload.Response.Body,
+        [HttpPost, Route("priceScheduleupdate")]
+        [OrderCloudWebhookAuth]
+        public async void HandlePriceScheduleUpdate([FromBody] WebhookPayloads.PriceSchedules.Patch payload)
+        {
+            var update = new PriceScheduleHistory()
+            {
+                Action = ActionType.UpdatePriceSchedule,
+                PriceScheduleID = payload.Response.Body.ID,
+                PriceSchedule = payload.Response.Body,
 
-        //    };
-        //    await _productUpdate.Post(update);
-        //    // to mp manager when a product is updated
-        //    //await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
-        //}
+            };
+            await _priceScheduleHistory.PutPriceSchedule(update);
+
+            // querying data and putting into excel spreadsheet
+            await _productUpdateCommand.SendAllProductUpdateEmails();
+            // to mp manager when a product is updated
+            //await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
+        }
+
 
         [HttpPost, Route("supplierupdated")]
         [OrderCloudWebhookAuth]
