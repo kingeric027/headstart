@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
@@ -92,11 +93,9 @@ namespace Marketplace.Common.Commands
 			var searchText = args.Search ?? "";
 
 			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeKitProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken);
-			//var meKitProductRequest = _oc.Me.ListProductsAsync<MarketplaceMeKitProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken);
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = GetExchangeRates(user);
 
-			//var meKitProducts = await meKitProductRequest;
 			var meProducts = await meProductsRequest;
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
 			var exchangeRates = await exchangeRatesRequest;
@@ -111,7 +110,6 @@ namespace Marketplace.Common.Commands
 			await _sendgridService.SendContactSupplierAboutProductEmail(template);
         }
 
-		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		private MarketplaceMeKitProduct ApplyBuyerProductPricing(MarketplaceMeKitProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
 			
@@ -147,13 +145,13 @@ namespace Marketplace.Common.Commands
 			return product;
 		}
 
-		private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
-		{
-			var exchangeRateForProduct = exchangeRates.Find(e => e.Currency == productCurrency).Rate;
-			return defaultPrice * (decimal)exchangeRateForProduct;
-		}
+        private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+        {
+            var exchangeRateForProduct = exchangeRates.Find(e => e.Currency == productCurrency).Rate;
+            return defaultPrice * (decimal)exchangeRateForProduct;
+        }
 
-		private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
+        private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
 		{
 			var buyer = await _marketplaceBuyerCommand.Get(user.BuyerID);
 
