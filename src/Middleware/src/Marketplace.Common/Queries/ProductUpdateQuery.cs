@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Common.Queries
 {
-    public interface IProductHistoryQuery<T> where T : class, IProductHistory<T>
+    public interface IProductHistoryQuery<T> where T : IProductHistory<T>
     {
         Task Delete(string cosmosID);
         Task<List<T>> List(string resourceID);

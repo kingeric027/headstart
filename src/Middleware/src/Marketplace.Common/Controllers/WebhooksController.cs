@@ -13,6 +13,7 @@ using System;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using ImpromptuInterface;
+using Cosmonaut;
 
 namespace Marketplace.Common.Controllers
 {
@@ -22,8 +23,7 @@ namespace Marketplace.Common.Controllers
         private readonly ISendgridService _sendgridService;
         private readonly IOrderCommand _orderCommand;
         private readonly IOrderCloudClient _oc;
-        private readonly ProductHistoryQuery _productHistory;
-        private readonly PriceScheduleHistoryQuery _priceScheduleHistory;
+        private readonly IProductHistoryQuery<ProductHistory> _producHistory;
         private readonly IProductUpdateCommand _productUpdateCommand;
 
         public WebhooksController(AppSettings settings, ISendgridService sendgridService, IOrderCommand orderCommand, 
@@ -83,10 +83,11 @@ namespace Marketplace.Common.Controllers
             var update = new ProductHistory()
             {
                 Action = ActionType.CreateProduct,
-                ProductID = payload.Response.Body.ID,
-                Product = payload.Response.Body,
+                ResourceID = payload.Response.Body.ID,
+                Resource = payload.Response.Body,
             };
-            await _productHistory.PostProduct(update);
+            await query.Po
+            await _productHistory.Post(update);
             // to mp manager when a product is created
             //await _sendgridService.SendSingleEmail("noreply@four51.com", "noreply@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
         }
@@ -99,11 +100,11 @@ namespace Marketplace.Common.Controllers
             var update = new ProductHistory()
             {
                 Action = ActionType.UpdateProduct,
-                ProductID = payload.Response.Body.ID,
-                Product = payload.Response.Body,
+                ResourceID = payload.Response.Body.ID,
+                Resource = payload.Response.Body,
 
             };
-            await _productHistory.PutProduct(update);
+            await _productHistory.Put(update);
 
             // querying data and putting into excel spreadsheet
             await _productUpdateCommand.SendAllProductUpdateEmails();
@@ -118,8 +119,8 @@ namespace Marketplace.Common.Controllers
             var update = new PriceScheduleHistory()
             {
                 Action = ActionType.CreatePriceSchedule,
-                PriceScheduleID = payload.Response.Body.ID,
-                PriceSchedule = payload.Response.Body,
+                ResourceID = payload.Response.Body.ID,
+                Resource = payload.Response.Body,
             };
             await _priceScheduleHistory.PostPriceSchedule(update);
             // to mp manager when a product is created
