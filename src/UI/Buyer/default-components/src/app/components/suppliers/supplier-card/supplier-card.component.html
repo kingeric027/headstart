@@ -6,24 +6,22 @@
              src="{{logoUrl}}"
              alt="{{_supplier?.Name}} Logo" />
         <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex flex-column mr-4">
-            <p class="h5 mb-0">{{_supplier?.Name}}</p>
+          <div class="d-flex flex-column">
+            <p (click)="shopSupplier(_supplier)"
+               class="supplier-card--supplier-name h5 mb-0 cursor-pointer">{{_supplier?.Name}}</p>
             <small class="d-block"
                    *ngFor="let category of _supplier?.xp?.Categories">{{category.VendorLevel}} - {{category.ServiceCategory}}</small>
           </div>
-          <div *ngIf="_supplier?.xp?.SupportContact"
-               class="d-flex flex-column text-right mr-4">
-            <p class="small text-muted mb-0"
-               translate>SUPPLIERS.CARD.SUPPORT_CONTACT</p>
-            <p class="h6 mb-0">{{_supplier?.xp?.SupportContact?.Name}}</p>
-            <p class="mb-0">{{_supplier?.xp?.SupportContact?.Email}}</p>
-            <p>{{_supplier?.xp?.SupportContact?.Phone}}</p>
-          </div>
         </div>
       </div>
-      <button class="btn btn-sm btn-outline-dark shop-now"
-              (click)="shopSupplier(_supplier)"
-              translate>SUPPLIERS.CARD.SHOP_NOW</button>
+      <div *ngIf="_supplier?.xp?.SupportContact"
+           class="d-flex flex-column text-right mr-4">
+        <p class="small text-muted mb-0"
+           translate>SUPPLIERS.CARD.SUPPORT_CONTACT</p>
+        <p class="h6 mb-0">{{_supplier?.xp?.SupportContact?.Name}}</p>
+        <p class="mb-0">{{_supplier?.xp?.SupportContact?.Email}}</p>
+        <p>{{_supplier?.xp?.SupportContact?.Phone}}</p>
+      </div>
     </div>
     <div [innerHTML]="_supplier?.xp?.Description"></div>
   </div>
