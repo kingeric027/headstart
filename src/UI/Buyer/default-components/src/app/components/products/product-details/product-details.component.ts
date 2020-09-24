@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak, Product } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, CurrentUser } from 'marketplace';
+import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
 import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
@@ -45,8 +45,11 @@ export class OCMProductDetails implements OnInit {
   _userCurrency: string;
   specLength: number;
   quoteFormModal = ModalState.Closed;
+  contactSupplierFormModal = ModalState.Closed;
   currentUser: CurrentUser;
   showRequestSubmittedMessage = false;
+  showContactSupplierFormSubmittedMessage = false;
+  showContactSupplierFormNotSubmittedMessage = false;
   submittedQuoteOrder: any;
   showGrid = false;
   isAddingToCart = false;
@@ -56,6 +59,7 @@ export class OCMProductDetails implements OnInit {
   isKitStatic = false;
   _chiliConfigs: ChiliConfig[] = [];
   showConfigs = false;
+  contactRequest: ContactSupplierBody;
   constructor(
     private formService: SpecFormService,
     private context: ShopperContextService) {
@@ -255,12 +259,20 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Open;
   }
 
+  openContactSupplierForm(): void {
+    this.contactSupplierFormModal = ModalState.Open;
+  }
+
   isQuoteProduct(): boolean {
     return this._product.xp.ProductType === 'Quote';
   }
 
   dismissQuoteForm(): void {
     this.quoteFormModal = ModalState.Closed;
+  }
+
+  dismissContactSupplierForm(): void {
+    this.contactSupplierFormModal = ModalState.Closed;
   }
 
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
@@ -277,6 +289,19 @@ export class OCMProductDetails implements OnInit {
     } catch (ex) {
       this.showRequestSubmittedMessage = false;
       this.quoteFormModal = ModalState.Closed;
+      throw ex;
+    }
+  }
+
+  async submitContactSupplierForm(formData: any): Promise<void> {
+    this.contactRequest = {Product: this._product, BuyerRequest: formData}
+    try {
+      await this.context.currentUser.submitContactSupplierForm(this.contactRequest);
+      this.contactSupplierFormModal = ModalState.Closed;
+      this.showContactSupplierFormSubmittedMessage = true;
+    } catch (ex) {
+      this.showContactSupplierFormNotSubmittedMessage = true;
+      this.contactSupplierFormModal = ModalState.Closed;
       throw ex;
     }
   }

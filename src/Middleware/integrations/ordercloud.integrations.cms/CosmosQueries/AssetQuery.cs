@@ -166,8 +166,8 @@ namespace ordercloud.integrations.cms
 				asset.Metadata.ImageHeight = image.Height;
 				asset.Metadata.ImageHorizontalResolution = (decimal)image.HorizontalResolution;
 				asset.Metadata.ImageVerticalResolution = (decimal)image.VerticalResolution;
-				var small = image.CreateSquareThumbnail(100);
-				var medium = image.CreateSquareThumbnail(300);
+				var small = image.ResizeSmallerDimensionToTarget(100);
+				var medium = image.ResizeSmallerDimensionToTarget(300);
 				await Task.WhenAll(new[] {
 					_blob.UploadAsset(container, $"{asset.id}-m", medium),
 					_blob.UploadAsset(container, $"{asset.id}-s", small)

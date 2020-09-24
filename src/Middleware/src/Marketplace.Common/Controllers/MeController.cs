@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
+using Marketplace.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -36,5 +38,12 @@ namespace Marketplace.Common.Controllers
 		{
 			return await _meProductCommand.List(args, VerifiedUserContext);
 		}
+
+		[DocName("POST request information about product")]
+		[HttpPost, Route("products/requestinfo"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task RequestProductInfo([FromBody] ContactSupplierBody template)
+        {
+			await _meProductCommand.RequestProductInfo(template);
+        }
 	}
 }

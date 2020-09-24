@@ -135,6 +135,12 @@
                                           [CurrentUser]="currentUser"
                                           (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
                 </ocm-modal>
+                <ocm-modal [state]="contactSupplierFormModal"
+                           [modalTitle]="'Product Inquiry'">
+                  <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
+                                             [CurrentUser]="currentUser"
+                                             (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
+     </ocm-modal>
               </div>
             </div>
             <div *ngIf="!isOrderable"
@@ -177,6 +183,13 @@
           </button>
         </span>
       </div>
+      <div class="alert alert-success my-3"
+           *ngIf="showContactSupplierFormSubmittedMessage">
+        <span translate>
+          PRODUCTS.DETAILS.THANK_YOU</span>
+        <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
+        </span>
+      </div>
       <strong>
         <span translate>PRODUCTS.DETAILS.DESCRIPTION</span>:
       </strong>
@@ -199,6 +212,16 @@
              target="_blank"
              download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
+      </div>
+      <div *ngIf="_product.xp.ProductType === 'Standard'"
+            class="mt-2">
+        <button type="button"
+                class="btn btn-link"
+                (click)="openContactSupplierForm()">
+          <small translate>PRODUCTS.DETAILS.CONTACT_PART_ONE</small>
+          <small translate>ALIAS.SUPPLIER_LOWERCASE</small>
+          <small translate>PRODUCTS.DETAILS.CONTACT_PART_TWO</small>
+        </button>
       </div>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
@@ -254,6 +277,12 @@
         <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
                                 [CurrentUser]="currentUser"
                                 (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+      </ocm-modal>
+      <ocm-modal [state]="contactSupplierFormModal"
+                 [modalTitle]="'Contact Supplier'">
+        <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
+                                [CurrentUser]="currentUser"
+                                (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
       </ocm-modal>
     </div>
   </div>

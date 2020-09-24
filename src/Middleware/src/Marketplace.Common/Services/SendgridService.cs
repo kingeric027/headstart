@@ -9,6 +9,7 @@ using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -30,6 +31,7 @@ namespace Marketplace.Common.Services
         Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
         Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
         Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, LineItemEmailDisplayText lineItemEmailDisplayText);
+        Task SendContactSupplierAboutProductEmail(ContactSupplierBody template);
     }
     public class SendgridService : ISendgridService
     {
@@ -47,6 +49,7 @@ namespace Marketplace.Common.Services
         private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
         private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
         private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
+        private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -299,6 +302,40 @@ namespace Marketplace.Common.Services
                     await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, templateID, templateData);
                 }
             };
+        }
+
+        public async Task SendContactSupplierAboutProductEmail(ContactSupplierBody template)
+        {
+            var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(template.Product.DefaultSupplierID);
+            var supplierEmail = supplier.xp.SupportContact.Email;
+            var templateData = new
+            {
+                ProductID = template.Product.ID,
+                ProductName = template.Product.Name,
+                template.BuyerRequest.FirstName,
+                template.BuyerRequest.LastName,
+                Location = template.BuyerRequest.BuyerLocation,
+                template.BuyerRequest.Phone,
+                template.BuyerRequest.Email,
+                Note = template.BuyerRequest.Comments
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
+            var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<MarketplaceUser>(
+                    filters: $"xp.RequestInfoEmails=true",
+                    page: page,
+                    pageSize: 100
+                 ));
+            foreach (var sellerUser in sellerUsers)
+            {
+                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, sellerUser.Email, INFORMATION_REQUEST, templateData);
+                if (sellerUser.xp.AddtlRcpts.Any())
+                {
+                    foreach (var rcpt in sellerUser.xp.AddtlRcpts)
+                    {
+                        await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, rcpt, INFORMATION_REQUEST, templateData);
+                    }
+                }
+            }
         }
 
         // helper functions 

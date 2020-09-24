@@ -127,6 +127,7 @@ import { OCMShippingSelectionForm } from './components/checkout/shipping-selecti
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
+import { OCMContactSupplierForm } from './components/products/contact-supplier-form/contact-supplier-form.component';
 import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
 import { OCMLocationListItem } from './components/profile/location-list-item/location-list-item.component';
 import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
@@ -151,6 +152,7 @@ export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): Trans
 const components = [
   OCMCategoryDropdown,
   OCMQuoteRequestForm,
+  OCMContactSupplierForm,
   OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
@@ -333,6 +335,7 @@ export class AppModule {
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
     this.buildWebComponent(OCMCategoryDropdown, 'ocm-category-dropdown');
     this.buildWebComponent(OCMQuoteRequestForm, 'ocm-quote-request-form');
+    this.buildWebComponent(OCMContactSupplierForm, 'ocm-contact-supplier-form');
 
     this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');

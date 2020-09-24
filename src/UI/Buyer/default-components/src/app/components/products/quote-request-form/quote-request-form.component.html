@@ -1,4 +1,5 @@
-<form (ngSubmit)="onSubmit()"
+<form *ngIf="myBuyerLocations"
+      (ngSubmit)="onSubmit()"
       novalidate
       [formGroup]="quoteRequestForm"
       name="QuoteRequestForm">
@@ -26,16 +27,19 @@
              autocomplete="off"
              showErrors />
     </div>
-    <!-- <div class="form-group">    
-        <label for="BuyerLocation">Buyer Location</label>
-        <input type="text"
-               formControlName="BuyerLocation"
+     <div *ngIf="myBuyerLocations.length > 0"
+           class="form-group">
+       <label for="BuyerLocation"
+              translate>For Location</label>
+       <select id="BuyerLocation"
                class="form-control"
-               id="BuyerLocation"
-               placeholder="Buyer Location"
-               autocomplete="off"
-               showErrors />
-      </div> -->
+               formControlName="BuyerLocation">
+          <option *ngFor="let location of myBuyerLocations"
+                  [ngValue]="location?.AddressName || ''">
+              {{ location?.AddressName }}
+          </option>
+       </select>
+   </div> 
     <div class="form-group">
       <label for="Phone"
              translate>PRODUCTS.QUOTE_REQ.PHONE</label>
