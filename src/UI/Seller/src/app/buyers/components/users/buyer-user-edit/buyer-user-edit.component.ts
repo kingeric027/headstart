@@ -23,8 +23,6 @@ export class BuyerUserEditComponent {
   updateResource = new EventEmitter<any>();
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>();
-  @Output()
-  hitScrollEnd: EventEmitter<any> = new EventEmitter();
   isCreatingNew: boolean;
   resourceForm: FormGroup;
   selectedResource: User;
