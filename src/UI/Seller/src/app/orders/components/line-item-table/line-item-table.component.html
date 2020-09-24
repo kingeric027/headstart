@@ -72,7 +72,7 @@
                     <span>{{ li.Product.Name }}
                       <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span>
                     </span>
-                    <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                    <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
                     <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                           class="
                       badge
