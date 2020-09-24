@@ -64,7 +64,19 @@ export class OCMProductDetails implements OnInit {
     this.specFormService = formService;
   }
   @Input() set product(superProduct: any) {
-    if (superProduct.PriceSchedule) {
+    if (superProduct.Product.xp.ProductType === "Kit") {
+      this.isKitProduct = true;
+      this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
+      this.isOrderable = true
+      this._product = superProduct.Product;
+      this._attachments = superProduct.Attachments;
+      this.images = superProduct.Images ? superProduct.Images.map(img => img) : [];
+      const currentUser = this.context.currentUser.get();
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+      this.productsIncludedInKit = superProduct.ProductAssignments.ProductsInKit;
+      this.getProductsInKit(superProduct.ProductAssignments.ProductsInKit);
+    } else {
       this.isKitProduct = false;
       this._superProduct = superProduct;
       this._product = superProduct.Product;
@@ -84,18 +96,6 @@ export class OCMProductDetails implements OnInit {
       this.imageUrls = superProduct.Images.map(img => img.Url);
       this.isOrderable = !!superProduct.PriceSchedule;
       this.supplierNote = this._product.xp && this._product.xp.Note;
-    } else {
-      this.isKitProduct = true;
-      this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
-      this.isOrderable = true
-      this._product = superProduct.Product;
-      this._attachments = superProduct.Attachments;
-      this.images = superProduct.Images ? superProduct.Images.map(img => img) : [];
-      const currentUser = this.context.currentUser.get();
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-      this.productsIncludedInKit = superProduct.ProductAssignments.ProductsInKit;
-      this.getProductsInKit(superProduct.ProductAssignments.ProductsInKit);
     }
   }
 
@@ -281,7 +281,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   async submitContactSupplierForm(formData: any): Promise<void> {
-    this.contactRequest = {Product: this._product, BuyerRequest: formData}
+    this.contactRequest = { Product: this._product, BuyerRequest: formData }
     try {
       await this.context.currentUser.submitContactSupplierForm(this.contactRequest);
       this.contactSupplierFormModal = ModalState.Closed;
