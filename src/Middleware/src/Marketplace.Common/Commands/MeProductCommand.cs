@@ -63,8 +63,8 @@ namespace Marketplace.Common.Commands
 			var exchangeRates = await exchangeRatesRequest;
 
 			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier, exchangeRates);
-			var productCurrency = superMarketplaceProduct.Product.xp.Currency;
-			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, productCurrency, exchangeRates);
+			var productCurrency = (Nullable<CurrencySymbol>)superMarketplaceProduct.Product.xp.Currency;
+			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (CurrencySymbol)productCurrency, exchangeRates);
 		
 			superMarketplaceProduct.Product = markedupProduct;
 			superMarketplaceProduct.Specs = markedupSpecs;
@@ -80,7 +80,7 @@ namespace Marketplace.Common.Commands
 					if (option.PriceMarkup != null)
 					{
 						var unconvertedMarkup = option.PriceMarkup ?? 0;
-						option.PriceMarkup = ConvertPrice(unconvertedMarkup, productCurrency, exchangeRates);
+						option.PriceMarkup = ConvertPrice(unconvertedMarkup, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
 					}
 					return option;
 				}).ToList();
@@ -125,7 +125,8 @@ namespace Marketplace.Common.Commands
 					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
 					{
 						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
-						var convertedPrice = ConvertPrice(markedupPrice, product.xp.Currency, exchangeRates);
+						var currency = (Nullable<CurrencySymbol>)CurrencySymbol.USD;
+						var convertedPrice = ConvertPrice(markedupPrice, currency, exchangeRates);
 						priceBreak.Price = convertedPrice;
 						return priceBreak;
 					}).ToList();
@@ -137,7 +138,8 @@ namespace Marketplace.Common.Commands
 						// price on price schedule will be in USD as it is set by the seller
 						// may be different rates in the future
 						// refactor to save price on the price schedule not product xp?
-						priceBreak.Price = ConvertPrice(priceBreak.Price, CurrencySymbol.USD, exchangeRates);
+						var currency = (Nullable<CurrencySymbol>)CurrencySymbol.USD;
+						priceBreak.Price = ConvertPrice(priceBreak.Price, currency, exchangeRates);
 						return priceBreak;
 					}).ToList();
 				}

@@ -84,7 +84,7 @@ export class OCMProductDetails implements OnInit {
       this.imageUrls = superProduct.Images.map(img => img.Url);
       this.isOrderable = !!superProduct.PriceSchedule;
       this.supplierNote = this._product.xp && this._product.xp.Note;
-    } else {
+    } else if (!superProduct.PriceSchedule && superProduct.Product.xp.ProductType !== "Quote") {
       this.isKitProduct = true;
       this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
       this.isOrderable = true
@@ -281,7 +281,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   async submitContactSupplierForm(formData: any): Promise<void> {
-    this.contactRequest = {Product: this._product, BuyerRequest: formData}
+    this.contactRequest = { Product: this._product, BuyerRequest: formData }
     try {
       await this.context.currentUser.submitContactSupplierForm(this.contactRequest);
       this.contactSupplierFormModal = ModalState.Closed;
