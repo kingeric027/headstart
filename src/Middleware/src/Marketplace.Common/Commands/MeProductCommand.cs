@@ -64,7 +64,7 @@ namespace Marketplace.Common.Commands
 
 			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier, exchangeRates);
 			var productCurrency = (Nullable<CurrencySymbol>)superMarketplaceProduct.Product.xp.Currency;
-			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (CurrencySymbol)productCurrency, exchangeRates);
+			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
 		
 			superMarketplaceProduct.Product = markedupProduct;
 			superMarketplaceProduct.Specs = markedupSpecs;

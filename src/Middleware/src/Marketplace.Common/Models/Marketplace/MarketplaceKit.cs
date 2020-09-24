@@ -10,8 +10,10 @@ namespace Marketplace.Common.Models.Marketplace
     public class KitProductDocument : Document<KitProduct> { }
 
     [SwaggerModel]
-    public class MarketplaceMeKitProduct : BuyerProduct<ProductXp, MarketplacePriceSchedule>
+    public class MarketplaceMeKitProduct
     {
+        public string ID { get; set; }
+        public string Name { get; set; }
         public MarketplaceMeProduct Product { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
