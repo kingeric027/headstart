@@ -62,7 +62,7 @@ namespace ordercloud.integrations.tecra
 
         public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string folder)
         {
-            return await this.Request("api/chili/alldocuments", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraDocument[]>();
+            return await this.Request("api/chili/documents", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraDocument[]>();
         }
         public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder)
         {

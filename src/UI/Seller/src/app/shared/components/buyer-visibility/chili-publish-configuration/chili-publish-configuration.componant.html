@@ -46,24 +46,30 @@
             </div>
         </div>
         <div *ngIf="showChiliConfigs" class="selected-configs">
-            <label>Selected Chili Configurations</label>
-            <div class="row" *ngFor="let config of chiliConfigs">
-                <div class="col-md-5">
-                    <p>Template: {{config.ChiliTemplateName}}</p>
-                </div>
-                <div class="col-md-3">
-                    <p>Catalog: {{config.CatalogID}}</p>
-                </div>
-                <div class="col-md-4">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-danger"
-                                type="submit"
-                                (click)="deleteChiliConfig(config)">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <strong>Selected Chili Configurations</strong>
+            <table class='table table-bordered table-condensed table-striped table-hover'>
+                <tr class="table-row" *ngFor="let config of chiliConfigs">
+                    <td>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <p>Template: {{config.ChiliTemplateName}}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p>Catalog: {{config.CatalogID}}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-danger"
+                                            type="submit"
+                                            (click)="deleteChiliConfig(config)">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </ng-container>

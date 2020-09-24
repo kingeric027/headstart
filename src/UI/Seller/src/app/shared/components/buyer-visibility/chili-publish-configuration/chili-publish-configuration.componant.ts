@@ -88,15 +88,20 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
 
     async listChiliConfigs(): Promise<void> {
         //TODO - Update to only get configs assosociated to this buyer and product
+        debugger;
         this.showChiliConfigs = false;
         this.chiliConfigs = [];
         const configs = await this.productService.listChiliConfigs();
         if (configs.Items.length > 0) {
             configs.Items.forEach(item => {
-                item.ReadOnly = true;
-                this.chiliConfigs.push(item);
+                if (item.BuyerID === this._buyerID) {
+                    item.ReadOnly = true;
+                    this.chiliConfigs.push(item);
+                }
             });
-            this.showChiliConfigs = true;
+            if (this.chiliConfigs.length > 0) {
+                this.showChiliConfigs = true;
+            }
         }
     }
 
@@ -155,22 +160,23 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
             CatalogID: this._catalogID
         };
 
-        debugger;
         await this.productService.saveChiliConfig(config);
         this.listChiliConfigs();
     }
     async deleteChiliConfig(config: ChiliConfig): Promise<void> {
-        //Delete all associated specs
-        const requests = config.Specs.map(cspec => {
-            return this.productService.deleteChiliSpec(cspec);
-        });
-        await Promise.all(requests);
+        if (confirm('Warning: This action cannot be undone.  Do you wish to continue?')) {
+            //Delete all associated specs
+            const requests = config.Specs.map(cspec => {
+                return this.productService.deleteChiliSpec(cspec);
+            });
+            await Promise.all(requests);
 
-        //Delete Config after all specs are deleted
-        await this.productService.deleteChiliConfig(config.ID);
+            //Delete Config after all specs are deleted
+            await this.productService.deleteChiliConfig(config.ID);
 
-        //Reset View
-        this.listChiliConfigs();
+            //Reset View
+            this.listChiliConfigs();
+        }
     }
 
     async editChiliConfig(event: any): Promise<void> {
