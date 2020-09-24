@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
+using System;
 
 namespace Marketplace.Common.Controllers
 {
@@ -106,10 +107,11 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("LIST user groups for home country")]
-        [HttpGet, Route("{buyerID}/usergroups/{homeCountry}/{pageNumber}/{searchTerm}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(string buyerID, string homeCountry, int pageNumber = 1, string searchTerm = null)
+        [HttpGet, Route("{buyerID}/usergroups/{userID}/{viewAssigned}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned)
         {
-            return await _locationPermissionCommand.ListUserGroupsByCountry(buyerID, homeCountry, pageNumber, searchTerm, VerifiedUserContext);
+            Console.WriteLine(args);
+            return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, userID, viewAssigned, VerifiedUserContext);
         }
 
         //[DocName("LIST user groups for home country")]

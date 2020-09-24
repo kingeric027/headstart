@@ -9,6 +9,7 @@ using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using Marketplace.Common.Constants;
 using ordercloud.integrations.library.helpers;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Marketplace.Common.Commands
 {
@@ -21,7 +22,7 @@ namespace Marketplace.Common.Commands
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
-        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(string buyerID, string homeCountry, int pageNumber, string searchTerm, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned, VerifiedUserContext verifiedUser);
         //Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext verifiedUser);
     }
 
@@ -114,16 +115,52 @@ namespace Marketplace.Common.Commands
             return await IsUserInUserGroup(buyerID, userGroupID, verifiedUser);
         }
 
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(string buyerID, string homeCountry, int pageNumber, string searchTerm, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned, VerifiedUserContext verifiedUser)
         {
-            var userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+            var user = await _oc.Users.GetAsync(
                 buyerID,
-                search: searchTerm,
-                filters: $"xp.Country={homeCountry}",
-                page: pageNumber,
-                pageSize: 100
+                userID
                 );
-
+            var userGroups = new ListPage<MarketplaceLocationUserGroup>();
+            if (!viewAssigned)
+            {
+                userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+                   buyerID,
+                   search: args.Search,
+                   filters: $"xp.Country={user.xp.Country}&xp.Type=BuyerLocation",
+                   page: args.Page,
+                   pageSize: 100
+                   );
+            } else
+            {
+                var allUserGroups = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+                   buyerID,
+                   search: args.Search,
+                   filters: $"xp.Country={user.xp.Country}&xp.Type=BuyerLocation",
+                   page: page,
+                   pageSize: 100
+               ));
+                var allUserGroupAssignments = await ListAllAsync.List((page) => _oc.UserGroups.ListUserAssignmentsAsync(
+                    buyerID,
+                    userID: userID
+                    ));
+                var activeUserLocationAssignments = new List<MarketplaceLocationUserGroup>();
+                foreach (var assignment in allUserGroupAssignments)
+                {
+                    var match = allUserGroups.Find(group => group.ID == assignment.UserGroupID);
+                    if (match != null)
+                    {
+                        activeUserLocationAssignments.Add(match);
+                    }
+                }
+                userGroups.Items = activeUserLocationAssignments;
+                userGroups.Meta = new ListPageMeta()
+                {
+                    Page = 1,
+                    PageSize = 100
+                };
+            }
+            //if (viewAssigned)
             return userGroups;
         }
 

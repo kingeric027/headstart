@@ -1,19 +1,38 @@
 <!-- User Permissions -->
-<div *ngIf="userGroups?.Items?.length > 0"  
-     class="row pt-3 mt-3 bg-white shadow-sm card-highlight-border">
+<div class="row pt-3 mt-3 bg-white shadow-sm card-highlight-border">
   <div class="col-md-5">
     <h5>{{displayText.Title}}</h5>
     <p class="font-italic">{{displayText.InfoText}}</p>
   </div>
   <div class="col-md-7">
+  <div class="actionBar btn-group w-50 mb-3"
+        role="group">
+    <button type="button"
+        class="btn btn-outline-primary btn-sm"
+        [ngClass]="{'active': !viewAssignedUserGroups}"
+        (click)="toggleUserGroupAssignmentView(false)"
+        translate>View All</button>
+    <button type="button"
+            class="btn btn-outline-primary btn-sm"
+            [ngClass]="{'active': viewAssignedUserGroups}"
+            (click)="toggleUserGroupAssignmentView(true)"
+            translate>View Assigned</button>
+    </div>
     <search-component class="mr-3 w-100 additional-item-resource-select-dropdown"
                       id="resource-search"
                       [placeholderText]="''"
                       [searchTermInput]="searchTerm"
                       (searched)="searchedResources($event)">
     </search-component>
-    <perfect-scrollbar style="max-width: 600px; max-height: 400px;">
-    <table class="table table-hover">
+    <p class="font-italic"
+          *ngIf="viewAssignedUserGroups && !userGroups.Items.length">
+      Retrieving this user's assignments, please wait...
+    </p>
+    <perfect-scrollbar style="height: 250px;">
+    <!-- <span *ngIf="!userGroups?.Items?.length"
+           class="font-italic">Retrieving location assignments...</span> -->
+    <table *ngIf="userGroups?.Items?.length" 
+            class="table table-hover">
       <thead>
         <tr>
           <th scope="col">Assigned</th>
@@ -54,7 +73,7 @@
       </tbody>
     </table>
     </perfect-scrollbar>
-    <ngb-pagination *ngIf="userGroups?.Meta.TotalPages > 1"
+    <ngb-pagination *ngIf="userGroups?.Meta.TotalPages > 1 && !viewAssignedUserGroups"
                      maxSize="10"
                      class="d-flex justify-content-center mt-3"
                      [collectionSize]="userGroups.Meta.TotalCount"

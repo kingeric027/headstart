@@ -44,7 +44,9 @@ export class UserGroupAssignments implements OnChanges {
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
   searchTermInput: string;
-  args: ListArgs;
+  args: ListArgs = { pageSize: 100 };
+  viewAssignedUserGroups = false;
+  retrievingAssignments: boolean;
 
   constructor(
     private router: Router,
@@ -83,13 +85,13 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroups(ID: string): Promise<void> {
     if (this.user.xp?.Country) {
-      const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, this.pageNumber);
+      const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
       this.userGroups = groups;
     }
-    const groups2 = await this.userPermissionsService.getUserGroups(ID, this.options);
-    console.log('these are the groups', groups2);
-    const groupsInHomeCountry = groups2.Items.filter(group => 
-    this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
+    // const groups2 = await this.userPermissionsService.getUserGroups(ID, this.options);
+    // console.log('these are the groups', groups2);
+    // const groupsInHomeCountry = groups2.Items.filter(group => 
+    // this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
@@ -168,8 +170,8 @@ export class UserGroupAssignments implements OnChanges {
     this.checkForUserUserGroupAssignmentChanges();
   }
 
-  async getUserGroupsByCountry(buyerID: string, homeCountry: string, pageNumber?: number, searchTerm?: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${homeCountry}/${pageNumber}/${searchTerm}`;
+  async getUserGroupsByCountry(buyerID: string, userID: string, viewAssigned: boolean): Promise<ListPage<MarketplaceLocationUserGroup>> {
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}/${viewAssigned}`;
     return await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
   }
 
@@ -187,30 +189,32 @@ export class UserGroupAssignments implements OnChanges {
         params = params.append(key, value.toString());
       }
     });
-    Object.entries(args.filters).forEach(([key, value]) => {
-      if ((typeof value !== 'object' && value) || (value && value.length)) {
-        params = params.append(key, value.toString());
-      }
-    });
+    // Object.entries(args.filters).forEach(([key, value]) => {
+    //   if ((typeof value !== 'object' && value) || (value && value.length)) {
+    //     params = params.append(key, value.toString());
+    //   }
+    // });
     return params;
   }
 
-  // async handleScrollEnd(): Promise<void> {
-    // if (this.userGroups?.Meta.TotalPages > this.pageNumber) {
-    //   this.pageNumber += 1;
-    //   const newGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, this.pageNumber);
-    //   this.userGroups.Items = this.userGroups.Items.concat(newGroups.Items);
-    //   this.changeDetection.detectChanges();
-    // }
-  // }
-
   async changePage(page: number) {
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, page);
+    this.args = { ...this.args, page };
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
   }
 
   async searchedResources(searchText: any) {
     this.searchTermInput = searchText;
-    this.args = { search: searchText }
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.xp?.Country, null, searchText);
+    this.args = {...this.args, search: searchText, page: 1 };
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
 }
+
+  async toggleUserGroupAssignmentView(value: boolean): Promise<void> {
+    console.log('should we view', value);
+    this.viewAssignedUserGroups = value;
+    this.userGroups.Items = [];
+    this.args = { pageSize: 100 };
+    this.retrievingAssignments = true;
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
+    this.retrievingAssignments = false;
+  }
 }
