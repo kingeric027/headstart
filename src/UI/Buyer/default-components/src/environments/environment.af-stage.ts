@@ -13,6 +13,7 @@ export const environment: Environment = {
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=7f9257b2-8a27-4527-9efa-225f4cb172da&redirect_uri=https://seb-four51-integration-stage.azurewebsites.net/api/anytime/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
