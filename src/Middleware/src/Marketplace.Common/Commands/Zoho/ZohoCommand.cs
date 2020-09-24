@@ -161,7 +161,7 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<List<ZohoLineItem>> ApplyShipping(MarketplaceOrderWorksheet orderWorksheet) {
             //// Step 4: shipping must be added as lineitems on the order
-            var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "shipping"});
+            var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "41000"});
             if (z_shipping.Items.Count != 0) return ZohoLineItemMapper.Map(orderWorksheet, z_shipping.Items.FirstOrDefault());
             // doesn't exist so we need to create it. shouldn't happen very often
             var new_shipping = await _zoho.Items.CreateAsync(new ZohoLineItem()
@@ -169,7 +169,7 @@ namespace Marketplace.Common.Commands.Zoho
                 item_type = "sales_and_purchases",
                 name = $"Shipping Charge",
                 description = $"Shipping Charge",
-                sku = "shipping",
+                sku = "41000",
                 quantity = 1
             });
             return ZohoLineItemMapper.Map(orderWorksheet, new_shipping);
@@ -219,16 +219,27 @@ namespace Marketplace.Common.Commands.Zoho
             var currencies = await _zoho.Currencies.ListAsync();
 
             // TODO: MODEL update ~ right now we don't have actual groups set up for locations, so this isn't accurate or complete
-            var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = location.Address.CompanyName });
+            var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = location.Address.AddressName });
             if (zContact.Items.Any())
             {
-               return await _zoho.Contacts.SaveAsync<ZohoContact>(
-                    ZohoContactMapper.Map(
-                        zContact.Items.FirstOrDefault(),
-                        ocBuyer,
-                        ocUsers.Items,
-                        currencies.Items.FirstOrDefault(c => c.currency_code == (location.UserGroup.xp.Currency != null ? location.UserGroup.xp.Currency.ToString() : "USD")),
-                        location));
+                try
+                {
+                    var z = await _zoho.Contacts.SaveAsync<ZohoContact>(
+                        ZohoContactMapper.Map(
+                            zContact.Items.FirstOrDefault(),
+                            ocBuyer,
+                            ocUsers.Items,
+                            currencies.Items.FirstOrDefault(c =>
+                                c.currency_code == (location.UserGroup.xp.Currency != null
+                                    ? location.UserGroup.xp.Currency.ToString()
+                                    : "USD")),
+                            location));
+                    return z;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message, ex);
+                }
             }
             else
             {

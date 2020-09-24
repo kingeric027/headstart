@@ -106,7 +106,6 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static List<ZohoContactPerson> Map(IList<MarketplaceUser> users, ZohoContact contact = null)
         {
             // there is no property at this time for primary contact in OC, so we'll go with the first in the list
-            var isFirst = true;
             var list = new List<ZohoContactPerson>();
             foreach (var user in users)
             {
@@ -119,18 +118,16 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     c.phone = user.Phone;
                     list.Add(c);
                 }
-                else
-                {
-                    list.Add(new ZohoContactPerson()
-                    {
-                        email = user.Email,
-                        first_name = user.FirstName,
-                        last_name = user.LastName,
-                        phone = user.Phone,
-                    });
-                }
-
-                isFirst = false;
+                //else
+                //{
+                //    list.Add(new ZohoContactPerson()
+                //    {
+                //        email = user.Email,
+                //        first_name = user.FirstName,
+                //        last_name = user.LastName,
+                //        phone = user.Phone,
+                //    });
+                //}
             }
             return list.DistinctBy(u => u.email).ToList();
         }
@@ -253,17 +250,17 @@ namespace Marketplace.Common.Services.Zoho.Mappers
     {
         public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems, IList<OrderPromotion> promotions)
         {
-            return new ZohoSalesOrder()
+            var o = new ZohoSalesOrder()
             {
                 reference_number = order.ID,
                 salesorder_number = order.ID,
                 date = order.DateSubmitted?.ToString("yyyy-MM-dd"),
                 is_discount_before_tax = true,
-                discount_amount = decimal.ToDouble(promotions.Sum(p => p.Amount)),
-                discount_type = "item_level",
+                discount = decimal.ToDouble(promotions.Sum(p => p.Amount)),
+                discount_type = "entity_level",
                 line_items = items.Select(item =>
                 {
-                    if (item.sku == "shipping")
+                    if (item.sku == "41000")
                     {
                         return new ZohoLineItem()
                         {
@@ -278,7 +275,10 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     {
                         item_id = item.item_id,
                         quantity = line_item.Quantity,
-                        rate = decimal.ToDouble(line_item.UnitPrice.Value)
+                        rate = decimal.ToDouble(line_item.UnitPrice.Value),
+                        discount = 0
+                        //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
+                        
                     };
                 }).ToList(),
                 tax_total = decimal.ToDouble(order.TaxCost),
@@ -289,6 +289,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 customer_id = contact.contact_id,
                 currency_code = contact.currency_code,
                 currency_symbol = contact.currency_symbol,
+                notes = promotions.Any() ? $"Promotions applied: {promotions.DistinctBy(p => p.Code).Select(p => p.Code).JoinString(" - ", p => p)}" : null
                 // same error as billing address
                 //shipping_address = new ZohoAddress() {
                 //    attention = $"{lineitems.FirstOrDefault()?.ShippingAddress.CompanyName}: {lineitems.FirstOrDefault()?.ShippingAddress.FirstName} {lineitems.FirstOrDefault()?.ShippingAddress.LastName}",
@@ -312,6 +313,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //contact_persons = new List<string>() { person.contact_person_id },
                 //shipping_charge = decimal.ToDouble(order.ShippingCost), //TODO: Please mention any Shipping/miscellaneous charges as additional line items.
             };
+            return o;
         }
     }
 

@@ -67,5 +67,6 @@ namespace Marketplace.Common.Services.Zoho.Models
         public bool is_discount_before_tax { get; set; }
         public double discount_amount { get; set; }
         public string discount_type { get; set; }
+        public double discount { get; set; }
     }
 }
