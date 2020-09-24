@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
+using Marketplace.Common.Services;
 using Marketplace.Models;
+using Marketplace.Models.Misc;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -13,6 +15,7 @@ namespace Marketplace.Common.Commands
 	{
 		Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
+		Task RequestProductInfo(ContactSupplierBody template);
 	}
 
 	public class MeProductCommand : IMeProductCommand
@@ -21,12 +24,14 @@ namespace Marketplace.Common.Commands
 		private readonly IMarketplaceBuyerCommand _marketplaceBuyerCommand;
 		private readonly IExchangeRatesCommand _exchangeRatesCommand;
 		private readonly IMarketplaceProductCommand _marketplaceProductCommand;
-		public MeProductCommand(IOrderCloudClient elevatedOc, IMarketplaceBuyerCommand marketplaceBuyerCommand, IExchangeRatesCommand exchangeRatesCommand, IMarketplaceProductCommand marketplaceProductCommand)
+		private readonly ISendgridService _sendgridService;
+		public MeProductCommand(IOrderCloudClient elevatedOc, IMarketplaceBuyerCommand marketplaceBuyerCommand, IExchangeRatesCommand exchangeRatesCommand, IMarketplaceProductCommand marketplaceProductCommand, ISendgridService sendgridService)
 		{
 			_oc = elevatedOc;
 			_marketplaceBuyerCommand = marketplaceBuyerCommand;
 			_exchangeRatesCommand = exchangeRatesCommand;
 			_marketplaceProductCommand = marketplaceProductCommand;
+			_sendgridService = sendgridService;
 		}
 		public async Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
 		{
@@ -97,6 +102,11 @@ namespace Marketplace.Common.Commands
 
 			return meProducts;
 		}
+
+		public async Task RequestProductInfo(ContactSupplierBody template)
+        {
+			await _sendgridService.SendContactSupplierAboutProductEmail(template);
+        }
 
 		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{

@@ -152,7 +152,7 @@ export function DateValidator(control: AbstractControl): ValidationErrors | null
 }
 
 export function ValidateRichTextDescription(control: AbstractControl): ValidationErrors | null {
-  return control.value && control.value.length >= 1000 ? { richTextFormatError: true } : null;
+  return control.value && control.value.length >= 2000 ? { richTextFormatError: true } : null;
 }
 
 export function ValidateSupplierCategorySelection(control: AbstractControl): ValidationErrors | null {

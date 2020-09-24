@@ -1,23 +1,23 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ValidateEmail, ValidateName, ValidatePhone } from 'src/app/validators/validators';
-import { QuoteOrderInfo, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
-import { CurrentUser, ShopperContextService } from 'marketplace';
+import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
+import { CurrentUser, ShopperContextService, ContactSupplierBody } from 'marketplace';
 
 @Component({
-  templateUrl: './quote-request-form.component.html',
-  styleUrls: ['./quote-request-form.component.scss'],
+  templateUrl: './contact-supplier-form.component.html',
+  styleUrls: ['./contact-supplier-form.component.scss'],
 })
-export class OCMQuoteRequestForm implements OnInit {
-  quoteRequestForm: FormGroup;
+export class OCMContactSupplierForm implements OnInit {
+  contactSupplierForm: FormGroup;
+  myBuyerLocations: MarketplaceAddressBuyer[];
   requestOptions: {
     pageSize?: number;
   } = {
     pageSize: 100
   };
-  myBuyerLocations: MarketplaceAddressBuyer[];
-  @Output() formSubmitted = new EventEmitter<{ user: QuoteOrderInfo }>();
-  @Output() formDismissed = new EventEmitter();
+  @Output() contactFormSubmitted = new EventEmitter<{ formData: any }>();
+  @Output() contactFormDismissed = new EventEmitter();
 
   private currentUser: CurrentUser;
   constructor(private context: ShopperContextService) {}
@@ -37,24 +37,24 @@ export class OCMQuoteRequestForm implements OnInit {
   }
 
   setForms(): void {
-    this.quoteRequestForm = new FormGroup({
+    this.contactSupplierForm = new FormGroup({
       FirstName: new FormControl(this.currentUser?.FirstName || '', [Validators.required, ValidateName]),
       LastName: new FormControl(this.currentUser?.LastName || '', [Validators.required, ValidateName]),
       BuyerLocation: new FormControl(this.myBuyerLocations[0]?.AddressName || '', [Validators.required]),
-      Phone: new FormControl(this.currentUser?.Phone || '', [Validators.required, ValidatePhone]),
       Email: new FormControl(this.currentUser?.Email || '', [Validators.required, ValidateEmail]),
-      Comments: new FormControl(''),
+      Phone: new FormControl(this.currentUser?.Phone || '', [Validators.required, ValidatePhone]),
+      Comments: new FormControl('', Validators.required),
     });
   }
 
   onSubmit(): void {
-    if (this.quoteRequestForm.status === 'INVALID') return;
-    this.formSubmitted.emit({
-      user: this.quoteRequestForm.value,
+    if (this.contactSupplierForm.status === 'INVALID') return;
+    this.contactFormSubmitted.emit({
+      formData: this.contactSupplierForm.value,
     });
   }
 
   dismissForm(): void {
-    this.formDismissed.emit();
+    this.contactFormDismissed.emit();
   }
 }

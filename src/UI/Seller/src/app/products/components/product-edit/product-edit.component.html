@@ -73,6 +73,13 @@
                       </select>
                     </div>
                   </div>
+                  <hr />
+                  <h6 class="font-weight-medium">Personalization
+                    <small class="d-block">
+                      <fa-icon style="color: #cccccc"
+                               [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.ARTWORK_REQUIRED_INFO</span>
+                    </small>
+                  </h6>
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox"
@@ -84,20 +91,17 @@
                              for="ArtworkRequired"
                              translate>ADMIN.PRODUCT_EDIT.ARTWORK_REQUIRED</label>
                     </div>
-                    <small>
-                      <fa-icon style="color: #cccccc"
-                               [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.ARTWORK_REQUIRED_INFO</span>
-                    </small>
                   </div>
                   <!-- /Product Name -->
                   <hr />
                   <h6 class="font-weight-medium"
-                      translate>ADMIN.PRODUCT_EDIT.PRODUCT_SKU</h6>
-                  <small *ngIf="isCreatingNew"
-                         class="mb-2">
-                    <fa-icon style="color: #cccccc"
-                             [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.NO_PROVIDED_SKU</span>
-                  </small>
+                      translate>ADMIN.PRODUCT_EDIT.PRODUCT_SKU
+                    <small *ngIf="isCreatingNew"
+                           class="d-block">
+                      <fa-icon style="color: #cccccc"
+                               [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.NO_PROVIDED_SKU</span>
+                    </small>
+                  </h6>
                   <div class="form-group w-50"
                        *ngIf="isCreatingNew">
                     <input type="text"
@@ -526,7 +530,8 @@
       <!-- /Description -->
       <!-- Pricing -->
       <li [ngbNavItem]="3"
-          id="3">
+          id="3"
+          [disabled]="readonly && !_superMarketplaceProductEditable?.PriceSchedule?.ID">
         <a [fragment]="price"
            class="text-muted d-flex justify-content-center align-items-center"
            ngbNavLink
