@@ -15,13 +15,13 @@ import { groupBy as _groupBy } from 'lodash';
 // temporarily any with sdk update
 // import { ProductImage } from '@ordercloud/headstart-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
-import { faDownload, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUndo, faExclamationTriangle, faInfoCircle, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { AppAuthService } from '@app-seller/auth';
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface';
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
 import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
 
@@ -32,6 +32,14 @@ export const LineItemTableStatus = {
   Backorered: 'Backorered',
 };
 
+export interface OrderProgress {
+  StatusDisplay: string;
+  Value: number;
+  ProgressBarType: string;
+  Striped: boolean;
+  Animated: boolean;
+}
+
 @Component({
   selector: 'app-order-details',
   templateUrl: './order-details.component.html',
@@ -40,6 +48,9 @@ export const LineItemTableStatus = {
 export class OrderDetailsComponent {
   faDownload = faDownload;
   faUndo = faUndo;
+  faExclamationTriangle = faExclamationTriangle;
+  faInfoCircle = faInfoCircle;
+  faUser = faUserAlt;
   _order: Order = {};
   _lineItems: MarketplaceLineItem[] = [];
   _payments: Payment[] = [];
@@ -49,6 +60,14 @@ export class OrderDetailsComponent {
   createShipment: boolean;
   isSellerUser = false;
   isSaving = false;
+  orderProgress: OrderProgress = {
+    StatusDisplay: 'Processing',
+    Value: 25,
+    ProgressBarType: 'primary',
+    Striped: false,
+    Animated: false
+  };
+  dataLtrs: string;
 
   @Input()
   set order(order: Order) {
@@ -70,6 +89,28 @@ export class OrderDetailsComponent {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
   }
 
+  setOrderProgress(order: MarketplaceOrder): void {
+    switch(order?.xp?.ShippingStatus) {
+      case 'Processing':
+        this.orderProgress = { StatusDisplay: "Processing", Value: 25, ProgressBarType: 'primary', Striped: false, Animated: false }
+        break;
+      case 'PartiallyShipped':
+        this.orderProgress = { StatusDisplay: "Partially Shipped", Value: 50, ProgressBarType: 'primary', Striped: false, Animated: false }
+        break;
+      case 'Backordered':
+        this.orderProgress = { StatusDisplay: "Item Backordered", Value: 75, ProgressBarType: 'danger', Striped: true, Animated: true }
+      case 'Shipped': 
+        this.orderProgress = { StatusDisplay: "Complete", Value: 100, ProgressBarType: 'success', Striped: false, Animated: false }
+        break;
+    }
+    if (order?.xp?.ClaimStatus === 'Pending') {
+      this.orderProgress = { StatusDisplay: "Needs Attention", Value: 100, ProgressBarType: 'danger', Striped: true, Animated: true }
+    }
+    if (order?.xp?.SubmittedOrderStatus === 'Canceled') {
+      this.orderProgress = { StatusDisplay: "Canceled", Value: 100, ProgressBarType: 'danger', Striped: false, Animated: false }
+    }
+  }
+
   setCardType(payment) {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
       return 'Card';
@@ -83,7 +124,7 @@ export class OrderDetailsComponent {
   }
 
   getFullName(address: Address) {
-    const fullName = `${address.FirstName || ''} ${address.LastName || ''}`;
+    const fullName = `${address?.FirstName || ''} ${address?.LastName || ''}`;
     return fullName.trim();
   }
 
@@ -103,6 +144,12 @@ export class OrderDetailsComponent {
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
+    if (!this.isQuoteOrder(order)) {
+      this.dataLtrs = order?.FromUser?.FirstName ? `${order?.FromUser?.FirstName?.slice(0,1).toUpperCase()}${order?.FromUser?.LastName?.slice(0,1).toUpperCase()}` : null
+    } else {
+      this.dataLtrs = order?.xp?.QuoteOrderInfo?.FirstName ? `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(0,1).toUpperCase()}${order?.xp?.QuoteOrderInfo?.LastName?.slice(0,1).toUpperCase()}` : null;
+    }
+    this.setOrderProgress(order);
     this._order = order;
     this.getIncomingOrOutgoing();
     const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID).toPromise();

@@ -401,6 +401,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     return this._ocService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
   }
 
+  getHeaderText(resourceInSelection: any): string {
+    return resourceInSelection.Name || 
+      resourceInSelection.Username || 
+      resourceInSelection.AddressName || 
+      resourceInSelection.AppName
+  }
+
   ngOnDestroy() {
     this.alive = false;
   }
