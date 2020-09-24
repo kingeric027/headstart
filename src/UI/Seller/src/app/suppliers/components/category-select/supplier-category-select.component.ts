@@ -95,8 +95,10 @@ export class SupplierCategorySelectComponent {
   }
 
   addCategory(): void {
-    const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: '', VendorLevel: '' }];
-    this.updateCategory(newCategorySelection);
+    if (this._serviceCatagoryConfig?.Items?.length > 0 && this._vendorLevelConfig?.Items?.length > 0) {
+      const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: this._serviceCatagoryConfig.Items[0], VendorLevel: this._vendorLevelConfig.Items[0] }];
+      this.updateCategory(newCategorySelection);
+    }
   }
 
   makeSelection(event: any, field: string, index: number): void {
