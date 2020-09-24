@@ -12,5 +12,13 @@ namespace ordercloud.integrations.tecra.Models
         public string password { get; set; }
         public string folder { get; set; }
     }
+    public class TecraFrameParams
+    {
+        public string docid { get; set; }
+        public string wsid { get; set; }
+        public string vpid { get; set; }
+        public string folder { get; set; }
+        public string storeid { get; set; }
+    }
 
 }

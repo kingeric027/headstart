@@ -1,0 +1,111 @@
+<div class="container-fluid mt-4"
+     *ngIf="_product">
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <iframe class="chili-frame" [src]="frameSrc" frameborder="0"></iframe>
+    </div>
+    <div class="col-md-6">
+      <form ngNoForm>
+        <div *ngFor="let spec of chiliTemplate.TemplateSpecs; let i = index">
+          <div *ngIf="spec.xp.UI.ControlType == 'Text'">
+            <label>{{spec.Name}}</label>
+            <input class="form-control" type='text' name="{{spec.Name}}" id="{{spec.ID}}" placeholder="{{spec.Name}}">
+          </div>
+        </div>
+      </form>
+    </div>
+    <!--Add To Cart-->
+    <div *ngIf="ShowAddToCart">
+      <div>
+        <div>
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 *ngIf="!showGrid"
+                class="font-weight-bold">
+              {{ _price  | currency: _userCurrency}}
+            </h4>
+            <p *ngIf="!showGrid"
+               class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
+            <span class="badge badge-pill badge-warning"
+                  *ngIf="percentSavings > 0">
+              <span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
+            </span>
+          </div>
+          <!--DISPLAY SHORT SPEC FORM -->
+          <div *ngIf="(specLength < 4 && !showGrid) && !_product.xp.ArtworkRequired">
+            <ocm-spec-form *ngIf="isOrderable && _specs?.Items?.length > 0"
+                           [superProduct]="_superProduct"
+                           [specs]="_specs"
+                           [currency]="_product?.xp?.Currency"
+                           (specFormChange)="onSpecFormChange($event.detail)">
+            </ocm-spec-form>
+            <div class="d-flex flex-column"
+                 *ngIf="isOrderable">
+              <span translate>PRODUCTS.DETAILS.QUANTITY</span>
+              <div class="d-flex flex-row">
+                <ocm-quantity-input class="d-inline-block mb-3 mr-3"
+                                    (qtyChange)="qtyChange($event.detail)"
+                                    [product]="_product"
+                                    [priceSchedule]="_priceSchedule"
+                                    [gridDisplay]="showGrid">
+                </ocm-quantity-input>
+                <button *ngIf="isQuoteProduct()"
+                        class="btn btn-block btn-primary mb-3"
+                        [disabled]="!specFormService.event?.valid || !qtyValid"
+                        (click)="openQuoteForm()"
+                        translate>
+                  PRODUCTS.DETAILS.REQ_QUOTE
+                </button>
+                <button *ngIf="!isQuoteProduct()"
+                        class="btn btn-block btn-primary mb-3"
+                        type="submit"
+                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                        (click)="addToCart()"
+                        translate>
+                  PRODUCTS.DETAILS.ADD_TO_CART
+                  <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
+                </button>
+              </div>
+              <div>
+                <ocm-modal [state]="quoteFormModal"
+                           [modalTitle]="'Request Quote'">
+                  <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
+                                          [CurrentUser]="currentUser"
+                                          (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+                </ocm-modal>
+              </div>
+            </div>
+            <div *ngIf="!isOrderable"
+                 class="alert alert-info"
+                 translate>
+              PRODUCTS.DETAILS.VIEW_ONLY
+            </div>
+          </div>
+          <div *ngIf="showGrid">
+            <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
+                                [specs]="_specs"
+                                [superProduct]="_superProduct"
+                                [product]="_product"
+                                [priceSchedule]="_priceSchedule">
+            </ocm-grid-spec-form>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="_priceBreaks && _priceBreaks.length > 1">
+        <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
+        <div class=" border border-medium border-radius mb-3 p-2">
+          <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
+          <div class="d-flex flex-row">
+            <span *ngFor="let priceBreak of _priceBreaks; let i = index"
+                  class="font-weight-bold d-flex mt-2">
+              {{ getPriceBreakRange(i) }}:
+              <p class="font-weight-normal ml-1 mr-4">{{priceBreak?.Price | currency: _userCurrency}}</p>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-right">
+    <a href="products/{{_product.ID}}">Back To Product</a>
+  </div>
+</div>

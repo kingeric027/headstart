@@ -226,4 +226,25 @@ namespace Marketplace.Common.Controllers
             return result;
         }
     }
+    [DocComments("\"Integration\" represents a URL to a Tecra Frame")]
+    [MarketplaceSection.Content(ListOrder = 5)]
+    [Route("tecra/frame"), OrderCloudIntegrationsAuth]
+    public class TecraFrameController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraFrameController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra Frame")]
+        [HttpGet, Route("")]
+        public async Task<string> Get(string id, string storeid)
+        {
+            var result = await _tecra.TecraFrame(id, storeid);
+            return result;
+        }
+    }
 }

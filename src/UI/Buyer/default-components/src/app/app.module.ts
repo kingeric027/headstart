@@ -141,6 +141,7 @@ import { OCMBuyerLocationPermissions } from './components/profile/buyer-location
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { OCMStaticPage } from './components/layout/static-page/static-page.component';
+import { OCMProductChiliConfig } from './components/products/product-chili-configuration/product-chili-configuration.component';
 
 export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
@@ -228,6 +229,7 @@ const components = [
   OCMLocationListItem,
   OCMLocationManagement,
   OCMCertificateForm,
+  OCMProductChiliConfig
 ];
 
 // @dynamic
@@ -316,6 +318,7 @@ export class AppModule {
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table');
 
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
+    this.buildWebComponent(OCMProductChiliConfig, 'ocm-product-chili-configuration');
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMStaticPage, 'ocm-static-page');

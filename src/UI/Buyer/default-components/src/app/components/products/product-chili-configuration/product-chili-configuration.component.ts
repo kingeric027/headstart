@@ -4,19 +4,20 @@ import { Spec, PriceBreak, Product } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, ChiliConfig, ChiliSpec, ChiliTemplate } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
 import { SuperMarketplaceProduct, ListPage } from '@ordercloud/headstart-sdk';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 @Component({
-  templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.scss'],
+  templateUrl: './product-chili-configuration.component.html',
+  styleUrls: ['./product-chili-configuration.component.scss'],
 })
-export class OCMProductDetails implements OnInit {
+export class OCMProductChiliConfig implements OnInit {
   faTh = faTh;
   faListUl = faListUl;
   faTimes = faTimes;
@@ -54,64 +55,48 @@ export class OCMProductDetails implements OnInit {
   productsIncludedInKit: ProductInKit[];
   ocProductsInKit: any[];
   isKitStatic = false;
-  _chiliConfigs: ChiliConfig[] = [];
-  showConfigs = false;
+  chiliTemplate: ChiliTemplate;
+  showSpecs = false;
+  frameSrc: SafeResourceUrl;
   constructor(
     private formService: SpecFormService,
+    private sanitizer: DomSanitizer,
     private context: ShopperContextService) {
     this.specFormService = formService;
   }
-  @Input() set product(superProduct: any) {
-    if (superProduct.PriceSchedule) {
-      this.isKitProduct = false;
-      this._superProduct = superProduct;
-      this._product = superProduct.Product;
-      this._priceSchedule = superProduct.PriceSchedule as any;
-      this._attachments = superProduct?.Attachments;
-      const currentUser = this.context.currentUser.get();
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-      this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
-      this._price = this.getTotalPrice();
-      // Specs
-      this._specs = { Meta: {}, Items: superProduct.Specs as any };
-      this.specFormService.event.valid = this._specs.Items.length === 0;
-      this.specLength = this._specs.Items.length;
-      // End Specs
-      this.images = superProduct.Images.map(img => img);
-      this.imageUrls = superProduct.Images.map(img => img.Url);
-      this.isOrderable = !!superProduct.PriceSchedule;
-      this.supplierNote = this._product.xp && this._product.xp.Note;
-    } else {
-      this.isKitProduct = true;
-      this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
-      this.isOrderable = true
-      this._product = superProduct.Product;
-      this._attachments = superProduct.Attachments;
-      this.images = superProduct.Images ? superProduct.Images.map(img => img) : [];
-      const currentUser = this.context.currentUser.get();
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-      this.productsIncludedInKit = superProduct.ProductAssignments.ProductsInKit;
-      this.getProductsInKit(superProduct.ProductAssignments.ProductsInKit);
-    }
+
+  @Input() set template(chiliTemplate: ChiliTemplate) {
+    this.chiliTemplate = chiliTemplate;
+    this.isKitProduct = false;
+    this._superProduct = chiliTemplate.Product;
+    this._product = chiliTemplate.Product.Product;
+    this._priceSchedule = chiliTemplate.Product.PriceSchedule as any;
+    this._attachments = chiliTemplate.Product?.Attachments;
+    const currentUser = this.context.currentUser.get();
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+    this._priceBreaks = chiliTemplate.Product.PriceSchedule?.PriceBreaks;
+    this._price = this.getTotalPrice();
+    // Specs
+    this._specs = { Meta: {}, Items: chiliTemplate.Product.Specs as any };
+    this.specFormService.event.valid = this._specs.Items.length === 0;
+    this.specLength = this._specs.Items.length;
+    // End Specs
+    this.images = chiliTemplate.Product.Images.map(img => img);
+    this.imageUrls = chiliTemplate.Product.Images.map(img => img.Url);
+    this.isOrderable = !!chiliTemplate.Product.PriceSchedule;
+    this.supplierNote = this._product.xp && this._product.xp.Note;
+    this.getTecraFrame();
   }
 
   async ngOnInit(): Promise<void> {
     this.currentUser = this.context.currentUser.get();
     this._userCurrency = this.context.currentUser.get().Currency;
-    this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
-    await this.listChiliConfigs();
   }
 
-  async listChiliConfigs(): Promise<void> {
-    const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
-    chiliConfigs.Items.map(item => {
-      if (item.SupplierProductID === this._product.ID) {
-        this._chiliConfigs.push(item);
-      }
-    });
-    this.showConfigs = true;
+  async getTecraFrame(): Promise<void> {
+    const frame = await this.context.chiliConfig.getChiliFrame(this.chiliTemplate.ChiliTemplateID, "4511001");
+    this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(frame); 
   }
 
   onSpecFormChange(event: SpecFormEvent): void {

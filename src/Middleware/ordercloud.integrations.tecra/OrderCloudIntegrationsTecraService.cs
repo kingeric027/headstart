@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Flurl.Http;
 using ordercloud.integrations.library;
@@ -12,6 +14,7 @@ namespace ordercloud.integrations.tecra
         Task<TecraToken> GetToken();
         Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string folder);
         Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder);
+        Task<string> GetTecraFrame(string token, string id, string storeid);
 
     }
     public class OrderCloudTecraConfig
@@ -65,6 +68,19 @@ namespace ordercloud.integrations.tecra
         {
             TecraDocumentRequest request = new TecraDocumentRequest();
             return await this.Request($"api/chili/{id}/variabledefinitions", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraSpec[]>();
+        }
+        public async Task<string> GetTecraFrame(string token, string id, string storeid)
+        {
+            //TODO - Make wsid and folder dynamic
+            TecraDocumentRequest request = new TecraDocumentRequest();
+            TecraFrameParams tparams = new TecraFrameParams();
+            tparams.docid = id;
+            tparams.storeid= storeid;
+            tparams.wsid = "a3b5ddf4-6fbc-4042-8070-be9401eb8767";
+            tparams.folder = "root";
+            tparams.vpid = "";
+
+            return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }
     }
 }
