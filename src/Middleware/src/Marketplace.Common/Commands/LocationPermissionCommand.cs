@@ -10,6 +10,7 @@ using ordercloud.integrations.library;
 using Marketplace.Common.Constants;
 using ordercloud.integrations.library.helpers;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Marketplace.Common.Commands
 {
@@ -23,7 +24,6 @@ namespace Marketplace.Common.Commands
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
         Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned, VerifiedUserContext verifiedUser);
-        //Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext verifiedUser);
     }
 
     public class LocationPermissionCommand : ILocationPermissionCommand
@@ -133,48 +133,32 @@ namespace Marketplace.Common.Commands
                    );
             } else
             {
-                var allUserGroups = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
-                   buyerID,
-                   search: args.Search,
-                   filters: $"xp.Country={user.xp.Country}&xp.Type=BuyerLocation",
-                   page: page,
-                   pageSize: 100
-               ));
-                var allUserGroupAssignments = await ListAllAsync.List((page) => _oc.UserGroups.ListUserAssignmentsAsync(
+                var userUserGroupAssignments = await _oc.UserGroups.ListUserAssignmentsAsync(
                     buyerID,
                     userID: userID
-                    ));
-                var activeUserLocationAssignments = new List<MarketplaceLocationUserGroup>();
-                foreach (var assignment in allUserGroupAssignments)
+                    );
+
+                var userBuyerLocationAssignments = new List<MarketplaceLocationUserGroup>();
+                foreach (var assignment in userUserGroupAssignments.Items)
                 {
-                    var match = allUserGroups.Find(group => group.ID == assignment.UserGroupID);
-                    if (match != null)
+                    var userGroupLocation = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(
+                        buyerID,
+                        assignment.UserGroupID
+                        );
+                    if (userGroupLocation.xp.Type == "BuyerLocation")
                     {
-                        activeUserLocationAssignments.Add(match);
+                        userBuyerLocationAssignments.Add(userGroupLocation);
                     }
                 }
-                userGroups.Items = activeUserLocationAssignments;
+                userGroups.Items = userBuyerLocationAssignments;
                 userGroups.Meta = new ListPageMeta()
                 {
                     Page = 1,
                     PageSize = 100
                 };
             }
-            //if (viewAssigned)
             return userGroups;
         }
-
-        //public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext user)
-        //{
-        //    var userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
-        //        buyerID,
-        //        filters: $"xp.Country={homeCountry}",
-        //        search: args.Search,
-        //        pageSize: 100,
-        //        page: args.Page);
-
-        //    return userGroups;
-        //}
 
     private async Task<bool> IsUserInUserGroup(string buyerID, string userGroupID, VerifiedUserContext verifiedUser)
         {

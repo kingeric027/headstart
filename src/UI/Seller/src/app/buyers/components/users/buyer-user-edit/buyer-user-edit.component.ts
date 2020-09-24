@@ -65,8 +65,4 @@ export class BuyerUserEditComponent {
       this.resourceForm.controls.Country.enable();
     }
   }
-
-  incrementPageNumber(event: any): void {
-    console.log('what is the event', event);
-  }
 }

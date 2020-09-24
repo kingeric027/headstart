@@ -33,7 +33,6 @@ export class UserGroupAssignments implements OnChanges {
   userOrgID: string;
   userID: string;
   userGroups: ListPage<MarketplaceLocationUserGroup>;
-  pageNumber = 1;
   add: UserGroupAssignment[];
   del: UserGroupAssignment[];
   _userUserGroupAssignmentsStatic: UserGroupAssignment[] = [];
@@ -49,10 +48,8 @@ export class UserGroupAssignments implements OnChanges {
   retrievingAssignments: boolean;
 
   constructor(
-    private router: Router,
     private http: HttpClient,
     private ocTokenService: OcTokenService,
-    private changeDetection: ChangeDetectorRef,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
   
@@ -88,10 +85,6 @@ export class UserGroupAssignments implements OnChanges {
       const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
       this.userGroups = groups;
     }
-    // const groups2 = await this.userPermissionsService.getUserGroups(ID, this.options);
-    // console.log('these are the groups', groups2);
-    // const groupsInHomeCountry = groups2.Items.filter(group => 
-    // this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
@@ -189,11 +182,6 @@ export class UserGroupAssignments implements OnChanges {
         params = params.append(key, value.toString());
       }
     });
-    // Object.entries(args.filters).forEach(([key, value]) => {
-    //   if ((typeof value !== 'object' && value) || (value && value.length)) {
-    //     params = params.append(key, value.toString());
-    //   }
-    // });
     return params;
   }
 
@@ -209,7 +197,6 @@ export class UserGroupAssignments implements OnChanges {
 }
 
   async toggleUserGroupAssignmentView(value: boolean): Promise<void> {
-    console.log('should we view', value);
     this.viewAssignedUserGroups = value;
     this.userGroups.Items = [];
     this.args = { pageSize: 100 };
