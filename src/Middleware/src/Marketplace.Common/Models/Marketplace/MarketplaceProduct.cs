@@ -29,7 +29,7 @@ namespace Marketplace.Models
     public class SuperMarketplaceMeProduct : IMarketplaceObject
     {
         public string ID { get; set; }
-        public MarketplaceMeKitProduct Product { get; set; }
+        public MarketplaceMeProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
         public IList<MarketplaceVariant> Variants { get; set; }
@@ -88,7 +88,8 @@ namespace Marketplace.Models
 	{
 		Standard,
 		Quote,
-		PurchaseOrder
+		PurchaseOrder,
+        Kit
 	}
 
     // measured in how many of the product fit in a 22x22x22 box

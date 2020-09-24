@@ -35,7 +35,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("LIST products")]
 		[HttpGet, Route("products"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<ListPageWithFacets<MarketplaceMeKitProduct>> ListMeProducts(ListArgs<MarketplaceMeProduct> args)
+		public async Task<ListPageWithFacets<MarketplaceMeProduct>> ListMeProducts(ListArgs<MarketplaceMeProduct> args)
 		{
 			return await _meProductCommand.List(args, VerifiedUserContext);
 		}

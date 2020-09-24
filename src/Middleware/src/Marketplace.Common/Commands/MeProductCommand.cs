@@ -15,7 +15,7 @@ namespace Marketplace.Common.Commands
 {
 	public interface IMeProductCommand
 	{
-		Task<ListPageWithFacets<MarketplaceMeKitProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
+		Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
 		Task RequestProductInfo(ContactSupplierBody template);
 	}
@@ -37,7 +37,7 @@ namespace Marketplace.Common.Commands
 		}
 		public async Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
 		{
-			var _product = _oc.Me.GetProductAsync<MarketplaceMeKitProduct>(id, user.AccessToken);
+			var _product = _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
 			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
 			var _images = _marketplaceProductCommand.GetProductImages(id, user);
@@ -88,21 +88,21 @@ namespace Marketplace.Common.Commands
 			}).ToList();
 		}
 
-		public async Task<ListPageWithFacets<MarketplaceMeKitProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
+		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
-			var searchText = args.Search ?? "";
+				var searchText = args.Search ?? "";
 
-			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeKitProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken);
-			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = GetExchangeRates(user);
+				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken);
+				var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+				var exchangeRatesRequest = GetExchangeRates(user);
 
-			var meProducts = await meProductsRequest;
-			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-			var exchangeRates = await exchangeRatesRequest;
+				var meProducts = await meProductsRequest;
+				var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+				var exchangeRates = await exchangeRatesRequest;
 
-			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
+				meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
 
-			return meProducts;
+				return meProducts;
 		}
 
 		public async Task RequestProductInfo(ContactSupplierBody template)
@@ -110,7 +110,7 @@ namespace Marketplace.Common.Commands
 			await _sendgridService.SendContactSupplierAboutProductEmail(template);
         }
 
-		private MarketplaceMeKitProduct ApplyBuyerProductPricing(MarketplaceMeKitProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
 			
 			if(product.PriceSchedule != null)
