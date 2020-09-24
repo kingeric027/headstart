@@ -101,7 +101,6 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
     const buyerID = await this.getParentResourceID();
     resource.ID = buyerID + '-{' + buyerID + '-UserIncrementor' + '}';
     const args = await this.createListArgs([resource]);
-    console.log('this.ocService', this.ocService);
     const newResource = await this.ocService.Create(...args).toPromise();
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);

@@ -5,7 +5,8 @@
     <p class="font-italic">{{displayText.InfoText}}</p>
   </div>
   <div class="col-md-7">
-  <div class="actionBar btn-group w-50 mb-3"
+  <div *ngIf="userGroupType==='BuyerLocation'"
+        class="actionBar btn-group w-50 mb-3"
         role="group">
     <button type="button"
         class="btn btn-outline-primary btn-sm"
@@ -18,20 +19,22 @@
             (click)="toggleUserGroupAssignmentView(true)"
             translate>View Assigned</button>
     </div>
-    <search-component class="mr-3 w-100 additional-item-resource-select-dropdown"
+    <search-component *ngIf="userGroupType==='BuyerLocation'"
+                      class="mr-3 w-100 additional-item-resource-select-dropdown"
                       id="resource-search"
                       [placeholderText]="''"
                       [searchTermInput]="searchTerm"
                       (searched)="searchedResources($event)">
     </search-component>
     <p class="font-italic"
-          *ngIf="viewAssignedUserGroups && !userGroups.Items.length">
-      Retrieving this user's assignments, please wait...
+          *ngIf="viewAssignedUserGroups && !userGroups.Meta">
+      Fetching assignmnents... 
+      <span class="spinner-border spinner-border-sm" 
+            role="status"
+                  aria-hidden="true"></span>
     </p>
-    <perfect-scrollbar style="height: 250px;">
-    <!-- <span *ngIf="!userGroups?.Items?.length"
-           class="font-italic">Retrieving location assignments...</span> -->
-    <table *ngIf="userGroups?.Items?.length" 
+    <perfect-scrollbar style="height: 300px;">
+    <table *ngIf="userGroups?.Meta" 
             class="table table-hover">
       <thead>
         <tr>
@@ -58,13 +61,6 @@
           <td *ngIf="userGroupType === 'UserPermissions'">{{group.Description}}</td>
           <td>{{group.ID}}</td>
         </tr>
-          <!-- <button ngbDropdownItem
-                  *ngFor="let group of userGroups"
-                  (click)="selectParentResource(resource)">
-            <summary-resource-display-component [resource]="resource"
-                                                [resourceType]="ocService.primaryResourceLevel">
-            </summary-resource-display-component>
-            </button> -->
         <tr *ngIf="!userGroups?.Items?.length">
           <td>
              <span class="font-italic">There are no locations for this user's Home Country.</span>
@@ -73,7 +69,7 @@
       </tbody>
     </table>
     </perfect-scrollbar>
-    <ngb-pagination *ngIf="userGroups?.Meta.TotalPages > 1 && !viewAssignedUserGroups"
+    <ngb-pagination *ngIf="userGroups?.Meta?.TotalPages > 1 && !viewAssignedUserGroups"
                      maxSize="10"
                      class="d-flex justify-content-center mt-3"
                      [collectionSize]="userGroups.Meta.TotalCount"
