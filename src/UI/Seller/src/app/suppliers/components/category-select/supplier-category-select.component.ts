@@ -96,7 +96,7 @@ export class SupplierCategorySelectComponent {
 
   addCategory(): void {
     if (this._serviceCatagoryConfig?.Items?.length > 0 && this._vendorLevelConfig?.Items?.length > 0) {
-      const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: this._serviceCatagoryConfig.Items[0], VendorLevel: this._vendorLevelConfig.Items[0] }];
+      const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: this._serviceCatagoryConfig.Items[0].Text, VendorLevel: this._vendorLevelConfig.Items[0].Text }];
       this.updateCategory(newCategorySelection);
     }
   }
