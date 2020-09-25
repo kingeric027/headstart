@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { Spec, PriceBreak, Product } from 'ordercloud-javascript-sdk';
+import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, MarketplaceKitProduct, ProductInKit } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -63,40 +63,50 @@ export class OCMProductDetails implements OnInit {
     private context: ShopperContextService) {
     this.specFormService = formService;
   }
-  @Input() set product(superProduct: any) {
-    if (superProduct.Product.xp.ProductType === "Kit") {
-      this.isKitProduct = true;
-      this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
-      this.isOrderable = true
-      this._product = superProduct.Product;
-      this._attachments = superProduct.Attachments;
-      this.images = superProduct.Images ? superProduct.Images.map(img => img) : [];
-      const currentUser = this.context.currentUser.get();
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-      this.productsIncludedInKit = superProduct.ProductAssignments.ProductsInKit;
-      this.getProductsInKit(superProduct.ProductAssignments.ProductsInKit);
+  @Input() set product(prod: any) {
+    if (prod.Product.xp.ProductType === 'Kit') {
+      this.setUpKitProduct(prod);
     } else {
-      this.isKitProduct = false;
-      this._superProduct = superProduct;
-      this._product = superProduct.Product;
-      this._priceSchedule = superProduct.PriceSchedule as any;
-      this._attachments = superProduct?.Attachments;
-      const currentUser = this.context.currentUser.get();
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
-      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-      this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
-      this._price = this.getTotalPrice();
-      // Specs
-      this._specs = { Meta: {}, Items: superProduct.Specs as any };
-      this.specFormService.event.valid = this._specs.Items.length === 0;
-      this.specLength = this._specs.Items.length;
-      // End Specs
-      this.images = superProduct.Images.map(img => img);
-      this.imageUrls = superProduct.Images.map(img => img.Url);
-      this.isOrderable = !!superProduct.PriceSchedule;
-      this.supplierNote = this._product.xp && this._product.xp.Note;
+      this.setUpProduct(prod);
     }
+  }
+
+  setUpKitProduct(kitProduct: any): void {
+    this.isKitProduct = true;
+    this.isKitStatic = kitProduct.Static || kitProduct.MinQty === kitProduct.MaxQty;
+    this.isOrderable = true
+    this._product = kitProduct.Product;
+    this._attachments = kitProduct.Attachments;
+    this.images = kitProduct.Images ? kitProduct.Images.map(img => img) : [];
+    const currentUser = this.context.currentUser.get();
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+    this.productsIncludedInKit = kitProduct.ProductAssignments.ProductsInKit;
+    this.getProductsInKit(kitProduct.ProductAssignments.ProductsInKit);
+  }
+
+  setUpProduct(superProduct: SuperMarketplaceProduct): void {
+    this.isKitProduct = false;
+    this._superProduct = superProduct;
+    this._product = superProduct.Product;
+    this._priceSchedule = superProduct.PriceSchedule as PriceSchedule;
+    this._attachments = superProduct?.Attachments;
+    const currentUser = this.context.currentUser.get();
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+    this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
+    this._price = this.getTotalPrice();
+
+    // images
+    this.images = superProduct.Images.map(img => img);
+    this.imageUrls = superProduct.Images.map(img => img.Url);
+    this.isOrderable = !!superProduct.PriceSchedule;
+    this.supplierNote = this._product.xp && this._product.xp.Note;
+
+    // specs
+    this._specs = { Meta: {}, Items: superProduct.Specs };
+    this.specFormService.event.valid = this._specs.Items.length === 0;
+    this.specLength = this._specs.Items.length;
   }
 
   ngOnInit(): void {
@@ -127,10 +137,10 @@ export class OCMProductDetails implements OnInit {
   async addKitToCart(): Promise<void> {
     this.isAddingToCart = true;
     try {
-      let lineItems = [];
+      const lineItems = [];
       if (this.isKitStatic) {
         this.productsIncludedInKit.forEach(product => {
-          let i = this.ocProductsInKit.findIndex(p => p.ID === product.ID);
+          const i = this.ocProductsInKit.findIndex(p => p.ID === product.ID);
           lineItems.push({
             ProductID: product.ID,
             Product: this.ocProductsInKit[i],
@@ -166,22 +176,22 @@ export class OCMProductDetails implements OnInit {
     }
   }
 
-  async asyncForEach(array, cb) {
+  async asyncForEach(array: any[], cb: Function): Promise<void> {
     for (let i = 0; i < array.length; i++) {
       await cb(array[i], i, array);
     }
   }
 
-  async getProductsInKit(productsInKit: ProductInKit[]) {
-    let meProducts = [];
+  async getProductsInKit(productsInKit: ProductInKit[]): Promise<void> {
+    const meProducts = [];
     await this.asyncForEach(productsInKit, async (product) => {
-      let meProduct = await this.context.tempSdk.getMeProduct(product.ID);
+      const meProduct = await this.context.tempSdk.getMeProduct(product.ID);
       meProducts.push(meProduct.Product);
     })
     this.ocProductsInKit = meProducts;
   }
 
-  changeQuantity(productID: string, event: QtyChangeEvent) {
+  changeQuantity(productID: string, event: QtyChangeEvent): void {
     let indexOfProduct;
     for (let i = 0; i < this.ocProductsInKit.length; i++) {
       if (this.ocProductsInKit[i].ID === productID) {
