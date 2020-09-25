@@ -67,7 +67,7 @@ export class OrderDetailsComponent {
     Striped: false,
     Animated: false
   };
-  dataLtrs: string;
+  orderAvatarInitials: string;
 
   @Input()
   set order(order: Order) {
@@ -145,9 +145,9 @@ export class OrderDetailsComponent {
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
     if (!this.isQuoteOrder(order)) {
-      this.dataLtrs = order?.FromUser?.FirstName ? `${order?.FromUser?.FirstName?.slice(0,1).toUpperCase()}${order?.FromUser?.LastName?.slice(0,1).toUpperCase()}` : null
+      this.orderAvatarInitials = order?.FromUser?.FirstName ? `${order?.FromUser?.FirstName?.slice(0,1).toUpperCase()}${order?.FromUser?.LastName?.slice(0,1).toUpperCase()}` : null
     } else {
-      this.dataLtrs = order?.xp?.QuoteOrderInfo?.FirstName ? `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(0,1).toUpperCase()}${order?.xp?.QuoteOrderInfo?.LastName?.slice(0,1).toUpperCase()}` : null;
+      this.orderAvatarInitials = order?.xp?.QuoteOrderInfo?.FirstName ? `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(0,1).toUpperCase()}${order?.xp?.QuoteOrderInfo?.LastName?.slice(0,1).toUpperCase()}` : null;
     }
     this.setOrderProgress(order);
     this._order = order;
