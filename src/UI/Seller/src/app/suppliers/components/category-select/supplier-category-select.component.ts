@@ -106,7 +106,7 @@ export class SupplierCategorySelectComponent {
 
     if (supplierCategoryConfig?.Filters?.length > 0) {
       result = supplierCategoryConfig.Filters.find(filter => filter.Display === 'Service Category');
-      result.Items.sort((a, b) => a.Text.toLowerCase() > b.Text.toLowerCase() ? 1 : -1)
+      result?.Items?.sort((a, b) => a.Text.toLowerCase() > b.Text.toLowerCase() ? 1 : -1)
     }
 
     return result;
