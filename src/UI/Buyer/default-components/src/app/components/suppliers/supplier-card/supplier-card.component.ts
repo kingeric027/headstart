@@ -1,4 +1,4 @@
-import { Input, Component, ViewEncapsulation } from '@angular/core';
+import { Input, Component } from '@angular/core';
 import { Supplier } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
