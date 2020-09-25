@@ -144,11 +144,9 @@ export class OrderDetailsComponent {
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
-    if (!this.isQuoteOrder(order)) {
-      this.orderAvatarInitials = order?.FromUser?.FirstName ? `${order?.FromUser?.FirstName?.slice(0,1).toUpperCase()}${order?.FromUser?.LastName?.slice(0,1).toUpperCase()}` : null
-    } else {
-      this.orderAvatarInitials = order?.xp?.QuoteOrderInfo?.FirstName ? `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(0,1).toUpperCase()}${order?.xp?.QuoteOrderInfo?.LastName?.slice(0,1).toUpperCase()}` : null;
-    }
+    this.orderAvatarInitials = !this.isQuoteOrder(order) ? `${order?.FromUser?.FirstName?.slice(0,1).toUpperCase()}${order?.FromUser?.LastName?.slice(0,1).toUpperCase()}`
+      :
+    `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(0,1).toUpperCase()}${order?.xp?.QuoteOrderInfo?.LastName?.slice(0,1).toUpperCase()}`;
     this.setOrderProgress(order);
     this._order = order;
     this.getIncomingOrOutgoing();

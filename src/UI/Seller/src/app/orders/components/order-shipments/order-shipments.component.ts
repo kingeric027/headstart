@@ -1,4 +1,4 @@
-import { Component, Inject, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Inject, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { faShippingFast, faWindowClose, faPlus, faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import {
@@ -14,19 +14,18 @@ import {
   OrderDirection,
   ListPage,
 } from '@ordercloud/angular-sdk';
-import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
+import { getProductSmallImageUrl } from '@app-seller/products/product-image.helper';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppAuthService } from '@app-seller/auth';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OrderService } from '@app-seller/orders/order.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
-import { ShippingStatus, LineItemStatus } from '../../../shared/models/order-status.interface';
+import { LineItemStatus } from '../../../shared/models/order-status.interface';
 import {
   CanChangeLineItemsOnOrderTo,
-  CanChangeTo,
   NumberCanChangeTo,
 } from '@app-seller/orders/line-item-status.helper';
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Component({
@@ -40,9 +39,11 @@ export class OrderShipmentsComponent implements OnChanges {
   faWindowClose = faWindowClose;
   faCog = faCog; // TO-DO - Use for edit button for Ship From address.
   createShipment = false;
-  viewShipments = false;
+  viewShipments = true;
   editShipFromAddress = false; // TO-DO - Use for editing Ship From address.
   shipmentForm: FormGroup;
+  // TODO: Get middleware route for listing super shipments
+  superShipments: SuperShipment[] = [];
   shipments: ListPage<Shipment>;
   shipmentItems: ListPage<ShipmentItem>;
   selectedShipment: Shipment;
@@ -51,12 +52,18 @@ export class OrderShipmentsComponent implements OnChanges {
   isSaving = false;
   isSellerUser = false;
   shipAllItems = false;
+  _order: Order;
   @Input()
   orderDirection: OrderDirection;
   @Input()
-  order: Order;
+  set order(o: Order) {
+    this._order = o;
+    this.handleSelectedOrderChange(o);
+  };
   @Output()
   createOrViewShipmentEvent = new EventEmitter<boolean>();
+  @Output()
+  shipmentCreated = new EventEmitter<null>();
 
   constructor(
     private orderService: OrderService,
@@ -71,13 +78,18 @@ export class OrderShipmentsComponent implements OnChanges {
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
   }
-
-  ngOnChanges() {
-    if (this.order.ID) {
-      this.createShipment = false;
-      this.getShipments();
-      this.getLineItems();
+  
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (this.orderDirection !== null && this.orderDirection !== undefined) {
+      this.superShipments = [];
+      await this.getShipments(this._order.ID);
+      await this.getLineItems(this._order.ID)
     }
+  }
+
+  async handleSelectedOrderChange(order: Order): Promise<void> {
+    this.createShipment = false;
+    this.superShipments = [];
   }
 
   setShipmentForm(): void {
@@ -143,13 +155,20 @@ export class OrderShipmentsComponent implements OnChanges {
   // handleUpdateShipFromAddress(addressID) {
   // }
 
-  async getShipments(): Promise<void> {
-    const shipments = await this.ocOrderService.ListShipments(this.orderDirection, this.order.ID).toPromise();
+  async getShipments(orderID: string): Promise<void> {
+    // TODO: Have to use as any bc sdk doesn't recognize 'Shipper' as a valid sort
+    const shipments = await this.ocOrderService
+      .ListShipments<any>(this.orderDirection, orderID, { sortBy: ['!Shipper'] as any })
+      .toPromise();
+    shipments?.Items?.forEach(async (s: Shipment) => {
+      const shipmentItems = await this.ocShipmentService.ListItems(s.ID).toPromise();
+      this.superShipments.push({Shipment: s, ShipmentItems: shipmentItems.Items});
+    });
     this.shipments = shipments;
   }
 
-  async getLineItems(): Promise<void> {
-    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, this.order.ID).toPromise();
+  async getLineItems(orderID: string): Promise<void> {
+    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, orderID).toPromise();
     this.lineItems = lineItemsResponse.Items as MarketplaceLineItem[];
   }
 
@@ -160,7 +179,7 @@ export class OrderShipmentsComponent implements OnChanges {
       if (quantities[li.ID] > 0 && quantities[li.ID] === li.Quantity) {
         lineItemsToPatch.push(
           this.ocLineItemService
-            .Patch(this.orderDirection, this.order.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } })
+            .Patch(this.orderDirection, this._order?.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } })
             .toPromise()
         );
       }
@@ -179,7 +198,7 @@ export class OrderShipmentsComponent implements OnChanges {
 
   getImageUrl(lineItem: LineItem): string {
     const product = lineItem.Product;
-    return getProductMediumImageUrl(product, this.appConfig.sellerID);
+    return getProductSmallImageUrl(product, this.appConfig.sellerID);
   }
 
   getCreateButtonAction(): string {
@@ -210,7 +229,7 @@ export class OrderShipmentsComponent implements OnChanges {
 
   async getSupplierAddresses(): Promise<void> {
     if (!this.supplierAddresses) {
-      this.supplierAddresses = await this.ocSupplierAddressService.List(this.order.ToCompanyID).toPromise();
+      this.supplierAddresses = await this.ocSupplierAddressService.List(this._order?.ToCompanyID).toPromise();
     }
   }
 
@@ -258,12 +277,14 @@ export class OrderShipmentsComponent implements OnChanges {
         DateShipped: shipment.ShipDate,
         Cost: shipment.Cost,
         Shipper: shipment.Shipper,
-        xp: { Service: this.shipmentForm.value.Service,
-              Comment: this.shipmentForm.value.Comment },
+        xp: {
+          Service: this.shipmentForm.value.Service,
+          Comment: this.shipmentForm.value.Comment,
+        },
       },
       ShipmentItems: this.lineItems
         .map(li => {
-          return { LineItemID: li.ID, OrderID: this.order.ID, QuantityShipped: shipment.Quantities[li.ID] };
+          return { LineItemID: li.ID, OrderID: this._order?.ID, QuantityShipped: shipment.Quantities[li.ID] };
         })
         .filter(li => li !== undefined),
     };
@@ -271,11 +292,9 @@ export class OrderShipmentsComponent implements OnChanges {
     const postedShipment: any = await this.httpClient
       .post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions)
       .toPromise();
-    this.getShipments();
-    this.getLineItems();
-    this.createShipment = false;
     this.isSaving = false;
     this.createOrViewShipmentEvent.emit(false);
+    this.shipmentCreated.emit();
   }
 
   shouldDisableSave(shipment: FormGroup): boolean {
