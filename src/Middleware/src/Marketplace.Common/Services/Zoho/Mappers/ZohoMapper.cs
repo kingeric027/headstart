@@ -71,7 +71,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return new ZohoContact()
             {
                 company_name = $"{buyer.Name}",
-                contact_name = $"{location.Address?.AddressName}",
+                contact_name = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}",
                 contact_type = "customer",
                 billing_address = ZohoAddressMapper.Map(location.Address),
                 shipping_address = ZohoAddressMapper.Map(location.Address),
@@ -89,7 +89,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, IList<MarketplaceUser> users, ZohoCurrency currency, MarketplaceBuyerLocation location)
         {
             contact.company_name = $"{buyer.Name}";
-            contact.contact_name = $"{location.Address?.AddressName}";
+            contact.contact_name = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}";
             contact.contact_type = "customer";
             contact.billing_address = ZohoAddressMapper.Map(location.Address);
             contact.shipping_address = ZohoAddressMapper.Map(location.Address);

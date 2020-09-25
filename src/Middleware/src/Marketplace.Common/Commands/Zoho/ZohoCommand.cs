@@ -18,6 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
     {
         Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet);
         Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, List<MarketplaceOrder> orders);
+        //Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet);
         Task<ZohoOrganizationList> ListOrganizations();
     }
 
@@ -60,6 +61,35 @@ namespace Marketplace.Common.Commands.Zoho
             return results;
         }
 
+        //public async Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
+        //{
+        //    // special request by SMG for creating PO of shipments
+        //    foreach (var item in updatedMarketplaceOrderWorksheet.LineItems)
+        //    {
+        //        if (item.sku == "41000")
+        //        {
+        //            var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = "SMG Shipping" });
+        //            var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = "41000" });
+        //            var shipping_order = await _zoho.PurchaseOrders.CreateAsync(new ZohoPurchaseOrder()
+        //            {
+        //                line_items = new List<ZohoLineItem>()
+        //                {
+        //                    new ZohoLineItem()
+        //                    {
+        //                        account_id = item.purchase_account_id,
+        //                        item_id = item.item_id,
+        //                        description = item.description,
+        //                        rate = item.rate,
+        //                        quantity = 1
+        //                    }
+        //                },
+        //                salesorder_id = z_order.salesorder_id,
+        //                reference_number = z_order.reference_number,
+        //            })
+        //        }
+        //    }
+        //}
+
         public async Task<List<ZohoPurchaseOrder>> CreatePurchaseOrder(ZohoSalesOrder z_order, List<MarketplaceOrder> orders)
         {
             try
@@ -67,10 +97,14 @@ namespace Marketplace.Common.Commands.Zoho
                 var results = new List<ZohoPurchaseOrder>();
                 foreach (var order in orders)
                 {
-                    var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
+                    var delivery_address =
+                        z_order
+                            .shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
                     var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
                     // TODO: accomodate possibility of more than 100 line items
-                    var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, pageSize: 100);
+                    var lineitems =
+                        await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID,
+                            pageSize: 100);
 
                     // Step 1: Create contact (customer) in Zoho
                     var contact = await CreateOrUpdateVendor(order);

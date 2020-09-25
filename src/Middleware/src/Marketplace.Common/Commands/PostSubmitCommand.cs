@@ -213,6 +213,7 @@ namespace Marketplace.Common.Commands
         private async Task HandleZohoIntegration(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
         {
             var zoho_salesorder = await _zoho.CreateSalesOrder(updatedMarketplaceOrderWorksheet);
+            //await _zoho.CreateShippingPurchaseOrder(zoho_salesorder, updatedMarketplaceOrderWorksheet);
             await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
         }
 
