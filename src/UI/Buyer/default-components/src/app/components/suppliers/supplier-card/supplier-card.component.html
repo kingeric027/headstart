@@ -23,6 +23,6 @@
         <p>{{_supplier?.xp?.SupportContact?.Phone}}</p>
       </div>
     </div>
-    <div [innerHTML]="_supplier?.xp?.Description"></div>
+    <span [innerHTML]="getSupplierDescription()"></span>
   </div>
 </div>
