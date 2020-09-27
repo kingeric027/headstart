@@ -23,16 +23,16 @@
                       class="mr-3 w-100 additional-item-resource-select-dropdown"
                       id="resource-search"
                       [placeholderText]="''"
-                      [searchTermInput]="searchTerm"
+                      [searchTermInput]="searchTermInput"
                       (searched)="searchedResources($event)">
     </search-component>
-    <p class="font-italic"
+    <div class="font-italic"
           *ngIf="viewAssignedUserGroups && !userGroups.Meta">
-      Fetching assignments... 
-      <span class="spinner-border spinner-border-sm" 
-            role="status"
-                  aria-hidden="true"></span>
-    </p>
+      <div class="spinner-border" role="status">
+       <span class="sr-only"
+             translate>ADMIN.COMMON.LOADING</span>
+      </div>
+    </div>
     <perfect-scrollbar style="height: 300px;">
     <table *ngIf="userGroups?.Meta" 
             class="table table-hover">

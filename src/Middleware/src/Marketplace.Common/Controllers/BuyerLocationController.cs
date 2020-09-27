@@ -106,10 +106,10 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("LIST user groups for home country")]
-        [HttpGet, Route("{buyerID}/usergroups/{userID}/{viewAssigned}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned)
+        [HttpGet, Route("{buyerID}/usergroups/{userID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID)
         {
-            return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, userID, viewAssigned, VerifiedUserContext);
+            return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, userID, VerifiedUserContext);
         }
     }
 }

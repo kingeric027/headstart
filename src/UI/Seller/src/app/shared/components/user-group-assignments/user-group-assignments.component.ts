@@ -40,8 +40,8 @@ export class UserGroupAssignments implements OnChanges {
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
   searchTermInput: string;
-  args: ListArgs = { pageSize: 100 };
   viewAssignedUserGroups = false;
+  args: ListArgs = { pageSize: 100, filters: { viewAssigned: false } };
   retrievingAssignments: boolean;
 
   constructor(
@@ -53,15 +53,17 @@ export class UserGroupAssignments implements OnChanges {
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
-      await this.getUserGroups(this.userOrgID);
+    this.searchTermInput = '';
+    this.args.search = null;
+    await this.getUserGroups(this.userOrgID);
     if (changes.user?.currentValue.ID && !this.userID) {
-      this.userID = this.user.ID
+      this.userID = this.user.ID;
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
         this.getUserGroupAssignments(this.user.ID, this.userOrgID);
       }
     }
     if (this.userID && changes.user?.currentValue?.ID !== changes.user?.previousValue?.ID) {
-      this.userID = this.user.ID
+      this.userID = this.user.ID;
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
   }
@@ -77,7 +79,7 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroups(ID: string): Promise<void> {
     if (this.user.xp?.Country) {
-      const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
+      const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
       this.userGroups = groups;
     } else {
       this.userGroups = await this.userPermissionsService.getUserGroups(ID, this.options);
@@ -160,8 +162,8 @@ export class UserGroupAssignments implements OnChanges {
     this.checkForUserUserGroupAssignmentChanges();
   }
 
-  async getUserGroupsByCountry(buyerID: string, userID: string, viewAssigned: boolean): Promise<ListPage<MarketplaceLocationUserGroup>> {
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}/${viewAssigned}`;
+  async getUserGroupsByCountry(buyerID: string, userID: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}`;
     return await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
   }
 
@@ -179,26 +181,30 @@ export class UserGroupAssignments implements OnChanges {
         params = params.append(key, value.toString());
       }
     });
+    Object.entries(args.filters).forEach(([key, value]) => {
+        params = params.append(key, value.toString());
+    });
     return params;
   }
 
   async changePage(page: number) {
     this.args = { ...this.args, page };
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
   }
 
   async searchedResources(searchText: any) {
     this.searchTermInput = searchText;
     this.args = {...this.args, search: searchText, page: 1 };
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
 }
 
   async toggleUserGroupAssignmentView(value: boolean): Promise<void> {
     this.viewAssignedUserGroups = value;
     this.userGroups = [];
-    this.args = { pageSize: 100 };
+    this.searchTermInput = '';
+    this.args = { pageSize: 100, filters: { viewAssigned: this.viewAssignedUserGroups } };
     this.retrievingAssignments = true;
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID, this.viewAssignedUserGroups);
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
     this.retrievingAssignments = false;
   }
 }

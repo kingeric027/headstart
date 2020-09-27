@@ -8,6 +8,7 @@ using Marketplace.Models;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using Marketplace.Common.Constants;
+using Azure.Core;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,7 +21,7 @@ namespace Marketplace.Common.Commands
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
-        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
     }
 
     public class LocationPermissionCommand : ILocationPermissionCommand
@@ -112,14 +113,17 @@ namespace Marketplace.Common.Commands
             return await IsUserInUserGroup(buyerID, userGroupID, verifiedUser);
         }
 
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, bool viewAssigned, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser)
         {
             var user = await _oc.Users.GetAsync(
                 buyerID,
                 userID
                 );
             var userGroups = new ListPage<MarketplaceLocationUserGroup>();
-            if (!viewAssigned)
+            var viewAssigned = args.Filters.FirstOrDefault(f => f.Name == "viewAssigned").QueryParams.
+                              FirstOrDefault(q => q.Item1 == "viewAssigned").Item2;
+
+            if (!bool.Parse(viewAssigned))
             {
                 userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
                    buyerID,
@@ -144,7 +148,10 @@ namespace Marketplace.Common.Commands
                         );
                     if (userGroupLocation.xp.Type == "BuyerLocation")
                     {
-                        userBuyerLocationAssignments.Add(userGroupLocation);
+                        if (args.Search == null || userGroupLocation.Name.ToLower().Contains(args.Search))
+                        {
+                            userBuyerLocationAssignments.Add(userGroupLocation);
+                        }
                     }
                 }
                 userGroups.Items = userBuyerLocationAssignments;
