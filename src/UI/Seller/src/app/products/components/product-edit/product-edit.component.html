@@ -311,6 +311,7 @@
                               [ngValue]="null"
                               translate>ADMIN.PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
                       <option *ngFor="let address of addresses?.Items"
+                              [selected]="shippingAddress === address"
                               [value]="address.ID">{{address.AddressName}}</option>
                     </select>
                   </div>
