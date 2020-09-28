@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject, OnInit } from '@angular/core';
 import {
   FULL_TABLE_RESOURCE_DICTIONARY,
   ResourceRow,
@@ -19,7 +19,7 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
   templateUrl: './full-resource-table.component.html',
   styleUrls: ['./full-resource-table.component.scss'],
 })
-export class FullResourceTableComponent {
+export class FullResourceTableComponent implements OnInit {
   headers = [];
   rows = [];
   numberOfColumns = 1;
@@ -32,6 +32,7 @@ export class FullResourceTableComponent {
   objectPreviewText: string;
   routeUrl: string;
   _resourceList = { Meta: {}, Items: [] };
+  defaultSortList: string[] = ["NAME"];
 
   @Input()
   resourceType: any;
@@ -58,6 +59,19 @@ export class FullResourceTableComponent {
     this.headers = this.getHeaders();
     this.rows = this.getRows(resources);
     this.numberOfColumns = this.getNumberOfColumns(this.resourceType);
+  }
+
+  ngOnInit() {
+    let headers: any[] = this.getHeaders();
+
+    if (headers?.length < 1) {return;} 
+
+    //To add other default sorts, add to this.defaultSortList. Since this is a common component, it's used on most pages and columns. 
+    //Currently we only want to sort by Name.
+    if (this.defaultSortList.includes(headers[0]?.path.toUpperCase())){
+      this.activeSort = headers[0]?.path;
+      this.ocService?.sortBy(this.activeSort);
+    }
   }
 
   getHeaders(): object[] {
