@@ -88,7 +88,6 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
 
     async listChiliConfigs(): Promise<void> {
         //TODO - Update to only get configs assosociated to this buyer and product
-        debugger;
         this.showChiliConfigs = false;
         this.chiliConfigs = [];
         const configs = await this.productService.listChiliConfigs();

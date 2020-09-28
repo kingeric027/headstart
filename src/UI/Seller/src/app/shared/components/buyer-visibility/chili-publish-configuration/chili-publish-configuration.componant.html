@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-5">
                 <div *ngIf="showChiliDocuments">
-                    <label>Select Chili Template</label>
+                    <label translate>ADMIN.PRODUCT_EDIT.SELECT_CHILI_TEMPLATE</label>
                     <select class="form-control"
                             (change)="selectChiliTemplate($event)">
                         <option selected
@@ -20,7 +20,7 @@
             </div>
             <div class="col-md-3">
                 <div *ngIf="showAvailableCategories">
-                    <label>Catalog Assignment</label>
+                    <label translate>ADMIN.PRODUCT_EDIT.CATALOG_ASSIGNMENT</label>
                     <select class="form-control"
                             (change)="setCatalogSelection($event)">
                         <option selected
@@ -39,14 +39,15 @@
                 <div *ngIf="showAssignmentButton">
                     <button class="btn btn-primary btn-chili"
                             type="submit"
-                            (click)="executeChiliConfigAssignmentRequest()">
-                        Save Chili Config
+                            (click)="executeChiliConfigAssignmentRequest()"
+                            translate>
+                        ADMIN.PRODUCT_EDIT.SAVE_CHILI_CONFIG
                     </button>
                 </div>
             </div>
         </div>
         <div *ngIf="showChiliConfigs" class="selected-configs">
-            <strong>Selected Chili Configurations</strong>
+            <strong translate>ADMIN.PRODUCT_EDIT.SELECTED_CHILI_CONFIGURATIONS</strong>
             <table class='table table-bordered table-condensed table-striped table-hover'>
                 <tr class="table-row" *ngFor="let config of chiliConfigs">
                     <td>
@@ -61,8 +62,9 @@
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-danger"
                                             type="submit"
-                                            (click)="deleteChiliConfig(config)">
-                                        Delete
+                                            (click)="deleteChiliConfig(config)"
+                                            translate>
+                                        ADMIN.DELETE.DELETE
                                     </button>
                                 </div>
                             </div>
