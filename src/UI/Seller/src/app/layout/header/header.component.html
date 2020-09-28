@@ -86,8 +86,8 @@
              [src]="myProfileImg"
              alt="ProfileImg"
              id="ProfileImgThumb">
-        <div *ngIf="!hasProfileImg && (dataLtrs !== 'undefinedundefined')"
-             [attr.data-letters]="dataLtrs"
+        <div *ngIf="!hasProfileImg && (currentUserInitials !== 'undefinedundefined')"
+             [attr.data-letters]="currentUserInitials"
              class="avatar avatar-sm ml-2"></div>
       </a>
     </div>

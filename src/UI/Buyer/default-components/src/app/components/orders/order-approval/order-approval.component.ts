@@ -3,6 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { ShopperContextService } from 'marketplace';
+import { IntegrationEvents } from 'ordercloud-javascript-sdk';
 
 @Component({
   templateUrl: './order-approval.component.html',
@@ -33,6 +34,7 @@ export class OCMOrderApproval implements OnInit {
   async submitReview(): Promise<void> {
     const comments = this.form.value.comments;
     if (this.approved) {
+      await IntegrationEvents.Calculate('Outgoing', this.orderID);
       await this.context.orderHistory.approveOrder(this.orderID, comments);
     } else {
       await this.context.orderHistory.declineOrder(this.orderID, comments);

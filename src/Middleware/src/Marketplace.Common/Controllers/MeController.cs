@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;

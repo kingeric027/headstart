@@ -121,9 +121,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
-    if((this.userContext as any).UserType !== SELLER) {
-      await this.getAvailableProductTypes();
-    }
+    await this.getAvailableProductTypes();
     this.setProductEditTab();
   }
 

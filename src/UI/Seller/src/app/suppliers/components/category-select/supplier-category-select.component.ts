@@ -82,7 +82,7 @@ export class SupplierCategorySelectComponent {
   set filterConfig(value: SupplierCategoryConfig) {
     if (value?.Filters) {
       this._vendorLevelConfig = value.Filters.find(filter => filter.Display === 'Vendor Level');
-      this._serviceCatagoryConfig = value.Filters.find(filter => filter.Display === 'Service Category');
+      this._serviceCatagoryConfig = this.getSortedCategories(value);
     }
   }
   @Output()
@@ -95,8 +95,21 @@ export class SupplierCategorySelectComponent {
   }
 
   addCategory(): void {
-    const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: '', VendorLevel: '' }];
-    this.updateCategory(newCategorySelection);
+    if (this._serviceCatagoryConfig?.Items?.length > 0 && this._vendorLevelConfig?.Items?.length > 0) {
+      const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: this._serviceCatagoryConfig.Items[0].Text, VendorLevel: this._vendorLevelConfig.Items[0].Text }];
+      this.updateCategory(newCategorySelection);
+    }
+  }
+
+  getSortedCategories(supplierCategoryConfig: SupplierCategoryConfig): SupplierCategoryConfigFilters {
+    let result: SupplierCategoryConfigFilters;
+
+    if (supplierCategoryConfig?.Filters?.length > 0) {
+      result = supplierCategoryConfig.Filters.find(filter => filter.Display === 'Service Category');
+      result?.Items?.sort((a, b) => a.Text.toLowerCase() > b.Text.toLowerCase() ? 1 : -1)
+    }
+
+    return result;
   }
 
   makeSelection(event: any, field: string, index: number): void {

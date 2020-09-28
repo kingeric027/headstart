@@ -11,6 +11,7 @@ import {
   NgbModalModule,
   NgbDatepickerModule,
   NgbTooltipModule,
+  NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -75,6 +76,7 @@ import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-p
     NgbModalModule,
     NgbDatepickerModule,
     NgbTooltipModule,
+    NgbProgressbarModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -93,6 +95,7 @@ import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-p
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
+    NgbProgressbarModule,
 
     // OrderCloud CMS Components
     CmsAdminModule,

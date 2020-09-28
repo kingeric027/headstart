@@ -260,7 +260,7 @@
                 New {{resourceType | titlecase}} {{labelSingular | translate}}
               </h3>
               <h3 *ngIf="!isCreatingNew"
-                  class="d-inline-block ml-1 mb-0">{{_resourceInSelection.Name || _resourceInSelection.Username || _resourceInSelection.AddressName || _resourceInSelection.AppName}}</h3>
+                  class="d-inline-block ml-1 mb-0">{{getHeaderText(_resourceInSelection)}}</h3>
             </span>
             <button *ngIf="canImpersonateResource && !isCreatingNew"
                     (click)="impersonateUser()"
