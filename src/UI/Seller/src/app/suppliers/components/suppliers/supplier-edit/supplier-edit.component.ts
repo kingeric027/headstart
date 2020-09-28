@@ -67,6 +67,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     this.availableCurrencies = this.availableCurrencies.filter(c =>
       Object.values(SupportedCurrencies).includes(SupportedCurrencies[c.Currency])
     );
+    this.resourceForm.get('Active').enable();
   }
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
