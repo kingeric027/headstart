@@ -62,7 +62,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   isCreatingNew: boolean;
   @Input()
   dataIsSaving = false;
-  userContext = {};
+  userContext: any = {};
   hasVariations = false;
   images: Asset[] = [];
   files: FileHandle[] = [];
@@ -83,6 +83,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
   productType: ProductXp['ProductType'];
+  shippingAddress: any;
   productVariations: any;
   variantsValid = true;
   editSpecs = false;
@@ -148,12 +149,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.location.replaceState(newLocation);
   }
 
-  async getAddresses(): Promise<void> {
+  async getAddresses(product?): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
     if (context.Me.Supplier) {
       this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise();
-    } else {
-      this.addresses = await this.ocAdminAddressService.List().toPromise();
     }
   }
 
@@ -180,6 +179,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.createProductForm(this._superMarketplaceProductEditable);
+    if (this.userContext?.UserType === "SELLER") {
+      this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable.Product.DefaultSupplierID).toPromise();
+      this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
+    }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
   }
