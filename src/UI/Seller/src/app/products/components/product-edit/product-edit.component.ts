@@ -301,7 +301,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async getAvailableProductTypes(): Promise<void> {
     const supplier = await this.currentUserService.getMySupplier();
-    this.availableProductTypes = supplier.xp.ProductTypes || []; 
+    this.availableProductTypes = supplier?.xp?.ProductTypes || []; 
   }
   
   async handleSave(): Promise<void> {
