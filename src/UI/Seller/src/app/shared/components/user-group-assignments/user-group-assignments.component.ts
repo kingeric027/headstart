@@ -40,8 +40,9 @@ export class UserGroupAssignments implements OnChanges {
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
   searchTermInput: string;
+  searching: boolean;
   viewAssignedUserGroups = false;
-  args: ListArgs = { pageSize: 100, filters: { viewAssigned: false } };
+  args: ListArgs = { pageSize: 100, filters: { assigned: false } };
   retrievingAssignments: boolean;
 
   constructor(
@@ -193,16 +194,18 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async searchedResources(searchText: any) {
+    this.searching = true;
     this.searchTermInput = searchText;
     this.args = {...this.args, search: searchText, page: 1 };
     this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+    this.searching = false;
 }
 
   async toggleUserGroupAssignmentView(value: boolean): Promise<void> {
     this.viewAssignedUserGroups = value;
     this.userGroups = [];
     this.searchTermInput = '';
-    this.args = { pageSize: 100, filters: { viewAssigned: this.viewAssignedUserGroups } };
+    this.args = { pageSize: 100, filters: { assigned: this.viewAssignedUserGroups } };
     this.retrievingAssignments = true;
     this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
     this.retrievingAssignments = false;

@@ -120,10 +120,10 @@ namespace Marketplace.Common.Commands
                 userID
                 );
             var userGroups = new ListPage<MarketplaceLocationUserGroup>();
-            var viewAssigned = args.Filters.FirstOrDefault(f => f.Name == "viewAssigned").QueryParams.
-                              FirstOrDefault(q => q.Item1 == "viewAssigned").Item2;
+            var assigned = args.Filters.FirstOrDefault(f => f.Name == "assigned").QueryParams.
+                              FirstOrDefault(q => q.Item1 == "assigned").Item2;
 
-            if (!bool.Parse(viewAssigned))
+            if (!bool.Parse(assigned))
             {
                 userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
                    buyerID,
