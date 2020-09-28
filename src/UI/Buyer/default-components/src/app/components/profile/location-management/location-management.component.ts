@@ -1,15 +1,15 @@
 import { Component, Input } from '@angular/core';
-import { Address,  } from 'ordercloud-javascript-sdk';
-import { ShopperContextService } from 'marketplace';
+import { Address } from 'ordercloud-javascript-sdk';
+import { ShopperContextService, AppConfig } from 'marketplace';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 import {
   MarketplaceAddressBuyer,
   TaxCertificate,
-} from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+} from '@ordercloud/headstart-sdk';
 import { CertificateFormOutput } from '../certificate-form/certificate-form.component';
 import { GeographyConfig } from '../../../config/geography.class';
-import { ActivatedRoute } from '@angular/router';
+import { downloadBase64String } from 'src/app/services/download.helper';
 
 
 @Component({
@@ -33,7 +33,7 @@ export class OCMLocationManagement {
     this.getLocationManagementDetails();
   };
   
-  constructor(private context: ShopperContextService, private activatedRoute: ActivatedRoute) {}
+  constructor(private context: ShopperContextService, private appConfig: AppConfig) {}
   
   toLocationOrders(): void {
     this.context.router.toOrdersByLocation({location: this._locationID});
@@ -57,13 +57,17 @@ export class OCMLocationManagement {
     const state = GeographyConfig.getStates('US').find(s => this.address.State === s.abbreviation); 
     const certificate: TaxCertificate = {
       ExpirationDate: formOutput.ExpirationDate,
-      SignedDate: formOutput.ExpirationDate,
+      SignedDate: formOutput.SignedDate,
       Base64UrlEncodedPDF: formOutput.Base64UrlEncodedPDF,
       ExposureZoneName: state.label,
       ExemptionNumber: this.address.ID
     }; 
     this.certificate = await this.context.addresses.createCertificate(this.address.ID, certificate);
     this.dismissCertificateForm();
+  }
+
+  downloadCertificate(): void {
+    downloadBase64String(this.certificate.Base64UrlEncodedPDF, 'application/pdf', this.certificate.FileName);
   }
 
   dismissCertificateForm(): void {

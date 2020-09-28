@@ -10,7 +10,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.USER'"
+                          [labelPlural]="'ADMIN.NAV.USERS'">
   <!-- edit user -->
   <div class="resource-edit">
     <app-seller-user-edit class="resource-edit"

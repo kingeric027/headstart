@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
-import { ListPage, MarketplaceLineItem, MarketplaceOrder } from 'marketplace-javascript-sdk';
-import { LineItems, Me, Order, Orders } from 'ordercloud-javascript-sdk';
+import { ListPage, MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import {
+  LineItems,
+  Me,
+  Order,
+  Orders,
+  OrderPromotion,
+  OrderWorksheet,
+  ShipEstimate,
+  IntegrationEvents,
+} from 'ordercloud-javascript-sdk';
 import { BehaviorSubject } from 'rxjs';
 import { listAll } from '../../functions/listAll';
 import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context';
@@ -15,20 +24,28 @@ export class OrderStateService {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
   };
+  public readonly DefaultOrderPromos: ListPage<OrderPromotion> = {
+    Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
+    Items: [],
+  };
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
       AvalaraTaxTransactionCode: '',
       OrderType: 'Standard',
       QuoteOrderInfo: null,
       Currency: 'USD', // Default value, overriden in reset() when app loads
-      OrderReturnInfo: {
-        HasReturn: false,
+      Returns: {
+        HasClaims: false,
+        HasUnresolvedClaims: false,
+        Resolutions: [],
       },
       ClaimStatus: ClaimStatus.NoClaim,
-      ShippingStatus: ShippingStatus.Processing
+      ShippingStatus: ShippingStatus.Processing,
     },
   };
   private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
+  private shipEstimatesSubject = new BehaviorSubject<ShipEstimate[]>([]);
+  private orderPromosSubject = new BehaviorSubject<ListPage<OrderPromotion>>(this.DefaultOrderPromos);
   private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(this.DefaultLineItems);
 
   constructor(
@@ -45,6 +62,14 @@ export class OrderStateService {
     this.orderSubject.next(value);
   }
 
+  get shipEstimates(): ShipEstimate[] {
+    return this.shipEstimatesSubject.value;
+  }
+
+  set shipEstimates(value: ShipEstimate[]) {
+    this.shipEstimatesSubject.next(value);
+  }
+
   get lineItems(): ListPage<MarketplaceLineItem> {
     return this.lineItemSubject.value;
   }
@@ -53,12 +78,24 @@ export class OrderStateService {
     this.lineItemSubject.next(value);
   }
 
+  get orderPromos(): ListPage<OrderPromotion> {
+    return this.orderPromosSubject.value;
+  }
+
+  set orderPromos(value: ListPage<OrderPromotion>) {
+    this.orderPromosSubject.next(value);
+  }
+
   onOrderChange(callback: (order: MarketplaceOrder) => void): void {
     this.orderSubject.subscribe(callback);
   }
 
   onLineItemsChange(callback: (lineItems: ListPage<MarketplaceLineItem>) => void): void {
     this.lineItemSubject.subscribe(callback);
+  }
+
+  onPromosChange(callback: (promos: ListPage<OrderPromotion>) => void): void {
+    this.orderPromosSubject.subscribe(callback);
   }
 
   async reset(): Promise<void> {
@@ -84,8 +121,23 @@ export class OrderStateService {
       this.order = (await Orders.Create('Outgoing', this.DefaultOrder as Order)) as MarketplaceOrder;
     }
     if (this.order.DateCreated) {
-      this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
+      await this.resetLineItems();
     }
+    this.orderPromos = await Orders.ListPromotions('Outgoing', this.order.ID);
+
+    await this.getShipEstimates();
+  }
+
+  async getShipEstimates(): Promise<void> {
+    const orderWorksheet = await IntegrationEvents.GetWorksheet('Outgoing', this.order.ID);
+
+    if (orderWorksheet?.ShipEstimateResponse?.ShipEstimates) {
+      this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
+    }
+  }
+
+  async resetLineItems(): Promise<void> {
+    this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
   }
 
   private async getOrdersForResubmit(): Promise<ListPage<MarketplaceOrder>> {

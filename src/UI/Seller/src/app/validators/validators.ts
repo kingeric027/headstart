@@ -5,22 +5,24 @@ import {
 } from '@app-seller/suppliers/components/category-select/supplier-category-select.component';
 
 export const ErrorDictionary = {
-  name: `Name can only contain characters Aa-Zz 0-9 - ' .`,
+  name: "Name can only contain characters Aa-Zz 0-9 - ' .",
   phone: 'Phone can only contain 20 numbers or "-" chars (no spaces)',
   zip: 'Zip Code is invalid',
   DateError: 'Enter date of the form mm-dd-yyyy',
   date: 'Enter date of the form mm-dd-yyyy',
   required: 'This field is required',
   min: 'Please enter a higher value',
+  max: 'Please enter a lower value',
   email: 'Please enter a valid email',
-  ocMatchFields: `Passwords don't match`,
-  minGreaterThanMax: `Minimum value cannot be greater than maximum`,
-  maxLessThanMin: `Maximum value cannot be less than minimum`,
+  ocMatchFields: "Passwords don't match",
+  minGreaterThanMax: 'Minimum value cannot be greater than maximum',
+  maxLessThanMin: 'Maximum value cannot be less than minimum',
   strongPassword: `Password must be at least eight characters long and include at least 
     one letter and one number. Password can also include special characters.`,
   richTextFormatError:
     'Descriptions can only be 1000 characters. Remember the character count includes HTML formatting text.',
   supplierCategoryError: 'Supplier category selections are invalid',
+  supplierProductTypeError: 'Please select at least one product type',
 };
 
 // only alphanumic and space . '
@@ -61,7 +63,7 @@ export function ValidateDate(control: AbstractControl): ValidationErrors | null 
 }
 
 export function ValidateCAZip(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[A-Za-z]\\d[A-Za-z][ -]?\\d[A-Za-z]\\d$/.test(control.value);
+  const isValid = /^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] ?\d[A-Z]\d)$/g.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
@@ -69,7 +71,7 @@ export function ValidateCAZip(control: AbstractControl): ValidationErrors | null
 }
 
 export function ValidateUSZip(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[0-9]{5}$/.test(control.value);
+  const isValid = /^[0-9]{5}(?:-[0-9]{4})?$/.test(control.value);
   if (!control.value || isValid) {
     return null;
   }
@@ -122,7 +124,7 @@ export const ValidateMinMax: ValidatorFn = (control: FormGroup): ValidationError
     min.setErrors({ minGreaterThanMax: true });
     max.setErrors({ maxLessThanMin: true });
     return null;
-  } 
+  }
   return null;
 };
 
@@ -150,11 +152,26 @@ export function DateValidator(control: AbstractControl): ValidationErrors | null
 }
 
 export function ValidateRichTextDescription(control: AbstractControl): ValidationErrors | null {
-  return control.value && control.value.length >= 1000 ? { richTextFormatError: true } : null;
+  return control.value && control.value.length >= 2000 ? { richTextFormatError: true } : null;
 }
 
 export function ValidateSupplierCategorySelection(control: AbstractControl): ValidationErrors | null {
   const isValidResource =
-    control.value.length > 0 && areAllCategoriesComplete(control.value) && !areDuplicateCategories(control.value);
+    control.value?.length > 0 && areAllCategoriesComplete(control.value) && !areDuplicateCategories(control.value);
   return isValidResource ? null : { SupplierCategoryError: true };
+}
+
+export function RequireCheckboxesToBeChecked(minRequired = 1): ValidatorFn {
+  return function validate(formGroup: FormGroup): ValidationErrors | null {
+    let checked = 0;
+
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.controls[key];
+
+      if (control.value === true) {
+        checked++;
+      }
+    });
+    return checked < minRequired ? { supplierProductTypeError: true } : null;
+  };
 }

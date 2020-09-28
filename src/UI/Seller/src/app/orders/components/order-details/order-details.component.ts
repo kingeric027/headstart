@@ -1,15 +1,44 @@
 import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
-import { Address, LineItem, OcLineItemService, OcOrderService, OcPaymentService, Order, Payment } from '@ordercloud/angular-sdk';
+import {
+  Address,
+  LineItem,
+  OcLineItemService,
+  OcPaymentService,
+  Order,
+  Payment,
+  OcOrderService,
+  OrderDirection,
+} from '@ordercloud/angular-sdk';
 import { groupBy as _groupBy } from 'lodash';
-import { ProductImage } from 'marketplace-javascript-sdk';
+
+// temporarily any with sdk update
+// import { ProductImage } from '@ordercloud/headstart-sdk';
 import { PDFService } from '@app-seller/orders/pdf-render.service';
-import { faDownload, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUndo, faExclamationTriangle, faInfoCircle, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { AppAuthService } from '@app-seller/auth';
-import { FormGroup, FormControl } from '@angular/forms';
+import { ReturnReason } from '@app-seller/shared/models/return-reason.interface';
+import { MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
+import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
+
+export const LineItemTableStatus = {
+  Default: 'Default',
+  Canceled: 'Canceled',
+  Returned: 'Returned',
+  Backorered: 'Backorered',
+};
+
+export interface OrderProgress {
+  StatusDisplay: string;
+  Value: number;
+  ProgressBarType: string;
+  Striped: boolean;
+  Animated: boolean;
+}
 
 @Component({
   selector: 'app-order-details',
@@ -19,19 +48,26 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class OrderDetailsComponent {
   faDownload = faDownload;
   faUndo = faUndo;
+  faExclamationTriangle = faExclamationTriangle;
+  faInfoCircle = faInfoCircle;
+  faUser = faUserAlt;
   _order: Order = {};
-  _lineItems: LineItem[] = [];
+  _lineItems: MarketplaceLineItem[] = [];
   _payments: Payment[] = [];
-  _liGroupedByShipFrom: LineItem[][];
-  _liGroups: any;
-  images: ProductImage[] = [];
-  orderDirection: string;
+  images: any[] = [];
+  orderDirection: OrderDirection;
   cardType: string;
   createShipment: boolean;
   isSellerUser = false;
-  processReturn = false;
   isSaving = false;
-  returnForm: FormGroup;
+  orderProgress: OrderProgress = {
+    StatusDisplay: 'Processing',
+    Value: 25,
+    ProgressBarType: 'primary',
+    Striped: false,
+    Animated: false
+  };
+  orderAvatarInitials: string;
 
   @Input()
   set order(order: Order) {
@@ -42,21 +78,37 @@ export class OrderDetailsComponent {
   }
   constructor(
     private ocLineItemService: OcLineItemService,
+    private ocOrderService: OcOrderService,
     private ocPaymentService: OcPaymentService,
     private orderService: OrderService,
     private pdfService: PDFService,
-    private ocOrderService: OcOrderService,
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER;
-   }
+  }
 
-   setReturnForm(): void {
-    this.returnForm = new FormGroup({
-      Comment: new FormControl(this._order.xp?.OrderReturnInfo?.Comment || ''),
-    });
+  setOrderProgress(order: MarketplaceOrder): void {
+    switch(order?.xp?.ShippingStatus) {
+      case 'Processing':
+        this.orderProgress = { StatusDisplay: "Processing", Value: 25, ProgressBarType: 'primary', Striped: false, Animated: false }
+        break;
+      case 'PartiallyShipped':
+        this.orderProgress = { StatusDisplay: "Partially Shipped", Value: 50, ProgressBarType: 'primary', Striped: false, Animated: false }
+        break;
+      case 'Backordered':
+        this.orderProgress = { StatusDisplay: "Item Backordered", Value: 75, ProgressBarType: 'danger', Striped: true, Animated: true }
+      case 'Shipped': 
+        this.orderProgress = { StatusDisplay: "Complete", Value: 100, ProgressBarType: 'success', Striped: false, Animated: false }
+        break;
+    }
+    if (order?.xp?.ClaimStatus === 'Pending') {
+      this.orderProgress = { StatusDisplay: "Needs Attention", Value: 100, ProgressBarType: 'danger', Striped: true, Animated: true }
+    }
+    if (order?.xp?.SubmittedOrderStatus === 'Canceled') {
+      this.orderProgress = { StatusDisplay: "Canceled", Value: 100, ProgressBarType: 'danger', Striped: false, Animated: false }
+    }
   }
 
   setCardType(payment) {
@@ -67,8 +119,12 @@ export class OrderDetailsComponent {
     return this.cardType;
   }
 
+  getReturnReason(reasonCode: string): string {
+    return ReturnReason[reasonCode];
+  }
+
   getFullName(address: Address) {
-    const fullName = `${address.FirstName || ''} ${address.LastName || ''}`;
+    const fullName = `${address?.FirstName || ''} ${address?.LastName || ''}`;
     return fullName.trim();
   }
 
@@ -78,7 +134,9 @@ export class OrderDetailsComponent {
   }
 
   async setOrderStatus() {
-    await this.middleware.acknowledgeQuoteOrder(this._order.ID).then(completedOrder => this.handleSelectedOrderChange(completedOrder));
+    await this.middleware
+      .acknowledgeQuoteOrder(this._order.ID)
+      .then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
   isQuoteOrder(order: Order) {
@@ -86,35 +144,25 @@ export class OrderDetailsComponent {
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
+    this.orderAvatarInitials = !this.isQuoteOrder(order) ? `${order?.FromUser?.FirstName?.slice(0,1).toUpperCase()}${order?.FromUser?.LastName?.slice(0,1).toUpperCase()}`
+      :
+    `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(0,1).toUpperCase()}${order?.xp?.QuoteOrderInfo?.LastName?.slice(0,1).toUpperCase()}`;
+    this.setOrderProgress(order);
     this._order = order;
     this.getIncomingOrOutgoing();
     const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID).toPromise();
-    this._lineItems = lineItemsResponse.Items;
+    this._lineItems = lineItemsResponse.Items as MarketplaceLineItem[];
     const paymentsResponse = await this.ocPaymentService.List(this.orderDirection, order.ID).toPromise();
     this._payments = paymentsResponse.Items;
-    this._liGroups = _groupBy(this._lineItems, li => li.ShipFromAddressID);
-    this._liGroupedByShipFrom = Object.values(this._liGroups);
+  }
+
+  async refreshOrder(): Promise<void> {
+    const order = await this.ocOrderService.Get(this.orderDirection, this._order.ID).toPromise();
+    this.handleSelectedOrderChange(order);
   }
 
   toggleCreateShipment(createShipment: boolean) {
     this.createShipment = createShipment;
-  }
-
-  toggleProcessReturn(): void {
-    this.processReturn = !this.processReturn;
-    if (this.processReturn) {
-      this.setReturnForm();
-    }
-  }
-
-  async onReturnFormSubmit(): Promise<void> {
-    this.isSaving = true;
-    const comment = this.returnForm.value.Comment;
-    await this.ocOrderService.Patch(this.orderDirection, this._order.ID, { xp: { OrderReturnInfo: { Comment: comment} } }).toPromise();
-    this._order = await this.ocOrderService.Get(this.orderDirection, this._order.ID).toPromise();
-    this.processReturn = false;
-    this.isSaving = false;
-
   }
 
   protected createAndSavePDF(): void {

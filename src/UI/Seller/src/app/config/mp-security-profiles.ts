@@ -28,7 +28,8 @@ export const MPRoles = {
   MPMeSupplierAddressAdmin: 'MPMeSupplierAddressAdmin',
   MPMeSupplierUserAdmin: 'MPMeSupplierUserAdmin',
   MPReportReader: 'MPReportReader',
-  MPStoreFrontAdmin: 'MPStoreFrontAdmin',
+  MPReportAdmin: 'MPReportAdmin',
+  MPStorefrontAdmin: 'MPStorefrontAdmin',
 };
 
 const OrderCloudRoles = {
@@ -228,7 +229,15 @@ const MPMeSupplierUserAdmin: MPRole = {
 };
 const MPReportReader: MPRole = {
   RoleName: MPRoles.MPReportReader,
-  OrderCloudRoles: [],
+  OrderCloudRoles: [OrderCloudRoles.SupplierReader, OrderCloudRoles.SupplierAdmin],
+};
+const MPReportAdmin: MPRole = {
+  RoleName: MPRoles.MPReportAdmin,
+  OrderCloudRoles: [OrderCloudRoles.AdminUserAdmin],
+};
+const MPStorefrontAdmin: MPRole = {
+  RoleName: MPRoles.MPStorefrontAdmin,
+  OrderCloudRoles: [OrderCloudRoles.ProductFacetAdmin, OrderCloudRoles.ProductFacetReader],
 };
 
 interface UserType {
@@ -246,6 +255,9 @@ const MarketPlaceManager = {
     MPSellerAdmin,
     MPSupplierAdmin,
     MPMeSupplierAdmin,
+    MPStorefrontAdmin,
+    MPReportReader,
+    MPReportAdmin
   ],
 };
 
@@ -262,10 +274,11 @@ const SupplierManager = {
     MPMeSupplierAdmin,
     MPMeSupplierAddressAdmin,
     MPMeSupplierUserAdmin,
+    MPReportReader
   ],
 };
 const SupplierTeamMember = {
   Name: 'SupplierTeamMember',
-  MPRoles: [MPMeProductAdmin, MPOrderAdmin, MPShipmentAdmin, MPMeSupplierAdmin, MPMeSupplierAddressAdmin],
+  MPRoles: [MPMeProductAdmin, MPOrderAdmin, MPShipmentAdmin, MPMeSupplierAdmin, MPMeSupplierAddressAdmin, MPReportReader],
 };
 const SEBUserTypes = [SupplierManager, SupplierTeamMember, MarketPlaceManager];

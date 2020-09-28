@@ -43,7 +43,7 @@ namespace Marketplace.Common.Commands.Zoho
             });
             _oc = new OrderCloudClient(new OrderCloudClientConfig()
             {
-                AuthUrl = settings.OrderCloudSettings.AuthUrl,
+                AuthUrl = settings.OrderCloudSettings.ApiUrl,
                 ApiUrl = settings.OrderCloudSettings.ApiUrl,
                 ClientId = settings.OrderCloudSettings.ClientID,
                 ClientSecret = settings.OrderCloudSettings.ClientSecret,
@@ -197,7 +197,7 @@ namespace Marketplace.Common.Commands.Zoho
         {
             var ocBuyer = await _oc.Buyers.GetAsync<MarketplaceBuyer>(order.FromCompanyID);
             var buyerAddress = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(order.FromCompanyID, order.BillingAddressID);
-            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceUserGroup>(order.FromCompanyID, order.BillingAddressID);
+            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(order.FromCompanyID, order.BillingAddressID);
             var location = new MarketplaceBuyerLocation
             {
                 Address = buyerAddress,

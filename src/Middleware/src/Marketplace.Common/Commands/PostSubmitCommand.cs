@@ -15,6 +15,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using Newtonsoft.Json.Converters;
+using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
 {
@@ -35,8 +36,10 @@ namespace Marketplace.Common.Commands
 		private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
+        private readonly IOrderCommand _orderCommand;
+        private readonly ILineItemCommand _lineItemCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
         {
             _freightPopService = freightPopService;
 			_oc = oc;
@@ -46,8 +49,9 @@ namespace Marketplace.Common.Commands
             _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
-
-		}
+            _orderCommand = orderCommand;
+            _lineItemCommand = lineItemCommand;
+        }
 
         private class PostSubmitErrorResponse
         {
@@ -180,7 +184,7 @@ namespace Marketplace.Common.Commands
                 return new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
-                    UnhandledErrorBody = JsonConvert.SerializeObject(ex),
+                    UnhandledErrorBody = "Failure handling failure marking process"
                 };
             }
         }
@@ -239,8 +243,6 @@ namespace Marketplace.Common.Commands
         {
             // forwarding
             var buyerOrder = orderWorksheet.Order;
-            //await CleanIDLineItems(orderWorksheet);
-
             var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, buyerOrder.ID);
             var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
 
@@ -252,30 +254,6 @@ namespace Marketplace.Common.Commands
             // need to get fresh order worksheet because this process has changed things about the worksheet
             var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
             return new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet>(updatedSupplierOrders, updatedWorksheet);
-        }
-
-        private async Task CleanIDLineItems(MarketplaceOrderWorksheet orderWorksheet)
-        {
-            /* line item ids are significant for suppliers creating a relationship
-            * between their shipments and line items in ordercloud 
-            * we are sequentially labeling these ids for ease of shipping */
-
-            var lineItemIDChanges = orderWorksheet.LineItems.Select((li, index) => (OldID: li.ID, NewID: CreateIDFromIndex(index)));
-            await Throttler.RunAsync(lineItemIDChanges, 100, 2, (lineItemIDChange) =>
-            {
-                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, orderWorksheet.Order.ID, lineItemIDChange.OldID, new PartialLineItem { ID = lineItemIDChange.NewID });
-            });
-        }
-
-        private string CreateIDFromIndex(int index)
-        {
-            /* X was choosen as a prefix for the lineItem ID so that it is easy to 
-               * direct suppliers where to look for the ID. L and I are sometimes indistinguishable 
-               * from the number 1 so I avoided those. X is also difficult to confuse with other
-               * letters when verbally pronounced */
-            var countInList = index + 1;
-            var paddedCount = countInList.ToString().PadLeft(3, '0');
-            return 'X' + paddedCount;
         }
 
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
@@ -290,37 +268,47 @@ namespace Marketplace.Common.Commands
                 var supplierID = supplierOrder.ToCompanyID;
                 supplierIDs.Add(supplierID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID)).ToList();
+                var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
                 var supplierOrderPatch = new PartialOrder()
                 {
                     ID = $"{buyerOrder.ID}-{supplierID}",
-                    xp = GetNewOrderXP(buyerOrder, supplierID, shipFromAddressIDsForSupplierOrder)
+                    xp = GetNewOrderXP(buyerOrder, supplier, shipFromAddressIDsForSupplierOrder)
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
+
+            await _lineItemCommand.SetInitialSubmittedLineItemStatuses(buyerOrder.ID);
 
             var buyerOrderPatch = new PartialOrder()
             {
                 xp = new
                 {
                     ShipFromAddressIDs = shipFromAddressIDs,
-                    SupplierIDs = supplierIDs
+                    SupplierIDs = supplierIDs,
+                    ClaimStatus = ClaimStatus.NoClaim,
+                    ShippingStatus = ShippingStatus.Processing,
+                    SubmittedOrderStatus = SubmittedOrderStatus.Open
                 }
             };
+            
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
             return updatedSupplierOrders;
         }
 
-        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, string supplierID, List<string> shipFromAddressIDsForSupplierOrder)
+        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, MarketplaceSupplier supplier, List<string> shipFromAddressIDsForSupplierOrder)
         {
             var supplierOrderXp = new OrderXp()
             {
                 ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
-                SupplierIDs = new List<string>() { supplierID },
+                SupplierIDs = new List<string>() { supplier.ID },
                 StopShipSync = false,
                 OrderType = buyerOrder.xp.OrderType,
                 QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
-				Currency = buyerOrder.xp.Currency
+				Currency = supplier.xp.Currency,
+                ClaimStatus = ClaimStatus.NoClaim,
+                ShippingStatus = ShippingStatus.Processing,
+                SubmittedOrderStatus = SubmittedOrderStatus.Open
             };
             return supplierOrderXp;
         }

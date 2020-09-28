@@ -57,7 +57,7 @@ namespace ordercloud.integrations.cardconnect
             return acct;
         }
 
-        public static CardConnectAuthorizationRequest Map(BuyerCreditCard card, Order order, OrderCloudIntegrationsCreditCardPayment payment)
+        public static CardConnectAuthorizationRequest Map(BuyerCreditCard card, Order order, OrderCloudIntegrationsCreditCardPayment payment, decimal amount)
         {
 			var address = card.xp.CCBillingAddress;
 			var req = new CardConnectAuthorizationRequest()
@@ -65,7 +65,7 @@ namespace ordercloud.integrations.cardconnect
                 name = $"{card.CardholderName}",
                 account = card.Token,
                 address = address.Street1,
-                amount = order.Total.ToString(CultureInfo.InvariantCulture),
+                amount = amount.ToString(),
                 //capture = auth.capture,
                 //bin = auth.bin,
                 city = address.City,

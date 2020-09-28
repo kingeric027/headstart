@@ -7,8 +7,9 @@ import {
   ListPage,
   Payment,
   BuyerCreditCard,
+  OrderPromotion,
 } from 'ordercloud-javascript-sdk';
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
@@ -23,12 +24,13 @@ export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   isAnon: boolean;
   order: MarketplaceOrder;
+  orderPromotions: OrderPromotion[] = [];
   lineItems: ListPage<MarketplaceLineItem>;
   orderSummaryMeta: OrderSummaryMeta;
   payments: ListPage<Payment>;
   cards: ListPage<BuyerCreditCard>;
   selectedCard: SelectedCreditCard;
-  shipEstimates: ShipEstimate[] = null;
+  shipEstimates: ShipEstimate[] = [];
   currentPanel: string;
   faCheck = faCheck;
   checkout: CheckoutService = this.context.order.checkout;
@@ -60,21 +62,25 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
+
     this.lineItems = this.context.order.cart.get();
+    this.orderPromotions = this.context.order.promos.get().Items;
     this.isAnon = this.context.currentUser.isAnonymous();
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress';
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, this.currentPanel)
+    this.reIDLineItems();
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, this.currentPanel)
     this.setValidation('login', !this.isAnon);
+  }
+
+  async reIDLineItems(): Promise<void> {
+    await this.checkout.cleanLineItemIDs(this.order.ID, this.lineItems.Items);
+    this.lineItems = this.context.order.cart.get();
   }
 
   async doneWithShipToAddress(): Promise<void> {
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
-    if(!this.orderSummaryMeta.StandardLineItemCount) {
-      this.toSection('payment');
-    } else {
-      this.toSection('shippingSelection');
-    }
+    this.toSection('shippingSelection');
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
@@ -85,7 +91,7 @@ export class OCMCheckout implements OnInit {
   async doneWithShippingRates(): Promise<void> {
     await this.checkout.calculateOrder();
     this.cards = await this.context.currentUser.cards.List();
-    await this.context.order.reset();
+    await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
     this.lineItems = this.context.order.cart.get();
     this.toSection('payment');
@@ -135,10 +141,11 @@ export class OCMCheckout implements OnInit {
         MerchantID: merchant.cardConnectMerchantID
       }
       cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
+      await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
     } else {
       cleanOrderID = await this.checkout.submitWithoutCreditCard();
+      await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
     }
-
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
   }
@@ -152,7 +159,7 @@ export class OCMCheckout implements OnInit {
   }
 
   toSection(id: string): void {
-    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.lineItems.Items, id)
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
     
     // set validation to true on all previous sections
@@ -179,5 +186,11 @@ export class OCMCheckout implements OnInit {
       }
     }
     this.currentPanel = $event.panelId;
+  }
+
+  updateOrderMeta(promos?: CustomEvent<OrderPromotion[]>): void {
+    this.orderPromotions = this.context.order.promos.get().Items;
+    this.orderPromotions = promos.detail;
+    this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, this.currentPanel)
   }
 }

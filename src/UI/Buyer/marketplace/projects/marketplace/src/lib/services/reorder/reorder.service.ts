@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { Me, Inventory, PriceSchedule } from 'ordercloud-javascript-sdk';
 import { partition as _partition } from 'lodash';
 import { OrderReorderResponse, MarketplaceMeProduct } from '../../shopper-context';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReorderHelperService {
-  constructor() {}
+  constructor(private tempSdk: TempSdk) {}
 
   public async validateReorder(orderID: string, lineItems: MarketplaceLineItem[]): Promise<OrderReorderResponse> {
     // instead of moving all of this logic to the middleware to support orders not
@@ -23,7 +24,7 @@ export class ReorderHelperService {
   private async ListProducts(items: MarketplaceLineItem[]): Promise<MarketplaceMeProduct[]> {
     const productIds = items.map(item => item.ProductID);
     // TODO - what if the url is too long?
-    return (await Me.ListProducts({ filters: { ID: productIds.join('|') } })).Items;
+    return (await this.tempSdk.listMeProducts({ filters: { ID: productIds.join('|') } })).Items;
   }
 
   private isLineItemValid(item: MarketplaceLineItem, products: MarketplaceMeProduct[]): boolean {

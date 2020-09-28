@@ -12,6 +12,7 @@ import { CurrentUserService } from '../current-user/current-user.service';
 import { UserManagementService } from '../user-management/user-management.service';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 import { ExchangeRatesService } from '../exchange-rates/exchange-rates.service';
+import { TempSdk } from '../temp-sdk/temp-sdk.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,7 @@ export class ShopperContextService {
     public categories: ProductCategoriesService,
     public userManagementService: UserManagementService,
     public addresses: AddressService,
-    public ordersToApprove: OrdersToApproveStateService
+    public ordersToApprove: OrdersToApproveStateService,
+    public tempSdk: TempSdk
   ) {}
 }

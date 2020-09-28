@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Marketplace.Models.Misc;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ordercloud.integrations.library;
+using System;
+using System.Linq;
+using System.Security.Claims;
 
 namespace Marketplace.Common.Controllers
 {
@@ -21,6 +25,14 @@ namespace Marketplace.Common.Controllers
 		{
 			VerifiedUserContext = new VerifiedUserContext(User);
 			base.OnActionExecuting(context);
+		}
+
+		public void RequireOneOf(params CustomRole[] customRoles)
+		{
+			var str = customRoles.Select(r => Enum.GetName(typeof(CustomRole), r));
+			var roles = VerifiedUserContext.Principal.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
+			var isAuthenticated = roles.Intersect(str).Count() > 0 || roles.Contains("FullAccess");
+			Require.That(isAuthenticated, new ErrorCode("InsufficientRoles", 401, $"You need a custom role. One of {string.Join(", ", customRoles)} required."));
 		}
 	}
 }

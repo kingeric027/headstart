@@ -1,5 +1,5 @@
 import { FormArray, FormControl, FormBuilder } from '@angular/forms';
-import { MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { LineItemForm } from './line-item-form.model';
 
 export class LineItemGroupForm {
@@ -7,11 +7,11 @@ export class LineItemGroupForm {
   lineItems = new FormArray([]);
   liGroup: MarketplaceLineItem[];
 
-  constructor(private fb: FormBuilder, liGroup: MarketplaceLineItem[]) {
+  constructor(private fb: FormBuilder, liGroup: MarketplaceLineItem[], action: string) {
     if (liGroup && liGroup[0].ShipFromAddressID) {
-      this.shipFromAddressID.setValue(liGroup[0].ShipFromAddressID);
+      this.shipFromAddressID.setValue(liGroup[0].ShipFromAddressID); 
     }
-    liGroup.forEach(li => this.lineItems.push(this.fb.group(new LineItemForm(li))));
+    liGroup.forEach(li => this.lineItems.push(this.fb.group(new LineItemForm(li, action))));
     this.liGroup = liGroup;
   }
 }

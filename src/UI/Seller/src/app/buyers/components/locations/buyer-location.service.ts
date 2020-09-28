@@ -10,8 +10,10 @@ import {
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { BuyerUserService } from '../users/buyer-user.service';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { Addresses } from 'ordercloud-javascript-sdk';
 
 export interface PermissionType {
   UserGroupSuffix: string;
@@ -66,20 +68,26 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocAddressService: OcAddressService,
     private ocUserGroupService: OcUserGroupService,
     private ocUserService: OcUserService,
-    private buyerUserService: BuyerUserService
+    private buyerUserService: BuyerUserService,
+    public currentUserService: CurrentUserService
   ) {
-    super(router, activatedRoute, ocAddressService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'locations');
+    super(
+      router,
+      activatedRoute,
+      Addresses,
+      currentUserService,
+      '/buyers',
+      'buyers',
+      BUYER_SUB_RESOURCE_LIST,
+      'locations'
+    );
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
-    const newResource = await MarketplaceSDK.ValidatedAddresses.SaveBuyerAddress(
-      this.getParentResourceID(),
-      originalID,
-      resource
-    );
+    const resourceID = await this.getParentResourceID();
+    const newResource = await HeadStartSDK.ValidatedAddresses.SaveBuyerAddress(resourceID, originalID, resource);
     const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
     this.resourceSubject.value.Items[resourceIndex] = newResource;
     this.resourceSubject.next(this.resourceSubject.value);
@@ -87,10 +95,8 @@ export class BuyerLocationService extends ResourceCrudService<BuyerAddress> {
   }
 
   async createNewResource(resource: any): Promise<any> {
-    const newResource = await MarketplaceSDK.ValidatedAddresses.CreateBuyerAddress(
-      this.getParentResourceID(),
-      resource
-    );
+    const resourceID = await this.getParentResourceID();
+    const newResource = await HeadStartSDK.ValidatedAddresses.CreateBuyerAddress(resourceID, resource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;

@@ -4,36 +4,42 @@
   <div class="row pt-3"
        id="product-options">
     <div class="col-md-5">
-      <h5>Product Variations</h5>
-      <p class="font-italic mb-0">{{ readonly ? "Product varieties as defined by the supplier." : "Does your product come in different varieties? Add the options here."}}</p>
+      <h5 translate>ADMIN.PRODUCT_EDIT.PRODUCT_VARIATIONS</h5>
+      <p class="font-italic mb-0"
+         translate>{{readonly ? 'ADMIN.PRODUCT_EDIT.PRODUCT_VARIETIES_DEFINED' : 'ADMIN.PRODUCT_EDIT.DOES_YOUR_PRODUCT'}}</p>
       <p class="mb-0"
-         *ngIf="variants">This product has <span [ngClass]="{'text-danger': !variantsValid}"
-              class="font-weight-bold">{{variants?.length}}</span> variations. (Limit 100)</p>
+         *ngIf="variants"><span translate>ADMIN.PRODUCT_EDIT.THIS_PRODUCT_HAS </span>
+        <span [ngClass]="{'text-danger': !variantsValid}"
+              class="font-weight-bold">{{variants?.length}}</span>
+        <span translate> ADMIN.PRODUCT_EDIT.VARIANTS_LIMIT_100</span></p>
       <p *ngIf="!variantsValid"
          class="text-danger">
-        <fa-icon [icon]="faExclamationCircle"></fa-icon> This product exceeds the limit of 100 variations.
+        <fa-icon [icon]="faExclamationCircle"></fa-icon> <span translate>ADMIN.PRODUCT_EDIT.THIS_PRODUCT_EXCEEDS</span>
       </p>
     </div>
     <div class="col-md-7">
       <button *ngIf="!editSpecs && !readonly && !superProductEditable?.Specs?.length"
               [disabled]="!canConfigureVariations"
               class="btn btn-outline-dark"
-              (click)="toggleEditSpecs()">
-        Configure Variations
+              (click)="toggleEditSpecs()"
+              translate>
+        ADMIN.PRODUCT_EDIT.CONFIGURE_VARIATIONS
       </button>
       <button *ngIf="!readonly && (!editSpecs && superProductEditable?.Specs?.length)"
               class="btn btn-outline-dark"
               (click)="toggleEditSpecs()">
-        <fa-icon [icon]="faCog"></fa-icon> Edit Variations
+        <fa-icon [icon]="faCog"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.EDIT_VARIATIONS</span>
       </button>
       <div class="form-group"
            *ngIf="editSpecs">
-        <label for="AddVariation">Add Variation</label>
+        <label for="AddVariation"
+               translate>ADMIN.PRODUCT_EDIT.ADD_VARIATION</label>
         <input type="text"
                class="form-control add-variation"
                id="AddVariation"
-               placeholder="Name the variation">
-        <label class="check-container">SKUs vary based on this variation
+               placeholder="{{'ADMIN.PRODUCT_EDIT.NAME_THE_VARIATION' | translate}}">
+        <label class="check-container"
+               translate>ADMIN.PRODUCT_EDIT.SKUS_VARY
           <input type="checkbox"
                  [checked]="shouldDefinesVariantBeChecked()"
                  (change)="definesVariant = !definesVariant"
@@ -42,7 +48,8 @@
           <span class="checkmark"></span>
         </label>
         <button class="btn btn-outline-dark"
-                (click)="addSpec()">Add</button>
+                (click)="addSpec()"
+                translate>ADMIN.PRODUCT_EDIT.ADD</button>
       </div>
     </div>
   </div>
@@ -56,13 +63,14 @@
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="ml-2 mb-0">{{spec.Name}}</h5>
             <button class="btn btn-link text-danger"
-                    (click)="removeSpec(spec)">Delete Variation</button>
+                    (click)="removeSpec(spec)"
+                    translate>ADMIN.PRODUCT_EDIT.DELETE_VARIATION</button>
           </div>
           <table class="table table-sm table-hover">
             <thead>
               <tr>
-                <th>Option</th>
-                <th>Price Markup</th>
+                <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
+                <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
                 <th></th>
               </tr>
             </thead>
@@ -73,18 +81,19 @@
                          id="{{spec.ID}}"
                          type="text"
                          maxlength="30"
-                         placeholder="Name">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.NAME' | translate}}">
                 </td>
                 <td>
                   <input class="form-control"
                          id="{{spec.ID}}Markup"
                          type="number"
-                         placeholder="Markup">
+                         placeholder="{{'ADMIN.PRODUCT_EDIT.MARKUP' | translate}}">
                 </td>
                 <td>
                   <button class="btn btn-outline-dark"
                           [disabled]="shouldDisableAddSpecOptBtn(spec)"
-                          (click)="addSpecOption(spec, specIndex)">Add</button>
+                          (click)="addSpecOption(spec, specIndex)"
+                          translate>ADMIN.PRODUCT_EDIT.ADD</button>
                 </td>
               </tr>
             </tbody>
@@ -92,9 +101,9 @@
           <table class="table table-sm table-hover">
             <thead>
               <tr>
-                <th>Option</th>
-                <th>Default</th>
-                <th>Price Markup</th>
+                <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
+                <th translate>ADMIN.PRODUCT_EDIT.DEFAULT</th>
+                <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
                 <th></th>
               </tr>
             </thead>
@@ -132,11 +141,18 @@
       <div class="d-flex justify-content-end align-items-center mt-3">
         <button *ngIf="editSpecs && areSpecChanges"
                 (click)="handleDiscardSpecChanges()"
-                class="btn btn-link text-dark">Cancel</button>
-        <button *ngIf="editSpecs"
+                class="btn btn-link text-dark"
+                translate>ADMIN.PRODUCT_EDIT.CANCEL</button>
+        <button *ngIf="editSpecs && areSpecChanges"
                 class="btn btn-outline-dark"
                 [disabled]="!variantsValid"
-                (click)="toggleEditSpecs()">{{areSpecChanges ? 'Save Changes' : 'Done'}}</button>
+                (click)="toggleEditSpecs()"
+                translate>ADMIN.PRODUCT_EDIT.SAVE_CHANGES</button>
+        <button *ngIf="editSpecs && !areSpecChanges"
+                class="btn btn-outline-dark"
+                [disabled]="!variantsValid"
+                (click)="toggleEditSpecs()"
+                translate>ADMIN.PRODUCT_EDIT.DONE</button>
       </div>
     </div>
   </div>
@@ -145,7 +161,8 @@
   <div class="row pt-3 position-relative product-variations">
     <div class="variant-overlay"
          *ngIf="editSpecs">
-      <span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length">Pending Variation Changes...</span>
+      <span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length"
+            translate>ADMIN.PRODUCT_EDIT.PENDING_VARIATION_CHANGES</span>
     </div>
     <div class="variant-overlay"
          *ngIf="assignVariantImages">
@@ -159,24 +176,28 @@
                alt="" />
           <div>
             <button class="btn btn-outline-dark"
-                    (click)="updateProductImageTags()">Done</button>
+                    (click)="updateProductImageTags()"
+                    translate>ADMIN.PRODUCT_EDIT.DONE</button>
           </div>
         </div>
       </div>
     </div>
     <div class="col-md-12">
       <div *ngIf="variants?.length > 0">
-        <h6>The following product variations have unique SKU's associated with them. You can manage these product SKU's in the table inputs below.</h6>
+        <h6 translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_HAVE</h6>
         <perfect-scrollbar class="product-table"
                            style="width: 100%; max-height: 600px;">
           <table class="table mb-0">
             <thead class="bg-light">
               <tr>
-                <th scope="col">Details</th>
+                <th scope="col"
+                    translate>ADMIN.PRODUCT_EDIT.DETAILS</th>
                 <th *ngFor="let spec of specsWithVariations; let i = index"
                     scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
-                <th scope="col">SKU</th>
-                <th scope="col">Total Markup</th>
+                <th scope="col"
+                    translate>ADMIN.PRODUCT_EDIT.SKU</th>
+                <th scope="col"
+                    translate>ADMIN.PRODUCT_EDIT.TOTAL_MARKUP</th>
               </tr>
             </thead>
             <tbody>
@@ -218,39 +239,47 @@
                          style="max-width: 50px"
                          [src]="img.Url"
                          alt="" />
-                    <div class="d-flex justify-content-between align-items-center">
-                      <mat-form-field appearance="standard">
-                        <mat-label>Ship Width</mat-label>
-                        <input matInput
+                    <div class="form-row">
+                      <div class="form-group col-3">
+                        <label for="shipWidth"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_WIDTH</label>
+                        <input class="form-control input-sm"
+                               id="shipWidth"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipWidth"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipWidth')"
-                               placeholder="Width">
-                      </mat-form-field>
-                      <mat-form-field appearance="standard">
-                        <mat-label>Ship Height</mat-label>
-                        <input matInput
+                               placeholder="{{'ADMIN.PRODUCT_EDIT.WIDTH' | translate}}">
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="shipHeight"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_HEIGHT</label>
+                        <input class="form-control input-sm"
+                               id="shipHeight"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipHeight"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipHeight')"
-                               placeholder="Height">
-                      </mat-form-field>
-                      <mat-form-field appearance="standard">
-                        <mat-label>Ship Length</mat-label>
-                        <input matInput
+                               placeholder="{{'ADMIN.PRODUCT_EDIT.HEIGHT' | translate}}">
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="shipLength"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_LENGTH</label>
+                        <input class="form-control input-sm"
+                               id="shipLength"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipLength"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipLength')"
-                               placeholder="Length">
-                      </mat-form-field>
-                      <mat-form-field appearance="standard">
-                        <mat-label>Ship Weight</mat-label>
-                        <input matInput
+                               placeholder="{{'ADMIN.PRODUCT_EDIT.LENGTH' | translate}}">
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="shipWeight"
+                               translate>ADMIN.PRODUCT_EDIT.SHIP_WEIGHT</label>
+                        <input class="form-control input-sm"
+                               id="shipWeight"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipWeight"
                                (focusout)="variantShippingDimensionUpdate($event, 'ShipWeight')"
-                               placeholder="Weight">
-                      </mat-form-field>
+                               placeholder="{{'ADMIN.PRODUCT_EDIT.WEIGHT' | translate}}">
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -261,15 +290,15 @@
       </div>
       <div class="mt-2"
            *ngIf="specsWithoutVariations?.length">
-        <h6>The following product variations do not have unique SKU's associated with them.</h6>
+        <h6 translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_DONT</h6>
         <perfect-scrollbar class="product-table"
                            style="width: 100%; max-height: 600px;">
           <table class="table mb-0">
             <thead class="bg-light">
               <tr>
-                <th>Variation</th>
-                <th>Option</th>
-                <th>Price Markup</th>
+                <th translate>ADMIN.PRODUCT_EDIT.VARIATION</th>
+                <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
+                <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
               </tr>
             </thead>
             <tbody *ngFor="let spec of specsWithoutVariations">

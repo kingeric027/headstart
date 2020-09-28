@@ -1,4 +1,6 @@
-import { MarketplaceOrder, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem, OrderPromotion } from '@ordercloud/headstart-sdk';
+import { ShipEstimate, LineItem } from 'ordercloud-javascript-sdk';
+import { concatAll } from 'rxjs/operators';
 
 export interface OrderSummaryMeta {
   StandardLineItems: MarketplaceLineItem[];
@@ -14,7 +16,10 @@ export interface OrderSummaryMeta {
   ShippingCost: number;
   TaxCost: number;
   CreditCardTotal: number;
+  DiscountTotal: number;
 
+  POSubtotal: number;
+  POShippingCost: number;
   POTotal: number;
   OrderTotal: number;
 }
@@ -41,30 +46,40 @@ const getOverrideText = (checkoutPanel: string): string => {
   }
 }
 
-const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: number, shouldHideShippingAndText: boolean): number => {
+const getCreditCardTotal = (subTotal: number, shippingCost: number, taxCost: number, shouldHideShippingAndText: boolean, discountTotal: number): number => {
   if(shouldHideShippingAndText) {
-    return subTotal;
+    return subTotal - discountTotal;
   } else {
-    return subTotal + shippingCost + taxCost;
+    return (subTotal + shippingCost + taxCost) - discountTotal;
   }
 }
 
+/* eslint-disable */
 export const getOrderSummaryMeta = (
   order: MarketplaceOrder, 
+  orderPromos: OrderPromotion[],
   lineItems: MarketplaceLineItem[], 
+  shipEstimates: ShipEstimate[],
   checkoutPanel: string, 
 ): OrderSummaryMeta => {
   const StandardLineItems = getStandardLineItems(lineItems);
   const POLineItems = getPurchaseOrderLineItems(lineItems);
 
   const ShippingAndTaxOverrideText = getOverrideText(checkoutPanel);
-
   const shouldHideShippingAndText = !!ShippingAndTaxOverrideText;
 
   const CreditCardDisplaySubtotal = StandardLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
-  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, order.ShippingCost, order.TaxCost, shouldHideShippingAndText);
+  const DiscountTotal = orderPromos.reduce((accumulator, promo) => (promo.Amount) + accumulator, 0);
+  
+  const POSubtotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
 
-  const POTotal = POLineItems.reduce((accumulator, li) => (li.Quantity * li.UnitPrice) + accumulator, 0);
+  const POShippingCost = getPOShippingCost(shipEstimates, POLineItems);
+  const ShippingCost = order.ShippingCost - POShippingCost;
+  
+  const POTotal = POSubtotal + POShippingCost;
+  
+  const CreditCardTotal = getCreditCardTotal(CreditCardDisplaySubtotal, ShippingCost, order.TaxCost, shouldHideShippingAndText, DiscountTotal);
+  console.log(CreditCardTotal);
   const OrderTotal = POTotal + CreditCardTotal;
 
   return {
@@ -75,14 +90,26 @@ export const getOrderSummaryMeta = (
     ShippingAndTaxOverrideText, 
     ShouldHideShippingAndText: shouldHideShippingAndText, 
     CreditCardDisplaySubtotal, 
-    ShippingCost: order.ShippingCost, 
+    POShippingCost,
+    ShippingCost: ShippingCost, 
     TaxCost: order.TaxCost, 
+    POSubtotal,
     POTotal, 
     CreditCardTotal, 
+    DiscountTotal,
     OrderTotal 
   };
 }
 
+/* eslint-enable */
 
+const getPOShippingCost = (shipEstimates: ShipEstimate[], POlineItems: MarketplaceLineItem[]): number => {
+  const POShipEstimates = shipEstimates.filter(shipEstimate => {
+    return shipEstimate.ShipEstimateItems.some(item => POlineItems.some(li => li.ID === item.LineItemID))
+  })
 
-
+  return POShipEstimates.reduce((acc, shipEstimate)  =>  {
+    const selectedMethod = shipEstimate.ShipMethods.find(method => method.ID === shipEstimate.SelectedShipMethodID);
+    return (selectedMethod?.Cost || 0) + acc;
+  }, 0)
+}

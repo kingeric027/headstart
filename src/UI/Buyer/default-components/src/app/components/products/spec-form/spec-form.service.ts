@@ -1,8 +1,8 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecFormEvent } from './spec-form-values.interface';
-import { SpecOption, Spec, LineItemSpec, ListPage } from 'ordercloud-javascript-sdk';
+import { SpecOption, Spec, LineItemSpec, ListPage, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
-import { ExchangedPriceBreak } from 'src/app/models/currency.interface';
+import { SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +18,7 @@ export class SpecFormService {
     };
   }
 
-  public getSpecMarkup(specs: ListPage<Spec>, selectedBreak: ExchangedPriceBreak, qty: number): number {
+  public getSpecMarkup(specs: ListPage<Spec>, selectedBreak: PriceBreak, qty: number): number {
     const markups: Array<number> = new Array<number>();
     for (const value in this.event.form) {
       if (this.event.form.hasOwnProperty(value)) {
@@ -26,11 +26,11 @@ export class SpecFormService {
         if (!spec) continue;
         const option = this.getOption(spec, this.event.form[value]);
         if (option) {
-          markups.push(this.singleSpecMarkup(selectedBreak.Price.Price, qty, option));
+          markups.push(this.singleSpecMarkup(selectedBreak.Price, qty, option));
         }
       }
     }
-    return (selectedBreak.Price.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
+    return (selectedBreak.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
   }
 
   public getLineItemSpecs(buyerSpecs: ListPage<Spec>): Array<LineItemSpec> {
@@ -71,6 +71,22 @@ export class SpecFormService {
     }
     return specs;
   }
+
+  public getLineItemImageUrl(product: SuperMarketplaceProduct): string {
+    const image = product.Images?.find(img => this.isImageMatchingSpecs(img, product));
+    return image?.Url;
+  }
+
+  private isImageMatchingSpecs(image: Asset, product: SuperMarketplaceProduct): boolean {
+    // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+  const specs = this.getLineItemSpecs({Meta: {}, Items: product.Specs as any});
+  return specs.
+    every(spec => image.Tags
+    .find(tag => tag?.split('-')
+    .includes(spec.Value.replace(/\s/g, ''))));
+}
+
+
 
   private singleSpecMarkup(unitPrice: number, quantity: number, option: SpecOption): number {
     switch (option.PriceMarkupType) {

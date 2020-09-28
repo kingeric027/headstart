@@ -43,9 +43,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("PUT a Buyer Location")]
         [HttpPut, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task<MarketplaceBuyerLocation> Update(string buyerID, string buyerLocationID, [FromBody] MarketplaceBuyerLocation buyerLocation)
+        public async Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, [FromBody] MarketplaceBuyerLocation buyerLocation)
         {
-            return await _buyerLocationCommand.Update(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext);
+            return await _buyerLocationCommand.Save(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext);
         }
 
         [DocName("Delete a Buyer Location")]

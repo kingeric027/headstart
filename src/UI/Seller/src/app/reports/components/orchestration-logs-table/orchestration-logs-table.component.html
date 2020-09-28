@@ -13,7 +13,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.LOG'"
+                          [labelPlural]="'ADMIN.NAV.LOGS'">
 
   <div class="resource-edit">
   </div>

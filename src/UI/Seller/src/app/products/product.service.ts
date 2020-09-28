@@ -1,17 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
-  OcProductService,
   Product,
   OcPriceScheduleService,
   OcCatalogService,
   ProductAssignment,
-  ProductCatalogAssignment,
   OcCategoryService,
   CategoryProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { Products } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -44,7 +43,7 @@ export class ProductService extends ResourceCrudService<Product> {
         HasVariants: false,
         Note: '',
         Tax: {
-          Category: null,
+          Category: null, // SEB-827 default tax category to TPP
           Code: null,
           Description: null,
         },
@@ -54,6 +53,7 @@ export class ProductService extends ResourceCrudService<Product> {
         },
         ProductType: null,
         StaticContent: null,
+        ArtworkRequired: false,
       },
     },
     PriceSchedule: {
@@ -80,23 +80,27 @@ export class ProductService extends ResourceCrudService<Product> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    private ocProductsService: OcProductService,
     private ocCategoryService: OcCategoryService,
-    private ocPriceScheduleService: OcPriceScheduleService
+    private ocPriceScheduleService: OcPriceScheduleService,
+    private ocCatalogService: OcCatalogService,
+    public currentUserService: CurrentUserService
   ) {
-    super(router, activatedRoute, ocProductsService, '/products', 'products');
+    super(router, activatedRoute, Products, currentUserService, '/products', 'products');
   }
 
   async updateProductCatalogAssignments(
     add: ProductAssignment[],
     del: ProductAssignment[],
-    buyerID: string
+    buyerID: string,
+    priceScheduleID: string
   ): Promise<void> {
-    const addRequests = add.map(newAssignment => this.ocProductsService.SaveAssignment(newAssignment).toPromise());
+    add = add.map(a => {
+      a.PriceScheduleID = priceScheduleID;
+      return a;
+    });
+    const addRequests = add.map(newAssignment => Products.SaveAssignment(newAssignment));
     const deleteRequests = del.map(assignmentToRemove =>
-      this.ocProductsService
-        .DeleteAssignment(assignmentToRemove.ProductID, buyerID, { userGroupID: assignmentToRemove.UserGroupID })
-        .toPromise()
+      Products.DeleteAssignment(assignmentToRemove.ProductID, buyerID, { userGroupID: assignmentToRemove.UserGroupID })
     );
     await Promise.all([...addRequests, ...deleteRequests]);
   }

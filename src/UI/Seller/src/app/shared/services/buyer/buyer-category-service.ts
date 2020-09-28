@@ -3,13 +3,30 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Category, OcCategoryService } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '../resource-crud/resource-crud.service';
 import { BUYER_SUB_RESOURCE_LIST } from '@app-seller/buyers/components/buyers/buyer.service';
+import { CurrentUserService } from '../current-user/current-user.service';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { Categories } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BuyerCategoryService extends ResourceCrudService<Category> {
-  constructor(router: Router, activatedRoute: ActivatedRoute, private ocCategoryService: OcCategoryService) {
-    super(router, activatedRoute, ocCategoryService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST, 'categories');
+  constructor(router: Router, activatedRoute: ActivatedRoute, currentUserService: CurrentUserService) {
+    super(
+      router,
+      activatedRoute,
+      Categories,
+      currentUserService,
+      '/buyers',
+      'buyers',
+      BUYER_SUB_RESOURCE_LIST,
+      'categories'
+    );
+  }
+
+  addIntrinsicListArgs(options: ListArgs): ListArgs {
+    options.filters = { 'xp.Type': 'Catalog' };
+    return options;
   }
 
   async updateResource(originalID: string, resource: Category): Promise<Category> {
@@ -22,25 +39,27 @@ export class BuyerCategoryService extends ResourceCrudService<Category> {
     return super.createNewResource(resource);
   }
 
- async getResourceInformation(resource: Category): Promise<boolean> {
+  async getResourceInformation(resource: Category): Promise<boolean> {
     if (resource.ParentID) {
-      const parentResourceID = this.getParentResourceID();
+      const parentResourceID = await this.getParentResourceID();
       let numberOfChecks = 0;
       const validDepth = await this.checkForDepth(parentResourceID, resource.ParentID, numberOfChecks);
       if (!validDepth) {
-        throw {message: `Categories cannot be saved this deep into a tree.  Please create this in a higher tier.`};
+        throw { message: `Categories cannot be saved this deep into a tree.  Please create this in a higher tier.` };
       } else {
         return true;
       }
     }
   }
 
-  async checkForDepth (parentResourceID: string, resourceParentID: string, numberOfChecks: number): Promise<boolean> {
+  async checkForDepth(parentResourceID: string, resourceParentID: string, numberOfChecks: number): Promise<boolean> {
     numberOfChecks++;
     if (numberOfChecks === 3) {
       return false;
     }
-    const parentOfResource = await this.ocCategoryService.Get(parentResourceID, resourceParentID).toPromise();
-    return !parentOfResource.ParentID ? true : await this.checkForDepth(parentResourceID, parentOfResource.ParentID, numberOfChecks);
+    const parentOfResource = await Categories.Get(parentResourceID, resourceParentID);
+    return !parentOfResource.ParentID
+      ? true
+      : await this.checkForDepth(parentResourceID, parentOfResource.ParentID, numberOfChecks);
   }
 }

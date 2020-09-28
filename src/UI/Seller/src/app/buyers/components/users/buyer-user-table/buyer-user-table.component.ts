@@ -53,7 +53,7 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
       a.UserID = user.ID;
       return a;
     });
-    const buyerID = this.buyerUserService.getParentResourceID();
-    await this.buyerUserService.updateUserUserGroupAssignments(buyerID, assignmentsToMake, []);
+    const buyerID = await this.buyerUserService.getParentResourceID();
+    await this.buyerUserService.updateUserUserGroupAssignments(buyerID, assignmentsToMake, [], assignmentsToMake.length > 0);
   }
 }

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, OrderReorderResponse, OrderViewContext } from 'marketplace';
-import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from 'marketplace-javascript-sdk';
+import { ShopperContextService, OrderReorderResponse, OrderViewContext, ShippingStatus } from 'marketplace';
+import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
+import { CanReturnOrder, CanCancelOrder } from 'src/app/services/lineitem-status.helper';
 
 @Component({
   templateUrl: './order-detail.component.html',
@@ -19,6 +20,7 @@ export class OCMOrderDetails implements OnInit {
   reorderResponse: OrderReorderResponse;
   message = { string: null, classType: null };
   showRequestReturn = false;
+  showRequestCancel = false;
   isQuoteOrder = isQuoteOrder;
   constructor(private context: ShopperContextService, private modalService: NgbModal) {}
 
@@ -44,6 +46,14 @@ export class OCMOrderDetails implements OnInit {
     return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
   }
 
+  canRequestReturn(): boolean {
+    return CanReturnOrder(this.orderDetails.LineItems);
+  }
+
+  canRequestCancel(): boolean {
+    return CanCancelOrder(this.orderDetails.LineItems);
+  }
+
   toggleFavorite(order: MarketplaceOrder): void {
     const newValue = !this.isFavorite(order.ID);
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID);
@@ -51,6 +61,12 @@ export class OCMOrderDetails implements OnInit {
 
   toggleRequestReturn(): void {
     this.showRequestReturn = !this.showRequestReturn;
+    if(this.showRequestReturn) this.showRequestCancel = false;
+  }
+
+  toggleRequestCancel(): void {
+    this.showRequestCancel = !this.showRequestCancel;
+    if(this.showRequestCancel) this.showRequestReturn = false;
   }
 
   toShipments(): void {
@@ -96,7 +112,7 @@ export class OCMOrderDetails implements OnInit {
         Quantity: li.Quantity,
         Specs: li.Specs,
         xp: {
-          LineItemImageUrl: li.xp.LineItemImageUrl,
+          ImageUrl: li.xp?.ImageUrl,
         },
       };
     });
@@ -110,5 +126,6 @@ export class OCMOrderDetails implements OnInit {
   toggleShowRequestForm(showRequestReturn: boolean): void {
     this.ngOnInit();
     this.showRequestReturn = showRequestReturn;
+    this.showRequestCancel = showRequestReturn;
   }
 }

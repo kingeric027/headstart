@@ -12,7 +12,7 @@ const MapToUserGroupDisplayText = {
   },
   BuyerLocation: {
     Title: 'Locations',
-    InfoText: 'Select which locations to which this user belongs.',
+    InfoText: `Select this user's locations.`,
     ConfirmText: 'Please confirm that you wish to alter this user\'s locations.',
     Column2: 'Location',
   },

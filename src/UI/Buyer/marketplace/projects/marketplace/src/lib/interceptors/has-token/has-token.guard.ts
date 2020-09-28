@@ -29,8 +29,12 @@ export class HasTokenGuard implements CanActivate {
   async canActivate(): Promise<boolean> {
     // check for impersonation superseeds existing tokens to allow impersonating buyers sequentially.
     if (this.isImpersonating()) {
-      const token = this.getImpersonationToken();
-      this.auth.setToken(token);
+      const token = this.getQueryParamToken();
+      this.auth.loginWithTokens(token);
+      return true;
+    } else if (this.isSingleSignOn()) {
+      const token = this.getQueryParamToken();
+      this.auth.loginWithTokens(token, null, true);
       return true;
     }
 
@@ -59,7 +63,11 @@ export class HasTokenGuard implements CanActivate {
     return this.document.location.pathname === '/impersonation';
   }
 
-  private getImpersonationToken(): string {
+  private isSingleSignOn(): boolean {
+    return this.document.location.pathname === '/sso';
+  }
+
+  private getQueryParamToken(): string {
     const match = /token=([^&]*)/.exec(this.document.location.search);
     if (!match) throw Error(`Missing url query param 'token'`);
     return match[1];

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { MeUser, Me, User, UserGroup } from 'ordercloud-javascript-sdk';
+import { MeUser, Me, User, UserGroup, Tokens } from 'ordercloud-javascript-sdk';
 import { TokenHelperService } from '../token-helper/token-helper.service';
 import { CreditCardService } from './credit-card.service';
-import { HttpClient } from '@angular/common/http';
-import { CurrentUser } from '../../shopper-context';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CurrentUser, AppConfig, ContactSupplierBody, BuyerRequestForInfo } from '../../shopper-context';
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,10 @@ export class CurrentUserService {
   // users for determining location management permissions for a user
   private userGroups: BehaviorSubject<UserGroup[]> = new BehaviorSubject<UserGroup[]>([]);
 
-  constructor(private tokenHelper: TokenHelperService, public cards: CreditCardService, public http: HttpClient) {}
+  constructor(private tokenHelper: TokenHelperService, 
+              public cards: CreditCardService, 
+              public http: HttpClient, 
+              private appConfig: AppConfig) {}
 
   get(): CurrentUser {
     return this.user;
@@ -44,6 +48,10 @@ export class CurrentUserService {
     return this.isAnon !== null ? this.isAnon : this.tokenHelper.isTokenAnonymous();
   }
 
+  isSSO(): boolean {
+    return this.tokenHelper.getIsSSO();
+  }
+
   onChange(callback: (user: CurrentUser) => void): void {
     this.userSubject.subscribe(callback);
   }
@@ -65,6 +73,16 @@ export class CurrentUserService {
     return this.userGroups.value.some(u => u.ID === userGroupIDNeeded);
   }
 
+  async submitContactSupplierForm(contactRequest: ContactSupplierBody): Promise<void> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
+    });
+    const url = `${this.appConfig.middlewareUrl}/me/products/requestinfo`;
+    await this.http
+      .post<void>(url, contactRequest, {headers})
+      .toPromise();
+  }
+
   private async MapToCurrentUser(user: MeUser): Promise<CurrentUser> {
     const currentUser = user as CurrentUser;
     const myUserGroups = await Me.ListUserGroups();
@@ -72,7 +90,7 @@ export class CurrentUserService {
     currentUser.FavoriteOrderIDs = this.getFavorites(user, this.favOrdersXP);
     currentUser.FavoriteProductIDs = this.getFavorites(user, this.favProductsXP);
     // Using `|| "USD"` for fallback right now in case there's bad data without the xp value.
-    currentUser.Currency = myUserGroups.Items.filter(ug => ug.xp.Type === 'BuyerLocation')[0].xp?.Currency || 'USD';
+    currentUser.Currency = myUserGroups.Items.filter(ug => ug.xp.Type === 'BuyerLocation')[0]?.xp?.Currency || 'USD';
     return currentUser;
   }
 

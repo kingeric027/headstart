@@ -43,20 +43,26 @@ namespace ordercloud.integrations.smartystreets
 		public async Task<AddressValidation> ValidateAddress(Address address)
 		{
 			var response = new AddressValidation(address);
-			var lookup = AddressMapper.MapToUSStreetLookup(address);
-			var candidate = await _service.ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
-			if (candidate.Count > 0)
+			if (address.Country == "US")
 			{
-				response.ValidAddress = AddressMapper.Map(candidate[0], address);
-				response.GapBetweenRawAndValid = candidate[0].Analysis.DpvFootnotes;
-			}
-			else
-			{
-				// no valid address found
-				var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
-				response.SuggestedAddresses = AddressMapper.Map(suggestions, address);
-			}
-			if (!response.ValidAddressFound) throw new InvalidAddressException(response);
+				var lookup = AddressMapper.MapToUSStreetLookup(address);
+				var candidate = await _service.ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
+				if (candidate.Count > 0)
+				{
+					response.ValidAddress = AddressMapper.Map(candidate[0], address);
+					response.GapBetweenRawAndValid = candidate[0].Analysis.DpvFootnotes;
+				}
+				else
+				{
+					// no valid address found
+					var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
+					response.SuggestedAddresses = AddressMapper.Map(suggestions, address);
+				}
+				if (!response.ValidAddressFound) throw new InvalidAddressException(response);
+            } else
+            {
+				response.ValidAddress = address;
+            }
 			return response;
 		}
 

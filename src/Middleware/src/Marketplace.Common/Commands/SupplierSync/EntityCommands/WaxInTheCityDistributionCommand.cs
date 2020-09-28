@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Marketplace.Models;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -22,7 +24,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             _ocSeller = new OrderCloudClient(new OrderCloudClientConfig
             {
                 ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                 ClientId = _settings.OrderCloudSettings.ClientID,
                 ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                 Roles = new[]
@@ -41,6 +43,11 @@ namespace Marketplace.Common.Commands.SupplierSync
             returnObject.Add("Order", JToken.FromObject(order));
             returnObject.Add("BuyerBillingAddress", JToken.FromObject(buyerOrder.BillingAddress));
             return JObject.FromObject(returnObject);
+        }
+
+        public Task<List<TemplateHydratedProduct>> ParseProductTemplate(IFormFile file, VerifiedUserContext user)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,17 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { Spec } from 'ordercloud-javascript-sdk';
+import { Spec, PriceBreak, Product } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
-import { MarketplaceMeProduct, ShopperContextService, ExchangeRates, CurrentUser } from 'marketplace';
+import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, AssetForDelivery, QuoteOrderInfo } from 'marketplace-javascript-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
-import { getPrimaryImageUrl } from 'src/app/services/images.helpers';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { SuperMarketplaceProduct, ListPage, Asset } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
-import { exchange } from 'src/app/services/currency.helper';
-import { BuyerCurrency, ExchangedPriceBreak } from 'src/app/models/currency.interface';
+import { SuperMarketplaceProduct, ListPage } from '@ordercloud/headstart-sdk';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 
@@ -23,11 +20,12 @@ export class OCMProductDetails implements OnInit {
   faTh = faTh;
   faListUl = faListUl;
   faTimes = faTimes;
+  _superProduct: SuperMarketplaceProduct;
   _specs: ListPage<Spec>;
   _product: MarketplaceMeProduct;
+  _kitProduct: MarketplaceKitProduct;
   _priceSchedule: PriceSchedule;
-  _priceBreaks: ExchangedPriceBreak[];
-  _rates: ListPage<ExchangeRates>;
+  _priceBreaks: PriceBreak[];
   _orderCurrency: string;
   _attachments: Asset[] = [];
   specFormService: SpecFormService;
@@ -39,53 +37,71 @@ export class OCMProductDetails implements OnInit {
   priceBreakRange: string[];
   selectedBreak: object;
   relatedProducts$: Observable<MarketplaceMeProduct[]>;
-  images: AssetForDelivery[] = [];
+  images: Asset[] = [];
   imageUrls: string[] = [];
   favoriteProducts: string[] = [];
   qtyValid = true;
   supplierNote: string;
+  _userCurrency: string;
   specLength: number;
   quoteFormModal = ModalState.Closed;
+  contactSupplierFormModal = ModalState.Closed;
   currentUser: CurrentUser;
   showRequestSubmittedMessage = false;
+  showContactSupplierFormSubmittedMessage = false;
+  showContactSupplierFormNotSubmittedMessage = false;
   submittedQuoteOrder: any;
   showGrid = false;
   isAddingToCart = false;
+  isKitProduct: boolean;
+  productsIncludedInKit: ProductInKit[];
+  ocProductsInKit: any[];
+  isKitStatic = false;
+  contactRequest: ContactSupplierBody;
   constructor(
     private formService: SpecFormService,
     private context: ShopperContextService) {
     this.specFormService = formService;
   }
-
-  @Input() set product(superProduct: SuperMarketplaceProduct) {
-    this._product = superProduct.Product;
-    this._priceSchedule = superProduct.PriceSchedule as any;
-    this._rates = this.context.exchangeRates.Get();
-    this._attachments = superProduct?.Attachments;
-    const currentUser = this.context.currentUser.get();
-    this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
-    this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks.map(pb => {
-      const newPrice: BuyerCurrency = exchange(this._rates, pb.Price, superProduct.Product?.xp?.Currency, this._orderCurrency);
-      const exchanged: ExchangedPriceBreak = {
-        Quantity: pb.Quantity,
-        Price: newPrice
-      }
-      return exchanged;
-    });
-    this._price = this.getTotalPrice();
-    // Specs
-    this._specs = { Meta: {}, Items: superProduct.Specs as any };
-    this.specFormService.event.valid = this._specs.Items.length === 0;
-    this.specLength = this._specs.Items.length;
-    // End Specs
-    this.images = superProduct.Images.map(img => img);
-    this.imageUrls = superProduct.Images.map(img => img.Url);
-    this.isOrderable = !!superProduct.PriceSchedule;
-    this.supplierNote = this._product.xp && this._product.xp.Note;
+  @Input() set product(superProduct: any) {
+    if (superProduct.Product.xp.ProductType === "Kit") {
+      this.isKitProduct = true;
+      this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
+      this.isOrderable = true
+      this._product = superProduct.Product;
+      this._attachments = superProduct.Attachments;
+      this.images = superProduct.Images ? superProduct.Images.map(img => img) : [];
+      const currentUser = this.context.currentUser.get();
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+      this.productsIncludedInKit = superProduct.ProductAssignments.ProductsInKit;
+      this.getProductsInKit(superProduct.ProductAssignments.ProductsInKit);
+    } else {
+      this.isKitProduct = false;
+      this._superProduct = superProduct;
+      this._product = superProduct.Product;
+      this._priceSchedule = superProduct.PriceSchedule as any;
+      this._attachments = superProduct?.Attachments;
+      const currentUser = this.context.currentUser.get();
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+      this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
+      this._price = this.getTotalPrice();
+      // Specs
+      this._specs = { Meta: {}, Items: superProduct.Specs as any };
+      this.specFormService.event.valid = this._specs.Items.length === 0;
+      this.specLength = this._specs.Items.length;
+      // End Specs
+      this.images = superProduct.Images.map(img => img);
+      this.imageUrls = superProduct.Images.map(img => img.Url);
+      this.isOrderable = !!superProduct.PriceSchedule;
+      this.supplierNote = this._product.xp && this._product.xp.Note;
+    }
   }
 
   ngOnInit(): void {
     this.currentUser = this.context.currentUser.get();
+    this._userCurrency = this.context.currentUser.get().Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
@@ -101,43 +117,86 @@ export class OCMProductDetails implements OnInit {
   }
 
   qtyChange(event: QtyChangeEvent): void {
+    this.qtyValid = event.valid;
     if (event.valid) {
       this.quantity = event.qty;
       this._price = this.getTotalPrice();
     }
   }
 
-  async addToCart(): Promise<void> {
-      this.isAddingToCart = true;
-      try {
-        await this.context.order.cart.add({
-          ProductID: this._product.ID,
-          Quantity: this.quantity,
-          Specs: this.specFormService.getLineItemSpecs(this._specs),
-          xp: {
-            LineItemImageUrl: this.getLineItemImageUrl(this._product)
-          }
-        });
-        this.isAddingToCart = false;
-      } catch (ex) {
-        this.isAddingToCart = false;
-        throw ex;
+  async addKitToCart(): Promise<void> {
+    this.isAddingToCart = true;
+    try {
+      let lineItems = [];
+      if (this.isKitStatic) {
+        this.productsIncludedInKit.forEach(product => {
+          let i = this.ocProductsInKit.findIndex(p => p.ID === product.ID);
+          lineItems.push({
+            ProductID: product.ID,
+            Product: this.ocProductsInKit[i],
+            Quantity: product.MinQty,
+            Specs: this.specFormService.getLineItemSpecs(this._specs),
+            xp: this.ocProductsInKit[i].xp
+          })
+        })
+        await this.context.order.cart.addMany(lineItems);
       }
+    } catch (ex) {
+      this.isAddingToCart = false;
+      throw ex;
+    }
+    this.isAddingToCart = false;
   }
 
-  getLineItemImageUrl(product: MarketplaceMeProduct): string {
-    const image = this.images.find(img => this.isImageMatchingSpecs(img));
-    return image ? image.Url : getPrimaryImageUrl(product);
+  async addToCart(): Promise<void> {
+    this.isAddingToCart = true;
+    try {
+      await this.context.order.cart.add({
+        ProductID: this._product.ID,
+        Quantity: this.quantity,
+        Specs: this.specFormService.getLineItemSpecs(this._specs),
+        xp: {
+          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+        }
+      });
+      this.isAddingToCart = false;
+    } catch (ex) {
+      this.isAddingToCart = false;
+      throw ex;
+    }
   }
 
-  isImageMatchingSpecs(image: AssetForDelivery): boolean {
-      // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    const specs = this.specFormService.getLineItemSpecs(this._specs);
-    return specs.
-      every(spec => image.Tags
-      .find(tag => tag
-      .split('-')
-      .includes(spec.Value.replace(/\s/g, ''))));
+  async asyncForEach(array, cb) {
+    for (let i = 0; i < array.length; i++) {
+      await cb(array[i], i, array);
+    }
+  }
+
+  async getProductsInKit(productsInKit: ProductInKit[]) {
+    let meProducts = [];
+    await this.asyncForEach(productsInKit, async (product) => {
+      let meProduct = await this.context.tempSdk.getMeProduct(product.ID);
+      meProducts.push(meProduct.Product);
+    })
+    this.ocProductsInKit = meProducts;
+  }
+
+  changeQuantity(productID: string, event: QtyChangeEvent) {
+    let indexOfProduct;
+    for (let i = 0; i < this.ocProductsInKit.length; i++) {
+      if (this.ocProductsInKit[i].ID === productID) {
+        indexOfProduct = i;
+      }
+    }
+    const item = {
+      Quantity: event.qty,
+      Product: this._product,
+      ProductID: this._product.ID,
+    };
+    // const i = this.lineItems.findIndex(li => li.ProductID === item.ProductID);
+    // if (i === -1) this.lineItems.push(item);
+    // else this.lineItems[i] = item;
+    this.getTotalPrice();
   }
 
   getPriceBreakRange(index: number): string {
@@ -155,7 +214,7 @@ export class OCMProductDetails implements OnInit {
     // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
     // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
     // is the cost per item.
-    if (!this._priceBreaks.length) return;
+    if (!this._priceBreaks?.length) return;
 
     const priceBreaks = this._priceBreaks;
     const startingBreak = _minBy(priceBreaks, 'Quantity');
@@ -164,11 +223,11 @@ export class OCMProductDetails implements OnInit {
     }, startingBreak);
     this.selectedBreak = selectedBreak;
     this.percentSavings = parseInt(
-      (((priceBreaks[0].Price.Price - selectedBreak.Price.Price) / priceBreaks[0].Price.Price) * 100).toFixed(0), 10
+      (((priceBreaks[0].Price - selectedBreak.Price) / priceBreaks[0].Price) * 100).toFixed(0), 10
     );
     return this.specFormService.event.valid
       ? this.specFormService.getSpecMarkup(this._specs, selectedBreak, this.quantity || startingBreak.Quantity)
-      : selectedBreak.Price.Price * (this.quantity || startingBreak.Quantity);
+      : selectedBreak.Price * (this.quantity || startingBreak.Quantity);
   }
 
   isFavorite(): boolean {
@@ -187,6 +246,10 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Open;
   }
 
+  openContactSupplierForm(): void {
+    this.contactSupplierFormModal = ModalState.Open;
+  }
+
   isQuoteProduct(): boolean {
     return this._product.xp.ProductType === 'Quote';
   }
@@ -195,17 +258,37 @@ export class OCMProductDetails implements OnInit {
     this.quoteFormModal = ModalState.Closed;
   }
 
+  dismissContactSupplierForm(): void {
+    this.contactSupplierFormModal = ModalState.Closed;
+  }
+
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
       const lineItem: MarketplaceLineItem = {};
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this._specs);
+      lineItem.xp = {
+        ImageUrl: this.specFormService.getLineItemImageUrl(this._product),
+      };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;
       this.showRequestSubmittedMessage = true;
     } catch (ex) {
       this.showRequestSubmittedMessage = false;
       this.quoteFormModal = ModalState.Closed;
+      throw ex;
+    }
+  }
+
+  async submitContactSupplierForm(formData: any): Promise<void> {
+    this.contactRequest = { Product: this._product, BuyerRequest: formData }
+    try {
+      await this.context.currentUser.submitContactSupplierForm(this.contactRequest);
+      this.contactSupplierFormModal = ModalState.Closed;
+      this.showContactSupplierFormSubmittedMessage = true;
+    } catch (ex) {
+      this.showContactSupplierFormNotSubmittedMessage = true;
+      this.contactSupplierFormModal = ModalState.Closed;
       throw ex;
     }
   }

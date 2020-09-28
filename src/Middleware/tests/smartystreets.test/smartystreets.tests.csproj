@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\integrations\ordercloud-integrations-smartystreets\ordercloud.integrations.smartystreets.csproj" />
-    <ProjectReference Include="..\..\src\ordercloud-integrations-smartystreets\ordercloud.integrations.smartystreets.csproj" />
   </ItemGroup>
 
 </Project>

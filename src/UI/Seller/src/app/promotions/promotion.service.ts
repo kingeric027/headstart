@@ -6,6 +6,8 @@ import {
   MarketplacePromoType,
   MarketplacePromoEligibility,
 } from '@app-seller/shared/models/marketplace-promo.interface';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { Promotions } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -31,6 +33,7 @@ export class PromotionService extends ResourceCrudService<Promotion> {
       Type: MarketplacePromoType.Percentage,
       Value: null,
       AppliesTo: MarketplacePromoEligibility.EntireOrder,
+      ScopeToSupplier: false,
       Supplier: null,
       Automatic: false,
       MinReq: {
@@ -40,7 +43,8 @@ export class PromotionService extends ResourceCrudService<Promotion> {
       MaxShipCost: null,
     },
   };
-  constructor(router: Router, activatedRoute: ActivatedRoute, ocPromotionService: OcPromotionService) {
-    super(router, activatedRoute, ocPromotionService, '/promotions', 'promotions');
+
+  constructor(router: Router, activatedRoute: ActivatedRoute, currentUserService: CurrentUserService) {
+    super(router, activatedRoute, Promotions, currentUserService, '/promotions', 'promotions');
   }
 }

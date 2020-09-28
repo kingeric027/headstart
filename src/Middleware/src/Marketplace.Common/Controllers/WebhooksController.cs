@@ -45,14 +45,8 @@ namespace Marketplace.Common.Controllers
         [OrderCloudWebhookAuth]
         public async void HandleOrderRequiresApproval([FromBody] MessageNotification<OrderSubmitEventBody> payload)
         {
+            await _orderCommand.PatchOrderRequiresApprovalStatus(payload.EventBody.Order.ID);
             await _sendgridService.SendOrderRequiresApprovalEmail(payload);
-        }
-
-        [HttpPost, Route("orderapproved")]
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderApproved([FromBody] MarketplaceOrderApprovePayload payload)
-        {
-            await _sendgridService.SendOrderApprovedEmail(payload);
         }
 
         [HttpPost, Route("orderdeclined")]
@@ -62,30 +56,9 @@ namespace Marketplace.Common.Controllers
             await _sendgridService.SendOrderDeclinedEmail(payload);
         }
 
-        [HttpPost, Route("ordershipped")] // TO DO: TEST
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderShipped([FromBody] WebhookPayloads.Orders.Ship payload)
-        {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Shipped", "<h1>this is a test email for order shipped</h1>");
-        }
-
-        [HttpPost, Route("orderdelivered")] // TO DO: TEST & FIND PROPER PAYLOAD, ADD TO ENV SEED PROCESS
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderDelivered(JObject payload)
-        {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Delivered", "<h1>this is a test email for order delivered</h1>");
-        }
-
-        [HttpPost, Route("ordercancelled")] // TO DO: TEST 
-        [OrderCloudWebhookAuth]
-        public async void HandleOrderCancelled([FromBody] WebhookPayloads.Orders.Cancel payload)
-        {
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "scasey@four51.com", "Order Cancelled", "<h1>this is a test email for order cancelled</h1>");
-        }
-
         [HttpPost, Route("newuser")] // TO DO: send email to mp manager
         [OrderCloudWebhookAuth]
-        public async void HandleNewUser([FromBody] WebhookPayloads.Users.Create payload)
+        public async void HandleNewUser([FromBody] MessageNotification<PasswordResetEventBody> payload)
         {
             await _sendgridService.SendNewUserEmail(payload);
         }

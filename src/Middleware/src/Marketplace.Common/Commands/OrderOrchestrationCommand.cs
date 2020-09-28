@@ -43,7 +43,7 @@ namespace Marketplace.Common.Commands
 			_oc = new OrderCloudClient(new OrderCloudClientConfig
             {
                 ApiUrl = appSettings.OrderCloudSettings.ApiUrl,
-                AuthUrl = appSettings.OrderCloudSettings.AuthUrl,
+                AuthUrl = appSettings.OrderCloudSettings.ApiUrl,
                 ClientId = appSettings.OrderCloudSettings.ClientID,
                 ClientSecret = appSettings.OrderCloudSettings.ClientSecret,
                 Roles = new[]
@@ -81,7 +81,7 @@ namespace Marketplace.Common.Commands
                 var supplierOrderCloudClient = new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _appSettings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = _appSettings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _appSettings.OrderCloudSettings.ApiUrl,
                     ClientId = apiClientID,
                     ClientSecret = _appSettings.OrderCloudSettings.ClientSecret,
                     Roles = new[]

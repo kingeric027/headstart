@@ -1,4 +1,4 @@
-import { OrdercloudEnv } from 'marketplace';
+import { OrdercloudEnv, Theme } from 'marketplace';
 
 export interface Environment {
   hostedApp: boolean;
@@ -7,6 +7,9 @@ export interface Environment {
   marketplaceID: string;
   baseUrl: string;
   middlewareUrl: string;
+  sellerID: string;
   ssoLink: string;
+  translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
+  theme?: Theme;
 }

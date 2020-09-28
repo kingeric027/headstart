@@ -1,4 +1,5 @@
-﻿using Marketplace.Common.Models;
+﻿using Marketplace.Common.Commands.SupplierSync;
+using Marketplace.Common.Models;
 using Marketplace.Models;
 using ordercloud.integrations.library;
 using ErrorCodes = Marketplace.Models.ErrorCodes;
@@ -16,6 +17,8 @@ namespace Marketplace.Common.Extensions
         {
             switch (obj.GetType().Name)
             {
+                case nameof(SuperMarketplaceProduct):
+                    return RecordType.HydratedProduct;
                 case nameof(MarketplaceProduct):
                     return RecordType.Product;
                 case nameof(MarketplaceProductFacet):
@@ -46,6 +49,8 @@ namespace Marketplace.Common.Extensions
                     return RecordType.CatalogAssignment;
                 case nameof(MarketplaceCatalog):
                     return RecordType.Catalog;
+                case nameof(TemplateProductFlat):
+                    return RecordType.TemplateProductFlat;
                 default:
                     throw new OrderCloudIntegrationException(ErrorCodes.All["UnrecognizedType"], obj);
             }

@@ -2,8 +2,8 @@
   <form [formGroup]="resourceForm">
     <div class="row pt-3">
       <div class="col-md-5">
-        <h5>Supplier Details</h5>
-        <p>This is the basic details of the supplier.</p>
+        <h5>{{'ALIAS.SUPPLIER' | translate}} Details</h5>
+        <p>These are the basic details of the {{'ALIAS.SUPPLIER' | translate | lowercase}}.</p>
       </div>
       <div class="col-md-7 form-group">
         <div class="form-group">
@@ -14,7 +14,6 @@
                    class="form-check-input"
                    id="Active"
                    showErrors
-                   [resourceForm]="resourceForm"
                    aria-describedby="Active"
                    formControlName="Active"
                    (input)="updateResourceFromEvent($event, 'Active')">
@@ -29,22 +28,48 @@
                  showErrors
                  aria-describedby="Name"
                  maxlength="100"
-                 [resourceForm]="resourceForm"
                  formControlName="Name"
                  (input)="updateResourceFromEvent($event, 'Name')"
                  placeholder="Enter Name">
         </div>
-        <div class="form-group">
-          <label for="Logo URL">Logo URL</label>
-          <input type="text"
-                 class="form-control"
-                 id="Logo URL"
-                 showErrors
-                 [resourceForm]="resourceForm"
-                 aria-describedby="Logo URL"
-                 formControlName="LogoUrl"
-                 (input)="updateResourceFromEvent($event, 'xp.Images.0.URL')"
-                 placeholder="Enter Logo URL">
+        <div class="form-group"
+             *ngIf="!logoLoading">
+          <label class="d-block"
+                 for="logo"><span translate>ALIAS.SUPPLIER</span> Logo
+          </label>
+          <div *ngIf="hasLogo">
+            <img class="d-block"
+                 id="supplier-logo"
+                 [src]="stagedLogoUrl || logoUrl"
+                 width="auto"
+                 height="100px">
+            <div class="mt-3">
+              <label for="imageUpload"
+                     *ngIf="hasLogo"
+                     class="btn btn-sm btn-outline-secondary mb-0">Update Logo</label>
+              <button *ngIf="!isCreatingNew"
+                      (click)="removeLogo()"
+                      class="btn btn-sm btn-link">Remove Logo</button>
+            </div>
+          </div>
+          <label *ngIf="!hasLogo"
+                 class="rmpm dropzone"
+                 for="imageUpload"
+                 appDrag
+                 (files)="dropFileUpload($event)">
+          </label>
+          <input class="d-none"
+                 id="imageUpload"
+                 type="file"
+                 (change)="manualFileUpload($event)">
+        </div>
+        <div *ngIf="logoLoading"
+             class="ml-auto p-2 align-self-center">
+          <div class="spinner-border"
+               role="status">
+            <span class="sr-only"
+                  translate>ADMIN.COMMON.LOADING</span>
+          </div>
         </div>
         <div class="form-group">
           <label for="Description">Description</label>
@@ -57,16 +82,15 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <mat-form-field appearance="outline">
-              <mat-label>Currency</mat-label>
-              <mat-select [disabled]="!isCreatingNew"
-                          formControlName="Currency"
-                          (selectionChange)="updateResourceFromEvent({target: { value: $event.value }}, 'xp.Currency')">
-                <mat-option *ngFor="let currency of availableCurrencies"
-                            [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</mat-option>
-              </mat-select>
-              <mat-error>You must select a currency.</mat-error>
-            </mat-form-field>
+            <label for="Currency">Currency <small *ngIf="isCreatingNew"
+                     class="text-danger font-weight-bolder">*</small></label>
+            <select class="form-control"
+                    id="Currency"
+                    formControlName="Currency"
+                    (change)="updateResourceFromEvent($event, 'xp.Currency')">
+              <option *ngFor="let currency of availableCurrencies"
+                      [value]="currency.Currency"><img [src]="currency.Icon"> {{currency.Name}}</option>
+            </select>
           </div>
           <div class="form-group col-md-6">
             <p class="mb-1">Use FreightPOP for Shipping</p>
@@ -76,14 +100,150 @@
                      class="form-check-input"
                      id="SyncFreightPop"
                      showErrors
-                     [resourceForm]="resourceForm"
                      aria-describedby="SyncFreightPop"
                      formControlName="SyncFreightPop"
                      (input)="updateResourceFromEvent($event, 'xp.SyncFreightPop')">
               <span class="slider round cursor-pointer"></span>
             </label>
           </div>
+
+          <div class="form-group col-md-12"
+               formGroupName="ProductTypes">
+            <label>Product Types</label>
+            <div class="d-flex justify-content-start align-items-center">
+              <div class="custom-control custom-checkbox mr-3">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       formControlName="Standard"
+                       (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Standard')"
+                       id="Standard">
+                <label class="custom-control-label"
+                       for="Standard">Standard</label>
+              </div>
+              <div class="custom-control custom-checkbox mr-3">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       formControlName="Quote"
+                       (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.Quote')"
+                       id="Quote">
+                <label class="custom-control-label"
+                       for="Quote">Quote</label>
+              </div>
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       formControlName="PurchaseOrder"
+                       (change)="updateResourceFromEvent({target: { value: $event.checked }}, 'xp.ProductTypes.PurchaseOrder')"
+                       id="PurchaseOrder">
+                <label class="custom-control-label"
+                       for="PurchaseOrder">Purchase Order</label>
+              </div>
+            </div>
+            <small id="productTypesHelp"
+                   class="form-text text-muted">
+              What types of products is this supplier able to sell? Check at least one.
+            </small>
+          </div>
+          <div class="form-group">
+            <label>Free Shipping</label>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox"
+                    class="custom-control-input"
+                    formControlName="FreeShippingEnabled"
+                    aria-describedby="FreeShippingEnabled"
+                    (input)="updateResourceFromEvent($event, 'xp.FreeShippingThreshold')"
+                    id="Enabled">
+              <label class="custom-control-label"
+                    for="Enabled">Enabled</label>
+            </div> 
+            <div *ngIf="_supplierEditable?.xp?.FreeShippingThreshold!=null">
+              <label for="Threshold">Order Subtotal Threshold</label>
+                <input type="number"
+                class="form-control"
+                id="Threshold"
+                [value]="_supplierEditable?.xp?.FreeShippingThreshold"
+                min="0"
+                [resourceForm]="resourceForm"
+                formControlName="FreeShippingThreshold" 
+                (input)="updateResourceFromEvent($event, 'xp.FreeShippingThreshold')">
+                <small id="thresholdHelp"
+                   class="form-text text-muted">
+              What is the minimum order subtotal required to receive free shipping?
+            </small>
+            </div> 
+          </div>
+          <div class="mt-3 form-group col-md-12">
+            <label for="Category">Categories</label>
+            <supplier-category-select-component [categorySelectionsControl]="resourceForm?.controls.Categories"
+                                                [filterConfig]="filterConfig"
+                                                (selectionsChanged)="updateResource.emit($event)">
+            </supplier-category-select-component>
+          </div>
+
+          <div *ngIf="countriesServicingOptions.length"
+               [formGroup]="countriesServicingForm"
+               class="form-group col-md-12">
+            <label>Countries to Service</label>
+            <div class="d-flex justify-content-start align-items-center">
+              <div *ngFor="let country of countriesServicingOptions"
+                   class="mr-3
+                   custom-control
+                   custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       [formControlName]="country.Value"
+                       (change)="updateCountriesServicing($event, country.Value)"
+                       id="{{country.Value}}">
+                <label class="custom-control-label"
+                       for="{{country.Value}}">{{country.Text}}</label>
+              </div>
+            </div>
+            <small id="productTypesHelp"
+                   class="form-text text-muted">
+              Which countries will you provide products to?
+            </small>
+          </div>
+
         </div>
+      </div>
+    </div>
+    <div *ngIf="!isCreatingNew"
+         class="row pt-3">
+      <div class="col-md-5">
+        <h5>Email Notifications</h5>
+        <p>Choose which {{_supplierEditable?.Name}} users will recieve email notifications, and add emails for additional recipients who may not be users.</p>
+      </div>
+      <div class="col-md-7 form-group">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Receives Emails</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!supplierUsers?.Items?.length">
+              <td>
+                <span class="font-italic">{{_supplierEditable?.Name}} does not have any users.</span>
+              </td>
+            </tr>
+            <tr class="cursor-pointer"
+                *ngFor="let user of supplierUsers?.Items">
+              <td class="d-flex justify-content-start align-items-center">
+                <label class="switch mb-0">
+                  <input class="form-check-input"
+                         type="checkbox"
+                         (click)="assignSupplierUser(user.Email)"
+                         [checked]="isAssigned(user.Email)">
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td>{{user.FirstName}} {{user.LastName}}</td>
+              <td>{{user.Email}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="row pt-3">
@@ -98,7 +258,6 @@
                  class="form-control"
                  id="Support Contact Name"
                  showErrors
-                 [resourceForm]="resourceForm"
                  aria-describedby="Support Contact Name"
                  formControlName="SupportContactName"
                  (input)="updateResourceFromEvent($event, 'xp.SupportContact.Name')"
@@ -111,7 +270,6 @@
                    class="form-control"
                    id="Support Contact Email"
                    showErrors
-                   [resourceForm]="resourceForm"
                    aria-describedby="Support Contact Email"
                    formControlName="SupportContactEmail"
                    (input)="updateResourceFromEvent($event, 'xp.SupportContact.Email')"
@@ -123,7 +281,6 @@
             <input type="text"
                    class="form-control"
                    showErrors
-                   [resourceForm]="resourceForm"
                    id="Support Contact Phone"
                    aria-describedby="Support Contact Phone"
                    formControlName="SupportContactPhone"

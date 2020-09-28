@@ -6,6 +6,7 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.DevCenter.Models;
+using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
@@ -26,10 +27,26 @@ namespace Marketplace.Common.Commands
 		private EnvironmentSeed _seed;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IMarketplaceBuyerCommand _buyerCommand;
+
+		private readonly string _orgName = $"Head Start {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}";
 		private readonly string _localWebhookUrl = "https://marketplaceteam.ngrok.io";
+		private readonly string _defaultBuyerID = "Default_HeadStart_Buyer";
+		private readonly string _defaultBuyerName = "Default HeadStart Buyer";
+		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
+
+		// used for pointing integration events to the ngrok url
+		private readonly string _buyerLocalApiClientName = "Default Marketplace Buyer UI LOCAL";
+
+		private readonly string _sellerApiClientName = "Default HeadStart Admin UI";
+		private readonly string _integrationsApiClientName = "Middleware Integrations";
+		private readonly string _sellerUserName = "Default_Admin";
+		private readonly string _buyerUserName = "Default_Buyer";
+		private readonly string _defaultPassword = "Four51Yet!";
+		private readonly string _fullAccessSecurityProfile = "DefaultContext";
 		private readonly string _allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		private static string _adminUIApiClientID;
 		private static string _buyerUIApiClientID;
+		private static string _buyerLocalUIApiClientID;
 		private static string _middlewareApiClientID;
 
 		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand, IOrderCloudSandboxService orderCloudSandboxService)
@@ -58,8 +75,9 @@ namespace Marketplace.Common.Commands
 			await CreateIncrementors(impersonation.access_token); // must be before create buyers
 			await CreateBuyers(user, impersonation.access_token);
 			await CreateXPIndices(impersonation.access_token);
-			await CreateAndAssignIntegrationEvents(seed.ApiUrl, impersonation.access_token);
+			await CreateAndAssignIntegrationEvents(impersonation.access_token, seed.ApiUrl);
 			await CreateSuppliers(user, impersonation.access_token);
+			await SetUpSellerAuthentication(impersonation.access_token);
 			//await this.ConfigureBuyers(impersonation.access_token);
 			return impersonation;
 		}
@@ -81,30 +99,61 @@ namespace Marketplace.Common.Commands
 			await Task.WhenAll(createMS, createWH, createIE);
 		}
 
+		private async Task SetUpSellerAuthentication(string token)
+		{
+			// delete default security profiles if they exist
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
+			} catch(Exception ex){}
+
+			try
+			{
+				await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
+			} catch(Exception ex){}
+			foreach (var sellerCustomRole in SellerMarketplaceRoles)
+			{
+					await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+					{
+						SecurityProfileID = sellerCustomRole.ToString()
+					}, token);
+			}
+			var defaultAdminUser = (await _oc.AdminUsers.ListAsync(accessToken: token)).Items.First(u => u.Username == _sellerUserName);
+			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+			{
+				SecurityProfileID = _fullAccessSecurityProfile,
+				UserID = defaultAdminUser.ID
+			}, token);
+		}
+
 		private async Task<AdminCompany> CreateOrganization(string token)
 		{
 			var org = new Organization()
 			{
-				Name = $"Marketplace.Print {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}",
+				Name = _orgName,
 				Active = true,
-				BuyerID = "Default_Marketplace_Buyer",
-				BuyerApiClientName = $"Default Marketplace Buyer UI",
-				BuyerName = $"Default Marketplace Buyer",
-				BuyerUserName = $"Default_Buyer",
-				BuyerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-				SellerApiClientName = $"Default Marketplace Admin UI",
-				SellerPassword = "Four51Yet!", // _settings.OrderCloudSettings.DefaultPassword,
-				SellerUserName = $"Default_Admin"
+				BuyerID = _defaultBuyerID,
+				BuyerApiClientName = _buyerApiClientName,
+				BuyerName = _defaultBuyerName,
+				BuyerUserName = _buyerUserName,
+				BuyerPassword = _defaultPassword,
+				SellerApiClientName = _sellerApiClientName,
+				SellerPassword = _defaultPassword,
+				SellerUserName = _sellerUserName
 			};
 			var request = await _dev.PostOrganization(org, token);
 			return request;
 		}
 
-
 		private async Task CreateBuyers(VerifiedUserContext user, string token) {
 			foreach (var buyer in _seed.Buyers)
 			{
-				await _buyerCommand.Create(buyer, user, token);
+				var superBuyer = new SuperMarketplaceBuyer()
+				{
+					Buyer = buyer,
+					Markup = new BuyerMarkup() { Percent = 0 }
+				};
+				await _buyerCommand.Create(superBuyer, token);
 			}
 		}
 
@@ -119,13 +168,17 @@ namespace Marketplace.Common.Commands
 
 		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
 			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
+			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Role" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "SyncFreightPop" },       
+			new XpIndex { ThingType = XpThingType.Company, Key = "CountriesServicing" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "LocationID" },       
-			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
+			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },
+			new XpIndex { ThingType = XpThingType.User, Key = "RequestInfoEmails" },       
 		};
 
 		public async Task CreateXPIndices(string token)
@@ -152,10 +205,11 @@ namespace Marketplace.Common.Commands
 
 		private async Task SetApiClientIDs(string token)
 		{
-			var list = await _oc.ApiClients.ListAsync(accessToken: token);
-			_adminUIApiClientID = list.Items.First(a => a.AppName.Contains("Admin")).ID;
-			_buyerUIApiClientID = list.Items.First(a => a.AppName.Contains("Buyer")).ID;
-			_middlewareApiClientID = list.Items.First(a => a.AppName.Contains("Middleware")).ID;
+			var list = await _oc.ApiClients.ListAsync(pageSize: 100, accessToken: token);
+			_adminUIApiClientID = list.Items.First(a => a.AppName == _sellerApiClientName).ID;
+			_buyerUIApiClientID = list.Items.First(a => a.AppName == _buyerApiClientName).ID;
+			_buyerLocalUIApiClientID = list.Items.First(a => a.AppName == _buyerLocalApiClientName).ID;
+			_middlewareApiClientID = list.Items.First(a => a.AppName == _integrationsApiClientName).ID;
 		}
 
 		private async Task PatchDefaultApiClients(string token)
@@ -169,7 +223,7 @@ namespace Marketplace.Common.Commands
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
 			}, accessToken: token);
-			var admin = _oc.ApiClients.PatchAsync(_adminUIApiClientID, new PartialApiClient()
+			var buyerLocal = _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient()
 			{
 				Active = true,
 				AllowAnyBuyer = true,
@@ -178,7 +232,16 @@ namespace Marketplace.Common.Commands
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
 			}, accessToken: token);
-			await Task.WhenAll(buyer, admin);
+			var admin = _oc.ApiClients.PatchAsync(_adminUIApiClientID, new PartialApiClient()
+			{
+				Active = true,
+				AllowAnyBuyer = false,
+				AllowAnySupplier = true,
+				AllowSeller = true,
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200,
+			}, accessToken: token);
+			await Task.WhenAll(buyer, buyerLocal, admin);
 		}
 
 		private async Task CreateApiClients(string token)
@@ -186,14 +249,14 @@ namespace Marketplace.Common.Commands
 			var clientSecret = RandomGen.GetString(_allowedChars, 60);
 			var integrationsClient = new PartialApiClient()
 			{
-				AppName = "Middleware Integrations",
+				AppName = _integrationsApiClientName,
 				Active = true,
 				AllowAnyBuyer = false,
 				AllowAnySupplier = false,
 				AllowSeller = true,
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
-				DefaultContextUserName = "Default_Admin",
+				DefaultContextUserName = _sellerUserName,
 				ClientSecret = clientSecret
 			};
 			await _oc.ApiClients.CreateAsync(integrationsClient, token);
@@ -237,18 +300,33 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" });
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
+			await _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshippingLOCAL" }, token);
 		}
 
 		public async Task CreateMarketPlaceRoles(string accessToken)
 		{
 			var profiles = DefaultSecurityProfiles.Select(p =>
-				new SecurityProfile() { Name = p.CustomRole.ToString(), ID = p.CustomRole.ToString(), CustomRoles = { p.CustomRole.ToString() }, Roles = p.Roles });
-
+				new SecurityProfile() { 
+					Name = p.CustomRole.ToString(), 
+					ID = p.CustomRole.ToString(), 
+					CustomRoles = p.CustomRoles == null ? new List<string>() { p.CustomRole.ToString() } : p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString()).ToList(), 
+					Roles = p.Roles });
 			foreach (var profile in profiles)
 			{
 				await _oc.SecurityProfiles.CreateAsync(profile, accessToken);
 			}
+			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+			{
+				BuyerID = _defaultBuyerID,
+				SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
+			}, accessToken);
+			await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+			{
+				Roles = new List<ApiRole> { ApiRole.FullAccess },
+				Name = _fullAccessSecurityProfile,
+				ID = _fullAccessSecurityProfile
+			}, accessToken);
 		}
 
 		public async Task DeleteAllWebhooks(string token)
@@ -430,17 +508,36 @@ namespace Marketplace.Common.Commands
 							MainContent = "ForgottenPassword"
 						}
 				}
+			},
+			new MessageSender()
+			{
+				Name = "New User Registration",
+				MessageTypes = new[] { MessageType.NewUserInvitation },
+				URL = "/newuser",
+				SharedKey = "wkaWSxPBBAABaxEp", // Where does this come from? Should it live somewhere else?
+				xp = new {
+						MessageTypeConfig = new {
+							MessageType = "NewUserInvitation",
+							FromEmail = "noreply@ordercloud.io",
+							Subject = "New User Registration",
+							TemplateName = "ForgottenPassword",
+							MainContent = "NewUserInvitation"
+						}
+				}
 			}
 		};
 		
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
+			
 			// seller/supplier
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.ProductFacetReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.PriceScheduleReader, ApiRole.ProductFacetReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin, ApiRole.AdminAddressReader, ApiRole.PriceScheduleAdmin  } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionAdmin, Roles = new[] { ApiRole.PromotionAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPContentAdmin, CustomRoles = new[] { CustomRole.AssetAdmin, CustomRole.SchemaAdmin, CustomRole.DocumentAdmin, } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionReader, Roles = new[] { ApiRole.PromotionReader } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPStoreFrontAdmin, Roles = new[] { ApiRole.ProductFacetAdmin, ApiRole.ProductFacetReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCategoryAdmin, Roles = new[] { ApiRole.CategoryAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCategoryReader, Roles = new[] { ApiRole.CategoryReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderAdmin, Roles = new[] { ApiRole.OrderAdmin, ApiRole.ShipmentReader } },
@@ -450,10 +547,12 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBuyerReader, Roles = new[] { ApiRole.BuyerReader, ApiRole.BuyerUserReader, ApiRole.UserGroupReader, ApiRole.AddressReader, ApiRole.CreditCardReader, ApiRole.ApprovalRuleReader } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSellerAdmin, Roles = new[] { ApiRole.AdminUserAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSupplierAdmin, Roles = new[] { ApiRole.SupplierAdmin, ApiRole.SupplierUserAdmin, ApiRole.SupplierAddressAdmin } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAdmin, Roles = new[] {ApiRole.SupplierReader, ApiRole.SupplierAdmin }, CustomRoles = new[] { CustomRole.AssetAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAddressAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierAddressAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierUserAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSupplierUserGroupAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserGroupAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader, CustomRoles = new[] { CustomRole.MPReportReader } },
+			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportAdmin, CustomRoles = new[] { CustomRole.MPReportAdmin } },
 			
 			// buyer
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
@@ -470,6 +569,22 @@ namespace Marketplace.Common.Commands
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
+		};
+
+		static readonly List<CustomRole> SellerMarketplaceRoles = new List<CustomRole>() {
+			CustomRole.MPProductAdmin,
+			CustomRole.MPPromotionAdmin,
+			CustomRole.MPStoreFrontAdmin,
+			CustomRole.MPCategoryAdmin,
+			CustomRole.MPOrderAdmin,
+			CustomRole.MPShipmentAdmin,
+			CustomRole.MPBuyerAdmin,
+			CustomRole.MPSellerAdmin,
+			CustomRole.MPSupplierAdmin,
+			CustomRole.MPSupplierUserGroupAdmin,
+			CustomRole.MPReportReader,
+			CustomRole.MPReportAdmin,
+			CustomRole.MPContentAdmin
 		};
 	}
 }

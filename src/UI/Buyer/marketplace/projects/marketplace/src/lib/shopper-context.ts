@@ -9,7 +9,52 @@ import {
   ApiRole,
   Sortable,
 } from 'ordercloud-javascript-sdk';
-import { UserGroupXp, ProductXp, TaxCertificate, MarketplaceAddressBuyer } from 'marketplace-javascript-sdk';
+import {
+  MarketplaceLocationUserGroup,
+  ProductXp,
+  TaxCertificate,
+  MarketplaceAddressBuyer,
+  MarketplaceProduct,
+} from '@ordercloud/headstart-sdk';
+
+// todo replace with sdk
+export interface SupplierFilterConfigDocument extends Document {
+  Doc: SupplierFilterConfig;
+}
+
+export interface SupplierFilterConfig {
+  Display: string;
+  Path: string;
+  Items: Filter[];
+  AllowSupplierEdit: boolean;
+  AllowSellerEdit: boolean;
+  BuyerAppFilterType: BuyerAppFilterType;
+}
+
+export enum BuyerAppFilterType {
+  SelectOption = 'SelectOption',
+  NonUI = 'NonUI',
+}
+
+export interface Filter {
+  Text: string;
+  Value: string;
+}
+
+export interface ContactSupplierBody {
+  Product: MarketplaceProduct;
+  BuyerRequest: BuyerRequestForInfo;
+}
+
+export interface BuyerRequestForInfo {
+  FirstName: string;
+  LastName: string;
+  BuyerLocation: string;
+  Email: string;
+  Phone: string;
+  Comments: string;
+}
+// end todo replace with sdk
 
 export interface LineItemGroupSupplier {
   supplier: Supplier;
@@ -19,7 +64,7 @@ export interface LineItemGroupSupplier {
 export interface CurrentUser extends MeUser {
   FavoriteProductIDs: string[];
   FavoriteOrderIDs: string[];
-  UserGroups: UserGroup<UserGroupXp>[];
+  UserGroups: MarketplaceLocationUserGroup[];
   Currency: CurrenySymbol;
 }
 
@@ -102,7 +147,7 @@ export enum OrderStatus {
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
   Open = 'Open',
-  Complete = 'Complete',
+  Completed = 'Completed',
   Canceled = 'Canceled',
 }
 
@@ -117,7 +162,7 @@ export enum ShippingStatus {
   PartiallyShipped = 'PartiallyShipped',
   Canceled = 'Canceled',
   Processing = 'Processing',
-  Backordered = 'Backordered'
+  Backordered = 'Backordered',
 }
 
 export enum ClaimStatus {
@@ -132,7 +177,9 @@ export enum LineItemStatus {
   Open = 'Open',
   Backordered = 'Backordered',
   Canceled = 'Canceled',
+  CancelRequested = 'CancelRequested',
   Returned = 'Returned',
+  ReturnRequested = 'ReturnRequested',
 }
 
 export interface CreditCard {
@@ -156,9 +203,13 @@ export interface LineItemWithProduct extends LineItem {
 }
 
 export enum OrdercloudEnv {
-  Production = 'Production',
-  Staging = 'Staging',
-  Sandbox = 'Sandbox',
+  Production = 'Production', // production and staging sites
+  Staging = 'Staging', // test site && local dev
+  Sandbox = 'Sandbox', // not using currently
+}
+
+export interface Theme {
+  logoSrc: string;
 }
 
 export class AppConfig {
@@ -187,10 +238,14 @@ export class AppConfig {
   /**
    * base path to middleware
    */
-
+  translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;
+  /**
+   *  The ID of the seller organization.
+   */
+  sellerID: string;
   /**
    *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
    */
@@ -202,6 +257,7 @@ export class AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
   scope: ApiRole[];
+  theme: Theme;
 }
 
 export interface DecodedOCToken {

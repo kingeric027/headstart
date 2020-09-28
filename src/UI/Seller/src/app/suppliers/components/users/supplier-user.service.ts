@@ -6,11 +6,14 @@ import {
   OcSupplierUserService,
   UserGroupAssignment,
   OcSupplierUserGroupService,
-  ListUserGroup,
-  ListUserGroupAssignment,
+  Supplier,
+  ListPage,
+  UserGroup,
 } from '@ordercloud/angular-sdk';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { SupplierUsers } from 'ordercloud-javascript-sdk';
 
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
@@ -28,17 +31,19 @@ export class SupplierUserService extends ResourceCrudService<User> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    ocSupplierUserService: OcSupplierUserService,
-    private ocSupplierUserGroupService: OcSupplierUserGroupService
+    private ocSupplierUserGroupService: OcSupplierUserGroupService,
+    public currentUserService: CurrentUserService
   ) {
     super(
       router,
       activatedRoute,
-      ocSupplierUserService,
+      SupplierUsers,
+      currentUserService,
       '/suppliers',
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
-      'users'
+      'users',
+      '/my-supplier'
     );
   }
   async updateUserUserGroupAssignments(
@@ -65,11 +70,11 @@ export class SupplierUserService extends ResourceCrudService<User> {
       .toPromise();
   }
 
-  async getUserGroups(supplierID: string, options: ListArgs): Promise<ListUserGroup> {
+  async getUserGroups(supplierID: string, options: ListArgs): Promise<ListPage<UserGroup>> {
     return await this.ocSupplierUserGroupService.List(supplierID, options as any).toPromise();
   }
 
-  async listUserAssignments(userID: string, supplierID: string): Promise<ListUserGroupAssignment> {
+  async listUserAssignments(userID: string, supplierID: string): Promise<ListPage<UserGroupAssignment>> {
     return await this.ocSupplierUserGroupService.ListUserAssignments(supplierID, { userID }).toPromise();
   }
 }

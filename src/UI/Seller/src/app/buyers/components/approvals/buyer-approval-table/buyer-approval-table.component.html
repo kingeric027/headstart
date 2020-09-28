@@ -3,7 +3,7 @@
                           [updatedResource]="updatedResource"
                           [resourceInSelection]="resourceInSelection"
                           [ocService]="ocService"
-[dataIsSaving]="dataIsSaving"
+                          [dataIsSaving]="dataIsSaving"
                           [parentResourceService]="buyerService"
                           [resourceForm]="resourceForm"
                           (searched)="searchResources($event)"
@@ -11,7 +11,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ADMIN.NAV.APPROVAL'"
+                          [labelPlural]="'ADMIN.NAV.APPROVALS'">
   <!-- edit product -->
   <div class="resource-edit">
     <resource-edit-component resourceType="ApprovalRule"

@@ -12,11 +12,12 @@ import {
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
 } from './resource-crud.types';
-import { BuyerAddress, ListBuyerAddress, ListAddress, Address } from '@ordercloud/angular-sdk';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListPage } from 'marketplace-javascript-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
+import { CurrentUserService } from '../current-user/current-user.service';
+import { BuyerAddress, ListPage, Address } from 'ordercloud-javascript-sdk';
+import { singular } from 'pluralize';
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
@@ -27,24 +28,28 @@ export abstract class ResourceCrudService<ResourceType> {
   public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
 
   route = '';
+  myRoute = '';
   primaryResourceLevel = '';
   // example: for supplier user service the primary is supplier and the secondary is users
   secondaryResourceLevel = '';
-  subResourceList: string[];
+  subResourceList: any[];
   emptyResource: any = {};
 
   private itemsPerPage = 100;
 
   constructor(
-    private router: Router,
+    protected router: Router,
     private activatedRoute: ActivatedRoute,
     public ocService: any,
+    public currentUserService: CurrentUserService,
     route: string,
     primaryResourceLevel: string,
-    subResourceList: string[] = [],
-    secondaryResourceLevel = ''
+    subResourceList: any[] = [],
+    secondaryResourceLevel = '',
+    myRoute = '',
   ) {
     this.route = route;
+    this.myRoute = myRoute;
     this.primaryResourceLevel = primaryResourceLevel;
     this.secondaryResourceLevel = secondaryResourceLevel;
     this.subResourceList = subResourceList;
@@ -57,8 +62,9 @@ export abstract class ResourceCrudService<ResourceType> {
         this.optionsSubject.next({});
       }
     });
-    this.optionsSubject.subscribe((options: Options) => {
-      if (this.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+    this.optionsSubject.subscribe(async (options: Options) => {
+      const parentResourceID = await this.getParentResourceID();
+      if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.listResources();
       }
     });
@@ -66,17 +72,20 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Can Override
   async list(args: any[]): Promise<ListPage<ResourceType>> {
-    return await this.ocService.List(...args).toPromise();
+    return await this.ocService.List(...args);
   }
 
-  async getMyResource(): Promise<any> {
-    return await Promise.resolve('');
+  public async getMyResource(): Promise<any> {
+    if (this.primaryResourceLevel === 'suppliers') {
+      return this.currentUserService.getMySupplier();
+    }
   }
 
   async listResources(pageNumber = 1, searchText = ''): Promise<void> {
-    if (this.shouldListResources()) {
+    const shouldList = await this.shouldListResources();
+    if (shouldList) {
       const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
-      const options = {
+      let options: ListArgs = {
         page: pageNumber,
         // allows a list call to pass in a search term that will not appear in the query params
         search: searchText || search,
@@ -84,13 +93,7 @@ export abstract class ResourceCrudService<ResourceType> {
         pageSize: this.itemsPerPage,
         filters,
       };
-      if (this.secondaryResourceLevel === 'catalogs') {
-        // placeholder conditional for getting the supplier order list page running
-        // will need to integrate this with the filter on the order list page as a seller
-        // user and potentially refactor later
-        
-        options.filters = { 'xp.Type': 'Catalog'}
-      }
+      options = this.addIntrinsicListArgs(options);
       const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
       if (pageNumber === 1) {
         this.setNewResources(resourceResponse);
@@ -98,6 +101,10 @@ export abstract class ResourceCrudService<ResourceType> {
         this.addResources(resourceResponse);
       }
     }
+  }
+
+  addIntrinsicListArgs(options: ListArgs): ListArgs {
+    return options;
   }
 
   getFetchStatus(options: Options): RequestStatus {
@@ -125,21 +132,27 @@ export abstract class ResourceCrudService<ResourceType> {
     return areFilters ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS : SUCCESSFUL_NO_ITEMS_NO_FILTERS;
   }
 
-  shouldListResources(): boolean {
+  async shouldListResources(): Promise<boolean> {
     if (!this.secondaryResourceLevel) {
       // for primary resources list if on the route
       return this.router.url.startsWith(this.route);
     } else {
+      const parentResourceID = await this.getParentResourceID();
       // for secondary resources list there is a parent ID
-      return !!this.getParentResourceID() && this.router.url.includes(this.secondaryResourceLevel);
+      return !!parentResourceID && this.router.url.includes(this.secondaryResourceLevel);
     }
   }
 
-  constructResourceURLs(resourceID = ''): string[] {
+  async isSupplierUser(): Promise<boolean> {
+    return await this.currentUserService.isSupplierUser();
+  }
+
+  async constructResourceURLs(resourceID = ''): Promise<string[]> {
     const newUrlPieces = [];
     newUrlPieces.push(this.route);
     if (this.secondaryResourceLevel) {
-      newUrlPieces.push(`/${this.getParentResourceID()}`);
+      const parentResourceID = await this.getParentResourceID();
+      newUrlPieces.push(`/${parentResourceID}`);
       newUrlPieces.push(`/${this.secondaryResourceLevel}`);
     }
     if (resourceID) {
@@ -168,12 +181,14 @@ export abstract class ResourceCrudService<ResourceType> {
     return newUrl;
   }
 
-  constructNewRouteInformation(resourceID = ''): any[] {
+  async constructNewRouteInformation(resourceID = ''): Promise<any[]> {
     let newUrl = '';
     const queryParams = this.activatedRoute.snapshot.queryParams;
-
     if (this.secondaryResourceLevel) {
-      newUrl += `${this.route}/${this.getParentResourceID()}/${this.secondaryResourceLevel}`;
+      const parentResourceID = await this.getParentResourceID();
+      newUrl += this.router.url.startsWith('/my-') ?
+        `${this.myRoute}/${this.secondaryResourceLevel}` :
+        `${this.route}/${parentResourceID}/${this.secondaryResourceLevel}`;
     } else {
       newUrl += `${this.route}`;
     }
@@ -183,18 +198,29 @@ export abstract class ResourceCrudService<ResourceType> {
     return [newUrl, queryParams];
   }
 
-  getParentResourceID(): string {
-    const urlPieces = this.router.url.split('/');
-    const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
-    return urlPieces[indexOfParent + 1];
+  private isMyResource(): boolean {
+    return this.router.url.startsWith('/my-');
   }
 
-  getResourceById(resourceID: string): Promise<any> {
+  async getParentResourceID(): Promise<string> {
+    if (this.isMyResource()) {
+      const myResource = await this.getMyResource();
+      return myResource.ID;
+    } else {
+      const urlPieces = this.router.url.split('/');
+      const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
+      return urlPieces[indexOfParent + 1];
+    }
+  }
+
+  async getResourceById(resourceID: string): Promise<any> {
     const orderDirection = this.optionsSubject.value.OrderDirection;
-    return this.ocService.Get(...this.createListArgs([resourceID], orderDirection)).toPromise();
+    const args = await this.createListArgs([resourceID], orderDirection);
+    if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
+    else return this.ocService.Get(...args);
   }
 
-  createListArgs(options: any[], orderDirection = ''): any[] {
+  async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
     /* ordercloud services follow a patter where the paramters to a function (Save, Create, List)
       are the nearly the same for all resource. However, sub resources (supplier users, buyer payment methods, etc...)
       have the parent resource ID as the first paramter before the expected argument
@@ -205,8 +231,8 @@ export abstract class ResourceCrudService<ResourceType> {
       // user and potentially refactor later
       return [orderDirection || 'Incoming', ...options];
     }
-    if (this.secondaryResourceLevel) {
-      const parentResourceID = this.getParentResourceID();
+    if (this.secondaryResourceLevel || this.isMyResource()) {
+      const parentResourceID = await this.getParentResourceID();
       return [parentResourceID, ...options];
     } else {
       return [...options];
@@ -214,7 +240,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find((i: any) => i.ID === resourceID);
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) => this.checkForResourceMatch(i, resourceID));
     if (resourceInList) {
       return resourceInList;
     } else {
@@ -224,23 +250,38 @@ export abstract class ResourceCrudService<ResourceType> {
     }
   }
 
+  checkForResourceMatch(i: any, resourceID: string): boolean {
+    return i.ID === resourceID;
+  }
+
   async updateResource(originalID: string, resource: any): Promise<any> {
-    const newResource = await this.ocService.Save(...this.createListArgs([originalID, resource])).toPromise();
-    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => i.ID === newResource.ID);
-    this.resourceSubject.value.Items[resourceIndex] = newResource;
-    this.resourceSubject.next(this.resourceSubject.value);
+    const args = await this.createListArgs([originalID, resource]);
+    const newResource =  await this.ocService.Save(...args);
+    this.updateResourceSubject(newResource);
     return newResource;
   }
 
+  updateResourceSubject(newResource: any): void {
+    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => this.checkForNewResourceMatch(i, newResource));
+    this.resourceSubject.value.Items[resourceIndex] = newResource;
+    this.resourceSubject.next(this.resourceSubject.value);
+  }
+
+  checkForNewResourceMatch(i: any, newResource: any): boolean {
+    return i.ID === newResource.ID;
+  }
+
   async deleteResource(resourceID: string): Promise<null> {
-    await this.ocService.Delete(...this.createListArgs([resourceID])).toPromise();
+    const args = await this.createListArgs([resourceID]);
+    await this.ocService.Delete(...args);
     this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
     this.resourceSubject.next(this.resourceSubject.value);
     return;
   }
 
   async createNewResource(resource: any): Promise<any> {
-    const newResource = await this.ocService.Create(...this.createListArgs([resource])).toPromise();
+    const args = await this.createListArgs([resource]);
+    const newResource = await this.ocService.Create(...args);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
@@ -274,7 +315,8 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   sortBy(field: string): void {
-    this.patchFilterState({ sortBy: field || undefined });
+    // temporarily as any until changed to latest oc sdk
+    this.patchFilterState({ sortBy: field || undefined } as any);
   }
 
   searchBy(searchTerm: string): void {
@@ -340,13 +382,15 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   // TODO - move to some other file. Not related to resource crud
-  getSuggestedAddresses = (ex): ListBuyerAddress => {
-    for (const err of ex.error.Errors) {
+  getSuggestedAddresses = (ex): ListPage<BuyerAddress<any>> => {
+    if (ex?.Message === "Address not valid") {
+      return ex?.Data?.SuggestedAddresses;
+    }
+    for (const err of ex?.error?.Errors) {
       if (err.ErrorCode === 'blocked by web hook') {
         return err.Data?.Body?.SuggestedAddresses;
       }
     }
-    throw ex;
   };
 
   // Handle URL updates
@@ -358,8 +402,10 @@ export abstract class ResourceCrudService<ResourceType> {
   private async listWithStatusIndicator(options: Options, orderDirection = ''): Promise<ListPage<ResourceType>> {
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options));
-      const args = this.createListArgs([options], orderDirection);
-      const resourceResponse = await this.list(args);
+      const args = await this.createListArgs([options], orderDirection);
+      let resourceResponse;
+      if (this.primaryResourceLevel === 'kitproducts') { resourceResponse = await this.ocService.List(); }
+      else { resourceResponse = await this.list(args); }
       this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
       return resourceResponse;
     } catch (error) {
@@ -372,7 +418,7 @@ export abstract class ResourceCrudService<ResourceType> {
     const isOnSubResource =
       this.subResourceList &&
       this.subResourceList.some(subResource => {
-        return this.router.url.includes(`/${subResource}`);
+        return this.router.url.includes(`/${subResource.route}`);
       });
     const isOnBaseRoute = this.router.url.includes(this.route);
     const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
@@ -388,11 +434,11 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
 
-  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resoruceToUpdate: T): T {
-    const updatedResourceCopy: any = this.copyResource(resoruceToUpdate);
-    var update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
-    if(resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
-      update.Product.Inventory.QuantityAvailable = null 
+  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resourceToUpdate: T): T {
+    const updatedResourceCopy: any = this.copyResource(resourceToUpdate);
+    const update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
+    if (resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
+      update.Product.Inventory.QuantityAvailable = null
       update.Product.Inventory.OrderCanExceed = false;
     }
     return update;
@@ -402,10 +448,13 @@ export abstract class ResourceCrudService<ResourceType> {
     return JSON.parse(JSON.stringify(resource));
   }
 
+  // TODO: Refactor to remove duplicate function (function exists in resource-table.component.ts)
   checkIfCreatingNew(): boolean {
     const routeUrl = this.router.routerState.snapshot.url;
-    const endUrl = routeUrl.slice(routeUrl.length - 4, routeUrl.length);
-    return endUrl === '/new';
+    const splitUrl = routeUrl.split('/');
+    const endUrl =
+      this.primaryResourceLevel === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
+    return endUrl === 'new' || endUrl.startsWith('new?');
   }
 
   checkForChanges<T>(resourceEditable: T, resourceStatic: T): boolean {
@@ -417,5 +466,17 @@ export abstract class ResourceCrudService<ResourceType> {
     if (dataIsSaving) return 'Saving...';
     if (isCreatingNew) return 'Create';
     if (!isCreatingNew) return 'Save Changes';
+  }
+
+  getParentIDParamName(): string {
+    return `${singular(this.primaryResourceLevel)}ID`;
+  }
+
+  getParentOrSecondaryIDParamName(): string {
+    return `${singular(this.secondaryResourceLevel || this.primaryResourceLevel)}ID`;
+  }
+
+  getResourceID(resource: any): string {
+    return resource.ID;
   }
 }

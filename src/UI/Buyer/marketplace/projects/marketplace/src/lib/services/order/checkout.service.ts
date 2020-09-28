@@ -8,18 +8,24 @@ import {
   OrderWorksheet,
   IntegrationEvents,
   ShipMethodSelection,
+  LineItem,
+  LineItems,
+  OrderPromotion,
 } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
 import {
-  MarketplaceSDK,
+  HeadStartSDK,
   Address,
   OrderCloudIntegrationsCreditCardPayment,
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
   ListPage,
-} from 'marketplace-javascript-sdk';
+  MarketplaceLineItem,
+  MarketplaceAddressBuyer,
+} from '@ordercloud/headstart-sdk';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -27,14 +33,13 @@ import {
 export class CheckoutService {
   constructor(
     private paymentHelper: PaymentHelperService,
-    private appSettings: AppConfig,
     private state: OrderStateService,
     private appConfig: AppConfig
   ) {}
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await MarketplaceSDK.MePayments.Post(payment); // authorize card
+    await HeadStartSDK.MePayments.Post(payment); // authorize card
     const orderID = this.submit();
     return orderID;
   }
@@ -42,6 +47,11 @@ export class CheckoutService {
   async submitWithoutCreditCard(): Promise<string> {
     const orderID = this.submit();
     return orderID;
+  }
+
+  async appendPaymentMethodToOrderXp(orderID: string, ccPayment?: any): Promise<void> {
+    const paymentMethod = ccPayment?.CreditCardID ? 'Credit Card' : 'Purchase Order';
+    await Orders.Patch('Outgoing', orderID, { xp: { PaymentMethod: paymentMethod } });
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {
@@ -61,7 +71,7 @@ export class CheckoutService {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     (address as any).ID = null;
-    this.order = await MarketplaceSDK.ValidatedAddresses.SetShippingAddress(
+    this.order = await HeadStartSDK.ValidatedAddresses.SetShippingAddress(
       'Outgoing',
       this.order.ID,
       address as Address
@@ -69,9 +79,10 @@ export class CheckoutService {
     return this.order;
   }
 
-  async setShippingAddressByID(addressID: string): Promise<MarketplaceOrder> {
+  async setShippingAddressByID(address: MarketplaceAddressBuyer, ): Promise<MarketplaceOrder> {
     try {
-      return await this.patch({ ShippingAddressID: addressID });
+      await Orders.Patch('Outgoing', this.order.ID, { xp: { ShippingAddress: address } })
+      return await this.patch({ ShippingAddressID: address.ID });
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
@@ -117,6 +128,27 @@ export class CheckoutService {
   // order cloud sandbox service methods, to be replaced by updated sdk in the future
   async estimateShipping(): Promise<OrderWorksheet> {
     return await IntegrationEvents.EstimateShipping('Outgoing', this.order.ID);
+  }
+
+  async cleanLineItemIDs(orderID: string, lineItems: MarketplaceLineItem[]): Promise<void> {
+    /* line item ids are significant for suppliers creating a relationship
+     * between their shipments and line items in ordercloud
+     * we are sequentially labeling these ids for ease of shipping */
+    const lineItemIDChanges = lineItems.map((li, index) => {
+      return LineItems.Patch('Outgoing', orderID, li.ID, { ID: this.createIDFromIndex(index) });
+    });
+    await Promise.all(lineItemIDChanges);
+    await this.state.resetLineItems();
+  }
+
+  createIDFromIndex(index: number): string {
+    /* X was choosen as a prefix for the lineItem ID so that it is easy to
+     * direct suppliers where to look for the ID. L and I are sometimes indistinguishable
+     * from the number 1 so I avoided those. X is also difficult to confuse with other
+     * letters when verbally pronounced */
+    const countInList = index + 1;
+    const paddedCount = countInList.toString().padStart(3, '0');
+    return 'X' + paddedCount;
   }
 
   async selectShipMethods(selections: ShipMethodSelection[]): Promise<OrderWorksheet> {
