@@ -185,7 +185,7 @@ namespace Marketplace.Common.Commands.Crud
             {
                 try
                 {
-                    var productRequest = _oc.Me.GetProductAsync<MarketplaceMeProduct>(p.ID);
+                    var productRequest = _oc.Me.GetProductAsync<MarketplaceMeProduct>(p.ID, userToken);
                     var specListRequest = ListAllAsync.List((page) => _oc.Products.ListSpecsAsync(p.ID, page: page, pageSize: 100));
                     var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
                     await Task.WhenAll(specListRequest, variantListRequest);
@@ -194,7 +194,7 @@ namespace Marketplace.Common.Commands.Crud
                     p.Specs = await specListRequest;
                     p.Variants = await variantListRequest;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     p.Product = null;
                 }

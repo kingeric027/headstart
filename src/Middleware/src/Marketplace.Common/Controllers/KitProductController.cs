@@ -27,12 +27,7 @@ namespace Marketplace.Common.Controllers
         {
             return await _command.Get(id, VerifiedUserContext);
         }
-        [DocName("GET Me Kit Product")]
-        [HttpGet, Route("me/{id}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<MarketplaceMeKitProduct> GetMeKit(string id)
-        {
-            return await _command.GetMeKit(id, VerifiedUserContext);
-        }
+        
         [DocName("POST Kit Product")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceKitProduct> Post([FromBody] MarketplaceKitProduct kitProduct)
