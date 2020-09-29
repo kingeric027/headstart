@@ -27,6 +27,7 @@ namespace Marketplace.Models
         public string BillingNumber { get; set; }
         public string Status { get; set; }
         public string LegalEntity { get; set; }
+        public string PrimaryContactName { get; set; }
     }
 
     public enum DestinationAddressAccessorial
