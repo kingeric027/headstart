@@ -150,7 +150,7 @@ namespace Marketplace.Common.Commands
         private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
         {
             var exchangeRateForProduct = exchangeRates.Find(e => e.Currency == productCurrency).Rate;
-            return defaultPrice * (decimal)exchangeRateForProduct;
+            return defaultPrice / (decimal)exchangeRateForProduct;
         }
 
         private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
