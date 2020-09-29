@@ -1,23 +1,17 @@
-html {
-  height: 100vh;
-}
+/*******************************************************************************************************************************
 
-body {
-  padding-top: 120px;
-  min-height: 100vh;
-}
+How to use _shame.scss:
 
-.flex-1 {
-  flex: 1 1 auto;
-}
+    (1) If it’s a hack or a hotfix, it goes in _shame.scss.
+    (2) Document all declarations fully:
+        (a) What part of the codebase does it relate to?
+        (b) Why was this needed?
+        (c) How does this fix it?
+        (d) How might you fix it properly, given more time?
+    (3) Do not blame the developer; if they explained why they had to do it then their reasons are probably (hopefully) valid.
+    (4) Try and clean shame.css up when you have some time.
 
-.mt-6 {
-  margin-top: 4.5rem;
-}
-
-.flex-shrink-0 {
-  flex-shrink: 0;
-}
+*******************************************************************************************************************************/
 
 .c-error-message {
   position: absolute;
@@ -25,29 +19,6 @@ body {
   padding: 0.5rem;
   border-radius: $border-radius;
   font-size: $small-font-size;
-}
-
-.border-hover {
-  transition: border-color 0.25s ease;
-
-  &:hover {
-    border: 1px solid $secondary;
-  }
-}
-
-.border-radius {
-  border-radius: $border-radius;
-}
-
-.ribbon.ribbon-top-right:after {
-  border-top-color: $ribbon-shadow-color;
-  border-left-color: $ribbon-shadow-color;
-}
-
-.cursor-pointer,
-.link,
-.btn {
-  cursor: $custom-range-track-cursor;
 }
 
 // this makes all address cards the same height
@@ -60,10 +31,6 @@ shared-address-display {
   }
 }
 
-.flex-none {
-  flex: none;
-}
-
 // Bootstrap IE issue with the last panel of ng-accordian
 .card-body#confirm {
   flex: none;
@@ -74,100 +41,12 @@ shared-address-display {
   }
 }
 
+//DESIGN: Refactor candidate
 .orders-awaiting-approval-popover {
   width: 30rem;
   .popover-body {
     padding: 0;
   }
-}
-
-.shine {
-  background: #f6f7f8;
-  background-image: linear-gradient(to right, #f6f7f8 0%, #f4f5f7 20%, #fcfcfc 40%, #f7f7f7 100%);
-  background-repeat: no-repeat;
-  display: inline-block;
-  position: relative;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-  animation-iteration-count: infinite;
-  animation-name: placeholderShimmer;
-  animation-timing-function: linear;
-
-  -webkit-animation-duration: 1s;
-  -webkit-animation-fill-mode: forwards;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-name: placeholderShimmer;
-  -webkit-animation-timing-function: linear;
-}
-@keyframes placeholderShimmer {
-  0% {
-    background-position: -468px 0;
-  }
-
-  100% {
-    background-position: 468px 0;
-  }
-}
-@-webkit-keyframes placeholderShimmer {
-  0% {
-    background-position: -468px 0;
-  }
-
-  100% {
-    background-position: 468px 0;
-  }
-}
-
-// Icon Buttons
-
-.icon-button {
-  padding: 0.75rem;
-  border-radius: 180px;
-  transition: background-color 0.25s;
-  &:hover {
-    background-color: rgba($gray-900, 0.1);
-    cursor: pointer;
-  }
-  .icon-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-  }
-}
-
-.ripple {
-  position: relative;
-  overflow: hidden;
-  transform: translate3d(0, 0, 0);
-}
-
-.ripple:after {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgb(73, 73, 73) 10%, transparent 5.01%);
-  background-repeat: no-repeat;
-  background-position: 50%;
-  transform: scale(10, 10);
-  opacity: 0;
-  transition: transform 0.5s, opacity 1s;
-}
-
-.ripple:active:after {
-  transform: scale(0, 0);
-  opacity: 0.3;
-  transition: 0s;
-}
-
-ocm-credit-card-form {
-  width: 100%;
 }
 
 // Styles for the progress loader
@@ -182,7 +61,76 @@ ng-progress {
   }
 }
 
+//DESIGN: Refactor candidate
 .info-edit-container {
   border-radius: $border-radius;
   border-left: 5px solid $primary;
+}
+
+
+.table {
+  thead {
+    color: $gray-600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 45px;
+  height: 24px;
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    &:checked {
+      + .slider {
+        background-color: $primary;
+        &:before {
+          -webkit-transform: translateX(20px);
+          -ms-transform: translateX(20px);
+          transform: translateX(20px);
+        }
+      }
+    }
+    &:focus {
+      + .slider {
+        box-shadow: 0 0 1px $primary;
+      }
+    }
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.2s;
+    transition: 0.2s;
+    &.round {
+      border-radius: 34px;
+      &:before {
+        border-radius: 50%;
+      }
+    }
+    &:before {
+      position: absolute;
+      content: '';
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: 0.2s;
+      transition: 0.2s;
+    }
+  }
+}
+
+#zsiqwidget {
+  bottom: 120px;
 }
