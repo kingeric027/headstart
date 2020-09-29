@@ -17,6 +17,7 @@ import { ShopperContextService } from 'marketplace';
         [config]="field"
         [group]="form"
         [index]="i"
+        [compact]="compact"
         ocSpecField
       ></ng-container>
     </form>
@@ -28,12 +29,13 @@ export class OCMSpecForm {
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
   config: FieldConfig[] = [];
   form: FormGroup;
- 
+
   @Input() currency: string;
+  @Input() compact?: boolean = false; // displays inputs in a compact way by setting them on a single line
   @Input() set specs(value: ListPage<Spec>) {
     this._specs = value;
     this.init();
-  } 
+  }
 
   constructor(private fb: FormBuilder, private context: ShopperContextService) { }
 
@@ -144,8 +146,7 @@ export class OCMSpecForm {
     }
   }
 
-  private createInputField(spec: Spec): FieldConfig
-  {
+  private createInputField(spec: Spec): FieldConfig {
     return {
       type: 'input',
       label: spec.Name,
