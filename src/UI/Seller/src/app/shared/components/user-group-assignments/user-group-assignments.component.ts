@@ -1,10 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { User, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService } from '@ordercloud/angular-sdk';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, Inject } from '@angular/core';
+import { User, UserGroup, UserGroupAssignment, OcSupplierUserGroupService, OcSupplierUserService, OcTokenService, ListPage } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { GetDisplayText } from './user-group-assignments.constants';
-import { Router } from '@angular/router';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { MarketplaceLocationUserGroup } from '@ordercloud/headstart-sdk';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 interface AssignmentsToAddUpdate {
   UserGroupType: string;
@@ -21,13 +24,12 @@ export class UserGroupAssignments implements OnChanges {
   @Input() userGroupType: string;
   @Input() isCreatingNew: boolean;
   @Input() userPermissionsService: IUserPermissionsService;
-  @Input() homeCountry: string;
   @Output() assignmentsToAdd = new EventEmitter<AssignmentsToAddUpdate>();
   @Output() hasAssignments = new EventEmitter<boolean>();
 
   userOrgID: string;
   userID: string;
-  userGroups: UserGroup[];
+  userGroups: ListPage<MarketplaceLocationUserGroup> | UserGroup[];
   add: UserGroupAssignment[];
   del: UserGroupAssignment[];
   _userUserGroupAssignmentsStatic: UserGroupAssignment[] = [];
@@ -37,23 +39,32 @@ export class UserGroupAssignments implements OnChanges {
   faExclamationCircle = faExclamationCircle;
   options = {filters: { 'xp.Type': ''}};
   displayText = '';
+  searchTermInput: string;
+  searching: boolean;
+  viewAssignedUserGroups = false;
+  args: ListArgs = { pageSize: 100, filters: { assigned: false } };
+  retrievingAssignments: boolean;
 
   constructor(
-    private router: Router
+    private http: HttpClient,
+    private ocTokenService: OcTokenService,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
   
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
     this.updateForUserGroupAssignmentType();
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
+    this.searchTermInput = '';
+    this.args.search = null;
     await this.getUserGroups(this.userOrgID);
     if (changes.user?.currentValue.ID && !this.userID) {
-      this.userID = this.user.ID
+      this.userID = this.user.ID;
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
         this.getUserGroupAssignments(this.user.ID, this.userOrgID);
       }
     }
     if (this.userID && changes.user?.currentValue?.ID !== changes.user?.previousValue?.ID) {
-      this.userID = this.user.ID
+      this.userID = this.user.ID;
       this.getUserGroupAssignments(this.user.ID, this.userOrgID);
     }
   }
@@ -68,17 +79,19 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroups(ID: string): Promise<void> {
-    const groups = await this.userPermissionsService.getUserGroups(ID, this.options);
-    const groupsInHomeCountry = groups.Items.filter(group => 
-    this.isCreatingNew ? group.xp?.Country === this.homeCountry : group.xp?.Country === this.user.xp?.Country);
-    this.userGroups = groupsInHomeCountry;
+    if (this.user.xp?.Country) {
+      const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+      this.userGroups = groups;
+    } else {
+      this.userGroups = await this.userPermissionsService.getUserGroups(ID, this.options);
+    }
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
     const userGroupAssignments = await this.userPermissionsService.listUserAssignments(userID, userOrgID);
     this._userUserGroupAssignmentsStatic = userGroupAssignments.Items;
     this._userUserGroupAssignmentsEditable = userGroupAssignments.Items;
-    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => this.userGroups.find(ug => ug.ID === assignedUG.UserGroupID));
+    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => (this.userGroups as any).Items?.find(ug => ug.ID === assignedUG.UserGroupID));
     this.hasAssignments.emit(match);
   }
 
@@ -148,5 +161,53 @@ export class UserGroupAssignments implements OnChanges {
     await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del, this.userGroupType === "BuyerLocation");
     await this.getUserGroupAssignments(this.userID, this.userOrgID);
     this.checkForUserUserGroupAssignmentChanges();
+  }
+
+  async getUserGroupsByCountry(buyerID: string, userID: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}`;
+    return await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
+  }
+
+  private buildHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+  }
+
+  private createHttpParams(args: ListArgs): HttpParams {
+    let params = new HttpParams();
+    Object.entries(args).forEach(([key, value]) => {
+      if (key !== 'filters' && value) {
+        params = params.append(key, value.toString());
+      }
+    });
+    Object.entries(args.filters).forEach(([key, value]) => {
+        params = params.append(key, value.toString());
+    });
+    return params;
+  }
+
+  async changePage(page: number) {
+    this.args = { ...this.args, page };
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+  }
+
+  async searchedResources(searchText: any) {
+    this.searching = true;
+    this.searchTermInput = searchText;
+    this.args = {...this.args, search: searchText, page: 1 };
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+    this.searching = false;
+}
+
+  async toggleUserGroupAssignmentView(value: boolean): Promise<void> {
+    this.viewAssignedUserGroups = value;
+    this.userGroups = [];
+    this.searchTermInput = '';
+    this.args = { pageSize: 100, filters: { assigned: this.viewAssignedUserGroups } };
+    this.retrievingAssignments = true;
+    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+    this.retrievingAssignments = false;
   }
 }
