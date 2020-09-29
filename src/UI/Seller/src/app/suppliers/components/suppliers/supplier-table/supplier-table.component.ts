@@ -45,7 +45,7 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     SupportContactPhone: new FormControl(
       (_get(supplier, 'xp.SupportContact') && _get(supplier, 'xp.SupportContact.Phone')) || ''
     ),
-    Active: new FormControl({ value: supplier.Active, disabled: this.isSupplierUser || !this.isCreatingNew }),
+    Active: new FormControl({ value: supplier.Active, disabled: this.isSupplierUser }),
     SyncFreightPop: new FormControl({ value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser }),
     Currency: new FormControl({ value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser }, Validators.required),
     ProductTypes: new FormGroup({
