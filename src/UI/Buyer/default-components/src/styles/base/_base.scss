@@ -30,9 +30,7 @@ body {
   box-sizing: inherit;
 }
 
-/**
- * Basic styles for links
- */
+// Basic styles for links
 
 .icon-button--hover-reactive {
   font-size: 18px;
@@ -43,7 +41,9 @@ body {
 
 .link,
 .btn,
+input,
 a,
 button {
+  font-family: $font-family-base;
   cursor: pointer;
 }
