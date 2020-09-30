@@ -146,7 +146,7 @@ namespace Marketplace.Common.Commands
                 var userBuyerLocationAssignments = new List<MarketplaceLocationUserGroup>();
                 foreach (var assignment in userUserGroupAssignments)
                 {
-                    //Buyer Location user groups are formatted as {buyerID}-{userID}.  This eliminates the unecessary groups that end in "-{OrderApproval}", for example, helping performance.
+                    //Buyer Location user groups are formatted as {buyerID}-{userID}.  This eliminates the unnecessary groups that end in "-{OrderApproval}", for example, helping performance.
                     if (assignment.UserGroupID.Split('-').Length == 2)
                     {
                         var userGroupLocation = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(

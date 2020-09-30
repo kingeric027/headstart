@@ -89,6 +89,7 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${userOrgID}/usergroupassignments/${userID}`;
+        //TO-DO - Replace with SDK
     const userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
     this._userUserGroupAssignmentsStatic = userGroupAssignments;
     this._userUserGroupAssignmentsEditable = userGroupAssignments;
@@ -166,6 +167,7 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroupsByCountry(buyerID: string, userID: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}`;
+    //TO-DO - Replace with SDK
     const userGroups = await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
     userGroups.Items.sort((a, b) => (a.Name > b.Name) ? 1 : ((b.Name > a.Name) ? -1 : 0));
     return userGroups;
