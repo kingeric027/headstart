@@ -594,7 +594,8 @@
                                         [copyProductResource]="copyProductResource"
                                         [myCurrency]="supplierCurrency"
                                         (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                        (variantsValidated)="validateVariants($event)">
+                                        (variantsValidated)="validateVariants($event)"
+                                        (isSpecsEditing)="specsBeingEdited($event)">
           </product-variations-component>
         </ng-template>
       </li>
@@ -803,14 +804,14 @@
          class="text-danger"
          translate>ADMIN.PRODUCT_EDIT.VARIATION_ISSUES</p>
       <div>
-        <button *ngIf="areChanges"
+        <button *ngIf="areChanges && !isSpecsEditing"
                 class="btn btn-primary"
                 type="submit"
                 [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
-                *ngIf="areChanges && !isCreatingNew"
+                *ngIf="areChanges && !isCreatingNew && !isSpecsEditing"
                 translate>COMMON.DISCARD_CHANGES</button>
       </div>
     </div>
