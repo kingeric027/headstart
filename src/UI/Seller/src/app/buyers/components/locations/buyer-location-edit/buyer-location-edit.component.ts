@@ -80,7 +80,8 @@ export class BuyerLocationEditComponent implements OnInit {
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
       LocationID: new FormControl(buyerLocation.Address.xp.LocationID),
       Currency: new FormControl(buyerLocation.UserGroup.xp.Currency, Validators.required),
-      BillingNumber: new FormControl(buyerLocation.Address.xp.BillingNumber)
+      // TODO: remove this workaround when headstart sdk has been updated to include correct type
+      BillingNumber: new FormControl((buyerLocation.Address.xp as any).BillingNumber)
     });
   }
 
