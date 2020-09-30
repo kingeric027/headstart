@@ -23,6 +23,7 @@ export class LineItemTableComponent {
   _user: MeUser;
   @Input() orderID: string;
   @Input() orderDirection: 'Incoming' | 'Outgoing';
+  @Input() currency: string;
   @Output() orderChange = new EventEmitter();
   isSaving = false;
 

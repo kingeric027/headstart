@@ -107,7 +107,7 @@ export class KitsEditComponent implements OnInit {
         this.images = product.Images;
         this.setForms(product);
         this.isCreatingNew = this.kitService.checkIfCreatingNew();
-        if (!this.isCreatingNew) this.getProductsInKit(product);
+        if (!this.isCreatingNew) await this.getProductsInKit(product);
         this.checkForChanges();
     }
 
@@ -117,7 +117,7 @@ export class KitsEditComponent implements OnInit {
         product.ProductAssignments.ProductsInKit.forEach(async p => {
             let ocProduct = await HeadStartSDK.Products.Get(p.ID, accessToken);
             productAssignments.push({
-                ID: p.ID, Name: ocProduct.Product.Name, Variants: p.Variants, MinQty: p.MinQty, MaxQty: p.MaxQty, Static: p.Static
+                ID: p.ID, Name: ocProduct.Product.Name, Variants: p.Variants, MinQty: p.MinQty, MaxQty: p.MaxQty, Static: p.Static, SpecCombo: p.SpecCombo
             });
         });
         this.productsIncluded = productAssignments;

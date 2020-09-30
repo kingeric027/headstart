@@ -97,7 +97,7 @@ export class BuyerUserService extends ResourceCrudService<User> implements IUser
     return await this.ocBuyerUserGroupService.ListUserAssignments(buyerID, { userID }).toPromise();
   }
 
-  async createNewResource(resource: any): Promise<any> {
+  async createNewResource(resource: User): Promise<any> {
     const buyerID = await this.getParentResourceID();
     resource.ID = buyerID + '-{' + buyerID + '-UserIncrementor' + '}';
     const args = await this.createListArgs([resource]);

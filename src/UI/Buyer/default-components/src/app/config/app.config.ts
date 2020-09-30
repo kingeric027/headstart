@@ -8,6 +8,7 @@ export const ocAppConfig: AppConfig = {
   marketplaceID: environment.marketplaceID,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
+  sellerID: environment.sellerID,
   ssoLink: environment.ssoLink,
   translateBlobUrl: environment.translateBlobUrl,
   ordercloudEnv: environment.ordercloudEnv,
@@ -39,5 +40,7 @@ export const ocAppConfig: AppConfig = {
     'MPLocationCreditCardAdmin',
     'MPLocationAddressAdmin',
     'MPLocationResaleCertAdmin',
+
+    'DocumentReader' // might be able to get rid of this if we assign to buyer, talk to team first
   ] as ApiRole[],
 };

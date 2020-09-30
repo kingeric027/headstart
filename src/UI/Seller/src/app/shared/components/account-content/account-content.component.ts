@@ -14,7 +14,7 @@ import { first } from 'rxjs/operators';
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string;
-  dataLtrs: string;
+  currentUserInitials: string;
   hasProfileImg: boolean = false;
   contentHeight: number;
   userContext: UserContext;
@@ -52,17 +52,17 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
 setUpSubs(): void {
     this.currentUserService.userSubject.subscribe(user => {
         this.user = user;
-        this.setDataLtrs(this.user);
+        this.setCurrentUserInitials(this.user);
     });
     this.currentUserService.profileImgSubject.subscribe(img => {
         this.hasProfileImg = Object.keys(img).length > 0;
     })
   }
 
-  setDataLtrs(user: MeUser): void {
+  setCurrentUserInitials(user: MeUser): void {
     const firstFirst = user?.FirstName?.substr(0,1);
     const firstLast = user?.LastName?.substr(0,1);
-    this.dataLtrs = `${firstFirst}${firstLast}`;
+    this.currentUserInitials = `${firstFirst}${firstLast}`;
   }
 
   async getSupplierOrg() {
@@ -87,6 +87,7 @@ setUpSubs(): void {
       LastName: new FormControl(me.LastName),
       Email: new FormControl({ value: me.Email, disabled: true }),
       Username: new FormControl(me.Username),
+      RequestInfoEmails: new FormControl(_get(me, 'xp.RequestInfoEmails')),
       OrderEmails: new FormControl(_get(me, 'xp.OrderEmails')),
       AddtlRcpts: new FormControl(_get(me, 'xp.AddtlRcpts')),
     });

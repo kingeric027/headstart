@@ -122,7 +122,7 @@ export class SupplierFilterService {
       activeFilters,
       (result, value, key: string) => (result[key.toLocaleLowerCase()] = value),
       {}
-    );
+    ) as any;
     filters.ID = supplierID || undefined;
     return filters;
   }

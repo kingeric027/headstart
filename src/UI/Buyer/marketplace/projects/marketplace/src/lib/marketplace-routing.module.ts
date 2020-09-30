@@ -24,6 +24,7 @@ import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-w
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component';
 import { LocationManagementWrapperComponent } from './wrapper-components/location-management-wrapper.component';
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component';
+import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component';
 
 export const MarketplaceRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
@@ -39,9 +40,6 @@ export const MarketplaceRoutes: Routes = [
     children: [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: 'home', component: HomeWrapperComponent },
-      // { path: 'support', component: SupportComponent },
-      // { path: 'faq', component: FaqComponent },
-      // { path: 'terms-and-conditions', component: TermsAndConditionsComponent },
       { path: 'impersonation', redirectTo: '/home' },
       { path: 'sso', redirectTo: '/home' },
 
@@ -103,6 +101,7 @@ export const MarketplaceRoutes: Routes = [
           { path: '', component: OrderHistoryWrapperComponent },
         ],
       },
+      { path: ':staticPageUrl', component: StaticPageWrapperComponent}
     ],
   },
 ];

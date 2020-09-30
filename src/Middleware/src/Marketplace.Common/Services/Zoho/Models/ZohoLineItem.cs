@@ -10,6 +10,7 @@ namespace Marketplace.Common.Services.Zoho.Models
     }
     public class ZohoLineItem
     {
+
         public string item_id { get; set; }
         public string line_item_id { get; set; }
         public string name { get; set; }
@@ -54,5 +55,6 @@ namespace Marketplace.Common.Services.Zoho.Models
         public string sku { get; set; }
         public string product_type { get; set; }
         public string purchase_description { get; set; }
+        public double? discount { get; set; }
     }
 }

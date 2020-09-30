@@ -10,6 +10,7 @@ namespace Marketplace.Models.Extended
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        public string BuyerLocation { get; set; }
         [Required]
         public string Phone { get; set; }
         [Required]

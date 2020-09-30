@@ -6,7 +6,16 @@
  * Set up a decent box model on the root element
  */
 html {
+  height: 100vh;
   box-sizing: border-box;
+  -ms-text-size-adjust: 100%; /* 3 */
+  -webkit-text-size-adjust: 100%; /* 3 */
+}
+
+body {
+  padding-top: 120px;
+  min-height: 100vh;
+  margin: 0;
 }
 
 /**
@@ -21,9 +30,7 @@ html {
   box-sizing: inherit;
 }
 
-/**
- * Basic styles for links
- */
+// Basic styles for links
 
 .icon-button--hover-reactive {
   font-size: 18px;
@@ -32,7 +39,11 @@ html {
   }
 }
 
-// add cursor: pointer to any element with routerLink attribute
-[ng-reflect-router-link]:hover {
+.link,
+.btn,
+input,
+a,
+button {
+  font-family: $font-family-base;
   cursor: pointer;
 }

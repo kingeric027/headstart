@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
 using Newtonsoft.Json;
@@ -87,7 +88,8 @@ namespace Marketplace.Models
 	{
 		Standard,
 		Quote,
-		PurchaseOrder
+		PurchaseOrder,
+        Kit
 	}
 
     // measured in how many of the product fit in a 22x22x22 box

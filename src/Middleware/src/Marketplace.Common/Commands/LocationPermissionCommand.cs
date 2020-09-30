@@ -8,6 +8,8 @@ using Marketplace.Models;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using Marketplace.Common.Constants;
+using Azure.Core;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,6 +22,8 @@ namespace Marketplace.Common.Commands
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
+        Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string buyerID, string userID, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
     }
 
     public class LocationPermissionCommand : ILocationPermissionCommand
@@ -111,11 +115,75 @@ namespace Marketplace.Common.Commands
             return await IsUserInUserGroup(buyerID, userGroupID, verifiedUser);
         }
 
-        private async Task<bool> IsUserInUserGroup(string buyerID, string userGroupID, VerifiedUserContext verifiedUser)
+        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string buyerID, string userID, VerifiedUserContext verifiedUser)
+        {
+            var userUserGroupAssignments = await GetUserUserGroupAssignments(buyerID, userID, verifiedUser);
+            return userUserGroupAssignments;
+        }
+
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser)
+        {
+            var user = await _oc.Users.GetAsync(
+                buyerID,
+                userID
+                );
+            var userGroups = new ListPage<MarketplaceLocationUserGroup>();
+            var assigned = args.Filters.FirstOrDefault(f => f.Name == "assigned").QueryParams.
+                              FirstOrDefault(q => q.Item1 == "assigned").Item2;
+
+            if (!bool.Parse(assigned))
+            {
+                userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+                   buyerID,
+                   search: args.Search,
+                   filters: $"xp.Country={user.xp.Country}&xp.Type=BuyerLocation",
+                   page: args.Page,
+                   pageSize: 100
+                   );
+            } else
+            {
+                var userUserGroupAssignments = await GetUserUserGroupAssignments(buyerID, userID, verifiedUser);
+                var userBuyerLocationAssignments = new List<MarketplaceLocationUserGroup>();
+                foreach (var assignment in userUserGroupAssignments)
+                {
+                    //Buyer Location user groups are formatted as {buyerID}-{userID}.  This eliminates the unnecessary groups that end in "-{OrderApproval}", for example, helping performance.
+                    if (assignment.UserGroupID.Split('-').Length == 2)
+                    {
+                        var userGroupLocation = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(
+                            buyerID,
+                            assignment.UserGroupID
+                            );
+                            if (args.Search == null || userGroupLocation.Name.ToLower().Contains(args.Search))
+                            {
+                                userBuyerLocationAssignments.Add(userGroupLocation);
+                            }
+                    }
+                }
+                userGroups.Items = userBuyerLocationAssignments;
+                userGroups.Meta = new ListPageMeta()
+                {
+                    Page = 1,
+                    PageSize = 100
+                };
+            }
+            return userGroups;
+        }
+
+    private async Task<bool> IsUserInUserGroup(string buyerID, string userGroupID, VerifiedUserContext verifiedUser)
         {
             var userGroupAssignmentForAccess = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID, verifiedUser.UserID);
             return userGroupAssignmentForAccess.Items.Count > 0;
         }
 
+    public async Task<List<UserGroupAssignment>> GetUserUserGroupAssignments(string buyerID, string userID, VerifiedUserContext verifiedUser)
+        {
+            return await ListAllAsync.List((page) => _oc.UserGroups.ListUserAssignmentsAsync(
+                   buyerID,
+                   userID: userID,
+                   page: page,
+                   pageSize: 100,
+                   accessToken: verifiedUser.AccessToken
+                   ));
+        }
     };
 }

@@ -38,7 +38,7 @@ export class HeaderComponent implements OnInit {
   headerConfig: MPRoute[];
   hasProfileImg: boolean = false;
   myProfileImg: string;
-  dataLtrs: string;
+  currentUserInitials: string;
 
   constructor(
     private ocTokenService: OcTokenService,
@@ -57,7 +57,7 @@ export class HeaderComponent implements OnInit {
       this.appAuthService.getOrdercloudUserType()
     );
     await this.getCurrentUser();
-    this.setDataLtrs(this.user);
+    this.setCurrentUserInitials(this.user);
     this.urlChange(this.router.url);
   }
 
@@ -84,7 +84,7 @@ export class HeaderComponent implements OnInit {
   setUpSubs(): void {
     this.currentUserService.userSubject.subscribe(user => {
       this.user = user;
-      this.setDataLtrs(this.user);
+      this.setCurrentUserInitials(this.user);
     });
     this.currentUserService.profileImgSubject.subscribe(img => {
       this.hasProfileImg = Object.keys(img).length > 0;
@@ -113,10 +113,10 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['account']);
   }
 
-  setDataLtrs(user: MeUser): void {
+  setCurrentUserInitials(user: MeUser): void {
     const firstFirst = user?.FirstName?.substr(0,1);
     const firstLast = user?.LastName?.substr(0,1);
-    this.dataLtrs = `${firstFirst}${firstLast}`;
+    this.currentUserInitials = `${firstFirst}${firstLast}`;
   }
 }
 

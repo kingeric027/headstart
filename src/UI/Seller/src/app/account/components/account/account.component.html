@@ -28,8 +28,8 @@
                        [src]="myProfileImg"
                        alt="ProfileImg"
                        id="ProfileImgThumb">
-                  <div *ngIf="!hasProfileImg && !profileImgLoading && (dataLtrs !== 'undefinedundefined')"
-                       [attr.data-letters]="dataLtrs"
+                  <div *ngIf="!hasProfileImg && !profileImgLoading && (currentUserInitials !== 'undefinedundefined')"
+                       [attr.data-letters]="currentUserInitials"
                        class="avatar avatar-sm"></div>
                   <div *ngIf="profileImgLoading"
                        class="spinner-border"

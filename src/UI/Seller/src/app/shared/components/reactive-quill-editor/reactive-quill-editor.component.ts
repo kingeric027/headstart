@@ -11,7 +11,7 @@ import { ValidateRichTextDescription } from '@app-seller/validators/validators';
 })
 export class ReactiveQuillComponent {
   _updatedResource: any;
-  _formControlForText: any;
+  _formControlForText: FormControl;
   quillChangeSubscription: any;
 
   @Input()

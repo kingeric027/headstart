@@ -1,46 +1,56 @@
 // --------------------------------------------------------------------------------------
-// This file should include variable overrides as well as custom variables
+// This file "should" include variable overrides of predefined bootstrap variables.
+// Looking for theme-specific customizations? drop them into _theme.styles.scss
 //
-// we've included a subset of common bootstrap variables you might want to override
-// to start you off. want to see the full list of bootstrap variables?
+// Want to see the full list of available bootstrap variables?
 // check out node_modules/bootstrap/variables.scss
 // --------------------------------------------------------------------------------------
 
-$blue: #1c3f65;
-$indigo: #6610f2;
-$purple: #6f42c1;
-$pink: #e83e8c;
-$red: #dc3545;
-$orange: #ee7421;
-$yellow: #ffc107;
-$teal: #20c997;
-$green: #28a745;
-$cyan: #94a8cd;
-$sky: #68cbdf;
-$plum: #652f6c;
-$blush: #f4e2e2;
+$blue:                      #1c3f65;
+$purple:                    #643367; // brand color
+$red:                       #FF3639;
+$orange:                    #ee7421; //DESIGN: need to double-check this. I see #DB7C00|#DB6E0F on their public site. Also #FFFFFF on #DB7C00|#DB6E0F fails AA color contrast
+$yellow:                    #f3bd1b;
+$teal:                      #2292a9; // brand color
+$cyan:                      #68cbdf;
+$green:                     #B3EB3B;
 
-$white: #fff;
-$gray-100: #f8f9fa;
-$gray-200: #e9ecef;
-$gray-300: #dee2e6;
-$gray-400: #ced4da;
-$gray-500: #adb5bd;
-$gray-600: #6c757d;
-$gray-700: #495057;
-$gray-800: #343a40;
-$gray-900: #212529;
-$black: #000;
+$white:                     #fff;
+$gray-100:                  #f5f4f5;
+$gray-200:                  #ebe8eb;
+$gray-300:                  #d5d0d5;
+$gray-400:                  #ccc7cc;
+$gray-500:                  #aaa1ab;
+$gray-600:                  #6f5f6f;
+$gray-700:                  #554356;
+$gray-800:                  #3b2c3c;
+$gray-900:                  #2a1e2b;
+$black:                     #171118;
 
-$primary: $orange;
-$secondary: $plum;
-$success: $green;
-$info: $sky;
-$warning: $yellow;
-$danger: $red;
-$light: $gray-100;
-$gray-light: $gray-300;
-$medium: $gray-500;
-$dark: $gray-800;
-$sky: $sky;
-$blush: $blush;
+$primary:                   $orange;
+$secondary:                 $purple;
+$success:                   $green;
+$info:                      $teal;
+$warning:                   $yellow;
+$danger:                    $red;
+$light:                     $gray-100;
+$gray-light:                $gray-300;
+$medium:                    $gray-500;
+$dark:                      $gray-800;
+
+$theme-colors: (
+  'medium':                 $medium,
+  'purple':                 $purple,
+  'gray-light':             $gray-light,
+  'white':                  $white,
+);
+
+$body-color:                $gray-800;
+$btn-padding-x:             1.25rem;
+
+// Typography
+
+@import '_typography.scss';
+
+$font-family-sans-serif:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-base:          'Brandon Grotesque', 'Nunito', $font-family-sans-serif;
