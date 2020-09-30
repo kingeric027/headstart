@@ -80,6 +80,7 @@ export class BuyerLocationEditComponent implements OnInit {
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
       LocationID: new FormControl(buyerLocation.Address.xp.LocationID),
       Currency: new FormControl(buyerLocation.UserGroup.xp.Currency, Validators.required),
+      BillingNumber: new FormControl(buyerLocation.Address.xp.BillingNumber)
     });
   }
 
@@ -137,7 +138,7 @@ export class BuyerLocationEditComponent implements OnInit {
       this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex.response.data);
+      this.suggestedAddresses = getSuggestedAddresses(ex?.response?.data);
       this.dataIsSaving = false;
     }
   }
