@@ -16,6 +16,8 @@ import { createUser, deleteUser } from '../api-utils.ts/users-util'
 import { saveUserAssignment } from '../api-utils.ts/usergroups-helper'
 import { t } from 'testcafe'
 import { setHeadstartSDKUrl } from './headstart-sdk-helper'
+import { createCreditCard } from '../api-utils.ts/credit-card-util'
+import { deleteOrdersForUser } from '../api-utils.ts/order-util'
 
 export async function adminClientSetup() {
 	await axiosSetup()
@@ -96,24 +98,23 @@ export async function loginTestCleanup(
 	await deleteUser(userID, buyerID, authToken)
 }
 
+export async function baseTestCleanup(
+	userID: string,
+	buyerID: string,
+	authToken: string
+) {
+	//delete orders for user
+	await deleteOrdersForUser(authToken, buyerID, userID)
+	await deleteUser(userID, buyerID, authToken)
+}
+
 export async function buyerTestSetup(authToken: string) {
 	await t.maximizeWindow()
 	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
-	await saveUserAssignment(user.ID, '0005-0002', '0005', authToken)
-	await saveUserAssignment(
-		user.ID,
-		'Dxd1cuubXU2BJkdnLf3v1A',
-		'0005',
-		authToken
-	)
-	await saveUserAssignment(
-		user.ID,
-		'iJhQ4uM-1UaFruXemXNZaw',
-		'0005',
-		authToken
-	) //move this stuff to a create buyer user method, and explain the user group IDs
 
 	await authBuyerBrowser(user)
+
+	await createCreditCard(t.ctx.userAuth, user.FirstName, user.LastName)
 
 	await t.navigateTo(`${testConfig.buyerAppUrl}home`)
 

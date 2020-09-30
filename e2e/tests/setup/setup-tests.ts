@@ -91,3 +91,5 @@ test.before(async t => {
 	await mainResourcePage.clickCreateNewStandardProduct()
 	await productDetailsPage.createProduct('Better Product', 'Better Warehouse')
 })
+
+//create brand user

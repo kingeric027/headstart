@@ -1,5 +1,6 @@
 import OrderCloudSDK = require('ordercloud-javascript-sdk')
 import faker = require('faker')
+import { saveUserAssignment } from './usergroups-helper'
 
 export async function createUser(clientAuth: string, buyerID: string) {
 	const firstName = faker.name.firstName()
@@ -26,6 +27,24 @@ export async function createUser(clientAuth: string, buyerID: string) {
 	})
 
 	testUser.ID = createdTestUser.ID
+
+	//make user assignments so user is able to see products
+	//0005-0002 is Denver CO
+	//Dxd1cuubXU2BJkdnLf3v1A is All Location Products
+	//iJhQ4uM-1UaFruXemXNZaw is Canada Only Products
+	await saveUserAssignment(testUser.ID, '0005-0002', '0005', clientAuth)
+	await saveUserAssignment(
+		testUser.ID,
+		'Dxd1cuubXU2BJkdnLf3v1A',
+		'0005',
+		clientAuth
+	)
+	await saveUserAssignment(
+		testUser.ID,
+		'iJhQ4uM-1UaFruXemXNZaw',
+		'0005',
+		clientAuth
+	)
 
 	return testUser
 }
