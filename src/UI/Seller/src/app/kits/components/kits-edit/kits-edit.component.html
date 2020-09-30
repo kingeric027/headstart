@@ -383,8 +383,13 @@
                          *ngIf="product?.Variants?.length && product.Static">
                       <select class="custom-select"
                               (change)="handleUpdateProduct($event, 'SpecCombo', 'string', product);">
+                        <option [ngValue]="null"
+                                disabled
+                                translate>ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE</option>
                         <option *ngFor="let variant of product.Variants"
-                                [value]="variant?.xp?.SpecCombo">{{variant?.xp?.SpecCombo}}</option>
+                                [selected]="variant.xp.SpecCombo === product.SpecCombo"
+                                [value]="variant.xp.SpecCombo">{{variant.xp.SpecCombo}}
+                        </option>
                       </select>
                     </div>
                   </td>
