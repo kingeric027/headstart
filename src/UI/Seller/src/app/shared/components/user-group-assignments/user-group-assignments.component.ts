@@ -88,9 +88,10 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
-    const userGroupAssignments = await this.userPermissionsService.listUserAssignments(userID, userOrgID);
-    this._userUserGroupAssignmentsStatic = userGroupAssignments.Items;
-    this._userUserGroupAssignmentsEditable = userGroupAssignments.Items;
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${userOrgID}/usergroupassignments/${userID}`;
+    const userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
+    this._userUserGroupAssignmentsStatic = userGroupAssignments;
+    this._userUserGroupAssignmentsEditable = userGroupAssignments;
     const match = this._userUserGroupAssignmentsStatic.some(assignedUG => (this.userGroups as any).Items?.find(ug => ug.ID === assignedUG.UserGroupID));
     this.hasAssignments.emit(match);
   }
@@ -165,7 +166,9 @@ export class UserGroupAssignments implements OnChanges {
 
   async getUserGroupsByCountry(buyerID: string, userID: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
     const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}`;
-    return await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
+    const userGroups = await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
+    userGroups.Items.sort((a, b) => (a.Name > b.Name) ? 1 : ((b.Name > a.Name) ? -1 : 0));
+    return userGroups;
   }
 
   private buildHeaders(): HttpHeaders {
