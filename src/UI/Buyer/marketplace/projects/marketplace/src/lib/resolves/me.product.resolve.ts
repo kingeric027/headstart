@@ -11,10 +11,8 @@ export class MeProductResolver implements Resolve<SuperMarketplaceProduct> {
   async resolve(route: ActivatedRouteSnapshot): Promise<SuperMarketplaceProduct> {
     // TODO: strongly type this once headstart sdk includes ProductType 'Kit'
     const superProduct = await HeadStartSDK.Mes.GetSuperProduct(route.params.productID) as any;
-    console.log(`SUPER PRODUCT`, superProduct)
     if (superProduct.Product.xp.ProductType === 'Kit') {
-      const kitProduct = await this.tempSdk.getKitProduct(superProduct.Product.ID);
-      console.log(`KIT PRODUCT`, superProduct)
+      const kitProduct = await this.tempSdk.getMeKitProduct(superProduct.Product.ID);
       return kitProduct;
     }
     return superProduct;

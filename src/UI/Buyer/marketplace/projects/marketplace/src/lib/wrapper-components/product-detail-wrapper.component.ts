@@ -17,7 +17,7 @@ export class ProductDetailWrapperComponent implements OnInit {
 
   ngOnInit(): void {
     const product = this.activatedRoute.snapshot.data.product;
-    this.isKit = product.xp.ProductTYpe === 'Kit';
+    this.isKit = product.Product.xp.ProductType === 'Kit';
     this.product = product;
   }
 }
