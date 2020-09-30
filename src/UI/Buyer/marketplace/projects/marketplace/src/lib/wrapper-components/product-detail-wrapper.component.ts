@@ -6,14 +6,18 @@ import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 
 @Component({
   template: `
-    <ocm-product-details [product]="product"> </ocm-product-details>
+    <ocm-kit-product-details *ngIf="isKit" [product]="product"></ocm-kit-product-details>
+    <ocm-product-details *ngIf="!isKit" [product]="product"> </ocm-product-details>
   `,
 })
 export class ProductDetailWrapperComponent implements OnInit {
+  isKit: boolean;
   product: SuperMarketplaceProduct | KitProduct;
   constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService, private tempSdk: TempSdk) { }
 
   ngOnInit(): void {
-    this.product = this.activatedRoute.snapshot.data.product;
+    const product = this.activatedRoute.snapshot.data.product;
+    this.isKit = product.xp.ProductTYpe === 'Kit';
+    this.product = product;
   }
 }
