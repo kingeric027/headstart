@@ -69,7 +69,7 @@
                                 translate>ADMIN.PRODUCT_EDIT.CHOOSE_PRODUCT_TYPE</option>
                         <option *ngFor="let product of availableProductTypes"
                                 [selected]="productType === product"
-                                value="{{product}}">{{product}}</option>
+                                [ngValue]="product">{{product}}</option>
                       </select>
                     </div>
                   </div>
@@ -311,6 +311,7 @@
                               [ngValue]="null"
                               translate>ADMIN.PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
                       <option *ngFor="let address of addresses?.Items"
+                              [selected]="shippingAddress === address"
                               [value]="address.ID">{{address.AddressName}}</option>
                     </select>
                   </div>

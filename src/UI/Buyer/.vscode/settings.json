@@ -3,5 +3,6 @@
         "./default-components",
         "./marketplace"
     ],
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "beautify.ignore": "**/*.{css,scss}",
 }

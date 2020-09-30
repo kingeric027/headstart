@@ -14,10 +14,10 @@ export class ProductDetailWrapperComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService, private tempSdk: TempSdk) { }
 
   async ngOnInit(): Promise<void> {
-    if (this.activatedRoute.snapshot.data.product.PriceSchedule) {
-      this.product = this.activatedRoute.snapshot.data.product;
+    if (this.activatedRoute.snapshot.data.product.Product.xp.ProductType === 'Kit') {
+      this.product = await this.tempSdk.getKitProduct(this.activatedRoute.snapshot.data.product.Product.ID);
     } else {
-      this.product = await this.tempSdk.getKitProduct(this.activatedRoute.snapshot.data.product.ID);
+      this.product = this.activatedRoute.snapshot.data.product;
     }
   }
 }

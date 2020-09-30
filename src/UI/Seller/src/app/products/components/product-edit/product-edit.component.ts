@@ -62,7 +62,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   isCreatingNew: boolean;
   @Input()
   dataIsSaving = false;
-  userContext = {};
+  userContext: any = {};
   hasVariations = false;
   images: Asset[] = [];
   files: FileHandle[] = [];
@@ -83,6 +83,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   taxCodeCategorySelected = false;
   taxCodes: ListPage<TaxCodes>;
   productType: ProductXp['ProductType'];
+  shippingAddress: any;
   productVariations: any;
   variantsValid = true;
   editSpecs = false;
@@ -121,9 +122,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.getAddresses();
     this.userContext = await this.currentUserService.getUserContext();
-    if((this.userContext as any).UserType !== SELLER) {
-      await this.getAvailableProductTypes();
-    }
+    await this.getAvailableProductTypes();
     this.setProductEditTab();
   }
 
@@ -135,7 +134,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.productType = productTypeFromUrl as ProductXp['ProductType'];
     }
     this.productForm.controls.ProductType.setValue(this.productType);
-    this.handleUpdateProduct({target: {value: this.productForm.controls.ProductType.value}}, 'Product.xp.ProductType');
+    this.handleUpdateProduct({ target: { value: this.productForm.controls.ProductType.value } }, 'Product.xp.ProductType');
   }
 
   setProductEditTab(): void {
@@ -150,12 +149,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.location.replaceState(newLocation);
   }
 
-  async getAddresses(): Promise<void> {
+  async getAddresses(product?): Promise<void> {
     const context: UserContext = await this.currentUserService.getUserContext();
     if (context.Me.Supplier) {
       this.addresses = await this.ocSupplierAddressService.List(context.Me.Supplier.ID).toPromise();
-    } else {
-      this.addresses = await this.ocAdminAddressService.List().toPromise();
     }
   }
 
@@ -182,6 +179,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.createProductForm(this._superMarketplaceProductEditable);
+    if (this.userContext?.UserType === "SELLER") {
+      this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable.Product.DefaultSupplierID).toPromise();
+      this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
+    }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
   }
@@ -206,9 +207,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         UseCumulativeQuantity: new FormControl(superMarketplaceProduct.PriceSchedule?.UseCumulativeQuantity),
         Note: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Note'), Validators.maxLength(140)),
         ProductType: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ProductType'), Validators.required),
-        IsResale: new FormControl({value: _get(superMarketplaceProduct.Product, 'xp.IsResale'), disabled: this.readonly}),
+        IsResale: new FormControl({ value: _get(superMarketplaceProduct.Product, 'xp.IsResale'), disabled: this.readonly }),
         QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
-        InventoryEnabled: new FormControl({value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'), disabled: this.readonly}),
+        InventoryEnabled: new FormControl({ value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'), disabled: this.readonly }),
         OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
@@ -227,44 +228,44 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   setInventoryValidator() {
     const quantityControl = this.productForm.get('QuantityAvailable');
     this.productForm.get('InventoryEnabled').valueChanges
-    .subscribe(inventory => {
-      if(inventory) {
-        quantityControl.setValidators([Validators.required, Validators.min(1)]);
-      } else {
-        quantityControl.setValidators(null); 
-      }
-      quantityControl.updateValueAndValidity()
-    })
+      .subscribe(inventory => {
+        if (inventory) {
+          quantityControl.setValidators([Validators.required, Validators.min(1)]);
+        } else {
+          quantityControl.setValidators(null);
+        }
+        quantityControl.updateValueAndValidity()
+      })
   }
 
   setNonRequiredFields(): void {
-    const optionalFieldsArray = ['TaxCodeCategory','TaxCode', 'ShipWeight', 'ShipFromAddressID', 'Price'];
+    const optionalFieldsArray = ['TaxCodeCategory', 'TaxCode', 'ShipWeight', 'ShipFromAddressID', 'Price'];
     const optionalControls = optionalFieldsArray.map(item => this.productForm.get(item))
     this.productForm.get('ProductType').valueChanges
-    .pipe(takeWhile(() => this.alive)).subscribe(productType => {
-      if(productType === 'Quote') {
-        optionalControls.forEach(control => {
-          control.setValidators(null);
-          control.updateValueAndValidity();
-        })
-      } else {
-        optionalControls.forEach(control => {
-          control.setValidators(Validators.required);
-          control.updateValueAndValidity();
-        })
-      }
-    })
+      .pipe(takeWhile(() => this.alive)).subscribe(productType => {
+        if (productType === 'Quote') {
+          optionalControls.forEach(control => {
+            control.setValidators(null);
+            control.updateValueAndValidity();
+          })
+        } else {
+          optionalControls.forEach(control => {
+            control.setValidators(Validators.required);
+            control.updateValueAndValidity();
+          })
+        }
+      })
   }
 
   isRequired(control: string): boolean {
     const theControl = this.productForm.get(control);
-    if(theControl.validator === null) return false;
+    if (theControl.validator === null) return false;
     const validator = this.productForm.get(control).validator({} as AbstractControl);
     return validator && validator.required;
   }
 
   productDetailsTabIsValid(): boolean {
-    return this.isShippingValid() && this.unitOfMeasureValid() && this.productForm.controls.Name.valid &&this.productForm.controls.TaxCodeCategory.valid &&
+    return this.isShippingValid() && this.unitOfMeasureValid() && this.productForm.controls.Name.valid && this.productForm.controls.TaxCodeCategory.valid &&
       this.productForm.controls.TaxCode.valid;
   }
 
@@ -275,14 +276,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
     const formControls = this.productForm.controls;
     const hasAlwaysRequiredFields = formControls.ShipFromAddressID.valid && formControls.SizeTier.valid &&
-     formControls.ShipWeight.valid && sizeTier;
+      formControls.ShipWeight.valid && sizeTier;
 
-    if(!hasAlwaysRequiredFields) {
+    if (!hasAlwaysRequiredFields) {
       return false;
     }
 
-    if(sizeTier === 'G') {
-      const hasDimensions = formControls.ShipWidth.valid && formControls.ShipHeight.valid && formControls.ShipLength.valid; 
+    if (sizeTier === 'G') {
+      const hasDimensions = formControls.ShipWidth.valid && formControls.ShipHeight.valid && formControls.ShipLength.valid;
       return hasDimensions;
     } else {
       return true
@@ -293,19 +294,19 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   unitOfMeasureValid(): boolean {
     return (
-      this.isCreatingNew 
-      && this.isRequired('UnitOfMeasureQty') 
-      && this.isRequired('UnitOfMeasureUnit') 
-      && this.productForm.controls.UnitOfMeasureUnit.valid 
+      this.isCreatingNew
+      && this.isRequired('UnitOfMeasureQty')
+      && this.isRequired('UnitOfMeasureUnit')
+      && this.productForm.controls.UnitOfMeasureUnit.valid
       && this.productForm.controls.UnitOfMeasureQty.valid
     );
   }
 
   async getAvailableProductTypes(): Promise<void> {
     const supplier = await this.currentUserService.getMySupplier();
-    this.availableProductTypes = supplier.xp.ProductTypes || []; 
+    this.availableProductTypes = supplier?.xp?.ProductTypes || ["Standard", "Quote", "PurchaseOrder", "Kit"];
   }
-  
+
   async handleSave(): Promise<void> {
     if (this.isCreatingNew) {
       await this.createNewProduct();
@@ -437,7 +438,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       FileName: file.Filename
     }
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-    await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
+    await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
     return await HeadStartSDK.Products.Get(productID, accessToken);
   }
 
@@ -472,7 +473,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     await HeadStartSDK.Assets.DeleteAssetAssignment(file.ID, this._superMarketplaceProductStatic.Product.ID, 'Products', null, null, accessToken);
     await HeadStartSDK.Assets.Delete(file.ID, accessToken);
     if (file.Type === 'Image') {
-      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID); 
+      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(i => i.ID !== file.ID);
     } else {
       this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(a => a.ID !== file.ID);
     }
@@ -528,8 +529,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   handleTaxCodeSelection(event: TaxProperties): void {
-    const codeUpdate = {target: {value: event.Code}};
-    const descriptionUpdate = {target: {value: event.Description}};
+    const codeUpdate = { target: { value: event.Code } };
+    const descriptionUpdate = { target: { value: event.Description } };
     this.productForm.controls.TaxCode.setValue(event.Code);
     this.handleUpdateProduct(codeUpdate, 'Product.xp.Tax.Code');
     this.handleUpdateProduct(descriptionUpdate, 'Product.xp.Tax.Description');
@@ -635,7 +636,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   getProductPreviewImage(): string | SafeUrl {
     return this.imageFiles[0]?.URL || getProductMediumImageUrl(this._superMarketplaceProductEditable?.Product, this.appConfig.sellerID);
   }
-  
+
   ngOnDestroy(): void {
     this.alive = false;
   }

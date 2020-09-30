@@ -82,7 +82,8 @@ namespace Marketplace.Common.Commands
                         {
                             Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
-                        }
+                        },
+                        ProductType = obj.ProductType
                     }
                 }, _user.AccessToken);
                 Asset image = new Asset()
@@ -193,7 +194,8 @@ namespace Marketplace.Common.Commands
                         {
                             Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
-                        }
+                        },
+                        ProductType = obj.ProductType
                     }
                 }, _user.AccessToken);
                 Asset image = null;
@@ -286,7 +288,8 @@ namespace Marketplace.Common.Commands
                 Url = asset?.Url,
                 Type = asset?.Type ?? AssetType.Image,
                 Tags = asset?.Tags?.JoinString(","),
-                FileName = asset?.FileName
+                FileName = asset?.FileName,
+                ProductType = product.xp.ProductType
             };
         }
 
@@ -339,7 +342,8 @@ namespace Marketplace.Common.Commands
                         {
                             Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
-                        }
+                        },
+                        ProductType = obj.ProductType
                     }
                 }, _user.AccessToken);
                 Asset image = null;

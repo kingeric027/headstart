@@ -1,0 +1,63 @@
+.chip .md {
+  display: inline-block;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: inherit;
+  vertical-align: bottom;
+}
+
+.md {
+  line-height: inherit;
+  vertical-align: bottom;
+}
+
+.chip fa-icon {
+  height: 32px;
+  margin-left: 4px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.md-cancel-chips:before {
+  content: '\f293';
+  font-size: 19px;
+  margin-right: 3px;
+  color: #a5a5a5;
+  -webkit-transition: all 150ms ease-in-out;
+  -moz-transition: all 150ms ease-in-out;
+  -ms-transition: all 150ms ease-in-out;
+  -o-transition: all 150ms ease-in-out;
+  transition: all 150ms ease-in-out;
+}
+
+.chip {
+  height: 27px;
+  background: #e0e0e0;
+  display: inline-block;
+  line-height: 26px;
+  padding: 0 10px 0 12px;
+  margin: 5px;
+  font-size: 14px;
+  border-radius: 16px;
+  color: #555;
+  font-weight: 500;
+  -webkit-transition: all 150ms ease-in-out;
+  -moz-transition: all 150ms ease-in-out;
+  -ms-transition: all 150ms ease-in-out;
+  -o-transition: all 150ms ease-in-out;
+  transition: all 100ms ease-in-out;
+  cursor: default;
+}
+
+.chip:hover {
+  background: #767577;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.19);
+}
+
+.chip:hover > .md:before {
+  color: #fff;
+}

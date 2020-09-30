@@ -11,6 +11,7 @@ import {
   NgbModalModule,
   NgbDatepickerModule,
   NgbTooltipModule,
+  NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -73,6 +74,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     NgbModalModule,
     NgbDatepickerModule,
     NgbTooltipModule,
+    NgbProgressbarModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -91,6 +93,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
+    NgbProgressbarModule,
 
     // OrderCloud CMS Components
     CmsAdminModule,
