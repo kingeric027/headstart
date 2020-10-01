@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import { SpecOption, Spec, ListPage } from 'ordercloud-javascript-sdk';
+import { SpecOption, Spec } from 'ordercloud-javascript-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { ShopperContextService } from 'marketplace';
 
@@ -24,20 +24,22 @@ import { ShopperContextService } from 'marketplace';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm {
-  _specs: Spec[];
+export class OCMSpecForm implements OnChanges {
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
   config: FieldConfig[] = [];
   form: FormGroup;
 
   @Input() currency: string;
   @Input() compact?: boolean = false; // displays inputs in a compact way by setting them on a single line
-  @Input() set specs(value: Spec[]) {
-    this._specs = value;
-    this.init();
-  }
+  @Input() specs: Spec[]
 
   constructor(private fb: FormBuilder, private context: ShopperContextService) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.specs) {
+      this.init();
+    }
+  }
 
   init(): void {
     this.config = this.createFieldConfig();
@@ -64,8 +66,8 @@ export class OCMSpecForm {
 
   createFieldConfig(): FieldConfig[] {
     const c: FieldConfig[] = [];
-    if (!this._specs) return c;
-    for (const spec of this._specs) {
+    if (!this.specs) return c;
+    for (const spec of this.specs) {
       if (spec?.xp?.control === 'checkbox') {
         c.push(this.createCheckboxField(spec));
       } else if (spec?.xp?.control === 'range') {
