@@ -48,6 +48,13 @@ $theme-colors: (
 $body-color:                  $gray-800;
 $btn-padding-x:               1.25rem;
 
+// .img-thumbnail
+$thumbnail-border-color:      $light;
+$thumbnail-border-width:      .5px;
+$thumbnail-box-shadow:        0 .125rem .25rem rgba($black, .075); // this is $box-shadow-sm
+$thumbnail-border-radius:     unset;
+$thumbnail-padding:           unset;
+
 // Typography
 
 @import '_typography.scss';
