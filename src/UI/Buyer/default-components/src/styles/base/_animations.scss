@@ -37,30 +37,91 @@
 
 // Ripple Effect
 .ripple {
-    position: relative;
-    overflow: hidden;
-    transform: translate3d(0, 0, 0);
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.ripple:after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgb(73, 73, 73) 10%, transparent 5.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.5s, opacity 1s;
+}
+
+.ripple:active:after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+
+// just apply .fancy-underline to the element and, presto!
+.fancy-underline {
+  border: none;
+  border-radius: 0;
+  position: relative;
+  text-decoration: none;
+}
+
+.fancy-underline:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  bottom: 0px;
+  background-color: currentColor;
+  visibility: hidden;
+  -webkit-transform: scaleX(0);
+  transform: scaleX(0);
+  -webkit-transition: all 0.3s ease-in-out 0s;
+  transition: all 0.3s ease-in-out 0s;
+}
+
+.fancy-underline:hover:before,
+.fancy-underline:focus:before {
+  visibility: visible;
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+}
+
+/* Wobble */
+
+.wobble {
+  display: inline-block;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  box-shadow: 0 0 1px transparent;
+}
+.wobble:hover {
+  animation-name: wobble;
+  animation-duration: .5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+}
+
+@keyframes wobble {
+  15% {
+    transform: translateX(2px);
   }
-  
-  .ripple:after {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    background-image: radial-gradient(circle, rgb(73, 73, 73) 10%, transparent 5.01%);
-    background-repeat: no-repeat;
-    background-position: 50%;
-    transform: scale(10, 10);
-    opacity: 0;
-    transition: transform 0.5s, opacity 1s;
+  30% {
+    transform: translateX(-2px);
   }
-  
-  .ripple:active:after {
-    transform: scale(0, 0);
-    opacity: 0.3;
-    transition: 0s;
+  60% {
+    transform: translateX(1px);
   }
+  100% {
+    transform: translateX(0);
+  }
+}
