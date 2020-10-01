@@ -1,39 +1,37 @@
-<div class="mb-3 bg-quaternary">
   <div class="container py-3">
-    <h1 class="display-4 m-0 headline-text text-center"
+    <h1 class="mb-0"
         translate>
       CART.CART.SHOPPING_CART
     </h1>
   </div>
-</div>
-<div class="container">
-  <div class="my-3 d-flex justify-content-between">
-    <button class="btn btn-outline-dark"
-            (click)="toProductList()"
-            translate>CART.CART.CONTINUE_SHOPPING</button>
-    <button class="btn btn-outline-danger"
-            *ngIf="_order?.LineItemCount"
-            (click)="emptyCart()"
-            translate>CART.CART.EMPTY_CART</button>
-  </div>
-  <div class="card bg-light p-3 flex-row justify-content-center"
-       *ngIf="!_order?.LineItemCount">
-    <p class="mb-0"
-       translate>CART.CART.CART_IS_EMPTY</p>
-  </div>
-  <div class="row flex-lg-row-reverse"
-       *ngIf="_order?.LineItemCount">
-    <div class="col-lg-4">
-      <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
-      <button class="btn btn-primary btn-block mb-4 font-weight-bold"
-              (click)="toCheckout()"
-              translate>CART.CART.CHECKOUT</button>
+  <div class="container">
+    <div class="my-3 d-flex justify-content-between">
+      <button class="btn btn-sm btn-outline-purple"
+              (click)="toProductList()"
+              translate>CART.CART.CONTINUE_SHOPPING</button>
+      <button class="btn btn-sm btn-outline-danger"
+              *ngIf="_order?.LineItemCount"
+              (click)="emptyCart()"
+              translate>CART.CART.EMPTY_CART</button>
     </div>
-    <div class="col-lg-8"
-         *ngIf="_lineItems?.Items">
-      <ocm-lineitem-table [lineItems]="_lineItems.Items"
-                          [readOnly]="false">
-      </ocm-lineitem-table>
+    <div class="card bg-light p-3 flex-row justify-content-center"
+         *ngIf="!_order?.LineItemCount">
+      <p class="mb-0"
+         translate>CART.CART.CART_IS_EMPTY</p>
+    </div>
+    <div class="row flex-lg-row-reverse"
+         *ngIf="_order?.LineItemCount">
+      <div class="col-lg-4">
+        <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
+        <button class="btn btn-lg btn-primary btn-block my-4 font-weight-bold"
+                (click)="toCheckout()"
+                translate>CART.CART.CHECKOUT</button>
+      </div>
+      <div class="col-lg-8"
+           *ngIf="_lineItems?.Items">
+        <ocm-lineitem-table [lineItems]="_lineItems.Items"
+                            [readOnly]="false">
+        </ocm-lineitem-table>
+      </div>
     </div>
   </div>
-</div>

@@ -1,94 +1,100 @@
 <div *ngIf="liGroupedByShipFrom?.length > 0">
-  <div class="card border shadow-sm mb-4"
+  <div class="card shadow mb-4"
        *ngFor="let liGroup of liGroupedByShipFrom; index as i">
     <div class="card-header p-3">
       <div class="row"
            *ngIf="suppliers?.length > 0 && suppliers[i]?.shipFrom && suppliers[i]?.supplier">
-        <div class="col">
-          <h5 class="card-title mb-0">
-            {{ suppliers[i].supplier.Name }}
-          </h5>
+        <div class="col-md">
+          <h2 class="card-title h6 mb-0">
+            <span class="text-muted font-weight-light">Supplier: </span>{{ suppliers[i].supplier.Name }}
+          </h2>
         </div>
-        <div class="d-flex flex-column justify-content-end pr-3">
-          <small class="text-muted">{{ suppliers[i].shipFrom.Street1 }} {{ suppliers[i].shipFrom.Street2 }} | {{ suppliers[i].shipFrom.City }},
+        <div class="col-md d-flex flex-column justify-content-end text-md-right">
+          <address class="small text-muted mb-0">{{ suppliers[i].shipFrom.Street1 }} {{ suppliers[i].shipFrom.Street2 }} | {{ suppliers[i].shipFrom.City }},
             {{ suppliers[i].shipFrom.State }},
             {{ suppliers[i].shipFrom.Zip }}
-          </small>
-          <small class="text-muted"
-                 *ngIf="suppliers[i].supplier?.xp?.Contacts">
+          </address>
+          <address class="small text-muted mb-0"
+                   *ngIf="suppliers[i].supplier?.xp?.Contacts">
             {{ suppliers[i].supplier.xp.Contacts[0].Phone | phoneFormat }} |
             {{ suppliers[i].supplier.xp.Contacts[0].Email }}
-          </small>
+          </address>
         </div>
       </div>
       <ng-content></ng-content>
     </div>
-    <div class="px-3 pt-2 d-none d-sm-block border-bottom"
-         *ngIf="orderType !== 'Quote'">
-      <div class="row">
-        <div class="col-sm-6"></div>
-        <div class="col-sm-6">
-          <div class="row">
-            <div *ngIf="!hasReturnInfo()"
-                 class="col-2 text-center"></div>
-            <div *ngIf="!hasCancelInfo()"
-                 class="col-2 text-center"></div>
-            <div class="col-3 text-center">
-              <h4 translate>CART.LINEITEM_TABLE.PRICE</h4>
-            </div>
-            <div class="col-2 text-center">
-              <h4 translate>CART.LINEITEM_TABLE.QTY</h4>
-            </div>
-            <div *ngIf="hasReturnInfo()"
-                 class="col-2 text-center">
-              <h4 translate>CART.LINEITEM_TABLE.QTY_RETURNED</h4>
-            </div>
-            <div *ngIf="hasCancelInfo()"
-                 class="col-2 text-center">
-              <h4 translate>CART.LINEITEM_TABLE.QTY_CANCELED</h4>
-            </div>
-            <div class="col-3 text-center">
-              <h4 translate>CART.LINEITEM_TABLE.TOTAL</h4>
+    <div class="card-body pt-sm-2">
+      <!-- Line Item Labels: Start -->
+      <div class="d-none d-sm-block border-bottom border-light pb-2"
+           *ngIf="orderType !== 'Quote'">
+        <div class="row">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <div class="row">
+              <div *ngIf="!hasReturnInfo()"
+                   class="col-2 text-center text-medium"></div>
+              <div *ngIf="!hasCancelInfo()"
+                   class="col-2 text-center text-medium"></div>
+              <div class="col-3 text-center text-medium">
+                <small translate>CART.LINEITEM_TABLE.PRICE</small>
+              </div>
+              <div class="col-2 text-center text-medium">
+                <small translate>CART.LINEITEM_TABLE.QTY</small>
+              </div>
+              <div *ngIf="hasReturnInfo()"
+                   class="col-2 text-center text-medium">
+                <small translate>CART.LINEITEM_TABLE.QTY_RETURNED</small>
+              </div>
+              <div *ngIf="hasCancelInfo()"
+                   class="col-2 text-right text-medium">
+                <small translate>CART.LINEITEM_TABLE.QTY_CANCELED</small>
+              </div>
+              <div class="col-3 text-right text-medium">
+                <small translate>CART.LINEITEM_TABLE.TOTAL</small>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="flex-none">
-      <div *ngFor="let li of liGroup; let i = index">
-        <div class="m-2 row align-items-center">
+      <!-- Line Item Labels: End -->
+      <!-- line item: Start -->
+      <div *ngFor="let li of liGroup; let i = index"
+           class="position-relative border-bottom border-light">
+        <div class="row no-gutters align-items-center my-3">
           <div class="col-sm-6"
                *ngIf="li">
-            <div class="row align-items-sm-center">
-              <div class="col-3 p-0">
-                <img class="img-thumbnail"
-                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
-                     alt="{{ li.Product.ID }}" />
+            <div class="row align-items-sm-center no-gutters">
+              <div class="col-md-3 col-sm-6 pr-md-3">
+                <a class="d-block"
+                   (click)="toProductDetails(li.Product.ID)">
+                  <img class="img-thumbnail w-100"
+                       [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
+                       alt="{{ li.Product.ID }}" />
+                </a>
               </div>
-              <div class="col-9">
-                <h4>
-                  <a (click)="toProductDetails(li.Product.ID)"
-                     class="text-primary link">{{
+              <div class="col-md-9 col-sm-6">
+                <a (click)="toProductDetails(li.Product.ID)"
+                   class="text-dark font-weight-medium line-height-1">{{
                     li | productNameWithSpecs
                   }}</a>
-                  <small class="text-muted d-block">{{ li.Product.ID }}</small>
-                  <small *ngIf="li.xp?.LineItemReturnInfo?.ReturnReason"
-                         class="text-dark d-block"
-                         translate>
-                    CART.LINEITEM_TABLE.RETURNED
-                    <span class="text-muted"
-                          translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
-                  </small>
-                  <small *ngIf="li.xp?.LineItemReturnInfo?.Comment">
-                    <span translate>CART.LINEITEM_TABLE.SELLER_COMMENT</span>:
-                    <span class="text-muted">{{li.xp?.LineItemReturnInfo?.Comment}}</span>
-                  </small>
-                  <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
-                        class="
+                <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                <small *ngIf="li.xp?.LineItemReturnInfo?.ReturnReason"
+                       class="text-dark d-block"
+                       translate>
+                  CART.LINEITEM_TABLE.RETURNED
+                  <span class="text-muted"
+                        translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
+                </small>
+                <small *ngIf="li.xp?.LineItemReturnInfo?.Comment">
+                  <span translate>CART.LINEITEM_TABLE.SELLER_COMMENT</span>:
+                  <span class="text-muted">{{li.xp?.LineItemReturnInfo?.Comment}}</span>
+                </small>
+                <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
+                      class="
                         badge
                         badge-pill
                         badge-primary">Purchase Order</span>
-                </h4>
+
                 <div *ngIf="readOnly && !hideStatus"><span translate>ORDERS.DETAIL.STATUS</span>:
                   <span *ngFor="let entry of li.xp.StatusByQuantity | keyvalue">
                     <span *ngIf="entry.value">
@@ -102,10 +108,6 @@
                     </span>
                   </span>
                 </div>
-                <a class="text-danger btn btn-link px-0 link"
-                   *ngIf="!readOnly"
-                   (click)="removeLineItem(li.ID)"
-                   translate>CART.LINEITEM_TABLE.REMOVE_ITEM</a>
               </div>
             </div>
           </div>
@@ -119,13 +121,13 @@
               <div class="
                  col-3
                  text-center">
-                <span class="d-block d-sm-none"
-                      translate>CART.LINEITEM_TABLE.UNIT_PRICE</span>
+                <small class="d-block d-sm-none"
+                       translate>CART.LINEITEM_TABLE.UNIT_PRICE</small>
                 <span class="text-nowrap">{{ li.UnitPrice | currency: _orderCurrency }}</span>
               </div>
               <div class="col-2 text-center">
-                <span class="d-block d-sm-none"
-                      translate>CART.LINEITEM_TABLE.QTY</span>
+                <small class="d-block d-sm-none"
+                       translate>CART.LINEITEM_TABLE.QTY</small>
                 <ocm-quantity-input *ngIf="!readOnly"
                                     [existingQty]="li.Quantity"
                                     [product]="li.Product"
@@ -137,36 +139,50 @@
               </div>
               <div *ngIf="hasReturnInfo()"
                    class="col-2 text-center">
-                <span class="d-block d-sm-none"
-                      translate>CART.LINEITEM_TABLE.QTY_RETURNED</span>
+                <small class="d-block d-sm-none"
+                       translate>CART.LINEITEM_TABLE.QTY_RETURNED</small>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ (li.xp?.LineItemReturnInfo?.QuantityToReturn | number) || 0 }}</span>
               </div>
               <div *ngIf="hasCancelInfo()"
                    class="col-2 text-center">
-                <span class="d-block d-sm-none"
-                      translate>CART.LINEITEM_TABLE.QTY_CANCELED</span>
+                <small class="d-block d-sm-none"
+                       translate>CART.LINEITEM_TABLE.QTY_CANCELED</small>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ (li.xp?.LineItemCancelInfo?.QuantityToCancel | number) || 0 }}</span>
               </div>
               <div class="col-3 text-right">
-                <span class="d-block d-sm-none"
-                      translate>CART.LINEITEM_TABLE.TOTAL</span>
+                <ngx-spinner *ngIf="isQtyChanging(li.ID)"
+                             bdColor="null"
+                             size="small"
+                             color="var(--purple)"
+                             type="ball-scale-ripple-multiple"
+                             [fullScreen]="false">
+                  <small class="sr-only">Calculating New Total</small>
+                </ngx-spinner>
+                <small class="d-block d-sm-none"
+                       translate>CART.LINEITEM_TABLE.TOTAL</small>
                 <span *ngIf="!isQtyChanging(li.ID)"
                       class="text-nowrap">{{ li.LineTotal | currency: _orderCurrency }}</span>
                 <span *ngIf="isQtyChanging(li.ID)"
                       class="text-nowrap">
-                  <mat-spinner *ngIf="isQtyChanging(li.ID)"
-                               diameter="20"
-                               class="spinner"></mat-spinner>
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <!-- hr only visible on mobile to more clearly distinguish between line items -->
-        <hr class="pb-4 d-block d-sm-none" />
+        <button class="btn btn-sm btn-remove wobble"
+                type="button"
+                *ngIf="!readOnly"
+                (click)="removeLineItem(li.ID)"
+                translate>
+          CART.LINEITEM_TABLE.REMOVE_ITEM
+          <fa-icon class="fa-xs"
+                   aria-hidden="true"
+                   [icon]="faTrashAlt"></fa-icon>
+        </button>
       </div>
+      <!-- line item: End -->
     </div>
   </div>
 </div>
