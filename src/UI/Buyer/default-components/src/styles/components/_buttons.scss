@@ -1,18 +1,30 @@
 // Icon Buttons
 
 .icon-button {
-    padding: 0.75rem;
-    border-radius: 180px;
-    transition: background-color 0.25s;
-    &:hover {
-      background-color: rgba($gray-900, 0.1);
-      cursor: pointer;
-    }
-    .icon-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-    }
+  padding: 0.75rem;
+  border-radius: 180px;
+  transition: background-color 0.25s;
+  &:hover {
+    background-color: rgba($gray-900, 0.1);
+    cursor: pointer;
   }
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.btn-remove {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0;
+  color: $danger;
+  font-size: .65rem;
+  &:hover {
+    color: darken($danger, 10%);
+  }
+}
