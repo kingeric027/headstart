@@ -54,6 +54,19 @@ class UserDetailsPage {
 		return email
 	}
 
+	async createVendorUser(email: string, firstName: string, lastName: string) {
+		await t.click(this.activeToggle)
+		await t.typeText(this.usernameField, email)
+		await t.typeText(this.emailField, email)
+		await t.typeText(this.firstNameField, firstName)
+		await t.typeText(this.lastNameField, lastName)
+		await this.addUserPermissions()
+
+		await t.click(this.createButton)
+
+		await loadingHelper.thisWait()
+	}
+
 	async createDefaultBrandUser() {
 		const firstName = faker.name.firstName()
 		const lastName = faker.name.lastName()
@@ -122,7 +135,7 @@ class UserDetailsPage {
 		await t.click(selectedLocation)
 	}
 
-	async enableUserPermissions() {
+	async updateUserPermissions() {
 		const permissionToggles = this.userGroupAssignments
 			.find('input')
 			.withAttribute('type', 'checkbox')
@@ -137,6 +150,18 @@ class UserDetailsPage {
 		await t.click(this.confirmButton)
 
 		await loadingHelper.waitForLoadingBar()
+	}
+
+	async addUserPermissions() {
+		const permissionToggles = this.userGroupAssignments
+			.find('input')
+			.withAttribute('type', 'checkbox')
+
+		await t.expect(await permissionToggles.count).gt(0)
+
+		for (let i = 0; i < (await permissionToggles.count); i++) {
+			await t.click(permissionToggles.nth(i).parent())
+		}
 	}
 }
 

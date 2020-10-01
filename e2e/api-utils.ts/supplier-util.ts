@@ -14,6 +14,19 @@ export async function getSupplierID(supplierName: string, clientAuth: string) {
 	if (supplier.Name.includes('AutomationVendor_')) return supplier.ID
 }
 
+export async function setupGetSupplierID(
+	supplierName: string,
+	clientAuth: string
+) {
+	const searchResponse = await OrderCloudSDK.Suppliers.List(
+		{ search: supplierName, searchOn: 'Name' },
+		{ accessToken: clientAuth }
+	)
+
+	const supplier = searchResponse.Items.find(x => x.Name === supplierName)
+	return supplier.ID
+}
+
 export async function getSupplier(supplierName: string, clientAuth: string) {
 	const searchResponse = await OrderCloudSDK.Suppliers.List(
 		{ search: supplierName, searchOn: 'Name' },

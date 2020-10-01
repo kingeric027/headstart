@@ -2,7 +2,7 @@ import * as OrderCloudSDK from 'ordercloud-javascript-sdk'
 import { ClientFunction } from 'testcafe'
 import loginPage from '../pages/login-page'
 import testConfig from '../testConfig'
-import headerPage from '../pages/header-page'
+import buyerHeaderPage from '../pages/buyer/buyer-header-page'
 import {
 	adminClientSetup,
 	loginTestSetup,
@@ -34,7 +34,7 @@ test
 	const testUser: OrderCloudSDK.User = t.ctx.testUser
 	await loginPage.login(testUser.Username, testUser.Password)
 	await t.expect(getLocation()).contains('home')
-	await headerPage.logout()
+	await buyerHeaderPage.logout()
 	await t.expect(getLocation()).contains('login')
 	await t.expect(loginPage.submitButton.exists).ok()
 })
