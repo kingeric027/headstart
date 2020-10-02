@@ -289,9 +289,13 @@ namespace Marketplace.Common.Services
                 MarketplaceSupplier supplierInfo = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplier);
                 // the list of emails to notify lives on Supplier.xp.NotificationRcpts as List<string>
                 var tos = new List<EmailAddress>();
-                foreach (var rcpt in supplierInfo.xp.NotificationRcpts) {
-                    tos.Add(new EmailAddress(rcpt));
-                };
+                if(supplierInfo?.xp?.NotificationRcpts.Count() >0 )
+                {
+                    foreach (var rcpt in supplierInfo.xp.NotificationRcpts)
+                    {
+                        tos.Add(new EmailAddress(rcpt));
+                    };
+                }
                 if (tos.Any() && orderWorksheet.Order.xp.OrderType == OrderType.Quote)
                 {
                     var quoteOrderData = new { supplierInfo.xp.SupportContact.Name };
