@@ -119,4 +119,8 @@ export class ProductFilters implements OnInit{
     console.log('change detected?', changeDetected);
     return changeDetected;
   }
+
+  saveFilterOverrides(): Promise<any> {
+    
+  }
 }
