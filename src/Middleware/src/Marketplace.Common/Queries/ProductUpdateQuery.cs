@@ -4,6 +4,7 @@ using Marketplace.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.SystemFunctions;
 using ordercloud.integrations.library;
 using Remotion.Linq.Clauses;
 using System;
@@ -22,7 +23,8 @@ namespace Marketplace.Common.Queries
         Task<List<T>> ListByDate(DateTime date);
         Task<T> Post(T update);
         Task<T> Put(T update);
-        Task<T> GetVersionByDate(string resourceID, DateTime date)
+        Task<T> GetVersionByDate(string resourceID, DateTime date);
+        Task DeleteMany(List<string> cosmosIDs);
     }
 
     public class ResourceHistoryQuery<T> : IResourceHistoryQuery<T> where T : class, IResourceHistory
@@ -44,6 +46,11 @@ namespace Marketplace.Common.Queries
         {
             var time = DateTime.Now;
             update.DateLastUpdated = new DateTime(time.Year, time.Month, time.Day, 0, 0, 0);
+            var previousResource = (await List(update.ResourceID)).Where(record => record.ResourceID == update.ResourceID);
+            if(previousResource.Count()>0)
+            {
+                await DeleteMany(previousResource.Select(r => r.id).ToList());
+            }
             var newProductUpdate = await _productStore.AddAsync(update);
             return newProductUpdate;
         }
@@ -86,6 +93,14 @@ namespace Marketplace.Common.Queries
         public async Task Delete(string cosmosID)
         {
             await _productStore.RemoveAsync(resource => resource.id == cosmosID);
+        }
+
+        public async Task DeleteMany(List<string> cosmosIDs)
+        {
+            await Throttler.RunAsync(cosmosIDs, 100, 5, async id =>
+            {
+                await _productStore.RemoveAsync(resource => resource.id == id);
+            });
         }
     }
 }

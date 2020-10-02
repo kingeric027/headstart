@@ -24,7 +24,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IProductUpdateCommand
     {
-        Task CleanUpProductHistoryData(List<ProductHistory> products);
+        //  Task CleanUpProductHistoryData(List<ProductHistory> products);
         Task SendAllProductUpdateEmails();
        //    Task SendProductUpdateEmail(string supplierID);
         ISheet SetHeaders(List<string> headers, ISheet worksheet);
@@ -197,13 +197,13 @@ namespace Marketplace.Common.Commands
         //    //  now we need to just send an email
         //}
 
-        public async Task CleanUpProductHistoryData(List<ProductHistory> products)
-        {
-            await Throttler.RunAsync(products, 100, 5, async product =>
-            {
-                await _productUpdate.DeleteProduct(product.id);
-            });
-        }
+        //public async Task CleanUpProductHistoryData(List<ProductHistory> products)
+        //{
+        //    await Throttler.RunAsync(products, 100, 5, async product =>
+        //    {
+        //        await _productUpdate.DeleteProduct(product.id);
+        //    });
+        //}
     }
 
 
