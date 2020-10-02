@@ -7,15 +7,15 @@ import bmTheme from '../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'The Barre Method',
-  clientID: '997F5753-4C11-4F5F-9B40-6AC843638BA2',
+  appname: 'The Bar Method',
+  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
-  ordercloudEnv: OrdercloudEnv.Production,
+  ordercloudEnv: OrdercloudEnv.Staging,
   theme: bmTheme,
 };
 /*
