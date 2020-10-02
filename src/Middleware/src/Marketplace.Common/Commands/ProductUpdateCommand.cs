@@ -81,7 +81,6 @@ namespace Marketplace.Common.Commands
                 };
                 userEmailList.Add(userEmail);
             }
-            //  var userEmails = usersToSend.Items.Select(user => user.Email);
             await _sendgridService.SendProductUpdateEmail(userEmailList, fileReference, fileName);
             
         }
