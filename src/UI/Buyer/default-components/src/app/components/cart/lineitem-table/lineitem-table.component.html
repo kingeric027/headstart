@@ -6,7 +6,7 @@
            *ngIf="suppliers?.length > 0 && suppliers[i]?.shipFrom && suppliers[i]?.supplier">
         <div class="col-md">
           <h2 class="card-title h6 mb-0">
-            <span class="text-muted font-weight-light">Supplier: </span>{{ suppliers[i].supplier.Name }}
+            <span class="text-medium font-weight-light">Ship From: </span>{{ suppliers[i].supplier.Name }}
           </h2>
         </div>
         <div class="col-md d-flex flex-column justify-content-end text-md-right">
@@ -155,7 +155,7 @@
                 <ngx-spinner *ngIf="isQtyChanging(li.ID)"
                              bdColor="null"
                              size="small"
-                             color="var(--purple)"
+                             color="var(--secondary)"
                              type="ball-scale-ripple-multiple"
                              [fullScreen]="false">
                   <small class="sr-only">Calculating New Total</small>
