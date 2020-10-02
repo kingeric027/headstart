@@ -38,14 +38,14 @@
       </div>
     </div>
   </div>
-  <ng-container *ngIf="!user?.xp?.OrderEmails">
+  <ng-container *ngIf="!(user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails || user?.xp?.ProductEmails)">
     <p>Notifications are turned off.</p>
   </ng-container>
-  <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails">
+  <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails || user?.xp?.ProductEmails">
     <li *ngIf="user?.xp?.OrderEmails">Order Updates</li>
     <li *ngIf="user?.xp?.RequestInfoEmails">Product Information Requests</li>
-    <h6 *ngIf="user?.xp?.AddtlRcpts?.length > 0"
-        class="font-weight-medium mt-3">Additional Recipients</h6>
+    <li *ngIf="user?.xp?.ProductEmails">Product Updates</li>
+    <h6 class="font-weight-medium mt-3">Additional Recipients</h6>
     <li *ngFor="let rcpt of user?.xp?.AddtlRcpts">{{rcpt}}</li>
   </ng-container>
 </div>

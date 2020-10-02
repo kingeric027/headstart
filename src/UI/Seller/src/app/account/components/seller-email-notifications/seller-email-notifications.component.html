@@ -34,7 +34,7 @@
              translate>Product Updates</label>
     </div>
   </form>
-  <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.ProductEmails"> 
+  <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.ProductEmails || user?.xp?.RequestInfoEmails">
     <hr />
     <label for="AdditionalEmails"
            class="h6 font-weight-medium">Additional Recipients</label>
