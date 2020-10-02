@@ -42,7 +42,7 @@ export class NotificationsComponent extends AccountContent {
   }
 
   toggleProductEmails(value: boolean): void {
-    if (value === false && !_get(this.user, 'xp.OrderEmails')) {
+    this.updateUserFromEvent({ target: { value: value } }, 'xp.ProductEmails')
       this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
     }
     this.updateUserFromEvent({target: {value: value}}, 'xp.ProductEmails')
