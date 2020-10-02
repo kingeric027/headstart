@@ -8,14 +8,14 @@ import bcfTheme from '../styles/themes/basecamp/theme-config';
 export const environment: Environment = {
   hostedApp: true,
   appname: 'Basecamp Fitness',
-  clientID: 'A2E62264-B6FB-4C25-8507-79A58A35BE85',
+  clientID: '0045BB67-84CC-42BD-9FA7-009875628F7C',
   marketplaceID: 'SEB',
   baseUrl: 'https://sebrandsmarketplace-basecamp-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
-  ordercloudEnv: OrdercloudEnv.Production,
+  ordercloudEnv: OrdercloudEnv.Staging,
   theme: bcfTheme,
 };
 /*

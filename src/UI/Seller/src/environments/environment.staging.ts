@@ -4,13 +4,13 @@
 // TODO: Change oc integration middleware url to staging URL when one exists
 export const environment = {
   hostedApp: true,
-  clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  clientID: 'C1D92C43-C7AF-467B-B3DF-D4751D70CAE6',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   appname: 'Marketplace Admin Staging',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
-  orderCloudApiUrl: 'https://api.ordercloud.io',
+  orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
   orderCloudApiVersion: 'v1',
   buyerUrl: 'https://marketplace-buyer-ui-staging.azurewebsites.net/',
   buyerClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',

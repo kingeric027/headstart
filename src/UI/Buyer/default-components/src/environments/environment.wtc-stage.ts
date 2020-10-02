@@ -7,15 +7,15 @@ import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Wax In The City',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  appname: 'Waxing The City',
+  clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB',
   baseUrl: 'https://sebrandsmarketplace-wax-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
-  ordercloudEnv: OrdercloudEnv.Production,
+  ordercloudEnv: OrdercloudEnv.Staging,
   theme: wtcTheme,
 };
 /*
