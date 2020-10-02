@@ -15,19 +15,20 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Common.Queries
 {
-    public interface IProductHistoryQuery<T> where T : IProductHistory<T>
+    public interface IResourceHistoryQuery<T> where T : class
     {
         Task Delete(string cosmosID);
         Task<List<T>> List(string resourceID);
         Task<List<T>> ListByDate(DateTime date);
         Task<T> Post(T update);
         Task<T> Put(T update);
+        Task<T> GetVersionByDate(string resourceID, DateTime date)
     }
 
-    public class ProductHistoryQuery<T> : IProductHistoryQuery<T> where T : class, IProductHistory<T>
+    public class ResourceHistoryQuery<T> : IResourceHistoryQuery<T> where T : class, IResourceHistory
     {
         private readonly ICosmosStore<T> _productStore;
-        public ProductHistoryQuery(ICosmosStore<T> productStore)
+        public ResourceHistoryQuery(ICosmosStore<T> productStore)
         {
             _productStore = productStore;
         }
@@ -41,20 +42,21 @@ namespace Marketplace.Common.Queries
 
         public async Task<T> Post(T update)
         {
-            //var time = DateTime.Now;
-            //update.DateLastUpdated = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0);
+            var time = DateTime.Now;
+            update.DateLastUpdated = new DateTime(time.Year, time.Month, time.Day, 0, 0, 0);
             var newProductUpdate = await _productStore.AddAsync(update);
             return newProductUpdate;
         }
 
         public async Task<T> Put(T update)
         {
-            //var time = DateTime.Now;
-            //update.DateLastUpdated = new DateTime(time.Year, time.Month, time.Day, time.Hour, 0, 0);
-            var productToUpdate = await _productStore.Query().FirstOrDefaultAsync(record => record.ResourceID == update.ResourceID && record.DateLastUpdated == update.DateLastUpdated);
+            var time = DateTime.Now;
+            update.DateLastUpdated = new DateTime(time.Year, time.Month, time.Day, 0, 0, 0);
+            var resourceToUpdate = (await List(update.ResourceID)).FirstOrDefault(record => record.ResourceID == update.ResourceID && record.DateLastUpdated == update.DateLastUpdated);
             try
             {
-                update.id = productToUpdate.id;
+                update.id = resourceToUpdate.id;
+                update.Action = resourceToUpdate.Action;
                 return await _productStore.UpdateAsync(update);
             }
             catch
@@ -71,6 +73,14 @@ namespace Marketplace.Common.Queries
             var resource = await _productStore.Query()
                 .Where(resource => resource.DateLastUpdated >= start && resource.DateLastUpdated < end).ToListAsync();
             return resource;
+        }
+
+        public async Task<T> GetVersionByDate(string resourceID, DateTime date)
+        {
+            var updates = (await List(resourceID))?.Where(p => p.DateLastUpdated < date);
+            var maxDate = updates?.Max(prop => prop.DateLastUpdated);
+            return updates.Where(p => p.DateLastUpdated == maxDate).FirstOrDefault();
+
         }
 
         public async Task Delete(string cosmosID)

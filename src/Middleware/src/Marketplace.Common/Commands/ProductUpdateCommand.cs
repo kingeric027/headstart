@@ -4,6 +4,7 @@ using Marketplace.Common.Services;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.OpenXmlFormats;
 using NPOI.SS.UserModel;
@@ -32,17 +33,23 @@ namespace Marketplace.Common.Commands
 
     public class ProductUpdateCommand : IProductUpdateCommand
     {
-        private readonly ProductHistoryQuery _productUpdate;
+        private readonly ResourceHistoryQuery<ProductHistory> _productQuery;
+        private readonly ResourceHistoryQuery<PriceScheduleHistory> _priceScheduleQuery;
         private readonly IOrderCloudClient _oc;
         private readonly BlobService _blob;
         private readonly CloudBlobContainer _container;
         private readonly ISendgridService _sendgridService;
-        public ProductUpdateCommand(IOrderCloudClient oc, ProductHistoryQuery productUpdate, BlobService blob, ISendgridService sendGrid)
+        public ProductUpdateCommand(
+            IOrderCloudClient oc,
+            ResourceHistoryQuery<ProductHistory> productQuery,
+            ResourceHistoryQuery<PriceScheduleHistory> priceScheduleQuery,
+            BlobService blob, 
+            ISendgridService sendGrid)
         {
-            _productUpdate = productUpdate;
+            _productQuery = productQuery;
             _oc = oc;
             _blob = blob;
-            _container = _blob.BlobClient.GetContainerReference("productupdate");
+            _container = _blob.BlobClient.GetContainerReference("productupdates");
             _sendgridService = sendGrid;
     }
 
@@ -113,58 +120,72 @@ namespace Marketplace.Common.Commands
         public async Task<List<ProductUpdateData>> BuildProductUpdateData()
         {
             var yesterday = DateTime.Now.AddDays(-1);
-            var yesterDaysUpdates = await _productUpdate.ListProductsByDate(new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0));
+            var startOfYesterday = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0);
+            var yesterdaysProductUpdates = await _productQuery.ListByDate(startOfYesterday);
+            var yesterdaysPriceScheduleUpdates = await _priceScheduleQuery.ListByDate(startOfYesterday);
+
+            var filterString = String.Join("|", yesterdaysPriceScheduleUpdates.Select(p => p.ResourceID));
+            var defaultPriceScheduleProducts = await _oc.Products.ListAsync(filters: $"DefaultPriceScheduleID={filterString}");
+
+            var updatedProducts = yesterdaysProductUpdates.Select(p => p.Resource).Concat(defaultPriceScheduleProducts.Items.Where(p => !yesterdaysProductUpdates.Select(p => p.ResourceID).Contains(p.ID)));
             var dataToSend = new List<ProductUpdateData>();
-            var dataToDelete = new List<ProductHistory>();
-            foreach (var update in yesterDaysUpdates)
+            foreach (var product in updatedProducts)
             {
-                var productUpdates = (await _productUpdate.ListProducts(update.ProductID));
-                var previousUpdates = productUpdates.Where(p => p.id != update.id).ToList();
-                ProductHistory mostRecentUpdate = null;
-                if (previousUpdates.Count != 0)
+                var productUpdateRecord = yesterdaysProductUpdates.Find(p => p.ResourceID == product.ID);
+                var updatedProduct = productUpdateRecord?.Resource;
+                var priceScheduleUpdateRecord = yesterdaysPriceScheduleUpdates.Find(p => p.ResourceID == product.DefaultPriceScheduleID);
+                var updatedPriceSchedule = priceScheduleUpdateRecord?.Resource;
+
+                var oldProduct = (await _productQuery.GetVersionByDate(updatedProduct.ID, startOfYesterday))?.Resource;
+                var oldPriceSchedule = (await _priceScheduleQuery.GetVersionByDate(updatedPriceSchedule.ID, startOfYesterday))?.Resource;
+
+                var updateData = new ProductUpdateData()
                 {
-                    dataToDelete = (List<ProductHistory>)dataToDelete.Concat(previousUpdates);
-                    var mostRecentUpdateDate = previousUpdates.Max(p => p.DateLastUpdated);
-                    mostRecentUpdate = previousUpdates.Where(p => p.DateLastUpdated == mostRecentUpdateDate).FirstOrDefault();
-                }
-                var productUpdate = new ProductUpdateData()
-                {
-                    TimeOfUpdate = update.DateLastUpdated,
-                    ProductID = update.ProductID,
-                    Action = update.Action
+                    Supplier = product.OwnerID,
+                    ProductID = product.ID,
+                    ProductAction = productUpdateRecord?.Action,
+                    DefaultPriceScheduleID = updatedPriceSchedule?.ID,
+                    DefaultPriceScheduleAction = priceScheduleUpdateRecord?.Action,
+
                 };
-                if (mostRecentUpdate == null || mostRecentUpdate.Product == null)
+
+                if (updatedProduct?.xp?.ProductType != oldProduct?.xp?.ProductType)
                 {
-                    productUpdate.OldProductType = null;
-                    productUpdate.OldActiveStatus = null;
-                    productUpdate.OldUnitMeasure = null;
+                    updateData.NewProductType = updatedProduct?.xp?.ProductType.ToString();
+                    updateData.NewProductType = updatedProduct?.xp?.ProductType.ToString();
                 }
-                else
+                if (updatedProduct?.xp?.UnitOfMeasure?.Qty != oldProduct?.xp?.UnitOfMeasure?.Qty)
                 {
-                    if (update.Product?.xp?.ProductType != mostRecentUpdate.Product?.xp?.ProductType)
-                    {
-                        productUpdate.OldProductType = mostRecentUpdate.Product.xp.ProductType;
-                        productUpdate.NewProductType = update.Product.xp.ProductType;
-                    }
-                    if (update.Product?.xp?.UnitOfMeasure?.Unit != mostRecentUpdate.Product?.xp?.UnitOfMeasure?.Unit)
-                    {
-                        productUpdate.OldUnitMeasure = mostRecentUpdate.Product.xp.UnitOfMeasure.Unit;
-                        productUpdate.NewUnitMeasure = update.Product.xp.UnitOfMeasure.Unit;
-                    }
-                    if (update.Product?.xp?.UnitOfMeasure?.Qty != mostRecentUpdate.Product?.xp?.UnitOfMeasure?.Qty)
-                    {
-                        productUpdate.OldUnitQty = mostRecentUpdate.Product.xp.UnitOfMeasure.Qty;
-                        productUpdate.NewUnitQty = update.Product.xp.UnitOfMeasure.Qty;
-                    }
-                    if (update.Product.Active != mostRecentUpdate.Product.Active)
-                    {
-                        productUpdate.OldActiveStatus = mostRecentUpdate.Product.Active;
-                        productUpdate.NewActiveStatus = update.Product.Active;
-                    }
+                    updateData.NewUnitQty = updatedProduct?.xp?.UnitOfMeasure?.Qty;
+                    updateData.OldUnitQty = oldProduct?.xp?.UnitOfMeasure?.Qty;
                 }
-                dataToSend.Add(productUpdate);
+                if (updatedProduct?.xp?.UnitOfMeasure?.Unit != oldProduct?.xp?.UnitOfMeasure?.Unit)
+                {
+                    updateData.NewUnitMeasure = updatedProduct?.xp?.UnitOfMeasure?.Unit;
+                    updateData.OldUnitMeasure = oldProduct?.xp?.UnitOfMeasure?.Unit;
+                }
+                if (updatedProduct?.Active != oldProduct?.Active)
+                {
+                    updateData.NewActiveStatus = updatedProduct?.Active;
+                    updateData.OldActiveStatus = oldProduct?.Active;
+                }
+                if (updatedPriceSchedule?.MaxQuantity != oldPriceSchedule?.MaxQuantity)
+                {
+                    updateData.NewMaxQty = updatedPriceSchedule?.MaxQuantity;
+                    updateData.OldMaxQty = oldPriceSchedule?.MaxQuantity;
+                }
+                if (updatedPriceSchedule?.MinQuantity != oldPriceSchedule?.MinQuantity)
+                {
+                    updateData.NewMaxQty = updatedPriceSchedule?.MinQuantity;
+                    updateData.OldMaxQty = oldPriceSchedule?.MinQuantity;
+                }
+                if (updatedPriceSchedule?.PriceBreaks != oldPriceSchedule?.PriceBreaks)
+                {
+                    updateData.NewPriceBreak = JsonConvert.SerializeObject(updatedPriceSchedule?.PriceBreaks);
+                    updateData.OldPriceBreak = JsonConvert.SerializeObject(oldPriceSchedule?.PriceBreaks);
+                }
+                dataToSend.Add(updateData);
             }
-            //  await CleanUpProductHistoryData(dataToDelete); //   delete old updates of products.
             return dataToSend;
         }
 

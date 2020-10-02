@@ -18,26 +18,36 @@ namespace Marketplace.Common.Models
         string ResourceID { get; set; }
     }
 
+    public interface IResourceHistory : ICosmosObject
+    {
+        ActionType Action { get; set; }
+        DateTime DateLastUpdated { get; set; }
+        [CosmosPartitionKey]
+        string ResourceID { get; set; }
+    }
+
     [SwaggerModel]
-    [CosmosCollection("productupdates")]
-    public class ProductHistory : CosmosObject, IProductHistory<Product>
+    [CosmosCollection("producthistory")]
+    public class ProductHistory : CosmosObject, IResourceHistory
     {
         [CosmosPartitionKey]
         public string ResourceID { get; set; }
         public ActionType Action { get; set; }
 
-        public Product Resource { get; set; }
+        public MarketplaceProduct Resource { get; set; }
         public DateTime DateLastUpdated { get; set; }
-
     }
 
-    public class PriceScheduleHistory : CosmosObject, IProductHistory<PriceSchedule>
+    [SwaggerModel]
+    [CosmosCollection("priceschedulehistory")]
+    public class PriceScheduleHistory : CosmosObject, IResourceHistory
     {
-        public ActionType Action { get; set; }
+        [CosmosPartitionKey]
         public string ResourceID { get; set; }
+        public ActionType Action { get; set; }
+
         public PriceSchedule Resource { get; set; }
         public DateTime DateLastUpdated { get; set; }
-
     }
 
     public class ProductAssignmentHistory : CosmosObject, IProductHistory<ProductAssignment>
@@ -51,10 +61,11 @@ namespace Marketplace.Common.Models
 
     public class ProductUpdateData
     {
+        //  Product Info
         public string Supplier { get; set; }
         public DateTime TimeOfUpdate { get; set; }
         public string ProductID { get; set; }
-        public ActionType Action { get; set; }
+        public Nullable<ActionType> ProductAction { get; set; }
         public string OldProductType { get; set; }
         public string OldUnitMeasure { get; set; }
         public Nullable<int> OldUnitQty { get; set; }
@@ -63,25 +74,23 @@ namespace Marketplace.Common.Models
         public string NewUnitMeasure { get; set; }
         public Nullable<int> NewUnitQty { get; set; }
         public bool? NewActiveStatus { get; set; }
-        public string PriceScheduleID { get; set; }
-        public string Buyer { get; set; }
-        public int OldMinQty { get; set; }
-        public int OldMaxQty { get; set; }
-        public List<PriceBreak> OldPriceBreak { get; set; }
-        public int NewMinQty { get; set; }
-        public int NewMaxQty { get; set; }
-        public List<PriceBreak> NewPriceBreak { get; set; }
+
+        //  Price Schedule info
+        public string DefaultPriceScheduleID { get; set; }
+        public Nullable<ActionType> DefaultPriceScheduleAction { get; set; }
+        public Nullable<int> OldMinQty { get; set; }
+        public Nullable<int> OldMaxQty { get; set; }
+        public string OldPriceBreak { get; set; }
+        public Nullable<int> NewMinQty { get; set; }
+        public Nullable<int> NewMaxQty { get; set; }
+        public string NewPriceBreak { get; set; }
 
     }
 
     public enum ActionType
     {
-        CreateProduct, 
-        CreatePriceSchedule, 
-        UpdateProduct, 
-        UpdatePriceSchedule, 
-        CreateProductPriceScheduleAssignments, 
-        UpdateProductPriceScheduleAssignments
+        Create,
+        Update
     }
 
 }

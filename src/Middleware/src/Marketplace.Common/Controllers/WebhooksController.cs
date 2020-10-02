@@ -23,7 +23,7 @@ namespace Marketplace.Common.Controllers
         private readonly ISendgridService _sendgridService;
         private readonly IOrderCommand _orderCommand;
         private readonly IOrderCloudClient _oc;
-        private readonly IProductHistoryQuery<ProductHistory> _producHistory;
+        private readonly IProductHistoryQuery<ProductHistory> _producQuery;
         private readonly IProductUpdateCommand _productUpdateCommand;
 
         public WebhooksController(AppSettings settings, ISendgridService sendgridService, IOrderCommand orderCommand, 

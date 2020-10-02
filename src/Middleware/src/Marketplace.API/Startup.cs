@@ -85,7 +85,6 @@ namespace Marketplace.API
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ProductHistoryQuery, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<PriceScheduleHistoryQuery, PriceScheduleHistory>(cosmosConfig)
-                .InjectCosmosStore<ProductAssignmentHistoryQuery, ProductAssignmentHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
