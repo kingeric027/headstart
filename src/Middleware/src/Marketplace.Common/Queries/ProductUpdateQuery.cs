@@ -1,4 +1,4 @@
-﻿using Cosmonaut;
+using Cosmonaut;
 using Cosmonaut.Extensions;
 using Marketplace.Common.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -84,9 +84,10 @@ namespace Marketplace.Common.Queries
 
         public async Task<T> GetVersionByDate(string resourceID, DateTime date)
         {
+            if (resourceID == null) return null;
             var updates = (await List(resourceID))?.Where(p => p.DateLastUpdated < date);
-            var maxDate = updates?.Max(prop => prop.DateLastUpdated);
-            return updates.Where(p => p.DateLastUpdated == maxDate).FirstOrDefault();
+            var maxDate = updates?.Max(prop => prop?.DateLastUpdated);
+            return updates.Where(p => p?.DateLastUpdated == maxDate)?.FirstOrDefault();
 
         }
 

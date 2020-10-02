@@ -78,7 +78,8 @@ namespace Marketplace.Orchestration
             logger.LogInformation("Starting function");
             try
             {
-                await _productUpdateCommand.SendAllProductUpdateEmails();   
+                await _productUpdateCommand.SendAllProductUpdateEmails();
+                await _productUpdateCommand.CleanUpProductHistoryData();
             }
             catch (Exception ex)
             {

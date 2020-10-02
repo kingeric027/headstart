@@ -24,9 +24,8 @@ namespace Marketplace.Common.Commands
 {
     public interface IProductUpdateCommand
     {
-        //  Task CleanUpProductHistoryData(List<ProductHistory> products);
+        Task CleanUpProductHistoryData();
         Task SendAllProductUpdateEmails();
-       //    Task SendProductUpdateEmail(string supplierID);
         ISheet SetHeaders(List<string> headers, ISheet worksheet);
         ISheet SetValues(IEnumerable<object> data, ISheet worksheet);
     }
@@ -47,6 +46,7 @@ namespace Marketplace.Common.Commands
             ISendgridService sendGrid)
         {
             _productQuery = productQuery;
+            _priceScheduleQuery = priceScheduleQuery;
             _oc = oc;
             _blob = blob;
             _container = _blob.BlobClient.GetContainerReference("productupdates");
@@ -136,16 +136,16 @@ namespace Marketplace.Common.Commands
                 var priceScheduleUpdateRecord = yesterdaysPriceScheduleUpdates.Find(p => p.ResourceID == product.DefaultPriceScheduleID);
                 var updatedPriceSchedule = priceScheduleUpdateRecord?.Resource;
 
-                var oldProduct = (await _productQuery.GetVersionByDate(updatedProduct.ID, startOfYesterday))?.Resource;
-                var oldPriceSchedule = (await _priceScheduleQuery.GetVersionByDate(updatedPriceSchedule.ID, startOfYesterday))?.Resource;
+                var oldProduct = (await _productQuery.GetVersionByDate(updatedProduct?.ID, startOfYesterday))?.Resource;
+                var oldPriceSchedule = (await _priceScheduleQuery.GetVersionByDate(updatedPriceSchedule?.ID, startOfYesterday))?.Resource;
 
                 var updateData = new ProductUpdateData()
                 {
                     Supplier = product.OwnerID,
                     ProductID = product.ID,
-                    ProductAction = productUpdateRecord?.Action,
+                    ProductAction = Enum.GetName(typeof(ActionType), productUpdateRecord?.Action),
                     DefaultPriceScheduleID = updatedPriceSchedule?.ID,
-                    DefaultPriceScheduleAction = priceScheduleUpdateRecord?.Action,
+                    DefaultPriceScheduleAction = Enum.GetName(typeof(ActionType), priceScheduleUpdateRecord?.Action),
 
                 };
 
@@ -181,29 +181,33 @@ namespace Marketplace.Common.Commands
                 }
                 if (updatedPriceSchedule?.PriceBreaks != oldPriceSchedule?.PriceBreaks)
                 {
-                    updateData.NewPriceBreak = JsonConvert.SerializeObject(updatedPriceSchedule?.PriceBreaks);
-                    updateData.OldPriceBreak = JsonConvert.SerializeObject(oldPriceSchedule?.PriceBreaks);
+                    var updatedBreaks = updatedPriceSchedule.PriceBreaks.Select(p => JsonConvert.SerializeObject(p)).ToList();
+                    var oldBreaks = oldPriceSchedule.PriceBreaks.Select(p => JsonConvert.SerializeObject(p)).ToList();
+                    updateData.NewPriceBreak = String.Join(",", updatedBreaks);
+                    updateData.OldPriceBreak = String.Join(",", oldBreaks);
                 }
                 dataToSend.Add(updateData);
             }
             return dataToSend;
         }
 
-        //public async Task SendProductUpdateEmail(string supplierID)
-        //{
-        //    var yesterday = DateTime.Now.AddDays(-1);
-        //    var yesterDaysUpdates = _productUpdate.ListProductsByDate(new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0));
-        //    var updatedProducts = await _productUpdate.ListProducts(supplierID, now);
-        //    //  now we need to just send an email
-        //}
-
-        //public async Task CleanUpProductHistoryData(List<ProductHistory> products)
-        //{
-        //    await Throttler.RunAsync(products, 100, 5, async product =>
-        //    {
-        //        await _productUpdate.DeleteProduct(product.id);
-        //    });
-        //}
+        public async Task CleanUpProductHistoryData()
+        {
+            var yesterday = DateTime.Now.AddDays(-1);
+            var startOfYesterday = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0);
+            var yesterdaysProductUpdates = await _productQuery.ListByDate(startOfYesterday);
+            var yesterdaysPriceScheduleUpdates = await _priceScheduleQuery.ListByDate(startOfYesterday);
+            foreach(var prod in yesterdaysProductUpdates)
+            {
+                var updates = (await _productQuery.List(prod.ResourceID)).Where(p => p.id != prod.id).Select(p => p.id);
+                await _productQuery.DeleteMany(updates.ToList());
+            }
+            foreach (var price in yesterdaysPriceScheduleUpdates)
+            {
+                var updates = (await _priceScheduleQuery.List(price.ResourceID)).Where(p => p.id != price.id).Select(p => p.id);
+                await _priceScheduleQuery.DeleteMany(updates.ToList());
+            }
+        }
     }
 
 

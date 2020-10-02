@@ -95,8 +95,6 @@ namespace Marketplace.Common.Controllers
                 Resource = payload.Response.Body,
             };
             await _productQuery.Post(update);
-            // to mp manager when a product is created
-            //await _sendgridService.SendSingleEmail("noreply@four51.com", "noreply@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
         }
 
         [HttpPost, Route("productupdated")]
@@ -112,11 +110,6 @@ namespace Marketplace.Common.Controllers
 
             };
             await _productQuery.Put(update);
-
-            // querying data and putting into excel spreadsheet
-            //await _productUpdateCommand.SendAllProductUpdateEmails();
-            // to mp manager when a product is updated
-            //await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
         }
 
         [HttpPost, Route("priceschedulecreated")]
@@ -130,8 +123,6 @@ namespace Marketplace.Common.Controllers
                 Resource = payload.Response.Body,
             };
             await _priceScheduleQuery.Post(update);
-            // to mp manager when a product is created
-            //await _sendgridService.SendSingleEmail("noreply@four51.com", "noreply@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
         }
 
         [HttpPost, Route("priceScheduleupdated")]
@@ -147,11 +138,6 @@ namespace Marketplace.Common.Controllers
 
             };
             await _priceScheduleQuery.Put(update);
-
-            // querying data and putting into excel spreadsheet
-            //  await _productUpdateCommand.SendAllProductUpdateEmails();
-            // to mp manager when a product is updated
-            //await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
         }
 
 

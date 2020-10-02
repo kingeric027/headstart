@@ -1,4 +1,4 @@
-﻿using Cosmonaut.Attributes;
+using Cosmonaut.Attributes;
 using Marketplace.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
@@ -9,14 +9,6 @@ using System.Text;
 
 namespace Marketplace.Common.Models
 {
-    public interface IProductHistory<T> : ICosmosObject
-    {
-        ActionType Action { get; set; }
-        DateTime DateLastUpdated { get; set; }
-        T Resource { get; set; }
-        [CosmosPartitionKey]
-        string ResourceID { get; set; }
-    }
 
     public interface IResourceHistory : ICosmosObject
     {
@@ -50,22 +42,12 @@ namespace Marketplace.Common.Models
         public DateTime DateLastUpdated { get; set; }
     }
 
-    public class ProductAssignmentHistory : CosmosObject, IProductHistory<ProductAssignment>
-    {
-        public ActionType Action { get; set; }
-        public string ResourceID { get; set; }
-        public ProductAssignment Resource { get; set; }
-        public DateTime DateLastUpdated { get; set; }
-
-    }
-
     public class ProductUpdateData
     {
         //  Product Info
         public string Supplier { get; set; }
-        public DateTime TimeOfUpdate { get; set; }
         public string ProductID { get; set; }
-        public Nullable<ActionType> ProductAction { get; set; }
+        public string ProductAction { get; set; }
         public string OldProductType { get; set; }
         public string OldUnitMeasure { get; set; }
         public Nullable<int> OldUnitQty { get; set; }
@@ -77,7 +59,7 @@ namespace Marketplace.Common.Models
 
         //  Price Schedule info
         public string DefaultPriceScheduleID { get; set; }
-        public Nullable<ActionType> DefaultPriceScheduleAction { get; set; }
+        public string DefaultPriceScheduleAction { get; set; }
         public Nullable<int> OldMinQty { get; set; }
         public Nullable<int> OldMaxQty { get; set; }
         public string OldPriceBreak { get; set; }
