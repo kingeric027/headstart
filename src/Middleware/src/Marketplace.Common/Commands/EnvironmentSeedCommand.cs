@@ -168,7 +168,8 @@ namespace Marketplace.Common.Commands
 
 		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
 			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Type" },       
-			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Role" },       
+			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Role" },
+			new XpIndex { ThingType = XpThingType.UserGroup, Key = "Country" },
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.ServiceCategory" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "Data.VendorLevel" },       
 			new XpIndex { ThingType = XpThingType.Company, Key = "SyncFreightPop" },       
@@ -177,7 +178,8 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "LocationID" },       
-			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },       
+			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },
+			new XpIndex { ThingType = XpThingType.User, Key = "RequestInfoEmails" },       
 		};
 
 		public async Task CreateXPIndices(string token)

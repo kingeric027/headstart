@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands.Crud;
+using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services;
 using Marketplace.Models;
+using Marketplace.Models.Misc;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -13,6 +17,7 @@ namespace Marketplace.Common.Commands
 	{
 		Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
+		Task RequestProductInfo(ContactSupplierBody template);
 	}
 
 	public class MeProductCommand : IMeProductCommand
@@ -21,12 +26,14 @@ namespace Marketplace.Common.Commands
 		private readonly IMarketplaceBuyerCommand _marketplaceBuyerCommand;
 		private readonly IExchangeRatesCommand _exchangeRatesCommand;
 		private readonly IMarketplaceProductCommand _marketplaceProductCommand;
-		public MeProductCommand(IOrderCloudClient elevatedOc, IMarketplaceBuyerCommand marketplaceBuyerCommand, IExchangeRatesCommand exchangeRatesCommand, IMarketplaceProductCommand marketplaceProductCommand)
+		private readonly ISendgridService _sendgridService;
+		public MeProductCommand(IOrderCloudClient elevatedOc, IMarketplaceBuyerCommand marketplaceBuyerCommand, IExchangeRatesCommand exchangeRatesCommand, IMarketplaceProductCommand marketplaceProductCommand, ISendgridService sendgridService)
 		{
 			_oc = elevatedOc;
 			_marketplaceBuyerCommand = marketplaceBuyerCommand;
 			_exchangeRatesCommand = exchangeRatesCommand;
 			_marketplaceProductCommand = marketplaceProductCommand;
+			_sendgridService = sendgridService;
 		}
 		public async Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
 		{
@@ -56,8 +63,8 @@ namespace Marketplace.Common.Commands
 			var exchangeRates = await exchangeRatesRequest;
 
 			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier, exchangeRates);
-			var productCurrency = superMarketplaceProduct.Product.xp.Currency;
-			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, productCurrency, exchangeRates);
+			var productCurrency = (Nullable<CurrencySymbol>)superMarketplaceProduct.Product.xp.Currency;
+			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
 		
 			superMarketplaceProduct.Product = markedupProduct;
 			superMarketplaceProduct.Specs = markedupSpecs;
@@ -73,7 +80,7 @@ namespace Marketplace.Common.Commands
 					if (option.PriceMarkup != null)
 					{
 						var unconvertedMarkup = option.PriceMarkup ?? 0;
-						option.PriceMarkup = ConvertPrice(unconvertedMarkup, productCurrency, exchangeRates);
+						option.PriceMarkup = ConvertPrice(unconvertedMarkup, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
 					}
 					return option;
 				}).ToList();
@@ -83,20 +90,25 @@ namespace Marketplace.Common.Commands
 
 		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
-			var searchText = args.Search ?? "";
-			var meProductsRequest = searchText.Length > 0 ? _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken) : _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, accessToken: user.AccessToken);
+				var searchText = args.Search ?? "";
 
-			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = GetExchangeRates(user);
+				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken);
+				var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+				var exchangeRatesRequest = GetExchangeRates(user);
 
-			var meProducts = await meProductsRequest;
-			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-			var exchangeRates = await exchangeRatesRequest;
+				var meProducts = await meProductsRequest;
+				var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+				var exchangeRates = await exchangeRatesRequest;
 
-			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
+				meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
 
-			return meProducts;
+				return meProducts;
 		}
+
+		public async Task RequestProductInfo(ContactSupplierBody template)
+        {
+			await _sendgridService.SendContactSupplierAboutProductEmail(template);
+        }
 
 		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
@@ -113,7 +125,8 @@ namespace Marketplace.Common.Commands
 					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
 					{
 						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
-						var convertedPrice = ConvertPrice(markedupPrice, product.xp.Currency, exchangeRates);
+						var currency = (Nullable<CurrencySymbol>)CurrencySymbol.USD;
+						var convertedPrice = ConvertPrice(markedupPrice, currency, exchangeRates);
 						priceBreak.Price = convertedPrice;
 						return priceBreak;
 					}).ToList();
@@ -125,7 +138,8 @@ namespace Marketplace.Common.Commands
 						// price on price schedule will be in USD as it is set by the seller
 						// may be different rates in the future
 						// refactor to save price on the price schedule not product xp?
-						priceBreak.Price = ConvertPrice(priceBreak.Price, CurrencySymbol.USD, exchangeRates);
+						var currency = (Nullable<CurrencySymbol>)CurrencySymbol.USD;
+						priceBreak.Price = ConvertPrice(priceBreak.Price, currency, exchangeRates);
 						return priceBreak;
 					}).ToList();
 				}
@@ -133,13 +147,13 @@ namespace Marketplace.Common.Commands
 			return product;
 		}
 
-		private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
-		{
-			var exchangeRateForProduct = exchangeRates.Find(e => e.Currency == productCurrency).Rate;
-			return defaultPrice * (decimal)exchangeRateForProduct;
-		}
+        private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+        {
+            var exchangeRateForProduct = exchangeRates.Find(e => e.Currency == productCurrency).Rate;
+            return defaultPrice / (decimal)exchangeRateForProduct;
+        }
 
-		private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
+        private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
 		{
 			var buyer = await _marketplaceBuyerCommand.Get(user.BuyerID);
 

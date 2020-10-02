@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using Npoi.Mapper;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using IPartial = ordercloud.integrations.library.IPartial;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
@@ -154,17 +156,21 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string ErrorMessage { get; set; }
     }
 
-    [SwaggerModel]
-    public class PartialTemplateProductFlat : PartialProduct<ProductXp>
+    public class PartialTemplateProductFlat : TemplateProductFlat, IPartial
     {
+        public JObject Values { get; set; }
     }
+
 
     [SwaggerModel]
     public class TemplateProductFlat : IMarketplaceObject
     {
         [OrderCloud.SDK.Required]
+        [RegularExpression("^[a-zA-Z0-9-_]*$", ErrorMessage = "IDs must have at least 8 characters and no more than 100, are required and can only contain characters Aa-Zz, 0-9, -, and _")]
         public string ID { get; set; }
         public bool Active { get; set; }
+        public ProductType ProductType { get; set; }
+
         [OrderCloud.SDK.Required]
         public string Name { get; set; }
         public string Description { get; set; }

@@ -18,7 +18,7 @@ export class ReorderHelperService {
     if (!orderID) throw new Error('Needs Order ID');
     const products = await this.ListProducts(lineItems);
     const [ValidLi, InvalidLi] = _partition(lineItems, item => this.isLineItemValid(item, products));
-    return { ValidLi, InvalidLi };
+    return { ValidLi: ValidLi as any, InvalidLi: InvalidLi as any };
   }
 
   private async ListProducts(items: MarketplaceLineItem[]): Promise<MarketplaceMeProduct[]> {

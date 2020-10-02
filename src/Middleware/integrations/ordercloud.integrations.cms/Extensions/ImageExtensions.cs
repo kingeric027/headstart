@@ -11,48 +11,14 @@ namespace ordercloud.integrations.cms
 {
 	public static class ImageExtensions
 	{
-        public static Image CreateSquareThumbnail(this Image srcImage, int targetDimension)
-        {
-            var aspectRatio = srcImage.Width / srcImage.Height;
-            if (aspectRatio > 2 || aspectRatio < 0.5)
-			{
-                return srcImage.CreateSquareWhiteSpaced(targetDimension);
-			} else
-			{
-                return srcImage.CreateSquareCropped(targetDimension);
-            }
-        }
-
-        private static Image CreateSquareCropped(this Image srcImage, int targetDimension)
+		public static Image ResizeSmallerDimensionToTarget(this Image srcImage, int targetSize)
 		{
-            var scaleFactor = targetDimension / (double)Math.Min(srcImage.Width, srcImage.Height);
-            if (scaleFactor > 1) return srcImage; // Don't increase image size
-            var srcDimension = (int)(targetDimension / scaleFactor);
-            var rectX = (srcImage.Width - srcDimension) / 2;
-            var rectY = (srcImage.Height - srcDimension) / 2;
-            var destRect = new Rectangle(0, 0, targetDimension, targetDimension);
-            var srcRect = new Rectangle(rectX, rectY, srcDimension, srcDimension);
+			var scaleFactor = targetSize / (double)Math.Min(srcImage.Width, srcImage.Height);
+			if (scaleFactor > 1) return srcImage; // Don't increase image size
+			var targetWidth = (int)(srcImage.Width * scaleFactor);
+			var targetHeight = (int)(srcImage.Height * scaleFactor);
 
-            return srcImage.CreateSquare(targetDimension, srcRect, destRect);
-        }
-
-        private static Image CreateSquareWhiteSpaced(this Image srcImage, int targetDimension)
-        {
-            var scaleFactor = targetDimension / (double)Math.Max(srcImage.Width, srcImage.Height);
-            if (scaleFactor > 1) return srcImage; // Don't increase image size
-            var rectWidth = (int)(srcImage.Width * scaleFactor);
-            var rectHeight = (int)(srcImage.Height * scaleFactor);
-            var rectX = (targetDimension - rectWidth) / 2;
-            var rectY = (targetDimension - rectHeight) / 2;
-            var destRect = new Rectangle(rectX, rectY, rectWidth, rectHeight);
-            var srcRect = new Rectangle(0, 0, srcImage.Width, srcImage.Height);
-
-            return srcImage.CreateSquare(targetDimension, srcRect, destRect);
-        }
-
-        private static Image CreateSquare(this Image srcImage, int targetDimension, Rectangle srcRect, Rectangle destRect)
-		{
-            var destImage = new Bitmap(targetDimension, targetDimension);
+            var destImage = new Bitmap(targetWidth, targetHeight);
             destImage.SetResolution(srcImage.HorizontalResolution, srcImage.VerticalResolution);
 
             using (var graphics = Graphics.FromImage(destImage))
@@ -66,13 +32,13 @@ namespace ordercloud.integrations.cms
                 using (var wrapMode = new ImageAttributes())
                 {
                     wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(srcImage, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, wrapMode);
+                    var destRect = new Rectangle(0, 0, targetWidth, targetHeight);
+                    graphics.DrawImage(srcImage, destRect, 0, 0, srcImage.Width, srcImage.Height, GraphicsUnit.Pixel, wrapMode);
                 }
             }
 
             return destImage;
         }
-
 
         public static byte[] ToBytes(this Image image, ImageFormat format)
         {

@@ -42,9 +42,9 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
                 },
                 UnitOfMeasure: {
                     Unit: null,
-                    Qty: null,
+                    Qty: 0,
                 },
-                ProductType: null,
+                ProductType: "Kit",
                 StaticContent: null,
             },
         },

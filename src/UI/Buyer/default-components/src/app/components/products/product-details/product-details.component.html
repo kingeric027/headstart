@@ -128,6 +128,12 @@
                                           [CurrentUser]="currentUser"
                                           (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
                 </ocm-modal>
+                <ocm-modal [state]="contactSupplierFormModal"
+                           [modalTitle]="'Product Inquiry'">
+                  <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
+                                             [CurrentUser]="currentUser"
+                                             (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
+     </ocm-modal>
               </div>
             </div>
             <div *ngIf="!isOrderable"
@@ -148,7 +154,7 @@
       </div>
       <div *ngIf="_priceBreaks && _priceBreaks.length > 1">
         <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
-        <div class=" border border-medium border-radius mb-3 p-2">
+        <div class=" border border-medium rounded mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
             <span *ngFor="let priceBreak of _priceBreaks; let i = index"
@@ -166,29 +172,46 @@
                   translate>PRODUCTS.DETAILS.VIEW_QUOTE</button>
         </span>
       </div>
+      <div class="alert alert-success my-3"
+           *ngIf="showContactSupplierFormSubmittedMessage">
+        <span translate>
+          PRODUCTS.DETAILS.THANK_YOU</span>
+        <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
+        </span>
+      </div>
       <strong>
         <span translate>PRODUCTS.DETAILS.DESCRIPTION</span>:
       </strong>
-      <div class="p-2 border border-medium border-radius">
+      <div class="p-2 border border-medium rounded">
         <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
         </p>
       </div>
       <div *ngIf="_attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
-          <a class="border border-medium border-radius p-2 mr-2"
+          <a class="border border-medium rounded p-2 mr-2"
              *ngFor="let attachment of _attachments"
              [href]="attachment.Url"
              target="_blank"
              download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
+      <div *ngIf="_product.xp.ProductType === 'Standard'"
+            class="mt-2">
+        <button type="button"
+                class="btn btn-link"
+                (click)="openContactSupplierForm()">
+          <small translate>PRODUCTS.DETAILS.CONTACT_PART_ONE</small>
+          <small translate>ALIAS.SUPPLIER_LOWERCASE</small>
+          <small translate>PRODUCTS.DETAILS.CONTACT_PART_TWO</small>
+        </button>
+      </div>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"
          *ngIf="specLength > 3">
       <div *ngIf="!showGrid"
-           class="p-3 border border-medium border-radius">
+           class="p-3 border border-medium rounded">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
                 *ngIf="percentSavings > 0">
@@ -236,6 +259,12 @@
         <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
                                 [CurrentUser]="currentUser"
                                 (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+      </ocm-modal>
+      <ocm-modal [state]="contactSupplierFormModal"
+                 [modalTitle]="'Contact Supplier'">
+        <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
+                                [CurrentUser]="currentUser"
+                                (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
       </ocm-modal>
     </div>
   </div>

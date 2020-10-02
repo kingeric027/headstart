@@ -2,6 +2,7 @@ import * as OrderCloudSDK from 'ordercloud-javascript-sdk'
 import {
 	adminClientAuth,
 	authAdminBrowser,
+	authBuyerBrowser,
 	authVendorBrowser,
 } from '../api-utils.ts/auth-util'
 import testConfig from '../testConfig'
@@ -15,6 +16,8 @@ import { createUser, deleteUser } from '../api-utils.ts/users-util'
 import { saveUserAssignment } from '../api-utils.ts/usergroups-helper'
 import { t } from 'testcafe'
 import { setHeadstartSDKUrl } from './headstart-sdk-helper'
+import { createCreditCard } from '../api-utils.ts/credit-card-util'
+import { deleteOrdersForUser } from '../api-utils.ts/order-util'
 
 export async function adminClientSetup() {
 	await axiosSetup()
@@ -93,6 +96,29 @@ export async function loginTestCleanup(
 	authToken: string
 ) {
 	await deleteUser(userID, buyerID, authToken)
+}
+
+export async function baseTestCleanup(
+	userID: string,
+	buyerID: string,
+	authToken: string
+) {
+	//delete orders for user
+	await deleteOrdersForUser(authToken, buyerID, userID)
+	await deleteUser(userID, buyerID, authToken)
+}
+
+export async function buyerTestSetup(authToken: string) {
+	await t.maximizeWindow()
+	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
+
+	await authBuyerBrowser(user)
+
+	await createCreditCard(t.ctx.userAuth, user.FirstName, user.LastName)
+
+	await t.navigateTo(`${testConfig.buyerAppUrl}home`)
+
+	return user
 }
 
 export async function adminTestSetup() {

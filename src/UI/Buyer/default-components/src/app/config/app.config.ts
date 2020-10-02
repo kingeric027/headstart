@@ -8,6 +8,7 @@ export const ocAppConfig: AppConfig = {
   marketplaceID: environment.marketplaceID,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
+  sellerID: environment.sellerID,
   ssoLink: environment.ssoLink,
   translateBlobUrl: environment.translateBlobUrl,
   ordercloudEnv: environment.ordercloudEnv,

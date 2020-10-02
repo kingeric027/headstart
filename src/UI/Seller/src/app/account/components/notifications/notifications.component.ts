@@ -30,19 +30,21 @@ export class NotificationsComponent extends AccountContent {
   faTimesCircle = faTimesCircle;
 
   toggleOrderEmails(value: boolean): void {
-    if (value === false && !_get(this.user, 'xp.ProductEmails')) {
-      this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
-    }
-    debugger;
+    //TO-DO - will need to ultimately refactor this to area to handle additional notification types more cleanly
+    // if (value === false) {
+    //   this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
+    // }
     this.updateUserFromEvent({target: {value: value}}, 'xp.OrderEmails')
   }
 
+  toggleRequestInfoEmails(value: boolean): void {
+    this.updateUserFromEvent({target: {value: value}}, 'xp.RequestInfoEmails')
+  }
+
   toggleProductEmails(value: boolean): void {
-    debugger; 
     if (value === false && !_get(this.user, 'xp.OrderEmails')) {
       this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
     }
-    debugger;
     this.updateUserFromEvent({target: {value: value}}, 'xp.ProductEmails')
   }
 

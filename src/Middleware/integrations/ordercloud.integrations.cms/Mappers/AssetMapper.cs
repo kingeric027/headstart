@@ -24,6 +24,7 @@ namespace ordercloud.integrations.cms
 				Title = form.Title,
 				Tags = MapTags(form.Tags),
 				Type = form.Type,
+				Active = form.Active,
 				FileName = form.FileName ?? form.File?.FileName,
 				Metadata = new AssetMetadata()
 				{

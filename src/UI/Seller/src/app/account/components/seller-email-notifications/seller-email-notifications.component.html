@@ -6,6 +6,16 @@
     <div class="custom-control custom-checkbox">
       <input type="checkbox"
              class="custom-control-input"
+             formControlName="RequestInfoEmails"
+             (click)="toggleRequestInfoEmails($event)"
+             id="RequestInfoEmails">
+        <label class="custom-control-label"
+               for="RequestInfoEmails"
+               translate>Product Information Requests</label>
+        </div>
+    <div class="custom-control custom-checkbox">
+      <input type="checkbox"
+             class="custom-control-input"
              formControlName="OrderEmails"
              (click)="toggleOrderEmails($event)"
              id="OrderEmails">

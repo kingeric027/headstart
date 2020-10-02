@@ -26,6 +26,7 @@ class ProductDetailsPage {
 	createButton: Selector
 	sizeTierDropdown: Selector
 	sizeTierOptions: Selector
+	buyerList: Selector
 
 	constructor() {
 		this.nameField = Selector('#Name')
@@ -52,6 +53,7 @@ class ProductDetailsPage {
 			.withAttribute('type', 'submit')
 		this.sizeTierDropdown = Selector('#SizeTier')
 		this.sizeTierOptions = this.sizeTierDropdown.find('option')
+		this.buyerList = Selector('.list-group-item')
 	}
 
 	async createDefaultProduct() {
@@ -86,8 +88,66 @@ class ProductDetailsPage {
 		return productName
 	}
 
+	async createProduct(name: string, warehouse: string) {
+		await t.typeText(this.nameField, name)
+		await t.typeText(this.quantityPerUnitField, '1')
+		await t.typeText(this.unitOfMeasureField, 'Unit')
+		await scrollIntoView('#TaxCodeCategory')
+		await t.click(this.taxCategoryDropdown)
+		await t.click(this.taxCategoryOptions.withText(createRegExp('freight')))
+		await t.click(this.taxCodeDropdown)
+		await t.click(
+			this.taxCodeOptions.withText(
+				createRegExp('delivery by company vehicle')
+			)
+		)
+		await t.click(this.shipAddressDropdown)
+		await t.click(this.shipAddressOptions.withText(createRegExp(warehouse)))
+		await t.typeText(this.productWeightField, '5')
+		await t.click(this.sizeTierDropdown)
+		await t.click(
+			this.sizeTierOptions.withText(createRegExp('2 - 5 units will fit'))
+		)
+		await t.click(this.pricingTab)
+		await t.typeText(this.priceField, '5')
+		await clickLeftOfElement(this.priceField)
+		await t.click(this.createButton)
+		await loadingHelper.waitForLoadingBar()
+	}
+
 	async clickBuyerVisibilityTab() {
 		await t.click(this.buyerVisibilityTab)
+		await loadingHelper.waitForLoadingBar()
+	}
+
+	async getBuyerIndex(buyer: string) {
+		// const element = this.buyerList.withText(createRegExp(buyer))
+		// element.
+		const elements = this.buyerList.addCustomDOMProperties({
+			index: el => {
+				const nodes = Array.prototype.slice.call(el.parentElement.children)
+				return nodes.indexOf(el)
+			},
+		})
+
+		//@ts-ignore
+		return await elements.withText(createRegExp(buyer)).index
+	}
+
+	async editBuyerVisibility(buyerID: string) {
+		const buyerIndex = await this.getBuyerIndex(buyerID)
+		await scrollIntoView(`.list-group-item:nth-of-type(${buyerIndex})`)
+		const thisBuyer = this.buyerList.withText(createRegExp(buyerID))
+		const editButton = thisBuyer.find('button').withText(createRegExp('edit'))
+		await t.click(editButton)
+		await loadingHelper.waitForLoadingBar()
+		await scrollIntoView(`button[type="submit"]`)
+		const thisCatalog = Selector('tr')
+			.withText(createRegExp('AutomationCatalog'))
+			.find('label')
+		await t.click(thisCatalog)
+		await t.click(Selector('button').withText(createRegExp('save')))
+		await loadingHelper.waitForLoadingBar()
 	}
 }
 
