@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
 import { FieldConfig } from './field-config.interface';
-import { SpecOption, Spec, ListPage } from 'ordercloud-javascript-sdk';
+import { SpecOption, Spec } from 'ordercloud-javascript-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
 import { ShopperContextService } from 'marketplace';
 
@@ -17,25 +17,29 @@ import { ShopperContextService } from 'marketplace';
         [config]="field"
         [group]="form"
         [index]="i"
+        [compact]="compact"
         ocSpecField
       ></ng-container>
     </form>
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
-export class OCMSpecForm {
-  _specs: ListPage<Spec>;
+export class OCMSpecForm implements OnChanges {
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
   config: FieldConfig[] = [];
   form: FormGroup;
- 
+
   @Input() currency: string;
-  @Input() set specs(value: ListPage<Spec>) {
-    this._specs = value;
-    this.init();
-  } 
+  @Input() compact?: boolean = false; // displays inputs in a compact way by setting them on a single line
+  @Input() specs: Spec[]
 
   constructor(private fb: FormBuilder, private context: ShopperContextService) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.specs) {
+      this.init();
+    }
+  }
 
   init(): void {
     this.config = this.createFieldConfig();
@@ -62,8 +66,8 @@ export class OCMSpecForm {
 
   createFieldConfig(): FieldConfig[] {
     const c: FieldConfig[] = [];
-    if (!this._specs || !this._specs.Items) return c;
-    for (const spec of this._specs.Items) {
+    if (!this.specs) return c;
+    for (const spec of this.specs) {
       if (spec?.xp?.control === 'checkbox') {
         c.push(this.createCheckboxField(spec));
       } else if (spec?.xp?.control === 'range') {
@@ -86,10 +90,8 @@ export class OCMSpecForm {
 
   handleChange(): void {
     this.specFormChange.emit({
-      type: 'Change',
-      valid: this.form.valid,
-      form: this.form.value,
-    } as SpecFormEvent);
+      form: this.form,
+    });
   }
 
   private createCheckboxField(spec: Spec): FieldConfig {
@@ -144,8 +146,7 @@ export class OCMSpecForm {
     }
   }
 
-  private createInputField(spec: Spec): FieldConfig
-  {
+  private createInputField(spec: Spec): FieldConfig {
     return {
       type: 'input',
       label: spec.Name,

@@ -8,7 +8,13 @@ import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 export class MeProductResolver implements Resolve<SuperMarketplaceProduct> {
   constructor(private tempSdk: TempSdk) { }
 
-  resolve(route: ActivatedRouteSnapshot): Promise<SuperMarketplaceProduct> {
-    return HeadStartSDK.Mes.GetSuperProduct(route.params.productID);
+  async resolve(route: ActivatedRouteSnapshot): Promise<SuperMarketplaceProduct> {
+    // TODO: strongly type this once headstart sdk includes ProductType 'Kit'
+    const superProduct = await HeadStartSDK.Mes.GetSuperProduct(route.params.productID) as any;
+    if (superProduct.Product.xp.ProductType === 'Kit') {
+      const kitProduct = await this.tempSdk.getMeKitProduct(superProduct.Product.ID);
+      return kitProduct;
+    }
+    return superProduct;
   }
 }
