@@ -15,6 +15,7 @@ namespace ordercloud.integrations.tecra
         Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string folder);
         Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder);
         Task<string> GetTecraFrame(string token, string id, string storeid);
+        Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder);
 
     }
     public class OrderCloudTecraConfig
@@ -64,6 +65,16 @@ namespace ordercloud.integrations.tecra
         {
             return await this.Request("api/chili/documents", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraDocument[]>();
         }
+        public async Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder)
+        {
+            TecraDocumentRequest request = new TecraDocumentRequest();
+            request.chiliurl = Config.ChiliUrl;
+            request.environment = Config.Environment;
+            request.username = Config.Username;
+            request.password = Config.Password;
+            request.folder = folder;
+            return await this.Request("api/chili/alldocuments", token).PostJsonAsync(request).ReceiveJson<TecraDocument[]>();
+        }
         public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder)
         {
             TecraDocumentRequest request = new TecraDocumentRequest();
@@ -76,7 +87,8 @@ namespace ordercloud.integrations.tecra
             TecraFrameParams tparams = new TecraFrameParams();
             tparams.docid = id;
             tparams.storeid= storeid;
-            tparams.wsid = "a3b5ddf4-6fbc-4042-8070-be9401eb8767";
+            //tparams.wsid = "e3210f88-277a-4b4c-9758-6f45906f0958";
+            tparams.wsid = "";
             tparams.folder = "root";
             tparams.vpid = "";
 

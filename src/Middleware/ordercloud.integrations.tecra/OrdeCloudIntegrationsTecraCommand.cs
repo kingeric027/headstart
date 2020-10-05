@@ -10,6 +10,7 @@ namespace ordercloud.integrations.tecra
     {
         Task<string> TecraToken();
         Task<IEnumerable<TecraDocument>> TecraDocuments(string folder);
+        Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string folder);
         Task<IEnumerable<TecraSpec>> TecraSpecs(string id, string folder);
         Task<string> TecraFrame(string id, string storeid);
     }
@@ -31,6 +32,13 @@ namespace ordercloud.integrations.tecra
         {
             TecraToken auth = await _tecra.GetToken();
             IEnumerable<TecraDocument> documents = await _tecra.GetTecraDocuments(auth.access_token, folder);
+            return documents;
+
+        }
+        public async Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string folder)
+        {
+            TecraToken auth = await _tecra.GetToken();
+            IEnumerable<TecraDocument> documents = await _tecra.TecraDocumentsByFolder(auth.access_token, folder);
             return documents;
 
         }

@@ -203,6 +203,14 @@ namespace Marketplace.Common.Controllers
             var result = await _tecra.TecraDocuments(folder);
             return result;
         }
+
+        [DocName("Get Tecra Documents By Folder")]
+        [HttpGet, Route("byfolder")]
+        public async Task<IEnumerable<TecraDocument>> GetByFolder(string folder)
+        {
+            var result = await _tecra.TecraDocumentsByFolder(folder);
+            return result;
+        }
     }
 
     [DocComments("\"Integration\" represents an array of Tecra Specs")]
