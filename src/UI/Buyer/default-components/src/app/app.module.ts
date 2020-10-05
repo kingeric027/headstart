@@ -23,6 +23,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
+import { NgxSpinnerModule } from 'ngx-spinner';
 import { OCMCategoryDropdown } from './components/layout/category-dropdown/category-dropdown.component';
 import { CmsBuyerModule } from '@ordercloud/angular-cms-components';
 
@@ -268,6 +269,7 @@ const components = [
       },
     }),
     NgxImageZoomModule,
+    NgxSpinnerModule,
     ReactiveFormsModule,
     FormsModule,
     MatListModule,
