@@ -106,10 +106,10 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("LIST all of a user's user group assignments")]
-        [HttpGet, Route("{buyerID}/usergroupassignments/{userID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
-        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string buyerID, string userID)
+        [HttpGet, Route("{userGroupType}/{parentID}/usergroupassignments/{userID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string userGroupType, string parentID, string userID)
         {
-            return await _locationPermissionCommand.ListUserUserGroupAssignments(buyerID, userID, VerifiedUserContext);
+            return await _locationPermissionCommand.ListUserUserGroupAssignments(userGroupType, parentID, userID, VerifiedUserContext);
         }
 
         [DocName("LIST user groups for home country")]
