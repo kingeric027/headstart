@@ -43,9 +43,6 @@ export class NotificationsComponent extends AccountContent {
 
   toggleProductEmails(value: boolean): void {
     this.updateUserFromEvent({ target: { value: value } }, 'xp.ProductEmails')
-      this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
-    }
-    this.updateUserFromEvent({target: {value: value}}, 'xp.ProductEmails')
   }
 
   addAddtlRcpt() {
