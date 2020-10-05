@@ -161,7 +161,7 @@
       </div>
       <div *ngIf="_priceBreaks && _priceBreaks.length > 1">
         <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
-        <div class=" border border-medium border-radius mb-3 p-2">
+        <div class=" border border-medium rounded mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
             <span *ngFor="let priceBreak of _priceBreaks; let i = index"
@@ -193,7 +193,7 @@
       <strong>
         <span translate>PRODUCTS.DETAILS.DESCRIPTION</span>:
       </strong>
-      <div class="p-2 border border-medium border-radius">
+      <div class="p-2 border border-medium rounded">
         <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
         </p>
       </div>
@@ -206,7 +206,7 @@
       <div *ngIf="_attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
-          <a class="border border-medium border-radius p-2 mr-2"
+          <a class="border border-medium rounded p-2 mr-2"
              *ngFor="let attachment of _attachments"
              [href]="attachment.Url"
              target="_blank"
@@ -228,7 +228,7 @@
     <div class="col-xl-2 col-lg-3"
          *ngIf="specLength > 3">
       <div *ngIf="!showGrid"
-           class="p-3 border border-medium border-radius">
+           class="p-3 border border-medium rounded">
         <div class="d-flex justify-content-between align-items-center">
           <span class="badge badge-pill badge-warning"
                 *ngIf="percentSavings > 0">

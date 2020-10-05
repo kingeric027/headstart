@@ -42,6 +42,7 @@ export class ProductVariations {
   productVariationsChanged = new EventEmitter<SuperMarketplaceProduct>();
   @Output() skuUpdated = new EventEmitter<SuperMarketplaceProduct>();
   @Output() variantsValidated = new EventEmitter<boolean>();
+  @Output() isSpecsEditing = new EventEmitter<boolean>();
   superProductEditable: SuperMarketplaceProduct;
   superProductStatic: SuperMarketplaceProduct;
   variants: Variant[] = [];
@@ -75,11 +76,13 @@ export class ProductVariations {
   
   toggleEditSpecs(): void {
     this.editSpecs = !this.editSpecs;
+    this.isSpecsEditing.emit(this.editSpecs);
   }
 
   handleDiscardSpecChanges(): void {
     this.editSpecs = !this.editSpecs;
     this.superProductEditable.Specs = this.superProductEditable?.Specs;
+    this.isSpecsEditing.emit(this.editSpecs);
     this.checkForSpecChanges();
   }
 

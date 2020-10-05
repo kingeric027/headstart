@@ -1,5 +1,5 @@
 import * as OrderCloudSDK from 'ordercloud-javascript-sdk'
-import { ApiRole } from 'ordercloud-javascript-sdk'
+import { ApiRole, Order } from 'ordercloud-javascript-sdk'
 import testConfig from '../testConfig'
 import { ClientFunction, t } from 'testcafe'
 
@@ -63,6 +63,21 @@ export async function authVendorBrowser(user: Partial<OrderCloudSDK.User>) {
 
 	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.token')
 	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.access-token')
+	//Below cookie is set on the browser when logging in, but does not seem to be needed
+	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
+
+	t.ctx.userAuth = userToken
+}
+
+export async function authBuyerBrowser(user: Partial<OrderCloudSDK.User>) {
+	const userToken = await userClientAuth(
+		testConfig.buyerAppClientID,
+		user.Username,
+		user.Password,
+		buyerUserRoles
+	)
+
+	await setBrowserAuthCookie(userToken, 'marketplace_test.access-token')
 	//Below cookie is set on the browser when logging in, but does not seem to be needed
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
@@ -196,4 +211,14 @@ export const vendorUserRoles: ApiRole[] = [
 	'MPMeSupplierUserAdmin',
 	// @ts-ignore
 	'MPSupplierUserGroupAdmin',
+]
+
+export const buyerUserRoles: ApiRole[] = [
+	'MeAddressAdmin',
+	'MeAdmin',
+	'MeCreditCardAdmin',
+	'MeXpAdmin',
+	'Shopper',
+	'SupplierReader',
+	'SupplierAddressReader',
 ]

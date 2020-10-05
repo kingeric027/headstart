@@ -125,9 +125,10 @@ namespace Marketplace.Common.Commands
             var ordersRelatingToProcess = new List<MarketplaceOrder> { updatedMarketplaceOrderWorksheet.Order };
             ordersRelatingToProcess.AddRange(updatedSupplierOrders);
 
-            var integrationRequests = new List<Task<ProcessResult>> { };
-
-            integrationRequests.Add(SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet)));
+            var integrationRequests = new List<Task<ProcessResult>>
+            {
+                SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet))
+            };
 
             // quote orders do not need to flow into our integrations
             if (IsStandardOrder(updatedMarketplaceOrderWorksheet))
@@ -137,10 +138,7 @@ namespace Marketplace.Common.Commands
                 integrationRequests.Add(SafeIntegrationCall(ProcessType.Zoho, async () => await HandleZohoIntegration(updatedSupplierOrders, updatedMarketplaceOrderWorksheet)));
             }
 
-            var integrationResponses = await Throttler.RunAsync(integrationRequests, 100, 4, (request) =>
-            {
-                return request;
-            });
+            var integrationResponses = await Throttler.RunAsync(integrationRequests, 100, 4, (request) => request);
 
             return await CreateOrderSubmitResponse(integrationResponses.ToList(), ordersRelatingToProcess);
         }
@@ -215,6 +213,7 @@ namespace Marketplace.Common.Commands
         private async Task HandleZohoIntegration(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
         {
             var zoho_salesorder = await _zoho.CreateSalesOrder(updatedMarketplaceOrderWorksheet);
+            //await _zoho.CreateShippingPurchaseOrder(zoho_salesorder, updatedMarketplaceOrderWorksheet);
             await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
         }
 

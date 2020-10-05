@@ -311,6 +311,7 @@
                               [ngValue]="null"
                               translate>ADMIN.PRODUCT_EDIT.CHOOSE_AN_ADDRESS</option>
                       <option *ngFor="let address of addresses?.Items"
+                              [selected]="shippingAddress === address"
                               [value]="address.ID">{{address.AddressName}}</option>
                     </select>
                   </div>
@@ -593,7 +594,8 @@
                                         [copyProductResource]="copyProductResource"
                                         [myCurrency]="supplierCurrency"
                                         (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                        (variantsValidated)="validateVariants($event)">
+                                        (variantsValidated)="validateVariants($event)"
+                                        (isSpecsEditing)="specsBeingEdited($event)">
           </product-variations-component>
         </ng-template>
       </li>
@@ -791,7 +793,8 @@
   </form>
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
-       class="d-flex justify-content-between align-items-center py-2">
+       class="d-flex justify-content-between align-items-center py-2"
+       style="position: relative;">
     <delete-confirm-modal-component *ngIf="!isCreatingNew"
                                     buttonText="ADMIN.NAV.PRODUCT"
                                     (deleteConfirmed)="handleDelete($event)">
@@ -801,14 +804,14 @@
          class="text-danger"
          translate>ADMIN.PRODUCT_EDIT.VARIATION_ISSUES</p>
       <div>
-        <button *ngIf="areChanges"
+        <button *ngIf="areChanges && !isSpecsEditing"
                 class="btn btn-primary"
                 type="submit"
                 [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
-                *ngIf="areChanges && !isCreatingNew"
+                *ngIf="areChanges && !isCreatingNew && !isSpecsEditing"
                 translate>COMMON.DISCARD_CHANGES</button>
       </div>
     </div>

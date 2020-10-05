@@ -1,0 +1,34 @@
+[class*="display-"] {
+  font-weight: bold;
+}
+
+// remove button border radius
+.btn,
+button {
+  border-radius: initial;
+}
+
+// default all headings to uppercase
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  text-transform: uppercase;
+}
+
+// Image thumbnails
+.img-thumbnail {
+  transition: box-shadow .25s ease-in;
+  &:hover,
+  &:focus {
+    box-shadow: 0 .125rem .25rem rgba($purple, .25)
+  }
+}

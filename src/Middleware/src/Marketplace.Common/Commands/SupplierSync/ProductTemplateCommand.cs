@@ -169,6 +169,8 @@ namespace Marketplace.Common.Commands.SupplierSync
         [RegularExpression("^[a-zA-Z0-9-_]*$", ErrorMessage = "IDs must have at least 8 characters and no more than 100, are required and can only contain characters Aa-Zz, 0-9, -, and _")]
         public string ID { get; set; }
         public bool Active { get; set; }
+        public ProductType ProductType { get; set; }
+
         [OrderCloud.SDK.Required]
         public string Name { get; set; }
         public string Description { get; set; }

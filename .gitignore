@@ -297,3 +297,7 @@ src/UI/Buyer/src/environments/environment.ts
 *.code-workspace
 src/Middleware/ngrok.exe
 *.orig
+
+src/UI/Buyer/.DS_Store
+
+src/UI/.DS_Store

@@ -24,29 +24,40 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
   ) {
     super(changeDetectorRef, productService, router, activatedRoute, ngZone);
     this.getUserContext(currentUserService);
-    this.buildFilterConfig()
+    this.buildFilterConfig();
   }
 
   async getUserContext(currentUserService: CurrentUserService): Promise<void> {
     this.userContext = await currentUserService.getUserContext();
   }
 
-
   async buildFilterConfig(): Promise<void> {
-    const suppliers = await this.ocSupplierService.List({ filters: {Active: 'true'}}).toPromise();
-    const supplierFilterOptions = suppliers.Items.map(s => {
-      return { Text: s.Name, Value: s.ID}
-    })
-  // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
-  // added to the filterconfig passed into the resourcetable in the future
+    let supplierListPage = await this.ocSupplierService
+      .List({ pageSize: 100, sortBy: ['Name'], filters: { Active: 'true' }})
+      .toPromise();
+    let suppliers = supplierListPage.Items;
+    if (supplierListPage.Meta.TotalPages > 1) {
+      for (let i = 2; i <= supplierListPage.Meta.TotalPages; i++) {
+        let newSuppliers = await this.ocSupplierService
+          .List({ pageSize: 100, sortBy: ['Name'], filters: { Active: 'true' }, page: i })
+          .toPromise();
+        suppliers = suppliers.concat(newSuppliers.Items);
+      }
+    }
+    let supplierFilterOptions = suppliers.map(s => {
+      return { Text: s.Name, Value: s.ID };
+    });
+    // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
+    // added to the filterconfig passed into the resourcetable in the future
     this.filterConfig = {
       Filters: [
         {
           Display: 'ADMIN.FILTERS.STATUS',
           Path: 'xp.Status',
           Items: [
-            {Text: 'ADMIN.FILTER_OPTIONS.DRAFT', Value: 'Draft'},
-            {Text: 'ADMIN.FILTER_OPTIONS.PUBLISHED', Value: 'Published'}],
+            { Text: 'ADMIN.FILTER_OPTIONS.DRAFT', Value: 'Draft' },
+            { Text: 'ADMIN.FILTER_OPTIONS.PUBLISHED', Value: 'Published' },
+          ],
           Type: 'Dropdown',
         },
         {
