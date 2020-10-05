@@ -97,20 +97,9 @@ namespace Marketplace.Common.Controllers
 		[HttpPatch, Route("filteroptionoverride/{id}"), OrderCloudIntegrationsAuth(ApiRole.AdminUserAdmin)]
 		public async Task<Product> FilterOptionOverride(string id, [FromBody] Product product)
         {
-			//var options = JObject.FromObject(filterOptions);
-			//var props = options.Properties();
-			//var expando = new ExpandoObject() as IDictionary<string, object>;
-			//foreach(var kvp in props)
-			//         {
-			//	expando.Add(kvp.Name, kvp.Value);
-			//         }
 			IDictionary<string, object> facets = product.xp.Facets;
-			//foreach (var filterName in facets.Keys)
-   //         {
-			//	object value = facets[filterName];
-			//	string value2 ="hi";
-			//}
-			return await _command.FilterOptionOverride(id, facets, VerifiedUserContext);
+			var supplierID = product.DefaultSupplierID;
+			return await _command.FilterOptionOverride(id, supplierID, facets, VerifiedUserContext);
         }
 	}
 }

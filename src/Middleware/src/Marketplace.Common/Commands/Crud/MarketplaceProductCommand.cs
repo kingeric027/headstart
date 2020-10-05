@@ -26,7 +26,7 @@ namespace Marketplace.Common.Commands.Crud
 		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
 		Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
 		Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
-		Task<Product> FilterOptionOverride(string id, IDictionary<string, object> facets, VerifiedUserContext user);
+		Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -352,30 +352,19 @@ namespace Marketplace.Common.Commands.Crud
 			);
 		}
 
-		public async Task<Product> FilterOptionOverride(string id, IDictionary<string, object> facets, VerifiedUserContext user)
+		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
 		{
-			var config = new OrderCloudClientConfig
-			{
-				ClientId = "91e0dfbc-48c4-4936-ba44-2db5c6b2645c",
-				ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-				GrantType = GrantType.ClientCredentials,
-				//Username = "mahersebd",
-				//Password = "fails345",
-				Roles = new[]
-						   {
-								 ApiRole.SupplierAdmin,
-								 ApiRole.ProductAdmin
-							},
-
-			};
-			var clientToUse = await _oc.ApiClients.GetAsync("91e0dfbc-48c4-4936-ba44-2db5c6b2645c");
+			//Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
+			//All suppliers have integration clients with a default user of dev_{supplierID}.
+			var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
+			var selectedSupplierClient = supplierClient.Items[0];
 			var configToUse = new OrderCloudClientConfig
 			{
-				ClientId = clientToUse.ID,
-				ClientSecret = clientToUse.ClientSecret,
+				ApiUrl = user.ApiUrl,
+				AuthUrl = user.AuthUrl,
+				ClientId = selectedSupplierClient.ID,
+				ClientSecret = selectedSupplierClient.ClientSecret,
 				GrantType = GrantType.ClientCredentials,
-				//Username = "mahersebd",
-				//Password = "fails345",
 				Roles = new[]
 						   {
 								 ApiRole.SupplierAdmin,
@@ -383,24 +372,11 @@ namespace Marketplace.Common.Commands.Crud
 							},
 
 			};
-			var newestClient = new OrderCloudClient(configToUse);
-			await newestClient.AuthenticateAsync();
-			var token2 = newestClient.TokenResponse.AccessToken;
+			var ocClient = new OrderCloudClient(configToUse);
+			await ocClient.AuthenticateAsync();
+			var token = ocClient.TokenResponse.AccessToken;
 
-
-
-
-
-
-			//var client = new OrderCloudClient(config);
-			//await client.AuthenticateAsync();
-			//var token = client.TokenResponse.AccessToken;
-
-
-
-			//var response = await client.AuthenticateAsync(user.ClientID, _settings.OrderCloudSettings.ClientSecret, ApiRole.ProductAdmin);
-			//var response2 = await client.AuthenticateAsync(user.ClientID, "mahersebd", "fails345", ApiRole.ProductAdmin);
-
+			//Format the facet data to change for request body
 			var facetDataFormatted = new ExpandoObject();
 			var facetDataFormattedCollection = (ICollection<KeyValuePair<string, object>>) facetDataFormatted;
 			foreach (var kvp in facets)
@@ -409,10 +385,11 @@ namespace Marketplace.Common.Commands.Crud
             }
 			dynamic facetDataFormattedDynamic = facetDataFormatted;
 
-			var updatedProduct = await newestClient.Products.PatchAsync(
+			//Update the product with a supplier token
+			var updatedProduct = await ocClient.Products.PatchAsync(
 				id,
 				new PartialProduct() {  xp = new { Facets = facetDataFormattedDynamic }},
-				accessToken: token2
+				accessToken: token
 				);
             return updatedProduct;
         }
@@ -422,28 +399,5 @@ namespace Marketplace.Common.Commands.Crud
 			var supplier = await _oc.Suppliers.GetAsync(supplierID, accessToken);
 			return supplier.Name;
 		}
-
-		//var supplierOrderCloudClient = new OrderCloudClient(new OrderCloudClientConfig
-		//{
-		//	//ApiUrl = user.ApiUrl,
-		//	//AuthUrl = user.AuthUrl,
-		//	ClientId = user.ClientID,
-		//	ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-		//	GrantType = GrantType.ClientCredentials,
-		//	Username = "mahersebd",
-		//	Password = "fails345",
-		//	Roles = new[]
-		//	   {
-		//						 ApiRole.SupplierAdmin,
-		//						 ApiRole.ProductAdmin
-		//					},
-
-		//});
-		////        await supplierOrderCloudClient.AuthenticateAsync(user.ClientID, _settings.OrderCloudSettings.ClientSecret, new[]{
-		////ApiRole.SupplierAdmin,
-		////            ApiRole.ProductAdmin
-
-		////			});
-		////END TESTING
 	}
 }

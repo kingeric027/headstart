@@ -17,15 +17,14 @@ export class ProductFilters implements OnInit{
   facetOptions: ProductFacet[];
   faCheckCircle = faCheckCircle;
   sellerFilterOverride: boolean;
-  facetsOnProductStatic: any;
-  facetsOnProductEditable: any;
+  facetsOnProductStatic: any[];
+  facetsOnProductEditable: any[];
   overriddenChanges: boolean;
+  savingOverriddenFilters: boolean;
 
   @Input() set facetsOnProduct (facets: any[]) {
     this.facetsOnProductStatic = cloneDeep(facets);
     this.facetsOnProductEditable = facets;
-    console.log('facets at this point', this.facetsOnProductStatic);
-    console.log('facets at this point 2', this.facetsOnProductEditable);
   };
   @Input() readonly = false;
   @Input() superProduct: MarketplaceProduct;
@@ -44,9 +43,7 @@ export class ProductFilters implements OnInit{
 
   async getFacets(): Promise<void> {
     const facets = await this.ocFacetService.List().toPromise();
-    console.log('confirm the facets on init', facets);
     this.facetOptions = facets.Items.filter(f => f?.xp?.Options?.length);
-    console.log('confirm the facet options on init', this.facetOptions);
   }
 
   areFacetOptionsSelected(facet: ProductFacet): boolean {
@@ -62,43 +59,31 @@ export class ProductFilters implements OnInit{
   }
 
   toggleFacetOption(facet: ProductFacet, option: string): void {
-    // console.log('facet', facet);
-    // console.log('option', option);
-    // console.log('facetsOnProduct', this.facetsOnProductEditable);
-    const productXpFacetKey = facet?.XpPath.split('.')[1]; //Color
-    let facetOnXp = this.facetsOnProductEditable[productXpFacetKey]; //What is currently selected...*selects green* ['White', 'Orange'], *selects purple* ['White', 'Orange', 'Green']
-    // console.log('facetOnXp', facetOnXp);
-    // console.log('productXpFacetKey', productXpFacetKey);
-    delete this.facetsOnProductEditable[productXpFacetKey]; //delete removes a property from an object
-    // If the key doesn't exist on Product.xp.Facets, initialize it as an empty array
+    const productXpFacetKey = facet?.XpPath.split('.')[1];
+    let facetOnXp = this.facetsOnProductEditable[productXpFacetKey];
+    delete this.facetsOnProductEditable[productXpFacetKey];
     if (!facetOnXp) {
-      facetOnXp = [] 
-    } //don't think this condition will come up
-    // If the facet in quetsion includes the option requested, remove it from the array, else add it.
+      facetOnXp = []; 
+    }
     if(facetOnXp.includes(option)) {
       facetOnXp = facetOnXp.filter(o => o !== option);
     } else {
       facetOnXp.push(option);
     }
     if (facetOnXp.length > 0) {
-      this.facetsOnProductEditable = { ...this.facetsOnProductEditable, [productXpFacetKey]: facetOnXp}
+      this.facetsOnProductEditable = { ...this.facetsOnProductEditable, [productXpFacetKey]: facetOnXp};
     };
     if (!this.readonly) {
       this.updatedFacets.emit(this.facetsOnProductEditable);
     } else {
-      console.log('VALUE TO SEND', this.facetsOnProductEditable);
       this.overrideFacets();
     }
   }
 
   overrideFacets(): void {
-    console.log('overriding facets', this.facetsOnProductEditable);
     if (this.checkForFacetOverrides()) {
       this.overriddenChanges = true;
-      console.log('static', this.facetsOnProductStatic)
-      console.log('editable', this.facetsOnProductEditable)
     } else {
-      console.log('should be hitting this condition');
       this.overriddenChanges = false;
     }
   }
@@ -120,19 +105,20 @@ export class ProductFilters implements OnInit{
         changeDetected = true;
       }
     });
-    console.log('change detected?', changeDetected);
     return changeDetected;
   }
 
   async saveFilterOverrides(): Promise<void> {
-    //TO-DO - replace with SDK
-    console.log('this.superProduct', this.superProduct);
-    console.log('facets that are sending', this.facetsOnProductEditable);
+    this.savingOverriddenFilters = true;
     (this.superProduct.xp as any).Facets = this.facetsOnProductEditable;
-    console.log('NOW THE SUPER', this.superProduct);
+        //TO-DO - replace with SDK
     const url = `${this.appConfig.middlewareUrl}/products/filteroptionoverride/${this.superProduct.ID}`;
-    const product = await this.http.patch<any>(url, this.superProduct, { headers: this.buildHeaders() }).toPromise();
+    const product = await this.http.patch<Product>(url, this.superProduct, { headers: this.buildHeaders() }).toPromise();
     this.superProduct = product;
+    this.facetsOnProductStatic = cloneDeep(product.xp.Facets);
+    this.facetsOnProductEditable = cloneDeep(product.xp.Facets);
+    this.sellerFilterOverride = false;
+    this.savingOverriddenFilters = false;
   }
 
   private buildHeaders(): HttpHeaders {
