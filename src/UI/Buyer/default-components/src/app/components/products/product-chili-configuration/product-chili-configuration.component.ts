@@ -13,6 +13,8 @@ import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
+declare var SetVariableValue: any;
+
 @Component({
   templateUrl: './product-chili-configuration.component.html',
   styleUrls: ['./product-chili-configuration.component.scss'],
@@ -86,17 +88,41 @@ export class OCMProductChiliConfig implements OnInit {
     this.imageUrls = chiliTemplate.Product.Images.map(img => img.Url);
     this.isOrderable = !!chiliTemplate.Product.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
-    this.getTecraFrame();
+    this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(this.chiliTemplate.Frame);
+  }
+
+  setTecraSpec(event: any, spec: ChiliSpec): void {
+    debugger;
+    const types = {
+      'Text': 'string',
+      'DropDown': 'list',
+      'Checkbox': 'checkbox'
+    };
+    const test = event.target.value;
+    SetVariableValue((spec.ListOrder -1), test, types[spec.xp.UI.ControlType])
+  }
+
+  loadScript(url: string) {
+    let body = <HTMLDivElement>document.body;
+    let script = document.createElement('script');
+    script.innerHTML = '';
+    script.src = url;
+    script.async = true;
+    script.defer = true;
+    body.appendChild(script);
   }
 
   async ngOnInit(): Promise<void> {
     this.currentUser = this.context.currentUser.get();
     this._userCurrency = this.context.currentUser.get().Currency;
+    this.loadScript('https://chili.accuconnect.com/CHILI/scripts/index.js');
+    this.loadScript('https://www.acculync.com/four51/scripts/nd_451_enc.js');
   }
 
   async getTecraFrame(): Promise<void> {
-    const frame = await this.context.chiliConfig.getChiliFrame(this.chiliTemplate.ChiliTemplateID, "4511001");
-    this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(frame); 
+    //const frame = await this.context.chiliConfig.getChiliFrame(this.chiliTemplate.ChiliTemplateID, "4511001");
+    const frame = await this.context.chiliConfig.getChiliFrame("89c89db5-3978-498c-9b3f-bd8b9f296f08", "4511002");
+    this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(frame);
   }
 
   onSpecFormChange(event: SpecFormEvent): void {

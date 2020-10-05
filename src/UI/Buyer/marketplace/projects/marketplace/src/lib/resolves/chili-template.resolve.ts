@@ -9,6 +9,10 @@ export class ChiliTemplateResolver implements Resolve<ChiliTemplate> {
   constructor(private chili: ChiliConfigService) { }
 
   async resolve(route: ActivatedRouteSnapshot): Promise<ChiliTemplate> {
-    return await this.chili.getChiliTemplate(route.params.configurationID);
+    const template = await this.chili.getChiliTemplate(route.params.configurationID);
+    //const frame = await this.chili.getChiliFrame(this.chiliTemplate.ChiliTemplateID, '4511001');
+    const frame = await this.chili.getChiliFrame('89c89db5-3978-498c-9b3f-bd8b9f296f08', '4511002');
+    template.Frame = frame;
+    return template;
   }
 }

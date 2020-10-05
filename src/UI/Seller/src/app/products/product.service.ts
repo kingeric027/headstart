@@ -129,6 +129,11 @@ export class ProductService extends ResourceCrudService<Product> {
     ): Promise<TecraDocument[]> {
         return this.chiliService.getDocuments(folder);
     }
+    async getTecraDocumentsByFolder(
+        folder: string
+    ): Promise<TecraDocument[]> {
+        return this.chiliService.getDocumentsByFolder(folder);
+    }
 
     async getTecraSpecs(
         docID: string,

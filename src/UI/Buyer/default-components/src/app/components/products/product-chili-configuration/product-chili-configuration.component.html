@@ -2,14 +2,14 @@
      *ngIf="_product">
   <div class="row mb-5">
     <div class="col-md-6">
-      <iframe class="chili-frame" [src]="frameSrc" frameborder="0"></iframe>
+      <iframe id="editor-iframe" class="chili-frame" [src]="frameSrc" frameborder="0"></iframe>
     </div>
     <div class="col-md-6">
       <form ngNoForm>
         <div *ngFor="let spec of chiliTemplate.TemplateSpecs; let i = index">
           <div *ngIf="spec.xp.UI.ControlType == 'Text'">
             <label>{{spec.Name}}</label>
-            <input class="form-control" type='text' name="{{spec.Name}}" id="{{spec.ID}}" placeholder="{{spec.Name}}">
+            <input class="form-control" type='text' name="{{spec.Name}}" id="{{spec.ID}}" placeholder="{{spec.Name}}" (change)="setTecraSpec($event, spec)">
           </div>
         </div>
       </form>
