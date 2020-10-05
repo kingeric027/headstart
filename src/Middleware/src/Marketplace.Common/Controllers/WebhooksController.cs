@@ -10,6 +10,11 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
 using System;
+using Marketplace.Common.Models;
+using Marketplace.Common.Queries;
+using ImpromptuInterface;
+using Cosmonaut;
+using Marketplace.Common.Models.Marketplace;
 
 namespace Marketplace.Common.Controllers
 {
@@ -18,12 +23,28 @@ namespace Marketplace.Common.Controllers
         private readonly AppSettings _settings;
         private readonly ISendgridService _sendgridService;
         private readonly IOrderCommand _orderCommand;
+        private readonly IOrderCloudClient _oc;
+        private readonly ResourceHistoryQuery<ProductHistory> _productQuery;
+        private readonly ResourceHistoryQuery<PriceScheduleHistory> _priceScheduleQuery;
 
-        public WebhooksController(AppSettings settings, ISendgridService sendgridService, IOrderCommand orderCommand) : base(settings)
+        private readonly IProductUpdateCommand _productUpdateCommand;
+
+        public WebhooksController(
+            AppSettings settings, 
+            ISendgridService sendgridService, 
+            IOrderCommand orderCommand,
+            ResourceHistoryQuery<ProductHistory> productQuery, 
+            ResourceHistoryQuery<PriceScheduleHistory> priceScheduleQuery, 
+            IOrderCloudClient orderCloud, 
+            IProductUpdateCommand productUpdateCommand) : base(settings)
         {
             _settings = settings;
             _sendgridService = sendgridService;
             _orderCommand = orderCommand;
+            _productQuery = productQuery;
+            _priceScheduleQuery = priceScheduleQuery;
+            _productUpdateCommand = productUpdateCommand;
+            _oc = orderCloud;
         }
 
         // USING AN OC MESSAGE SENDER - NOT WEBHOOK
@@ -65,19 +86,60 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("productcreated")]
         [OrderCloudWebhookAuth]
-        public async void HandleProductCreation([FromBody] WebhookPayloads.Products.Create payload)
+        public async void HandleProductCreation([FromBody] MarketplaceProductCreatePayload payload)
         {
-            // to mp manager when a product is created
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "noreply@four51.com", "New Product Created", "<h1>this is a test email for product creation</h1>");
+            var update = new ProductHistory()
+            {
+                Action = ActionType.Create,
+                ResourceID = payload.Response.Body.ID,
+                Resource = payload.Response.Body,
+            };
+            await _productQuery.Post(update);
         }
 
-        [HttpPost, Route("productupdate")]
+        [HttpPost, Route("productupdated")]
         [OrderCloudWebhookAuth]
-        public async void HandleProductUpdate([FromBody] WebhookPayloads.Products.Patch payload)
+        public async void HandleProductUpdate([FromBody] MarketplaceProductUpdatePayload payload)
         {
-            // to mp manager when a product is updated
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Product Updated", "<h1>this is a test email for product update</h1>");
+            Console.WriteLine(payload);
+            var update = new ProductHistory()
+            {
+                Action = ActionType.Update,
+                ResourceID = payload.Response.Body.ID,
+                Resource = payload.Response.Body,
+
+            };
+            await _productQuery.Put(update);
         }
+
+        [HttpPost, Route("priceschedulecreated")]
+        [OrderCloudWebhookAuth]
+        public async void HandlePriceScheduleCreation([FromBody] WebhookPayloads.PriceSchedules.Create payload)
+        {
+            var update = new PriceScheduleHistory()
+            {
+                Action = ActionType.Create,
+                ResourceID = payload.Response.Body.ID,
+                Resource = payload.Response.Body,
+            };
+            await _priceScheduleQuery.Post(update);
+        }
+
+        [HttpPost, Route("priceScheduleupdated")]
+        [OrderCloudWebhookAuth]
+        public async void HandlePriceScheduleUpdate([FromBody] WebhookPayloads.PriceSchedules.Patch payload)
+        {
+            var updatedPriceSchedule = await _oc.PriceSchedules.GetAsync(payload.Request.Body.ID);
+            var update = new PriceScheduleHistory()
+            {
+                Action = ActionType.Update,
+                ResourceID = updatedPriceSchedule.ID,
+                Resource = updatedPriceSchedule,
+
+            };
+            await _priceScheduleQuery.Put(update);
+        }
+
 
         [HttpPost, Route("supplierupdated")]
         [OrderCloudWebhookAuth]

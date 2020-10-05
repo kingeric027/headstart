@@ -7,6 +7,7 @@ import { OcAdminUserService, OcSupplierUserService } from '@ordercloud/angular-s
 import { faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { AppAuthService } from '@app-seller/auth';
+import {get as _get} from 'lodash';
 
 @Component({
   selector: 'account-notifications',
@@ -38,6 +39,13 @@ export class NotificationsComponent extends AccountContent {
 
   toggleRequestInfoEmails(value: boolean): void {
     this.updateUserFromEvent({target: {value: value}}, 'xp.RequestInfoEmails')
+  }
+
+  toggleProductEmails(value: boolean): void {
+    this.updateUserFromEvent({ target: { value: value } }, 'xp.ProductEmails')
+      this.updateUserFromEvent({target: {value: []}}, 'xp.AddtlRcpts');
+    }
+    this.updateUserFromEvent({target: {value: value}}, 'xp.ProductEmails')
   }
 
   addAddtlRcpt() {
