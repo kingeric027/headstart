@@ -101,6 +101,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
+  isSpecsEditing = false;
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
@@ -187,6 +189,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges();
   }
 
+  
+  specsBeingEdited(event): void {
+    this.isSpecsEditing = event;
+  }
+  
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
     if (superMarketplaceProduct.Product) {
       this.productForm = new FormGroup({
