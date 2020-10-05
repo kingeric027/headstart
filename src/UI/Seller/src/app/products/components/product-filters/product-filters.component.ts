@@ -1,8 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { OcProductFacetService, ProductFacet } from '@ordercloud/angular-sdk';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { OcProductFacetService, OcTokenService, Product, ProductFacet } from '@ordercloud/angular-sdk';
 import { omit as _omit } from 'lodash';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { cloneDeep } from 'lodash';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { MarketplaceProduct, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 
 @Component({
@@ -14,8 +17,8 @@ export class ProductFilters implements OnInit{
   facetOptions: ProductFacet[];
   faCheckCircle = faCheckCircle;
   sellerFilterOverride: boolean;
-  facetsOnProductStatic: any[];
-  facetsOnProductEditable: any[];
+  facetsOnProductStatic: any;
+  facetsOnProductEditable: any;
   overriddenChanges: boolean;
 
   @Input() set facetsOnProduct (facets: any[]) {
@@ -25,10 +28,14 @@ export class ProductFilters implements OnInit{
     console.log('facets at this point 2', this.facetsOnProductEditable);
   };
   @Input() readonly = false;
+  @Input() superProduct: MarketplaceProduct;
   @Output() updatedFacets = new EventEmitter<any>();
 
   constructor(
     private ocFacetService: OcProductFacetService,
+    private ocTokenService: OcTokenService,
+    private http: HttpClient,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
   ngOnInit(): void {
@@ -55,13 +62,13 @@ export class ProductFilters implements OnInit{
   }
 
   toggleFacetOption(facet: ProductFacet, option: string): void {
-    console.log('facet', facet);
-    console.log('option', option);
-    console.log('facetsOnProduct', this.facetsOnProductEditable);
+    // console.log('facet', facet);
+    // console.log('option', option);
+    // console.log('facetsOnProduct', this.facetsOnProductEditable);
     const productXpFacetKey = facet?.XpPath.split('.')[1]; //Color
     let facetOnXp = this.facetsOnProductEditable[productXpFacetKey]; //What is currently selected...*selects green* ['White', 'Orange'], *selects purple* ['White', 'Orange', 'Green']
-    console.log('facetOnXp', facetOnXp);
-    console.log('productXpFacetKey', productXpFacetKey);
+    // console.log('facetOnXp', facetOnXp);
+    // console.log('productXpFacetKey', productXpFacetKey);
     delete this.facetsOnProductEditable[productXpFacetKey]; //delete removes a property from an object
     // If the key doesn't exist on Product.xp.Facets, initialize it as an empty array
     if (!facetOnXp) {
@@ -69,20 +76,17 @@ export class ProductFilters implements OnInit{
     } //don't think this condition will come up
     // If the facet in quetsion includes the option requested, remove it from the array, else add it.
     if(facetOnXp.includes(option)) {
-      console.log('WE HAVE THIS, DELETE!');
       facetOnXp = facetOnXp.filter(o => o !== option);
     } else {
-      console.log('WE DO NOT HAVE THIS, ADD!');
       facetOnXp.push(option);
     }
     if (facetOnXp.length > 0) {
       this.facetsOnProductEditable = { ...this.facetsOnProductEditable, [productXpFacetKey]: facetOnXp}
     };
-    // this.updatedFacets.emit(this.facetsOnProduct); //COMMENTED OUT FOR NOW - UNCOMMENT LATER
-    //TESTING
     if (!this.readonly) {
       this.updatedFacets.emit(this.facetsOnProductEditable);
     } else {
+      console.log('VALUE TO SEND', this.facetsOnProductEditable);
       this.overrideFacets();
     }
   }
@@ -120,7 +124,21 @@ export class ProductFilters implements OnInit{
     return changeDetected;
   }
 
-  saveFilterOverrides(): Promise<any> {
-    
+  async saveFilterOverrides(): Promise<void> {
+    //TO-DO - replace with SDK
+    console.log('this.superProduct', this.superProduct);
+    console.log('facets that are sending', this.facetsOnProductEditable);
+    (this.superProduct.xp as any).Facets = this.facetsOnProductEditable;
+    console.log('NOW THE SUPER', this.superProduct);
+    const url = `${this.appConfig.middlewareUrl}/products/filteroptionoverride/${this.superProduct.ID}`;
+    const product = await this.http.patch<any>(url, this.superProduct, { headers: this.buildHeaders() }).toPromise();
+    this.superProduct = product;
+  }
+
+  private buildHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
   }
 }

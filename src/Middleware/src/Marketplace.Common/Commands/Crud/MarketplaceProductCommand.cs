@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Models;
+using Newtonsoft.Json;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
+
 
 namespace Marketplace.Common.Commands.Crud
 {
@@ -23,6 +26,7 @@ namespace Marketplace.Common.Commands.Crud
 		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
 		Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
 		Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
+		Task<Product> FilterOptionOverride(string id, IDictionary<string, object> facets, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -35,11 +39,13 @@ namespace Marketplace.Common.Commands.Crud
 		private readonly IOrderCloudClient _oc;
 		private readonly IAssetedResourceQuery _assetedResources;
 		private readonly IAssetQuery _assets;
+		private readonly AppSettings _settings;
 		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
 		{
 			_assetedResources = assetedResources;
 			_assets = assets;
 			_oc = elevatedOc;
+			_settings = settings;
 		}
 
 		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
@@ -48,7 +54,7 @@ namespace Marketplace.Common.Commands.Crud
 			var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(priceScheduleID);
 			return priceSchedule;
 		}
-		
+
 		public async Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user)
 		{
 			/* must remove the price schedule from the visibility assignments
@@ -69,7 +75,7 @@ namespace Marketplace.Common.Commands.Crud
 			await AddPriceScheduleAssignmentToProductCatalogAssignments(id, buyerID, priceScheduleID);
 			return newPriceSchedule;
 		}
-		
+
 		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, VerifiedUserContext user)
 		{
 			var priceScheduleID = $"{id}-{buyerID}";
@@ -126,16 +132,16 @@ namespace Marketplace.Common.Commands.Crud
 			// Get the price schedule, if it exists, if not - send empty price schedule
 			var _priceSchedule = new PriceSchedule();
 			try
-            {
-				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, user.AccessToken); 
-            } catch
-            {
+			{
+				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, user.AccessToken);
+			} catch
+			{
 				_priceSchedule = new PriceSchedule();
-            }
+			}
 			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _images = GetProductImages(id, user);
-			var _attachments =  GetProductAttachments(id, user);
+			var _attachments = GetProductAttachments(id, user);
 			try
 			{
 				return new SuperMarketplaceProduct
@@ -209,12 +215,12 @@ namespace Marketplace.Common.Commands.Crud
 			PriceSchedule _priceSchedule = null;
 			// If the superProduct has a price schedule, create
 			if (superProduct.PriceSchedule != null)
-            {
+			{
 				superProduct.PriceSchedule.ID = superProduct.Product.ID;
 				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
 				superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
-            }
-        	// Create Product
+			}
+			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
 			var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
@@ -306,9 +312,9 @@ namespace Marketplace.Common.Commands.Crud
 			// If applicable, update OR create the Product PriceSchedule
 			PriceSchedule _priceSchedule = null;
 			if (superProduct.PriceSchedule != null)
-            {
+			{
 				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
-            }
+			}
 			// Update the Product itself
 			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// List Variants
@@ -346,10 +352,98 @@ namespace Marketplace.Common.Commands.Crud
 			);
 		}
 
+		public async Task<Product> FilterOptionOverride(string id, IDictionary<string, object> facets, VerifiedUserContext user)
+		{
+			var config = new OrderCloudClientConfig
+			{
+				ClientId = "91e0dfbc-48c4-4936-ba44-2db5c6b2645c",
+				ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+				GrantType = GrantType.ClientCredentials,
+				//Username = "mahersebd",
+				//Password = "fails345",
+				Roles = new[]
+						   {
+								 ApiRole.SupplierAdmin,
+								 ApiRole.ProductAdmin
+							},
+
+			};
+			var clientToUse = await _oc.ApiClients.GetAsync("91e0dfbc-48c4-4936-ba44-2db5c6b2645c");
+			var configToUse = new OrderCloudClientConfig
+			{
+				ClientId = clientToUse.ID,
+				ClientSecret = clientToUse.ClientSecret,
+				GrantType = GrantType.ClientCredentials,
+				//Username = "mahersebd",
+				//Password = "fails345",
+				Roles = new[]
+						   {
+								 ApiRole.SupplierAdmin,
+								 ApiRole.ProductAdmin
+							},
+
+			};
+			var newestClient = new OrderCloudClient(configToUse);
+			await newestClient.AuthenticateAsync();
+			var token2 = newestClient.TokenResponse.AccessToken;
+
+
+
+
+
+
+			//var client = new OrderCloudClient(config);
+			//await client.AuthenticateAsync();
+			//var token = client.TokenResponse.AccessToken;
+
+
+
+			//var response = await client.AuthenticateAsync(user.ClientID, _settings.OrderCloudSettings.ClientSecret, ApiRole.ProductAdmin);
+			//var response2 = await client.AuthenticateAsync(user.ClientID, "mahersebd", "fails345", ApiRole.ProductAdmin);
+
+			var facetDataFormatted = new ExpandoObject();
+			var facetDataFormattedCollection = (ICollection<KeyValuePair<string, object>>) facetDataFormatted;
+			foreach (var kvp in facets)
+            {
+				facetDataFormattedCollection.Add(kvp);
+            }
+			dynamic facetDataFormattedDynamic = facetDataFormatted;
+
+			var updatedProduct = await newestClient.Products.PatchAsync(
+				id,
+				new PartialProduct() {  xp = new { Facets = facetDataFormattedDynamic }},
+				accessToken: token2
+				);
+            return updatedProduct;
+        }
+
 		private async Task<string> GetSupplierNameForXpFacet(string supplierID, string accessToken)
 		{
 			var supplier = await _oc.Suppliers.GetAsync(supplierID, accessToken);
 			return supplier.Name;
 		}
+
+		//var supplierOrderCloudClient = new OrderCloudClient(new OrderCloudClientConfig
+		//{
+		//	//ApiUrl = user.ApiUrl,
+		//	//AuthUrl = user.AuthUrl,
+		//	ClientId = user.ClientID,
+		//	ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+		//	GrantType = GrantType.ClientCredentials,
+		//	Username = "mahersebd",
+		//	Password = "fails345",
+		//	Roles = new[]
+		//	   {
+		//						 ApiRole.SupplierAdmin,
+		//						 ApiRole.ProductAdmin
+		//					},
+
+		//});
+		////        await supplierOrderCloudClient.AuthenticateAsync(user.ClientID, _settings.OrderCloudSettings.ClientSecret, new[]{
+		////ApiRole.SupplierAdmin,
+		////            ApiRole.ProductAdmin
+
+		////			});
+		////END TESTING
 	}
 }
