@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "Display": {
+      "type": "string",
+      "description": "Text for UI display"
+    },
+    "AllowSupplierEdit": {
+      "type": "boolean",
+      "description": "should the supplier be able to edit the options on their own supplier"
+    },
+    "AllowSellerEdit": {
+      "type": "boolean",
+      "description": "should the seller be able to edit the options on suppliers"
+    },
+    "BuyerAppFilterType": {
+      "type": "string",
+      "description": "how will this filter function on the buyer app",
+      "enum": [
+        "SelectOption",
+        "NonUI"
+      ]
+    },
+    "Path": {
+      "type": "string",
+      "description": "Path to filter value from root of object"
+    },
+    "Items": {
+      "description": "Potential Options for Field",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Text": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "title": "FilterConfigurationForSupplier",
+  "$schema": "https://marketplace-middleware.azurewebsites.net/schema-specs/metaschema",
+  "$id": "https://marketplace-middleware.azurewebsites.net/schema-specs/b04a1dc7-984b-44a6-bb9b-96a8f21c5c0e"
+}

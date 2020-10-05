@@ -80,10 +80,10 @@ namespace Marketplace.Common.Commands
             {
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
-            });
+            }, token);
 
             // list message senders
-            var msList = await _oc.MessageSenders.ListAsync();
+            var msList = await _oc.MessageSenders.ListAsync(accessToken: token);
             // create message sender assignment
             var assignmentList = msList.Items.Select(ms =>
             {
@@ -93,10 +93,10 @@ namespace Marketplace.Common.Commands
                     BuyerID = ocBuyerID
                 };
             });
-            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a, token));
 
-            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" });
-            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" }, token);
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" }, token);
 
             await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
             {
@@ -104,14 +104,14 @@ namespace Marketplace.Common.Commands
                 CatalogID = ocBuyer.ID,
                 ViewAllCategories = true,
                 ViewAllProducts = false
-            });
+            }, token);
             return buyer;
         }
 
         private async Task<BuyerMarkup> CreateMarkup(BuyerMarkup markup, string buyerID, string token)
         {
             // to move from xp to contentdocs, that logic will go here instead of a patch
-            var updatedBuyer = await _oc.Buyers.PatchAsync(buyerID, new PartialBuyer() { xp = new { MarkupPercent = markup.Percent } });
+            var updatedBuyer = await _oc.Buyers.PatchAsync(buyerID, new PartialBuyer() { xp = new { MarkupPercent = markup.Percent } }, token);
             return new BuyerMarkup()
             {
                 Percent = (int)updatedBuyer.xp.MarkupPercent

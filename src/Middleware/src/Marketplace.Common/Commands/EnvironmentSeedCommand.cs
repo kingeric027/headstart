@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Helpers;
-using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
-using Marketplace.Common.Services.DevCenter.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Marketplace.Common.Commands
 {
     public interface IEnvironmentSeedCommand
     {
-		Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user);
+		Task<string> Seed(EnvironmentSeed seed, VerifiedUserContext devUserContext);
 		Task PostStagingRestore();
     }
 	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
@@ -24,129 +25,137 @@ namespace Marketplace.Common.Commands
 		private readonly IOrderCloudClient _oc;
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
-		private EnvironmentSeed _seed;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IMarketplaceBuyerCommand _buyerCommand;
+		private readonly ISchemaQuery _schemaQuery;
+		private readonly IDocumentQuery _docQuery;
 
-		private readonly string _orgName = $"Head Start {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}";
-		private readonly string _localWebhookUrl = "https://marketplaceteam.ngrok.io";
-		private readonly string _defaultBuyerID = "Default_HeadStart_Buyer";
-		private readonly string _defaultBuyerName = "Default HeadStart Buyer";
 		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
-
-		// used for pointing integration events to the ngrok url
-		private readonly string _buyerLocalApiClientName = "Default Marketplace Buyer UI LOCAL";
-
+		private readonly string _buyerLocalApiClientName = "Default Marketplace Buyer UI LOCAL"; // used for pointing integration events to the ngrok url
 		private readonly string _sellerApiClientName = "Default HeadStart Admin UI";
 		private readonly string _integrationsApiClientName = "Middleware Integrations";
 		private readonly string _sellerUserName = "Default_Admin";
-		private readonly string _buyerUserName = "Default_Buyer";
-		private readonly string _defaultPassword = "Four51Yet!";
 		private readonly string _fullAccessSecurityProfile = "DefaultContext";
-		private readonly string _allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		private static string _adminUIApiClientID;
-		private static string _buyerUIApiClientID;
-		private static string _buyerLocalUIApiClientID;
-		private static string _middlewareApiClientID;
 
-		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand, IOrderCloudSandboxService orderCloudSandboxService)
+		public EnvironmentSeedCommand(
+			AppSettings settings,
+			IDevCenterService dev,
+			IMarketplaceSupplierCommand supplierCommand,
+			IMarketplaceBuyerCommand buyerCommand,
+			ISchemaQuery schemaQuery,
+			IDocumentQuery docQuery,
+			IOrderCloudClient oc
+		)
 		{
 			_settings = settings;
-			_oc = oc;
 			_dev = dev;
 			_supplierCommand = supplierCommand;
 			_buyerCommand = buyerCommand;
+			_schemaQuery = schemaQuery;
+			_docQuery = docQuery;
+			_oc = oc;
 		}
 
-		public async Task<ImpersonationToken> Seed(EnvironmentSeed seed, VerifiedUserContext user)
+		public async Task<string> Seed(EnvironmentSeed seed, VerifiedUserContext devUserContext)
 		{
-			_seed = seed;
-			var org = await CreateOrganization(user.AccessToken);
-			var company = await _dev.GetOrganizations(org.OwnerDevID, user.AccessToken);
+			await VerifyOrgExists(seed.SellerOrgID, devUserContext.AccessToken);
+			var orgToken = await _dev.GetOrgToken(seed.SellerOrgID, devUserContext.AccessToken);
 
-			// at this point everything we do is as impersonation of the admin user on a new token
-			var impersonation = await _dev.Impersonate(company.Items.FirstOrDefault(c => c.AdminCompanyID == org.ID).ID, user.AccessToken);
-			await CreateApiClients(impersonation.access_token);
-			await SetApiClientIDs(impersonation.access_token); // must be before patch api clients
-			await PatchDefaultApiClients(impersonation.access_token);
-			await CreateWebhooks(impersonation.access_token, seed.ApiUrl);
-			await CreateMessageSenders(impersonation.access_token, seed.ApiUrl);
-			await CreateMarketPlaceRoles(impersonation.access_token);
-			await CreateIncrementors(impersonation.access_token); // must be before create buyers
-			await CreateBuyers(user, impersonation.access_token);
-			await CreateXPIndices(impersonation.access_token);
-			await CreateAndAssignIntegrationEvents(impersonation.access_token, seed.ApiUrl);
-			await CreateSuppliers(user, impersonation.access_token);
-			await SetUpSellerAuthentication(impersonation.access_token);
-			//await this.ConfigureBuyers(impersonation.access_token);
-			return impersonation;
+            await CreateDefaultSellerUser(orgToken);
+            await CreateApiClients(orgToken);
+            await CreateSecurityProfiles(seed, orgToken);
+            await AssignSecurityProfiles(seed, orgToken);
+
+            var apiClients = await GetApiClients(orgToken);
+            await CreateWebhooks(apiClients.BuyerUiApiClient.ID, apiClients.AdminUiApiClient.ID, orgToken);
+            await CreateMessageSenders(orgToken);
+            await CreateIncrementors(orgToken); // must be before CreateBuyers
+            await CreateBuyers(seed, orgToken);
+            await CreateXPIndices(orgToken);
+            await CreateAndAssignIntegrationEvents(apiClients.BuyerUiApiClient.ID, apiClients.BuyerLocalUiApiClient.ID, orgToken);
+
+            var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
+            await CreateSuppliers(userContext, seed, orgToken);
+            await CreateContentDocSchemas(userContext);
+            await CreateDefaultContentDocs(userContext);
+			
+			return orgToken;
+
 		}
+
+		public async Task VerifyOrgExists(string orgID, string devToken)
+        {
+			try
+            {
+				await _dev.GetOrganization(orgID, devToken);
+            } catch
+            {
+				// the devcenter API no longer allows us to create an organization outside of devcenter
+				// so we need to create the org first before seeding it
+				throw new Exception("Failed to retrieve seller organization with SellerOrgID. The organization must exist before it can be seeded");
+            }
+        }
 
 		public async Task PostStagingRestore()
 		{	
 			var token = (await _oc.AuthenticateAsync()).AccessToken;
-			var baseUrl = _settings.EnvironmentSettings.BaseUrl;
-			await SetApiClientIDs(token);
+			var apiClients = await GetApiClients(token);
 
 			var deleteMS = DeleteAllMessageSenders(token);
 			var deleteWH = DeleteAllWebhooks(token);
-			var deleteIE = DeleteAllIntegrationEvents(token);
+			var deleteIE = DeleteAllIntegrationEvents(apiClients.BuyerUiApiClient.ID, token);
 			await Task.WhenAll(deleteMS, deleteWH, deleteIE);
 
-			var createMS = CreateMessageSenders(token, baseUrl);
-			var createWH = CreateWebhooks(token, baseUrl);
-			var createIE = CreateAndAssignIntegrationEvents(token, baseUrl);
+			var createMS = CreateMessageSenders(token);
+			var createWH = CreateWebhooks(apiClients.BuyerUiApiClient.ID, apiClients.AdminUiApiClient.ID, token);
+			var createIE = CreateAndAssignIntegrationEvents(apiClients.BuyerUiApiClient.ID, apiClients.BuyerLocalUiApiClient.ID, token);
 			await Task.WhenAll(createMS, createWH, createIE);
 		}
 
-		private async Task SetUpSellerAuthentication(string token)
-		{
-			// delete default security profiles if they exist
-			try
-			{
-				await _oc.SecurityProfiles.DeleteAsync("buyerProfile1", token);
-			} catch(Exception ex){}
 
-			try
+		private async Task AssignSecurityProfiles(EnvironmentSeed seed, string orgToken)
+		{
+			// assign buyer security profiles
+			var buyerSecurityProfileAssignmentRequests = seed.Buyers.Select(b =>
 			{
-				await _oc.SecurityProfiles.DeleteAsync("sellerProfile1", token);
-			} catch(Exception ex){}
-			foreach (var sellerCustomRole in SellerMarketplaceRoles)
+				return _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment
+				{
+					BuyerID = b.ID,
+					SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
+				}, orgToken);
+			});
+			await Task.WhenAll(buyerSecurityProfileAssignmentRequests);
+
+			// assign seller security profiles to seller org
+			var sellerSecurityProfileAssignmentRequests = SellerMarketplaceRoles.Select(role =>
 			{
-					await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-					{
-						SecurityProfileID = sellerCustomRole.ToString()
-					}, token);
-			}
-			var defaultAdminUser = (await _oc.AdminUsers.ListAsync(accessToken: token)).Items.First(u => u.Username == _sellerUserName);
+				return _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+				{
+					SecurityProfileID = role.ToString()
+				}, orgToken);
+			});
+			
+			// assign full access security profile to default admin user
+			var defaultAdminUser = (await _oc.AdminUsers.ListAsync(accessToken: orgToken)).Items.First(u => u.Username == _sellerUserName);
 			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
 			{
 				SecurityProfileID = _fullAccessSecurityProfile,
 				UserID = defaultAdminUser.ID
-			}, token);
+			}, orgToken);
 		}
 
-		private async Task<AdminCompany> CreateOrganization(string token)
-		{
-			var org = new Organization()
+		private async Task CreateBuyers(EnvironmentSeed seed, string token) {
+			seed.Buyers.Add(new MarketplaceBuyer
 			{
-				Name = _orgName,
+				ID = "Default_HeadStart_Buyer",
+				Name = "Default HeadStart Buyer",
 				Active = true,
-				BuyerID = _defaultBuyerID,
-				BuyerApiClientName = _buyerApiClientName,
-				BuyerName = _defaultBuyerName,
-				BuyerUserName = _buyerUserName,
-				BuyerPassword = _defaultPassword,
-				SellerApiClientName = _sellerApiClientName,
-				SellerPassword = _defaultPassword,
-				SellerUserName = _sellerUserName
-			};
-			var request = await _dev.PostOrganization(org, token);
-			return request;
-		}
-
-		private async Task CreateBuyers(VerifiedUserContext user, string token) {
-			foreach (var buyer in _seed.Buyers)
+				xp = new BuyerXp
+				{
+					MarkupPercent = 0
+				}
+			});
+			foreach (var buyer in seed.Buyers)
 			{
 				var superBuyer = new SuperMarketplaceBuyer()
 				{
@@ -157,13 +166,143 @@ namespace Marketplace.Common.Commands
 			}
 		}
 
-		private async Task CreateSuppliers(VerifiedUserContext user, string token)
+		private async Task CreateSuppliers(VerifiedUserContext user, EnvironmentSeed seed, string token)
 		{
 			// Create Suppliers and necessary user groups and security profile assignments
-			foreach (MarketplaceSupplier supplier in _seed.Suppliers)
+			foreach (MarketplaceSupplier supplier in seed.Suppliers)
 			{
 				await _supplierCommand.Create(supplier, user, token);
 			}
+		}
+
+		private async Task<VerifiedUserContext> GetVerifiedUserContext(ApiClient middlewareApiClient)
+        {
+			// some endpoints such as documents and documentschemas require a verified user context for a user in the seller org
+			// however the context that we get when calling this endpoint is for the dev user so we need to create a user context
+			// with the seller user
+			var ocConfig = new OrderCloudClientConfig
+			{
+				ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+				AuthUrl = _settings.OrderCloudSettings.ApiUrl,
+				ClientId = middlewareApiClient.ID,
+				ClientSecret = middlewareApiClient.ClientSecret,
+				GrantType = GrantType.ClientCredentials,
+				Roles = new[]
+				{
+					ApiRole.FullAccess
+				}
+			};
+			return await new VerifiedUserContext().Define(ocConfig);
+		}
+
+		private async Task CreateContentDocSchemas(VerifiedUserContext userContext)
+        {
+            var kitSchema = new DocSchema
+            {
+                ID = "KitProduct",
+				RestrictedAssignmentTypes = new List<ResourceType> { },
+				Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/kitproduct.json"))
+			};
+
+            var supplierFilterConfigSchema = new DocSchema
+            {
+                ID = "SupplierFilterConfig",
+                RestrictedAssignmentTypes = new List<ResourceType> { },
+                Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/supplierfilterconfig.json"))
+			};
+
+			await Task.WhenAll(
+				_schemaQuery.Create(kitSchema, userContext),
+				_schemaQuery.Create(supplierFilterConfigSchema, userContext)
+			);
+        }
+
+		private async Task CreateDefaultContentDocs(VerifiedUserContext userContext)
+        {
+			// any default created docs should be generic enough to be used by all orgs
+			await Task.WhenAll(
+				_docQuery.Create("SupplierFilterConfig", GetCountriesServicingDoc(), userContext),
+				_docQuery.Create("SupplierFilterConfig", GetServiceCategoryDoc(), userContext),
+				_docQuery.Create("SupplierFilterConfig", GetVendorLevelDoc(), userContext)
+			);
+        }
+
+		private SupplierFilterConfigDocument GetCountriesServicingDoc()
+        {
+			return new SupplierFilterConfigDocument
+			{
+				ID = "CountriesServicing",
+				Doc = new SupplierFilterConfig
+				{
+					Display = "Countries Servicing",
+					Path = "xp.CountriesServicing",
+					Items = new List<Filter>
+					{
+						new Filter
+						{
+							Text = "UnitedStates",
+							Value = "US"
+						}
+					},
+					AllowSellerEdit = true,
+					AllowSupplierEdit = true,
+					BuyerAppFilterType  = "NonUI"
+				}
+			};
+		}
+
+		private dynamic GetServiceCategoryDoc()
+		{
+			return new SupplierFilterConfigDocument
+			{
+				ID = "ServiceCategory",
+				Doc = new SupplierFilterConfig
+				{
+					Display = "Service Category",
+					Path = "xp.Categories.ServiceCategory",
+					AllowSupplierEdit = false,
+					AllowSellerEdit = true,
+					BuyerAppFilterType = "SelectOption",
+					Items = new List<Filter>
+					{
+
+					}
+				}
+			};
+		}
+
+		private SupplierFilterConfigDocument GetVendorLevelDoc()
+        {
+			return new SupplierFilterConfigDocument
+			{
+				ID = "VendorLevel",
+				Doc = new SupplierFilterConfig
+				{
+					Display = "Vendor Level",
+					Path = "xp.Categories.VendorLevel",
+					AllowSupplierEdit = true,
+					AllowSellerEdit = true,
+					BuyerAppFilterType = "SelectOption",
+					Items = new List<Filter>
+					{
+
+					}
+				}
+			};
+		}
+
+		private async Task CreateDefaultSellerUser(string token)
+        {
+			var defaultSellerUser = new User
+			{
+				ID = "Default_Admin",
+				Username = _sellerUserName,
+				Email = "test@test.com",
+				Active = true,
+				FirstName = "Default",
+				LastName = "User"
+			};
+			await _oc.AdminUsers.CreateAsync(defaultSellerUser, token);
 		}
 
 		static readonly List<XpIndex> DefaultIndices = new List<XpIndex>() {
@@ -204,51 +343,34 @@ namespace Marketplace.Common.Commands
 			}
 		}
 
-		private async Task SetApiClientIDs(string token)
+		private async Task<ApiClientIDs> GetApiClients(string token)
 		{
 			var list = await _oc.ApiClients.ListAsync(pageSize: 100, accessToken: token);
-			_adminUIApiClientID = list.Items.First(a => a.AppName == _sellerApiClientName).ID;
-			_buyerUIApiClientID = list.Items.First(a => a.AppName == _buyerApiClientName).ID;
-			_buyerLocalUIApiClientID = list.Items.First(a => a.AppName == _buyerLocalApiClientName).ID;
-			_middlewareApiClientID = list.Items.First(a => a.AppName == _integrationsApiClientName).ID;
+			var adminUIApiClient = list.Items.First(a => a.AppName == _sellerApiClientName);
+			var buyerUIApiClient = list.Items.First(a => a.AppName == _buyerApiClientName);
+			var buyerLocalUIApiClient = list.Items.First(a => a.AppName == _buyerLocalApiClientName);
+			var middlewareApiClient = list.Items.First(a => a.AppName == _integrationsApiClientName);
+			return new ApiClientIDs()
+			{
+				AdminUiApiClient = adminUIApiClient,
+				BuyerUiApiClient = buyerUIApiClient,
+				BuyerLocalUiApiClient = buyerLocalUIApiClient,
+				MiddlewareApiClient = middlewareApiClient
+			};
 		}
 
-		private async Task PatchDefaultApiClients(string token)
-		{
-			var buyer = _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient()
-			{
-				Active = true,
-				AllowAnyBuyer = true,
-				AllowAnySupplier = false,
-				AllowSeller = false,
-				AccessTokenDuration = 600,
-				RefreshTokenDuration = 43200,
-			}, accessToken: token);
-			var buyerLocal = _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient()
-			{
-				Active = true,
-				AllowAnyBuyer = true,
-				AllowAnySupplier = false,
-				AllowSeller = false,
-				AccessTokenDuration = 600,
-				RefreshTokenDuration = 43200,
-			}, accessToken: token);
-			var admin = _oc.ApiClients.PatchAsync(_adminUIApiClientID, new PartialApiClient()
-			{
-				Active = true,
-				AllowAnyBuyer = false,
-				AllowAnySupplier = true,
-				AllowSeller = true,
-				AccessTokenDuration = 600,
-				RefreshTokenDuration = 43200,
-			}, accessToken: token);
-			await Task.WhenAll(buyer, buyerLocal, admin);
-		}
+		public class ApiClientIDs
+        {
+			public ApiClient AdminUiApiClient { get; set; }
+			public ApiClient BuyerUiApiClient { get; set; }
+			public ApiClient BuyerLocalUiApiClient { get; set; }
+			public ApiClient MiddlewareApiClient { get; set; }
+        }
 
 		private async Task CreateApiClients(string token)
 		{
-			var clientSecret = RandomGen.GetString(_allowedChars, 60);
-			var integrationsClient = new PartialApiClient()
+			var allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			var integrationsClient = new ApiClient()
 			{
 				AppName = _integrationsApiClientName,
 				Active = true,
@@ -258,27 +380,63 @@ namespace Marketplace.Common.Commands
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200,
 				DefaultContextUserName = _sellerUserName,
-				ClientSecret = clientSecret
+				ClientSecret = RandomGen.GetString(allowedChars, 60)
 			};
-			await _oc.ApiClients.CreateAsync(integrationsClient, token);
+			var sellerClient = new ApiClient()
+			{
+				AppName = _sellerApiClientName,
+				Active = true,
+				AllowAnyBuyer = false,
+				AllowAnySupplier = false,
+				AllowSeller = true,
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200
+			};
+			var buyerClient = new ApiClient()
+			{
+				AppName = _buyerApiClientName,
+				Active = true,
+				AllowAnyBuyer = true,
+				AllowAnySupplier = false,
+				AllowSeller = false,
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200
+			};
+			var buyerLocalClient = new ApiClient()
+			{
+				AppName = _buyerLocalApiClientName,
+				Active = true,
+				AllowAnyBuyer = false,
+				AllowAnySupplier = false,
+				AllowSeller = false,
+				AccessTokenDuration = 600,
+				RefreshTokenDuration = 43200
+			};
+
+			var integrationsClientRequest = _oc.ApiClients.CreateAsync(integrationsClient, token);
+			var sellerClientRequest = _oc.ApiClients.CreateAsync(sellerClient, token);
+			var buyerClientRequest = _oc.ApiClients.CreateAsync(buyerClient, token);
+			var buyerLocalClientRequest = _oc.ApiClients.CreateAsync(buyerLocalClient, token);
+
+			await Task.WhenAll(integrationsClientRequest, sellerClientRequest, buyerClientRequest, buyerLocalClientRequest);
 		}
 
-		private async Task CreateMessageSenders(string accessToken, string baseURL)
+		private async Task CreateMessageSenders(string accessToken)
 		{
 			foreach (var messageSender in DefaultMessageSenders)
 			{
-				messageSender.URL = $"{baseURL}{messageSender.URL}";
+				messageSender.URL = $"{_settings.EnvironmentSettings.BaseUrl}{messageSender.URL}";
 				await _oc.MessageSenders.CreateAsync(messageSender, accessToken);
 			}
 		}
-		private async Task CreateAndAssignIntegrationEvents(string token, string apiUrl)
+		private async Task CreateAndAssignIntegrationEvents(string buyerUiApiClientID, string buyerLocalUiApiClientID, string token)
 		{
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
 				ElevatedRoles = new [] { ApiRole.FullAccess },
 				ID = "freightpopshipping",
 				EventType = IntegrationEventType.OrderCheckout,
-				CustomImplementationUrl = apiUrl,
+				CustomImplementationUrl = _settings.EnvironmentSettings.BaseUrl,
 				Name = "FreightPOP Shipping",
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
@@ -292,7 +450,7 @@ namespace Marketplace.Common.Commands
 				ElevatedRoles = new [] { ApiRole.FullAccess },
 				ID = "freightpopshippingLOCAL",
 				EventType = IntegrationEventType.OrderCheckout,
-				CustomImplementationUrl = _localWebhookUrl,
+				CustomImplementationUrl = "https://marketplaceteam.ngrok.io", // local webhook url
 				Name = "FreightPOP Shipping LOCAL",
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
@@ -301,33 +459,30 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
-			await _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshippingLOCAL" }, token);
+			await _oc.ApiClients.PatchAsync(buyerUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
+			await _oc.ApiClients.PatchAsync(buyerLocalUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshippingLOCAL" }, token);
 		}
 
-		public async Task CreateMarketPlaceRoles(string accessToken)
+		public async Task CreateSecurityProfiles(EnvironmentSeed seed, string accessToken)
 		{
 			var profiles = DefaultSecurityProfiles.Select(p =>
-				new SecurityProfile() { 
-					Name = p.CustomRole.ToString(), 
-					ID = p.CustomRole.ToString(), 
-					CustomRoles = p.CustomRoles == null ? new List<string>() { p.CustomRole.ToString() } : p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString()).ToList(), 
-					Roles = p.Roles });
-			foreach (var profile in profiles)
-			{
-				await _oc.SecurityProfiles.CreateAsync(profile, accessToken);
-			}
-			await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
-			{
-				BuyerID = _defaultBuyerID,
-				SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
-			}, accessToken);
-			await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+				new SecurityProfile()
+				{
+					Name = p.CustomRole.ToString(),
+					ID = p.CustomRole.ToString(),
+					CustomRoles = p.CustomRoles == null ? new List<string>() { p.CustomRole.ToString() } : p.CustomRoles.Append(p.CustomRole).Select(r => r.ToString()).ToList(),
+					Roles = p.Roles
+				}).ToList();
+
+			profiles.Add(new SecurityProfile()
 			{
 				Roles = new List<ApiRole> { ApiRole.FullAccess },
 				Name = _fullAccessSecurityProfile,
 				ID = _fullAccessSecurityProfile
-			}, accessToken);
+			});
+
+			var profileCreateRequests = profiles.Select(p => _oc.SecurityProfiles.CreateAsync(p, accessToken));
+			await Task.WhenAll(profileCreateRequests);
 		}
 
 		public async Task DeleteAllWebhooks(string token)
@@ -341,18 +496,18 @@ namespace Marketplace.Common.Commands
 		{
 			var messageSenders = await _oc.MessageSenders.ListAsync(pageSize: 100, accessToken: token);
 			await Throttler.RunAsync(messageSenders.Items, 500, 20, messageSender =>
-				_oc.MessageSenders.DeleteAsync(messageSender.ID));
+				_oc.MessageSenders.DeleteAsync(messageSender.ID, token));
 		}
 
-		public async Task DeleteAllIntegrationEvents(string token)
+		public async Task DeleteAllIntegrationEvents(string buyerUiApiClientID, string token)
 		{
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = null });
+			await _oc.ApiClients.PatchAsync(buyerUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = null }, token);
 			var integrationEvents = await _oc.IntegrationEvents.ListAsync(pageSize: 100, accessToken: token);
 			await Throttler.RunAsync(integrationEvents.Items, 500, 20, integrationEvent =>
-				_oc.IntegrationEvents.DeleteAsync(integrationEvent.ID));
+				_oc.IntegrationEvents.DeleteAsync(integrationEvent.ID, token));
 		}
 
-		private async Task CreateWebhooks(string accessToken, string baseURL)
+		private async Task CreateWebhooks(string buyerUiApiClientID, string adminUiApiClientID, string accessToken)
 		{
 			var DefaultWebhooks = new List<Webhook>() {
 			new Webhook() {
@@ -369,7 +524,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/approve", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { _buyerUIApiClientID }
+			  ApiClientIDs = new [] { buyerUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "Order Declined",
@@ -385,7 +540,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/decline", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { _buyerUIApiClientID }
+			  ApiClientIDs = new [] { buyerUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "Order Shipped",
@@ -401,7 +556,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/ship", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { _adminUIApiClientID }
+			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "Order Cancelled",
@@ -417,7 +572,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/cancel", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { _adminUIApiClientID }
+			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "New User",
@@ -433,7 +588,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/buyers/{buyerID}/users", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { _buyerUIApiClientID, _adminUIApiClientID }
+			  ApiClientIDs = new [] { buyerUiApiClientID, adminUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "Product Created",
@@ -449,7 +604,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/products", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { _adminUIApiClientID }
+			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "Product Update",
@@ -465,7 +620,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/products/{productID}", Verb = "PATCH" }
 			  },
-			  ApiClientIDs = new [] { _adminUIApiClientID }
+			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
 			  Name = "Supplier Updated",
@@ -481,12 +636,12 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/suppliers/{supplierID}", Verb = "PATCH" }
 			  },
-			 ApiClientIDs = new [] { _adminUIApiClientID }
+			 ApiClientIDs = new [] { adminUiApiClientID }
 			},
 		};
 			foreach (Webhook webhook in DefaultWebhooks)
 			{
-				webhook.Url = $"{baseURL}{webhook.Url}";
+				webhook.Url = $"{_settings.EnvironmentSettings.BaseUrl}{webhook.Url}";
 				webhook.HashKey = _settings.OrderCloudSettings.WebhookHashKey;
 				await _oc.Webhooks.CreateAsync(webhook, accessToken);
 			}
@@ -527,7 +682,7 @@ namespace Marketplace.Common.Commands
 				}
 			}
 		};
-		
+
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
 			
 			// seller/supplier

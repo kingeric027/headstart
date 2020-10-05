@@ -80,7 +80,7 @@ namespace Marketplace.Common.Commands
                 {
                     ApiClientID = apiClient.ID
                 }
-            });
+            }, token);
 
             // Assign Supplier API Client to new supplier
             await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
@@ -89,7 +89,7 @@ namespace Marketplace.Common.Commands
                 SupplierID = ocSupplierID
             }, token);
             // list message senders
-            var msList = await _oc.MessageSenders.ListAsync();
+            var msList = await _oc.MessageSenders.ListAsync(accessToken: token);
             // create message sender assignment
             var assignmentList = msList.Items.Select(ms =>
             {
@@ -99,7 +99,7 @@ namespace Marketplace.Common.Commands
                     SupplierID = ocSupplierID
                 };
             });
-            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a, token));
             return supplier;
         }
     
@@ -110,7 +110,7 @@ namespace Marketplace.Common.Commands
             {
                 SupplierID = supplierID,
                 SecurityProfileID = "MPMeAdmin"
-            });
+            }, token);
 
             foreach(var userType in SEBUserTypes.Supplier())
             {

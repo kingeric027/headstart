@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using ordercloud.integrations.library;
 using ordercloud.integrations.cms;
 using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace Marketplace.Models
 {
@@ -20,7 +22,11 @@ namespace Marketplace.Models
         public List<Filter> Items { get; set; }
         public bool AllowSupplierEdit { get; set; }
         public bool AllowSellerEdit { get; set; }
-        public BuyerAppFilterType BuyerAppFilterType { get; set; }
+
+
+        // Either SelectOption or NonUi
+        // we can't use an enum because it comes through as int and json validator expects string
+        public string BuyerAppFilterType { get; set; }
     }
 
     [SwaggerModel]
@@ -28,12 +34,6 @@ namespace Marketplace.Models
     {
         public string Text {get; set;}
         public string Value {get; set; }
-    }
-
-    public enum BuyerAppFilterType
-    {
-       SelectOption,
-       NonUI
     }
 
 }
