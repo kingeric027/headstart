@@ -40,7 +40,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   availableCurrencies: SupportedRates[] = [];
   isCreatingNew: boolean;
   countriesServicingOptions = [];
-  countriesServicingForm:  FormGroup;
+  countriesServicingForm: FormGroup;
   hasLogo = false;
   logoUrl: string = "";
   stagedLogoUrl: SafeUrl = null;
@@ -77,7 +77,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
 
   async handleSelectedSupplierChange(supplier: MarketplaceSupplier): Promise<void> {
     this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`;
-    !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}})).Items?.length > 0);
+    !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } })).Items?.length > 0);
     !this.isCreatingNew && (this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise());
     this.setUpSupplierCountrySelectIfNeeded();
   }
@@ -118,10 +118,10 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       this.updateResource.emit({ field: 'xp.ProductTypes', value: valueToArray });
     } else {
       let value;
-      if(field === 'xp.FreeShippingThreshold') {
-        value = parseInt(event.target.value, 10) ? parseInt(event.target.value, 10) : 
-            event.target.value === '' ? 0 :
-                event.target.checked ? 0 : null;
+      if (field === 'xp.FreeShippingThreshold') {
+        value = parseInt(event.target.value, 10) ? parseInt(event.target.value, 10) :
+          event.target.value === '' ? 0 :
+            event.target.checked ? 0 : null;
       } else {
         value = ['Active', 'xp.SyncFreightPop'].includes(field) ? event.target.checked : event.target.value;
       }
@@ -161,7 +161,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     } else {
       this.logoLoading = true;
       const file: File = event?.target?.files[0];
-      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}});
+      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } });
       if (logoAssets?.Items?.length > 0) {
         // If logo exists, remove the assignment, then the logo itself
         await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, "Suppliers", null, null);
@@ -194,14 +194,14 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     }
     // Upload the asset, then make the asset assignment to Suppliers
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-    await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'Suppliers', ResourceID: supplierID, AssetID: newAsset.ID }, accessToken);
+    await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Suppliers', ResourceID: supplierID, AssetID: newAsset.ID }, accessToken);
   }
 
   async removeLogo(): Promise<void> {
     this.logoLoading = true;
     try {
       // Get the logo asset
-      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, {filters: {Tags: ["Logo"]}});
+      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } });
       // Remove the logo asset assignment
       await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, "Suppliers", null, null);
       // Remove the logo asset
@@ -221,20 +221,21 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   }
 
   assignSupplierUser(email: string): void {
+    this._supplierEditable?.xp?.NotificationRcpts ? null : this._supplierEditable.xp.NotificationRcpts = [];
     const index = this._supplierEditable?.xp?.NotificationRcpts.indexOf(email);
     if (index !== -1) {
       this.removeAddtlRcpt(index);
       return;
     }
     const existingRcpts = this._supplierEditable?.xp?.NotificationRcpts || [];
-    const constructedEvent = {target: {value: [...existingRcpts, email]}};
+    const constructedEvent = { target: { value: [...existingRcpts, email] } };
     this.updateResourceFromEvent(constructedEvent, 'xp.NotificationRcpts');
   }
 
   removeAddtlRcpt(index: number): void {
     const copiedResource = JSON.parse(JSON.stringify(this._supplierEditable));
     const editedArr = copiedResource.xp?.NotificationRcpts.filter(e => e !== copiedResource.xp?.NotificationRcpts[index]);
-    this.updateResourceFromEvent({target: {value: editedArr}}, 'xp.NotificationRcpts');
+    this.updateResourceFromEvent({ target: { value: editedArr } }, 'xp.NotificationRcpts');
   }
 
   isAssigned(email: string): boolean {
