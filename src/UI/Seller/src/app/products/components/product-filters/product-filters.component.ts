@@ -67,6 +67,7 @@ export class ProductFilters implements OnInit{
     }
     if(facetOnXp.includes(option)) {
       facetOnXp = facetOnXp.filter(o => o !== option);
+      this.facetsOnProductEditable = { ...this.facetsOnProductEditable, [productXpFacetKey]: facetOnXp};
     } else {
       facetOnXp.push(option);
     }
@@ -100,7 +101,7 @@ export class ProductFilters implements OnInit{
     const keys = Object.keys(this.facetsOnProductStatic);
     let changeDetected = false;
     keys.forEach(key => {
-      if (this.facetsOnProductEditable[key].length !== this.facetsOnProductStatic[key].length ||
+      if (this.facetsOnProductEditable[key]?.length !== this.facetsOnProductStatic[key]?.length ||
           !this.facetsOnProductEditable[key].every(item => this.facetsOnProductStatic[key].includes(item))) {
         changeDetected = true;
       }
