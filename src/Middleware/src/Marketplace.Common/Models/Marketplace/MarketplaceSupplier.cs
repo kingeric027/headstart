@@ -25,6 +25,7 @@ namespace Marketplace.Models.Models.Marketplace
 		public CurrencySymbol? Currency { get; set; } = null;
         public List<ProductType> ProductTypes { get; set; }
         public List<string> CountriesServicing { get; set; }
+        public List<string> BuyersServicing { get; set; }
         public List<SupplierCategory> Categories { get; set; }
         public List<string> NotificationRcpts { get; set; }
         public Nullable<int> FreeShippingThreshold { get; set; }
