@@ -1,3 +1,4 @@
+import { MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { ValidatorFn } from '@angular/forms';
 
 export interface FieldConfig {
@@ -14,4 +15,5 @@ export interface FieldConfig {
   validation?: ValidatorFn[];
   value?: any;
   currency?: string;
+  disabledVariants?: MarketplaceVariant[]
 }

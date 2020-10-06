@@ -228,7 +228,8 @@ namespace Marketplace.Common.Commands.Crud
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
 				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+				v.Active = v.Active;
+				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active }, accessToken: user.AccessToken);
 			});
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
@@ -290,8 +291,17 @@ namespace Marketplace.Common.Commands.Crud
 			// Check if Variants differ
 			var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
 			var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
+			bool hasVariantChange = false;
+
+			foreach(Variant variant in requestVariants)
+            {
+				var currVariant = existingVariants.Where(v => v.ID == variant.ID)?.First();
+				if (currVariant == null) { continue; }
+				hasVariantChange = HasVariantChange(variant, currVariant);
+				if (hasVariantChange) { break; }
+            }
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.
-			if (variantsAdded || variantsRemoved || requestVariants.Any(v => v.xp.NewID != null))
+			if (variantsAdded || variantsRemoved || hasVariantChange || requestVariants.Any(v => v.xp.NewID != null))
 			{
 				// Re-generate Variants
 				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);
@@ -300,7 +310,7 @@ namespace Marketplace.Common.Commands.Crud
 				{
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
-					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active }, accessToken: user.AccessToken);
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
@@ -328,6 +338,19 @@ namespace Marketplace.Common.Commands.Crud
 				Images = _images,
 				Attachments = _attachments
 			};
+		}
+
+        private bool HasVariantChange(Variant variant, Variant currVariant)
+        {
+            if (variant.Active != currVariant.Active) { return true; }
+			if (variant.Description != currVariant.Description) { return true; }
+			if (variant.Name != currVariant.Name) { return true; }
+			if (variant.ShipHeight != currVariant.ShipHeight) { return true; }
+			if (variant.ShipLength != currVariant.ShipLength) { return true; }
+			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
+			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
+
+			return false;
 		}
 
 		public async Task Delete(string id, VerifiedUserContext user)

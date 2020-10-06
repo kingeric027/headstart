@@ -67,7 +67,7 @@
         </table>
         <button class="btn btn-block btn-primary mb-3"
                 type="submit"
-                [disabled]="this.isAddingToCart || !this.qtyValid || !isKitStatic"
+                [disabled]="this.isAddingToCart || !this.qtyValid || !isKitStatic || this.is"
                 (click)="addKitToCart()"
                 translate>
           PRODUCTS.DETAILS.ADD_TO_CART
@@ -90,10 +90,11 @@
           <!--DISPLAY SHORT SPEC FORM -->
           <div *ngIf="specLength < 4 && !showGrid">
             <ocm-spec-form *ngIf="isOrderable && _specs?.Items?.length > 0"
-                           [superProduct]="_superProduct"
+                           [disabledVariants]="_disabledVariants"
                            [specs]="_specs"
                            [currency]="_product?.xp?.Currency"
-                           (specFormChange)="onSpecFormChange($event.detail)">
+                           (specFormChange)="onSpecFormChange($event.detail)"
+                           (isSelectionInactive)="onSelectionInactive($event)">
             </ocm-spec-form>
             <div class="d-flex flex-column"
                  *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
@@ -114,7 +115,7 @@
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
-                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid || this.isInactiveVariant"
                         (click)="addToCart()"
                         translate>
                   PRODUCTS.DETAILS.ADD_TO_CART
@@ -220,8 +221,10 @@
         </div>
         <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
                        [specs]="_specs"
+                       [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event.detail)">
+                       (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"
              class="alert alert-info"

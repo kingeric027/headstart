@@ -1,5 +1,7 @@
+import { isValidLength } from './../../../services/card-validation.helper';
+import { SuperMarketplaceProduct, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, FormBuilder } from '@angular/forms';
+import { FormControl, FormBuilder, AbstractControl } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
@@ -25,11 +27,14 @@ import { ShopperContextService } from 'marketplace';
 })
 export class OCMSpecForm {
   _specs: ListPage<Spec>;
+  isValidAvailability: boolean;
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
+  @Output() onSelectionInactive: EventEmitter<boolean> = new EventEmitter<boolean>();
   config: FieldConfig[] = [];
   form: FormGroup;
  
   @Input() currency: string;
+  @Input() disabledVariants: MarketplaceVariant[]
   @Input() set specs(value: ListPage<Spec>) {
     this._specs = value;
     this.init();
@@ -84,12 +89,80 @@ export class OCMSpecForm {
     return new FormControl({ disabled, value }, validation);
   }
 
-  handleChange(): void {
+  handleChange(): void { 
+    console.log(this.form);
+    console.log(this.disabledVariants);
+    this.validateChangeAvailability(this.form, this.disabledVariants);
     this.specFormChange.emit({
       type: 'Change',
       valid: this.form.valid,
       form: this.form.value,
     } as SpecFormEvent);
+  }
+
+  validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]) {
+
+    for(let disabledVariant of disabledVariants){
+      if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
+        this.onSelectionInactive.emit(true);
+      }
+    }
+
+    form.value.ctrls.forEach(control => {
+      if (!this.isControlAvailable(control, disabledVariants)){
+        //control isn't available.
+      }
+    });
+    this.isValidAvailability = true;
+    let matchingSpecCount: number;
+    for (let control of form.value.ctrls){
+       disabledVariants.forEach(variant => {
+         matchingSpecCount = 0;
+         for (let spec of variant.Specs) {
+           if (spec.Value.toUpperCase() != control.toUpperCase()){
+             break;
+           }
+         }
+       })
+    }
+    // disabledVariants.forEach(variants => {
+    //   for (let spec of variants.Specs){
+    //     if (!form.value.ctrls.contains(spec.Value)) { break; }
+
+    //   }
+     
+    //   if (form.value.ctrls.contains(variants.Specs)){
+
+    //   }
+    
+  }
+  isControlInactive(ctrls: string[], disabledVariant: MarketplaceVariant): boolean {
+    let controlCount = 0;
+   for (let variant of disabledVariant.Specs) {
+     ctrlLoop:
+     for (let controlValue of ctrls){
+       if (variant.Value == controlValue) {
+        console.log(`ctrls: ${controlValue} and variant: ${variant.Value} almost matching!`)
+        controlCount = controlCount + 1;
+        if (controlCount ==  ctrls.length){ console.log(`${controlValue} matches ${variant.Value} twice now!`); return true; }
+        break ctrlLoop;
+       }
+     }
+   }
+   return false;
+  }
+
+  isControlAvailable(control: AbstractControl, disabledVariants: MarketplaceVariant[]): boolean {
+    for (let variant of disabledVariants){
+      let isAvailable = false;
+      for (let spec of variant.Specs) {
+       console.log(`spec: ${spec.Value} and control: ${control}`)
+      }
+    }
+    disabledVariants.forEach(element => {
+
+    });
+    return true;
   }
 
   private createCheckboxField(spec: Spec): FieldConfig {
@@ -130,6 +203,7 @@ export class OCMSpecForm {
         }).Value
         : null,
       options: _map(spec.Options),
+      disabledVariants: this.disabledVariants,
       validation: [spec.Required ? Validators.required : Validators.nullValidator],
       currency: this.context.currentUser.get().Currency
     }

@@ -4,7 +4,7 @@ import { Spec, PriceBreak, Product } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -58,6 +58,8 @@ export class OCMProductDetails implements OnInit {
   ocProductsInKit: any[];
   isKitStatic = false;
   contactRequest: ContactSupplierBody;
+  _disabledVariants: any[];
+  isInactiveVariant: boolean;
   constructor(
     private formService: SpecFormService,
     private context: ShopperContextService) {
@@ -87,6 +89,7 @@ export class OCMProductDetails implements OnInit {
       this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
       this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
       this._price = this.getTotalPrice();
+      this.populateInactiveVariants(superProduct);
       // Specs
       this._specs = { Meta: {}, Items: superProduct.Specs as any };
       this.specFormService.event.valid = this._specs.Items.length === 0;
@@ -110,6 +113,20 @@ export class OCMProductDetails implements OnInit {
       this.specFormService.event = event;
       this._price = this.getTotalPrice();
     }
+  }
+
+  onSelectionInactive(event: any){
+    console.log(event);
+    this.isInactiveVariant = event;
+  }
+
+  populateInactiveVariants(superProduct: SuperMarketplaceProduct) {
+    this._disabledVariants = [];
+    superProduct.Variants?.forEach(variant => {
+      if (!variant.Active) {
+        this._disabledVariants.push(variant);
+      }
+    })
   }
 
   toggleGrid(showGrid: boolean): void {
