@@ -10,7 +10,7 @@ export const environment: Environment = {
   appname: 'Anytime Fitness',
   clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  baseUrl: 'https://sebrandsmarketplace-anytime-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
