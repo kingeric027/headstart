@@ -42,7 +42,7 @@ namespace Marketplace.Common.Services
     {
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
-        private const string NO_REPLY_EMAIL_ADDRESS = "noreply@four51.com";
+        private const string NO_REPLY_EMAIL_ADDRESS = "noreply@sebvendorportal.com";
         private const string BUYER_ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID = "d-777af54b1e414b0b853f983697889267";
