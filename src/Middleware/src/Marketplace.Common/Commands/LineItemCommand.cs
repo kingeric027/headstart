@@ -281,24 +281,18 @@ namespace Marketplace.Common.Commands
                     var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.supplier);
                     if (shouldNotify)
                     {
-                        try
+                        await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
                         {
-                            await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
+                            if (supplier?.xp?.NotificationRcpts?.Any() ?? false)
                             {
-                                if (supplier?.xp?.NotificationRcpts?.Any() ?? false)
+                                var tos = new List<EmailAddress>();
+                                foreach (var rcpt in supplier.xp.NotificationRcpts)
                                 {
-                                    var tos = new List<EmailAddress>();
-                                    foreach (var rcpt in supplier.xp.NotificationRcpts)
-                                    {
-                                        tos.Add(new EmailAddress(rcpt));
-                                    };
-                                    await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
-                                }
-                            });
-                        } catch(Exception ex)
-                        {
-                            Console.WriteLine(ex);
-                        }
+                                    tos.Add(new EmailAddress(rcpt));
+                                };
+                                await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
+                            }
+                        });
                         
                     }
                 }
