@@ -134,6 +134,7 @@ namespace Marketplace.Common.Commands
 					SecurityProfileID = role.ToString()
 				}, orgToken);
 			});
+			await Task.WhenAll(sellerSecurityProfileAssignmentRequests);
 			
 			// assign full access security profile to default admin user
 			var defaultAdminUser = (await _oc.AdminUsers.ListAsync(accessToken: orgToken)).Items.First(u => u.Username == _sellerUserName);
@@ -387,7 +388,7 @@ namespace Marketplace.Common.Commands
 				AppName = _sellerApiClientName,
 				Active = true,
 				AllowAnyBuyer = false,
-				AllowAnySupplier = false,
+				AllowAnySupplier = true,
 				AllowSeller = true,
 				AccessTokenDuration = 600,
 				RefreshTokenDuration = 43200
@@ -406,7 +407,7 @@ namespace Marketplace.Common.Commands
 			{
 				AppName = _buyerLocalApiClientName,
 				Active = true,
-				AllowAnyBuyer = false,
+				AllowAnyBuyer = true,
 				AllowAnySupplier = false,
 				AllowSeller = false,
 				AccessTokenDuration = 600,

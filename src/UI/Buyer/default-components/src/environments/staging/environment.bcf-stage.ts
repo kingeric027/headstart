@@ -2,22 +2,21 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
-import bmTheme from '../styles/themes/bar-method/theme-config';
+import { Environment } from '../env.interface';
+import bcfTheme from '../../styles/themes/basecamp/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'The Barre Method',
-  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
+  appname: 'Basecamp Fitness',
+  clientID: 'A2E62264-B6FB-4C25-8507-79A58A35BE85',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  baseUrl: 'https://sebrandsmarketplace-basecamp-stage.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
-  ssoLink:
-    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: bmTheme,
+  theme: bcfTheme,
 };
 /*
 

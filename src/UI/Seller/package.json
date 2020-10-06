@@ -10,12 +10,12 @@
     "lint": "eslint src/**/*.ts",
     "e2e": "ng e2e",
     "precommit": "lint-staged --config ./lint-staged.config.js",
-    "serve-test": "ng serve --configuration=test",
-    "build-test": "ng build --configuration=test",
-    "serve-staging": "ng serve --configuration=staging",
-    "build-staging": "ng build --configuration=staging",
-    "serve-production": "ng serve --configuration=production",
-    "build-production": "ng build --configuration=production"
+    "serve-test": "ng serve --configuration=selfesteembrands-test",
+    "build-test": "ng build --configuration=selfesteembrands-test",
+    "serve-staging": "ng serve --configuration=selfesteembrands-staging",
+    "build-staging": "ng build --configuration=selfesteembrands-staging",
+    "serve-production": "ng serve --configuration=selfesteembrands-production",
+    "build-production": "ng build --configuration=selfesteembrands-production"
   },
   "private": true,
   "dependencies": {

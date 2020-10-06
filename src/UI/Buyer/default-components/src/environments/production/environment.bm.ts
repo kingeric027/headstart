@@ -2,21 +2,22 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
-import bcfTheme from '../styles/themes/basecamp/theme-config';
+import { Environment } from '../env.interface';
+import bmTheme from '../../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Basecamp Fitness',
-  clientID: '0045BB67-84CC-42BD-9FA7-009875628F7C',
+  appname: 'The Barre Method',
+  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
-  ssoLink: null,
+  ssoLink:
+    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: bcfTheme,
+  theme: bmTheme,
 };
 /*
 

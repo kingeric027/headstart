@@ -68,7 +68,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.af.ts"
+                "with": "src/environments/production/environment.af.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -97,7 +97,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.af-stage.ts"
+                "with": "src/environments/staging/environment.af-stage.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -126,7 +126,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bcf.ts"
+                "with": "src/environments/production/environment.bcf.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -155,7 +155,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bcf-stage.ts"
+                "with": "src/environments/staging/environment.bcf-stage.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -184,7 +184,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.wtc.ts"
+                "with": "src/environments/production/environment.wtc.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -213,7 +213,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.wtc-stage.ts"
+                "with": "src/environments/staging/environment.wtc-stage.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -242,7 +242,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bm.ts"
+                "with": "src/environments/production/environment.bm.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -271,7 +271,123 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bm-stage.ts"
+                "with": "src/environments/staging/environment.bm-stage.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "headstartdemo-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/headstartdemo"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/test/environment.headstartdemo-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "brandweardesigns-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/brandweardesigns"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/test/environment.brandweardesigns-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "fastsigns-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/fastsigns"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/test/environment.fastsigns-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "go2partners-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/go2partners"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/test/environment.go2partners-test.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -300,7 +416,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.test.ts"
+                "with": "src/environments/test/environment.test.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -359,6 +475,18 @@
             },
             "bm-stage": {
               "browserTarget": "default-components:build:bm-stage"
+            },
+            "headstartdemo-test": {
+              "browserTarget": "default-components:build:headstartdemo-test"
+            },
+            "brandweardesigns-test": {
+              "browserTarget": "default-components:build:brandweardesigns-test"
+            },
+            "fastsigns-test": {
+              "browserTarget": "default-components:build:fastsigns-test"
+            },
+            "go2partners-test": {
+              "browserTarget": "default-components:build:go2partners-test"
             },
             "test": {
               "browserTarget": "default-components:build:test"

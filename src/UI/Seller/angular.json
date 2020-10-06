@@ -28,7 +28,7 @@
             ]
           },
           "configurations": {
-            "test": {
+            "selfesteembrands-test": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -41,11 +41,11 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
+                  "with": "src/environments/test/selfesteembrands.test.ts"
                 }
               ]
             },
-            "staging": {
+            "selfesteembrands-staging": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -58,11 +58,11 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
+                  "with": "src/environments/staging/selfesteembrands.staging.ts"
                 }
               ]
             },
-            "production": {
+            "selfesteembrands-production": {
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -75,7 +75,109 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.production.ts"
+                  "with": "src/environments/production/selfesteembrands.production.ts"
+                }
+              ]
+            },
+            "brandweardesigns-production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/production/brandweardesigns.production.ts"
+                }
+              ]
+            },
+            "brandweardesigns-test": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/test/brandweardesigns.test.ts"
+                }
+              ]
+            },
+            "fastsigns-production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/production/fastsigns.production.ts"
+                }
+              ]
+            },
+            "fastsigns-test": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/test/fastsigns.test.ts"
+                }
+              ]
+            },
+            "headstartdemo-production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/production/headstartdemo.production.ts"
+                }
+              ]
+            },
+            "headstartdemo-test": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/test/headstartdemo.test.ts"
                 }
               ]
             }
@@ -87,14 +189,32 @@
             "browserTarget": "base-seller:build"
           },
           "configurations": {
-            "test": {
-              "browserTarget": "base-seller:build:test"
+            "selfesteembrands-test": {
+              "browserTarget": "base-seller:build:selfesteembrands-test"
             },
-            "staging": {
-              "browserTarget": "base-seller:build:staging"
+            "selfesteembrands-staging": {
+              "browserTarget": "base-seller:build:selfesteembrands-staging"
             },
-            "production": {
-              "browserTarget": "base-seller:build:production"
+            "selfesteembrands-production": {
+              "browserTarget": "base-seller:build:selfesteembrands-production"
+            },
+            "brandweardesigns-test": {
+              "browserTarget": "base-seller:build:brandweardesigns-test"
+            },
+            "brandweardesigns-production": {
+              "browserTarget": "base-seller:build:brandweardesigns-production"
+            },
+            "fastsigns-test": {
+              "browserTarget": "base-seller:build:fastsigns-test"
+            },
+            "fastsigns-production": {
+              "browserTarget": "base-seller:build:fastsigns-production"
+            },
+            "headstartdemo-test": {
+              "browserTarget": "base-seller:build:headstartdemo-test"
+            },
+            "headstartdemo-production": {
+              "browserTarget": "base-seller:build:headstartdemo-production"
             }
           }
         },

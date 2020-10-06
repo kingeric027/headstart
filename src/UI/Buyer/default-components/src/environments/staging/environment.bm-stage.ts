@@ -2,21 +2,21 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
-import bcfTheme from '../styles/themes/basecamp/theme-config';
+import { Environment } from '../env.interface';
+import bmTheme from '../../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Basecamp Fitness',
-  clientID: 'A2E62264-B6FB-4C25-8507-79A58A35BE85',
+  appname: 'The Barre Method',
+  clientID: '997F5753-4C11-4F5F-9B40-6AC843638BA2',
   marketplaceID: 'SEB',
-  baseUrl: 'https://sebrandsmarketplace-basecamp-stage.azurewebsites.net/',
+  baseUrl: 'https://sebrandsmarketplace-bar-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: bcfTheme,
+  theme: bmTheme,
 };
 /*
 

@@ -2,13 +2,13 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
-import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
+import { Environment } from '../env.interface';
+import afTheme from '../../styles/themes/anytime-fitness/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Wax In The City',
-  clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
+  appname: 'Anytime Fitness',
+  clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
@@ -16,7 +16,7 @@ export const environment: Environment = {
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: wtcTheme,
+  theme: afTheme,
 };
 /*
 
