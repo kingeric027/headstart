@@ -17,7 +17,7 @@
                              [favorite]="isFavorite()"
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
-        <div class="btn-group float-right"
+        <!-- <div class="btn-group float-right"
              *ngIf="specs?.length > 0">
           <button class="btn btn-sm btn-outline-secondary"
                   [ngClass]="{'active' : !showGrid}"
@@ -31,7 +31,7 @@
             <fa-icon [icon]="faTh">
             </fa-icon>
           </button>
-        </div>
+        </div> -->
       </div>
       <div *ngIf="supplierNote"
            class="alert alert-info my-3"><b>
