@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using System.Linq;
+using ordercloud.integrations.cms;
+using System.Dynamic;
+using System;
 
 namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceBuyerCommand
     {
-        Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, string token);
+        Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, VerifiedUserContext user);
         Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null);
         Task<SuperMarketplaceBuyer> Update(string buyerID, SuperMarketplaceBuyer buyer, string token);
     }
@@ -17,16 +20,18 @@ namespace Marketplace.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
+        private readonly IDocumentQuery _query;
 
-        public MarketplaceBuyerCommand(AppSettings settings, IOrderCloudClient oc)
+        public MarketplaceBuyerCommand(AppSettings settings, IOrderCloudClient oc, IDocumentQuery query)
         {
             _settings = settings;
             _oc = oc;
+            _query = query;
         }
-        public async Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer superBuyer, string token)
+        public async Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer superBuyer, VerifiedUserContext user)
         {
-            var createdBuyer = await CreateBuyerAndRelatedFunctionalResources(superBuyer.Buyer, token);
-            var createdMarkup = await CreateMarkup(superBuyer.Markup, createdBuyer.ID, token);
+            var createdBuyer = await CreateBuyerAndRelatedFunctionalResources(superBuyer.Buyer, user);
+            var createdMarkup = await CreateMarkup(superBuyer.Markup, createdBuyer.ID, user.AccessToken);
             return new SuperMarketplaceBuyer()
             {
                 Buyer = createdBuyer,
@@ -67,11 +72,11 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        public async Task<MarketplaceBuyer> CreateBuyerAndRelatedFunctionalResources(MarketplaceBuyer buyer, string token)
+        public async Task<MarketplaceBuyer> CreateBuyerAndRelatedFunctionalResources(MarketplaceBuyer buyer, VerifiedUserContext user)
         {
             buyer.ID = "{buyerIncrementor}";
             buyer.Active = true;
-            var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
+            var ocBuyer = await _oc.Buyers.CreateAsync(buyer, user.AccessToken);
             buyer.ID = ocBuyer.ID;
             var ocBuyerID = ocBuyer.ID;
 
@@ -81,6 +86,14 @@ namespace Marketplace.Common.Commands
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
             });
+
+            // add buyer to list of possible 'BuyersServicing' in the ContentDoc 'SupplierFilterConfig'
+            // TODO: Add removal of this buyer filter to the buyer cleanup process
+            var newBuyerToService = new Filter() { Text = ocBuyer.Name, Value = ocBuyerID};
+            var config = await _query.List("SupplierFilterConfig", new ListArgs<Document<SupplierFilterConfig>>(), user);
+            var buyersServicingConfig = config.Items.FirstOrDefault(c => c.ID == "BuyersServicing");
+            buyersServicingConfig.Doc.Items.Add(newBuyerToService);
+            await _query.Save("SupplierFilterConfig", "BuyersServicing", buyersServicingConfig, user);
 
             // list message senders
             var msList = await _oc.MessageSenders.ListAsync();
