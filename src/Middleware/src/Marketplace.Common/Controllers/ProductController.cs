@@ -5,6 +5,11 @@ using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Newtonsoft;
+using Newtonsoft.Json.Linq;
+using System.Dynamic;
+using System.Collections.Generic;
+using Flurl.Util;
 
 namespace Marketplace.Common.Controllers
 {
@@ -87,5 +92,14 @@ namespace Marketplace.Common.Controllers
 		{
 			await _command.DeletePricingOverride(id, buyerID, VerifiedUserContext);
 		}
+
+		[DocName("PATCH Product filter option override")]
+		[HttpPatch, Route("filteroptionoverride/{id}"), OrderCloudIntegrationsAuth(ApiRole.AdminUserAdmin)]
+		public async Task<Product> FilterOptionOverride(string id, [FromBody] Product product)
+        {
+			IDictionary<string, object> facets = product.xp.Facets;
+			var supplierID = product.DefaultSupplierID;
+			return await _command.FilterOptionOverride(id, supplierID, facets, VerifiedUserContext);
+        }
 	}
 }

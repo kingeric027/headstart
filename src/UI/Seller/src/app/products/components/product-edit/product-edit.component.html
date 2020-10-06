@@ -571,7 +571,8 @@
         <ng-template ngbNavContent>
           <product-filters-component [readonly]="readonly"
                                      (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
-                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []">
+                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"
+                                     [superProduct]="_superMarketplaceProductEditable?.Product">
           </product-filters-component>
         </ng-template>
       </li>
