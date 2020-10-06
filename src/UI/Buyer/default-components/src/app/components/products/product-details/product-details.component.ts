@@ -3,6 +3,7 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { MarketplaceLineItem, Asset, QuoteOrderInfo } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
@@ -62,6 +63,7 @@ export class OCMProductDetails implements OnInit {
     this.isOrderable = !!superProduct.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
     this.specs = superProduct.Specs;
+      this.populateInactiveVariants(superProduct);
   }
 
   ngOnInit(): void {
@@ -74,6 +76,20 @@ export class OCMProductDetails implements OnInit {
   onSpecFormChange(event: SpecFormEvent): void {
     this.specForm = event.form;
     this.calculatePrice();
+  }
+
+  onSelectionInactive(event: any){
+    console.log(event);
+    this.isInactiveVariant = event;
+  }
+
+  populateInactiveVariants(superProduct: SuperMarketplaceProduct) {
+    this._disabledVariants = [];
+    superProduct.Variants?.forEach(variant => {
+      if (!variant.Active) {
+        this._disabledVariants.push(variant);
+      }
+    })
   }
 
   toggleGrid(showGrid: boolean): void {

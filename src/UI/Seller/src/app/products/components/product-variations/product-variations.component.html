@@ -229,7 +229,7 @@
                        supplier-facet-chip"
                     (click)="toggleActive(variant)"
                     [ngClass]="{'active': variant.Active}">{{getVariantStatusDisplay(variant)}}
-                 <fa-icon *ngIf="true"
+                 <fa-icon *ngIf="variant.Active"
                           [icon]="faCheckCircle"></fa-icon>
                </div>
                   </td>

@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormBuilder } from '@angular/forms';
+import { isValidLength } from './../../../services/card-validation.helper';
+import { SuperMarketplaceProduct, MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { FormControl, FormBuilder, AbstractControl } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
-
 import { FieldConfig } from './field-config.interface';
 import { SpecOption, Spec } from 'ordercloud-javascript-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
@@ -24,12 +25,16 @@ import { ShopperContextService } from 'marketplace';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
+
 export class OCMSpecForm implements OnChanges {
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
+  @Output() onSelectionInactive: EventEmitter<boolean> = new EventEmitter<boolean>();
   config: FieldConfig[] = [];
   form: FormGroup;
+  isValidAvailability: boolean;
 
   @Input() currency: string;
+  @Input() disabledVariants: MarketplaceVariant[]
   @Input() compact?: boolean = false; // displays inputs in a compact way by setting them on a single line
   @Input() specs: Spec[]
 
@@ -88,10 +93,76 @@ export class OCMSpecForm implements OnChanges {
     return new FormControl({ disabled, value }, validation);
   }
 
-  handleChange(): void {
+  handleChange(): void { 
+    this.validateChangeAvailability(this.form, this.disabledVariants);
     this.specFormChange.emit({
       form: this.form,
     });
+  }
+
+  validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]) {
+    if (disabledVariants.length < 1){ return; }
+    for(let disabledVariant of disabledVariants){
+      if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
+        this.onSelectionInactive.emit(true);
+      }
+    }
+
+    form.value.ctrls.forEach(control => {
+      if (!this.isControlAvailable(control, disabledVariants)){
+        //control isn't available.
+      }
+    });
+    this.isValidAvailability = true;
+    let matchingSpecCount: number;
+    for (let control of form.value.ctrls){
+       disabledVariants.forEach(variant => {
+         matchingSpecCount = 0;
+         for (let spec of variant.Specs) {
+           if (spec.Value.toUpperCase() != control.toUpperCase()){
+             break;
+           }
+         }
+       })
+    }
+    // disabledVariants.forEach(variants => {
+    //   for (let spec of variants.Specs){
+    //     if (!form.value.ctrls.contains(spec.Value)) { break; }
+
+    //   }
+     
+    //   if (form.value.ctrls.contains(variants.Specs)){
+
+    //   }
+    
+  }
+  isControlInactive(ctrls: string[], disabledVariant: MarketplaceVariant): boolean {
+    let controlCount = 0;
+   for (let variant of disabledVariant.Specs) {
+     ctrlLoop:
+     for (let controlValue of ctrls){
+       if (variant.Value == controlValue) {
+        console.log(`ctrls: ${controlValue} and variant: ${variant.Value} almost matching!`)
+        controlCount = controlCount + 1;
+        if (controlCount ==  ctrls.length){ console.log(`${controlValue} matches ${variant.Value} twice now!`); return true; }
+        break ctrlLoop;
+       }
+     }
+   }
+   return false;
+  }
+
+  isControlAvailable(control: AbstractControl, disabledVariants: MarketplaceVariant[]): boolean {
+    for (let variant of disabledVariants){
+      let isAvailable = false;
+      for (let spec of variant.Specs) {
+       console.log(`spec: ${spec.Value} and control: ${control}`)
+      }
+    }
+    disabledVariants.forEach(element => {
+
+    });
+    return true;
   }
 
   private createCheckboxField(spec: Spec): FieldConfig {
@@ -132,6 +203,7 @@ export class OCMSpecForm implements OnChanges {
         }).Value
         : null,
       options: _map(spec.Options),
+      disabledVariants: this.disabledVariants,
       validation: [spec.Required ? Validators.required : Validators.nullValidator],
       currency: this.context.currentUser.get().Currency
     }

@@ -54,8 +54,10 @@
             <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
                            [superProduct]="_superProduct"
                            [specs]="specs"
+                           [disabledVariants]="_disabledVariants"
                            [currency]="_product?.xp?.Currency"
-                           (specFormChange)="onSpecFormChange($event.detail)">
+                           (specFormChange)="onSpecFormChange($event.detail)"
+                           (isSelectionInactive)="onSelectionInactive($event)">
             </ocm-spec-form>
             <div class="d-flex flex-column"
                  *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
@@ -76,6 +78,7 @@
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
+                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid || this.isInactiveVariant"
                         [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
                         (click)="addToCart()"
                         translate>
@@ -182,8 +185,10 @@
         </div>
         <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
                        [specs]="specs"
+                       [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event.detail)">
+                       (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"
              class="alert alert-info"
