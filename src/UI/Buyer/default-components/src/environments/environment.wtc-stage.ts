@@ -10,7 +10,7 @@ export const environment: Environment = {
   appname: 'Wax In The City',
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  baseUrl: 'https://sebrandsmarketplace-wax-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
