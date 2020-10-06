@@ -10,7 +10,7 @@ export const environment: Environment = {
   appname: 'The Bar Method',
   clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  baseUrl: 'https://sebrandsmarketplace-bar-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
