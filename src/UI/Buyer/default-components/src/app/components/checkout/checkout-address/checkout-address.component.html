@@ -42,14 +42,19 @@
             {{address.City}} {{address.State}} {{address.Zip}}
           </span>
         </option>
-        <option [ngValue]="NEW_ADDRESS_CODE"
-                translate>CHECKOUT.CHECKOUT_ADDRESS.NEW_ADDRESS</option>
+        <!-- <option [ngValue]="NEW_ADDRESS_CODE"
+                translate>CHECKOUT.CHECKOUT_ADDRESS.NEW_ADDRESS</option> -->
       </select>
-      <button type="submit"
-              *ngIf="!showNewAddressForm"
-              (click)="saveAddressesAndContinue()"
-              class="btn btn-secondary btn-sm mr-2 mt-3"
-              translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
+      <div class="d-flex justify-content-between align-items-center">
+        <button (click)="showNewAddressForm = true"
+                class="btn btn-secondary btn-sm mr-2 mt-3"
+                translate>Add New Address</button>
+        <button type="submit"
+                *ngIf="!showNewAddressForm"
+                (click)="saveAddressesAndContinue()"
+                class="btn btn-secondary btn-sm mr-2 mt-3"
+                translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
+      </div>
     </div>
     <ocm-address-form *ngIf="showNewAddressForm"
                       [suggestedAddresses]="suggestedAddresses"

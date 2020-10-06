@@ -4,6 +4,7 @@ import { ShopperContextService } from 'marketplace';
 import { MarketplaceOrder, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
+import { NgxSpinnerService } from 'ngx-spinner';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
 // Goal is to get all the checkout logic and state into one component. 
@@ -21,12 +22,12 @@ export class OCMCheckoutAddress implements OnInit {
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
-  
+
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListPage<LineItem>;
   @Output() continue = new EventEmitter();
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { }
 
   async ngOnInit(): Promise<void> {
     this.selectedShippingAddress = this.lineItems?.Items[0].ShippingAddress;
@@ -69,7 +70,7 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   private async listSavedShippingAddresses(): Promise<void> {
-    this.existingShippingAddresses = await this.context.addresses.list({ filters: { Shipping: true }});
+    this.existingShippingAddresses = await this.context.addresses.list({ filters: { Shipping: true } });
   }
 
   private async saveNewShippingAddress(address: BuyerAddress): Promise<MarketplaceAddressBuyer> {
