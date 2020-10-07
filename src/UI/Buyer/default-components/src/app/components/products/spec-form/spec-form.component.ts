@@ -1,7 +1,6 @@
-import { isValidLength } from './../../../services/card-validation.helper';
-import { SuperMarketplaceProduct, MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 
@@ -90,8 +89,6 @@ export class OCMSpecForm {
   }
 
   handleChange(): void { 
-    console.log(this.form);
-    console.log(this.disabledVariants);
     this.validateChangeAvailability(this.form, this.disabledVariants);
     this.specFormChange.emit({
       type: 'Change',
