@@ -68,7 +68,7 @@
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
-                        [disabled]="!specForm?.valid || !qtyValid"
+                        [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                         (click)="openQuoteForm()"
                         translate>
                   PRODUCTS.DETAILS.REQ_QUOTE
@@ -76,7 +76,7 @@
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
-                        [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                        [disabled]="isAddingToCart || (specForm && !specForm?.valid) || !qtyValid"
                         (click)="addToCart()"
                         translate>
                   PRODUCTS.DETAILS.ADD_TO_CART
@@ -200,15 +200,15 @@
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
-                  [disabled]="!specForm?.valid || !qtyValid"
+                  [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                   (click)="openQuoteForm()"
                   translate>
-            PRODUCTS.DETAILS.REQ_QUOTE
+            PRODUCTS.DETAILS.REQ_QUOTE sss
           </button>
           <button *ngIf="!isQuoteProduct()"
                   class="btn btn-block btn-primary"
                   type="submit"
-                  [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                  [disabled]="isAddingToCart || (specForm && !specForm?.valid) || !qtyValid"
                   (click)="addToCart($event)"
                   translate>
             PRODUCTS.DETAILS.ADD_TO_CART
