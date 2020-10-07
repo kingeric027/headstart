@@ -38,7 +38,7 @@ import {
 	deleteBuyerLocation,
 } from '../../api-utils.ts/buyer-locations-util'
 import { userClientAuth, vendorUserRoles } from '../../api-utils.ts/auth-util'
-import headerPage from '../../pages/header-page'
+import headerPage from '../../pages/buyer/buyer-header-page'
 import { scrollIntoView } from '../../helpers/element-helper'
 
 fixture`Product Tests`
@@ -65,10 +65,26 @@ fixture`Product Tests`
 			'Test123!',
 			vendorUserRoles
 		)
+		ctx.productID = await createDefaultProduct(
+			ctx.warehouseID,
+			ctx.supplierUserAuth
+		)
+		ctx.buyerID = await createDefaultBuyer(ctx.clientAuth)
+		const catalog = await createDefaultCatalog(ctx.buyerID, ctx.clientAuth)
+		ctx.catalogID = catalog.ID
+		const location = await createDefaultBuyerLocation(
+			ctx.buyerID,
+			ctx.clientAuth
+		)
+		ctx.locationID = location.Address.ID
 		//wait 20 seconds to let everything get setup
 		await delay(20000)
 	})
 	.after(async ctx => {
+		await deleteProduct(ctx.productID, ctx.supplierUserAuth)
+		await deleteCatalog(ctx.catalogID, ctx.buyerID, ctx.clientAuth)
+		await deleteBuyerLocation(ctx.buyerID, ctx.locationID, ctx.clientAuth)
+		await deleteBuyer(ctx.buyerID, ctx.clientAuth)
 		await deleteSupplierAddress(
 			ctx.warehouseID,
 			ctx.supplierID,
@@ -112,61 +128,14 @@ test
 		.ok()
 })
 
-//still WIP, getting error when I try to do this locally
-test.skip
-	.before(async () => {
-		//Create Product
-		t.ctx.productID = await createDefaultProduct(
-			t.fixtureCtx.warehouseID,
-			t.fixtureCtx.supplierUserAuth
-		)
-
-		//Create Brand
-		t.ctx.buyerID = await createDefaultBuyer(t.fixtureCtx.clientAuth)
-		//Create Brand Catalog
-		const catalog = await createDefaultCatalog(
-			t.ctx.buyerID,
-			t.fixtureCtx.clientAuth
-		)
-		t.ctx.catalogID = catalog.ID
-
-		//Create Brand Location
-		const location = await createDefaultBuyerLocation(
-			t.ctx.buyerID,
-			t.fixtureCtx.clientAuth
-		)
-		t.ctx.locationID = location.Address.ID
-
-		await adminTestSetup()
-	})
-	.after(async () => {
-		//Delete Product
-		await deleteProduct(t.ctx.productID, t.fixtureCtx.supplierUserAuth)
-		//Delete Brand Catalog
-		await deleteCatalog(
-			t.ctx.catalogID,
-			t.ctx.buyerID,
-			t.fixtureCtx.clientAuth
-		)
-		//Delete Brand Location
-		await deleteBuyerLocation(
-			t.ctx.buyerID,
-			t.ctx.locationID,
-			t.fixtureCtx.clientAuth
-		)
-		//Delete Brand
-		await deleteBuyer(t.ctx.buyerID, t.fixtureCtx.clientAuth)
-	})('Assign Product to Catalog | 19976', async t => {
-	console.log(t.ctx.productID)
-	console.log(t.ctx.buyerID)
-	console.log(t.ctx.catalogID)
-	await t.debug()
+test.before(async () => {
+	await adminTestSetup()
+})('Assign Product to Catalog | 19976', async t => {
 	await adminHeaderPage.selectAllProducts()
-	await mainResourcePage.searchForResource(t.ctx.productID)
-	await mainResourcePage.selectResource(t.ctx.productID)
+	await mainResourcePage.searchForResource(t.fixtureCtx.productID)
+	await mainResourcePage.selectResource(t.fixtureCtx.productID)
 	await productDetailsPage.clickBuyerVisibilityTab()
-	await t.debug()
-	await scrollIntoView('.list-group-item')
-}) //as seller user (automation admin user)
+	await productDetailsPage.editBuyerVisibility(t.fixtureCtx.buyerID)
+})
 
 //Check that new product shows up on buyer side

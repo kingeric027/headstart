@@ -7,7 +7,7 @@ import { specErrors } from '../errors';
 @Component({
   selector: 'spec-form-input',
   template: `
-    <div [formGroup]="group">
+    <div [formGroup]="group" [class.row]="compact">
       <div class="form-input">
         <label>{{ config.label }}</label>
         <input
@@ -38,7 +38,7 @@ export class SpecFormInputComponent implements Field, OnInit {
   index: number;
   errorMsgs = specErrors;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.ctrls = this.group.get('ctrls') as FormArray;

@@ -9,6 +9,8 @@ import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 })
 export class OCMCategoryDropdown {
   faCaretRight = faCaretRight;
+  activeCatID: string = '';
+  activeSubCatID: string = '';
 
   @Output() closeDropdown = new EventEmitter();
   @Input() set categories(value: Category[]) {
@@ -21,7 +23,7 @@ export class OCMCategoryDropdown {
   subCategories: Category[] = [];
   subSubCategories: Category[] = []; // Intentionally restricted to three levels.
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService) { }
 
   assignCategories(categories: Category[], level: string): any {
     const subCategories = [];
@@ -59,5 +61,13 @@ export class OCMCategoryDropdown {
   setActiveCategory(categoryID: string): void {
     this.context.router.toProductList({ categoryID });
     this.closeDropdown.emit(false);
+  }
+
+  hoverSetActiveParentCat(categoryID: string): void {
+    this.activeCatID = categoryID;
+  }
+
+  hoverSetActiveSubCat(categoryID: string): void {
+    this.activeSubCatID = categoryID;
   }
 }

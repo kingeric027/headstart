@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
@@ -13,6 +14,7 @@ import { CancelReturnReason } from '../../orders/order-return/order-return-table
 })
 export class OCMLineitemTable {
   closeIcon = faTimes;
+  faTrashAlt = faTrashAlt;
   @Input() set lineItems(value: MarketplaceLineItem[]) {
     this._lineItems = value;
     this.sortLineItems(this._lineItems);
@@ -30,7 +32,7 @@ export class OCMLineitemTable {
   _lineItems = [];
   _orderCurrency: string;
 
-  constructor(private context: ShopperContextService) { 
+  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { 
     this._orderCurrency = this.context.currentUser.get().Currency;
   }
 
@@ -60,6 +62,7 @@ export class OCMLineitemTable {
   }
 
   isQtyChanging(lineItemID: string): boolean {
+    this.spinner.show();
     return this.updatingLiIDs.includes(lineItemID);
   }
 

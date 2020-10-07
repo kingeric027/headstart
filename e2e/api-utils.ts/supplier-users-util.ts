@@ -113,6 +113,36 @@ export async function getSupplierUserID(
 	if (user.Username.includes('.hpmqx9la@mailosaur.io')) return user.ID
 }
 
+export async function setupGetSupplierUserID(
+	username: string,
+	vendorID: string,
+	clientAuth: string
+) {
+	const searchResponse = await OrderCloudSDK.SupplierUsers.List(
+		vendorID,
+		{
+			search: username,
+			searchOn: 'Username',
+		},
+		{ accessToken: clientAuth }
+	)
+
+	const user = searchResponse.Items.find(x => x.Username === username)
+
+	return user.ID
+}
+
+export async function updateSupplierUser(
+	supplierID: string,
+	userID: string,
+	update: Partial<OrderCloudSDK.User>,
+	clientAuth: string
+) {
+	await OrderCloudSDK.SupplierUsers.Patch(supplierID, userID, update, {
+		accessToken: clientAuth,
+	})
+}
+
 export async function getSupplierUser(
 	userID: string,
 	vendorID: string,

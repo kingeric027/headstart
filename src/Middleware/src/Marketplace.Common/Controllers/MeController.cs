@@ -19,11 +19,11 @@ namespace Marketplace.Common.Controllers
 	{
 
 		private readonly IMeProductCommand _meProductCommand;
-		private readonly IMarketplaceProductCommand _productCommand;
-		public MeController(AppSettings settings, IMarketplaceProductCommand productCommand, IMeProductCommand meProductCommand) : base(settings)
+		private readonly IMarketplaceKitProductCommand _kitProductCommand;
+		public MeController(AppSettings settings, IMeProductCommand meProductCommand, IMarketplaceKitProductCommand kitProductCommand) : base(settings)
 		{
-			_productCommand = productCommand;
 			_meProductCommand = meProductCommand;
+			_kitProductCommand = kitProductCommand;
 		}
 
 		[DocName("GET Super Product")]
@@ -46,5 +46,12 @@ namespace Marketplace.Common.Controllers
         {
 			await _meProductCommand.RequestProductInfo(template);
         }
+
+		[DocName("GET Kit Product")]
+		[HttpGet, Route("kitproducts/{kitProductID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<MarketplaceMeKitProduct> GetMeKit(string kitProductID)
+		{
+			return await _kitProductCommand.GetMeKit(kitProductID, VerifiedUserContext);
+		}
 	}
 }

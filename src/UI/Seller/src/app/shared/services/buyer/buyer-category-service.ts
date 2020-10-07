@@ -24,11 +24,6 @@ export class BuyerCategoryService extends ResourceCrudService<Category> {
     );
   }
 
-  addIntrinsicListArgs(options: ListArgs): ListArgs {
-    options.filters = { 'xp.Type': 'Catalog' };
-    return options;
-  }
-
   async updateResource(originalID: string, resource: Category): Promise<Category> {
     await this.getResourceInformation(resource);
     return super.updateResource(originalID, resource);

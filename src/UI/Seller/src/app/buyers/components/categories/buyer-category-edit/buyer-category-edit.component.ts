@@ -45,6 +45,7 @@ export class BuyerCategoryEditComponent {
     const endUrl = splitUrl[splitUrl.length - 1];
     let params = endUrl.includes('new?') ? endUrl.split('=') : '';
     params = params[1] ? params[1] : '';
+    params = params[2] ? params[2] : '';
     this._params = params;
     return endUrl.includes('new?');
   }

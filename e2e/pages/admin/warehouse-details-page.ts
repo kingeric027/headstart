@@ -53,6 +53,22 @@ class WarehouseDetailsPage {
 
 		return addressName
 	}
+
+	async createWarehouse(warehouseName: string, companyName: string) {
+		await t.typeText(this.addressNameField, warehouseName)
+		await t.typeText(this.companyNameField, companyName)
+		await t.click(this.countryDropdown)
+		await t.click(
+			this.countryOptions.withText(createRegExp('united states of america'))
+		)
+		await t.typeText(this.street1Field, '700 American Ave #200')
+		await t.typeText(this.cityField, 'King Of Prussia')
+		await t.typeText(this.stateField, 'PA')
+		await t.typeText(this.zipField, '19406')
+		await t.click(this.createButton)
+
+		await loadingHelper.waitForTwoLoadingBars()
+	}
 }
 
 export default new WarehouseDetailsPage()

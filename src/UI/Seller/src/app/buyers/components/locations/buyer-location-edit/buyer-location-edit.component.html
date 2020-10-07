@@ -212,19 +212,35 @@
                    placeholder="Contact Email">
           </div>
         </div>
-        <div class="form-group">
-          <label for="LocationID">{{'ALIAS.BUYER_LOCATION' | translate}} ID</label>
-          <input type="text"
-                 class="form-control"
-                 id="LocationID"
-                 showErrors
-                 aria-describedby="Location ID"
-                 maxlength="100"
-                 [resourceForm]="resourceForm"
-                 formControlName="LocationID"
-                 (input)="handleUpdateBuyerLocation($event, 'Address.xp.LocationID')"
-                 placeholder="Enter {{'ALIAS.BUYER_LOCATION' | translate}} ID">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="LocationID">{{'ALIAS.BUYER_LOCATION' | translate}} ID</label>
+            <input type="text"
+                   class="form-control"
+                   id="LocationID"
+                   showErrors
+                   aria-describedby="Location ID"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="LocationID"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.xp.LocationID')"
+                   placeholder="Enter {{'ALIAS.BUYER_LOCATION' | translate}} ID">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="LocationID">{{'ADMIN.BILLING_NUMBER' | translate}}</label>
+            <input type="text"
+                   class="form-control"
+                   id="BillingNumber"
+                   showErrors
+                   aria-describedby="Billing Number"
+                   maxlength="100"
+                   [resourceForm]="resourceForm"
+                   formControlName="BillingNumber"
+                   (input)="handleUpdateBuyerLocation($event, 'Address.xp.BillingNumber')"
+                   placeholder="Enter {{'ADMIN.BILLING_NUMBER' | translate}}">
+          </div>
         </div>
+       
       </div>
     </div>
     <buyer-location-permissions [locationID]="buyerLocationEditable?.Address?.ID"></buyer-location-permissions>

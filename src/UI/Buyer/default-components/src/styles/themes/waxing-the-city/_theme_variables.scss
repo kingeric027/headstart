@@ -6,51 +6,58 @@
 // check out node_modules/bootstrap/variables.scss
 // --------------------------------------------------------------------------------------
 
-$blue:                      #1c3f65;
-$purple:                    #643367; // brand color
-$red:                       #FF3639;
-$orange:                    #ee7421; //DESIGN: need to double-check this. I see #DB7C00|#DB6E0F on their public site. Also #FFFFFF on #DB7C00|#DB6E0F fails AA color contrast
-$yellow:                    #f3bd1b;
-$teal:                      #2292a9; // brand color
-$cyan:                      #68cbdf;
-$green:                     #B3EB3B;
+$blue:                        #1c3f65;
+$purple:                      #643367; // brand color
+$red:                         #E12D30;
+$orange:                      #ee7421; //DESIGN: need to double-check this. I see #DB7C00|#DB6E0F on their public site. Also #FFFFFF on #DB7C00|#DB6E0F fails AA color contrast
+$yellow:                      #f3bd1b;
+$teal:                        #2292a9; // brand color
+$cyan:                        #68cbdf;
+$green:                       #B3EB3B;
 
-$white:                     #fff;
-$gray-100:                  #f5f4f5;
-$gray-200:                  #ebe8eb;
-$gray-300:                  #d5d0d5;
-$gray-400:                  #ccc7cc;
-$gray-500:                  #aaa1ab;
-$gray-600:                  #6f5f6f;
-$gray-700:                  #554356;
-$gray-800:                  #3b2c3c;
-$gray-900:                  #2a1e2b;
-$black:                     #171118;
+$white:                       #fff;
+$gray-100:                    #f5f4f5;
+$gray-200:                    #ebe8eb;
+$gray-300:                    #d5d0d5;
+$gray-400:                    #ccc7cc;
+$gray-500:                    #aaa1ab;
+$gray-600:                    #6f5f6f;
+$gray-700:                    #554356;
+$gray-800:                    #3b2c3c;
+$gray-900:                    #2a1e2b;
+$black:                       #171118;
 
-$primary:                   $orange;
-$secondary:                 $purple;
-$success:                   $green;
-$info:                      $teal;
-$warning:                   $yellow;
-$danger:                    $red;
-$light:                     $gray-100;
-$gray-light:                $gray-300;
-$medium:                    $gray-500;
-$dark:                      $gray-800;
+$primary:                     $orange;
+$secondary:                   $purple;
+$success:                     $green;
+$info:                        $teal;
+$warning:                     $yellow;
+$danger:                      $red;
+$light:                       $gray-100;
+$gray-light:                  $gray-300;
+$medium:                      $gray-500;
+$dark:                        $gray-800;
 
 $theme-colors: (
-  'medium':                 $medium,
-  'purple':                 $purple,
-  'gray-light':             $gray-light,
-  'white':                  $white,
+  'medium':                   $medium,
+  'purple':                   $purple,
+  'gray-light':               $gray-light,
+  'white':                    $white,
 );
 
-$body-color:                $gray-800;
-$btn-padding-x:             1.25rem;
+$body-color:                  $gray-800;
+$btn-padding-x:               1.25rem;
+
+// .img-thumbnail
+$thumbnail-border-color:      $light;
+$thumbnail-border-width:      .5px;
+$thumbnail-box-shadow:        0 .125rem .25rem rgba($black, .075); // this is $box-shadow-sm
+$thumbnail-border-radius:     unset;
+$thumbnail-padding:           unset;
 
 // Typography
 
 @import '_typography.scss';
 
-$font-family-sans-serif:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
-$font-family-base:          'Brandon Grotesque', 'Nunito', $font-family-sans-serif;
+$font-family-sans-serif:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-base:            'Brandon Grotesque', 'Nunito', $font-family-sans-serif;

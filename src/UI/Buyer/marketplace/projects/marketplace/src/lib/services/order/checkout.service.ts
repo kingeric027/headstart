@@ -8,9 +8,7 @@ import {
   OrderWorksheet,
   IntegrationEvents,
   ShipMethodSelection,
-  LineItem,
   LineItems,
-  OrderPromotion,
 } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
@@ -25,7 +23,6 @@ import {
   MarketplaceLineItem,
   MarketplaceAddressBuyer,
 } from '@ordercloud/headstart-sdk';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -39,12 +36,15 @@ export class CheckoutService {
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    await this.incrementOrderIfNeeded();
+    payment.OrderID = this.order.ID;
     await HeadStartSDK.MePayments.Post(payment); // authorize card
     const orderID = this.submit();
     return orderID;
   }
 
   async submitWithoutCreditCard(): Promise<string> {
+    await this.incrementOrderIfNeeded();
     const orderID = this.submit();
     return orderID;
   }
@@ -183,7 +183,6 @@ export class CheckoutService {
   // Private Methods
   private async submit(): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await this.incrementOrderIfNeeded();
     const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
     await this.state.reset();
     return submittedOrder.ID;

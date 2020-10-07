@@ -10,6 +10,7 @@ interface testConfig {
 	adminSellerUsername: string
 	adminSellerPassword: string
 	adminAppClientID: string
+	buyerAppClientID: string
 }
 
 const testConfig: testConfig = {
@@ -20,6 +21,7 @@ const testConfig: testConfig = {
 	adminSellerUsername: process.env.ADMIN_SELLER_USER_USERNAME,
 	adminSellerPassword: process.env.ADMIN_SELLER_USER_PASSWORD,
 	adminAppClientID: process.env.ADMIN_APP_CLIENT_ID,
+	buyerAppClientID: process.env.BUYER_APP_CLIENT_ID,
 }
 
 export default testConfig

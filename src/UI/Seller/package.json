@@ -44,7 +44,7 @@
     "@ngx-translate/http-loader": "^5.0.0",
     "@ordercloud/angular-cms-components": "^1.0.0-beta.38",
     "@ordercloud/angular-sdk": "1.0.0-12",
-    "@ordercloud/headstart-sdk": "1.7.1",
+    "@ordercloud/headstart-sdk": "1.8.2",
     "@tinymce/tinymce-angular": "^4.1.0",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",

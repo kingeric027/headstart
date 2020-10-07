@@ -8,9 +8,9 @@ import { Asset } from '@ordercloud/headstart-sdk';
   styleUrls: ['./image-gallery.component.scss'],
 })
 export class OCMImageGallery implements OnInit, OnChanges {
-  @Input() imgUrls: string[] = [];
-  @Input() imgs: Asset[] = [];
+  @Input() images: Asset[] = [];
   @Input() specs: any[] = [];
+  imgUrls: string[] = [];
 
   // gallerySize can be changed and the component logic + behavior will all work. However, the UI may look wonky.
   readonly gallerySize = 5;
@@ -30,6 +30,7 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.imgUrls = this.images.map(i => i.Url);
     if (changes.specs) {
       this.onSpecsChange();
     }
@@ -55,21 +56,21 @@ export class OCMImageGallery implements OnInit, OnChanges {
 
   onSpecsChange(): void {
     let image;
-    if (this.imgs.length === 1) {
-      image = this.imgs[0];
+    if (this.images.length === 1) {
+      image = this.images[0];
     } else {
-      image = this.imgs.find(img => this.isImageMatchingSpecs(img));
+      image = this.images.find(img => this.isImageMatchingSpecs(img));
     }
     if (image) {
       this.select(image.Url);
     } else {
       // If no specs/tags match, grab primary image, or placeholder if no images exist
-      this.imgs[0] ? this.select(this.imgs[0].Url) : this.select('http://placehold.it/500x500');
+      this.images[0] ? this.select(this.images[0].Url) : this.select('http://placehold.it/500x500');
     }
   }
 
   getGallery(): Asset[] {
-    return this.imgs.slice(this.startIndex, this.endIndex + 1);
+    return this.images.slice(this.startIndex, this.endIndex + 1);
   }
 
   forward(): void {

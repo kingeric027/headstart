@@ -242,6 +242,10 @@
                             [selectedParentResouceName]="selectedParentResourceName">
             </request-status>
           </perfect-scrollbar>
+          <resource-list-meta *ngIf="selectedResourceID"
+                              [selectedResourceID]="selectedResourceID"
+                              [listPage]="_ocService?.resourceSubject?.value">
+          </resource-list-meta>
         </div>
         <div class="col-md-9 col-sm-12 bg-light contents">
           <div *ngIf="shouldShowTitleContainer"
@@ -324,4 +328,8 @@
       </ng-template>
     </div>
   </div>
+  <resource-list-meta *ngIf="!selectedResourceID"
+                      [selectedResourceID]="selectedResourceID"
+                      [listPage]="_ocService?.resourceSubject?.value">
+  </resource-list-meta>
 </div>

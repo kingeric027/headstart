@@ -5,4 +5,5 @@ export interface Field {
   config: FieldConfig;
   group: FormGroup;
   index: number;
+  compact?: boolean;
 }
