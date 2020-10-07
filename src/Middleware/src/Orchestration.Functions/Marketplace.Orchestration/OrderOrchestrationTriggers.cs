@@ -18,12 +18,14 @@ namespace Marketplace.Orchestration
         private readonly IOrderOrchestrationCommand _orderOrchestrationCommand;
         private readonly LogQuery _log;
         private readonly AppSettings _appSettings;
+        private readonly IProductUpdateCommand _productUpdateCommand;
        
 
         public OrderOrchestrationTrigger(AppSettings appSettings, IOrderCloudIntegrationsFunctionToken token, 
-            IOrderOrchestrationCommand orderOrchestrationCommand, ISupplierSyncCommand supplier, LogQuery log)
+            IOrderOrchestrationCommand orderOrchestrationCommand, ISupplierSyncCommand supplier, LogQuery log, IProductUpdateCommand productUpdateCommand)
         {
             _orderOrchestrationCommand = orderOrchestrationCommand;
+            _productUpdateCommand = productUpdateCommand;
             _log = log;
             _appSettings = appSettings;
         }
@@ -62,6 +64,22 @@ namespace Marketplace.Orchestration
             try
             {
                     await client.StartNewAsync("FedexShipManagerCreatedShipmentSyncProcess", "");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+            }
+        }
+
+        [FunctionName("EmailProductUpdates")]
+        public async Task EmailProductUpdates([TimerTrigger("0 15 9 * * *")] TimerInfo myTimer, [OrchestrationClient] DurableOrchestrationClient client, ILogger logger)
+        {
+            // run every day at 9:15am
+            logger.LogInformation("Starting function");
+            try
+            {
+                await _productUpdateCommand.SendAllProductUpdateEmails();
+                await _productUpdateCommand.CleanUpProductHistoryData();
             }
             catch (Exception ex)
             {

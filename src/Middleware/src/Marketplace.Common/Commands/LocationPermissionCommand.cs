@@ -22,7 +22,7 @@ namespace Marketplace.Common.Commands
         Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
-        Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string buyerID, string userID, VerifiedUserContext verifiedUser);
+        Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string userGroupType, string parentID, string userID, VerifiedUserContext verifiedUser);
         Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
     }
 
@@ -115,9 +115,9 @@ namespace Marketplace.Common.Commands
             return await IsUserInUserGroup(buyerID, userGroupID, verifiedUser);
         }
 
-        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string buyerID, string userID, VerifiedUserContext verifiedUser)
+        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string userGroupType, string parentID, string userID, VerifiedUserContext verifiedUser)
         {
-            var userUserGroupAssignments = await GetUserUserGroupAssignments(buyerID, userID, verifiedUser);
+            var userUserGroupAssignments = await GetUserUserGroupAssignments(userGroupType, parentID, userID, verifiedUser);
             return userUserGroupAssignments;
         }
 
@@ -142,7 +142,7 @@ namespace Marketplace.Common.Commands
                    );
             } else
             {
-                var userUserGroupAssignments = await GetUserUserGroupAssignments(buyerID, userID, verifiedUser);
+                var userUserGroupAssignments = await GetUserUserGroupAssignments("BuyerLocation", buyerID, userID, verifiedUser);
                 var userBuyerLocationAssignments = new List<MarketplaceLocationUserGroup>();
                 foreach (var assignment in userUserGroupAssignments)
                 {
@@ -175,15 +175,27 @@ namespace Marketplace.Common.Commands
             return userGroupAssignmentForAccess.Items.Count > 0;
         }
 
-    public async Task<List<UserGroupAssignment>> GetUserUserGroupAssignments(string buyerID, string userID, VerifiedUserContext verifiedUser)
+    public async Task<List<UserGroupAssignment>> GetUserUserGroupAssignments(string userGroupType, string parentID, string userID, VerifiedUserContext verifiedUser)
         {
-            return await ListAllAsync.List((page) => _oc.UserGroups.ListUserAssignmentsAsync(
-                   buyerID,
+            if (userGroupType == "UserPermissions")
+            {
+                return await ListAllAsync.List((page) => _oc.SupplierUserGroups.ListUserAssignmentsAsync(
+                   parentID,
                    userID: userID,
                    page: page,
                    pageSize: 100,
                    accessToken: verifiedUser.AccessToken
                    ));
+            } else
+            {
+                return await ListAllAsync.List((page) => _oc.UserGroups.ListUserAssignmentsAsync(
+                   parentID,
+                   userID: userID,
+                   page: page,
+                   pageSize: 100,
+                   accessToken: verifiedUser.AccessToken
+                   ));
+            }
         }
     };
 }

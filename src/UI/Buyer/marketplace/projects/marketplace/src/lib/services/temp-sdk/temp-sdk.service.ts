@@ -48,8 +48,8 @@ export class TempSdk {
       .toPromise();
   }
 
-  async getKitProduct(id: string): Promise<MarketplaceKitProduct> {
-    const url = `${this.appConfig.middlewareUrl}/kitproducts/me/${id}`;
+  async getMeKitProduct(id: string): Promise<MarketplaceKitProduct> {
+    const url = `${this.appConfig.middlewareUrl}/me/kitproducts/${id}`;
     return await this.http
       .get<MarketplaceKitProduct>(url, { headers: this.buildHeaders() }).toPromise();
   }

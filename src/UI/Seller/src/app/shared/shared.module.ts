@@ -54,6 +54,7 @@ import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/
 import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
 import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { ResourceListMeta } from './components/resource-list-meta/resource-list-meta.component';
 
 @NgModule({
   imports: [
@@ -132,6 +133,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
+    ResourceListMeta,
   ],
   declarations: [
     SearchComponent,
@@ -162,6 +164,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
+    ResourceListMeta,
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,

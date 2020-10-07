@@ -22,6 +22,8 @@ export class SellerEmailNotifications {
   @Output()
   toggleReceiveOrderEmails = new EventEmitter<boolean>();
   @Output()
+  toggleReceiveProductEmails = new EventEmitter<boolean>();
+  @Output()
   toggleReceiveRequestInfoEmails = new EventEmitter<boolean>();
   @Output()
   addRcpt = new EventEmitter<void>();
@@ -30,6 +32,9 @@ export class SellerEmailNotifications {
   // Ouput Functions
   toggleOrderEmails = (event: any): void => this.toggleReceiveOrderEmails.emit(event.target.checked);
   toggleRequestInfoEmails = (event: any): void => this.toggleReceiveRequestInfoEmails.emit(event.target.checked);
+  
+  toggleProductEmails =(event: any): void => this.toggleReceiveProductEmails.emit(event.target.checked);
+  
   removeAddtlRcpt = (index: number): void => this.removeRcpt.emit(index);
   addAddtlRcpt = () => this.addRcpt.emit();
 }

@@ -571,7 +571,8 @@
         <ng-template ngbNavContent>
           <product-filters-component [readonly]="readonly"
                                      (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
-                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []">
+                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"
+                                     [superProduct]="_superMarketplaceProductEditable?.Product">
           </product-filters-component>
         </ng-template>
       </li>
@@ -693,7 +694,7 @@
             </div>
             <div class="row pt-3 mt-5 border-top">
               <div class="col-md-5">
-                <h5 translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_PRODUCT</h5>
+                <h5 translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_PRODUCTS</h5>
                 <p class="font-italic"
                    translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_DESC</p>
               </div>

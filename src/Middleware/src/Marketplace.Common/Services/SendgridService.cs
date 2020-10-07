@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
@@ -8,6 +9,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
@@ -21,6 +23,8 @@ namespace Marketplace.Common.Services
         Task SendSingleEmail(string from, string to, string subject, string htmlContent);
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
+        Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
+
         Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
@@ -32,6 +36,7 @@ namespace Marketplace.Common.Services
         Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
         Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, LineItemEmailDisplayText lineItemEmailDisplayText);
         Task SendContactSupplierAboutProductEmail(ContactSupplierBody template);
+        Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName);
     }
     public class SendgridService : ISendgridService
     {
@@ -50,6 +55,7 @@ namespace Marketplace.Common.Services
         private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
         private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
         private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
+        private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-8d60fcbc191b4fd1ae526e28713e6abe";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -80,6 +86,18 @@ namespace Marketplace.Common.Services
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             await client.SendEmailAsync(msg);
+        }
+
+        public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
+        {
+            var client = new SendGridClient(_settings.SendgridApiKey);
+            var fromEmail = new EmailAddress(from);
+            var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
+            using (Stream stream = await fileReference.OpenReadAsync())
+            {
+                await msg.AddAttachmentAsync(fileName, stream);
+            }
+                await client.SendEmailAsync(msg);
         }
 
         public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -133,6 +151,18 @@ namespace Marketplace.Common.Services
                 order.Comments
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+        }
+
+        public async Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName)
+        {
+            var yesterday = DateTime.Now.AddDays(-1).ToString();
+            var templateData = new
+            {
+                date = yesterday
+            };
+            await SendSingleTemplateEmailMultipleRcptsAttachment(NO_REPLY_EMAIL_ADDRESS, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
+            //string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName
+
         }
 
         public async Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, LineItemEmailDisplayText lineItemEmailDisplayText)
