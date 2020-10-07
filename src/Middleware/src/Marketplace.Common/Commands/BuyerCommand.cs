@@ -87,14 +87,6 @@ namespace Marketplace.Common.Commands
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
             });
 
-            // add buyer to list of possible 'BuyersServicing' in the ContentDoc 'SupplierFilterConfig'
-            // TODO: Add removal of this buyer filter to the buyer cleanup process
-            var newBuyerToService = new Filter() { Text = ocBuyer.Name, Value = ocBuyerID};
-            var config = await _query.List("SupplierFilterConfig", new ListArgs<Document<SupplierFilterConfig>>(), user);
-            var buyersServicingConfig = config.Items.FirstOrDefault(c => c.ID == "BuyersServicing");
-            buyersServicingConfig.Doc.Items.Add(newBuyerToService);
-            await _query.Save("SupplierFilterConfig", "BuyersServicing", buyersServicingConfig, user);
-
             // list message senders
             var msList = await _oc.MessageSenders.ListAsync();
             // create message sender assignment

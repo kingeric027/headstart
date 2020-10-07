@@ -239,7 +239,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
 
   assignBuyer(buyerID: string): void {
     this._supplierEditable?.xp?.BuyersServicing ? null : this._supplierEditable.xp.BuyersServicing = [];
-    const index = (this._supplierEditable?.xp as any)?.BuyersServicing.indexOf(buyerID);
+    const index = this._supplierEditable?.xp?.BuyersServicing.indexOf(buyerID);
     if (index !== -1) {
       this.removeAddtlRcpt(index);
       return;
