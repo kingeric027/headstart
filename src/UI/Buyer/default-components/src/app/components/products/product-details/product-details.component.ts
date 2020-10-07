@@ -115,8 +115,7 @@ export class OCMProductDetails implements OnInit {
     }
   }
 
-  onSelectionInactive(event: any){
-    console.log(event);
+  onSelectionInactive(event: boolean){
     this.isInactiveVariant = event;
   }
 

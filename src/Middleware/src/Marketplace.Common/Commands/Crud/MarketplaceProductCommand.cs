@@ -295,9 +295,9 @@ namespace Marketplace.Common.Commands.Crud
 
 			foreach(Variant variant in requestVariants)
             {
-				var currVariant = existingVariants.Where(v => v.ID == variant.ID)?.First();
-				if (currVariant == null) { continue; }
-				hasVariantChange = HasVariantChange(variant, currVariant);
+				var currVariant = existingVariants.Where(v => v.ID == variant.ID);
+				if (currVariant == null || currVariant.Count() < 1) { continue; }
+				hasVariantChange = HasVariantChange(variant, currVariant.First());
 				if (hasVariantChange) { break; }
             }
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.

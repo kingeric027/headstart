@@ -94,8 +94,11 @@
                            [specs]="_specs"
                            [currency]="_product?.xp?.Currency"
                            (specFormChange)="onSpecFormChange($event.detail)"
-                           (isSelectionInactive)="onSelectionInactive($event)">
+                           (isSelectionInactive)="onSelectionInactive($event.detail)">
             </ocm-spec-form>
+            <div *ngIf="this.isInactiveVariant">
+              <strong class="text-danger">This option is unavailable and cannot be added to the cart. Please make another selection.</strong>
+            </div>
             <div class="d-flex flex-column"
                  *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
               <div class="d-flex flex-row">
