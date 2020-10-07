@@ -1,11 +1,4 @@
   <ng-container *ngIf="!isLoading">
-    <ngx-spinner *ngIf="isLoading"
-                 bdColor="rgba(0,0,0,0.5)"
-                 size="default"
-                 color="#fff"
-                 type="ball-scale-ripple-multiple"
-                 [fullScreen]="false">
-    </ngx-spinner>
     <div class="form-group">
       <label for="selectBuyerLocation"
              translate>CHECKOUT.CHECKOUT_ADDRESS.BUYER_LOCATION</label>
@@ -45,16 +38,17 @@
         <!-- <option [ngValue]="NEW_ADDRESS_CODE"
                 translate>CHECKOUT.CHECKOUT_ADDRESS.NEW_ADDRESS</option> -->
       </select>
-      <div class="d-flex justify-content-between align-items-center">
-        <button (click)="showNewAddressForm = true"
-                class="btn btn-secondary btn-sm mr-2 mt-3"
-                translate>Add New Address</button>
-        <button type="submit"
-                *ngIf="!showNewAddressForm"
-                (click)="saveAddressesAndContinue()"
-                class="btn btn-secondary btn-sm mr-2 mt-3"
-                translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
-      </div>
+      <!-- <div class="d-flex justify-content-between align-items-center"> -->
+      <button (click)="showNewAddressForm = true"
+              class="btn btn-outline-primary btn-sm mr-2 mt-3"
+              translate>Add New Address</button>
+      <button type="submit"
+              *ngIf="!showNewAddressForm"
+              [disabled]="newShippingAddress == null"
+              (click)="saveAddressesAndContinue()"
+              class="btn btn-secondary btn-sm mr-2 mt-3"
+              translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
+      <!-- </div> -->
     </div>
     <ocm-address-form *ngIf="showNewAddressForm"
                       [suggestedAddresses]="suggestedAddresses"

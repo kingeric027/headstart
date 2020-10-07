@@ -11,7 +11,7 @@
       <div class="col-lg-3">
         <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
       </div>
-      <div class="col-lg-9">
+      <div class="col-lg-9 my-md-0 my-3">
         <ngb-accordion [closeOthers]="true"
                        (panelChange)="beforeChange($event)"
                        #acc="ngbAccordion"
@@ -56,17 +56,19 @@
               <fa-icon class="text-success"
                        *ngIf="getValidation('shippingAddress') && (!isLoading || currentPanel !== 'shippingAddress')"
                        [icon]="faCheck"><span class="sr-only">Shipping Address Confirmed</span></fa-icon>
-              <div *ngIf="!isLoading && currentPanel === 'shippingAddressLoading'">DOOOO</div>
-              <ngx-spinner *ngIf="isLoading && currentPanel === 'shippingAddressLoading'"
-                           bdColor="null"
-                           size="small"
-                           color="var(--secondary)"
-                           type="ball-scale-ripple-multiple"
-                           [fullScreen]="false">
-                <small class="sr-only">Calculating Shipping Rates</small>
-              </ngx-spinner>
             </ng-template>
             <ng-template ngbPanelContent>
+              <div class="d-block h-50"
+                   *ngIf="!isLoading && currentPanel === 'shippingAddressLoading'">
+                <ngx-spinner *ngIf="isLoading && currentPanel === 'shippingAddressLoading'"
+                             bdColor="null"
+                             size="small"
+                             color="var(--secondary)"
+                             type="ball-scale-ripple-multiple"
+                             [fullScreen]="false">
+                  <small class="sr-only">Calculating Shipping Rates</small>
+                </ngx-spinner>
+              </div>
               <ocm-checkout-address [isAnon]="isAnon"
                                     [order]="order"
                                     [lineItems]="lineItems"
