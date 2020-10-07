@@ -1,5 +1,5 @@
 import { MarketplaceVariant } from '@ordercloud/headstart-sdk';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';

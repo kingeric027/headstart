@@ -4,7 +4,6 @@ import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
 import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant } from '@ordercloud/headstart-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -49,6 +48,8 @@ export class OCMProductDetails implements OnInit {
   isAddingToCart = false;
   contactRequest: ContactSupplierBody;
   specForm: FormGroup;
+  isInactiveVariant: boolean;
+  _disabledVariants: MarketplaceVariant[];
   constructor(
     private specFormService: SpecFormService,
     private context: ShopperContextService,
