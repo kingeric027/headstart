@@ -17,7 +17,9 @@ import { faTimes, faSpinner, faExclamationCircle, faTimesCircle } from '@fortawe
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { environment } from 'src/environments/environment';
 import { ToastrService } from 'ngx-toastr';
-import { User, OcSupplierUserService } from '@ordercloud/angular-sdk';
+import { User, OcSupplierUserService, Buyer } from '@ordercloud/angular-sdk';
+import { Buyers } from 'ordercloud-javascript-sdk';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -36,6 +38,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     this._supplierEditable = value;
   }
   supplierUsers: ListPage<User>;
+  buyers: ListPage<Buyer>;
   _supplierEditable: MarketplaceSupplier;
   availableCurrencies: SupportedRates[] = [];
   isCreatingNew: boolean;
@@ -57,7 +60,8 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private toastrService: ToastrService,
-    private ocSupplierUserService: OcSupplierUserService
+    private ocSupplierUserService: OcSupplierUserService,
+    private router: Router
   ) {
     this.isCreatingNew = this.supplierService.checkIfCreatingNew();
   }
@@ -79,6 +83,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`;
     !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } })).Items?.length > 0);
     !this.isCreatingNew && (this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise());
+    !this.router.url.startsWith('/my-supplier') && (this.buyers = await Buyers.List());
     this.setUpSupplierCountrySelectIfNeeded();
   }
 
@@ -98,7 +103,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
 
   updateCountriesServicing(event: any, country: string): void {
     const checked = event.target.checked;
-    let newCountriesSupported = (this._supplierEditable as any).xp.CountriesServicing || [];
+    let newCountriesSupported = this._supplierEditable.xp.CountriesServicing || [];
     const isCountryInExistingValue = newCountriesSupported.includes(country);
     if (checked && !isCountryInExistingValue) {
       newCountriesSupported = [...newCountriesSupported, country];
@@ -232,13 +237,35 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     this.updateResourceFromEvent(constructedEvent, 'xp.NotificationRcpts');
   }
 
+  assignBuyer(buyerID: string): void {
+    this._supplierEditable?.xp?.BuyersServicing ? null : this._supplierEditable.xp.BuyersServicing = [];
+    const index = (this._supplierEditable?.xp as any)?.BuyersServicing.indexOf(buyerID);
+    if (index !== -1) {
+      this.removeAddtlRcpt(index);
+      return;
+    }
+    const existingBuyersToService = this._supplierEditable?.xp?.BuyersServicing || [];
+    const constructedEvent = { target: { value: [...existingBuyersToService, buyerID] } };
+    this.updateResourceFromEvent(constructedEvent, 'xp.BuyersServicing');
+  }
+
   removeAddtlRcpt(index: number): void {
     const copiedResource = JSON.parse(JSON.stringify(this._supplierEditable));
     const editedArr = copiedResource.xp?.NotificationRcpts.filter(e => e !== copiedResource.xp?.NotificationRcpts[index]);
     this.updateResourceFromEvent({ target: { value: editedArr } }, 'xp.NotificationRcpts');
   }
 
-  isAssigned(email: string): boolean {
-    return this._supplierEditable?.xp?.NotificationRcpts?.includes(email);
+  removeBuyerServicing(index: number): void {
+    const copiedResource = JSON.parse(JSON.stringify(this._supplierEditable));
+    const editedArr = copiedResource.xp?.BuyersServicing.filter(e => e !== copiedResource.xp?.BuyersServicing[index]);
+    this.updateResourceFromEvent({ target: { value: editedArr } }, 'xp.BuyersServicing');
+  }
+
+  isAssigned(val: string, field: string): boolean {
+    if (field === 'NotificationRcpts') {
+      return this._supplierEditable?.xp?.NotificationRcpts?.includes(val);
+    } else {
+      return this._supplierEditable?.xp?.BuyersServicing?.includes(val);
+    }
   }
 }
