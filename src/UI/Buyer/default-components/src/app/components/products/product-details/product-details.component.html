@@ -102,7 +102,7 @@
                 </ocm-modal>
               </div>
             </div>
-            <div *ngIf="!isOrderable"
+            <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
                  class="alert alert-info"
                  translate>
               PRODUCTS.DETAILS.VIEW_ONLY
@@ -192,7 +192,7 @@
                        (specFormChange)="onSpecFormChange($event.detail)">
                        (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
-        <div *ngIf="!isOrderable"
+        <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
              class="alert alert-info"
              translate>
           PRODUCTS.DETAILS.VIEW_ONLY
