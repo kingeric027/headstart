@@ -70,7 +70,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             return new ZohoContact()
             {
-                company_name = $"{buyer.Name}",
+                company_name = $"{buyer.Name} - {location.Address?.xp.LocationID}",
                 contact_name = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}",
                 contact_type = "customer",
                 billing_address = ZohoAddressMapper.Map(location.Address),
@@ -88,7 +88,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
         public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, IList<MarketplaceUser> users, ZohoCurrency currency, MarketplaceBuyerLocation location)
         {
-            contact.company_name = $"{buyer.Name}";
+            contact.company_name = $"{buyer.Name} - {location.Address?.xp.LocationID}";
             contact.contact_name = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}";
             contact.contact_type = "customer";
             contact.billing_address = ZohoAddressMapper.Map(location.Address);
@@ -97,6 +97,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             contact.contact_persons = ZohoContactMapper.Map(users, contact);
             contact.currency_id = currency.currency_id;
             contact.notes = $"Franchise ID: {buyer.ID} ~ Location ID: {location.Address?.xp.LocationID}";
+            
             //contact.tax_id = location.Address?.xp?.AvalaraCertificateID.ToString();
             //avatax_use_code = "use code",
             //avatax_exempt_no = "exempt no"
@@ -112,22 +113,23 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 if (contact?.contact_persons != null && contact.contact_persons.Any(p => p.email == user.Email))
                 {
                     var c = contact.contact_persons.FirstOrDefault(p => p.email == user.Email);
+                    c.contact_person_id = c.contact_person_id;
                     c.email = user.Email;
                     c.first_name = user.FirstName;
                     c.last_name = user.LastName;
                     c.phone = user.Phone;
                     list.Add(c);
                 }
-                //else
-                //{
-                //    list.Add(new ZohoContactPerson()
-                //    {
-                //        email = user.Email,
-                //        first_name = user.FirstName,
-                //        last_name = user.LastName,
-                //        phone = user.Phone,
-                //    });
-                //}
+                else
+                {
+                    list.Add(new ZohoContactPerson()
+                    {
+                        email = user.Email,
+                        first_name = user.FirstName,
+                        last_name = user.LastName,
+                        phone = user.Phone,
+                    });
+                }
             }
             return list.DistinctBy(u => u.email).ToList();
         }

@@ -253,37 +253,37 @@ namespace Marketplace.Common.Commands.Zoho
             var currencies = await _zoho.Currencies.ListAsync();
 
             // TODO: MODEL update ~ right now we don't have actual groups set up for locations, so this isn't accurate or complete
-            var zContact = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = location.Address.AddressName });
-            if (zContact.Items.Any())
+            var zContactList = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}"});
+            var zContact = await _zoho.Contacts.GetAsync(zContactList.Items.FirstOrDefault()?.contact_id);
+            if (zContact != null)
             {
                 try
                 {
-                    var z = await _zoho.Contacts.SaveAsync<ZohoContact>(
-                        ZohoContactMapper.Map(
-                            zContact.Items.FirstOrDefault(),
-                            ocBuyer,
-                            ocUsers.Items,
-                            currencies.Items.FirstOrDefault(c =>
-                                c.currency_code == (location.UserGroup.xp.Currency != null
-                                    ? location.UserGroup.xp.Currency.ToString()
-                                    : "USD")),
-                            location));
-                    return z;
+                    var map = ZohoContactMapper.Map(
+                        zContact.Item,
+                        ocBuyer,
+                        ocUsers.Items,
+                        currencies.Items.FirstOrDefault(c =>
+                            c.currency_code == (location.UserGroup.xp.Currency != null
+                                ? location.UserGroup.xp.Currency.ToString()
+                                : "USD")),
+                        location);
+                    return await _zoho.Contacts.SaveAsync<ZohoContact>(map);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message, ex);
                 }
             }
-            else
-            {
-                return await _zoho.Contacts.CreateAsync<ZohoContact>(
-                    ZohoContactMapper.Map(
-                        ocBuyer,
-                        ocUsers.Items,
-                        currencies.Items.FirstOrDefault(c => c.currency_code == (location.UserGroup.xp.Currency != null ? location.UserGroup.xp.Currency.ToString() : "USD")),
-                        location));
-            }
+            var contact = ZohoContactMapper.Map(
+                ocBuyer,
+                ocUsers.Items,
+                currencies.Items.FirstOrDefault(c =>
+                    c.currency_code == (location.UserGroup.xp.Currency != null
+                        ? location.UserGroup.xp.Currency.ToString()
+                        : "USD")),
+                location);
+            return await _zoho.Contacts.CreateAsync<ZohoContact>(contact);
         }
     }
 }
