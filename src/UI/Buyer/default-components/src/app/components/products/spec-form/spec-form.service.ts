@@ -12,7 +12,7 @@ export class SpecFormService {
   constructor() { }
 
   public getSpecMarkup(specs: Spec[], selectedBreak: PriceBreak, qty: number, specForm: FormGroup): number {
-    const formValues = specForm.value;
+    const formValues = specForm.value || undefined;
     const markups: Array<number> = new Array<number>();
     for (const value in formValues) {
       if (formValues.hasOwnProperty(value)) {
@@ -28,7 +28,7 @@ export class SpecFormService {
   }
 
   public getLineItemSpecs(buyerSpecs: Spec[], specForm: FormGroup): Array<LineItemSpec> {
-    const formValues = specForm.value;
+    const formValues = specForm ? specForm.value : undefined;
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
     for (const value in formValues) {
       if (formValues.hasOwnProperty(value)) {
