@@ -78,8 +78,7 @@ export class OCMProductDetails implements OnInit {
     this.calculatePrice();
   }
 
-  onSelectionInactive(event: any){
-    console.log(event);
+  onSelectionInactive(event: boolean){
     this.isInactiveVariant = event;
   }
 

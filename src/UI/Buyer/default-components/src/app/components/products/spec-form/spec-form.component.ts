@@ -28,7 +28,7 @@ import { ShopperContextService } from 'marketplace';
 
 export class OCMSpecForm implements OnChanges {
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
-  @Output() onSelectionInactive: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() isSelectionInactive: EventEmitter<boolean> = new EventEmitter<boolean>();
   config: FieldConfig[] = [];
   form: FormGroup;
   isValidAvailability: boolean;
@@ -101,68 +101,34 @@ export class OCMSpecForm implements OnChanges {
   }
 
   validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]) {
+    let controlInactive: boolean = false;
     if (disabledVariants.length < 1){ return; }
     for(let disabledVariant of disabledVariants){
       if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
-        this.onSelectionInactive.emit(true);
+        controlInactive = true;
+        this.isSelectionInactive.emit(controlInactive);
+        return;
       }
     }
 
-    form.value.ctrls.forEach(control => {
-      if (!this.isControlAvailable(control, disabledVariants)){
-        //control isn't available.
-      }
-    });
-    this.isValidAvailability = true;
-    let matchingSpecCount: number;
-    for (let control of form.value.ctrls){
-       disabledVariants.forEach(variant => {
-         matchingSpecCount = 0;
-         for (let spec of variant.Specs) {
-           if (spec.Value.toUpperCase() != control.toUpperCase()){
-             break;
-           }
-         }
-       })
+    if (!controlInactive) {
+      this.isSelectionInactive.emit(controlInactive);
     }
-    // disabledVariants.forEach(variants => {
-    //   for (let spec of variants.Specs){
-    //     if (!form.value.ctrls.contains(spec.Value)) { break; }
-
-    //   }
-     
-    //   if (form.value.ctrls.contains(variants.Specs)){
-
-    //   }
-    
   }
+
   isControlInactive(ctrls: string[], disabledVariant: MarketplaceVariant): boolean {
     let controlCount = 0;
    for (let variant of disabledVariant.Specs) {
      ctrlLoop:
      for (let controlValue of ctrls){
        if (variant.Value == controlValue) {
-        console.log(`ctrls: ${controlValue} and variant: ${variant.Value} almost matching!`)
         controlCount = controlCount + 1;
-        if (controlCount ==  ctrls.length){ console.log(`${controlValue} matches ${variant.Value} twice now!`); return true; }
+        if (controlCount ==  ctrls.length){ return true; }
         break ctrlLoop;
        }
      }
    }
    return false;
-  }
-
-  isControlAvailable(control: AbstractControl, disabledVariants: MarketplaceVariant[]): boolean {
-    for (let variant of disabledVariants){
-      let isAvailable = false;
-      for (let spec of variant.Specs) {
-       console.log(`spec: ${spec.Value} and control: ${control}`)
-      }
-    }
-    disabledVariants.forEach(element => {
-
-    });
-    return true;
   }
 
   private createCheckboxField(spec: Spec): FieldConfig {
