@@ -42,8 +42,15 @@ export class ProductFilters implements OnInit{
   }
 
   async getFacets(): Promise<void> {
-    const facets = await this.ocFacetService.List().toPromise();
-    this.facetOptions = facets.Items.filter(f => f?.xp?.Options?.length);
+    let facetsListPage = await this.ocFacetService.List({ pageSize: 100 }).toPromise();
+    let facets = facetsListPage.Items;
+    if (facetsListPage.Meta.TotalPages > 1) {
+      for (let i = 2; i <= facetsListPage.Meta.TotalPages; i++) {
+        let additionalFacets = await this.ocFacetService.List({ pageSize: 100, page: i}).toPromise();
+        facets = facets.concat(additionalFacets.Items);
+      }
+    }
+    this.facetOptions = facets.filter(f => f?.xp?.Options?.length);
   }
 
   areFacetOptionsSelected(facet: ProductFacet): boolean {
