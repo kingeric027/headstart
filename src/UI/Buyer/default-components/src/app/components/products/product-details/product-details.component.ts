@@ -67,7 +67,7 @@ export class OCMProductDetails implements OnInit {
   ngOnInit(): void {
     this.calculatePrice();
     this.currentUser = this.context.currentUser.get();
-    this.userCurrency = this.context.currentUser.get().Currency;
+    this.userCurrency = this.currentUser.Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 

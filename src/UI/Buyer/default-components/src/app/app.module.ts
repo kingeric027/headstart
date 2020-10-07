@@ -143,6 +143,7 @@ import { OCMBuyerLocationPermissions } from './components/profile/buyer-location
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { OCMStaticPage } from './components/layout/static-page/static-page.component';
+import { OCMKitProductDetails } from './components/products/kit-product-details/kit-product-details.component';
 
 export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
@@ -158,6 +159,7 @@ const components = [
   OCMQuantityInput,
   OCMProductCarousel,
   OCMProductDetails,
+  OCMKitProductDetails,
   OCMImageGallery,
   OCMSpecForm,
   OCMOrderSummary,
@@ -320,6 +322,7 @@ export class AppModule {
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table');
 
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
+    this.buildWebComponent(OCMKitProductDetails, 'ocm-kit-product-details')
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMStaticPage, 'ocm-static-page');
