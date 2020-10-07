@@ -61,12 +61,6 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   }
 
   private setBuyerFilterIfNeeded(): void {
-    if (
-      this.supplierFilterConfig.find(
-        s => s.Path === 'xp.BuyersServicing' && s.BuyerAppFilterType === BuyerAppFilterType.NonUI
-      )
-    ) {
-      this.context.supplierFilters.setNonURLFilter('xp.BuyersServicing', this.context.currentUser.get().Buyer.ID);
-    }
+    this.context.supplierFilters.setNonURLFilter('xp.BuyersServicing', this.context.currentUser.get().Buyer.ID);
   }
 }
