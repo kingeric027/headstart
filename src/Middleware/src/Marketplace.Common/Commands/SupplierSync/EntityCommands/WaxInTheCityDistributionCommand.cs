@@ -8,7 +8,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
-    [SupplierSync("027"), SupplierSync("waxinthecitydistribution")]
+    [SupplierSync("027"), SupplierSync("093"), SupplierSync("waxinthecitydistribution")]
     public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _oc;

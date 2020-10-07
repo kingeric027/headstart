@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService, OcProductService } from '@ordercloud/angular-sdk';
-import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -59,6 +59,7 @@ export class ProductVariations {
   faCheckDouble = faCheckDouble;
   faCaretRight = faCaretRight;
   faCaretDown = faCaretDown;
+  faCheckCircle = faCheckCircle;
   faExclamationCircle = faExclamationCircle;
   assignVariantImages = false;
   viewVariantDetails = false;
@@ -99,6 +100,25 @@ export class ProductVariations {
     if (this.variants?.length === 100 && spec.DefinesVariant) return true;
     if (this.variants?.length === 100 && !spec.DefinesVariant) return false;
     if (!this.variantsValid) return true;
+  }
+
+  toggleActive(variant: Variant) {
+    variant.Active = !variant.Active;
+
+    const updateProductResourceCopy = this.productService.copyResource(
+      this.superProductEditable || this.productService.emptyResource
+  );
+  updateProductResourceCopy.Variants.find(x => x.ID === variant.ID).Active = variant.Active
+  this.superProductEditable = updateProductResourceCopy;
+  this.productVariationsChanged.emit(this.superProductEditable);
+  }
+
+  getVariantStatusDisplay(variant: Variant): string {
+    if (variant.Active) {
+      return "Active";
+    } else {
+      return "Inactive";
+    }
   }
 
   updateSku($event: any, i: number): void {
