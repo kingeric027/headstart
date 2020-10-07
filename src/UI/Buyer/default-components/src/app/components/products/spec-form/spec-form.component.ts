@@ -1,7 +1,6 @@
-import { isValidLength } from './../../../services/card-validation.helper';
-import { SuperMarketplaceProduct, MarketplaceVariant } from '@ordercloud/headstart-sdk';
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormBuilder, AbstractControl } from '@angular/forms';
+import { MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
 import { FieldConfig } from './field-config.interface';

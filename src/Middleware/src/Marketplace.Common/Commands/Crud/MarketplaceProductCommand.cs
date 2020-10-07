@@ -234,8 +234,7 @@ namespace Marketplace.Common.Commands.Crud
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
 				v.Name = v.xp.NewID ?? v.ID;
-				v.Active = v.Active;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active }, accessToken: user.AccessToken);
+				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
 			});
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
