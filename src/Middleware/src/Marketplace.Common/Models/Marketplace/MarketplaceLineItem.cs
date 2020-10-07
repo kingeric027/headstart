@@ -1,5 +1,7 @@
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Marketplace.Models.Extended;
+using System.Collections.Generic;
 
 namespace Marketplace.Models.Models.Marketplace
 {
@@ -9,16 +11,19 @@ namespace Marketplace.Models.Models.Marketplace
     [SwaggerModel]
 	public class LineItemXp 
     {
-        public LineItemReturnInfo LineItemReturnInfo { get; set; }
-        public string LineItemImageUrl { get; set; }
-        public decimal? ProductUnitPrice { get; set; }
+        public Dictionary<LineItemStatus, int> StatusByQuantity { get; set; }
+        public List<LineItemClaim> Returns { get; set; }
+        public List<LineItemClaim> Cancelations { get; set; }
+        public string ImageUrl { get; set; }
     }
 
-	[SwaggerModel]
-	public class LineItemReturnInfo
+    [SwaggerModel]
+    public class LineItemClaim
     {
-        public int QuantityToReturn { get; set; }
-        public string ReturnReason { get; set; }
-        public bool Resolved { get; set; }
+        public string RMANumber { get; set; }
+        public int Quantity { get; set; }
+        public string Reason { get; set; }
+        public string Comment { get; set; }
+        public bool IsResolved { get; set; }
     }
 }

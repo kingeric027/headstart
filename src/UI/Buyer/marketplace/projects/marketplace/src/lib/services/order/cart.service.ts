@@ -1,51 +1,38 @@
 import { Injectable } from '@angular/core';
-import { ListLineItem, OcOrderService, OcLineItemService, OcMeService, OcTokenService } from '@ordercloud/angular-sdk';
+import { Orders, LineItems, Me, Spec, LineItemSpec } from 'ordercloud-javascript-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MarketplaceLineItem, MarketplaceOrder, MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { AppConfig } from '../../shopper-context';
-
-export interface ICart {
-  onAdd: Subject<MarketplaceLineItem>;
-  get(): ListLineItem;
-  add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
-  remove(lineItemID: string): Promise<void>;
-  setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem>;
-  addMany(lineItem: MarketplaceLineItem[]): Promise<MarketplaceLineItem[]>;
-  empty(): Promise<void>;
-  onChange(callback: (lineItems: ListLineItem) => void): void;
-  moveOrderToCart(orderID: string): Promise<void>;
-}
+import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
+import { TempSdk } from '../../services/temp-sdk/temp-sdk.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CartService implements ICart {
+export class CartService {
   public onAdd = new Subject<MarketplaceLineItem>(); // need to make available as observable
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
-  constructor(
-    private ocOrderService: OcOrderService,
-    private ocLineItemService: OcLineItemService,
-    private ocMeService: OcMeService,
-    private state: OrderStateService,
-    private http: HttpClient,
-    private ocTokenService: OcTokenService,
-    private appSettings: AppConfig
-  ) {}
+  constructor(private state: OrderStateService,
+              private tempSdk: TempSdk) {}
 
-  get(): ListLineItem {
+  get(): ListPage<MarketplaceLineItem> {
     return this.lineItems;
   }
 
   // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
   async add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     // order is well defined, line item can be added
+    this.onAdd.next(lineItem);
     if (!_isUndefined(this.order.DateCreated)) {
+      const lineItems = this.state.lineItems.Items;
+      const liWithSameProduct = lineItems.find(li => li.ProductID === lineItem.ProductID);
+      if (liWithSameProduct && this.hasSameSpecs(lineItem, liWithSameProduct)) {
+        // combine any line items that have the same productID/specs into one line item
+        lineItem.Quantity += liWithSameProduct.Quantity;
+      }
       return await this.upsertLineItem(lineItem);
     }
     if (!this.initializingOrder) {
@@ -60,7 +47,7 @@ export class CartService implements ICart {
     this.lineItems.Items = this.lineItems.Items.filter(li => li.ID !== lineItemID);
     Object.assign(this.state.order, this.calculateOrder());
     try {
-      await this.ocLineItemService.Delete('outgoing', this.order.ID, lineItemID).toPromise();
+      await this.tempSdk.deleteLineItem(this.state.order.ID, lineItemID);
     } finally {
       this.state.reset();
     }
@@ -68,7 +55,7 @@ export class CartService implements ICart {
 
   async setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     try {
-      return await this.add(lineItem);
+      return await this.upsertLineItem(lineItem);
     } finally {
       this.state.reset();
     }
@@ -86,30 +73,21 @@ export class CartService implements ICart {
      * do not repopulate in the cart after the resubmit we are deleting all of these
      * unsubmitted orders */
 
-    const orderToUpdate = (await this.ocOrderService
-      .Patch('Outgoing', orderID, { xp: { IsResubmitting: true } })
-      .toPromise()) as MarketplaceOrder;
+    const orderToUpdate = (await Orders.Patch('Outgoing', orderID, {
+      xp: { IsResubmitting: true },
+    })) as MarketplaceOrder;
 
-    const currentUnsubmittedOrders = await this.ocMeService
-      .ListOrders({
-        sortBy: '!DateCreated',
-        filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
-      })
-      .toPromise();
+    const currentUnsubmittedOrders = await Me.ListOrders({
+      sortBy: '!DateCreated',
+      filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
+    });
 
-    const deleteOrderRequests = currentUnsubmittedOrders.Items.map(c =>
-      this.ocOrderService.Delete('Outgoing', c.ID).toPromise()
-    );
+    const deleteOrderRequests = currentUnsubmittedOrders.Items.map(c => Orders.Delete('Outgoing', c.ID));
     await Promise.all(deleteOrderRequests);
 
     // cannot use this.state.reset because the order index isn't ready immediately after the patch of IsResubmitting
     this.state.order = orderToUpdate;
-    this.state.lineItems = await listAll(
-      this.ocLineItemService,
-      this.ocLineItemService.List,
-      'outgoing',
-      this.order.ID
-    );
+    this.state.lineItems = await listAll(LineItems, LineItems.List, 'Outgoing', this.order.ID);
   }
 
   async empty(): Promise<void> {
@@ -117,17 +95,30 @@ export class CartService implements ICart {
     this.lineItems = this.state.DefaultLineItems;
     Object.assign(this.order, this.calculateOrder());
     try {
-      await this.ocOrderService.Delete('outgoing', ID).toPromise();
+      await Orders.Delete('Outgoing', ID);
     } finally {
       this.state.reset();
     }
   }
-  y;
+
+  private hasSameSpecs(line1: MarketplaceLineItem, line2: MarketplaceLineItem): boolean {
+    const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({SpecID: s.SpecID, OptionID: s.OptionID}));
+    const sortedSpecs2 = line2.Specs.sort(this.sortSpecs).map(s => ({SpecID: s.SpecID, OptionID: s.OptionID}));
+    return JSON.stringify(sortedSpecs1) === JSON.stringify(sortedSpecs2);
+  }
+
+  private sortSpecs(a: LineItemSpec, b: LineItemSpec): number {
+    // sort by SpecID, if SpecID is the same, then sort by OptionID
+    if(a.SpecID === b.SpecID) {
+      return (a.OptionID < b.OptionID) ? -1 : (a.OptionID > b.OptionID) ? 1 : 0;
+    } else {
+      return a.SpecID < b.SpecID ? -1 : 1;
+    }
+  }
 
   private async upsertLineItem(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
-    this.onAdd.next(lineItem);
     try {
-      return await MarketplaceSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
+      return await HeadStartSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
       await this.state.reset();
     }
@@ -135,7 +126,7 @@ export class CartService implements ICart {
 
   private calculateOrder(): MarketplaceOrder {
     const LineItemCount = this.lineItems.Items.length;
-    this.lineItems.Items.forEach(li => {
+    this.lineItems.Items.forEach((li: any) => {
       li.LineTotal = li.Quantity * li.UnitPrice;
       if (isNaN(li.LineTotal)) li.LineTotal = undefined;
     });
@@ -152,11 +143,11 @@ export class CartService implements ICart {
     this.state.order = value;
   }
 
-  private get lineItems(): ListLineItem {
+  private get lineItems(): ListPage<MarketplaceLineItem> {
     return this.state.lineItems;
   }
 
-  private set lineItems(value: ListLineItem) {
+  private set lineItems(value: ListPage<MarketplaceLineItem>) {
     this.state.lineItems = value;
   }
 }

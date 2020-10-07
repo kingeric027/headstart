@@ -1,19 +1,18 @@
 import { Component, Input, OnChanges, ViewChild, OnDestroy } from '@angular/core';
-import { ListSupplier } from '@ordercloud/angular-sdk';
+import { Supplier, ListPage } from 'ordercloud-javascript-sdk';
 import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FormControl, FormGroup } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { takeWhile } from 'rxjs/operators';
-import { SupplierFilters, ShopperContextService } from 'marketplace';
-import { SupplierCategoryConfig } from 'marketplace-javascript-sdk';
+import { ShopperContextService, SupplierFilterConfig, BuyerAppFilterType, SupplierFilters } from 'marketplace';
 
 @Component({
   templateUrl: './supplier-list.component.html',
   styleUrls: ['./supplier-list.component.scss'],
 })
 export class OCMSupplierList implements OnChanges, OnDestroy {
-  @Input() suppliers: ListSupplier;
-  _supplierCategoryConfig: SupplierCategoryConfig;
+  @Input() suppliers: ListPage<Supplier>;
+  _supplierFilterConfig: SupplierFilterConfig[];
   @ViewChild('popover', { static: false }) public popover: NgbPopover;
   alive = true;
   searchTermForSuppliers: string = null;
@@ -26,8 +25,8 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
 
   constructor(private context: ShopperContextService) {}
 
-  @Input() set supplierCategoryConfig(value: SupplierCategoryConfig) {
-    this._supplierCategoryConfig = value;
+  @Input() set supplierFilterConfig(value: SupplierFilterConfig[]) {
+    this._supplierFilterConfig = value;
     this.setForm();
     this.context.supplierFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
@@ -40,8 +39,10 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
 
   setForm(): void {
     const formGroup = {};
-    this._supplierCategoryConfig.Filters.forEach(filter => {
-      formGroup[filter.Path] = new FormControl('');
+    this._supplierFilterConfig.forEach(filterConfig => {
+      if (filterConfig.BuyerAppFilterType === BuyerAppFilterType.SelectOption) {
+        formGroup[filterConfig.Path] = new FormControl('');
+      }
     });
     this.filterForm = new FormGroup(formGroup);
   }
@@ -58,8 +59,9 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
 
   applyFilters(): void {
     const filters = {};
-    this._supplierCategoryConfig.Filters.forEach(filter => {
-      filters[filter.Path] = this.filterForm.value[filter.Path];
+    this._supplierFilterConfig.forEach(filterConfig => {
+      if (filterConfig.BuyerAppFilterType === BuyerAppFilterType.SelectOption)
+        filters[filterConfig.Path] = this.filterForm.value[filterConfig.Path];
     });
     this.context.supplierFilters.filterByFields(filters);
     this.popover.close();
@@ -84,8 +86,9 @@ export class OCMSupplierList implements OnChanges, OnDestroy {
   private handleFiltersChange = (filters: SupplierFilters): void => {
     if (filters.activeFilters) {
       this.searchTermForSuppliers = filters.search || '';
-      this._supplierCategoryConfig.Filters.forEach(filter => {
-        this.filterForm.controls[filter.Path].setValue(filters.activeFilters[filter.Path]);
+      this._supplierFilterConfig.forEach(filterConfig => {
+        if (filterConfig.BuyerAppFilterType === BuyerAppFilterType.SelectOption)
+          this.filterForm.controls[filterConfig.Path].setValue(filters.activeFilters[filterConfig.Path]);
       });
     }
   };

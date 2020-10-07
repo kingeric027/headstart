@@ -1,20 +1,14 @@
 import { Component, Input } from '@angular/core';
-import {
-  ShopperContextService,
-  UserGroup,
-  User,
-  UserGroupAssignment,
-  OcUserGroupService,
-  ApprovalRule,
-  OcApprovalRuleService,
-} from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { UserGroup, UserGroupAssignment } from 'ordercloud-javascript-sdk';
+import { MarketplaceUser } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './order-approval-permissions.component.html',
   styleUrls: ['./order-approval-permissions.component.scss'],
 })
 export class OCMOrderAccessManagement {
-  users: User[] = [];
+  users: MarketplaceUser[] = [];
   permissionAssignmentsStatic: UserGroupAssignment[] = [];
   permissionAssignmentsEditable: UserGroupAssignment[] = [];
   add: UserGroupAssignment[] = [];
@@ -32,11 +26,7 @@ export class OCMOrderAccessManagement {
     this.fetchUserManagementInformation();
   }
 
-  constructor(
-    private context: ShopperContextService,
-    private ocOcUserGroupService: OcUserGroupService,
-    private ocApprovalRuleService: OcApprovalRuleService
-  ) {}
+  constructor(private context: ShopperContextService) {}
 
   toggleAllNeedingApproval(): void {
     if (this.areAllUsersAssignedToNeedsApproval) {

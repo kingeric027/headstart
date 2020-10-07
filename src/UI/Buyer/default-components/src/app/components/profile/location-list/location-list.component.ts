@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ShopperContextService, BuyerLocationWithCert } from 'marketplace';
-import { MarketplaceAddressBuyer } from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './location-list.component.html',

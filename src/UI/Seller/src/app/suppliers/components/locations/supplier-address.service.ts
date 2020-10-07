@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OcSupplierAddressService, Address, ListAddress } from '@ordercloud/angular-sdk';
+import { OcSupplierAddressService, Address, Supplier, ListPage } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { SupplierAddresses } from 'ordercloud-javascript-sdk';
 
 @Injectable({
   providedIn: 'root',
@@ -12,38 +14,39 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
-    private ocSupplierAddressService: OcSupplierAddressService
+    private ocSupplierAddressService: OcSupplierAddressService,
+    public currentUserService: CurrentUserService
   ) {
     super(
       router,
       activatedRoute,
-      ocSupplierAddressService,
+      SupplierAddresses,
+      currentUserService,
       '/suppliers',
       'suppliers',
       SUPPLIER_SUB_RESOURCE_LIST,
-      'locations'
+      'locations',
+      '/my-supplier'
     );
   }
 
   async createNewResource(resource: any): Promise<any> {
     // special iding process for supplier addresses
-    const parentResourceID = this.getParentResourceID();
-    const existingAddresses = await this.ocSupplierAddressService.List(parentResourceID).toPromise();
+    const parentResourceID = await this.getParentResourceID();
+    const existingAddresses = await SupplierAddresses.List(parentResourceID);
     const newID = this.getIncrementedID(parentResourceID, existingAddresses);
     resource.ID = newID;
 
-    const newResource = await MarketplaceSDK.ValidatedAddresses.CreateSupplierAddress(
-      this.getParentResourceID(),
-      resource
-    );
+    const newResource = await HeadStartSDK.ValidatedAddresses.CreateSupplierAddress(parentResourceID, resource);
     this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
     this.resourceSubject.next(this.resourceSubject.value);
     return newResource;
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
-    const newResource = await MarketplaceSDK.ValidatedAddresses.SaveSupplierAddress(
-      this.getParentResourceID(),
+    const parentResourceID = await this.getParentResourceID();
+    const newResource = await HeadStartSDK.ValidatedAddresses.SaveSupplierAddress(
+      parentResourceID,
       originalID,
       resource
     );
@@ -53,10 +56,10 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     return newResource;
   }
 
-  private getIncrementedID(supplierID: string, existingAddresses: ListAddress): string {
+  private getIncrementedID(supplierID: string, existingAddresses: ListPage<Address>): string {
     const numbers = existingAddresses.Items.map(a => Number(a.ID.split('-')[1]));
     const highestNumber = Math.max(...numbers);
-    const nextID = highestNumber + 1;
+    const nextID = highestNumber === -Infinity ? 1 : highestNumber + 1;
     return `${supplierID}-${nextID.toString().padStart(2, '0')}`;
   }
 
@@ -71,7 +74,7 @@ export class SupplierAddressService extends ResourceCrudService<Address> {
     Zip: '',
     Country: '',
     Phone: '',
-    AddressName: 'Your new supplier location',
+    AddressName: '',
     xp: null,
   };
 }

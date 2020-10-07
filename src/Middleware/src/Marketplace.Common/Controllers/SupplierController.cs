@@ -1,10 +1,11 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
 using ordercloud.integrations.library;
+using Marketplace.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -41,5 +42,26 @@ namespace Marketplace.Common.Controllers
 		   var ocAuth = await _oc.AuthenticateAsync();
 			return await _command.Create(supplier, VerifiedUserContext, ocAuth.AccessToken);
 		}
+
+		[DocName("GET If Location Deletable")]
+		[HttpGet, Route("candelete/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierAddressAdmin)]
+		public async Task<bool> CanDeleteLocation(string locationID)
+		{
+			///ocAuth is the token for the organization that is specified in the AppSettings
+			var ocAuth = await _oc.AuthenticateAsync();
+			var productList = await _oc.Products.ListAsync(filters: $"ShipFromAddressID={locationID}", accessToken: ocAuth.AccessToken);
+			return productList.Items.Count == 0;
+		}
+
+		[DocName("PATCH Supplier")]
+		[DocIgnore] // PartialSupplier throws an openapi error?
+		[HttpPatch, Route("{supplierID}"), OrderCloudIntegrationsAuth]
+		public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, [FromBody] PartialSupplier supplier)
+		{
+			///ocAuth is the token for the organization that is specified in the AppSettings
+			var ocAuth = await _oc.AuthenticateAsync();
+			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext, ocAuth.AccessToken);
+		}
+
 	}
 }

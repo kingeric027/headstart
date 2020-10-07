@@ -1,32 +1,44 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ListSupplier } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { MarketplaceSDK, SupplierCategoryConfig } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
+import { Supplier } from 'ordercloud-javascript-sdk';
+import { SupplierFilterConfig, BuyerAppFilterType } from '../shopper-context';
+import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 
 @Component({
   template: `
-    <ocm-supplier-list [suppliers]="suppliers" [supplierCategoryConfig]="supplierCategoryConfig"></ocm-supplier-list>
+    <ocm-supplier-list [suppliers]="suppliers" [supplierFilterConfig]="supplierFilterConfig"></ocm-supplier-list>
   `,
 })
 export class SupplierListWrapperComponent implements OnInit, OnDestroy {
-  suppliers: ListSupplier;
-  supplierCategoryConfig: SupplierCategoryConfig;
+  suppliers: ListPage<Supplier>;
+  supplierFilterConfig: SupplierFilterConfig[];
   alive = true;
 
-  constructor(private activatedRoute: ActivatedRoute, public context: ShopperContextService) {}
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    public context: ShopperContextService,
+    private tempSdk: TempSdk
+  ) { }
 
   ngOnInit(): void {
-    this.suppliers = this.activatedRoute.snapshot.data.products;
-    this.getSupplierCategories();
-    this.context.supplierFilters.activeFiltersSubject
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(this.handleFiltersChange);
+    this.setUpData();
   }
 
   ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  private async setUpData(): Promise<void> {
+    this.suppliers = this.activatedRoute.snapshot.data.products;
+    await this.getSupplierCategories();
+    this.setSupplierCountryIfNeeded();
+    this.setBuyerFilterIfNeeded();
+    this.context.supplierFilters.activeFiltersSubject
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(this.handleFiltersChange);
   }
 
   private handleFiltersChange = async (): Promise<void> => {
@@ -34,7 +46,21 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
   };
 
   private getSupplierCategories = async (): Promise<void> => {
-    const marketplaceID = this.context.appSettings.marketplaceID;
-    this.supplierCategoryConfig = await MarketplaceSDK.SupplierCategoryConfigs.Get(marketplaceID);
+    const supplierFilterConfigResponse = await this.tempSdk.getSupplierFilterConfig();
+    this.supplierFilterConfig = supplierFilterConfigResponse.Items.map(s => s.Doc);
   };
+
+  private setSupplierCountryIfNeeded(): void {
+    if (
+      this.supplierFilterConfig.find(
+        s => s.Path === 'xp.CountriesServicing' && s.BuyerAppFilterType === BuyerAppFilterType.NonUI
+      )
+    ) {
+      this.context.supplierFilters.setNonURLFilter('xp.CountriesServicing', this.context.currentUser.get().xp.Country);
+    }
+  }
+
+  private setBuyerFilterIfNeeded(): void {
+    this.context.supplierFilters.setNonURLFilter('xp.BuyersServicing', this.context.currentUser.get().Buyer.ID);
+  }
 }

@@ -1,10 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Address,  } from '@ordercloud/angular-sdk';
+import { Component, Input } from '@angular/core';
+import { Address,  } from 'ordercloud-javascript-sdk';
 import { ShopperContextService } from 'marketplace';
 
 import {
   MarketplaceAddressBuyer,
-} from '../../../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+} from '@ordercloud/headstart-sdk';
 
 
 @Component({

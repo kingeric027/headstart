@@ -1,28 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { ListLineItem, OcMeService } from '@ordercloud/angular-sdk';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { ListLineItemWithProduct, MarketplaceMeProduct } from '../shopper-context';
+import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context';
 import { CurrentOrderService } from '../services/order/order.service';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, ListPage, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { Me, Orders, OrderPromotion } from 'ordercloud-javascript-sdk';
+import { PromoService } from '../services/order/promo.service';
 
 @Component({
   template: `
-    <ocm-cart [order]="order" [lineItems]="lineItems"></ocm-cart>
+    <ocm-cart [order]="order" [lineItems]="lineItems" [orderPromos]="orderPromos"></ocm-cart>
   `,
 })
 export class CartWrapperComponent implements OnInit {
   order: MarketplaceOrder;
-  lineItems: ListLineItemWithProduct;
+  lineItems: ListPage<LineItemWithProduct>;
+  orderPromos: ListPage<OrderPromotion>;
   productCache: MarketplaceMeProduct[] = []; // TODO - move to cart service?
 
   constructor(
     private currentOrder: CurrentOrderService,
-    private ocMeService: OcMeService,
-    public context: ShopperContextService // used in template
-  ) {}
+    private currentPromos: PromoService) {}
 
   ngOnInit(): void {
     this.currentOrder.onChange(this.setOrder);
+    this.currentPromos.onChange(this.setOrderPromos);
     this.currentOrder.cart.onChange(this.setLineItems);
   }
 
@@ -30,12 +30,16 @@ export class CartWrapperComponent implements OnInit {
     this.order = order;
   };
 
-  setLineItems = async (items: ListLineItem): Promise<void> => {
+  setLineItems = async (items: ListPage<MarketplaceLineItem>): Promise<void> => {
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
     await this.updateProductCache(items.Items.map(li => li.ProductID));
     this.lineItems = this.mapToLineItemsWithProduct(items);
   };
+
+  setOrderPromos = (promos: ListPage<OrderPromotion>): void => {
+    this.orderPromos = promos;
+  }
 
   async updateProductCache(productIDs: string[]): Promise<void> {
     const cachedIDs = this.productCache.map(p => p.ID);
@@ -43,8 +47,8 @@ export class CartWrapperComponent implements OnInit {
     this.productCache = [...this.productCache, ...(await this.requestProducts(toAdd))];
   }
 
-  mapToLineItemsWithProduct(lis: ListLineItem): ListLineItemWithProduct {
-    const Items = lis.Items.map(li => {
+  mapToLineItemsWithProduct(lis: ListPage<MarketplaceLineItem>): ListPage<LineItemWithProduct> {
+    const Items = lis.Items.map((li: LineItemWithProduct) => {
       const product = this.getCachedProduct(li.ProductID);
       li.Product = product;
       return li;
@@ -53,7 +57,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   async requestProducts(ids: string[]): Promise<MarketplaceMeProduct[]> {
-    return await Promise.all(ids.map(id => this.ocMeService.GetProduct(id).toPromise()));
+    return await Promise.all(ids.map(id => Me.GetProduct(id)));
   }
 
   getCachedProduct(id: string): MarketplaceMeProduct {

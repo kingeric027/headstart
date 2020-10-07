@@ -1,74 +1,57 @@
 import { AppConfig, MarketplaceBuyerCreditCard } from '../../shopper-context';
 import {
-  ListPayment,
   Payment,
-  OcOrderService,
-  OcPaymentService,
+  Orders,
+  Payments,
   BuyerAddress,
-  OcMeService,
-} from '@ordercloud/angular-sdk';
+  Me,
+  OrderWorksheet,
+  IntegrationEvents,
+  ShipMethodSelection,
+  LineItems,
+} from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
 import { PaymentHelperService } from '../payment-helper/payment-helper.service';
 import { OrderStateService } from './order-state.service';
-import { OrderWorksheet, ShipMethodSelection } from '../ordercloud-sandbox/ordercloud-sandbox.models';
-import { OrderCloudSandboxService } from '../ordercloud-sandbox/ordercloud-sandbox.service';
 import {
-  MarketplaceSDK,
+  HeadStartSDK,
   Address,
   OrderCloudIntegrationsCreditCardPayment,
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
-} from 'marketplace-javascript-sdk';
-
-export interface ICheckout {
-  submitWithCreditCard(card: OrderCloudIntegrationsCreditCardPayment, marketplaceID: string): Promise<string>;
-  submitWithoutCreditCard(): Promise<string>;
-  addComment(comment: string): Promise<MarketplaceOrder>;
-  listPayments(): Promise<ListPayment>;
-  createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment>;
-  createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment>;
-  createPurchaseOrderPayment(amount: number): Promise<Payment>;
-  setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder>;
-  setShippingAddressByID(addressID: string): Promise<MarketplaceOrder>;
-  setBuyerLocationByID(buyerLocationID: string): Promise<MarketplaceOrder>;
-  estimateShipping(): Promise<OrderWorksheet>;
-  selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet>;
-  calculateOrder(): Promise<MarketplaceOrder>;
-}
+  ListPage,
+  MarketplaceLineItem,
+  MarketplaceAddressBuyer,
+} from '@ordercloud/headstart-sdk';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CheckoutService implements ICheckout {
+export class CheckoutService {
   constructor(
-    private ocOrderService: OcOrderService,
-    private ocPaymentService: OcPaymentService,
-    private ocMeService: OcMeService,
     private paymentHelper: PaymentHelperService,
-    private appSettings: AppConfig,
     private state: OrderStateService,
-    private orderCloudSandBoxService: OrderCloudSandboxService,
     private appConfig: AppConfig
   ) {}
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await MarketplaceSDK.MePayments.Post(payment); // authorize card
+    await this.incrementOrderIfNeeded();
+    payment.OrderID = this.order.ID;
+    await HeadStartSDK.MePayments.Post(payment); // authorize card
     const orderID = this.submit();
     return orderID;
   }
 
   async submitWithoutCreditCard(): Promise<string> {
+    await this.incrementOrderIfNeeded();
     const orderID = this.submit();
     return orderID;
   }
 
-  private async submit(): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await this.incrementOrderIfNeeded();
-    const submittedOrder = await this.ocOrderService.Submit('outgoing', this.order.ID).toPromise();
-    await this.state.reset();
-    return submittedOrder.ID;
+  async appendPaymentMethodToOrderXp(orderID: string, ccPayment?: any): Promise<void> {
+    const paymentMethod = ccPayment?.CreditCardID ? 'Credit Card' : 'Purchase Order';
+    await Orders.Patch('Outgoing', orderID, { xp: { PaymentMethod: paymentMethod } });
   }
 
   async addComment(comment: string): Promise<MarketplaceOrder> {
@@ -78,19 +61,17 @@ export class CheckoutService implements ICheckout {
   async incrementOrderIfNeeded(): Promise<void> {
     // 'as any' can be removed after sdk update
     if (!(this.order.xp as any)?.IsResubmitting) {
-      this.order = (await this.ocOrderService
-        .Patch('outgoing', this.order.ID, {
-          ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
-        })
-        .toPromise()) as MarketplaceOrder;
+      this.order = (await Orders.Patch('Outgoing', this.order.ID, {
+        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      })) as MarketplaceOrder;
     }
   }
 
   async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
-    address.ID = null;
-    this.order = await MarketplaceSDK.ValidatedAddresses.SetShippingAddress(
+    (address as any).ID = null;
+    this.order = await HeadStartSDK.ValidatedAddresses.SetShippingAddress(
       'Outgoing',
       this.order.ID,
       address as Address
@@ -98,9 +79,10 @@ export class CheckoutService implements ICheckout {
     return this.order;
   }
 
-  async setShippingAddressByID(addressID: string): Promise<MarketplaceOrder> {
+  async setShippingAddressByID(address: MarketplaceAddressBuyer, ): Promise<MarketplaceOrder> {
     try {
-      return await this.patch({ ShippingAddressID: addressID });
+      await Orders.Patch('Outgoing', this.order.ID, { xp: { ShippingAddress: address } })
+      return await this.patch({ ShippingAddressID: address.ID });
     } catch (ex) {
       if (ex.error.Errors[0].ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
@@ -123,11 +105,11 @@ export class CheckoutService implements ICheckout {
   }
 
   async isApprovalNeeded(locationID: string): Promise<boolean> {
-    const userGroups = await this.ocMeService.ListUserGroups({ searchOn: 'ID', search: locationID }).toPromise();
+    const userGroups = await Me.ListUserGroups({ searchOn: 'ID', search: locationID });
     return userGroups.Items.some(u => u.ID === `${locationID}-NeedsApproval`);
   }
 
-  async listPayments(): Promise<ListPayment> {
+  async listPayments(): Promise<ListPage<Payment>> {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID);
   }
 
@@ -145,22 +127,66 @@ export class CheckoutService implements ICheckout {
   // Integration Methods
   // order cloud sandbox service methods, to be replaced by updated sdk in the future
   async estimateShipping(): Promise<OrderWorksheet> {
-    return await this.orderCloudSandBoxService.estimateShipping(this.order.ID);
+    return await IntegrationEvents.EstimateShipping('Outgoing', this.order.ID);
   }
 
-  async selectShipMethod(selection: ShipMethodSelection): Promise<OrderWorksheet> {
-    const orderWorksheet = await this.orderCloudSandBoxService.selectShipMethod(this.order.ID, selection);
+  async cleanLineItemIDs(orderID: string, lineItems: MarketplaceLineItem[]): Promise<void> {
+    /* line item ids are significant for suppliers creating a relationship
+     * between their shipments and line items in ordercloud
+     * we are sequentially labeling these ids for ease of shipping */
+    const lineItemIDChanges = lineItems.map((li, index) => {
+      return LineItems.Patch('Outgoing', orderID, li.ID, { ID: this.createIDFromIndex(index) });
+    });
+    await Promise.all(lineItemIDChanges);
+    await this.state.resetLineItems();
+  }
+
+  createIDFromIndex(index: number): string {
+    /* X was choosen as a prefix for the lineItem ID so that it is easy to
+     * direct suppliers where to look for the ID. L and I are sometimes indistinguishable
+     * from the number 1 so I avoided those. X is also difficult to confuse with other
+     * letters when verbally pronounced */
+    const countInList = index + 1;
+    const paddedCount = countInList.toString().padStart(3, '0');
+    return 'X' + paddedCount;
+  }
+
+  async selectShipMethods(selections: ShipMethodSelection[]): Promise<OrderWorksheet> {
+    const orderWorksheet = await IntegrationEvents.SelectShipmethods('Outgoing', this.order.ID, {
+      ShipMethodSelections: selections,
+    });
     this.order = orderWorksheet.Order;
     return orderWorksheet;
   }
 
   async calculateOrder(): Promise<MarketplaceOrder> {
-    const orderCalculation = await this.orderCloudSandBoxService.calculateOrder(this.order.ID);
+    const orderCalculation = await IntegrationEvents.Calculate('Outgoing', this.order.ID);
     this.order = orderCalculation.Order;
     return this.order;
   }
 
+  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
+    const payment: Payment = {
+      Amount: amount,
+      DateCreated: new Date().toDateString(),
+      Type: 'PurchaseOrder',
+    };
+    return await Payments.Create('Outgoing', this.order.ID, payment);
+  }
+
+  async deleteExistingPayments(): Promise<any[]> {
+    const payments = await Payments.List('Outgoing', this.order.ID);
+    const deleteAll = payments.Items.map(payment => Payments.Delete('Outgoing', this.order.ID, payment.ID));
+    return Promise.all(deleteAll);
+  }
+
   // Private Methods
+  private async submit(): Promise<string> {
+    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
+    await this.state.reset();
+    return submittedOrder.ID;
+  }
 
   private async createCCPayment(
     partialAccountNum: string,
@@ -168,7 +194,7 @@ export class CheckoutService implements ICheckout {
     creditCardID: string,
     amount: number
   ): Promise<Payment> {
-    const payment = {
+    const payment: Payment = {
       Amount: amount,
       DateCreated: new Date().toDateString(),
       Accepted: false,
@@ -176,33 +202,15 @@ export class CheckoutService implements ICheckout {
       CreditCardID: creditCardID,
       xp: {
         partialAccountNumber: partialAccountNum,
-        cardType: cardType,
+        cardType,
       },
     };
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
-  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
-    const payment = {
-      Amount: amount,
-      DateCreated: new Date().toDateString(),
-      Type: 'PurchaseOrder',
-    };
-    return await this.ocPaymentService.Create('outgoing', this.order.ID, payment).toPromise();
-  }
-
-  async deleteExistingPayments(): Promise<any[]> {
-    const payments = await this.ocPaymentService.List('outgoing', this.order.ID).toPromise();
-    const deleteAll = payments.Items.map(payment =>
-      this.ocPaymentService.Delete('outgoing', this.order.ID, payment.ID).toPromise()
-    );
-    return Promise.all(deleteAll);
+    return await Payments.Create('Outgoing', this.order.ID, payment);
   }
 
   private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {
-    return (this.order = (await this.ocOrderService
-      .Patch('outgoing', this.order.ID, order)
-      .toPromise()) as MarketplaceOrder);
+    this.order = (await Orders.Patch('Outgoing', this.order.ID, order)) as MarketplaceOrder;
+    return this.order;
   }
 
   private get order(): MarketplaceOrder {

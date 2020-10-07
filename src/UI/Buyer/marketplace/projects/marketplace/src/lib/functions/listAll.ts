@@ -1,6 +1,5 @@
 import { flatten, range } from 'lodash';
-import { Meta } from '@ordercloud/angular-sdk';
-import { Observable } from 'rxjs';
+import { Meta } from 'ordercloud-javascript-sdk';
 
 interface ListPage<T> {
   Items?: T[];
@@ -20,8 +19,8 @@ interface ListPage<T> {
  */
 export async function listAll<T = any>(
   service: any,
-  listFunc: (...args: any) => Observable<ListPage<T>>,
-  ...listArgs
+  listFunc: (...args: any) => Promise<ListPage<T>>,
+  ...listArgs: any[]
 ): Promise<ListPage<T>> {
   // get or create filters obj if it doesnt exist
   listFunc = listFunc.bind(service);
@@ -32,10 +31,10 @@ export async function listAll<T = any>(
   filtersObj.page = 1;
   filtersObj.pageSize = 100;
 
-  const result1 = await listFunc(...listArgs, filtersObj).toPromise();
+  const result1 = await listFunc(...listArgs, filtersObj);
   const additionalPages = range(2, result1?.Meta.TotalPages + 1);
 
-  const requests = additionalPages.map((page: number) => listFunc(...listArgs, { ...filtersObj, page }).toPromise());
+  const requests = additionalPages.map((page: number) => listFunc(...listArgs, { ...filtersObj, page }));
   const results: ListPage<T>[] = await Promise.all(requests);
   // combine and flatten items for all list calls
   return { Items: flatten([result1, ...results].map(r => r.Items)), Meta: result1.Meta };

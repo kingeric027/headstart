@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { OcMeService } from '@ordercloud/angular-sdk';
-import { MarketplaceSDK, OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
-import { MarketplaceBuyerCreditCard, ListMarketplaceBuyerCreditCard } from '../../shopper-context';
+import { Me, ListPage } from 'ordercloud-javascript-sdk';
+import { HeadStartSDK, OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
+import { MarketplaceBuyerCreditCard } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
@@ -18,19 +18,19 @@ export class CreditCardService {
     UnionPay: RegExp('^(62[0-9]{14,17})$'),
   };
 
-  constructor(private ocMeService: OcMeService) {}
+  constructor() {}
 
   async Save(card: OrderCloudIntegrationsCreditCardToken): Promise<MarketplaceBuyerCreditCard> {
     card.CardType = this.getCardType(card.AccountNumber);
-    return await MarketplaceSDK.MeCreditCardAuthorizations.MePost(card);
+    return await HeadStartSDK.MeCreditCardAuthorizations.MePost(card);
   }
 
   async Delete(cardID: string): Promise<void> {
-    return await this.ocMeService.DeleteCreditCard(cardID).toPromise();
+    return await Me.DeleteCreditCard(cardID);
   }
 
-  async List(): Promise<ListMarketplaceBuyerCreditCard> {
-    return await this.ocMeService.ListCreditCards({ pageSize: 100 }).toPromise();
+  async List(): Promise<ListPage<MarketplaceBuyerCreditCard>> {
+    return await Me.ListCreditCards({ pageSize: 100 });
   }
 
   private getCardType(cardNumber: string): string {

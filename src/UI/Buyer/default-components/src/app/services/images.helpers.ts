@@ -1,24 +1,16 @@
-import { map as _map, without as _without, uniqBy as _uniq } from 'lodash';
 import { ocAppConfig } from '../config/app.config';
-import { MarketplaceMeProduct } from 'marketplace';
-import { MarketplaceSDK } from '../../../../marketplace/node_modules/marketplace-javascript-sdk/dist';
+import { MarketplaceMeProduct, CurrentUser } from 'marketplace';
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
-// TODO - change when cms project is more stable
-export const getImageUrls = async (product: MarketplaceMeProduct): Promise<string[]> => {
-  // let images = ((product as any)?.xp?.Images) || [];
-  // images = _uniq(images, (img: any) => img.URL);
-  // const images = await MarketplaceSDK.ProductContents.ListAssets(product.ID);
-  
-  const images = { Items: [] };
-  let urls: string[] = images.Items.map(img => {
-    return img.Url;
-  });
-  urls = _without(urls, undefined);
-  if (urls.length === 0) urls.push('http://placehold.it/300x300');
-  return urls;
+export const getPrimaryImageUrl = (product: MarketplaceMeProduct, user: CurrentUser): string => {
+  return `${ocAppConfig.middlewareUrl}/assets/${user.Seller.ID}/products/${product.ID}/thumbnail?size=M`;
 };
 
-export const getPrimaryImageUrl = (product: MarketplaceMeProduct): string => {
-  return `${ocAppConfig.middlewareUrl}/products/${product.ID}/image`;
-  // return getImageUrls(product)[0];
+export const getPrimaryLineItemImage = (
+  lineItemID: string,
+  lineItems: MarketplaceLineItem[],
+  user: CurrentUser
+): string => {
+  const li = lineItems.find(item => item.ID === lineItemID);
+  return getPrimaryImageUrl(li.Product, user);
 };

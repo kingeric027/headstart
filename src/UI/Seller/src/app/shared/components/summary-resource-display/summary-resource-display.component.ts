@@ -1,10 +1,12 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, Inject } from '@angular/core';
 import { singular } from 'pluralize';
 import { SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY } from '@app-seller/shared/services/configuration/table-display';
 import { OcCategoryService } from '@ordercloud/angular-sdk';
 import { faChevronDown, faChevronRight, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductMainImageUrlOrPlaceholder } from '@app-seller/products/product-image.helper';
+import { PLACEHOLDER_URL, PRODUCT_IMAGE_PATH_STRATEGY, getProductSmallImageUrl } from '@app-seller/products/product-image.helper';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { SUPPLIER_LOGO_PATH_STRATEGY, getSupplierLogoSmallUrl } from '@app-seller/suppliers/supplier-logo.helper';
 
 @Component({
   selector: 'summary-resource-display-component',
@@ -45,6 +47,7 @@ export class SummaryResourceDisplay implements OnChanges {
   set resource(value: any) {
     this._resource = value;
   }
+
   @Input()
   set parentResourceID(value: any) {
     this._parentResourceID = value;
@@ -67,9 +70,10 @@ export class SummaryResourceDisplay implements OnChanges {
   constructor(
     private ocCategoryService: OcCategoryService,
     private router: Router,
-    private activatedRoute: ActivatedRoute) {}
+    @Inject(applicationConfiguration) private appConfig: AppConfig) {}
 
   setDisplayValuesForResource(resource: any) {
+    if (resource.ProductAssignments) resource = resource.Product;
     this._primaryHeader = this.getValueOnExistingResource(resource, 'toPrimaryHeader');
     this._secondaryHeader = this.getValueOnExistingResource(resource, 'toSecondaryHeader');
     this._shouldShowImage = !!SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY[this.resourceType].toImage;
@@ -82,7 +86,9 @@ export class SummaryResourceDisplay implements OnChanges {
     const piecesOfPath = pathToValue.split('.');
     if (pathToValue) {
       if (pathToValue === PRODUCT_IMAGE_PATH_STRATEGY) {
-        return getProductMainImageUrlOrPlaceholder(value);
+        return getProductSmallImageUrl(value, this.appConfig.sellerID);
+      } else if (pathToValue === SUPPLIER_LOGO_PATH_STRATEGY) {
+        return getSupplierLogoSmallUrl(value, this.appConfig.sellerID);
       } else {
         let currentObject = value;
         piecesOfPath.forEach(piece => {
@@ -173,7 +179,7 @@ export class SummaryResourceDisplay implements OnChanges {
     this.router.navigate([`${splitUrl[1]}/${splitUrl[2]}/${splitUrl[3]}/new`], { queryParams: { ParentCategory: resource } });
   }
 
-  //Nested resources cannot be added beyond a third tier
+  // Nested resources cannot be added beyond a third tier
   isAtMaximumDepth() {
     const parentOfResource = this._resource?.ParentID;
     let parentOfParentOfResource;

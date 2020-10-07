@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HasTokenGuard as HasToken } from '@app-seller/shared';
 import { HomeComponent } from '@app-seller/layout/home/home.component';
+import { CanEditMySupplierGuard } from './shared/guards/can-edit-my-supplier/can-edit-my-supplier.guard';
 
 const routes: Routes = [
   {
@@ -14,6 +15,10 @@ const routes: Routes = [
       {
         path: 'products',
         loadChildren: () => import('./products/products.module').then(m => m.ProductsModule),
+      },
+      {
+        path: 'kitproducts',
+        loadChildren: () => import('./kits/kits.module').then(m => m.KitsModule),
       },
       {
         path: 'promotions',
@@ -40,7 +45,8 @@ const routes: Routes = [
         loadChildren: () => import('./suppliers/suppliers.module').then(m => m.SuppliersModule),
       },
       {
-        path: 'my-supplier-profile',
+        path: 'my-supplier',
+        canActivate: [CanEditMySupplierGuard],
         loadChildren: () => import('./suppliers/suppliers.module').then(m => m.SuppliersModule),
       },
       {
@@ -50,6 +56,10 @@ const routes: Routes = [
       {
         path: 'storefronts',
         loadChildren: () => import('./storefronts/storefronts.module').then(m => m.StorefrontsModule),
+      },
+      {
+        path: 'account',
+        loadChildren: () => import('./account/account.module').then(m => m.AccountModule),
       },
     ],
   },

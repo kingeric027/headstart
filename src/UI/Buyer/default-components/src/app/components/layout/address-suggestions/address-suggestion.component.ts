@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BuyerAddress, ListBuyerAddress, ShopperContextService } from 'marketplace';
+import { ShopperContextService } from 'marketplace';
+import { BuyerAddress } from 'ordercloud-javascript-sdk';
 import { faSquare, faCheckSquare } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
@@ -7,16 +8,16 @@ import { faSquare, faCheckSquare } from '@fortawesome/free-regular-svg-icons';
   styleUrls: ['./address-suggestion.component.scss'],
 })
 export class OCMAddressSuggestion implements OnInit {
-  @Input() suggestedAddresses: ListBuyerAddress;
+  @Input() suggestedAddresses: BuyerAddress;
   @Output() selectedAddress = new EventEmitter<BuyerAddress>();
   activeAddress: BuyerAddress;
   faSquare = faSquare;
   faCheckSquare = faCheckSquare;
   constructor(public context: ShopperContextService) {}
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  setActiveAddress(address) {
+  setActiveAddress(address: BuyerAddress): void {
     this.activeAddress = address;
     this.selectedAddress.emit(address);
   }

@@ -31,6 +31,7 @@
     height: 100%;
     opacity: 100;
     transition: height 350ms ease-in-out, opacity 350ms ease-in-out;
+    margin-bottom: 2rem;
     &.hidden {
         height: 0;
         opacity: 0;

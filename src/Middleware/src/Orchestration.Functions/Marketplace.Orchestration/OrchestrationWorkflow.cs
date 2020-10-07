@@ -5,8 +5,11 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using Action = Marketplace.Common.Models.Action;
 using LogLevel = Marketplace.Common.Models.LogLevel;
 
@@ -16,13 +19,15 @@ namespace Marketplace.Orchestration
     {
         private readonly IOrchestrationCommand _orch;
         private readonly ISyncCommand _sync;
+        private readonly IOrderCloudIntegrationsFunctionToken _token;
         private readonly LogQuery _log;
 
-        public OrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, LogQuery log)
+        public OrchestrationWorkflow(IOrchestrationCommand orch, ISyncCommand sync, IOrderCloudIntegrationsFunctionToken token, LogQuery log)
         {
             _orch = orch;
             _sync = sync;
             _log = log;
+            _token = token;
         }
 
         [FunctionName("OrchestrationWorkflow")]
@@ -35,7 +40,6 @@ namespace Marketplace.Orchestration
                 var wi = new WorkItem(path)
                 {
                     Cache = await context.CallActivityAsync<JObject>("GetCachedItem", path),
-                    //Current = await context.CallActivityAsync<JObject>("GetQueuedItem", path)
                 };
                 var queue = await context.CallActivityAsync<JObject>("GetQueuedItem", path);
                 wi.Current = queue["Model"] as JObject;
@@ -63,26 +67,33 @@ namespace Marketplace.Orchestration
                 
                 await context.CallActivityAsync("UpdateCache", wi);
 
-                log.LogInformation($"{wi.RecordId}: {wi.Action.ToString()} successfully");
+                log.LogDebug($"{wi.RecordId}: {wi.Action} success");
+                log.LogInformation($"{wi.RecordId}: {wi.Action} successfully");
                 await context.CallActivityAsync<JObject>("LogEvent", new OrchestrationLog(wi) { Level = LogLevel.Success });
             }
             catch (OrchestrationException oex)
             {
                 log.LogError($"{oex.Error.Type}: {oex.Message}", oex.Error.Data);
+                log.LogDebug($"{oex.Error.Type}: {oex.Message}", oex.Error.Data);
             }
             catch (FunctionFailedException fex)
             {
                 log.LogError(fex.Message);
+                log.LogDebug(fex.Message);
             }
             catch (Exception ex)
             {
                 log.LogError(ex.Message);
+                log.LogDebug(ex.Message);
             }
             finally
             {
                 await context.CallActivityAsync("CleanupQueue", context.GetInput<string>());
             }
         }
+
+        [FunctionName("DefineUserContext")]
+        public async Task<VerifiedUserContext> DefineUserContext([ActivityTrigger] WorkItem wi) => await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
 
         [FunctionName("LogEvent")]
         public async Task LogEvent([ActivityTrigger] OrchestrationLog log) => await _log.Save(log);

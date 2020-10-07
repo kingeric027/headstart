@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { ListPayment, ListLineItem } from '@ordercloud/angular-sdk';
+import { Payment, ListPage } from 'ordercloud-javascript-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { MarketplaceOrder } from 'marketplace-javascript-sdk';
+import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './checkout-confirm.component.html',
@@ -13,8 +13,8 @@ export class OCMCheckoutConfirm implements OnInit {
 
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListLineItem;
-  @Input() payments: ListPayment;
+  @Input() lineItems: ListPage<MarketplaceLineItem>;
+  @Input() payments: ListPage<Payment>;
   @Output() submitOrderWithComment = new EventEmitter<string>();
 
   constructor() {}

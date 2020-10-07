@@ -5,6 +5,11 @@ using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Newtonsoft;
+using Newtonsoft.Json.Linq;
+using System.Dynamic;
+using System.Collections.Generic;
+using Flurl.Util;
 
 namespace Marketplace.Common.Controllers
 {
@@ -54,5 +59,47 @@ namespace Marketplace.Common.Controllers
 		{
 			await _command.Delete(id, VerifiedUserContext);
 		}
+
+
+		// todo add auth for seller user
+		[DocName("GET Product pricing override")]
+		[HttpGet, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID)
+		{
+			return await _command.GetPricingOverride(id, buyerID, VerifiedUserContext);
+		}
+
+		// todo add auth for seller user
+		[DocName("CREATE Product pricing override")]
+		[HttpPost, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
+		{
+			return await _command.CreatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext);
+		}
+
+		// todo add auth for seller user
+		[DocName("PUT Product pricing override")]
+		[HttpPut, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
+		{
+			return await _command.UpdatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext);
+		}
+
+		// todo add auth for seller user
+		[DocName("DELETE Product pricing override")]
+		[HttpDelete, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		public async Task DeletePricingOverride(string id, string buyerID)
+		{
+			await _command.DeletePricingOverride(id, buyerID, VerifiedUserContext);
+		}
+
+		[DocName("PATCH Product filter option override")]
+		[HttpPatch, Route("filteroptionoverride/{id}"), OrderCloudIntegrationsAuth(ApiRole.AdminUserAdmin)]
+		public async Task<Product> FilterOptionOverride(string id, [FromBody] Product product)
+        {
+			IDictionary<string, object> facets = product.xp.Facets;
+			var supplierID = product.DefaultSupplierID;
+			return await _command.FilterOptionOverride(id, supplierID, facets, VerifiedUserContext);
+        }
 	}
 }

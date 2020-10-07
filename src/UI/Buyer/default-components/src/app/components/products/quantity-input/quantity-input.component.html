@@ -2,7 +2,7 @@
   <div class="form-group mb-0">
     <label for="quantity"
            class="sr-only"
-           tranlsate>PRODUCTS.QTY_INPUT.QTY</label>
+           translate>PRODUCTS.QTY_INPUT.QTY</label>
     <input *ngIf="!isQtyRestricted"
            id="quantity"
            type="number"
@@ -10,12 +10,12 @@
            class="form-control text-center"
            placeholder="0"
            [attr.disabled]="disabled ? '' : null"
-           style="min-width:65px"
+           style="min-width:55px"
            aria-label="Quantity Input Selector"
            aria-describedby="quantity" />
     <select *ngIf="isQtyRestricted"
             class="form-control text-center"
-            style="min-width:65px"
+            style="min-width:55px"
             [attr.disabled]="disabled ? '' : null"
             formControlName="quantity"
             id="quantity">
@@ -26,7 +26,7 @@
     </select>
   </div>
 </form>
-<small *ngIf="errorMsg !== ''"
+<small *ngIf="errorMsg !== '' && !gridDisplay"
        class="alert alert-danger error-message c-error-message text-center">
   {{ errorMsg }}
   <br />

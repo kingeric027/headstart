@@ -1,4 +1,3 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29230.47
@@ -16,17 +15,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.library", "src\ordercloud.integrations.library\ordercloud.integrations.library.csproj", "{854B7782-2147-4820-9237-86AE4FE741D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.library", "integrations\ordercloud.integrations.library\ordercloud.integrations.library.csproj", "{854B7782-2147-4820-9237-86AE4FE741D5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.exchangerates", "src\ordercloud.integrations.exchangerates\ordercloud.integrations.exchangerates.csproj", "{D1C77C25-FC09-4E94-BF8A-35D55967ABE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.exchangerates", "integrations\ordercloud.integrations.exchangerates\ordercloud.integrations.exchangerates.csproj", "{D1C77C25-FC09-4E94-BF8A-35D55967ABE9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.cardconnect", "src\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj", "{5C320131-2000-4FCB-BCF6-0F8E62D52BCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.cardconnect", "integrations\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj", "{5C320131-2000-4FCB-BCF6-0F8E62D52BCF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.avalara", "src\ordercloud.integrations.avalara\ordercloud.integrations.avalara.csproj", "{818EB883-B66B-4B88-8267-9CF196D05D8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.avalara", "integrations\ordercloud.integrations.avalara\ordercloud.integrations.avalara.csproj", "{818EB883-B66B-4B88-8267-9CF196D05D8B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.cms", "src\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj", "{F57B6A48-973C-4C1B-A838-4488BFAB8EBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.cms", "integrations\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj", "{F57B6A48-973C-4C1B-A838-4488BFAB8EBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.smartystreets", "src\ordercloud-integrations-smartystreets\ordercloud.integrations.smartystreets.csproj", "{237BAFE6-2F8B-418A-8A50-026885ABC4CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.smartystreets", "integrations\ordercloud-integrations-smartystreets\ordercloud.integrations.smartystreets.csproj", "{237BAFE6-2F8B-418A-8A50-026885ABC4CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "smartystreets.tests", "tests\smartystreets.test\smartystreets.tests.csproj", "{DC1767FC-9E4C-4A2C-8B33-1D9596E0DACC}"
 EndProject
@@ -36,8 +35,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cardconnect.tests", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMS.Tests", "tests\cms.tests\CMS.Tests.csproj", "{56A0A6A0-543B-437C-BA29-D727D40FEA96}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cosmos.tests", "tests\cosmos.tests\cosmos.tests.csproj", "{ABEAAAC1-474A-4A39-8629-9F93C031BF7F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "exchangerates.tests", "tests\exchangerates.tests\exchangerates.tests.csproj", "{5EDB5CF5-9FC3-4893-8197-26DE665DB121}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "library.tests", "tests\library.tests\library.tests.csproj", "{3C0447C0-F5E2-4E43-939F-5FDC9A56B74E}"
@@ -46,7 +43,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Tests", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.Tests", "tests\Orchestration.Tests\Orchestration.Tests.csproj", "{AE99A3FF-0999-4F96-B7BD-4F367D3CE723}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ordercloud.integrations.freightpop", "ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj", "{B8F5F373-6B30-4A81-BE56-E7387344AA80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.freightpop", "integrations\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj", "{B8F5F373-6B30-4A81-BE56-E7387344AA80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,10 +105,6 @@ Global
 		{56A0A6A0-543B-437C-BA29-D727D40FEA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56A0A6A0-543B-437C-BA29-D727D40FEA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56A0A6A0-543B-437C-BA29-D727D40FEA96}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ABEAAAC1-474A-4A39-8629-9F93C031BF7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ABEAAAC1-474A-4A39-8629-9F93C031BF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ABEAAAC1-474A-4A39-8629-9F93C031BF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ABEAAAC1-474A-4A39-8629-9F93C031BF7F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5EDB5CF5-9FC3-4893-8197-26DE665DB121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5EDB5CF5-9FC3-4893-8197-26DE665DB121}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EDB5CF5-9FC3-4893-8197-26DE665DB121}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -135,15 +130,21 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{854B7782-2147-4820-9237-86AE4FE741D5} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
+		{D1C77C25-FC09-4E94-BF8A-35D55967ABE9} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
+		{5C320131-2000-4FCB-BCF6-0F8E62D52BCF} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
+		{818EB883-B66B-4B88-8267-9CF196D05D8B} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
+		{F57B6A48-973C-4C1B-A838-4488BFAB8EBA} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
+		{237BAFE6-2F8B-418A-8A50-026885ABC4CC} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
 		{DC1767FC-9E4C-4A2C-8B33-1D9596E0DACC} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{E9449028-CDA4-4E6E-A838-2C7AC9C0B8D7} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{1ECC06E2-393D-460E-B3E4-CC6A91DF621E} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{56A0A6A0-543B-437C-BA29-D727D40FEA96} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
-		{ABEAAAC1-474A-4A39-8629-9F93C031BF7F} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{5EDB5CF5-9FC3-4893-8197-26DE665DB121} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{3C0447C0-F5E2-4E43-939F-5FDC9A56B74E} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{CDC067B9-27B3-47B8-9E82-442D79156AE5} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{AE99A3FF-0999-4F96-B7BD-4F367D3CE723} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
+		{B8F5F373-6B30-4A81-BE56-E7387344AA80} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D28C7C46-780F-4A68-80B8-9789997A37F7}

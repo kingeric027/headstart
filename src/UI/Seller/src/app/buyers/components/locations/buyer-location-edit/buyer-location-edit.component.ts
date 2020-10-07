@@ -9,9 +9,8 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
-import { MarketplaceSDK } from 'marketplace-javascript-sdk';
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
-import { OcIntegrationsAPIService } from '@app-seller/shared/services/oc-integrations-api/oc-integrations-api.service';
+import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -44,15 +43,14 @@ export class BuyerLocationEditComponent implements OnInit {
   buyerLocationStatic: MarketplaceBuyerLocation;
   areChanges = false;
   dataIsSaving = false;
-  availableCurrencies: SupportedRates[] = [];
+  countryOptions: SupportedCountries[];
 
   constructor(
     private buyerLocationService: BuyerLocationService,
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
-    private ocIntegrations: OcIntegrationsAPIService
-  ) {}
+  ) {this.countryOptions = GeographyConfig.getCountries();}
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
     this.buyerLocationEditable = buyerLocation;
@@ -64,7 +62,6 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
-    this.availableCurrencies = await this.ocIntegrations.getAvailableCurrencies();
   }
 
   createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
@@ -81,15 +78,11 @@ export class BuyerLocationEditComponent implements OnInit {
       Country: new FormControl(buyerLocation.Address.Country, Validators.required),
       Phone: new FormControl(buyerLocation.Address.Phone, ValidatePhone),
       Email: new FormControl(buyerLocation.Address.xp.Email, ValidateEmail),
-      // once sdk is regenerated we can remove
-      LocationID: new FormControl((buyerLocation.Address.xp as any).LocationID),
+      LocationID: new FormControl(buyerLocation.Address.xp.LocationID),
       Currency: new FormControl(buyerLocation.UserGroup.xp.Currency, Validators.required),
+      // TODO: remove this workaround when headstart sdk has been updated to include correct type
+      BillingNumber: new FormControl((buyerLocation.Address.xp as any).BillingNumber)
     });
-  }
-
-  updateResourceFromEvent(event: any, field: string): void {
-    this.updateResource.emit({ value: event.target.value, field });
-    this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   handleSelectedAddress(event: Address): void {
@@ -117,11 +110,11 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async createNewBuyerLocation(): Promise<void> {
     try {
-      console.log(this.buyerLocationEditable)
       this.dataIsSaving = true;
       this.buyerLocationEditable.UserGroup.xp.Type = 'BuyerLocation';
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
-      const newBuyerLocation = await MarketplaceSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
+      (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
+      const newBuyerLocation = await HeadStartSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
       this.refreshBuyerLocationData(newBuyerLocation);
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
@@ -134,7 +127,8 @@ export class BuyerLocationEditComponent implements OnInit {
   async updateBuyerLocation(): Promise<void> {
     try {
       this.dataIsSaving = true;
-      const updatedBuyerLocation = await MarketplaceSDK.BuyerLocations.Update(
+      (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
+      const updatedBuyerLocation = await HeadStartSDK.BuyerLocations.Save(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
         this.buyerLocationEditable
@@ -145,13 +139,13 @@ export class BuyerLocationEditComponent implements OnInit {
       this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
       this.dataIsSaving = false;
     } catch (ex) {
-      this.suggestedAddresses = getSuggestedAddresses(ex.response.data);
+      this.suggestedAddresses = getSuggestedAddresses(ex?.response?.data);
       this.dataIsSaving = false;
     }
   }
 
   async handleDelete($event): Promise<void> {
-    await MarketplaceSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
+    await HeadStartSDK.BuyerLocations.Delete(this.buyerID, this.buyerLocationEditable.Address.ID);
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
@@ -170,6 +164,15 @@ export class BuyerLocationEditComponent implements OnInit {
       value: field === 'Active' ? event.target.checked : event.target.value,
     };
     this.updateBuyerLocationResource(buyerLocationUpdate);
+    if (field === 'Address.Country') {
+      this.setCurrencyByCountry(buyerLocationUpdate.value);
+    }
+  }
+
+  setCurrencyByCountry(countryCode: string): void {
+    const selectedCountry = this.countryOptions.find(country => country.abbreviation === countryCode);
+    this.resourceForm.controls.Currency.setValue(selectedCountry.currency);
+    this.buyerLocationEditable.UserGroup.xp.Currency = this.resourceForm.value.Currency;
   }
 
   handleDiscardChanges(): void {
@@ -179,7 +182,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   private async handleSelectedAddressChange(address: Address): Promise<void> {
-    const marketplaceBuyerLocation = await MarketplaceSDK.BuyerLocations.Get(this.buyerID, address.ID);
+    const marketplaceBuyerLocation = await HeadStartSDK.BuyerLocations.Get(this.buyerID, address.ID);
     this.refreshBuyerLocationData(marketplaceBuyerLocation);
   }
 }

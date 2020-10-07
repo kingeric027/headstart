@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -28,7 +30,7 @@ namespace Marketplace.Common.Commands.SupplierSync
             {
                 var oc = new OrderCloudClient(new OrderCloudClientConfig()
                 {
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = user.ClientID
                 });

@@ -4,13 +4,14 @@
 
 export const environment = {
   hostedApp: false,
+  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
-  ocMiddlewareUrl: 'https://ordercloud-middleware-test.azurewebsites.net',
   appname: 'Marketplace Admin Local',
-  marketplaceID: 'seb',
-  cmsUrl: 'https://marktplacetest.blob.core.windows.net',
+  translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+  blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
-  orderCloudAuthUrl: 'https://stagingauth.ordercloud.io/oauth/token',
   orderCloudApiVersion: 'v1',
+  buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
+  buyerClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
 };

@@ -1,7 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
-import { OrderDetails, MarketplaceOrder } from 'marketplace-javascript-sdk';
-import { OrderApproval, Promotion, BuyerAddress, Payment, LineItem } from '@ordercloud/angular-sdk';
+import {
+  OrderDetails,
+  MarketplaceOrder,
+  MarketplaceLineItem,
+  MarketplaceAddressBuyer,
+} from '@ordercloud/headstart-sdk';
+import { OrderApproval, Payment, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 
 @Component({
@@ -10,25 +15,25 @@ import { isQuoteOrder } from '../../../services/orderType.helper';
 })
 export class OCMOrderHistorical {
   order: MarketplaceOrder;
-  lineItems: LineItem[] = [];
-  promotions: Promotion[] = [];
+  lineItems: MarketplaceLineItem[] = [];
+  promotions: OrderPromotion[] = [];
   payments: Payment[] = [];
   approvals: OrderApproval[] = [];
   isQuoteOrder = isQuoteOrder;
-  buyerLocation: BuyerAddress;
+  buyerLocation: MarketplaceAddressBuyer;
   @Input() isOrderToApprove = false;
   @Input() set orderDetails(value: OrderDetails) {
     this.order = value.Order;
     this.lineItems = value.LineItems;
     this.promotions = value.Promotions;
-    this.payments = value.Payments;
-    this.approvals = value.Approvals.filter(a => a.Approver);
+    this.payments = value.Payments as any;
+    this.approvals = value.Approvals.filter(a => a.Approver) as any;
     this.getBuyerLocation(this.order.BillingAddressID);
   }
 
   constructor(private context: ShopperContextService) {}
 
-  async getBuyerLocation(addressID): Promise<void> {
+  async getBuyerLocation(addressID: string): Promise<void> {
     if (!this.isQuoteOrder(this.order)) {
       const buyerLocation = await this.context.addresses.get(addressID);
       this.buyerLocation = buyerLocation;

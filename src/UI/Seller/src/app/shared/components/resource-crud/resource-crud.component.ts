@@ -3,10 +3,10 @@ import { takeWhile } from 'rxjs/operators';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { singular } from 'pluralize';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { ListPage } from '@ordercloud/headstart-sdk';
+import { BehaviorSubject } from 'rxjs';
 
 export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnDestroy {
   alive = true;
@@ -18,6 +18,9 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
   resourceInSelection = {} as ResourceType;
   resourceForm: FormGroup;
   isMyResource = false;
+  isSupplierUser = false;
+  parentResourceID: string;
+  parentResourceIDSubject = new BehaviorSubject<string>(undefined);
 
   // form setting defined in component implementing this component
   createForm: (resource: any) => FormGroup;
@@ -56,10 +59,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     }
   }
 
-  ngOnInit(): void {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
     this.subscribeToResources();
-    this.subscribeToResourceSelection();
+    await this.subscribeToResourceSelection();
     this.setForm(this.updatedResource);
   }
 
@@ -72,23 +75,26 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
 
   async determineViewingContext(): Promise<void> {
     this.isMyResource = this.router.url.startsWith('/my-');
+    this.isSupplierUser = await this.ocService.isSupplierUser();
     if (this.isMyResource) {
-      const supplier = await this.ocService.getMyResource();
-      this.setResourceSelectionFromResource(supplier);
+      const myResource = await this.ocService.getMyResource();
+      const shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+      if (!shouldDisplayList) this.setResourceSelectionFromResource(myResource);
     }
   }
 
   subscribeToResourceSelection(): void {
-    this.activatedRoute.params.subscribe(params => {
-      if (this.ocService.getParentResourceID() !== REDIRECT_TO_FIRST_PARENT) {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.activatedRoute.params.subscribe(async params => {
+      this.parentResourceID = await this.ocService.getParentResourceID();
+      this.parentResourceIDSubject.next(this.parentResourceID);
+      if (this.parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
         this.setIsCreatingNew();
-        const resourceIDSelected =
-          params[`${singular(this.ocService.secondaryResourceLevel || this.ocService.primaryResourceLevel)}ID`];
-        if (resourceIDSelected) {
-          this.setResourceSelectionFromID(resourceIDSelected);
-        }
+        const resourceIDSelected = params[this.ocService.getParentOrSecondaryIDParamName()]; // Example - Reports uses a different prefix to ID
         if (this.isCreatingNew) {
           this.setResoureObjectsForCreatingNew();
+        } else if (resourceIDSelected) {
+          this.setResourceSelectionFromID(resourceIDSelected);
         }
       }
     });
@@ -137,8 +143,10 @@ export abstract class ResourceCrudComponent<ResourceType> implements OnInit, OnD
     this.setUpdatedResourceAndResourceForm(this.ocService.emptyResource);
   }
 
-  selectResource(resource: any): void {
-    const [newURL, queryParams] = this.ocService.constructNewRouteInformation(resource.ID || '');
+  async selectResource(resource: any): Promise<void> {
+    const [newURL, queryParams] = await this.ocService.constructNewRouteInformation(
+      this.ocService.getResourceID(resource) || ''
+    );
     this.navigate(newURL, { queryParams });
   }
 

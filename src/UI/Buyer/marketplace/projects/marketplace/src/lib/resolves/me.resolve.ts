@@ -1,24 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRoute } from '@angular/router';
-import { OcMeService, ListBuyerAddress } from '@ordercloud/angular-sdk';
-import { Observable } from 'rxjs';
+import { Resolve } from '@angular/router';
+import { Me, BuyerAddress } from 'ordercloud-javascript-sdk';
 import { AddressService } from '../services/addresses/address.service';
-import { UserManagementService } from '../services/user-management/user-management.service';
+import { ListPage, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 
 @Injectable()
-export class MeListAddressResolver implements Resolve<ListBuyerAddress> {
-  constructor(private service: OcMeService) {}
+export class MeListAddressResolver implements Resolve<ListPage<BuyerAddress>> {
+  constructor() {}
 
-  resolve(): Observable<ListBuyerAddress> | Promise<ListBuyerAddress> | any {
-    return this.service.ListAddresses();
+  resolve(): Promise<ListPage<BuyerAddress>> {
+    return Me.ListAddresses();
   }
 }
 
 @Injectable()
-export class MeListBuyerLocationResolver implements Resolve<ListBuyerAddress> {
+export class MeListBuyerLocationResolver implements Resolve<ListPage<MarketplaceAddressBuyer>> {
   constructor(private service: AddressService) {}
 
-  resolve(): Observable<ListBuyerAddress> | Promise<ListBuyerAddress> | any {
+  resolve(): Promise<ListPage<MarketplaceAddressBuyer>> {
     return this.service.listBuyerLocations();
   }
 }

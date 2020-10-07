@@ -1,8 +1,9 @@
+/* eslint-disable max-lines-per-function */
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, flatMap } from 'rxjs/operators';
-import { AuthService } from 'src/app/shared/services/auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 /**
  * handle 401 unauthorized responses gracefully

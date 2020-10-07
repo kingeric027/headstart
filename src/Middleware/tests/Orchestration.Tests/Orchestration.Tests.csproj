@@ -4,7 +4,40 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="JObjectTests\cache.json" />
+    <None Remove="JObjectTests\current.json" />
+    <None Remove="JObjectTests\hydrated.json" />
+    <None Remove="Orchestration.Tests.csproj.DotSettings" />
+    <None Remove="TemplateTests\TemplateCsv.csv" />
+    <None Remove="TemplateTests\TemplateExcel.xlsx" />
+    <None Remove="TemplateTests\TemplateSheets.xlsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="JObjectTests\cache.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JObjectTests\current.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JObjectTests\hydrated.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TemplateTests\TemplateCsv.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TemplateTests\TemplateExcel.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TemplateTests\TemplateSheets.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CreditCardValidator" Version="1.4.6" />
@@ -21,7 +54,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Marketplace.Common\Marketplace.Common.csproj" />
-    <ProjectReference Include="..\..\src\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="JObjectTests\hydrated.json" />
   </ItemGroup>
 
 </Project>

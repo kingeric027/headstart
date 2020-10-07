@@ -1,45 +1,40 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
-import { SpecFormEvent } from './spec-form-values.interface';
-import { PriceBreak, SpecOption, Spec, ListSpec, LineItemSpec } from '@ordercloud/angular-sdk';
+import { SpecOption, Spec, LineItemSpec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
-import { ExchangedPriceBreak } from 'src/app/models/currency.interface';
+import { SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
+import { FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SpecFormService {
-  event: SpecFormEvent;
 
-  constructor() {
-    this.event = {
-      valid: false,
-      type: '',
-      form: null,
-    };
-  }
+  constructor() { }
 
-  public getSpecMarkup(specs: ListSpec, selectedBreak: ExchangedPriceBreak, qty: number): number {
+  public getSpecMarkup(specs: Spec[], selectedBreak: PriceBreak, qty: number, specForm: FormGroup): number {
+    const formValues = specForm.value;
     const markups: Array<number> = new Array<number>();
-    for (const value in this.event.form) {
-      if (this.event.form.hasOwnProperty(value)) {
+    for (const value in formValues) {
+      if (formValues.hasOwnProperty(value)) {
         const spec = this.getSpec(specs, value);
         if (!spec) continue;
-        const option = this.getOption(spec, this.event.form[value]);
+        const option = this.getOption(spec, formValues[value]);
         if (option) {
-          markups.push(this.singleSpecMarkup(selectedBreak.Price.Price, qty, option));
+          markups.push(this.singleSpecMarkup(selectedBreak.Price, qty, option));
         }
       }
     }
-    return (selectedBreak.Price.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
+    return (selectedBreak.Price + markups.reduce((x, acc) => x + acc, 0)) * qty;
   }
 
-  public getLineItemSpecs(buyerSpecs: ListSpec): Array<LineItemSpec> {
+  public getLineItemSpecs(buyerSpecs: Spec[], specForm: FormGroup): Array<LineItemSpec> {
+    const formValues = specForm.value;
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
-    for (const value in this.event.form) {
-      if (this.event.form.hasOwnProperty(value)) {
+    for (const value in formValues) {
+      if (formValues.hasOwnProperty(value)) {
         const spec = this.getSpec(buyerSpecs, value);
         if (!spec) continue;
-        const option = this.getOption(spec, this.event.form[value]);
+        const option = this.getOption(spec, formValues[value]);
         if (option) {
           specs.push({
             SpecID: spec.ID,
@@ -52,10 +47,10 @@ export class SpecFormService {
     return specs;
   }
 
-  public getGridLineItemSpecs(buyerSpecs: ListSpec, specValues: string[]): Array<object> {
-    const specs: Array<object> = new Array<object>();
-    for (let i = 0; i < buyerSpecs.Items.length; i++) {
-      let name = buyerSpecs.Items[i].Name.replace(/ /g, '')
+  public getGridLineItemSpecs(buyerSpecs: Spec[], specValues: string[]): GridSpecOption[] {
+    const specs: GridSpecOption[] = [];
+    for (let i = 0; i < buyerSpecs.length; i++) {
+      const name = buyerSpecs[i].Name.replace(/ /g, '')
       const spec = this.getSpec(buyerSpecs, name);
       if (!spec) continue;
       const option = this.getOption(spec, specValues[i], 'grid');
@@ -72,6 +67,20 @@ export class SpecFormService {
     return specs;
   }
 
+  public getLineItemImageUrl(product: SuperMarketplaceProduct, specForm: FormGroup): string {
+    const image = product.Images?.find(img => this.isImageMatchingSpecs(img, product, specForm));
+    return image?.Url;
+  }
+
+  private isImageMatchingSpecs(image: Asset, product: SuperMarketplaceProduct, specForm: FormGroup): boolean {
+    // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+    const specs = this.getLineItemSpecs(product.Specs, specForm);
+    return specs.
+      every(spec => image.Tags
+        .find(tag => tag?.split('-')
+          .includes(spec.Value.replace(/\s/g, ''))));
+  }
+
   private singleSpecMarkup(unitPrice: number, quantity: number, option: SpecOption): number {
     switch (option.PriceMarkupType) {
       case 'NoMarkup':
@@ -85,8 +94,8 @@ export class SpecFormService {
     }
   }
 
-  private getSpec(specs: ListSpec, value: any): Spec {
-    return _find(specs?.Items, item => item.Name.replace(/ /g, '') === value);
+  private getSpec(specs: Spec[], value: any): Spec {
+    return _find(specs, item => item.Name.replace(/ /g, '') === value);
   }
 
   private getOption(spec: Spec, value: any, type?: string): SpecOption {
@@ -108,7 +117,15 @@ export class SpecFormService {
       });
       return o as SpecOption;
     }
-    if (type === "grid") return _find(spec.Options, o => o.ID === value);
+    if (type === 'grid') return _find(spec.Options, o => o.ID === value);
     else return _find(spec.Options, o => o.Value === value);
   }
+}
+
+export interface GridSpecOption {
+  SpecID: string;
+  OptionID: string;
+  Value: string;
+  MarkupType: string;
+  Markup: number;
 }

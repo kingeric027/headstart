@@ -1,8 +1,9 @@
-﻿using Marketplace.Common.TemporaryAppConstants;
 using Marketplace.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
+using System.Linq;
+using Marketplace.Common.Constants;
 
 namespace Marketplace.Common.Commands
 {
@@ -10,6 +11,7 @@ namespace Marketplace.Common.Commands
     {
         Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token);
         Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token);
+        Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -26,6 +28,12 @@ namespace Marketplace.Common.Commands
             Require.That(supplierID == user.SupplierID,
                 new ErrorCode("Unauthorized", 401, $"You are only authorized to view {user.SupplierID}."));
             return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
+        }
+
+        public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token)
+        {
+            Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
+            return await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
         {
@@ -62,18 +70,48 @@ namespace Marketplace.Common.Commands
                 AllowSeller = false,
                 IsAnonBuyer = false,
             }, token);
+
+
+            // not adding api client ID on supplier Create because that approach would require creating the API client first
+            // but creating supplier first is preferable in case there are error in the request
+            ocSupplier = await _oc.Suppliers.PatchAsync(ocSupplier.ID, new PartialSupplier()
+            {
+                xp = new
+                {
+                    ApiClientID = apiClient.ID
+                }
+            });
+
             // Assign Supplier API Client to new supplier
             await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
             {
                 ApiClientID = apiClient.ID,
                 SupplierID = ocSupplierID
             }, token);
-           
+            // list message senders
+            var msList = await _oc.MessageSenders.ListAsync();
+            // create message sender assignment
+            var assignmentList = msList.Items.Select(ms =>
+            {
+                return new MessageSenderAssignment
+                {
+                    MessageSenderID = ms.ID,
+                    SupplierID = ocSupplierID
+                };
+            });
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
             return supplier;
         }
     
         public async Task CreateUserTypeUserGroupsAndSecurityProfileAssignments(User user, string token, string supplierID)
         {
+            // Assign supplier to MPMeAdmin security profile
+            await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+            {
+                SupplierID = supplierID,
+                SecurityProfileID = "MPMeAdmin"
+            });
+
             foreach(var userType in SEBUserTypes.Supplier())
             {
                 var userGroupID = $"{supplierID}{userType.UserGroupIDSuffix}";

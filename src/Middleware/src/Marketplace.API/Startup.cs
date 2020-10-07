@@ -8,6 +8,7 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Controllers;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -25,6 +26,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
+using OrderCloud.AzureStorage;
 
 namespace Marketplace.API
 {
@@ -41,8 +43,9 @@ namespace Marketplace.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
+			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName, 
                 _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
+
 			var avalaraConfig = new AvalaraConfig()
 			{
 				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
@@ -53,6 +56,7 @@ namespace Marketplace.API
 			};
 			var cmsConfig = new CMSConfig()
 			{
+				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
 				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
 			};
@@ -71,14 +75,19 @@ namespace Marketplace.API
             services
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<SupplierCategoryConfigQuery, SupplierCategoryConfig>(cosmosConfig)
-                .InjectCosmosStore<AssetQuery, Asset>(cosmosConfig)
-                .InjectCosmosStore<AssetContainerQuery, AssetContainer>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResource>(cosmosConfig).Inject<AppSettings>()
+                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
+				.InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
+				.InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
+				.InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
+				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
+                .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
+                .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
-                .Inject<IZohoCommand>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
                 .Inject<IOrchestrationCommand>()
@@ -88,15 +97,41 @@ namespace Marketplace.API
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
+                .Inject<ILineItemCommand>()
+                .Inject<IMeProductCommand>()
+                .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
-                .Inject<ISupplierCategoryConfigQuery>()
+				.Inject<IDocumentQuery>()
+				.Inject<IBlobStorage>()
+				.Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .Inject<IChiliTemplateCommand>()
+                .Inject<IChiliConfigCommand>()
+                .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
+                .AddSingleton<DownloadReportCommand>()
+                .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
+                    ApiUrl = "https://books.zoho.com/api/v3",
+                    AccessToken = _settings.ZohoSettings.AccessToken,
+                    ClientId = _settings.ZohoSettings.ClientId,
+                    ClientSecret = _settings.ZohoSettings.ClientSecret,
+                    OrganizationID = _settings.ZohoSettings.OrgID }, 
+                    new OrderCloudClientConfig {
+                        ApiUrl = _settings.OrderCloudSettings.ApiUrl,
+                        AuthUrl = _settings.OrderCloudSettings.ApiUrl,
+                        ClientId = _settings.OrderCloudSettings.ClientID,
+                        ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                        Roles = new[]
+                            {
+                                ApiRole.FullAccess
+                            }
+                    }
+                ))
+				.AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
-                .AddSingleton<IBlobStorage>(x => new BlobStorage(cmsConfig))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
@@ -105,7 +140,7 @@ namespace Marketplace.API
                 .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                    AuthUrl = _settings.OrderCloudSettings.AuthUrl,
+                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                     ClientId = _settings.OrderCloudSettings.ClientID,
                     ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                     Roles = new[]
@@ -125,9 +160,8 @@ namespace Marketplace.API
         public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.OrderCloudIntegrationsConfigureWebApp(env, "v1")
-                .UseSwagger()
                 .UseSwaggerUI(c => {
-                    c.SwaggerEndpoint($"/swagger/v1/swagger.json", $"API v1");
+                    c.SwaggerEndpoint($"/swagger", $"API v1");
                     c.RoutePrefix = string.Empty;
                 });
         }

@@ -12,7 +12,9 @@
                           (changesSaved)="saveUpdates()"
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
-                          (resourceSelected)="selectResource($event)">
+                          (resourceSelected)="selectResource($event)"
+                          [labelSingular]="'ALIAS.BUYER_LOCATION'"
+                          [labelPlural]="'ALIAS.BUYER_LOCATIONS'">
   <app-buyer-location-edit class="resource-edit"
                            [suggestedAddresses]="suggestedAddresses"
                            [filterConfig]="filterConfig"

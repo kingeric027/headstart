@@ -4,7 +4,9 @@
     <!-- Brand Logo -->
     <a class="navbar-brand clickable cursor-pointer"
        (click)="context.router.toHome()">
-      <img class="logo" />
+      <img class="logo"
+           [src]="appConfig.theme.logoSrc"
+           height="40" />
     </a>
     <!-- /Brand Logo -->
     <!-- Mobile Toggle -->
@@ -38,7 +40,14 @@
              [ngClass]="{ active: activePath === '/suppliers' }"
              (click)="isCollapsed = !isCollapsed"
              (click)="context.router.toSupplierList()"
-             translate>LAYOUT.APP_HEADER.SUPPLIERS</a>
+             translate>ALIAS.SUPPLIERS</a>
+        </li>
+        <li class="nav-item clickable cursor-pointer"
+            *ngFor="let page of staticPages">
+          <a class="nav-link"
+             [ngClass]="{ active: activePath === '/' + page.Doc.Url }"
+             (click)="isCollapsed = !isCollapsed"
+             routerLink="{{ '/' + page.Doc.Url}}">{{page.Doc.NavigationTitle}}</a>
         </li>
         <!-- Mobile Profile Menu Items -->
         <div *ngIf="screenSize === 'xs' || screenSize === 'sm'">
@@ -166,8 +175,10 @@
                    (click)="context.router[profileRoute.routerCall]()">{{ profileRoute.displayText }}</a>
               </span>
             </ng-container>
-            <div class="dropdown-divider"></div>
+            <div *ngIf="!isSSO"
+                 class="dropdown-divider"></div>
             <a class="nav-item dropdown-item cursor-pointer"
+               *ngIf="!isSSO"
                (click)="logout()"
                href="/login"
                translate>
@@ -189,27 +200,23 @@
 <!-- Search / Cart Nav -->
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container">
-    <button class="btn btn-light cursor-pointer"
-            placement="left"
-            ngbTooltip="Categories"
-            [openDelay]="500"
-            (click)="toggleCategoryDropdown(true)"
-            position="absolute"
-            *ngIf="!showCategoryDropdown">
-      <fa-icon [icon]="faBars"></fa-icon>
-    </button>
-    <button class="btn btn-light cursor-pointer"
-            placement="left"
-            ngbTooltip="Categories"
-            [openDelay]="500"
-            (click)="toggleCategoryDropdown(false)"
-            position="absolute"
-            *ngIf="showCategoryDropdown">
-      <fa-icon [icon]="faBars"></fa-icon>
-    </button>
+    <div class="category-toggle cursor-pointer"
+         (click)="showCategoryDropdown = !showCategoryDropdown">
+      <fa-icon *ngIf="!showCategoryDropdown"
+               placement="right"
+               ngbTooltip="Categories"
+               [openDelay]="500"
+               [icon]="faBars"></fa-icon>
+      <fa-icon *ngIf="showCategoryDropdown"
+               class="category-toggle__active"
+               placement="right"
+               ngbTooltip="Categories"
+               [openDelay]="500"
+               [icon]="faTimes"></fa-icon>
+    </div>
 
     <ocm-search class="ml-3 mr-3 w-100"
-                [placeholderText]="'Search Products...'"
+                [placeholderText]="'Products'"
                 [searchTermInput]="searchTermForProducts"
                 (searched)="searchProducts($event.detail)">
     </ocm-search>
@@ -248,9 +255,9 @@
     </ul>
   </div>
 </nav>
-<ocm-category-dropdown class="categoryDropdown"
-                       (window:mouseup)="clickOutsideCategoryDropdown($event)"
+<ocm-category-dropdown (window:mouseup)="clickOutsideCategoryDropdown($event)"
                        (closeDropdown)="toggleCategoryDropdown($event.detail)"
                        [categories]="categories"
-                       *ngIf="showCategoryDropdown"></ocm-category-dropdown>
+                       *ngIf="showCategoryDropdown"
+                       style="position: fixed; height: 100vh; top: 0;"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->

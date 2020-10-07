@@ -1,7 +1,7 @@
 // angular
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, AppConfig } from 'marketplace';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -11,9 +11,13 @@ import { ToastrService } from 'ngx-toastr';
 export class OCMLogin implements OnInit {
   form: FormGroup;
   appName: string;
-  ssoLink: string; // TODO - remove from marketplace generic. Should be SEB specific.
+  ssoLink: string; // null indicates no sso
 
-  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
+  constructor(
+    private context: ShopperContextService,
+    private toasterService: ToastrService,
+    public appConfig: AppConfig
+  ) {}
 
   ngOnInit(): void {
     this.ssoLink = this.context.appSettings.ssoLink;

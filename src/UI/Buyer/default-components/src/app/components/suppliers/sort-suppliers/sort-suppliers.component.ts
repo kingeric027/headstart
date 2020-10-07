@@ -18,13 +18,14 @@ export class OCMSupplierSort implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.form = new FormGroup({ sortBy: new FormControl(null) });
     this.context.supplierFilters.activeFiltersSubject.pipe(takeWhile(() => this.alive)).subscribe(filters => {
-      this.setForm(filters.sortBy);
+      const sortBy = !!filters.sortBy?.length ? filters.sortBy[0] : undefined;
+      this.setForm(sortBy);
     });
   }
 
   sortStrategyChanged(): void {
     const sortValue = this.form.get('sortBy').value;
-    this.context.supplierFilters.sortBy(sortValue);
+    this.context.supplierFilters.sortBy([sortValue]);
     this.closePopoverEvent.emit();
   }
 

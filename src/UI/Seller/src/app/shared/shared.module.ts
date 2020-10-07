@@ -11,6 +11,7 @@ import {
   NgbModalModule,
   NgbDatepickerModule,
   NgbTooltipModule,
+  NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -32,6 +33,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
 import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
 import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
+import { ReturnForm } from './components/return-form/return-form.component';
 import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
 import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component';
 import { QuillModule } from 'ngx-quill';
@@ -42,19 +44,17 @@ import { DragDirective } from './directives/dragDrop.directive';
 import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
 import { PhoneFormatPipe } from './pipes/phone-format.pipe';
 import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
 import { LocationIDInputDirective } from './directives/location-id-input.directive';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatButtonModule } from '@angular/material/button';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule, MatSelect } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ActionMenuComponent } from './components/action-menu/action-menu.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { CmsAdminModule } from '@ordercloud/angular-cms-components';
+import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
+import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
+import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
+import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { ResourceListMeta } from './components/resource-list-meta/resource-list-meta.component';
 
 @NgModule({
   imports: [
@@ -75,21 +75,13 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     NgbModalModule,
     NgbDatepickerModule,
     NgbTooltipModule,
-    // @angular/material
-    MatTabsModule,
-    MatChipsModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatBadgeModule,
-    MatSlideToggleModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatInputModule,
-    MatSnackBarModule,
-    MatSelectModule,
+    NgbProgressbarModule,
 
     // Quill
     QuillModule.forRoot(),
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
   ],
   exports: [
     // angular
@@ -102,18 +94,11 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     NgbPaginationModule,
     NgbTabsetModule,
     NgbDropdownModule,
-    // @angular/material
-    MatTabsModule,
-    MatChipsModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatBadgeModule,
-    MatSlideToggleModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatInputModule,
-    MatSnackBarModule,
-    MatSelectModule,
+    NgbProgressbarModule,
+
+    // OrderCloud CMS Components
+    CmsAdminModule,
+
     // app components
     SearchComponent,
     SortColumnComponent,
@@ -136,10 +121,19 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     LocationIDInputDirective,
     DragDirective,
     DeleteConfirmModal,
+    ReturnForm,
     PhoneFormatPipe,
     YesNoFormatPipe,
+    SafeHTMLPipe,
+    ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
+    TranslateModule,
+    ResourceBreadcrumbsComponent,
+    ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
+    ProductCategoryAssignment,
+    ResourceListMeta,
   ],
   declarations: [
     SearchComponent,
@@ -156,6 +150,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     ResourceTableComponent,
     RequestStatus,
     DeleteConfirmModal,
+    ReturnForm,
     SummaryResourceDisplay,
     FullResourceTableComponent,
     ResourceEditComponent,
@@ -164,10 +159,17 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     LocationIDInputDirective,
     DragDirective,
     ConfirmModal,
+    ActionMenuComponent,
     UserGroupAssignments,
+    ProductVisibilityAssignments,
+    BuyerVisibilityConfiguration,
+    ProductCategoryAssignment,
+    ResourceListMeta,
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
+    ResourceBreadcrumbsComponent,
+    SafeHTMLPipe,
   ],
 })
 export class SharedModule {

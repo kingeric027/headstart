@@ -14,6 +14,7 @@ namespace Marketplace.Common
     public class AppSettings
     {
 		public AppEnvironment Env { get; set; }
+        public UI UI { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
 		public AvalaraSettings AvalaraSettings { get; set; }
         public BlobSettings BlobSettings { get; set; }
@@ -29,6 +30,13 @@ namespace Marketplace.Common
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
         public string SendgridApiKey { get; set; }
+        public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
+    }
+
+    public class UI
+    {
+        public string BaseBuyerUrl { get; set; }
+        public string BaseAdminUrl { get; set; }
     }
 
 	public class EnvironmentSettings
@@ -46,7 +54,9 @@ namespace Marketplace.Common
 
     public class ZohoSettings
     {
-        public string AuthToken { get; set; }
+        public string AccessToken { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
         public string OrgID { get; set; }
     }
 
@@ -59,7 +69,6 @@ namespace Marketplace.Common
 
 	public class OrderCloudSettings
 	{
-		public string AuthUrl { get; set; }
 		public string ApiUrl { get; set; }
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
@@ -72,4 +81,10 @@ namespace Marketplace.Common
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }
 	}
+
+    public class ChiliPublishSettings
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+    }
 }

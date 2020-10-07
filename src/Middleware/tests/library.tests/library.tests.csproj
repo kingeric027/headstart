@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
+    <ProjectReference Include="..\..\integrations\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 
 </Project>

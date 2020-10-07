@@ -1,272 +1,49 @@
 @charset 'UTF-8';
 
 // Theme Variables - must come before vendor
-@import 'themes/anytime-fitness/variables.scss';
+@import '_theme_variables';
 
 // Vendors
-@import 'vendor/bootstrap',
-'vendor/normalize',
-'vendor/ngx-toastr';
+@import 'vendor/bootstrap', 
+        'vendor/normalize', 
+        'vendor/ngx-toastr';
+
+// Theme Styles
+@import '_theme_styles';
 
 // Abstracts
-@import 'abstracts/variables',
-'abstracts/functions',
-'abstracts/mixins';
+@import 'abstracts/custom-utilities', 
+        'abstracts/variables', 
+        'abstracts/functions', 
+        'abstracts/mixins';
 
 // Scaffolding
 @import 'base/base',
-'base/fonts',
-'base/typography',
-'base/helpers';
+        'base/typography', 
+        'base/animations';
 
 // Layout
-@import 'layout/header',
-'layout/footer';
+@import 'layout/header', 
+        'layout/footer';
 
 // Components
-@import 'components/button',
-'components/_forms',
-'components/_product-list',
-'components/_card-ribbon',
-'components/_card-hover',
-'components/_list-items.scss',
-'components/_carousel-arrow.scss',
-'components/_modal.scss';
+@import 'components/buttons', 
+        'components/_cards',
+        'components/_card-ribbon', 
+        'components/chip', 
+        'components/_forms', 
+        'components/_product-list', 
+        'components/_list-items.scss', 
+        'components/_carousel-arrow.scss', 
+        'components/_modal.scss';
 
 // Pages
 @import 'pages/_home';
 
 @import '_shame';
 
-// Theme Styles
-@import 'themes/anytime-fitness/styles';
-
-//@import '../app/ocm-default-components/shared.scss'; 
-
-
-.cursor-pointer,
-.link,
-.btn {
-  cursor: $custom-range-track-cursor;
-}
-
-.table {
-  thead {
-    color: $gray-600;
-    text-transform: uppercase;
-    font-size: .8rem;
-  }
-}
-
-.btn-link {
-  // The amount of padding-left in a button
-  // So the text aligns with things rather than the invisible button edge
-  margin-left: -10.8px;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 45px;
-  height: 24px;
-  input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    &:checked {
-      + .slider {
-        background-color: $primary;
-        &:before {
-          -webkit-transform: translateX(20px);
-          -ms-transform: translateX(20px);
-          transform: translateX(20px);
-        }
-      }
-    }
-    &:focus {
-      + .slider {
-        box-shadow: 0 0 1px $primary;
-      }
-    }
-  }
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: 0.2s;
-    transition: 0.2s;
-    &.round {
-      border-radius: 34px;
-      &:before {
-        border-radius: 50%;
-      }
-    }
-    &:before {
-      position: absolute;
-      content: '';
-      height: 16px;
-      width: 16px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      -webkit-transition: 0.2s;
-      transition: 0.2s;
-    }
-  }
-}
-
-// Custom checkboxes
-/* The container */
-.check-container {
-  margin-top: 0.5rem;
-  display: block;
-  position: relative;
-  padding-left: 35px;
-  margin-bottom: 12px;
-  font-size: 14px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  transition: 200ms all ease;
-  & input:disabled {
-    cursor: default;
-  }
-  .check-label {
-    font-size: 1rem;
-    margin-bottom: 0;
-  }
-}
-
-/* Hide the browser's default checkbox */
-.check-container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-/* Create a custom checkbox */
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 20px;
-  width: 20px;
-  border-radius: 5px;
-  border: 1px solid #d1d1d1;
-  background-color: #eee;
-}
-
-/* Look disabled, when disabled */
-.check-container input:disabled ~ .checkmark {
-  background-color: #d1d1d1;
-  border: 1px solid #d1d1d1;
-  cursor: default;
-}
-
-/* On mouse-over, add a grey background color */
-.check-container:hover input ~ .checkmark {
-  background-color: #ccc;
-  border: 1px solid #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.check-container input:checked ~ .checkmark {
-  background-color: white;
-  border: 1px solid $primary;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-/* Show the checkmark when checked */
-.check-container input:checked ~ .checkmark:after {
-  display: block;
-}
-
-/* Style the checkmark/indicator */
-.check-container .checkmark:after {
-  left: 6px;
-  top: 3px;
-  width: 5px;
-  height: 10px;
-  border: solid $primary;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
-}
-
-.chip .md {
-  display: inline-block;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: inherit;
-  vertical-align: bottom;
-}
-
-.md {
-  line-height: inherit;
-  vertical-align: bottom;
-}
-
-.chip fa-icon {
-  height: 32px;
-  margin-left: 4px;
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.md-cancel-chips:before {
-  content: "\f293";
-  font-size: 19px;
-  margin-right: 3px;
-  color: #A5A5A5;
-  -webkit-transition: all 150ms ease-in-out;
-  -moz-transition: all 150ms ease-in-out;
-  -ms-transition: all 150ms ease-in-out;
-  -o-transition: all 150ms ease-in-out;
-  transition: all 150ms ease-in-out;
-}
-
-.chip {
-  height: 27px;
-  background: #E0E0E0;
-  display: inline-block;
-  line-height: 26px;
-  padding: 0 10px 0 12px;
-  margin: 5px;
-  font-size: 14px;
-  border-radius: 16px;
-  color: #555;
-  font-weight: 500;
-  -webkit-transition: all 150ms ease-in-out;
-  -moz-transition: all 150ms ease-in-out;
-  -ms-transition: all 150ms ease-in-out;
-  -o-transition: all 150ms ease-in-out;
-  transition: all 100ms ease-in-out;
-  cursor: default;
-}
-
-.chip:hover {
-  background: #767577;
-  color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.19)
-}
-
-.chip:hover > .md:before {
-  color: #fff;
-}
+/*******************************************************************************************************************************
+    Keep this file clear of styling declarations!
+    Drop them into _components, the actual component scss file, 
+    or _shame.scss if you need to just kick the can down the road!
+******************************************************************************************************************************/

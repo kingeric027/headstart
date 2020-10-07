@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { BrowserModule } from '@angular/platform-browser';
 import {
   NgModule,
@@ -15,15 +16,17 @@ import { MarketplaceModule, AppConfig } from 'marketplace';
 import { createCustomElement } from '@angular/elements';
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { CookieModule } from 'ngx-cookie';
-import { OrderCloudModule } from '@ordercloud/angular-sdk';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxImageZoomModule } from 'ngx-image-zoom';
+import { NgxSpinnerModule } from 'ngx-spinner';
 import { OCMCategoryDropdown } from './components/layout/category-dropdown/category-dropdown.component';
+import { CmsBuyerModule } from '@ordercloud/angular-cms-components';
+
 import {
   NgbCarouselModule,
   NgbTooltipModule,
@@ -45,7 +48,6 @@ import { ChildCategoryPipe } from './pipes/category-children.pipe';
 import { CreditCardFormatPipe } from './pipes/credit-card-format.pipe';
 import { PaymentMethodDisplayPipe } from './pipes/payment-method-display.pipe';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { OcSDKConfig } from './config/ordercloud-sdk.config';
 import { ComponentNgElementStrategyFactory } from 'src/lib/component-factory-strategy';
 import { NgbDateNativeAdapter } from './config/date-picker.config';
 import { AppErrorHandler } from './config/error-handling.config';
@@ -126,6 +128,7 @@ import { OCMShippingSelectionForm } from './components/checkout/shipping-selecti
 import { ConfirmModal } from './components/layout/confirm-modal/confirm-modal.component.';
 import { OCMPaymentCreditCard } from './components/payments/payment-credit-card/payment-credit-card.component';
 import { OCMQuoteRequestForm } from './components/products/quote-request-form/quote-request-form.component';
+import { OCMContactSupplierForm } from './components/products/contact-supplier-form/contact-supplier-form.component';
 import { UnitOfMeasurePipe } from './pipes/unit-of-measure.pipe';
 import { OCMLocationListItem } from './components/profile/location-list-item/location-list-item.component';
 import { OCMCertificateForm } from './components/profile/certificate-form/certificate-form.component';
@@ -135,12 +138,21 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OCMBuyerLocationPermissions } from './components/profile/buyer-location-permissions/buyer-location-permissions';
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
+import { SafeHTMLPipe } from './pipes/safe-html.pipe';
+import { OCMStaticPage } from './components/layout/static-page/static-page.component';
+
+export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
+  // return new TranslateHttpLoader(http, appConfig.translateBlobUrl, '-test.json');
+}
 
 const components = [
   OCMCategoryDropdown,
   OCMQuoteRequestForm,
+  OCMContactSupplierForm,
   OCMProductCard,
   OCMToggleFavorite,
   OCMQuantityInput,
@@ -152,6 +164,7 @@ const components = [
   OCMLineitemTable,
   OCMCart,
   OCMHomePage,
+  OCMStaticPage,
   OCMProductSort,
   OCMSupplierSort,
   OCMSupplierCard,
@@ -237,30 +250,33 @@ const components = [
     ShipperTrackingPipe,
     ShipperTrackingSupportedPipe,
     UnitOfMeasurePipe,
+    SafeHTMLPipe,
     ...components,
   ],
   imports: [
+    CmsBuyerModule,
     BrowserModule,
     MarketplaceModule,
     AppRoutingModule,
     HttpClientModule,
-    OrderCloudModule.forRoot(OcSDKConfig),
     CookieModule.forRoot(),
     ToastrModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
+        deps: [HttpClient, AppConfig],
       },
     }),
     NgxImageZoomModule,
+    NgxSpinnerModule,
     ReactiveFormsModule,
     FormsModule,
     MatListModule,
     MatCardModule,
     MatTableModule,
     MatCheckboxModule,
+    MatProgressSpinnerModule,
     MatButtonModule,
     FontAwesomeModule,
     NgbCarouselModule,
@@ -306,6 +322,7 @@ export class AppModule {
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
+    this.buildWebComponent(OCMStaticPage, 'ocm-static-page');
     this.buildWebComponent(OCMProductSort, 'ocm-product-sort');
     this.buildWebComponent(OCMSupplierSort, 'ocm-supplier-sort');
     this.buildWebComponent(OCMSupplierCard, 'ocm-supplier-card');
@@ -317,6 +334,7 @@ export class AppModule {
     this.buildWebComponent(OCMAppHeader, 'ocm-app-header');
     this.buildWebComponent(OCMCategoryDropdown, 'ocm-category-dropdown');
     this.buildWebComponent(OCMQuoteRequestForm, 'ocm-quote-request-form');
+    this.buildWebComponent(OCMContactSupplierForm, 'ocm-contact-supplier-form');
 
     this.buildWebComponent(OCMPaymentList, 'ocm-payment-list');
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
@@ -371,7 +389,7 @@ export class AppModule {
     this.buildWebComponent(OCMCertificateForm, 'ocm-certificate-form');
   }
 
-  buildWebComponent(angularComponent, htmlTagName: string): void {
+  buildWebComponent(angularComponent: any, htmlTagName: string): void {
     const component = createCustomElement(angularComponent, {
       injector: this.injector,
       // See this issue for why this Factory, copied from Angular/elements source code is included.
@@ -384,10 +402,4 @@ export class AppModule {
       }
     }
   }
-}
-
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/');
-  // uncomment to reference test file using XXX in place of words
-  // return new TranslateHttpLoader(http, 'https://marketplaceqa.blob.core.windows.net/ngx-translate/i18n/', '-test.json');
 }

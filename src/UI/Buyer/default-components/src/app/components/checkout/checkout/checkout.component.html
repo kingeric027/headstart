@@ -1,10 +1,8 @@
-<div class="mb-3 bg-quaternary">
-  <div class="container py-3">
-    <h1 class="display-4 m-0 headline-text text-center"
-        translate>
-      CHECKOUT.CHECKOUT.CHECKOUT
-    </h1>
-  </div>
+<div class="container py-3">
+  <h1 class="display-4 m-0 headline-text text-center"
+      translate>
+    CHECKOUT.CHECKOUT.CHECKOUT
+  </h1>
 </div>
 <div class="container">
   <div *ngIf="order">
@@ -61,6 +59,7 @@
               <ocm-checkout-address [isAnon]="isAnon"
                                     [order]="order"
                                     [lineItems]="lineItems"
+                                    [orderPromos]="orderPromotions"
                                     (continue)="doneWithShipToAddress()"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
@@ -75,6 +74,7 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-shipping [order]="order"
                                      [lineItems]="lineItems"
+                                     [orderPromos]="orderPromotions"
                                      [shipEstimates]="shipEstimates"
                                      (selectShipRate)="selectShipMethod($event.detail)"
                                      (continue)="doneWithShippingRates()">
@@ -92,8 +92,10 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-payment [isAnon]="isAnon"
                                     [order]="order"
+                                    [orderPromos]="orderPromotions"
                                     [cards]="cards"
                                     [orderSummaryMeta]="orderSummaryMeta"
+                                    (promosChanged)="updateOrderMeta($event)"
                                     (cardSelected)="onCardSelected($event.detail)"
                                     (continue)="onAcknowledgePurchaseOrder()">
               </ocm-checkout-payment>
@@ -107,6 +109,7 @@
             <ng-template ngbPanelContent>
               <ocm-checkout-confirm [isAnon]="isAnon"
                                     [order]="order"
+                                    [orderPromos]="orderPromotions"
                                     [lineItems]="lineItems"
                                     [payments]="payments"
                                     (submitOrderWithComment)="submitOrderWithComment($event.detail)">

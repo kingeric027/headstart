@@ -1,21 +1,25 @@
 import { InjectionToken } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { ApiRole } from '@ordercloud/angular-sdk';
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
-  marketplaceID: environment.marketplaceID,
-  cmsUrl: environment.cmsUrl,
   clientID: environment.clientID,
+  sellerID: environment.sellerID,
   middlewareUrl: environment.middlewareUrl,
-  ocMiddlewareUrl: environment.ocMiddlewareUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
-  orderCloudAuthUrl: environment.orderCloudAuthUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
+  translateBlobUrl: environment.translateBlobUrl,
+  blobStorageUrl: environment.blobStorageUrl,
+  buyerUrl: environment.buyerUrl,
+  buyerClientID: environment.buyerClientID,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
     // 'AdminAddressReader' is just for reading admin addresses as a seller user on product create/edti
     // Will need to be updated to 'AdminAddressAdmin' when seller address create is implemented
+    'ApiClientAdmin',
+    'ApiClientReader',
     'AdminAddressReader',
     'MeAddressAdmin',
     'MeAdmin',
@@ -54,6 +58,11 @@ export const ocAppConfig: AppConfig = {
     'ProductFacetReader',
     'ShipmentAdmin',
 
+    // custom cms roles
+    'AssetAdmin',
+    'DocumentAdmin',
+    'SchemaAdmin',
+
     // custom roles used to conditionally display ui
     'MPMeProductAdmin',
     'MPMeProductReader',
@@ -70,13 +79,29 @@ export const ocAppConfig: AppConfig = {
     'MPBuyerReader',
     'MPSellerAdmin',
     'MPReportReader',
+    'MPReportAdmin',
     'MPSupplierAdmin',
     'MPMeSupplierAdmin',
     'MPMeSupplierAddressAdmin',
     'MPMeSupplierUserAdmin',
     'MPSupplierUserGroupAdmin',
-    'MPStoreFrontAdmin',
-  ],
+    'MPStorefrontAdmin',
+  ] as ApiRole[],
+  impersonatingBuyerScope: [
+    'MeAddressAdmin',
+    'AddressAdmin', // Only for location owners
+    'MeAdmin',
+    'MeCreditCardAdmin',
+    'MeXpAdmin',
+    'UserGroupAdmin',
+    'ApprovalRuleAdmin',
+    'BuyerUserAdmin',
+    'Shopper',
+    'BuyerReader',
+    'PasswordReset',
+    'SupplierReader',
+    'SupplierAddressReader',
+  ] as ApiRole[],
 };
 
 export const applicationConfiguration = new InjectionToken<AppConfig>('app.config', {
@@ -96,22 +121,22 @@ export interface AppConfig {
    * will be used for authentication. You can view client ids for apps
    * you own or are a contributor to on the [dashboard](https://developer.ordercloud.io/dashboard)
    */
+  sellerID: string;
   clientID: string;
   /**
    * base path to middleware
    */
   middlewareUrl: string;
-  /**
-   * base path to ordercloud integrations middleware
-   */
-  ocMiddlewareUrl: string;
 
-  cmsUrl: string;
-
-  marketplaceID: string;
+  translateBlobUrl: string;
+  blobStorageUrl: string;
 
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: string;
+
+  //  buyer url and client ID are needed for impersonating buyers
+  buyerUrl: string;
+  buyerClientID: string;
 
   /**
    * An array of security roles that will be requested upon login.
@@ -121,8 +146,8 @@ export interface AppConfig {
    */
 
   orderCloudApiUrl: string;
-  orderCloudAuthUrl: string;
   orderCloudApiVersion: string;
 
-  scope: string[];
+  scope: ApiRole[];
+  impersonatingBuyerScope: ApiRole[];
 }

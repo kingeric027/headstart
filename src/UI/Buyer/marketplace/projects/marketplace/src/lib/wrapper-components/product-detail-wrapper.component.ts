@@ -1,26 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { ListSpec } from '@ordercloud/angular-sdk';
 import { ActivatedRoute } from '@angular/router';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
 import { CurrentUserService } from '../services/current-user/current-user.service';
-import { MarketplaceMeProduct } from '../shopper-context';
-import { SuperMarketplaceProduct } from 'marketplace-javascript-sdk';
+import { SuperMarketplaceProduct, KitProduct } from '@ordercloud/headstart-sdk';
+import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 
 @Component({
   template: `
-    <ocm-product-details [product]="product"> </ocm-product-details>
+    <ocm-kit-product-details *ngIf="isKit" [product]="product"></ocm-kit-product-details>
+    <ocm-product-details *ngIf="!isKit" [product]="product"> </ocm-product-details>
   `,
 })
 export class ProductDetailWrapperComponent implements OnInit {
-  product: SuperMarketplaceProduct;
-
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    public context: ShopperContextService, // used in template
-    protected currentUser: CurrentUserService
-  ) {}
+  isKit: boolean;
+  product: SuperMarketplaceProduct | KitProduct;
+  constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService, private tempSdk: TempSdk) { }
 
   ngOnInit(): void {
-    this.product = this.activatedRoute.snapshot.data.product;
+    const product = this.activatedRoute.snapshot.data.product;
+    this.isKit = product.Product.xp.ProductType === 'Kit';
+    this.product = product;
   }
 }

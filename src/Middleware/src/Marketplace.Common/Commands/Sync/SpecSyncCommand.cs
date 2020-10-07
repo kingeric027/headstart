@@ -6,6 +6,7 @@ using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using Marketplace.Models;
+using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands
@@ -13,14 +14,14 @@ namespace Marketplace.Common.Commands
     public class SpecSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        public SpecSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, log)
+        public SpecSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc) : base(settings, oc, log)
         {
             _oc = oc;
         }
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpec>();
+            var obj = wi.Current.ToObject<ChiliSpec>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -62,7 +63,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpec>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<ChiliSpec>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;

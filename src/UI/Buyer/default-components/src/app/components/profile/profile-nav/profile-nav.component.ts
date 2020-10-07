@@ -11,6 +11,8 @@ export class OCMProfileNav {
   profileRoutes: RouteConfig[] = [];
 
   constructor(public context: ShopperContextService) {
+    const isSSO = context.currentUser.isSSO() || !context.currentUser.hasRoles("PasswordReset");
     this.profileRoutes = context.router.getProfileRoutes();
+    if (isSSO) this.profileRoutes = this.profileRoutes.filter(r => r.routerCall !== 'toChangePassword');
   }
 }

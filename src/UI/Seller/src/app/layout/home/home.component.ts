@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 
 @Component({
   selector: 'app-home',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    @Inject(applicationConfiguration) private appConfig: AppConfig
+  ) {}
 
   ngOnInit() {
   }

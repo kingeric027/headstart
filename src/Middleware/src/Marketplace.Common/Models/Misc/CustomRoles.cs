@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Models.Misc
+namespace Marketplace.Models.Misc
 {
 	public enum CustomRole
 	{
@@ -9,6 +9,7 @@
 		MeProductAdmin,
 		MPProductReader,
 		MPPromotionReader,
+		MPContentAdmin,
 		MPPromotionAdmin,
 		MPCategoryAdmin,
 		MPCategoryReader, 
@@ -19,20 +20,30 @@
 		MPBuyerReader,
 		MPSellerAdmin,
 		MPSupplierAdmin, 
+		MPMeSupplierAdmin,
 		MPMeSupplierAddressAdmin,
 		MPMeSupplierUserAdmin,
 		MPSupplierUserGroupAdmin,
 		MPReportReader,
+		MPReportAdmin,
+		MPStoreFrontAdmin,
 
 		// buyer
 		MPBaseBuyer,
 		MPLocationPermissionAdmin,
-		MPLocationApprovalRuleAdmin,
 		MPLocationCreditCardAdmin,
 		MPLocationAddressAdmin,
 		MPLocationOrderApprover,
 		MPLocationNeedsApproval,
 		MPLocationViewAllOrders,
-		MPLocationResaleCertAdmin
+		MPLocationResaleCertAdmin,
+
+		// cms 
+		AssetAdmin,
+		AssetReader,
+		DocumentAdmin,
+		DocumentReader,
+		SchemaAdmin,
+		SchemaReader
 	}
 }

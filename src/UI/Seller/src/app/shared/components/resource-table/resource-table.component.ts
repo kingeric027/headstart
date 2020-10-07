@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 import { getPsHeight, getScreenSizeBreakPoint } from '@app-seller/shared/services/dom.helper';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
@@ -19,14 +19,13 @@ import { Options, RequestStatus } from '@app-seller/shared/services/resource-cru
 import { faCalendar, faChevronLeft, faFilter, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { NgbDateStruct, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { singular } from 'pluralize';
-import { filter, takeWhile } from 'rxjs/operators';
-import { ListPage } from 'marketplace-javascript-sdk';
+import { takeWhile } from 'rxjs/operators';
+import { ListPage } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
-
-interface BreadCrumb {
-  displayText: string;
-  route: string;
-}
+import { transformDateMMDDYYYY } from '@app-seller/shared/services/date.helper';
+import { TranslateService } from '@ngx-translate/core';
+import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 
 @Component({
   selector: 'resource-table-component',
@@ -52,31 +51,37 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   _currentResourceNamePlural: string;
   _currentResourceNameSingular: string;
   _ocService: ResourceCrudService<any>;
+  _filterConfig: any;
   areChanges: boolean;
   parentResources: ListPage<any>;
   requestStatus: RequestStatus;
-  selectedParentResourceName = 'Fetching Data';
+  selectedParentResourceName: string;
   selectedParentResourceID = '';
-  breadCrumbs: BreadCrumb[] = [];
   isCreatingNew = false;
   isCreatingSubResource = false;
   isMyResource = false;
+  shouldDisplayList = false;
   alive = true;
   screenSize;
   myResourceHeight = 450;
   tableHeight = 450;
   editResourceHeight = 450;
   activeFilterCount = 0;
+  canImpersonateResource = false;
   filterForm: FormGroup;
   fromDate: string;
   toDate: string;
+  resourceType: string | null = null;
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef,
+    private translate: TranslateService,
+    private impersonationService: ImpersonationService,
+    private currentUserService: CurrentUserService,
     ngZone: NgZone
-  ) {}
+  ) { }
 
   @Input()
   resourceList: ListPage<any> = { Meta: {}, Items: [] };
@@ -115,24 +120,70 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   @Input()
   selectedResourceID: string;
   @Input()
-  filterConfig: any;
+  set filterConfig(value: any) {
+    this._filterConfig = value;
+    this.setFilterForm();
+  }
   @Input()
   resourceForm: FormGroup;
   @Input()
   shouldShowCreateNew = true;
+  @Input()
+  shouldShowTitleContainer = true;
   @Input()
   shouldShowResourceActions = true;
   @Input()
   dataIsSaving = false;
   @Input()
   canBeDeleted = true;
+  @Input()
+  labelSingular: string;
+  @Input()
+  labelPlural: string;
+  @Input()
+  excludeFromFilterBar = false;
+  @Input()
+  excludeFromFullTableView = false;
+  @Input()
+  excludeFromSubResourceView = false;
+  availableProductTypes = [];
 
-  async ngOnInit() {
-    this.determineViewingContext();
+  async ngOnInit(): Promise<void> {
+    await this.determineViewingContext();
+    await this.getAvailableProductTypes();
     this.initializeSubscriptions();
-    this.setFilterForm();
     this.subscribeToOptions();
     this.screenSize = getScreenSizeBreakPoint();
+  }
+
+  async getAvailableProductTypes(): Promise<void> {
+    const supplier = await this.currentUserService.getMySupplier();
+    const formattedSupplierProductTypes = supplier?.xp?.ProductTypes
+      .map(pt => {
+        const link = pt.match(/[A-Z][a-z]+/g).map(t => t.toLowerCase()).join('-');
+        return {
+          Display: `${pt.match(/[A-Z][a-z]+/g).join(' ')} Product`,
+          Link: link
+        }
+      });
+    this.availableProductTypes = formattedSupplierProductTypes || [];
+  }
+
+  getTitle(isMyResource: boolean, resourceName: string, selectedParentResourceName: string): string {
+    const translatedResourceName = this.translate.instant(this.labelPlural);
+    if (isMyResource) {
+      if (resourceName === 'suppliers') {
+        return this.translate.instant('ADMIN.NAV.MY_PROFILE');
+      } else {
+        return translatedResourceName;
+      }
+    } else {
+      if (selectedParentResourceName) {
+        return translatedResourceName + ' - ' + selectedParentResourceName;
+      } else {
+        return translatedResourceName;
+      }
+    }
   }
 
   ngAfterViewChecked() {
@@ -154,12 +205,12 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     if (typeof this.filterForm.value.from === 'object') {
       const fromDate = this.filterForm.value.from;
       this.fromDate = this.transformDateForUser(fromDate);
-      this.filterForm.value.from = this.transformDateForFilter(fromDate);
+      this.filterForm.value.from = transformDateMMDDYYYY(fromDate);
     }
     if (typeof this.filterForm.value.to === 'object') {
       const toDate = this.filterForm.value.to;
       this.toDate = this.transformDateForUser(toDate);
-      this.filterForm.value.to = this.transformDateForFilter(toDate);
+      this.filterForm.value.to = transformDateMMDDYYYY(toDate);
     }
     if (typeof this.filterForm.value.timeStamp === 'object') {
       const timeStamp = this.transformDateForUser(this.filterForm.value.timeStamp);
@@ -173,10 +224,6 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     const month = date.month.toString().length === 1 ? '0' + date.month : date.month;
     const day = date.day.toString().length === 1 ? '0' + date.day : date.day;
     return date.year + '-' + month + '-' + day;
-  }
-
-  transformDateForFilter(date: NgbDateStruct) {
-    return date.month + '-' + date.day + '-' + date.year;
   }
 
   removeFieldsWithNoValue(formValues: ListArgs) {
@@ -195,8 +242,15 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.editResourceHeight = getPsHeight('additional-item-edit-resource');
   }
 
-  determineViewingContext() {
+  async determineViewingContext() {
     this.isMyResource = this.router.url.startsWith('/my-');
+    this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
+    const routeParams = this.activatedRoute.snapshot.params
+    this.canImpersonateResource = routeParams.buyerID && routeParams.userID;
+    if (this.isMyResource) {
+      const resource = await this._ocService.getMyResource();
+      this.selectedParentResourceName = resource.Name;
+    }
   }
 
   private async initializeSubscriptions() {
@@ -209,7 +263,8 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   private async redirectToFirstParentIfNeeded() {
     if (this.parentResourceService) {
-      if (this.parentResourceService.getParentResourceID() === REDIRECT_TO_FIRST_PARENT) {
+      const parentResourceID = await this.parentResourceService.getParentResourceID();
+      if (parentResourceID === REDIRECT_TO_FIRST_PARENT) {
         await this.parentResourceService.listResources();
         this._ocService.selectParentResource(this.parentResourceService.resourceSubject.value.Items[0]);
       }
@@ -217,15 +272,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private setUrlSubscription() {
-    this.router.events
-      .pipe(takeWhile(() => this.alive))
-      // only need to set the breadcrumbs on nav end events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.setBreadCrumbs();
-      });
     this.activatedRoute.params.pipe(takeWhile(() => this.alive)).subscribe(() => {
-      this.setBreadCrumbs();
       this.checkIfCreatingNew();
     });
   }
@@ -235,14 +282,25 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       .pipe(takeWhile(() => this.parentResourceService && this.alive))
       .subscribe(async params => {
         await this.redirectToFirstParentIfNeeded();
-        const parentIDParamName = `${singular(this._ocService.primaryResourceLevel)}ID`;
+        const parentIDParamName = this.getParentIDParamName(params);
         const parentResourceID = params[parentIDParamName];
         this.selectedParentResourceID = parentResourceID;
+        if (this.isMyResource) {
+          const parentResource = await this._ocService.getMyResource();
+          if (parentResource) this.selectedParentResourceName = parentResource.Name;
+        }
         if (params && parentResourceID) {
           const parentResource = await this.parentResourceService.findOrGetResourceByID(parentResourceID);
           if (parentResource) this.selectedParentResourceName = parentResource.Name;
         }
       });
+  }
+
+  getParentIDParamName(params: Params): string {
+    if (params?.ReportType) {
+      return 'ReportType';
+    }
+    return `${singular(this._ocService.primaryResourceLevel)}ID`;
   }
 
   private setListRequestStatusSubscription() {
@@ -251,47 +309,33 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
       this.changeDetectorRef.detectChanges();
     });
   }
+
   // TODO: Refactor to remove duplicate function (function exists in resrouce-crud.service.ts)
   private checkIfCreatingNew() {
     const routeUrl = this.router.routerState.snapshot.url;
     const splitUrl = routeUrl.split('/');
-    const endUrl = splitUrl[splitUrl.length - 1];
+    const endUrl =
+      this._currentResourceNamePlural === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
     this.isCreatingNew = endUrl === 'new' || endUrl.startsWith('new?');
+    if (this._currentResourceNamePlural === 'products' && this.isCreatingNew) {
+      this.resourceType = splitUrl[splitUrl.length - 1].split('-').join(' ');
+    }
     this.isCreatingSubResource = endUrl.includes('new?');
-  }
-
-  private setBreadCrumbs() {
-    // basically we are just taking off the portion of the url after the selected route piece
-    // in the future breadcrumb logic might need to be more complicated than this
-    const urlPieces = this.router.url
-      .split('/')
-      .filter(p => p)
-      .map(p => {
-        if (p.includes('?')) {
-          return p.slice(0, p.indexOf('?'));
-        } else {
-          return p;
-        }
-      });
-    this.breadCrumbs = urlPieces.map((piece, index) => {
-      const route = `/${urlPieces.slice(0, index + 1).join('/')}`;
-      return {
-        displayText: piece,
-        route,
-      };
-    });
-    this.changeDetectorRef.detectChanges();
   }
 
   setFilterForm() {
     const formGroup = {};
-    if (this.filterConfig && this.filterConfig.Filters) {
-      this.filterConfig.Filters.forEach(filter => {
+    if (this._filterConfig && this._filterConfig.Filters) {
+      this._filterConfig.Filters.forEach(filter => {
         const value = this.getSelectedFilterValue(filter.Path);
         formGroup[filter.Path] = new FormControl(value);
       });
       this.filterForm = new FormGroup(formGroup);
     }
+  }
+
+  async impersonateUser(): Promise<void> {
+    await this.impersonationService.impersonateUser(this.activatedRoute.snapshot?.params?.buyerID, this._resourceInSelection)
   }
 
   getSelectedFilterValue(pathOfFilter: string) {
@@ -355,6 +399,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
 
   getSaveBtnText(): string {
     return this._ocService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew);
+  }
+
+  getHeaderText(resourceInSelection: any): string {
+    return resourceInSelection.Name ||
+      resourceInSelection.Username ||
+      resourceInSelection.AddressName ||
+      resourceInSelection.AppName
   }
 
   ngOnDestroy() {

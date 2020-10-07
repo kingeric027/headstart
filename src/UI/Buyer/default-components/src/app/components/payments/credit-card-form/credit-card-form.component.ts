@@ -3,7 +3,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators';
 import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
-import { OrderCloudIntegrationsCreditCardToken } from 'marketplace-javascript-sdk';
+import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { GeographyConfig } from 'src/app/config/geography.class';
 
 export interface CreditCardFormOutput {
@@ -20,7 +20,7 @@ export class OCMCreditCardForm implements OnInit {
   @Output() formDismissed = new EventEmitter();
   @Input() card: OrderCloudIntegrationsCreditCardToken;
   @Input() submitText: string;
-  @Input() set showCVV(value) {
+  @Input() set showCVV(value: boolean) {
     if (value && !this._showCVV) {
       this.buildCVVForm();
     }
@@ -29,7 +29,7 @@ export class OCMCreditCardForm implements OnInit {
     }
     this._showCVV = value;
   }
-  @Input() set showCardDetails(value) {
+  @Input() set showCardDetails(value: boolean) {
     if (value && !this._showCardDetails) {
       this.buildCardDetailsForm(this.card);
     }
@@ -79,7 +79,7 @@ export class OCMCreditCardForm implements OnInit {
     this.formDismissed.emit();
   }
 
-  onCountryChange(event?): void {
+  onCountryChange(event?: any): void {
     this.stateOptions = this.getStateOptions(this.cardForm.value.country);
     this.cardForm.get('zip').setValidators([Validators.required, ValidateUSZip]);
     if (event) {

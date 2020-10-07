@@ -1,48 +1,60 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { User } from 'marketplace';
 import { ValidateEmail, ValidateName, ValidatePhone } from 'src/app/validators/validators';
+import { QuoteOrderInfo, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
+import { CurrentUser, ShopperContextService } from 'marketplace';
 
 @Component({
-    templateUrl: './quote-request-form.component.html',
-    styleUrls: ['./quote-request-form.component.scss'],
+  templateUrl: './quote-request-form.component.html',
+  styleUrls: ['./quote-request-form.component.scss'],
 })
 export class OCMQuoteRequestForm implements OnInit {
-    quoteRequestForm: FormGroup;
-    private currentUser: User = {};
-    @Output() formSubmitted = new EventEmitter<{ user: User; }>();
-    @Output() formDismissed = new EventEmitter();
-    constructor() { }
+  quoteRequestForm: FormGroup;
+  requestOptions: {
+    pageSize?: number;
+  } = {
+    pageSize: 100
+  };
+  myBuyerLocations: MarketplaceAddressBuyer[];
+  @Output() formSubmitted = new EventEmitter<{ user: QuoteOrderInfo }>();
+  @Output() formDismissed = new EventEmitter();
 
-    ngOnInit() {
-        this.setForms();
-    }
+  private currentUser: CurrentUser;
+  constructor(private context: ShopperContextService) {}
 
-    @Input() set CurrentUser(user: User) {
-        this.currentUser = user || {};
-        this.setForms();
-        this.quoteRequestForm.markAsPristine();
-    }
+  async ngOnInit(): Promise<void> {
+    await this.getMyBuyerLocations();
+    this.setForms();
+  }
 
-    setForms(): void {
-        this.quoteRequestForm = new FormGroup({
-            FirstName: new FormControl(this.currentUser.FirstName || '', [Validators.required, ValidateName]),
-            LastName: new FormControl(this.currentUser.LastName || '', [Validators.required, ValidateName]),
-            //BuyerLocation: new FormControl(this.currentUser.BuyerLocation || '', [Validators.required, ValidateName]),
-            Phone: new FormControl(this.currentUser.Phone || '', [Validators.required, ValidatePhone]),
-            Email: new FormControl(this.currentUser.Email || '', [Validators.required, ValidateEmail]),
-            Comments: new FormControl('')
-        });
-    }
+  @Input() set CurrentUser(user: CurrentUser) {
+    this.currentUser = user;
+  }
 
-    onSubmit(): void {
-        if (this.quoteRequestForm.status === 'INVALID') return;
-        this.formSubmitted.emit({
-            user: this.quoteRequestForm.value
-        });
-    }
+  async getMyBuyerLocations(): Promise<void> {
+    const addresses = await this.context.addresses.list(this.requestOptions);
+    this.myBuyerLocations = addresses.Items;
+  }
 
-    dismissForm(): void {
-        this.formDismissed.emit();
-    }
+  setForms(): void {
+    this.quoteRequestForm = new FormGroup({
+      FirstName: new FormControl(this.currentUser?.FirstName || '', [Validators.required, ValidateName]),
+      LastName: new FormControl(this.currentUser?.LastName || '', [Validators.required, ValidateName]),
+      BuyerLocation: new FormControl(this.myBuyerLocations[0]?.AddressName || '', [Validators.required]),
+      Phone: new FormControl(this.currentUser?.Phone || '', [Validators.required, ValidatePhone]),
+      Email: new FormControl(this.currentUser?.Email || '', [Validators.required, ValidateEmail]),
+      Comments: new FormControl(''),
+    });
+  }
+
+  onSubmit(): void {
+    if (this.quoteRequestForm.status === 'INVALID') return;
+    this.formSubmitted.emit({
+      user: this.quoteRequestForm.value,
+    });
+  }
+
+  dismissForm(): void {
+    this.formDismissed.emit();
+  }
 }

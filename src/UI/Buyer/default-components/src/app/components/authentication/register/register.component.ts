@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { MeUser } from 'ordercloud-javascript-sdk';
 import {
   ValidateName,
   ValidateEmail,
@@ -18,7 +18,7 @@ export class OCMRegister implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService) {}
 
   // TODO: validation isn't working
   ngOnInit(): void {
