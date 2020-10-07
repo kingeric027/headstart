@@ -44,7 +44,8 @@
       {{ orderSummaryMeta.POTotal | currency: _orderCurrency }}
     </span>
   </h4>
-  <div class="font-italic po-info mb-3">
+  <div *ngIf="orderSummaryMeta.POLineItemCount"
+       class="font-italic po-info mb-3">
     Please note - Key fob and/or wallet card orders will NOT be charged to your credit card. The cost of key fobs, wallet cards, sales tax, and shipping will be deducted via an ABC remit. The price reflected on this order is an estimate, and actual final cost may vary based on applicable sales tax rates. By placing an order with this item in your cart, you accept these terms.
   </div>
   <h4 *ngIf="!orderSummaryMeta.POLineItemCount">
