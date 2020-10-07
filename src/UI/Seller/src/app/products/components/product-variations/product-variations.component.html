@@ -194,6 +194,7 @@
                     translate>ADMIN.PRODUCT_EDIT.DETAILS</th>
                 <th *ngFor="let spec of specsWithVariations; let i = index"
                     scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
+                <th scope="col" translate>ADMIN.PRODUCT_EDIT.ACTIVE</th>
                 <th scope="col"
                     translate>ADMIN.PRODUCT_EDIT.SKU</th>
                 <th scope="col"
@@ -215,6 +216,22 @@
                   <td *ngFor="let specValue of variant.xp?.SpecValues">
                     {{specValue.SpecOptionValue}} <span class="font-weight-bold"
                           *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency: myCurrency?.Currency}})</span>
+                  </td>
+                  <td>
+                    <div *ngIf="readonly"
+                    class="chip supplier-facet-chip readonly active">{{getVariantStatusDisplay(variant)}}
+                 <fa-icon [icon]="faCheckCircle"></fa-icon>
+               </div>
+               <div *ngIf="!readonly"
+                    class="
+                       chip
+                       editable
+                       supplier-facet-chip"
+                    (click)="toggleActive(variant)"
+                    [ngClass]="{'active': variant.Active}">{{getVariantStatusDisplay(variant)}}
+                 <fa-icon *ngIf="variant.Active"
+                          [icon]="faCheckCircle"></fa-icon>
+               </div>
                   </td>
                   <td>
                     <div class="input-group-sm">
