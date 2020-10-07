@@ -47,6 +47,8 @@ export class OCMProductDetails implements OnInit {
   showGrid = false;
   isAddingToCart = false;
   contactRequest: ContactSupplierBody;
+  _disabledVariants: any[];
+  isInactiveVariant: boolean;
   specForm: FormGroup;
   isInactiveVariant: boolean;
   _disabledVariants: MarketplaceVariant[];
@@ -56,6 +58,41 @@ export class OCMProductDetails implements OnInit {
     private productDetailService: ProductDetailService
   ) {
   }
+  @Input() set product(superProduct: any) {
+    if (superProduct.Product.xp.ProductType === "Kit") {
+      this.isKitProduct = true;
+      this.isKitStatic = superProduct.Static || superProduct.MinQty === superProduct.MaxQty;
+      this.isOrderable = true
+      this._product = superProduct.Product;
+      this._attachments = superProduct.Attachments;
+      this.images = superProduct.Images ? superProduct.Images.map(img => img) : [];
+      const currentUser = this.context.currentUser.get();
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+      this.productsIncludedInKit = superProduct.ProductAssignments.ProductsInKit;
+      this.getProductsInKit(superProduct.ProductAssignments.ProductsInKit);
+    } else {
+      this.isKitProduct = false;
+      this._superProduct = superProduct;
+      this._product = superProduct.Product;
+      this._priceSchedule = superProduct.PriceSchedule as any;
+      this._attachments = superProduct?.Attachments;
+      const currentUser = this.context.currentUser.get();
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0]?.xp?.Currency;
+      this._orderCurrency = currentUser.UserGroups.filter(ug => ug.xp?.Type === 'BuyerLocation')[0].xp?.Currency;
+      this._priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
+      this._price = this.getTotalPrice();
+      this.populateInactiveVariants(superProduct);
+      // Specs
+      this._specs = { Meta: {}, Items: superProduct.Specs as any };
+      this.specFormService.event.valid = this._specs.Items.length === 0;
+      this.specLength = this._specs.Items.length;
+      // End Specs
+      this.images = superProduct.Images.map(img => img);
+      this.imageUrls = superProduct.Images.map(img => img.Url);
+      this.isOrderable = !!superProduct.PriceSchedule;
+      this.supplierNote = this._product.xp && this._product.xp.Note;
+    }
   @Input() set product(superProduct: SuperMarketplaceProduct) {
     this._superProduct = superProduct;
     this._product = superProduct.Product;
