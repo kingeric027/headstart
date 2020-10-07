@@ -24,6 +24,7 @@ export class UserGroupAssignments implements OnChanges {
   @Input() userGroupType: string;
   @Input() isCreatingNew: boolean;
   @Input() userPermissionsService: IUserPermissionsService;
+  @Input() homeCountry: string;
   @Output() assignmentsToAdd = new EventEmitter<AssignmentsToAddUpdate>();
   @Output() hasAssignments = new EventEmitter<boolean>();
 
@@ -83,7 +84,7 @@ export class UserGroupAssignments implements OnChanges {
       const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
       this.userGroups = groups;
     } else {
-      this.userGroups = await this.userPermissionsService.getUserGroups(ID, this.options);
+      this.userGroups = await this.userPermissionsService.getUserGroups(ID, {filters: { 'xp.Country': this.homeCountry}});
     }
   }
 
