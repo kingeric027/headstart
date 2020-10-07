@@ -97,7 +97,7 @@
                 </ocm-modal>
               </div>
             </div>
-            <div *ngIf="!isOrderable"
+            <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
                  class="alert alert-info"
                  translate>
               PRODUCTS.DETAILS.VIEW_ONLY
@@ -185,7 +185,7 @@
                        [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event.detail)">
         </ocm-spec-form>
-        <div *ngIf="!isOrderable"
+        <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
              class="alert alert-info"
              translate>
           PRODUCTS.DETAILS.VIEW_ONLY
