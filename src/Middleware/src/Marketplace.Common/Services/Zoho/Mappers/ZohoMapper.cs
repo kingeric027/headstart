@@ -250,6 +250,49 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesOrderMapper
     {
+        public static ZohoSalesOrder Map(ZohoSalesOrder zOrder, MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems, IList<OrderPromotion> promotions)
+        {
+                zOrder.reference_number = order.ID;
+                zOrder.salesorder_number = order.ID;
+                zOrder.date = order.DateSubmitted?.ToString("yyyy-MM-dd");
+                zOrder.is_discount_before_tax = true;
+                zOrder.discount = decimal.ToDouble(promotions.Sum(p => p.Amount));
+                zOrder.discount_type = "entity_level";
+                zOrder.line_items = items.Select(item =>
+                {
+                    if (item.sku == "41000")
+                    {
+                        return new ZohoLineItem()
+                        {
+                            item_id = item.item_id,
+                            quantity = 1,
+                            rate = item.rate
+                        };
+                    }
+
+                    var line_item = lineitems.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
+                    return new ZohoLineItem()
+                    {
+                        item_id = item.item_id,
+                        quantity = line_item.Quantity,
+                        rate = decimal.ToDouble(line_item.UnitPrice.Value),
+                        discount = 0
+                        //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount));
+
+                    };
+                }).ToList();
+                zOrder.tax_total = decimal.ToDouble(order.TaxCost);
+                zOrder.customer_name = contact.contact_name;
+                zOrder.sub_total = decimal.ToDouble(order.Subtotal);
+                zOrder.total = decimal.ToDouble(order.Total);
+                zOrder.customer_id = contact.contact_id;
+                zOrder.currency_code = contact.currency_code;
+                zOrder.currency_symbol = contact.currency_symbol;
+                zOrder.notes = promotions.Any()
+                    ? $"Promotions applied: {promotions.DistinctBy(p => p.Code).Select(p => p.Code).JoinString(" - ", p => p)}"
+                    : null;
+            return zOrder;
+        }
         public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact, IList<MarketplaceLineItem> lineitems, IList<OrderPromotion> promotions)
         {
             var o = new ZohoSalesOrder()
