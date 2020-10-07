@@ -81,8 +81,7 @@
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
-                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid || this.isInactiveVariant"
-                        [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                        [disabled]="isAddingToCart || !specForm?.valid || !qtyValid || isInactiveVariant"
                         (click)="addToCart()"
                         translate>
                   PRODUCTS.DETAILS.ADD_TO_CART
