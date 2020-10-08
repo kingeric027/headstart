@@ -19,7 +19,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() product: MarketplaceMeProduct;
 
   @Input() existingQty: number;
-  @Input() gridDisplay? = false;
+  @Input() gridDisplay?= false;
   @Input() isQtyChanging;
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
   // TODO - replace with real product info
@@ -32,7 +32,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   max: number;
   disabled = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
 
   ngOnInit(): void {
@@ -42,7 +42,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     if (endUrl.includes('cart')) {
       this.form = new FormGroup({
         quantity: new FormControl(1, {
-          validators: Validators.required, 
+          validators: Validators.required,
           updateOn: 'blur'
         }),
       });
