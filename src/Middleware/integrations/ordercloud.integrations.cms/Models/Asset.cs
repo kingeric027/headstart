@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ordercloud.integrations.cms
 {
-	public enum AssetType { Image, Theme, Attachment, Structured }
+	public enum AssetType { Image, Text, Audio, Video, Slides, SpreadSheet, PDF, Compressed, Code, JSON, Markup, Unknown }
 
 	[SwaggerModel]
 	public class Asset

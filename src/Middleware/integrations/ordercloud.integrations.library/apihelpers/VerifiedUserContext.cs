@@ -106,7 +106,7 @@ namespace ordercloud.integrations.library
         {
             get
             {
-                return _token.Payload.FirstOrDefault(t => t.Key == "exp").Value.ToString().UnixToDateTime();
+                return _token.Payload.FirstOrDefault(t => t.Key == "exp").Value.ToString().UnixToDateTimeUTC();
             }
         }
     }
