@@ -58,11 +58,8 @@ export class ProductFilters implements OnInit{
   areFacetOptionsSelected(facet: ProductFacet): boolean {
     const productXpFacetKey = facet?.XpPath.split('.')[1];
     console.log('this.facetsOnProductEditable', this.facetsOnProductEditable);
-    // if (this.sellerFilterOverride) {
-    //   this.facetsOnProductEditable = this.facetOptions;
-    // }
     console.log('evaluate', Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey));
-    return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey);
+    return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey) && this.facetsOnProductEditable[productXpFacetKey].length;
   }
 
   isFacetOptionApplied(facet: ProductFacet, option: string): boolean {
@@ -116,7 +113,8 @@ export class ProductFilters implements OnInit{
     let changeDetected = false;
     keys.forEach(key => {
       if (this.facetsOnProductEditable[key]?.length !== this.facetsOnProductStatic[key]?.length ||
-          !this.facetsOnProductEditable[key].every(item => this.facetsOnProductStatic[key].includes(item))) {
+          !this.facetsOnProductEditable[key].every(item => this.facetsOnProductStatic[key].includes(item)) ||
+          (!(key in this.facetsOnProductStatic))) {
         changeDetected = true;
       }
     });
