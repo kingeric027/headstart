@@ -49,7 +49,9 @@ namespace Marketplace.Common.Commands
                     MinQuantity = obj.MinQuantity,
                     Name = obj.Name,
                     PriceBreaks = new List<PriceBreak>()
-                        {new PriceBreak() {Price = obj.Price.To<decimal>(), Quantity = obj.QuantityMultiplier}},
+                    {
+                        new PriceBreak() {Price = obj.Price.To<decimal>(), Quantity = obj.QuantityMultiplier}
+                    },
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
                 }, _user.AccessToken);
