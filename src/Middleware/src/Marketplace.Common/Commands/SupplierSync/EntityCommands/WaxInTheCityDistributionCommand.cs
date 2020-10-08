@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
@@ -44,18 +45,16 @@ namespace Marketplace.Common.Commands.SupplierSync
             var supplierLineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, supplierOrder.ID, pageSize: 100, accessToken: user.AccessToken);
             var buyerOrder = await _ocSeller.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID.Split('-')[0]);
             var buyerLineItems = await _ocSeller.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrder.ID);
-
+            
             var returnObject = new JObject
             {
-                {"SupplierOrder", new JObject
-                {
+                {"SupplierOrder", new JObject {
                     {"Order", JToken.FromObject(supplierOrder)},
-                    new JProperty("LineItems", JToken.FromObject(supplierLineItems))
+                    new JProperty("LineItems", JToken.FromObject(supplierLineItems.Items))
                 }},
-                {"BuyerOrder", new JObject
-                {
+                {"BuyerOrder", new JObject {
                     {"Order", JToken.FromObject(buyerOrder)},
-                    new JProperty("LineItems", JToken.FromObject(buyerLineItems))
+                    new JProperty("LineItems", JToken.FromObject(buyerLineItems.Items.Where(li => li.SupplierID == supplierOrder.ToCompanyID).Select(li => li)))
                 }},
                 {"Order", JToken.FromObject(supplierOrder)},
                 {"BuyerBillingAddress", JToken.FromObject(buyerOrder.BillingAddress)}
