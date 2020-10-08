@@ -4,6 +4,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
 import { Buyer, Buyers } from 'ordercloud-javascript-sdk';
+import { ListArgs } from '@ordercloud/headstart-sdk';
 
 export const BUYER_SUB_RESOURCE_LIST = [
   { route: 'users', display: 'ADMIN.NAV.USERS' },
@@ -35,5 +36,9 @@ export class BuyerService extends ResourceCrudService<Buyer> {
     private buyerTempService: BuyerTempService
   ) {
     super(router, activatedRoute, Buyers, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);
+  }
+  addIntrinsicListArgs(options: ListArgs): ListArgs {
+    options.sortBy = ["NAME"];
+    return options;
   }
 }
