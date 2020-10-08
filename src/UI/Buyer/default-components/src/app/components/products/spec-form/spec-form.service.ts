@@ -1,7 +1,7 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecOption, Spec, LineItemSpec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
-import { SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
+import { Asset } from '@ordercloud/headstart-sdk';
 import { FormGroup } from '@angular/forms';
 
 @Injectable({
@@ -67,15 +67,15 @@ export class SpecFormService {
     return specs;
   }
 
-  public getLineItemImageUrl(product: SuperMarketplaceProduct, specForm: FormGroup): string {
-    const image = product.Images?.find(img => this.isImageMatchingSpecs(img, product, specForm));
+  public getLineItemImageUrl(images: Asset[], specs: Spec[], specForm: FormGroup): string {
+    const image = images?.find(img => this.isImageMatchingSpecs(img, specs, specForm));
     return image?.Url;
   }
 
-  private isImageMatchingSpecs(image: Asset, product: SuperMarketplaceProduct, specForm: FormGroup): boolean {
+  private isImageMatchingSpecs(image: Asset, specs: Spec[], specForm: FormGroup): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    const specs = this.getLineItemSpecs(product.Specs, specForm);
-    return specs.
+    const liSpecs = this.getLineItemSpecs(specs, specForm);
+    return liSpecs.
       every(spec => image.Tags
         .find(tag => tag?.split('-')
           .includes(spec.Value.replace(/\s/g, ''))));
