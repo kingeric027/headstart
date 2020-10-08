@@ -8,7 +8,6 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { HeadStartSDK, MarketplaceLocationUserGroup } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
-import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 
 interface AssignmentsToAddUpdate {
   UserGroupType: string;
