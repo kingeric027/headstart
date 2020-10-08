@@ -7,7 +7,7 @@ import {
   OcSupplierUserGroupService,
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import {Suppliers} from 'ordercloud-javascript-sdk';
@@ -59,5 +59,10 @@ export class SupplierService extends ResourceCrudService<Supplier> {
     const newResource = await this.middleware.updateSupplier(originalID, resource);
     this.updateResourceSubject(newResource)
     return newResource;
+  }
+
+  addIntrinsicListArgs(options: ListArgs): ListArgs {
+    options.sortBy = ["NAME"];
+    return options;
   }
 }

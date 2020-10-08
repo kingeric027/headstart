@@ -31,7 +31,7 @@ export class OCMImageGallery implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.imgUrls = this.images.map(i => i.Url);
-    if (changes.specs) {
+    if (changes.specs && changes.specs.currentValue) {
       this.onSpecsChange();
     }
   }
