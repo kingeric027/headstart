@@ -227,7 +227,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
 
   assignSupplierUser(email: string): void {
     this._supplierEditable?.xp?.NotificationRcpts ? null : this._supplierEditable.xp.NotificationRcpts = [];
-    const index = this._supplierEditable?.xp?.NotificationRcpts.indexOf(email);
+    const index = this._supplierEditable?.xp?.NotificationRcpts?.indexOf(email);
     if (index !== -1) {
       this.removeAddtlRcpt(index);
       return;
@@ -239,9 +239,9 @@ export class SupplierEditComponent implements OnInit, OnChanges {
 
   assignBuyer(buyerID: string): void {
     this._supplierEditable?.xp?.BuyersServicing ? null : this._supplierEditable.xp.BuyersServicing = [];
-    const index = (this._supplierEditable?.xp as any)?.BuyersServicing.indexOf(buyerID);
+    const index = this._supplierEditable?.xp?.BuyersServicing?.indexOf(buyerID);
     if (index !== -1) {
-      this.removeAddtlRcpt(index);
+      this.removeBuyerServicing(index);
       return;
     }
     const existingBuyersToService = this._supplierEditable?.xp?.BuyersServicing || [];

@@ -9,6 +9,12 @@ namespace Marketplace.Common.Services.Zoho.Models
         public List<ZohoContact> Items { get; set; }
     }
 
+    public class ZohoSingleContact : ZohoListResponse
+    {
+        [JsonProperty(PropertyName = "contact")]
+        public ZohoContact Item { get; set; }
+    }
+
     public class ZohoContact
     {
         public string contact_id { get; set; }
