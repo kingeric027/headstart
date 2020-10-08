@@ -30,6 +30,7 @@ export class OCMCheckoutAddress implements OnInit {
   constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { }
 
   async ngOnInit(): Promise<void> {
+    this.spinner.hide();
     this.selectedShippingAddress = this.lineItems?.Items[0].ShippingAddress;
     await this.listSavedShippingAddresses();
     await this.listSavedBuyerLocations();
@@ -53,12 +54,20 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   async saveAddressesAndContinue(newShippingAddress: Address = null): Promise<void> {
-    this.order = await this.context.order.checkout.setBuyerLocationByID(this.selectedBuyerLocation?.ID);
-    if (newShippingAddress != null) {
-      this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
+    try {
+      this.spinner.show();
+      this.order = await this.context.order.checkout.setBuyerLocationByID(this.selectedBuyerLocation?.ID);
+      if (newShippingAddress != null) {
+        this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
+      }
+      await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
+      
+      this.spinner.hide();
+      this.continue.emit();
+    } catch(e) {
+      this.spinner.hide();
+      throw e;
     }
-    await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
-    this.continue.emit();
   }
 
   private async listSavedBuyerLocations(): Promise<void> {
@@ -83,4 +92,5 @@ export class OCMCheckoutAddress implements OnInit {
       this.suggestedAddresses = getSuggestedAddresses(ex);
     }
   }
+
 }

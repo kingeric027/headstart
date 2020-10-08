@@ -1,4 +1,11 @@
   <ng-container *ngIf="!isLoading">
+    <ngx-spinner bdColor="rgba(255, 255, 255, 0.9)"
+                 color="var(--primary)"
+                 size="small"
+                 type="ball-spin-clockwise-fade"
+                 [fullScreen]="false">
+      <small>Loading Shipping Selections... (TEST LOADING)</small>
+    </ngx-spinner>
     <div class="form-group">
       <label for="selectBuyerLocation"
              translate>CHECKOUT.CHECKOUT_ADDRESS.BUYER_LOCATION</label>
@@ -38,21 +45,20 @@
         <!-- <option [ngValue]="NEW_ADDRESS_CODE"
                 translate>CHECKOUT.CHECKOUT_ADDRESS.NEW_ADDRESS</option> -->
       </select>
-      <!-- <div class="d-flex justify-content-between align-items-center"> -->
       <button (click)="showNewAddressForm = true"
               class="btn btn-outline-primary btn-sm mr-2 mt-3"
               translate>Add New Address</button>
       <button type="submit"
               *ngIf="!showNewAddressForm"
-              [disabled]="newShippingAddress == null"
+              [disabled]="!selectedShippingAddress"
               (click)="saveAddressesAndContinue()"
               class="btn btn-secondary btn-sm mr-2 mt-3"
               translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
-      <!-- </div> -->
     </div>
     <ocm-address-form *ngIf="showNewAddressForm"
                       [suggestedAddresses]="suggestedAddresses"
                       [showOptionToSave]="true"
+                      (formDismissed)="showNewAddressForm = false"
                       (formSubmitted)="saveAddressesAndContinue($event.detail.address)"
                       [homeCountry]="homeCountry"
                       [btnText]="'Save and Continue'">
