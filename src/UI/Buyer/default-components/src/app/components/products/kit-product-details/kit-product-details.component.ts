@@ -1,8 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MarketplaceMeKitProduct, MarketplaceMeProduct, MeProductInKit, VariantSpec } from '@ordercloud/headstart-sdk';
+import { NavigationEnd, Router } from '@angular/router';
+import { Asset, MarketplaceMeKitProduct, MarketplaceMeProduct, MeProductInKit, Variant, VariantSpec } from '@ordercloud/headstart-sdk';
 import { ShopperContextService } from 'marketplace';
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk';
+import { Subscription } from 'rxjs';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
@@ -12,16 +14,19 @@ import { SpecFormService } from '../spec-form/spec-form.service';
   templateUrl: './kit-product-details.component.html',
   styleUrls: ['./kit-product-details.component.scss']
 })
-export class OCMKitProductDetails implements OnInit {
+export class OCMKitProductDetails implements OnInit, OnDestroy {
   panelActiveIDs: string[]
   isAddingToCart = false;
   userCurrency: string;
   _product: MarketplaceMeKitProduct;
+  routeSubscription: Subscription;
 
   // holds everything about a product needed for this view, easily referenced by productID
   productDictionary: {
     [key: string]: {
       product: MarketplaceMeProduct;
+      images: Asset[];
+      imageUrl: string;
       priceBreaks: PriceBreak[];
       specs: Spec[];
       specForm: FormGroup;
@@ -31,33 +36,13 @@ export class OCMKitProductDetails implements OnInit {
       percentSavings?: number;
       isExpanded?: boolean;
       errorMessage?: string;
+      disabledVariants: Variant[];
     };
   } = {};
 
   @Input() set product(product: MarketplaceMeKitProduct) {
     this._product = product
-    this._product.ProductAssignments.ProductsInKit.forEach(p => {
-
-      // min/max qty flow down from kit (possibly put this in middleware)
-      const isOrderable = p.Product.PriceSchedule;
-      if (isOrderable) {
-        p.Product.PriceSchedule.MinQuantity = p.MinQty;
-        p.Product.PriceSchedule.MaxQuantity = p.MaxQty;
-      }
-
-      this.productDictionary[p.ID] = {
-        product: p.Product,
-        specs: p.Static ? this.filterStaticKitSpecs(p) : p.Specs,
-        priceBreaks: p.Product.PriceSchedule?.PriceBreaks ?? [],
-        specForm: {} as FormGroup,
-        quantity: p.Product.PriceSchedule?.PriceBreaks[0].Quantity,
-        quantityValid: true,
-        price: undefined,
-        percentSavings: undefined,
-        isExpanded: true
-      }
-      this.calculatePrice(p.ID);
-    })
+    this.setKitDetails();
 
     // expand all panels that have specs by default
     this.panelActiveIDs = this._product.ProductAssignments.ProductsInKit.filter(p => {
@@ -68,8 +53,52 @@ export class OCMKitProductDetails implements OnInit {
   constructor(
     private context: ShopperContextService,
     private specFormService: SpecFormService,
-    private productDetailService: ProductDetailService
-  ) { }
+    private productDetailService: ProductDetailService,
+    private router: Router
+  ) {
+    this.dontReuseComponent();
+  }
+
+  dontReuseComponent(): void {
+    // tell angular to reload the component on url changes - by default angular will try to reuse the same component
+    // so url will change but view won't change when we route to product detail of a product in the kit
+    this.router.routeReuseStrategy.shouldReuseRoute = (): boolean => false;
+    this.routeSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // Trick the Router into believing it's last link wasn't previously loaded
+        this.router.navigated = false;
+      }
+    });
+  }
+
+  setKitDetails(): void {
+    this._product.ProductAssignments.ProductsInKit.forEach(p => {
+
+      // min/max qty flow down from kit (possibly put this in middleware)
+      const isOrderable = p.Product.PriceSchedule;
+      if (isOrderable) {
+        p.Product.PriceSchedule.MinQuantity = p.MinQty;
+        p.Product.PriceSchedule.MaxQuantity = p.MaxQty;
+      }
+      const images = (p as any).Images as Asset[]; // TODO: remove this cast once types are generated
+      const appConfig = this.context.appSettings;
+      this.productDictionary[p.ID] = {
+        product: p.Product,
+        specs: p.Static ? this.filterStaticKitSpecs(p) : p.Specs,
+        images,
+        imageUrl: images && images.length ? `${appConfig.middlewareUrl}/assets/${appConfig.sellerID}/products/${p.ID}/thumbnail?size=S` : 'http://placehold.it/100x100',
+        priceBreaks: p.Product.PriceSchedule?.PriceBreaks ?? [],
+        specForm: {} as FormGroup,
+        quantity: p.Product.PriceSchedule?.PriceBreaks[0].Quantity,
+        quantityValid: true,
+        price: undefined,
+        percentSavings: undefined,
+        isExpanded: true,
+        disabledVariants: p.Variants.filter(v => !v.Active)
+      }
+      this.calculatePrice(p.ID);
+    })
+  }
 
   ngOnInit(): void {
     this.userCurrency = this.context.currentUser.get().Currency;
@@ -124,7 +153,9 @@ export class OCMKitProductDetails implements OnInit {
             this.buildStaticKitSpecs(kitDefinition) :
             this.specFormService.getLineItemSpecs(details.specs, details.specForm),
           xp: {
-            KitProductID: this._product.Product.ID // use this to group kit line items visually
+            ImageUrl: this.specFormService.getLineItemImageUrl(details.images, details.specs, details.specForm),
+            KitProductImageUrl: this._product.Images && this._product.Images.length ? this._product.Images[0].Url : null,
+            KitProductID: this._product.Product.ID // used to group kit line items during checkout
           }
         }
       })
@@ -161,6 +192,12 @@ export class OCMKitProductDetails implements OnInit {
 
   areQuantitesValid(): boolean {
     return !Object.values(this.productDictionary).find(details => !details.quantityValid)
+  }
+
+  ngOnDestroy(): void {
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
   }
 
 }

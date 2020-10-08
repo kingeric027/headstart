@@ -55,7 +55,7 @@ export class OCMProductDetails implements OnInit {
     private context: ShopperContextService,
     private productDetailService: ProductDetailService
   ) { }
-  
+
   @Input() set product(superProduct: SuperMarketplaceProduct) {
     this._superProduct = superProduct;
     this._product = superProduct.Product;
@@ -64,7 +64,7 @@ export class OCMProductDetails implements OnInit {
     this.isOrderable = !!superProduct.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
     this.specs = superProduct.Specs;
-      this.populateInactiveVariants(superProduct);
+    this.populateInactiveVariants(superProduct);
   }
 
   ngOnInit(): void {
@@ -79,7 +79,7 @@ export class OCMProductDetails implements OnInit {
     this.calculatePrice();
   }
 
-  onSelectionInactive(event: boolean){
+  onSelectionInactive(event: boolean) {
     this.isInactiveVariant = event;
   }
 
@@ -120,7 +120,7 @@ export class OCMProductDetails implements OnInit {
         Quantity: this.quantity,
         Specs: this.specFormService.getLineItemSpecs(this.specs, this.specForm),
         xp: {
-          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct, this.specForm)
+          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct.Images, this._superProduct.Specs, this.specForm)
         }
       });
     } finally {
@@ -176,7 +176,7 @@ export class OCMProductDetails implements OnInit {
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this.specs, this.specForm);
       lineItem.xp = {
-        ImageUrl: this.specFormService.getLineItemImageUrl(this._product, this.specForm),
+        ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct.Images, this._superProduct.Specs, this.specForm),
       };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;

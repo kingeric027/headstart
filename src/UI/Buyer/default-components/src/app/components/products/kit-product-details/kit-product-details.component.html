@@ -16,7 +16,10 @@
                        ngbPanelToggle>
             <div class="d-flex align-items-center justify-content-between">
               <div>
-                <div>{{productKitDetails.Product.Name}} | {{ productDictionary[productKitDetails.Product.ID].price | currency: userCurrency }} <span *ngIf="productKitDetails.MinQty === productKitDetails.MaxQty"> | (qty: {{ productKitDetails.MinQty }})</span></div>
+                <img [src]="productDictionary[productKitDetails.Product.ID].imageUrl"
+                     alt="{{'Image for ' + productKitDetails.Product.Name }}">
+                <div> <a (click)="context.router.toProductDetails(productKitDetails.Product.ID)"
+                     class="text-dark font-weight-medium line-height-1">{{ productKitDetails.Product.Name }}</a> | {{ productDictionary[productKitDetails.Product.ID].price | currency: userCurrency }} <span *ngIf="productKitDetails.MinQty === productKitDetails.MaxQty"> | (qty: {{ productKitDetails.MinQty }})</span></div>
                 <ocm-quantity-input *ngIf="productKitDetails.MinQty !== productKitDetails.MaxQty"
                                     [gridDisplay]="true"
                                     [product]="productKitDetails.Product"
@@ -36,6 +39,7 @@
           </ng-template>
           <ng-template ngbPanelContent>
             <ocm-spec-form *ngIf="productDictionary[productKitDetails.Product.ID]?.specs?.length > 0"
+                           [disabledVariants]="productDictionary[productKitDetails.Product.ID].disabledVariants"
                            [compact]="true"
                            [currency]="productKitDetails.Product?.xp?.Currency"
                            [specs]="productDictionary[productKitDetails.Product.ID].specs"
