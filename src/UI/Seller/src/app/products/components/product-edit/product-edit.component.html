@@ -221,31 +221,29 @@
                 <div class="card py-2 px-3 mt-3 bg-white">
                   <h6 class="font-weight-medium"
                       translate>ADMIN.PRODUCT_EDIT.INVENTORY_TRACKING</h6>
-                  <div class="form-row">
-                    <div class="form-group col-6">
-                      <div class="custom-control custom-checkbox">
-                        <input type="checkbox"
-                               class="custom-control-input"
-                               formControlName="InventoryEnabled"
-                               (input)="handleUpdateProduct($event, 'Product.Inventory.Enabled')"
-                               id="InventoryEnabled">
-                        <label class="custom-control-label"
-                               for="InventoryEnabled"
-                               translate>ADMIN.PRODUCT_EDIT.ENABLE_INVENTORY_TRACKING</label>
-                      </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             formControlName="InventoryEnabled"
+                             (input)="handleUpdateProduct($event, 'Product.Inventory.Enabled')"
+                             id="InventoryEnabled">
+                      <label class="custom-control-label"
+                             for="InventoryEnabled"
+                             translate>ADMIN.PRODUCT_EDIT.ENABLE_INVENTORY_TRACKING</label>
                     </div>
-                    <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled"
-                         class="form-group col-6">
-                      <div class="custom-control custom-checkbox">
-                        <input type="checkbox"
-                               class="custom-control-input"
-                               formControlName="OrderCanExceed"
-                               (input)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')"
-                               id="OrderCanExceed">
-                        <label class="custom-control-label"
-                               for="OrderCanExceed"
-                               translate>ADMIN.PRODUCT_EDIT.ORDER_CAN_EXCEED</label>
-                      </div>
+                  </div>
+                  <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled"
+                       class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             formControlName="OrderCanExceed"
+                             (input)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')"
+                             id="OrderCanExceed">
+                      <label class="custom-control-label"
+                             for="OrderCanExceed"
+                             translate>ADMIN.PRODUCT_EDIT.ORDER_CAN_EXCEED</label>
                     </div>
                   </div>
                   <div [ngbTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Your product must have a SKU before you can enable variants' : ''"
