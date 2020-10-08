@@ -11,8 +11,7 @@ export const ocAppConfig: AppConfig = {
   orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
   blobStorageUrl: environment.blobStorageUrl,
-  buyerUrl: environment.buyerUrl,
-  buyerClientID: environment.buyerClientID,
+  buyerConfigs: environment.buyerConfigs,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
@@ -135,8 +134,7 @@ export interface AppConfig {
   sellerName: string;
 
   //  buyer url and client ID are needed for impersonating buyers
-  buyerUrl: string;
-  buyerClientID: string;
+  buyerConfigs: any;
 
   /**
    * An array of security roles that will be requested upon login.
