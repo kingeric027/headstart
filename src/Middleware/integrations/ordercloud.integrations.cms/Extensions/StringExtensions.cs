@@ -15,10 +15,13 @@ namespace ordercloud.integrations.cms
 			if (mimeType.StartsWith("video/")) return AssetType.Video;
 
 			if (mimeType.Contains("pdf")) return AssetType.PDF;
-			if (mimeType.ContainsOneOf("presentation", "powerpoint", "slide")) return AssetType.Slides;
-			if (mimeType.ContainsOneOf("spread", "excel", "xls", "csv")) return AssetType.SpreadSheet;
+			if (mimeType.ContainsOneOf("presentation", "powerpoint", "slide", "keynote", "impress")) return AssetType.Presentation;
+			if (mimeType.ContainsOneOf("spread", "excel", "xls", "csv", "calc", "numbers")) return AssetType.SpreadSheet;
 			if (mimeType.ContainsOneOf("zip", "tar", "zlib", "zstd", "compressed", "7z")) return AssetType.Compressed;
 			if (mimeType.ContainsOneOf("html", "xml", "markdown", "yaml")) return AssetType.Markup;
+			if (mimeType.ContainsOneOf("video", "mplayer", "quicktime", "movie")) return AssetType.Video;
+			if (mimeType.ContainsOneOf("music")) return AssetType.Audio;
+
 			if (mimeType.ContainsOneOf("javascript")) return AssetType.Code;
 			if (mimeType.Contains("json")) return AssetType.JSON;
 
