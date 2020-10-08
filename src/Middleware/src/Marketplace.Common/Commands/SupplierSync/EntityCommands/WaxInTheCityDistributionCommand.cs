@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Models;
+using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -32,16 +34,32 @@ namespace Marketplace.Common.Commands.SupplierSync
                     ApiRole.FullAccess
                 }
             });
+            //7A8002F4-E22F-4A3A-A091-E8B531BB5010
+            //dwKGiqiqxBHILnzJSNgvpgMI4mBzVuJqJEt28AIZNCYWxL343st33v46kCL4
         }
 
         public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
-            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID, user.AccessToken);
+            var supplierOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID, user.AccessToken);
+            var supplierLineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, supplierOrder.ID, pageSize: 100, accessToken: user.AccessToken);
             var buyerOrder = await _ocSeller.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID.Split('-')[0]);
+            var buyerLineItems = await _ocSeller.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrder.ID);
 
-            var returnObject = new JObject();
-            returnObject.Add("Order", JToken.FromObject(order));
-            returnObject.Add("BuyerBillingAddress", JToken.FromObject(buyerOrder.BillingAddress));
+            var returnObject = new JObject
+            {
+                {"SupplierOrder", new JObject
+                {
+                    {"Order", JToken.FromObject(supplierOrder)},
+                    new JProperty("LineItems", JToken.FromObject(supplierLineItems))
+                }},
+                {"BuyerOrder", new JObject
+                {
+                    {"Order", JToken.FromObject(buyerOrder)},
+                    new JProperty("LineItems", JToken.FromObject(buyerLineItems))
+                }},
+                {"Order", JToken.FromObject(supplierOrder)},
+                {"BuyerBillingAddress", JToken.FromObject(buyerOrder.BillingAddress)}
+            };
             return JObject.FromObject(returnObject);
         }
 
