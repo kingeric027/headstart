@@ -127,14 +127,14 @@ namespace Marketplace.Common.Commands
 
             var integrationRequests = new List<Task<ProcessResult>>
             {
-                //SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet))
+                SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet))
             };
 
             // quote orders do not need to flow into our integrations
             if (IsStandardOrder(updatedMarketplaceOrderWorksheet))
             {
-                //integrationRequests.Add(SafeIntegrationCall(ProcessType.FreightPop, async () => await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders)));
-                //integrationRequests.Add(SafeIntegrationCall(ProcessType.Avalara, async () => await HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>())));
+                integrationRequests.Add(SafeIntegrationCall(ProcessType.FreightPop, async () => await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders)));
+                integrationRequests.Add(SafeIntegrationCall(ProcessType.Avalara, async () => await HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>())));
                 integrationRequests.Add(SafeIntegrationCall(ProcessType.Zoho, async () => await HandleZohoIntegration(updatedSupplierOrders, updatedMarketplaceOrderWorksheet)));
             }
 
@@ -213,7 +213,8 @@ namespace Marketplace.Common.Commands
         private async Task HandleZohoIntegration(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
         {
             var zoho_salesorder = await _zoho.CreateSalesOrder(updatedMarketplaceOrderWorksheet);
-            await _zoho.CreatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
+            //TODO: put into a throttler the lines below
+            await _zoho.CreateOrUpdatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
             await _zoho.CreateShippingPurchaseOrder(zoho_salesorder, updatedMarketplaceOrderWorksheet);
         }
 
