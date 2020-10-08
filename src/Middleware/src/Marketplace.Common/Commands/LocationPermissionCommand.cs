@@ -24,6 +24,7 @@ namespace Marketplace.Common.Commands
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string userGroupType, string parentID, string userID, VerifiedUserContext verifiedUser);
         Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
     }
 
     public class LocationPermissionCommand : ILocationPermissionCommand
@@ -196,6 +197,18 @@ namespace Marketplace.Common.Commands
                    accessToken: verifiedUser.AccessToken
                    ));
             }
+        }
+
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext verifiedUser)
+        {
+            var userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+                   buyerID,
+                   search: args.Search,
+                   filters: $"xp.Country={homeCountry}&xp.Type=BuyerLocation",
+                   page: args.Page,
+                   pageSize: 100
+                   );
+            return userGroups;
         }
     };
 }
