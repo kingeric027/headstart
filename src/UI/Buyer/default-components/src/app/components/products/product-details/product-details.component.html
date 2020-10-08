@@ -17,7 +17,8 @@
                              [favorite]="isFavorite()"
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
-        <div class="btn-group float-right"
+        <!-- TODO: Uncomment to have grid spec form option and fix related bugs
+          <div class="btn-group float-right" 
              *ngIf="specs?.length > 0">
           <button class="btn btn-sm btn-outline-secondary"
                   [ngClass]="{'active' : !showGrid}"
@@ -31,7 +32,7 @@
             <fa-icon [icon]="faTh">
             </fa-icon>
           </button>
-        </div>
+        </div> -->
       </div>
       <div *ngIf="supplierNote"
            class="alert alert-info my-3"><b>
@@ -54,9 +55,14 @@
             <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
                            [superProduct]="_superProduct"
                            [specs]="specs"
+                           [disabledVariants]="_disabledVariants"
                            [currency]="_product?.xp?.Currency"
-                           (specFormChange)="onSpecFormChange($event.detail)">
+                           (specFormChange)="onSpecFormChange($event.detail)"
+                           (isSelectionInactive)="onSelectionInactive($event.detail)">
             </ocm-spec-form>
+            <div *ngIf="this.isInactiveVariant">
+              <strong class="text-danger">This option is unavailable and cannot be added to the cart. Please make another selection.</strong>
+            </div>
             <div class="d-flex flex-column"
                  *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
               <div class="d-flex flex-row">
@@ -68,7 +74,7 @@
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
-                        [disabled]="!specForm?.valid || !qtyValid"
+                        [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                         (click)="openQuoteForm()"
                         translate>
                   PRODUCTS.DETAILS.REQ_QUOTE
@@ -76,7 +82,7 @@
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
-                        [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                        [disabled]="isAddingToCart || (specForm && !specForm?.valid)  || !qtyValid || isInactiveVariant"
                         (click)="addToCart()"
                         translate>
                   PRODUCTS.DETAILS.ADD_TO_CART
@@ -97,7 +103,7 @@
                 </ocm-modal>
               </div>
             </div>
-            <div *ngIf="!isOrderable"
+            <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
                  class="alert alert-info"
                  translate>
               PRODUCTS.DETAILS.VIEW_ONLY
@@ -182,10 +188,12 @@
         </div>
         <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
                        [specs]="specs"
+                       [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event.detail)">
+                       (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
-        <div *ngIf="!isOrderable"
+        <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
              class="alert alert-info"
              translate>
           PRODUCTS.DETAILS.VIEW_ONLY
@@ -200,15 +208,15 @@
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
-                  [disabled]="!specForm?.valid || !qtyValid"
+                  [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                   (click)="openQuoteForm()"
                   translate>
-            PRODUCTS.DETAILS.REQ_QUOTE
+            PRODUCTS.DETAILS.REQ_QUOTE sss
           </button>
           <button *ngIf="!isQuoteProduct()"
                   class="btn btn-block btn-primary"
                   type="submit"
-                  [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                  [disabled]="isAddingToCart || (specForm && !specForm?.valid) || !qtyValid"
                   (click)="addToCart($event)"
                   translate>
             PRODUCTS.DETAILS.ADD_TO_CART

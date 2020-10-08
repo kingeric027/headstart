@@ -49,7 +49,7 @@ export class ProductFilterService {
     const { page, sortBy, search, categoryID, showOnlyFavorites, activeFacets = {} } = this.activeFiltersSubject.value;
     const facets = _transform(
       activeFacets,
-      (result, value, key: any) => (result[`xp.Facets.${key.toLocaleLowerCase()}`] = value),
+      (result, value, key: any) => (result[`xp.Facets.${key}`] = value),
       {}
     );
     const favorites = this.currentUser.get().FavoriteProductIDs.join('|') || undefined;

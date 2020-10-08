@@ -258,5 +258,6 @@
 <ocm-category-dropdown (window:mouseup)="clickOutsideCategoryDropdown($event)"
                        (closeDropdown)="toggleCategoryDropdown($event.detail)"
                        [categories]="categories"
-                       *ngIf="showCategoryDropdown"></ocm-category-dropdown>
+                       *ngIf="showCategoryDropdown"
+                       style="position: fixed; height: 100vh; top: 0;"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->

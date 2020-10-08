@@ -1,7 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { OcProductFacetService, ProductFacet } from '@ordercloud/angular-sdk';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { OcProductFacetService, OcTokenService, Product, ProductFacet } from '@ordercloud/angular-sdk';
 import { omit as _omit } from 'lodash';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { cloneDeep } from 'lodash';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { MarketplaceProduct, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 
 @Component({
@@ -12,13 +16,25 @@ import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 export class ProductFilters implements OnInit{
   facetOptions: ProductFacet[];
   faCheckCircle = faCheckCircle;
+  sellerFilterOverride: boolean;
+  facetsOnProductStatic: any[];
+  facetsOnProductEditable: any[];
+  overriddenChanges: boolean;
+  savingOverriddenFilters: boolean;
 
-  @Input() facetsOnProduct: any = [];
+  @Input() set facetsOnProduct (facets: any[]) {
+    this.facetsOnProductStatic = cloneDeep(facets);
+    this.facetsOnProductEditable = facets;
+  };
   @Input() readonly = false;
+  @Input() superProduct: MarketplaceProduct;
   @Output() updatedFacets = new EventEmitter<any>();
 
   constructor(
     private ocFacetService: OcProductFacetService,
+    private ocTokenService: OcTokenService,
+    private http: HttpClient,
+    @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
   ngOnInit(): void {
@@ -26,41 +42,97 @@ export class ProductFilters implements OnInit{
   }
 
   async getFacets(): Promise<void> {
-    const facets = await this.ocFacetService.List().toPromise();
-    this.facetOptions = facets.Items.filter(f => f?.xp?.Options?.length);
+    let facetsListPage = await this.ocFacetService.List({ pageSize: 100 }).toPromise();
+    let facets = facetsListPage.Items;
+    if (facetsListPage.Meta.TotalPages > 1) {
+      for (let i = 2; i <= facetsListPage.Meta.TotalPages; i++) {
+        let additionalFacets = await this.ocFacetService.List({ pageSize: 100, page: i}).toPromise();
+        facets = facets.concat(additionalFacets.Items);
+      }
+    }
+    this.facetOptions = facets.filter(f => f?.xp?.Options?.length);
   }
 
   areFacetOptionsSelected(facet: ProductFacet): boolean {
     const productXpFacetKey = facet?.XpPath.split('.')[1];
-    return Object.keys(this.facetsOnProduct).includes(productXpFacetKey);
+    return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey);
   }
 
   isFacetOptionApplied(facet: ProductFacet, option: string): boolean {
     const productXpFacetKey = facet?.XpPath.split('.')[1];
-    const facetOptionsOnProduct = this.facetsOnProduct[productXpFacetKey];
+    const facetOptionsOnProduct = this.facetsOnProductEditable[productXpFacetKey];
     const isFacetOptionApplied = facetOptionsOnProduct && facetOptionsOnProduct.includes(option);
     return isFacetOptionApplied;
   }
 
   toggleFacetOption(facet: ProductFacet, option: string): void {
     const productXpFacetKey = facet?.XpPath.split('.')[1];
-    let facetOnXp = this.facetsOnProduct[productXpFacetKey];
-    delete this.facetsOnProduct[productXpFacetKey];
-    // If the key doesn't exist on Product.xp.Facets, initialize it as an empty array
+    let facetOnXp = this.facetsOnProductEditable[productXpFacetKey];
+    delete this.facetsOnProductEditable[productXpFacetKey];
     if (!facetOnXp) {
-      facetOnXp = [] 
+      facetOnXp = []; 
     }
-    
-    // If the facet in quetsion includes the option requested, remove it from the array, else add it.
     if(facetOnXp.includes(option)) {
       facetOnXp = facetOnXp.filter(o => o !== option);
+      this.facetsOnProductEditable = { ...this.facetsOnProductEditable, [productXpFacetKey]: facetOnXp};
     } else {
       facetOnXp.push(option);
     }
-    
     if (facetOnXp.length > 0) {
-      this.facetsOnProduct = { ...this.facetsOnProduct, [productXpFacetKey]: facetOnXp}
+      this.facetsOnProductEditable = { ...this.facetsOnProductEditable, [productXpFacetKey]: facetOnXp};
     };
-    this.updatedFacets.emit(this.facetsOnProduct);
+    if (!this.readonly) {
+      this.updatedFacets.emit(this.facetsOnProductEditable);
+    } else {
+      this.overrideFacets();
+    }
+  }
+
+  overrideFacets(): void {
+    if (this.checkForFacetOverrides()) {
+      this.overriddenChanges = true;
+    } else {
+      this.overriddenChanges = false;
+    }
+  }
+
+  toggleSellerFilterOverride(): void {
+    this.overriddenChanges = false;
+    this.sellerFilterOverride = !this.sellerFilterOverride;
+    if (!this.sellerFilterOverride) {
+      this.facetsOnProductEditable = cloneDeep(this.facetsOnProductStatic);
+    }
+  }
+
+  checkForFacetOverrides(): boolean {
+    const keys = Object.keys(this.facetsOnProductStatic);
+    let changeDetected = false;
+    keys.forEach(key => {
+      if (this.facetsOnProductEditable[key]?.length !== this.facetsOnProductStatic[key]?.length ||
+          !this.facetsOnProductEditable[key].every(item => this.facetsOnProductStatic[key].includes(item))) {
+        changeDetected = true;
+      }
+    });
+    return changeDetected;
+  }
+
+  async saveFilterOverrides(): Promise<void> {
+    this.savingOverriddenFilters = true;
+    (this.superProduct.xp as any).Facets = this.facetsOnProductEditable;
+        //TO-DO - replace with SDK
+    const url = `${this.appConfig.middlewareUrl}/products/filteroptionoverride/${this.superProduct.ID}`;
+    const product = await this.http.patch<Product>(url, this.superProduct, { headers: this.buildHeaders() }).toPromise();
+    this.superProduct = product;
+    this.facetsOnProductStatic = cloneDeep(product.xp.Facets);
+    this.facetsOnProductEditable = cloneDeep(product.xp.Facets);
+    this.sellerFilterOverride = false;
+    this.savingOverriddenFilters = false;
+  }
+
+  private buildHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
   }
 }

@@ -584,7 +584,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     if (superMarketplaceProduct.Product.xp.Tax.Category === null) superMarketplaceProduct.Product.xp.Tax = null;
-    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null) superMarketplaceProduct.PriceSchedule = null;
+    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null) superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price = 0;
     return await HeadStartSDK.Products.Post(superMarketplaceProduct);
   }
 

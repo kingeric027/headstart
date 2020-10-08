@@ -7,7 +7,7 @@ import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Wax In The City',
+  appname: 'Waxing The City',
   clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',

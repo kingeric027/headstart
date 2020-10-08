@@ -88,7 +88,7 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${userOrgID}/usergroupassignments/${userID}`;
+    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${this.userGroupType}/${userOrgID}/usergroupassignments/${userID}`;
         //TO-DO - Replace with SDK
     const userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
     this._userUserGroupAssignmentsStatic = userGroupAssignments;
