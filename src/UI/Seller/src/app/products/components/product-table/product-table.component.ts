@@ -72,7 +72,8 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
       return {
         Display: 'ADMIN.FILTERS.SUPPLIER',
         Path: 'DefaultSupplierID',
-        Items: supplierFilterOptions
+        Items: supplierFilterOptions,
+        Type: 'Dropdown'
       }
   }
 }
