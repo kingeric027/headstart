@@ -84,22 +84,23 @@ export class ProductPricingComponent {
   }
 
   getBuyerPercentMarkupPrice(supplierPrice: number): number {
-    const markupMultiplier = (this.selectedSuperMarketplaceBuyer?.Markup?.Percent || 0)/100 + 1; 
+    const markupMultiplier = (this.selectedSuperMarketplaceBuyer?.Markup?.Percent || 0) / 100 + 1;
     const conversionRate = this.supplierToSellerCurrencyRate * markupMultiplier;
-    return Math.round(supplierPrice * conversionRate);
+    return supplierPrice * conversionRate;
+
   }
 
   updateSupplierPriceSchedule(event: PriceSchedule): void {
-    this.updateProduct.emit({field: 'PriceSchedule', value: event});
+    this.updateProduct.emit({ field: 'PriceSchedule', value: event });
   }
-  
+
   updateOverridePriceSchedule(event: PriceSchedule): void {
     this.overridePriceScheduleEditable = event;
     this.diffBuyerVisibility();
   }
 
   diffBuyerVisibility(): void {
-    if(!this.isSavedOverride && this.isUsingPriceOverride) {
+    if (!this.isSavedOverride && this.isUsingPriceOverride) {
       this.areChangesToBuyerVisibility = true;
     } else if (this.isSavedOverride && !this.isUsingPriceOverride) {
       this.areChangesToBuyerVisibility = true;

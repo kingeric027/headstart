@@ -54,6 +54,7 @@ namespace Marketplace.Common.Models.Marketplace
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
         public MarketplaceProduct Product { get; set; }
+        public IList<Asset> Images { get; set; }
     }
 
     [SwaggerModel]
@@ -67,6 +68,7 @@ namespace Marketplace.Common.Models.Marketplace
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
         public MarketplaceMeProduct Product { get; set; }
+        public IList<Asset> Images { get; set; }
     }
 
 }

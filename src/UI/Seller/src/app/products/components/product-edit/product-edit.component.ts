@@ -181,7 +181,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.createProductForm(this._superMarketplaceProductEditable);
-    if (this.userContext?.UserType === "SELLER") {
+    if (this.userContext?.UserType === 'SELLER') {
       this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable.Product.DefaultSupplierID).toPromise();
       this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
     }
@@ -189,11 +189,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges();
   }
 
-  
+
   specsBeingEdited(event): void {
     this.isSpecsEditing = event;
   }
-  
+
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
     if (superMarketplaceProduct.Product) {
       this.productForm = new FormGroup({
@@ -201,7 +201,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
         ID: new FormControl(superMarketplaceProduct.Product.ID),
         Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(2000)),
-        Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
         ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
         ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight),
@@ -217,6 +216,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         IsResale: new FormControl({ value: _get(superMarketplaceProduct.Product, 'xp.IsResale'), disabled: this.readonly }),
         QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
         InventoryEnabled: new FormControl({ value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'), disabled: this.readonly }),
+        VariantLevelTracking: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.VariantLevelTracking'), null),
         OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
@@ -227,21 +227,39 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }, { validators: ValidateMinMax }
       );
       this.setInventoryValidator();
+      this.setVariantLevelTrackingDisabledSubscription();
       this.setNonRequiredFields();
       this.setResourceType();
     }
   }
 
-  setInventoryValidator() {
+  setInventoryValidator(): void {
     const quantityControl = this.productForm.get('QuantityAvailable');
+    const variantLevelTrackingControl = this.productForm.get('VariantLevelTracking');
     this.productForm.get('InventoryEnabled').valueChanges
-      .subscribe(inventory => {
-        if (inventory) {
+      .pipe(takeWhile(() => this.alive)).subscribe(inventory => {
+        if (inventory && variantLevelTrackingControl.value === false) {
           quantityControl.setValidators([Validators.required, Validators.min(1)]);
         } else {
           quantityControl.setValidators(null);
         }
         quantityControl.updateValueAndValidity()
+      })
+  }
+
+  setVariantLevelTrackingDisabledSubscription(): void {
+    const variantLevelTrackingControl = this.productForm.get('VariantLevelTracking');
+    // Set initial state to disabled
+    if (this.isCreatingNew) {
+      variantLevelTrackingControl.disable();
+    }
+    this.productForm.get('ID').valueChanges
+      .pipe(takeWhile(() => this.alive)).subscribe(id => {
+        if (id) {
+          variantLevelTrackingControl.enable();
+        } else {
+          variantLevelTrackingControl.disable();
+        }
       })
   }
 
@@ -311,7 +329,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async getAvailableProductTypes(): Promise<void> {
     const supplier = await this.currentUserService.getMySupplier();
-    this.availableProductTypes = supplier?.xp?.ProductTypes || ["Standard", "Quote", "PurchaseOrder", "Kit"];
+    this.availableProductTypes = supplier?.xp?.ProductTypes || ['Standard', 'Quote', 'PurchaseOrder', 'Kit'];
   }
 
   async handleSave(): Promise<void> {
@@ -379,7 +397,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const productUpdate = {
       field,
       value:
-        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed', 'Product.xp.ArtworkRequired'].includes(field)
+        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed', 'Product.Inventory.VariantLevelTracking', 'Product.xp.ArtworkRequired'].includes(field)
           ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);
@@ -436,14 +454,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges();
   }
 
-  async uploadAsset(productID: string, file: FileHandle, assetType: string): Promise<SuperMarketplaceProduct> {
+  async uploadAsset(productID: string, file: FileHandle, isAttachment = false): Promise<SuperMarketplaceProduct> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    const asset: AssetUpload = {
+    const asset = {
       Active: true,
+      Title: isAttachment ? 'Product_Attachment' : null,
       File: file.File,
-      Type: (assetType as AssetUpload['Type']),
       FileName: file.Filename
-    }
+    } as AssetUpload;
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
     await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
     return await HeadStartSDK.Products.Get(productID, accessToken);
@@ -452,7 +470,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, 'Attachment');
+      superProduct = await this.uploadAsset(productID, file, true);
     }
     this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -463,7 +481,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async addImages(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, 'Image');
+      superProduct = await this.uploadAsset(productID, file);
     }
     this.imageFiles = []
     //  need to copy the object so object.assign does not modify target
@@ -584,7 +602,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`;
     if (superMarketplaceProduct.Product.xp.Tax.Category === null) superMarketplaceProduct.Product.xp.Tax = null;
-    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null) superMarketplaceProduct.PriceSchedule = null;
+    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null) superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price = 0;
     return await HeadStartSDK.Products.Post(superMarketplaceProduct);
   }
 

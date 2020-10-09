@@ -25,14 +25,8 @@ namespace ordercloud.integrations.cms
 				.FirstOrDefault(method => method.Name == "GetAsync" && method.IsGenericMethod == false);
 			var paramCount = getMethod.GetParameters().Length;
 			var parameters = paramCount == 2 ? new object[] { resource.ResourceID, null } : new object[] { resource.ParentResourceID, resource.ResourceID, null };
-			try
-			{
-				await (Task)getMethod.Invoke(sdk, parameters);
-			} catch (Exception ex)
-			{
-				if (ex.Message == "username is required.") throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient()
-				throw ex;
-			}
+				
+			await (Task)getMethod.Invoke(sdk, parameters);
 		}
 
 		// Used to confirm resource exists and user has WRITE access
@@ -44,14 +38,8 @@ namespace ordercloud.integrations.cms
 			var paramInfo = getMethod.GetParameters();
 			var emptyPatch = Activator.CreateInstance(paramInfo[paramInfo.Length - 2].ParameterType);
 			var parameters = paramInfo.Length == 3 ? new object[] { resource.ResourceID, emptyPatch, null } : new object[] { resource.ParentResourceID, resource.ResourceID, emptyPatch, null };
-			try
-			{
-				await (Task)getMethod.Invoke(sdk, parameters);
-			} catch (Exception ex)
-			{
-				if (ex.Message == "username is required.") throw new TokenExpiredException(); // TODO - this is really a bug with MultiTenantOCClient() 
-				throw ex;
-			}
+			
+			await (Task)getMethod.Invoke(sdk, parameters);
 		}
 
 		public static ListPage<T> Empty<T>(this ListPage<T> list)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ordercloud.integrations.library;
 using ordercloud.integrations.cms;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
 namespace Marketplace.Models
 {
@@ -20,7 +21,7 @@ namespace Marketplace.Models
         public List<Filter> Items { get; set; }
         public bool AllowSupplierEdit { get; set; }
         public bool AllowSellerEdit { get; set; }
-        public BuyerAppFilterType BuyerAppFilterType { get; set; }
+        public string BuyerAppFilterType { get; set; }
     }
 
     [SwaggerModel]
@@ -30,10 +31,10 @@ namespace Marketplace.Models
         public string Value {get; set; }
     }
 
-    public enum BuyerAppFilterType
+    public class BuyerAppFilterType
     {
-       SelectOption,
-       NonUI
+        public const string SelectOption = "SelectOption";
+        public const string NonUI = "NonUI";
     }
 
 }

@@ -7,7 +7,7 @@ import bmTheme from '../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'The Barre Method',
+  appname: 'The Bar Method',
   clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
   baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',

@@ -25,7 +25,7 @@
 		"testcafe": "^1.9.0",
 		"testcafe-reporter-html": "^1.4.4",
 		"testcafe-reporter-testcafe-to-testrail": "^1.0.0-alpha.0",
-		"@ordercloud/headstart-sdk": "^1.7.2",
+		"@ordercloud/headstart-sdk": "^1.8.3",
 		"@applitools/eyes-testcafe": "^1.9.0"
 	}
 }

@@ -2,7 +2,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { OrderListColumn } from '../../../models/order-list-column';
 import { ShopperContextService, OrderViewContext } from 'marketplace';
-import { ListPage } from 'ordercloud-javascript-sdk';
+import { ListPage, Order } from 'ordercloud-javascript-sdk';
 import { isQuoteOrder } from '../../../services/orderType.helper';
 import { MarketplaceOrder } from '@ordercloud/headstart-sdk';
 
@@ -41,6 +41,15 @@ export class OCMOrderList {
 
   changePage(page: number): void {
     this.changedPage.emit(page);
+  }
+
+  getOrderStatus(order: Order): string {
+    //AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
+    if (order?.Status === "AwaitingApproval") {
+      return "AwaitingApproval"
+    } else {
+      return order?.xp?.SubmittedOrderStatus;
+    }
   }
 
   isFavorite(orderID: string): boolean {

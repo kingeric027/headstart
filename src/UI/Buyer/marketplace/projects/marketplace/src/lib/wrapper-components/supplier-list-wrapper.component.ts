@@ -21,7 +21,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     public context: ShopperContextService,
     private tempSdk: TempSdk
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.setUpData();
@@ -35,6 +35,7 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
     this.suppliers = this.activatedRoute.snapshot.data.products;
     await this.getSupplierCategories();
     this.setSupplierCountryIfNeeded();
+    this.setBuyerFilterIfNeeded();
     this.context.supplierFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange);
@@ -57,5 +58,9 @@ export class SupplierListWrapperComponent implements OnInit, OnDestroy {
     ) {
       this.context.supplierFilters.setNonURLFilter('xp.CountriesServicing', this.context.currentUser.get().xp.Country);
     }
+  }
+
+  private setBuyerFilterIfNeeded(): void {
+    this.context.supplierFilters.setNonURLFilter('xp.BuyersServicing', this.context.currentUser.get().Buyer.ID);
   }
 }

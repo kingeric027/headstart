@@ -7,7 +7,13 @@ import { t } from 'testcafe'
 import randomString from '../helpers/random-string'
 
 export async function deleteProduct(productID: string, clientAuth: string) {
-	await HeadStartSDK.Products.Delete(productID, clientAuth)
+	//put in try/catch because seeing some random 500 errors when deleting product
+	//with middleware. The product gets deleted, but still throws error
+	try {
+		await HeadStartSDK.Products.Delete(productID, clientAuth)
+	} catch (e) {
+		console.log('Error deleting product')
+	}
 }
 
 export async function getProductID(productName: string, clientAuth: string) {
