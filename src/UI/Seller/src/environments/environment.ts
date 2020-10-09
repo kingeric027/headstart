@@ -12,6 +12,23 @@ export const environment = {
   blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
   orderCloudApiVersion: 'v1',
-  buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
-  buyerClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  buyerConfigs: {
+    'Anytime Fitness': {
+      clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+      buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+    },
+    'Basecamp Fitness': {
+      clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+      buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+    },
+    'The Bar Method': {
+      clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+      buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+    },
+    'Waxing The City': {
+      clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+      buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+    }
+  }
 };
+
