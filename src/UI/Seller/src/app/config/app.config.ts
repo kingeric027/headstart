@@ -52,7 +52,6 @@ export const ocAppConfig: AppConfig = {
     'SupplierUserAdmin',
     'SupplierUserGroupAdmin',
     'SupplierAddressAdmin',
-    'SupplierAddressReader',
     'AdminUserAdmin',
     'ProductFacetAdmin',
     'ProductFacetReader',
