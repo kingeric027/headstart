@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 import { Component, ChangeDetectorRef, NgZone, OnInit } from '@angular/core';
 import { Product, OcSupplierService } from '@ordercloud/angular-sdk';
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
@@ -25,17 +24,11 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
     ngZone: NgZone,
   ) {
     super(changeDetectorRef, productService, router, activatedRoute, ngZone);
-    //  this.getUserContext(currentUserService);
     this.buildFilterConfig();
   }
 
-  // async getUserContext(currentUserService: CurrentUserService): Promise<void> {
-  //   this.userContext = await currentUserService.getUserContext();
-  // }
-
   async buildFilterConfig(): Promise<void> {
     this.userContext = await this.currentUserService.getUserContext();
-    debugger;
 
     this.filterConfig = {
       Filters: [

@@ -77,7 +77,6 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
       assignment => !JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID) ||
         !JSON.stringify(this.kitProductCatalogAssignments).includes(assignment.CatalogID)
     );
-    debugger;
     this.del = this._productCatalogAssignmentsStatic.filter(
       assignment => !JSON.stringify(this._productCatalogAssignmentsEditable).includes(assignment.CatalogID)
     );
