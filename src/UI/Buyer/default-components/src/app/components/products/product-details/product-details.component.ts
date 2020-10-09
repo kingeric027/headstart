@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
+import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
 import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant } from '@ordercloud/headstart-sdk';
@@ -50,6 +50,7 @@ export class OCMProductDetails implements OnInit {
   specForm: FormGroup;
   isInactiveVariant: boolean;
   _disabledVariants: MarketplaceVariant[];
+  variantInventory: number;
   constructor(
     private specFormService: SpecFormService,
     private context: ShopperContextService,
@@ -76,7 +77,21 @@ export class OCMProductDetails implements OnInit {
 
   onSpecFormChange(event: SpecFormEvent): void {
     this.specForm = event.form;
+    if (this._superProduct?.Product?.Inventory?.Enabled && this._superProduct?.Product?.Inventory?.VariantLevelTracking) {
+      this.variantInventory = this.getVariantInventory();
+    }
     this.calculatePrice();
+  }
+
+  getVariantInventory(): number {
+    let specCombo = "";
+    let specOptions: SpecOption[] = [];
+    this._superProduct?.Specs?.forEach(s => s.Options.forEach(o => specOptions = specOptions.concat(o)));
+    for (var i = 0; i < this.specForm.value.ctrls.length; i++) {
+      const matchingOption = specOptions.find(o => o.Value === this.specForm.value.ctrls[i])
+      i === 0 ? specCombo += matchingOption.ID : specCombo += `-${matchingOption.ID}`
+    }
+    return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
   }
 
   onSelectionInactive(event: boolean) {

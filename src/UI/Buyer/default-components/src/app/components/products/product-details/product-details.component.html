@@ -70,7 +70,8 @@
                                     (qtyChange)="qtyChange($event.detail)"
                                     [product]="_product"
                                     [priceSchedule]="_product.PriceSchedule"
-                                    [gridDisplay]="showGrid">
+                                    [gridDisplay]="showGrid"
+                                    [variantInventory]="variantInventory">
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
@@ -191,7 +192,7 @@
                        [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event.detail)">
-                       (isSelectionInactive)="onSelectionInactive($event)">
+          (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable || _product.xp.ProductType === 'Quote'"
              class="alert alert-info"
@@ -204,7 +205,8 @@
                               style="max-width: 100px"
                               (qtyChange)="qtyChange($event.detail)"
                               [product]="_product"
-                              [priceSchedule]="priceSchedule">
+                              [priceSchedule]="priceSchedule"
+                              [variantInventory]="variantInventory">
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"

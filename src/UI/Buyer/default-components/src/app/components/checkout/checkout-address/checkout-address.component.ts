@@ -4,6 +4,7 @@ import { ShopperContextService } from 'marketplace';
 import { MarketplaceOrder, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk';
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
+import { NgxSpinnerService } from 'ngx-spinner';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
 // Goal is to get all the checkout logic and state into one component. 
@@ -21,14 +22,15 @@ export class OCMCheckoutAddress implements OnInit {
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
-  
+
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListPage<LineItem>;
   @Output() continue = new EventEmitter();
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { }
 
   async ngOnInit(): Promise<void> {
+    this.spinner.hide();
     this.selectedShippingAddress = this.lineItems?.Items[0].ShippingAddress;
     await this.listSavedShippingAddresses();
     await this.listSavedBuyerLocations();
@@ -52,12 +54,20 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   async saveAddressesAndContinue(newShippingAddress: Address = null): Promise<void> {
-    this.order = await this.context.order.checkout.setBuyerLocationByID(this.selectedBuyerLocation?.ID);
-    if (newShippingAddress != null) {
-      this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
+    try {
+      this.spinner.show();
+      this.order = await this.context.order.checkout.setBuyerLocationByID(this.selectedBuyerLocation?.ID);
+      if (newShippingAddress != null) {
+        this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
+      }
+      await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
+      
+      this.spinner.hide();
+      this.continue.emit();
+    } catch(e) {
+      this.spinner.hide();
+      throw e;
     }
-    await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
-    this.continue.emit();
   }
 
   private async listSavedBuyerLocations(): Promise<void> {
@@ -69,7 +79,7 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   private async listSavedShippingAddresses(): Promise<void> {
-    this.existingShippingAddresses = await this.context.addresses.list({ filters: { Shipping: true }});
+    this.existingShippingAddresses = await this.context.addresses.list({ filters: { Shipping: true } });
   }
 
   private async saveNewShippingAddress(address: BuyerAddress): Promise<MarketplaceAddressBuyer> {
@@ -82,4 +92,5 @@ export class OCMCheckoutAddress implements OnInit {
       this.suggestedAddresses = getSuggestedAddresses(ex);
     }
   }
+
 }
