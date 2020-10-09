@@ -31,7 +31,7 @@ class UserDetailsPage {
 		)
 		this.confirmButton = Selector('button').withText(createRegExp('confirm'))
 		this.countryDropdown = Selector('#Country')
-		this.locationAssignments = Selector('user-group-assignments')
+		this.locationAssignments = Selector('user-group-assignments').find('tr')
 	}
 
 	async createDefaultVendorUser() {
@@ -122,7 +122,7 @@ class UserDetailsPage {
 
 		await t.click(this.createButton)
 
-		await loadingHelper.waitForTwoLoadingBars()
+		await loadingHelper.waitForLoadingBar()
 
 		return email
 	}
@@ -136,6 +136,7 @@ class UserDetailsPage {
 	}
 
 	async updateUserPermissions() {
+		await t.debug()
 		const permissionToggles = this.userGroupAssignments
 			.find('input')
 			.withAttribute('type', 'checkbox')
