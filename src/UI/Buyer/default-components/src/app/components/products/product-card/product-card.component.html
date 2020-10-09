@@ -1,16 +1,20 @@
-<div class="card mb-5 w-100 border-hover cursor-pointer">
+<div class="card card-hover border-hover mb-5 w-100 cursor-pointer">
+
   <div class="ribbon ribbon-top-right bg-light">
     <ocm-toggle-favorite title="Favorite"
                          (click)="$event.stopPropagation()"
                          [favorite]="_isFavorite"
                          (favoriteChanged)="setIsFavorite($event.detail)"></ocm-toggle-favorite>
   </div>
-  <div class="d-flex flex-fill flex-column"
-       (click)="toDetails()">
-    <img class="card-img-top img-fluid flex-shrink-0"
-         [src]="getImageUrl()"
-         alt="{{ _product.ID }}" />
-    <div class="card-body bg-light">
+  <a class="clickable-card d-flex flex-fill flex-column"
+     name="{{_product.Name}}"
+     (click)="toDetails()">
+    <figure class="card-img-top">
+      <img class="img-fluid w-100"
+           [src]="getImageUrl()"
+           alt="{{ _product.ID }}" />
+    </figure>
+    <div class="card-body">
       <h5 class="card-title"
           title="{{ _product.Name }}">{{_product.Name}}
       </h5>
@@ -19,7 +23,7 @@
         {{ _product.ID }}
       </small>
       <p class="card-text">{{_product?.xp?.Facets?.supplier && _product?.xp?.Facets?.supplier[0]}}</p>
-      <div class="d-flex flex-wrap justify-content-between align-items-center">
+      <div class="d-flex flex-wrap justify-content-between align-items-center card-price">
         <p class="card-text mb-0"
            *ngIf="_product.PriceSchedule?.PriceBreaks">
           {{ _price | currency: _userCurrency }}
@@ -30,11 +34,10 @@
                translate>PRODUCTS.CARD.QUANTITY</label>
       </div>
     </div>
-  </div>
+  </a>
   <div class="card-footer"
        *ngIf="showAddToCart()">
-    <ocm-quantity-input class="w-50"
-                        id="quantity"
+    <ocm-quantity-input id="quantity"
                         [existingQty]="null"
                         [product]="_product"
                         [priceSchedule]="_product.PriceSchedule"
@@ -42,7 +45,7 @@
     </ocm-quantity-input>
     <button (click)="$event.stopPropagation()"
             [disabled]="isAddingToCart || !qtyValid"
-            class="btn btn-outline-secondary btn-block small mt-2"
+            class="btn btn-outline-secondary btn-block btn-sm"
             type="submit"
             (click)="addToCart()"
             translate>

@@ -21,7 +21,7 @@
                   <ng-container *ngFor="let filter of _supplierFilterConfig">
                     <div *ngIf="filter.BuyerAppFilterType === 'SelectOption'"
                          class="group">
-                      <select class="form-control input-sm"
+                      <select class="custom-select input-sm"
                               type="select"
                               required
                               [formControlName]="filter.Path">
