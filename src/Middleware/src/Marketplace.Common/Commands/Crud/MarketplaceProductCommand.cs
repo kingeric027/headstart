@@ -251,6 +251,8 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
 		{
+			// Update the Product itself
+			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// Two spec lists to compare (requestSpecs and existingSpecs)
 			IList<Spec> requestSpecs = superProduct.Specs.ToList();
 			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
@@ -321,8 +323,6 @@ namespace Marketplace.Common.Commands.Crud
 			{
 				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
 			}
-			// Update the Product itself
-			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
 			// List Product Specs
