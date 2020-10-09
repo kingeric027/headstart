@@ -17,7 +17,7 @@ export class OCMSupplierCard {
   constructor(private context: ShopperContextService, private domSanitizer: DomSanitizer) {}
 
   shopSupplier(supplier: Supplier): void {
-    this.context.router.toProductList({ activeFacets: { Supplier: supplier.Name.toLocaleLowerCase() } });
+    this.context.router.toProductList({ activeFacets: { supplier: supplier.Name.toLocaleLowerCase() } });
   }
   getSupplierDescription(): SafeHtml {
     if (this._supplier && this._supplier?.xp) {
