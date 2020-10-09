@@ -67,7 +67,7 @@ export async function createSupplier(clientAuth: string) {
 			Currency: 'USD',
 			Description: '',
 			Images: [],
-			ProductTypes: ['Standard'],
+			ProductTypes: ['Standard', 'Quote', 'PurchaseOrder'],
 			SupportContact: {
 				Name: '',
 				Email: '',

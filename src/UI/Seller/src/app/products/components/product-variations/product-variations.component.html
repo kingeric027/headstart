@@ -194,9 +194,13 @@
                     translate>ADMIN.PRODUCT_EDIT.DETAILS</th>
                 <th *ngFor="let spec of specsWithVariations; let i = index"
                     scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
-                <th scope="col" translate>ADMIN.PRODUCT_EDIT.ACTIVE</th>
+                <th scope="col"
+                    translate>ADMIN.PRODUCT_EDIT.ACTIVE</th>
                 <th scope="col"
                     translate>ADMIN.PRODUCT_EDIT.SKU</th>
+                <th *ngIf="superProductEditable?.Product?.Inventory?.VariantLevelTracking"
+                    scope="col"
+                    translate>ADMIN.PRODUCT_EDIT.INVENTORY</th>
                 <th scope="col"
                     translate>ADMIN.PRODUCT_EDIT.TOTAL_MARKUP</th>
               </tr>
@@ -219,19 +223,19 @@
                   </td>
                   <td>
                     <div *ngIf="readonly"
-                    class="chip supplier-facet-chip readonly active">{{getVariantStatusDisplay(variant)}}
-                 <fa-icon [icon]="faCheckCircle"></fa-icon>
-               </div>
-               <div *ngIf="!readonly"
-                    class="
+                         class="chip supplier-facet-chip readonly active">{{getVariantStatusDisplay(variant)}}
+                      <fa-icon [icon]="faCheckCircle"></fa-icon>
+                    </div>
+                    <div *ngIf="!readonly"
+                         class="
                        chip
                        editable
                        supplier-facet-chip"
-                    (click)="toggleActive(variant)"
-                    [ngClass]="{'active': variant.Active}">{{getVariantStatusDisplay(variant)}}
-                 <fa-icon *ngIf="variant.Active"
-                          [icon]="faCheckCircle"></fa-icon>
-               </div>
+                         (click)="toggleActive(variant)"
+                         [ngClass]="{'active': variant.Active}">{{getVariantStatusDisplay(variant)}}
+                      <fa-icon *ngIf="variant.Active"
+                               [icon]="faCheckCircle"></fa-icon>
+                    </div>
                   </td>
                   <td>
                     <div class="input-group-sm">
@@ -240,6 +244,16 @@
                              [disabled]="readonly || variant === variantInSelection"
                              (change)="updateSku($event, i)"
                              [value]="variant?.xp?.NewID || variant?.ID">
+                    </div>
+                  </td>
+                  <td *ngIf="superProductEditable?.Product?.Inventory?.VariantLevelTracking">
+                    <div class="input-group-sm">
+                      <input class="form-control input-sm"
+                             type="number"
+                             min="0"
+                             [disabled]="readonly || variant === variantInSelection"
+                             (change)="updateVariantInventory($event, i)"
+                             [value]="variant?.Inventory?.QuantityAvailable">
                     </div>
                   </td>
                   <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency: myCurrency?.Currency}}</td>

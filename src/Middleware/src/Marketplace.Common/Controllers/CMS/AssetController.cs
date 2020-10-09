@@ -82,12 +82,12 @@ namespace Marketplace.CMS.Controllers
 			await _assetedResources.DeleteAssignment(assignment, VerifiedUserContext);
 		}
 
-		[DocName("Reorder Asset Assignment"), OrderCloudIntegrationsAuth]
-		[HttpPost, Route("assignments/moveto/{listOrderWithinType}")]
-		public async Task ReorderAssetAssignment(int listOrderWithinType, [FromBody] AssetAssignment assignment)
+		[DocName("Move Image Assignment"), OrderCloudIntegrationsAuth]
+		[HttpPost, Route("assignments/moveto/{newPosition}")]
+		public async Task MoveImageAssignment(int newPosition, [FromBody] AssetAssignment assignment)
 		{
 			RequireOneOf(CustomRole.AssetAdmin);
-			await _assetedResources.MoveAssignment(assignment, listOrderWithinType, VerifiedUserContext);
+			await _assetedResources.MoveImageAssignment(assignment, newPosition, VerifiedUserContext);
 		}
 
 		[DocName("List Assets Assigned to Resource")]
