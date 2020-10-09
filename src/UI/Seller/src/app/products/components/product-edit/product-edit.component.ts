@@ -181,7 +181,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.taxCodeCategorySelected = this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null;
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.createProductForm(this._superMarketplaceProductEditable);
-    if (this.userContext?.UserType === "SELLER") {
+    if (this.userContext?.UserType === 'SELLER') {
       this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable.Product.DefaultSupplierID).toPromise();
       this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
     }
@@ -311,7 +311,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async getAvailableProductTypes(): Promise<void> {
     const supplier = await this.currentUserService.getMySupplier();
-    this.availableProductTypes = supplier?.xp?.ProductTypes || ["Standard", "Quote", "PurchaseOrder", "Kit"];
+    this.availableProductTypes = supplier?.xp?.ProductTypes || ['Standard', 'Quote', 'PurchaseOrder', 'Kit'];
   }
 
   async handleSave(): Promise<void> {
@@ -436,14 +436,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges();
   }
 
-  async uploadAsset(productID: string, file: FileHandle, assetType: string): Promise<SuperMarketplaceProduct> {
+  async uploadAsset(productID: string, file: FileHandle, isAttachment = false): Promise<SuperMarketplaceProduct> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    const asset: AssetUpload = {
+    const asset = {
       Active: true,
+      Title: isAttachment ? 'Product_Attachment' : null,
       File: file.File,
-      Type: (assetType as AssetUpload['Type']),
       FileName: file.Filename
-    }
+    } as AssetUpload;
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
     await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
     return await HeadStartSDK.Products.Get(productID, accessToken);
@@ -452,7 +452,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async addDocuments(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, 'Attachment');
+      superProduct = await this.uploadAsset(productID, file, true);
     }
     this.staticContentFiles = [];
     // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -463,7 +463,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async addImages(files: FileHandle[], productID: string): Promise<void> {
     let superProduct;
     for (const file of files) {
-      superProduct = await this.uploadAsset(productID, file, 'Image');
+      superProduct = await this.uploadAsset(productID, file);
     }
     this.imageFiles = []
     //  need to copy the object so object.assign does not modify target

@@ -122,7 +122,7 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
-			var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
+			var attachments = assets.Items.Where(a => a.Title == "Product_Attachment").ToList();
 			return attachments;
 		}
 

@@ -16,7 +16,7 @@ namespace ordercloud.integrations.cms
 		Task<string> GetThumbnail(Resource resource, ThumbSize size, string sellerID);
 		Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user);
 		Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user);
-		Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user);
+		Task MoveImageAssignment(AssetAssignment assignment, int newPosition, VerifiedUserContext user);
 	}
 
 	public class AssetedResourceQuery : IAssetedResourceQuery
@@ -41,9 +41,7 @@ namespace ordercloud.integrations.cms
 			var assetedResource = await GetExisting(resource, user.SellerID);
 			if (assetedResource == null) return new ListPage<Asset>().Empty();
 			var assetIDs = assetedResource.ImageAssetIDs
-				.Concat(assetedResource.ThemeAssetIDs)
-				.Concat(assetedResource.AttachmentAssetIDs)
-				.Concat(assetedResource.StructuredAssetsIDs)
+				.Concat(assetedResource.AllOtherAssetIDs)
 				.ToList();
 			var assets = await _assets.ListByInternalIDs(assetIDs, args);
 			var items = assets.Items.Select(a => {
@@ -90,13 +88,14 @@ namespace ordercloud.integrations.cms
 			await _store.UpdateAsync(assetedResource);
 		}
 
-		public async Task MoveAssignment(AssetAssignment assignment, int listOrderWithinType, VerifiedUserContext user)
+		public async Task MoveImageAssignment(AssetAssignment assignment, int newPosition, VerifiedUserContext user)
 		{
 			assignment.Validate();
 			await new OrderCloudClientWithContext(user).EmptyPatch(assignment);
 			var asset = await _assets.GetDO(assignment.AssetID, user);
+			if (asset.Type != AssetType.Image) throw new ReorderImagesOnlyException();
 			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
-			GetAssetIDs(assetedResource, asset.Type).MoveTo(asset.id, listOrderWithinType);
+			assetedResource.ImageAssetIDs.MoveTo(asset.id, newPosition);
 			await _store.UpdateAsync(assetedResource);
 		}
 
@@ -122,9 +121,8 @@ namespace ordercloud.integrations.cms
 
 		private List<string> GetAssetIDs(AssetedResourceDO assetedResource, AssetType assetType)
 		{
-			var property = assetedResource.GetType().GetProperty($"{assetType}AssetIDs");
-			var list = (List<string>)property.GetValue(assetedResource, null) ?? new List<string>();
-			return list;
+			if (assetType == AssetType.Image) return assetedResource.ImageAssetIDs;
+			return assetedResource.AllOtherAssetIDs;
 		}
 
 		private string GetPlaceholderImageUrl(ResourceType type)
