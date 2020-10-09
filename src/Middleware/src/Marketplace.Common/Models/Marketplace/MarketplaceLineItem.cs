@@ -19,6 +19,7 @@ namespace Marketplace.Models.Models.Marketplace
         // kit specific fields
         public string KitProductImageUrl { get; set; }
         public string KitProductID { get; set; }
+        public string KitProductName { get; set; }
     }
 
     [SwaggerModel]

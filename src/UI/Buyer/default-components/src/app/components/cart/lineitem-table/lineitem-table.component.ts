@@ -15,12 +15,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class OCMLineitemTable implements OnInit {
   closeIcon = faTimes;
   faTrashAlt = faTrashAlt;
-  @Input() set lineItems(value: MarketplaceLineItem[]) {
-    this._lineItems = value;
-    this.sortLineItems(this._lineItems);
-    const liGroups = _groupBy(value, li => li.ShipFromAddressID);
-    this.liGroupedByShipFrom = Object.values(liGroups);
-    this.sortLineItemGroups(this.liGroupedByShipFrom);
+  @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
+    this._lineItems = lineItems;
+    this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(lineItems);
+    this.liGroupedByKit = this.groupLineItemsByKitID(lineItems)
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
   @Input() orderType: OrderType;
@@ -28,9 +26,11 @@ export class OCMLineitemTable implements OnInit {
   @Input() hideStatus = false;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
+  liGroupedByKit: MarketplaceLineItem[][];
   updatingLiIDs: string[] = [];
   _lineItems = [];
   _orderCurrency: string;
+  showKitDetails = true;
 
   constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) {
     this._orderCurrency = this.context.currentUser.get().Currency;
@@ -40,12 +40,37 @@ export class OCMLineitemTable implements OnInit {
     this.spinner.show(); // visibility is handled by *ngIf
   }
 
+  toggleKitDetails(): void {
+    this.showKitDetails = !this.showKitDetails;
+  }
+
+  groupLineItemsByKitID(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
+    const kitLineItems = lineItems.filter(li => li.xp.KitProductID);
+    const liKitGroups = _groupBy(kitLineItems, li => li.xp.KitProductID);
+    return Object.values(liKitGroups);
+  }
+
+  groupLineItemsByShipFrom(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
+    const supplierLineItems = lineItems.filter(li => !li.xp.KitProductID);
+    const liGroups = _groupBy(supplierLineItems, li => li.ShipFromAddressID);
+    return Object.values(liGroups)
+      .sort((a, b) => {
+        const nameA = a[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
+        const nameB = b[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
+        return nameA.localeCompare(nameB);
+      });
+  }
+
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(liGroups);
   }
 
   removeLineItem(lineItemID: string): void {
     this.context.order.cart.remove(lineItemID);
+  }
+
+  removeKit(kitProductID: string): void {
+    this.context.order.cart
   }
 
   toProductDetails(productID: string): void {
@@ -75,22 +100,6 @@ export class OCMLineitemTable implements OnInit {
 
   getLineItem(lineItemID: string): MarketplaceLineItem {
     return this._lineItems.find(li => li.ID === lineItemID);
-  }
-
-  sortLineItems(lineItems: MarketplaceLineItem[]): void {
-    this._lineItems = lineItems.sort((a, b) => {
-      const nameA = a.Product.Name.toUpperCase(); // ignore upper and lowercase
-      const nameB = b.Product.Name.toUpperCase(); // ignore upper and lowercase
-      return nameA.localeCompare(nameB);
-    });
-  }
-
-  sortLineItemGroups(liGroups: MarketplaceLineItem[][]): void {
-    this.liGroupedByShipFrom = liGroups.sort((a, b) => {
-      const nameA = a[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
-      const nameB = b[0].ShipFromAddressID.toUpperCase(); // ignore upper and lowercase
-      return nameA.localeCompare(nameB);
-    })
   }
 
   hasReturnInfo(): boolean {
