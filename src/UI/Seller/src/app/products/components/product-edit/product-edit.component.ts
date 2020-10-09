@@ -189,11 +189,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges();
   }
 
-  
+
   specsBeingEdited(event): void {
     this.isSpecsEditing = event;
   }
-  
+
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
     if (superMarketplaceProduct.Product) {
       this.productForm = new FormGroup({
@@ -201,7 +201,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         Name: new FormControl(superMarketplaceProduct.Product.Name, [Validators.required, Validators.maxLength(100)]),
         ID: new FormControl(superMarketplaceProduct.Product.ID),
         Description: new FormControl(superMarketplaceProduct.Product.Description, Validators.maxLength(2000)),
-        Inventory: new FormControl(superMarketplaceProduct.Product.Inventory),
         QuantityMultiplier: new FormControl(superMarketplaceProduct.Product.QuantityMultiplier),
         ShipFromAddressID: new FormControl(superMarketplaceProduct.Product.ShipFromAddressID, Validators.required),
         ShipHeight: new FormControl(superMarketplaceProduct.Product.ShipHeight),
@@ -217,6 +216,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         IsResale: new FormControl({ value: _get(superMarketplaceProduct.Product, 'xp.IsResale'), disabled: this.readonly }),
         QuantityAvailable: new FormControl(superMarketplaceProduct.Product?.Inventory?.QuantityAvailable, null),
         InventoryEnabled: new FormControl({ value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'), disabled: this.readonly }),
+        VariantLevelTracking: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.VariantLevelTracking'), null),
         OrderCanExceed: new FormControl(_get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')),
         TaxCodeCategory: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Category', null), Validators.required),
         TaxCode: new FormControl(_get(superMarketplaceProduct.Product, 'xp.Tax.Code', null), Validators.required),
@@ -227,21 +227,39 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }, { validators: ValidateMinMax }
       );
       this.setInventoryValidator();
+      this.setVariantLevelTrackingDisabledSubscription();
       this.setNonRequiredFields();
       this.setResourceType();
     }
   }
 
-  setInventoryValidator() {
+  setInventoryValidator(): void {
     const quantityControl = this.productForm.get('QuantityAvailable');
+    const variantLevelTrackingControl = this.productForm.get('VariantLevelTracking');
     this.productForm.get('InventoryEnabled').valueChanges
-      .subscribe(inventory => {
-        if (inventory) {
+      .pipe(takeWhile(() => this.alive)).subscribe(inventory => {
+        if (inventory && variantLevelTrackingControl.value === false) {
           quantityControl.setValidators([Validators.required, Validators.min(1)]);
         } else {
           quantityControl.setValidators(null);
         }
         quantityControl.updateValueAndValidity()
+      })
+  }
+
+  setVariantLevelTrackingDisabledSubscription(): void {
+    const variantLevelTrackingControl = this.productForm.get('VariantLevelTracking');
+    // Set initial state to disabled
+    if (this.isCreatingNew) {
+      variantLevelTrackingControl.disable();
+    }
+    this.productForm.get('ID').valueChanges
+      .pipe(takeWhile(() => this.alive)).subscribe(id => {
+        if (id) {
+          variantLevelTrackingControl.enable();
+        } else {
+          variantLevelTrackingControl.disable();
+        }
       })
   }
 
@@ -379,7 +397,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const productUpdate = {
       field,
       value:
-        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed', 'Product.xp.ArtworkRequired'].includes(field)
+        ['Product.Active', 'Product.Inventory.Enabled', 'Product.Inventory.OrderCanExceed', 'Product.Inventory.VariantLevelTracking', 'Product.xp.ArtworkRequired'].includes(field)
           ? event.target.checked : typeOfValue === 'number' ? Number(event.target.value) : event.target.value
     };
     this.updateProductResource(productUpdate);

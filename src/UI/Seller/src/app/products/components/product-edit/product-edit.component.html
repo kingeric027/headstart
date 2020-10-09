@@ -238,7 +238,6 @@
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox"
                              class="custom-control-input"
-                             [resourceForm]="resourceForm"
                              formControlName="OrderCanExceed"
                              (input)="handleUpdateProduct($event, 'Product.Inventory.OrderCanExceed')"
                              id="OrderCanExceed">
@@ -247,7 +246,22 @@
                              translate>ADMIN.PRODUCT_EDIT.ORDER_CAN_EXCEED</label>
                     </div>
                   </div>
-                  <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled"
+                  <div [ngbTooltip]="!_superMarketplaceProductEditable?.Product?.ID ? 'Your product must have a SKU before you can enable variants' : ''"
+                       placement="bottom-left"
+                       *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled"
+                       class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox"
+                             class="custom-control-input"
+                             formControlName="VariantLevelTracking"
+                             (input)="handleUpdateProduct($event, 'Product.Inventory.VariantLevelTracking')"
+                             id="VariantLevelTracking">
+                      <label class="custom-control-label"
+                             for="VariantLevelTracking"
+                             translate>Track inventory for each individual variation</label>
+                    </div>
+                  </div>
+                  <div *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled && !_superMarketplaceProductEditable?.Product?.Inventory?.VariantLevelTracking"
                        class="form-group w-50">
                     <label for="QuantityAvailable"
                            translate>ADMIN.PRODUCT_EDIT.QUANTITY_AVAILABLE</label>
@@ -264,6 +278,17 @@
                       <div class="input-group-append"><span class="input-group-text rounded-right">units</span></div>
                     </div>
                   </div>
+                  <ng-container *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.VariantLevelTracking">
+                    <p class="mb-0"
+                       translate>ADMIN.PRODUCT_EDIT.QUANTITY_AVAILABLE</p>
+                    <a [fragment]="variants"
+                       class="text-muted cursor-pointer"
+                       translate
+                       (click)="active = 5"
+                       (click)="tabChanged({nextId: 5}, _superMarketplaceProductEditable?.Product?.ID)">
+                      Edit variant quantities
+                    </a>
+                  </ng-container>
                 </div>
                 <!-- /Inventory Tracking -->
                 <!-- Tax Categorization -->

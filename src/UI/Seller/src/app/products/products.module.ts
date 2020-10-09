@@ -11,10 +11,10 @@ import { ProductVariations } from './components/product-variations/product-varia
 import { ProductFilters } from './components/product-filters/product-filters.component';
 import { ProductPricingComponent } from './components/product-pricing/product-pricing.component';
 import { PriceBreakEditor } from './components/price-break-editor/price-break-editor.component';
-import { NgbTabset, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTabset, NgbModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-  imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule, NgbModule],
+  imports: [SharedModule, ProductsRoutingModule, PerfectScrollbarModule, NgbModule, NgbTooltipModule],
   declarations: [
     ProductTableComponent,
     ProductEditComponent,
