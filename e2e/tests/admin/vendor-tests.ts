@@ -99,6 +99,7 @@ test.after(async t => {
 	await t.expect(await minorResourcePage.resourceExists(warehouseName)).ok()
 })
 
+//failing because of: https://four51.atlassian.net/browse/SEB-1065
 test('Assign Roles to Vendor User | 19970', async t => {
 	await adminHeaderPage.selectVendorUsers()
 	await minorResourcePage.selectParentResourceDropdown(t.fixtureCtx.supplierID)
