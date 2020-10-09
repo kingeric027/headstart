@@ -84,7 +84,7 @@
                translate>PROFILE.ADDRESS_FORM.STATE</label>
         <select *ngIf="stateOptions.length !== 0"
                 formControlName="State"
-                class="form-control"
+                class="custom-select"
                 id="State"
                 showErrors>
           <option [ngValue]="null"
@@ -121,7 +121,7 @@
                for="country"
                translate>PROFILE.ADDRESS_FORM.COUNTRY</label>
         <select formControlName="Country"
-                class="form-control"
+                class="custom-select"
                 id="Country"
                 showErrors
                 disabled
@@ -170,9 +170,9 @@
   </div>
   <div class="d-flex justify-content-start align-items-center">
     <button type="submit"
-            class="btn btn-primary btn-sm mr-2">{{ btnText }}</button>
+            class="btn btn-secondary btn-sm mr-2">{{ btnText }}</button>
     <button type="button"
-            class="btn btn-link text-danger"
+            class="btn btn-sm btn-outline-danger"
             (click)="dismissForm()"
             translate>PROFILE.ADDRESS_FORM.CANCEL</button>
   </div>

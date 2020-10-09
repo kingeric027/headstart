@@ -10,20 +10,19 @@
       </ocm-shipping-selection-form>
     </ocm-lineitem-table>
   </div>
-  <div class="d-flex justify-content-start align-items-center">
-    <button *ngIf="!_areAllShippingSelectionsMade"
-            type="submit"
-            disabled="'true'"
-            class="btn btn-primary btn-sm mr-2"
-            translate>
-      CHECKOUT.CHECKOUT_SHIPPING.SHIPPING_SPEED
-    </button>
-    <button *ngIf="_areAllShippingSelectionsMade"
-            type="submit"
-            class="btn btn-primary btn-sm mr-2"
-            (click)="onContinueClicked()"
-            translate>
-      CHECKOUT.CHECKOUT_SHIPPING.SAVE_CONTINUE
-    </button>
-  </div>
+  <p *ngIf="!_areAllShippingSelectionsMade"
+     class="mb-0 font-italic text-danger"
+     translate>
+    <fa-icon class="fa-sm"
+             aria-hidden="true"
+             [icon]="faExclamationCircle"></fa-icon>
+    CHECKOUT.CHECKOUT_SHIPPING.SHIPPING_SPEED
+  </p>
+  <button *ngIf="_areAllShippingSelectionsMade"
+          type="submit"
+          class="btn btn-secondary btn-sm mr-2"
+          (click)="onContinueClicked()"
+          translate>
+    CHECKOUT.CHECKOUT_SHIPPING.SAVE_CONTINUE
+  </button>
 </div>
