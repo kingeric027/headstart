@@ -44,7 +44,6 @@ export class ProductFilters implements OnInit{
   async getFacets(): Promise<void> {
     let facetsListPage = await this.ocFacetService.List({ pageSize: 100 }).toPromise();
     let facets = facetsListPage.Items;
-    console.log('what are the facets', facets);
     if (facetsListPage.Meta.TotalPages > 1) {
       for (let i = 2; i <= facetsListPage.Meta.TotalPages; i++) {
         let additionalFacets = await this.ocFacetService.List({ pageSize: 100, page: i}).toPromise();
@@ -52,13 +51,10 @@ export class ProductFilters implements OnInit{
       }
     }
     this.facetOptions = facets.filter(f => f?.xp?.Options?.length);
-    console.log('what are the facet options', this.facetOptions);
   }
 
   areFacetOptionsSelected(facet: ProductFacet): boolean {
     const productXpFacetKey = facet?.XpPath.split('.')[1];
-    console.log('this.facetsOnProductEditable', this.facetsOnProductEditable);
-    console.log('evaluate', Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey));
     return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey) && this.facetsOnProductEditable[productXpFacetKey].length;
   }
 
