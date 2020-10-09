@@ -72,7 +72,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   fromDate: string;
   toDate: string;
   resourceType: string | null = null;
-  
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -81,33 +81,33 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     private impersonationService: ImpersonationService,
     private currentUserService: CurrentUserService,
     ngZone: NgZone
-    ) {}
-    
-    @Input()
-    resourceList: ListPage<any> = { Meta: {}, Items: [] };
-    @Input()
-    set ocService(service: ResourceCrudService<any>) {
-      this._ocService = service;
-      this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
-      this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
-    }
-    @Input()
-    parentResourceService?: ResourceCrudService<any>;
-    @Output()
-    searched: EventEmitter<any> = new EventEmitter();
-    @Output()
-    hitScrollEnd: EventEmitter<any> = new EventEmitter();
-    @Output()
-    changesSaved: EventEmitter<any> = new EventEmitter();
-    @Output()
-    resourceDelete: EventEmitter<any> = new EventEmitter();
-    @Output()
-    changesDiscarded: EventEmitter<any> = new EventEmitter();
-    @Output()
-    resourceSelected: EventEmitter<any> = new EventEmitter();
-    @Input()
-    set updatedResource(value: any) {
-      this._updatedResource = value;
+  ) { }
+
+  @Input()
+  resourceList: ListPage<any> = { Meta: {}, Items: [] };
+  @Input()
+  set ocService(service: ResourceCrudService<any>) {
+    this._ocService = service;
+    this._currentResourceNamePlural = service.secondaryResourceLevel || service.primaryResourceLevel;
+    this._currentResourceNameSingular = singular(this._currentResourceNamePlural);
+  }
+  @Input()
+  parentResourceService?: ResourceCrudService<any>;
+  @Output()
+  searched: EventEmitter<any> = new EventEmitter();
+  @Output()
+  hitScrollEnd: EventEmitter<any> = new EventEmitter();
+  @Output()
+  changesSaved: EventEmitter<any> = new EventEmitter();
+  @Output()
+  resourceDelete: EventEmitter<any> = new EventEmitter();
+  @Output()
+  changesDiscarded: EventEmitter<any> = new EventEmitter();
+  @Output()
+  resourceSelected: EventEmitter<any> = new EventEmitter();
+  @Input()
+  set updatedResource(value: any) {
+    this._updatedResource = value;
     if (this._resourceInSelection && this._updatedResource && this._ocService)
       this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
@@ -115,7 +115,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   set resourceInSelection(value: any) {
     this._resourceInSelection = value;
     if (this._resourceInSelection && this._updatedResource && this._ocService)
-    this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
+      this.areChanges = this._ocService.checkForChanges(this._updatedResource, this._resourceInSelection);
   }
   @Input()
   selectedResourceID: string;
@@ -128,7 +128,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   resourceForm: FormGroup;
   @Input()
   shouldShowCreateNew = true;
-  @Input() 
+  @Input()
   shouldShowTitleContainer = true;
   @Input()
   shouldShowResourceActions = true;
@@ -159,13 +159,13 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   async getAvailableProductTypes(): Promise<void> {
     const supplier = await this.currentUserService.getMySupplier();
     const formattedSupplierProductTypes = supplier?.xp?.ProductTypes
-    .map(pt => {
-      const link = pt.match(/[A-Z][a-z]+/g).map(t => t.toLowerCase()).join('-');
-      return {
-        Display: `${pt.match(/[A-Z][a-z]+/g).join(' ')} Product`,
-        Link: link
-      }
-    });
+      .map(pt => {
+        const link = pt.match(/[A-Z][a-z]+/g).map(t => t.toLowerCase()).join('-');
+        return {
+          Display: `${pt.match(/[A-Z][a-z]+/g).join(' ')} Product`,
+          Link: link
+        }
+      });
     this.availableProductTypes = formattedSupplierProductTypes || [];
   }
 
@@ -247,7 +247,7 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
     this.shouldDisplayList = this.router.url.includes('locations') || this.router.url.includes('users');
     const routeParams = this.activatedRoute.snapshot.params
     this.canImpersonateResource = routeParams.buyerID && routeParams.userID;
-    if(this.isMyResource) {
+    if (this.isMyResource) {
       const resource = await this._ocService.getMyResource();
       this.selectedParentResourceName = resource.Name;
     }
@@ -402,9 +402,9 @@ export class ResourceTableComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   getHeaderText(resourceInSelection: any): string {
-    return resourceInSelection.Name || 
-      resourceInSelection.Username || 
-      resourceInSelection.AddressName || 
+    return resourceInSelection.Name ||
+      resourceInSelection.Username ||
+      resourceInSelection.AddressName ||
       resourceInSelection.AppName
   }
 

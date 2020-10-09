@@ -7,6 +7,32 @@
              translate>ADMIN.PRODUCT_EDIT.CONFIGURE_STOREFRONT_FILTERS</p>
         </div>
       </div>
+      <div *ngIf="readonly">
+        <button *ngIf="!sellerFilterOverride"
+                class="btn btn-primary mb-3"
+                type="button"
+                (click)="toggleSellerFilterOverride()"
+                translate>
+          ADMIN.PRODUCT_EDIT.OVERRIDE_FILTERS
+        </button>
+        <button *ngIf="sellerFilterOverride"
+                 class="btn btn-outline-primary mb-3"
+                 type="button"
+                 (click)="toggleSellerFilterOverride()"
+                 translate>
+          ADMIN.PRODUCT_EDIT.CANCEL_OVERRIDE
+        </button>
+        <button *ngIf="sellerFilterOverride && overriddenChanges"
+                class="btn btn-primary ml-3 mb-3"
+                type="button"
+                [disabled]="savingOverriddenFilters"
+                (click)="saveFilterOverrides()">
+            <span *ngIf="!savingOverriddenFilters"
+                translate>ADMIN.PRODUCT_EDIT.SAVE_CHANGES</span>
+            <span *ngIf="savingOverriddenFilters"
+                  translate>ADMIN.PRODUCT_EDIT.SAVING</span>
+        </button>
+      </div>
       <div class="row">
         <div class="col-md-12">
           <perfect-scrollbar style="width: 100%; max-height: 350px;">
@@ -25,11 +51,12 @@
                     </td>
                     <td>
                       <ng-container *ngFor="let option of facet?.xp?.Options">
-                        <div *ngIf="readonly && isFacetOptionApplied(facet, option)"
+                        <div *ngIf="readonly && isFacetOptionApplied(facet, option) && !sellerFilterOverride"
                              class="chip supplier-facet-chip readonly active">{{option}}
-                          <fa-icon [icon]="faCheckCircle"></fa-icon>
+                          <fa-icon *ngIf="!readonly || sellerFilterOverride"
+                                    [icon]="faCheckCircle"></fa-icon>
                         </div>
-                        <div *ngIf="!readonly"
+                        <div *ngIf="!readonly || sellerFilterOverride"
                              class="
                                 chip
                                 editable

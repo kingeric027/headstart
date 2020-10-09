@@ -43,10 +43,11 @@ namespace Marketplace.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName, 
-                _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
+			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
+              _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
 
-			var avalaraConfig = new AvalaraConfig()
+
+            var avalaraConfig = new AvalaraConfig()
 			{
 				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
 				AccountID = _settings.AvalaraSettings.AccountID,
@@ -83,6 +84,8 @@ namespace Marketplace.API
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
                 .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()

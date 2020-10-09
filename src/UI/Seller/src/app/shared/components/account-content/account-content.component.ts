@@ -89,6 +89,7 @@ setUpSubs(): void {
       Username: new FormControl(me.Username),
       RequestInfoEmails: new FormControl(_get(me, 'xp.RequestInfoEmails')),
       OrderEmails: new FormControl(_get(me, 'xp.OrderEmails')),
+      ProductEmails: new FormControl(_get(me, 'xp.ProductEmails')),
       AddtlRcpts: new FormControl(_get(me, 'xp.AddtlRcpts')),
     });
   }

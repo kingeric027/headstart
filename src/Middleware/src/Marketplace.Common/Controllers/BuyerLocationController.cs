@@ -106,10 +106,10 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("LIST all of a user's user group assignments")]
-        [HttpGet, Route("{buyerID}/usergroupassignments/{userID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
-        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string buyerID, string userID)
+        [HttpGet, Route("{userGroupType}/{parentID}/usergroupassignments/{userID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string userGroupType, string parentID, string userID)
         {
-            return await _locationPermissionCommand.ListUserUserGroupAssignments(buyerID, userID, VerifiedUserContext);
+            return await _locationPermissionCommand.ListUserUserGroupAssignments(userGroupType, parentID, userID, VerifiedUserContext);
         }
 
         [DocName("LIST user groups for home country")]
@@ -117,6 +117,13 @@ namespace Marketplace.Common.Controllers
         public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID)
         {
             return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, userID, VerifiedUserContext);
+        }
+
+        [DocName("LIST user groups for new user")]
+        [HttpGet, Route("{buyerID}/{homeCountry}/usergroups"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry)
+        {
+            return await _locationPermissionCommand.ListUserGroupsForNewUser(args, buyerID, homeCountry, VerifiedUserContext);
         }
     }
 }

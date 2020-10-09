@@ -18,11 +18,9 @@ export class StaticPageService {
     try {
       const pageList = await HeadStartSDK.Documents.ListDocuments('cms-page-schema', 'ApiClients', this.appConfig.clientID)
       this.pages = pageList.Items;
-      console.log(this.pages);
     } catch (e) {
       // might not be an error if its just not configured
       this.pages = [];
-      console.log('error retrieving static pages');
     }
   }
 }

@@ -571,7 +571,8 @@
         <ng-template ngbNavContent>
           <product-filters-component [readonly]="readonly"
                                      (updatedFacets)="updateProductResource({field: 'Product.xp.Facets', value: $event})"
-                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []">
+                                     [facetsOnProduct]="_superMarketplaceProductEditable?.Product?.xp?.Facets || []"
+                                     [superProduct]="_superMarketplaceProductEditable?.Product">
           </product-filters-component>
         </ng-template>
       </li>
@@ -594,7 +595,8 @@
                                         [copyProductResource]="copyProductResource"
                                         [myCurrency]="supplierCurrency"
                                         (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                        (variantsValidated)="validateVariants($event)">
+                                        (variantsValidated)="validateVariants($event)"
+                                        (isSpecsEditing)="specsBeingEdited($event)">
           </product-variations-component>
         </ng-template>
       </li>
@@ -692,7 +694,7 @@
             </div>
             <div class="row pt-3 mt-5 border-top">
               <div class="col-md-5">
-                <h5 translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_PRODUCT</h5>
+                <h5 translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_PRODUCTS</h5>
                 <p class="font-italic"
                    translate>ADMIN.PRODUCT_EDIT.DOCUMENTS_DESC</p>
               </div>
@@ -792,7 +794,8 @@
   </form>
   <!-- TODO: 2/2 Abstract into component to be used anywhere using inputs and outputs -->
   <div *ngIf="userContext?.UserType === 'SUPPLIER'"
-       class="d-flex justify-content-between align-items-center py-2">
+       class="d-flex justify-content-between align-items-center py-2"
+       style="position: relative;">
     <delete-confirm-modal-component *ngIf="!isCreatingNew"
                                     buttonText="ADMIN.NAV.PRODUCT"
                                     (deleteConfirmed)="handleDelete($event)">
@@ -802,14 +805,14 @@
          class="text-danger"
          translate>ADMIN.PRODUCT_EDIT.VARIATION_ISSUES</p>
       <div>
-        <button *ngIf="areChanges"
+        <button *ngIf="areChanges && !isSpecsEditing"
                 class="btn btn-primary"
                 type="submit"
                 [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
-                *ngIf="areChanges && !isCreatingNew"
+                *ngIf="areChanges && !isCreatingNew && !isSpecsEditing"
                 translate>COMMON.DISCARD_CHANGES</button>
       </div>
     </div>

@@ -9,6 +9,7 @@ import {
   faBoxOpen,
   faHome,
   faBars,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Category } from 'ordercloud-javascript-sdk';
@@ -55,6 +56,7 @@ export class OCMAppHeader implements OnInit {
   faUserCircle = faUserCircle;
   faHome = faHome;
   faBars = faBars;
+  faTimes = faTimes;
   faBoxOpen = faBoxOpen;
   flagIcon: string;
 
@@ -100,7 +102,7 @@ export class OCMAppHeader implements OnInit {
   }
 
   clickOutsideCategoryDropdown(event: any): void {
-    const clickIsOutside = !event.target.closest('.categoryDropdown');
+    const clickIsOutside = !event.target.closest('.category-nav__menu');
     if (clickIsOutside) {
       this.showCategoryDropdown = false;
     }

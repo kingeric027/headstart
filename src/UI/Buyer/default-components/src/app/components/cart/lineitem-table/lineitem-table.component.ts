@@ -1,18 +1,20 @@
-import { Component, Input } from '@angular/core';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { Component, Input, OnInit } from '@angular/core';
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
 import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
-export class OCMLineitemTable {
+export class OCMLineitemTable implements OnInit {
   closeIcon = faTimes;
+  faTrashAlt = faTrashAlt;
   @Input() set lineItems(value: MarketplaceLineItem[]) {
     this._lineItems = value;
     this.sortLineItems(this._lineItems);
@@ -30,8 +32,12 @@ export class OCMLineitemTable {
   _lineItems = [];
   _orderCurrency: string;
 
-  constructor(private context: ShopperContextService) { 
+  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) {
     this._orderCurrency = this.context.currentUser.get().Currency;
+  }
+
+  ngOnInit(): void {
+    this.spinner.show(); // visibility is handled by *ngIf
   }
 
   async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
@@ -53,7 +59,7 @@ export class OCMLineitemTable {
       const { ProductID, Specs, Quantity, xp } = li;
       // ACTIVATE SPINNER/DISABLE INPUT IF QTY BEING UPDATED
       this.updatingLiIDs.push(lineItemID);
-      await this.context.order.cart.setQuantity({ProductID, Specs, Quantity, xp});
+      await this.context.order.cart.setQuantity({ ProductID, Specs, Quantity, xp });
       // REMOVE SPINNER/ENABLE INPUT IF QTY NO LONGER BEING UPDATED
       this.updatingLiIDs.splice(this.updatingLiIDs.indexOf(lineItemID), 1);
     }

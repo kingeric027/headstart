@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Orders, LineItems, Me } from 'ordercloud-javascript-sdk';
+import { Orders, LineItems, Me, Spec, LineItemSpec } from 'ordercloud-javascript-sdk';
 import { Subject } from 'rxjs';
 import { OrderStateService } from './order-state.service';
 import { isUndefined as _isUndefined } from 'lodash';
@@ -28,9 +28,10 @@ export class CartService {
     this.onAdd.next(lineItem);
     if (!_isUndefined(this.order.DateCreated)) {
       const lineItems = this.state.lineItems.Items;
-      const existingLiQuantity = lineItems.find(li => li.ProductID === lineItem.ProductID)?.Quantity;
-      if (existingLiQuantity) {
-        lineItem.Quantity += existingLiQuantity;
+      const liWithSameProduct = lineItems.find(li => li.ProductID === lineItem.ProductID);
+      if (liWithSameProduct && this.hasSameSpecs(lineItem, liWithSameProduct)) {
+        // combine any line items that have the same productID/specs into one line item
+        lineItem.Quantity += liWithSameProduct.Quantity;
       }
       return await this.upsertLineItem(lineItem);
     }
@@ -97,6 +98,21 @@ export class CartService {
       await Orders.Delete('Outgoing', ID);
     } finally {
       this.state.reset();
+    }
+  }
+
+  private hasSameSpecs(line1: MarketplaceLineItem, line2: MarketplaceLineItem): boolean {
+    const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({SpecID: s.SpecID, OptionID: s.OptionID}));
+    const sortedSpecs2 = line2.Specs.sort(this.sortSpecs).map(s => ({SpecID: s.SpecID, OptionID: s.OptionID}));
+    return JSON.stringify(sortedSpecs1) === JSON.stringify(sortedSpecs2);
+  }
+
+  private sortSpecs(a: LineItemSpec, b: LineItemSpec): number {
+    // sort by SpecID, if SpecID is the same, then sort by OptionID
+    if(a.SpecID === b.SpecID) {
+      return (a.OptionID < b.OptionID) ? -1 : (a.OptionID > b.OptionID) ? 1 : 0;
+    } else {
+      return a.SpecID < b.SpecID ? -1 : 1;
     }
   }
 

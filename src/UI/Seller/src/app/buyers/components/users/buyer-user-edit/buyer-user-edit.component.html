@@ -122,4 +122,12 @@
       </div>
     </div>
   </form>
+  <user-group-assignments *ngIf="selectedResource && isCreatingNew && this.resourceForm.controls.Country.value"
+                          [isCreatingNew]="isCreatingNew"
+                          userGroupType="BuyerLocation"
+                          [user]="selectedResource"
+                          [homeCountry]="resourceForm.controls.Country.value"
+                          (assignmentsToAdd)="addUserGroupAssignments($event)"
+                          [userPermissionsService]="buyerUserService">
+  </user-group-assignments>
 </div>
