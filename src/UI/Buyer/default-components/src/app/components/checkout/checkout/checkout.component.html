@@ -6,7 +6,7 @@
 </div>
 <div class="container">
   <div *ngIf="order">
-    <div class="row flex-lg-row-reverse"
+    <div class="row flex-lg-row-reverse my-3"
          *ngIf="order.LineItemCount">
       <div class="col-lg-3">
         <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
@@ -62,10 +62,11 @@
                    *ngIf="!isLoading && currentPanel === 'shippingAddressLoading'">
                 <ngx-spinner *ngIf="isLoading && currentPanel === 'shippingAddressLoading'"
                              bdColor="null"
+                             color="var(--primary)"
                              size="small"
-                             color="var(--secondary)"
-                             type="ball-scale-ripple-multiple"
-                             [fullScreen]="false">
+                             bdColor="null"
+                             [fullScreen]="false"
+                             type="ball-spin-clockwise-fade">
                   <small class="sr-only">Calculating Shipping Rates</small>
                 </ngx-spinner>
               </div>
@@ -85,10 +86,11 @@
                        [icon]="faCheck"><span class="sr-only">Shipping Address Confirmed</span></fa-icon>
               <ngx-spinner *ngIf="isLoading && currentPanel === 'shippingSelectionLoading'"
                            bdColor="null"
+                           color="var(--primary)"
                            size="small"
-                           color="var(--secondary)"
-                           type="ball-scale-ripple-multiple"
-                           [fullScreen]="false">
+                           bdColor="null"
+                           [fullScreen]="false"
+                           type="ball-spin-clockwise-fade">
                 <small class="sr-only">Confirming shipping selections</small>
               </ngx-spinner>
             </ng-template>
@@ -111,10 +113,11 @@
                        [icon]="faCheck"></fa-icon>
               <ngx-spinner *ngIf="isLoading && currentPanel === 'paymentLoading'"
                            bdColor="null"
+                           color="var(--primary)"
                            size="small"
-                           color="var(--secondary)"
-                           type="ball-scale-ripple-multiple"
-                           [fullScreen]="false">
+                           bdColor="null"
+                           [fullScreen]="false"
+                           type="ball-spin-clockwise-fade">
                 <small class="sr-only">Capturing payment</small>
               </ngx-spinner>
             </ng-template>
@@ -136,10 +139,11 @@
                   translate>CHECKOUT.CHECKOUT.CONFIRM </h2>
               <ngx-spinner *ngIf="isLoading && currentPanel === 'submitLoading'"
                            bdColor="null"
+                           color="var(--primary)"
                            size="small"
-                           color="var(--secondary)"
-                           type="ball-scale-ripple-multiple"
-                           [fullScreen]="false">
+                           bdColor="null"
+                           [fullScreen]="false"
+                           type="ball-spin-clockwise-fade">
                 <small class="sr-only">Submitting order</small>
               </ngx-spinner>
             </ng-template>
