@@ -190,8 +190,8 @@
                 <div class="col-sm-9">
                   <div class="ml-3">
                     <h6>
-                      <span>{{ li.Product.Name }}</span>
-                      <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                      <span>{{ li.Product.Name }} <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span> </span>
+                      <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
                     </h6>
                     <img [id]="i"
                          [src]="getImageUrl(li)"

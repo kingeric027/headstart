@@ -40,6 +40,8 @@ import {
 import { userClientAuth, vendorUserRoles } from '../../api-utils.ts/auth-util'
 import headerPage from '../../pages/buyer/buyer-header-page'
 import { scrollIntoView } from '../../helpers/element-helper'
+import { refreshPage } from '../../helpers/page-helper'
+import loadingHelper from '../../helpers/loading-helper'
 
 fixture`Product Tests`
 	.meta('TestRun', '1')
@@ -100,7 +102,8 @@ fixture`Product Tests`
 	.page(testConfig.adminAppUrl)
 
 //Product not being shown in UI after create, new to reload page to see
-//failing because of https://four51.atlassian.net/browse/SEB-725
+//https://four51.atlassian.net/browse/SEB-725
+//added work around to refresh page after creating product for all create product tests
 test
 	.before(async t => {
 		const vendorUser = await getSupplierUser(
@@ -116,13 +119,79 @@ test
 				t.ctx.createdProductName,
 				t.fixtureCtx.clientAuth
 			)
-			await deleteProduct(createdProductID, t.ctx.userAuth)
+			await t.wait(3000)
+			await deleteProduct(createdProductID, t.fixtureCtx.supplierUserAuth)
 		}
-	})('Create Product | 19215', async t => {
+	})('Create Standard Product | 19215', async t => {
 	await adminHeaderPage.selectAllProducts()
 	await mainResourcePage.clickCreateNewStandardProduct()
-	const createdProductName = await productDetailsPage.createDefaultProduct()
+	const createdProductName = await productDetailsPage.createDefaultStandardProduct()
 	t.ctx.createdProductName = createdProductName
+	await t.wait(5000)
+	await refreshPage() //refresh because of bug
+	await t.wait(3000)
+	await t
+		.expect(await mainResourcePage.resourceExists(createdProductName))
+		.ok()
+})
+
+test
+	.before(async t => {
+		const vendorUser = await getSupplierUser(
+			t.fixtureCtx.supplierUserID,
+			t.fixtureCtx.supplierID,
+			t.fixtureCtx.clientAuth
+		)
+		await vendorTestSetup(vendorUser.Username, 'Test123!')
+	})
+	.after(async () => {
+		if (t.ctx.createdProductName != null) {
+			const createdProductID = await getProductID(
+				t.ctx.createdProductName,
+				t.fixtureCtx.clientAuth
+			)
+			await t.wait(3000)
+			await deleteProduct(createdProductID, t.ctx.userAuth)
+		}
+	})('Create Quote Product | 19690', async t => {
+	await adminHeaderPage.selectAllProducts()
+	await mainResourcePage.clickCreateNewQuoteProduct()
+	const createdProductName = await productDetailsPage.createDefaultQuoteProduct()
+	t.ctx.createdProductName = createdProductName
+	await t.wait(5000)
+	await refreshPage() //refresh because of bug
+	await t.wait(3000)
+	await t
+		.expect(await mainResourcePage.resourceExists(createdProductName))
+		.ok()
+})
+
+test
+	.before(async t => {
+		const vendorUser = await getSupplierUser(
+			t.fixtureCtx.supplierUserID,
+			t.fixtureCtx.supplierID,
+			t.fixtureCtx.clientAuth
+		)
+		await vendorTestSetup(vendorUser.Username, 'Test123!')
+	})
+	.after(async () => {
+		if (t.ctx.createdProductName != null) {
+			const createdProductID = await getProductID(
+				t.ctx.createdProductName,
+				t.fixtureCtx.clientAuth
+			)
+			await t.wait(3000)
+			await deleteProduct(createdProductID, t.ctx.userAuth)
+		}
+	})('Create Purchase Order Product | 19691', async t => {
+	await adminHeaderPage.selectAllProducts()
+	await mainResourcePage.clickCreateNewPurchaseOrderProduct()
+	const createdProductName = await productDetailsPage.createDefaultStandardProduct()
+	t.ctx.createdProductName = createdProductName
+	await t.wait(5000)
+	await refreshPage() //refresh because of bug
+	await t.wait(3000)
 	await t
 		.expect(await mainResourcePage.resourceExists(createdProductName))
 		.ok()

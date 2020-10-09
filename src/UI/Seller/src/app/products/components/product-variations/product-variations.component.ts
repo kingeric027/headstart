@@ -32,7 +32,7 @@ export class ProductVariations {
   @Input() checkForChanges;
   @Input() copyProductResource;
   @Input() isCreatingNew = false;
-  get specsWithVariations()  {
+  get specsWithVariations() {
     return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant) as Spec[];
   };
   get specsWithoutVariations() {
@@ -66,7 +66,7 @@ export class ProductVariations {
   variantInSelection: Variant;
   imageInSelection: Asset;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private ocProductService: OcProductService, private appAuthService: AppAuthService,) {}
+  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private ocProductService: OcProductService, private appAuthService: AppAuthService,) { }
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -74,7 +74,7 @@ export class ProductVariations {
     }
     return totalMarkup;
   }
-  
+
   toggleEditSpecs(): void {
     this.editSpecs = !this.editSpecs;
     this.isSpecsEditing.emit(this.editSpecs);
@@ -89,7 +89,7 @@ export class ProductVariations {
 
   checkForSpecChanges(): void {
     this.areSpecChanges = JSON.stringify(this.superProductEditable?.Specs) !== JSON.stringify(this.superProductStatic?.Specs);
-  } 
+  }
 
   shouldDefinesVariantBeChecked(): boolean {
     if (this.definesVariant) return true;
@@ -107,10 +107,10 @@ export class ProductVariations {
 
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
-  );
-  updateProductResourceCopy.Variants.find(x => x.ID === variant.ID).Active = variant.Active
-  this.superProductEditable = updateProductResourceCopy;
-  this.productVariationsChanged.emit(this.superProductEditable);
+    );
+    updateProductResourceCopy.Variants.find(x => x.ID === variant.ID).Active = variant.Active
+    this.superProductEditable = updateProductResourceCopy;
+    this.productVariationsChanged.emit(this.superProductEditable);
   }
 
   getVariantStatusDisplay(variant: Variant): string {
@@ -123,16 +123,28 @@ export class ProductVariations {
 
   updateSku($event: any, i: number): void {
     const updateProductResourceCopy = this.productService.copyResource(
-        this.superProductEditable || this.productService.emptyResource
+      this.superProductEditable || this.productService.emptyResource
     );
     updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, '');
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
   }
 
+  updateVariantInventory($event: any, i: number): void {
+    const updateProductResourceCopy = this.productService.copyResource(
+      this.superProductEditable || this.productService.emptyResource
+    );
+    if (updateProductResourceCopy.Variants[i].Inventory === null || updateProductResourceCopy.Variants[i].Inventory === undefined) {
+      updateProductResourceCopy.Variants[i].Inventory = { QuantityAvailable: 0 };
+    }
+    updateProductResourceCopy.Variants[i].Inventory.QuantityAvailable = Number($event.target.value);
+    this.superProductEditable = updateProductResourceCopy;
+    this.productVariationsChanged.emit(this.superProductEditable);
+  }
+
   addSpec(): void {
     const updateProductResourceCopy = this.productService.copyResource(
-        this.superProductEditable || this.productService.emptyResource
+      this.superProductEditable || this.productService.emptyResource
     );
     const input = (document.getElementById('AddVariation') as any)
     if (input.value === '') {
@@ -244,7 +256,7 @@ export class ProductVariations {
         Active: true,
         xp: {
           SpecCombo: `${opt.ID}`,
-          SpecValues:[{
+          SpecValues: [{
             SpecName: spec.Name,
             SpecOptionValue: opt.Value,
             PriceMarkup: opt.PriceMarkup
@@ -264,7 +276,7 @@ export class ProductVariations {
           Active: true,
           xp: {
             SpecCombo: `${variant.xp.SpecCombo}-${opt.ID}`,
-            SpecValues:[...variant.xp.SpecValues, {
+            SpecValues: [...variant.xp.SpecValues, {
               SpecName: spec.Name,
               SpecOptionValue: opt.Value,
               PriceMarkup: opt.PriceMarkup
@@ -297,7 +309,7 @@ export class ProductVariations {
     this.superProductEditable.Specs = updateProductResourceCopy.Specs;
     await this.ocSpecService.Patch(specID, { DefaultOptionID: optionID }).toPromise();
   }
-  
+
   isImageSelected(img: Asset): boolean {
     if (!img.Tags) img.Tags = []
     return img.Tags.includes(this.variantInSelection?.xp?.SpecCombo);
@@ -337,7 +349,9 @@ export class ProductVariations {
   }
 
   getVariantDetailColSpan(): number {
-    return 3+this.superProductEditable?.Specs?.length;
+    let colSpan = 4 + this.superProductEditable?.Specs?.length;
+    if (this.superProductEditable?.Product?.Inventory?.VariantLevelTracking) colSpan + 1;
+    return colSpan;
   }
 
   async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
@@ -346,12 +360,12 @@ export class ProductVariations {
     if (event.target.value === '') return;
     if (Number(event.target.value) === this.variantInSelection[field]) return;
     const value = Number(event.target.value);
-    switch(field) {
-      case 'ShipWeight': 
-        partialVariant = { ShipWeight: value}
+    switch (field) {
+      case 'ShipWeight':
+        partialVariant = { ShipWeight: value }
         break;
       case 'ShipHeight':
-        partialVariant = { ShipHeight: value}
+        partialVariant = { ShipHeight: value }
         break;
       case 'ShipWidth':
         partialVariant = { ShipWidth: value }
