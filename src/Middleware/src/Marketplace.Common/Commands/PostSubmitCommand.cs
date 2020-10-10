@@ -28,7 +28,6 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
 
         // temporary service until we get updated sdk
-        private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
 		private readonly IExchangeRatesCommand _exchangeRates;
@@ -37,13 +36,12 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCommand _orderCommand;
         private readonly ILineItemCommand _lineItemCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
         {
 			_oc = oc;
             _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
-            _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
             _orderCommand = orderCommand;
@@ -244,9 +242,8 @@ namespace Marketplace.Common.Commands
             // no relationship exists currently in the platform
             var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(buyerOrder, supplierOrders);
 
-            // leaving this in until the sdk supports type parameters on order worksheet
             // need to get fresh order worksheet because this process has changed things about the worksheet
-            var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
+            var updatedWorksheet =  await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, buyerOrder.ID);
             return new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet>(updatedSupplierOrders, updatedWorksheet);
         }
 

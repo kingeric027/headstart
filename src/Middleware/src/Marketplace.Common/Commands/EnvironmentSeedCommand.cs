@@ -49,7 +49,7 @@ namespace Marketplace.Common.Commands
 		private static string _buyerLocalUIApiClientID;
 		private static string _middlewareApiClientID;
 
-		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand, IOrderCloudSandboxService orderCloudSandboxService)
+		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand)
 		{
 			_settings = settings;
 			_oc = oc;

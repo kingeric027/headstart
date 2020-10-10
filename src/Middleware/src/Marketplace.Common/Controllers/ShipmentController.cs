@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Controllers
 {

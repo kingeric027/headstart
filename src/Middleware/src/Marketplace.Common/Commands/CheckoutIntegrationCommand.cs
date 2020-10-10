@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Exceptions;
-using Marketplace.Models.Extended;
 using OrderCloud.SDK;
-using static Marketplace.Models.ErrorCodes;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
@@ -15,25 +12,25 @@ using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
-    public interface IOCShippingIntegration
+    public interface ICheckoutIntegrationCommand
     {
-        Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload);
-        Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload);
+        Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
+        Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
     }
 
-    public class OCShippingIntegration : IOCShippingIntegration
+    public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
     {
         private readonly IAvalaraCommand _avalara;
         private readonly IExchangeRatesCommand _exchangeRates;
         private readonly IOrderCloudClient _oc;
-        public OCShippingIntegration(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud)
+        public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud)
         {
 			_avalara = avalara;
             _exchangeRates = exchangeRates;
             _oc = orderCloud;
         }
 
-        public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
+        public async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
 			//var orderWorksheet = orderCalculatePayload.OrderWorksheet;
 			//var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
@@ -98,7 +95,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 lineItems.ToList();
         }
 
-        public async Task<OrderCalculateResponse> CalculateOrder(OrderCalculatePayload<MarketplaceOrderWorksheet> orderCalculatePayload)
+        public async Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
             if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
