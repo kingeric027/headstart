@@ -75,4 +75,13 @@ namespace Marketplace.Common
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
     }
+
+    public class EasyPostSettings
+	{
+        public string APIKey { get; set; }
+        public string SMGFedexAccountId { get; set; }
+        public string ProvisionFedexAccountId { get; set; } 
+        public string SEBDistributionFedexAccountId { get; set; }
+
+    }
 }
