@@ -9,6 +9,8 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.easypost;
+using NPOI.OpenXmlFormats.Dml;
 
 namespace Marketplace.Common.Services.ShippingIntegration
 {
@@ -21,41 +23,65 @@ namespace Marketplace.Common.Services.ShippingIntegration
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
     {
         private readonly IAvalaraCommand _avalara;
+        private readonly IEasyPostShippingService _shippingService;
         private readonly IExchangeRatesCommand _exchangeRates;
         private readonly IOrderCloudClient _oc;
-        public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud)
+        public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud, IEasyPostShippingService shippingService)
         {
 			_avalara = avalara;
             _exchangeRates = exchangeRates;
             _oc = orderCloud;
+            _shippingService = shippingService;
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
-			//var orderWorksheet = orderCalculatePayload.OrderWorksheet;
-			//var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
-
-			//var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(lineItemsForShippingEstimates);
-			//proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
-			//{
-			//    proposedShipmentRequest.RateResponseTask = _freightPopService.GetRatesAsync(proposedShipmentRequest.RateRequestBody);
-			//    return proposedShipmentRequest;
-			//}).ToList();
-
-			//var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
-			//await Task.WhenAll(tasks);
-			//CurrencySymbol orderCurrency = (CurrencySymbol)Enum.Parse(typeof(CurrencySymbol), orderWorksheet.Order.xp.Currency);
-			//var rates = (await _exchangeRates.Get(orderCurrency)).Rates;
-			//var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
-			//var shipEstimatesWithFreeShippingApplied = await ApplyFreeShipping(orderWorksheet, shipEstimates);
-
-			return new ShipEstimateResponse()
+            var worksheet = orderCalculatePayload.OrderWorksheet;
+            var excludePOProducts = orderCalculatePayload.ConfigData.ExcludePOProductsFromShipping;
+            if (excludePOProducts)
 			{
-				//ShipEstimates = shipEstimatesWithFreeShippingApplied as IList<ShipEstimate>
-			};
-		}
+                worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
+            }
 
-        private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, List<ShipEstimate> shipEstimates)
+            var shipResponse = await _shippingService.GetRates(worksheet);
+
+            var shipperCurrency = CurrencySymbol.USD;
+            var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
+
+            if (shipperCurrency != buyerCurrency)
+			{
+                shipResponse.ShipEstimates = await ConvertShipingRatesCurrency(shipResponse.ShipEstimates, shipperCurrency, buyerCurrency);
+            }
+
+            shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
+
+            return shipResponse;
+        }
+
+        private async Task<List<ShipEstimate>> ConvertShipingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
+		{
+            var rates = (await _exchangeRates.Get(buyerCurrency)).Rates;
+            var conversionRate = rates.Find(r => r.Currency == shipperCurrency).Rate;
+            return shipEstimates.Select(estimate =>
+            {
+                estimate.ShipMethods = estimate.ShipMethods.Select(method =>
+                {
+                    var convertedCost = method.Cost / (decimal)conversionRate;
+                    method.xp = new
+                    {
+                        OriginalShipCost = method.Cost,
+                        OriginalCurrency = shipperCurrency.ToString(),
+                        ExchangeRate = conversionRate,
+                        OrderCurrency = buyerCurrency.ToString()
+                    };
+                    method.Cost = convertedCost;
+                    return method;
+                }).ToList();
+                return estimate;
+            }).ToList();
+        }
+
+        private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, IList<ShipEstimate> shipEstimates)
         {
             var supplierIDs = orderWorksheet.LineItems.Select(li => li.SupplierID);
             var suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
@@ -88,13 +114,6 @@ namespace Marketplace.Common.Services.ShippingIntegration
         }
 
 
-        private List<LineItem> GetLineItemsToIncludeInShipping(IList<LineItem> lineItems, CheckoutIntegrationConfiguration configData)
-        {
-            return configData.ExcludePOProductsFromShipping ? 
-                lineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder.ToString()).ToList() : 
-                lineItems.ToList();
-        }
-
         public async Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
             if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == OrderType.Quote)
@@ -110,17 +129,6 @@ namespace Marketplace.Common.Services.ShippingIntegration
                     TaxTotal = totalTax,
                 };
             }
-        }
-
-        private List<string> GetProductsWithInvalidDimensions(IList<LineItem> lineItems)
-        {
-            return lineItems.Where(lineItem =>
-            {
-                return !(lineItem.Product.ShipHeight > 0 &&
-                lineItem.Product.ShipLength > 0 &&
-                lineItem.Product.ShipWeight > 0 &&
-                lineItem.Product.ShipWidth > 0);
-            }).Select(lineItem => lineItem.Product.ID).ToList();
         }
     }
 }
