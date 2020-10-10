@@ -43,13 +43,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Tests", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.Tests", "tests\Orchestration.Tests\Orchestration.Tests.csproj", "{AE99A3FF-0999-4F96-B7BD-4F367D3CE723}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.freightpop", "integrations\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj", "{B8F5F373-6B30-4A81-BE56-E7387344AA80}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{319BF0EE-B007-4EF7-A181-1BA20C46F203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMigrations", "DataMigrations\DataMigrations.csproj", "{E2A14896-B501-4070-8DD3-5EEB013046C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataMigrations", "DataMigrations\DataMigrations.csproj", "{E2A14896-B501-4070-8DD3-5EEB013046C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,10 +123,6 @@ Global
 		{AE99A3FF-0999-4F96-B7BD-4F367D3CE723}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE99A3FF-0999-4F96-B7BD-4F367D3CE723}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE99A3FF-0999-4F96-B7BD-4F367D3CE723}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8F5F373-6B30-4A81-BE56-E7387344AA80}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2A14896-B501-4070-8DD3-5EEB013046C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2A14896-B501-4070-8DD3-5EEB013046C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2A14896-B501-4070-8DD3-5EEB013046C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -152,7 +146,6 @@ Global
 		{3C0447C0-F5E2-4E43-939F-5FDC9A56B74E} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{CDC067B9-27B3-47B8-9E82-442D79156AE5} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
 		{AE99A3FF-0999-4F96-B7BD-4F367D3CE723} = {0B969DE0-4342-474E-A83B-BF34DAF05600}
-		{B8F5F373-6B30-4A81-BE56-E7387344AA80} = {CCAF8AD5-2FCC-46E0-82EF-2FCC0EEC8B16}
 		{E2A14896-B501-4070-8DD3-5EEB013046C5} = {319BF0EE-B007-4EF7-A181-1BA20C46F203}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

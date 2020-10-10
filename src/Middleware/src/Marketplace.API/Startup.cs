@@ -24,7 +24,6 @@ using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
-using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
 
@@ -65,12 +64,6 @@ namespace Marketplace.API
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
                 Container = _settings.ExchangeRatesSettings.Container
-            };
-            var freightPopConfig = new FreightPopConfig()
-            {
-                BaseUrl = _settings.FreightPopSettings.BaseUrl,
-                Password = _settings.FreightPopSettings.Password,
-                Username = _settings.FreightPopSettings.Username
             };
 
             services
@@ -130,7 +123,6 @@ namespace Marketplace.API
                     }
                 ))
 				.AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
 				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))

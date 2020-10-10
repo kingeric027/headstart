@@ -1,5 +1,4 @@
-﻿using ordercloud.integrations.freightpop;
-using Marketplace.Models;
+﻿using Marketplace.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -15,7 +14,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
     public class ShipmentXp
     {
         // storing full freightPopShipmentRate for potential reference later
-        public ShipmentRate FreightPopShipmentRate { get; set; }
+        //public ShipmentRate FreightPopShipmentRate { get; set; }
         public string Service { get; set; }
         public string Comment { get; set; }
     }

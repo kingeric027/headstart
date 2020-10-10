@@ -33,7 +33,6 @@
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.cardconnect\ordercloud.integrations.cardconnect.csproj" />
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.cms\ordercloud.integrations.cms.csproj" />
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.exchangerates\ordercloud.integrations.exchangerates.csproj" />
-    <ProjectReference Include="..\..\integrations\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj" />
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
   </ItemGroup>
 

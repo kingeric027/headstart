@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Mappers;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Exceptions;
 using Marketplace.Models.Extended;
@@ -10,7 +9,6 @@ using OrderCloud.SDK;
 using static Marketplace.Models.ErrorCodes;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
-using ordercloud.integrations.freightpop;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
@@ -25,13 +23,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
     public class OCShippingIntegration : IOCShippingIntegration
     {
-        readonly IFreightPopService _freightPopService;
         private readonly IAvalaraCommand _avalara;
         private readonly IExchangeRatesCommand _exchangeRates;
         private readonly IOrderCloudClient _oc;
-        public OCShippingIntegration(IFreightPopService freightPopService, IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud)
+        public OCShippingIntegration(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud)
         {
-            _freightPopService = freightPopService;
 			_avalara = avalara;
             _exchangeRates = exchangeRates;
             _oc = orderCloud;
@@ -39,29 +35,28 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
         public async Task<ShipEstimateResponse> GetRatesAsync(OrderCalculatePayload orderCalculatePayload)
         {
+			//var orderWorksheet = orderCalculatePayload.OrderWorksheet;
+			//var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
 
-            var orderWorksheet = orderCalculatePayload.OrderWorksheet;
-            var lineItemsForShippingEstimates = GetLineItemsToIncludeInShipping(orderCalculatePayload.OrderWorksheet.LineItems, orderCalculatePayload.ConfigData);
+			//var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(lineItemsForShippingEstimates);
+			//proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
+			//{
+			//    proposedShipmentRequest.RateResponseTask = _freightPopService.GetRatesAsync(proposedShipmentRequest.RateRequestBody);
+			//    return proposedShipmentRequest;
+			//}).ToList();
 
-            var proposedShipmentRequests = ShipmentEstimateRequestsMapper.Map(lineItemsForShippingEstimates);
-            proposedShipmentRequests = proposedShipmentRequests.Select(proposedShipmentRequest =>
-            {
-                proposedShipmentRequest.RateResponseTask = _freightPopService.GetRatesAsync(proposedShipmentRequest.RateRequestBody);
-                return proposedShipmentRequest;
-            }).ToList();
+			//var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
+			//await Task.WhenAll(tasks);
+			//CurrencySymbol orderCurrency = (CurrencySymbol)Enum.Parse(typeof(CurrencySymbol), orderWorksheet.Order.xp.Currency);
+			//var rates = (await _exchangeRates.Get(orderCurrency)).Rates;
+			//var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
+			//var shipEstimatesWithFreeShippingApplied = await ApplyFreeShipping(orderWorksheet, shipEstimates);
 
-            var tasks = proposedShipmentRequests.Select(p => p.RateResponseTask);
-            await Task.WhenAll(tasks);
-            CurrencySymbol orderCurrency = (CurrencySymbol)Enum.Parse(typeof(CurrencySymbol), orderWorksheet.Order.xp.Currency);
-            var rates = (await _exchangeRates.Get(orderCurrency)).Rates;
-            var shipEstimates = proposedShipmentRequests.Select(proposedShipmentRequest => ShipmentEstimateMapper.Map(proposedShipmentRequest, orderCurrency, rates)).ToList();
-            var shipEstimatesWithFreeShippingApplied = await ApplyFreeShipping(orderWorksheet, shipEstimates);
-
-            return new ShipEstimateResponse()
-            {
-                ShipEstimates = shipEstimatesWithFreeShippingApplied as IList<ShipEstimate>
-            };
-        }
+			return new ShipEstimateResponse()
+			{
+				//ShipEstimates = shipEstimatesWithFreeShippingApplied as IList<ShipEstimate>
+			};
+		}
 
         private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, List<ShipEstimate> shipEstimates)
         {

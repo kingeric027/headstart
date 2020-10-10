@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ordercloud.integrations.freightpop;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Newtonsoft.Json.Linq;
@@ -8,14 +7,6 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
-	public class ShipmentEstimateRequest
-	{
-		public string ID { get; set; }
-		public List<ShipEstimateItem> ShipEstimateItems { get; set; }
-		public RateRequestBody RateRequestBody { get; set; }
-		public Task<Response<GetRatesData>> RateResponseTask { get; set; }
-	}
-
 	// should be able to remove with sdk update
 	public class MarketplaceOrderWorksheet : OrderWorksheet<MarketplaceOrder, MarketplaceLineItem, ShipEstimateResponse, OrderCalculateResponse, OrderSubmitResponse>
 	{

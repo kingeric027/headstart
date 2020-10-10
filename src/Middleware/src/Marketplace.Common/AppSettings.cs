@@ -20,11 +20,6 @@ namespace Marketplace.Common
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
-        public FreightPopSettings FreightPopSettings { get; set; }
-
-        // additional field for production settings because we can only test third
-        // party shipping on FreigthPOP prd
-        public FreightPopSettings FreightPopSettingsProd { get; set; }
         public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
@@ -58,13 +53,6 @@ namespace Marketplace.Common
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string OrgID { get; set; }
-    }
-
-    public class FreightPopSettings
-    {
-        public string BaseUrl { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
     }
 
 	public class OrderCloudSettings
