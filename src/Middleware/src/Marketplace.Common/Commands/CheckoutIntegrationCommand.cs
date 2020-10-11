@@ -33,6 +33,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             _exchangeRates = exchangeRates;
             _oc = orderCloud;
             _shippingService = shippingService;
+            _settings = settings;
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload)
@@ -44,21 +45,43 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
             }
 
+            var groupedLineItems = orderCalculatePayload.OrderWorksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
             var accounts = new [] { _settings.EasyPostSettings.ProvisionFedexAccountId, _settings.EasyPostSettings.SEBDistributionFedexAccountId, _settings.EasyPostSettings.SMGFedexAccountId };
-            var shipResponse = await _shippingService.GetRates(worksheet, accounts);
+            var shipResponse = await _shippingService.GetRates(groupedLineItems, accounts); // include all accounts at this stage so we can save on order worksheet and analyze 
 
-            var shipperCurrency = CurrencySymbol.USD;
+            // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  
+            for (int i = 0; i < groupedLineItems.Count; i++)
+            {
+                var supplierID = groupedLineItems[i].First().SupplierID;
+                shipResponse.ShipEstimates[i].ShipMethods = shipResponse.ShipEstimates[i].ShipMethods
+                    .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList();
+            }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
 
-            if (shipperCurrency != buyerCurrency)
-			{
-                shipResponse.ShipEstimates = await ConvertShipingRatesCurrency(shipResponse.ShipEstimates, shipperCurrency, buyerCurrency);
+            if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
+            {
+                shipResponse.ShipEstimates = await ConvertShipingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
             }
 
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
 
             return shipResponse;
         }
+
+        private string GetShippingAccountForSupplier(string supplierID)
+		{
+            if (supplierID == _settings.OrderCloudSettings.ProvisionSupplierID)
+			{
+                return _settings.EasyPostSettings.ProvisionFedexAccountId;
+
+            } else if (supplierID == _settings.OrderCloudSettings.SEBDistributionSupplierID) 
+            {
+                return _settings.EasyPostSettings.SEBDistributionFedexAccountId;
+            } else
+			{
+                return _settings.EasyPostSettings.SMGFedexAccountId;
+            }
+		}
 
         private async Task<List<ShipEstimate>> ConvertShipingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
 		{
@@ -83,7 +106,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             }).ToList();
         }
 
-        private async Task<List<ShipEstimate>> ApplyFreeShipping(OrderWorksheet orderWorksheet, IList<ShipEstimate> shipEstimates)
+        private async Task<List<ShipEstimate>> ApplyFreeShipping(MarketplaceOrderWorksheet orderWorksheet, IList<ShipEstimate> shipEstimates)
         {
             var supplierIDs = orderWorksheet.LineItems.Select(li => li.SupplierID);
             var suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
