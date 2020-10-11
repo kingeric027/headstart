@@ -26,7 +26,8 @@ namespace Marketplace.Common.Services.ShippingIntegration
         private readonly IEasyPostShippingService _shippingService;
         private readonly IExchangeRatesCommand _exchangeRates;
         private readonly IOrderCloudClient _oc;
-        public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud, IEasyPostShippingService shippingService)
+        private readonly AppSettings _settings;
+        public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud, IEasyPostShippingService shippingService, AppSettings settings)
         {
 			_avalara = avalara;
             _exchangeRates = exchangeRates;
@@ -43,7 +44,8 @@ namespace Marketplace.Common.Services.ShippingIntegration
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
             }
 
-            var shipResponse = await _shippingService.GetRates(worksheet);
+            var accounts = new [] { _settings.EasyPostSettings.ProvisionFedexAccountId, _settings.EasyPostSettings.SEBDistributionFedexAccountId, _settings.EasyPostSettings.SMGFedexAccountId };
+            var shipResponse = await _shippingService.GetRates(worksheet, accounts);
 
             var shipperCurrency = CurrencySymbol.USD;
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;

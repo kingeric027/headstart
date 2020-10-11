@@ -26,6 +26,7 @@ namespace Marketplace.Common
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
         public string SendgridApiKey { get; set; }
         public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
+        public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
     }
 
     public class UI

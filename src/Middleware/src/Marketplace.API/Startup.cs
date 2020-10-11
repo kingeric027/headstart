@@ -27,6 +27,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
+using System.Runtime.InteropServices;
 
 namespace Marketplace.API
 {
@@ -125,7 +126,7 @@ namespace Marketplace.API
                 .AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
-                .AddSingleton<IEasyPostShippingService>()
+                .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")

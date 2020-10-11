@@ -1,20 +1,38 @@
 ﻿using Flurl.Http;
+using Microsoft.Extensions.Azure;
 using OrderCloud.SDK;
 using System;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ordercloud.integrations.easypost
 {
+	public class AddressPair : IEquatable<AddressPair>
+	{
+		public Address ShipFrom { get; set; }
+		public Address ShipTo { get; set; }
+
+		public bool Equals(AddressPair other)
+		{
+			return (ShipFrom.Street1 == other.ShipFrom.Street1) &&
+					(ShipFrom.Zip == other.ShipFrom.Zip) &&
+					(ShipFrom.City == other.ShipFrom.City) &&
+					(ShipTo.Street1 == other.ShipTo.Street1) &&
+					(ShipTo.Zip == other.ShipTo.Zip) &&
+					(ShipTo.City == other.ShipTo.City);
+		}
+	}
+
 	public interface IEasyPostShippingService
 	{
-		Task<ShipEstimateResponse> GetRates(OrderWorksheet order);
+		Task<ShipEstimateResponse> GetRates(OrderWorksheet order, IEnumerable<string> carrierAccountIDs);
 	}
 
 
 	public class EasyPostShippingService : IEasyPostShippingService
 	{
-
 		private readonly EasyPostConfig _config;
 		private const string BaseUrl = "https://api.easypost.com/v2";
 
@@ -22,17 +40,26 @@ namespace ordercloud.integrations.easypost
 		{
 			_config = config;
 		}
-		public async Task<ShipEstimateResponse> GetRates(OrderWorksheet order)
+
+		public async Task<ShipEstimateResponse> GetRates(OrderWorksheet order, IEnumerable<string> carrierAccountIDs)
 		{
-			var easyPostShipment = new EasyPostShipment()
+			var groupedLineItems = order.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress });
+			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, carrierAccountIDs));
+			var easyPostResponse = await Task.WhenAll(easyPostShipments.Select(PostShipment));
+			var shipEstimateResponse = new ShipEstimateResponse
 			{
-				from_address = EasyPostMappers.MapAddress(shipment.ShipFromAddress),
-				to_address = EasyPostMappers.MapAddress(shipment.ShipToAddress),
-				parcel = EasyPostMappers.MapParcel(shipment.Weight),
-				carrier_accounts = carrierAccountIDs.Select(id => new EasyPostCarrierAccount() { id = id }).ToList()
+				ShipEstimates = groupedLineItems.Select((lineItems, index) =>
+				{
+					var shipMethods = EasyPostMappers.MapRates(easyPostResponse[index].rates);
+					return new ShipEstimate()
+					{
+						ShipMethods = shipMethods, // This will get filtered down based on carrierAccounts
+						ShipEstimateItems = lineItems.Select(li => new ShipEstimateItem() { LineItemID = li.ID, Quantity = li.Quantity }).ToList(),
+						xp = { AllShipMethods = shipMethods } // This is being saved so we have all data to compare rates across carrierAccounts
+					};
+				}).ToList(),
 			};
-
-
+			return shipEstimateResponse;
 		}
 
 		private async Task<EasyPostShipment> PostShipment(EasyPostShipment shipment)

@@ -1,12 +1,14 @@
-﻿using System;
+﻿using OrderCloud.SDK;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ordercloud.integrations.easypost
 {
 	public static class EasyPostMappers
 	{
-		public static EasyPostAddress MapAddress(OrderCloud.SDK.Address address)
+		public static EasyPostAddress MapAddress(Address address)
 		{
 			return new EasyPostAddress()
 			{
@@ -19,23 +21,43 @@ namespace ordercloud.integrations.easypost
 			};
 		}
 
-		public static EasyPostParcel MapParcel(OrderCloud.SDK.LineItem li)
+		// To use this method all the LineItems should have the same ShipTo and ShipFrom
+		// TODO - does this need to be more intelligient?
+		public static EasyPostParcel MapParcel(IEnumerable<LineItem> lineItems)
 		{
-			return new EasyPostParcel()
+			var totalWeight = lineItems.Aggregate(0.0, (sum, lineItem) => 
 			{
-				weight = (double)(li.Product.ShipWeight ?? 1), // ship weight is required and cannot be 0.
-				height = (double)(li.Product.ShipHeight), // optional, so null is fine
-				width = (double)(li.Product.ShipWidth),
-				length = (double)(li.Product.ShipLength)
+				var productShipWeight = lineItem.Product.ShipWeight ?? 1;
+				return sum += ((double)productShipWeight * lineItem.Quantity);
+			});
+			return new EasyPostParcel() { weight = totalWeight };
+		}
+
+		public static ShipMethod MapRate(EasyPostRate rate)
+		{
+			return new ShipMethod()
+			{
+				ID = rate.id,
+				Name = $"{rate.carrier} {rate.service}",
+				Cost = decimal.Parse(rate.rate),
+				EstimatedTransitDays = (int)rate.delivery_days,
+				xp =
+				{
+					CarrierAccountID = rate.carrier_account_id
+				}
 			};
 		}
 
-		// deprecated
-		public static EasyPostParcel MapParcel(double weight) 
+		public static IList<ShipMethod> MapRates(IEnumerable<EasyPostRate> rates) => rates.Select(MapRate).ToList();
+
+		public static EasyPostShipment MapShipment(IGrouping<AddressPair, LineItem> groupedLineItems, IEnumerable<string> accounts)
 		{
-			return new EasyPostParcel()
+			return new EasyPostShipment()
 			{
-				weight = weight
+				from_address = MapAddress(groupedLineItems.Key.ShipFrom),
+				to_address = MapAddress(groupedLineItems.Key.ShipTo),
+				parcel = MapParcel(groupedLineItems), // All line items with the same shipFrom and shipTo are grouped into 1 "parcel"
+				carrier_accounts = accounts.Select(id => new EasyPostCarrierAccount() { id = id }).ToList()
 			};
 		}
 	}
