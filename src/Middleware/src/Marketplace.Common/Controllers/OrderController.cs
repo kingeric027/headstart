@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using ordercloud.integrations.library;
 using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Extended;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Controllers
 {
