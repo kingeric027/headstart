@@ -102,6 +102,10 @@ export class OCMCheckout implements OnInit {
     this.destoryLoadingIndicator('payment');
   }
 
+  navigateBackToAddress() {
+    this.toSection("shippingAddress");
+  }
+
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.initLoadingIndicator('paymentLoading');
     // TODO - is delete still needed? There used to be an OC bug with multiple payments on an order.
