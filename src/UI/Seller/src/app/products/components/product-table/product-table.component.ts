@@ -30,8 +30,7 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
   async buildFilterConfig(): Promise<void> {
     this.userContext = await this.currentUserService.getUserContext();
 
-    this.filterConfig = {
-      Filters: [
+    const filters= [
         {
           Display: 'ADMIN.FILTERS.STATUS',
           Path: 'xp.Status',
@@ -41,15 +40,14 @@ export class ProductTableComponent extends ResourceCrudComponent<Product> implem
           ],
           Type: 'Dropdown',
         }
-      ]
-    }
+      ];
     if(this.userContext.UserRoles.includes('SupplierReader') || this.userContext.UserRoles.includes('SupplierAdmin')) {
       const supplierFilter = await this.buildSupplierFilter();
-      this.filterConfig.Filters.push(supplierFilter);
+      filters.push(supplierFilter);
     }
-    // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
-    // added to the filterconfig passed into the resourcetable in the future
-    
+    this.filterConfig = {
+      Filters: filters
+    };
   }
 
   async buildSupplierFilter(): Promise<any> {
