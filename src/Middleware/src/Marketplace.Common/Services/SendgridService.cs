@@ -277,7 +277,7 @@ namespace Marketplace.Common.Services
                     Phone = orderWorksheet.Order.xp.QuoteOrderInfo.Phone,
                     Email = orderWorksheet.Order.FromUser.Email,
                     Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
-                    ProductID = orderWorksheet.LineItems.FirstOrDefault().Product.Name,
+                    ProductID = orderWorksheet.LineItems.FirstOrDefault().Product.ID,
                     ProductName = orderWorksheet.LineItems.FirstOrDefault().Product.Name,
                     order = orderWorksheet.Order
                 };
