@@ -19,13 +19,14 @@ export class BuyerLocationCatalogs {
       const routeUrl = this.router.routerState.snapshot.url;
       this.buyerID = routeUrl.split('/')[2];
       this.locationID = locationUserGroup?.ID;
-      if (this.buyerID !== REDIRECT_TO_FIRST_PARENT) {
-        this.getCatalogs();
-      }
+      // if (this.buyerID !== REDIRECT_TO_FIRST_PARENT) {
+      //   this.getCatalogs();
+      // }
       this.resetAssignments(locationUserGroup.xp.CatalogAssignments || []);
     }
   }
 
+  @Input()
   catalogs: MarketplaceCatalog[] = [];
   locationCatalogAssignmentsEditable: string[] = [];
   locationCatalogAssignmentsStatic: string[] = [];
@@ -52,10 +53,10 @@ export class BuyerLocationCatalogs {
     this.areChanges = !!this.delLocationCatalogAssignments.length || !!this.addLocationCatalogAssignments.length;
   }
 
-  async getCatalogs(): Promise<void> {
-    const catalogsResponse = await this.marketplaceCatalogService.list(this.buyerID);
-    this.catalogs = catalogsResponse.Items;
-  }
+  // async getCatalogs(): Promise<void> {
+  //   const catalogsResponse = await this.marketplaceCatalogService.list(this.buyerID);
+  //   this.catalogs = catalogsResponse.Items;
+  // }
 
   isAssigned(catalog: MarketplaceCatalog): boolean {
     return this.locationCatalogAssignmentsEditable.includes(catalog.ID);

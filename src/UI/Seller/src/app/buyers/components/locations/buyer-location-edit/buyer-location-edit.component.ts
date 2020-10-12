@@ -9,8 +9,10 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
-import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, MarketplaceCatalog } from '@ordercloud/headstart-sdk';
 import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
+import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -44,12 +46,14 @@ export class BuyerLocationEditComponent implements OnInit {
   areChanges = false;
   dataIsSaving = false;
   countryOptions: SupportedCountries[];
+  catalogs: MarketplaceCatalog[] = [];
 
   constructor(
     private buyerLocationService: BuyerLocationService,
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
+    private marketplaceCatalogService: CatalogsTempService
   ) {this.countryOptions = GeographyConfig.getCountries();}
 
   async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
@@ -61,6 +65,9 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.buyerID !== REDIRECT_TO_FIRST_PARENT) {
+      this.getCatalogs();
+    }
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
   }
 
@@ -83,6 +90,11 @@ export class BuyerLocationEditComponent implements OnInit {
       // TODO: remove this workaround when headstart sdk has been updated to include correct type
       BillingNumber: new FormControl((buyerLocation.Address.xp as any).BillingNumber)
     });
+  }
+
+  async getCatalogs(): Promise<void> {
+    const catalogsResponse = await this.marketplaceCatalogService.list(this.buyerID);
+    this.catalogs = catalogsResponse.Items;
   }
 
   handleSelectedAddress(event: Address): void {
