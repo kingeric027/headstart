@@ -29,6 +29,7 @@ export const environment = {
       clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
       buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
     }
-  }
+  },
+  productFieldsToMonitor: ["PriceSchedule", "Product.xp.IsResale"]
 };
 
