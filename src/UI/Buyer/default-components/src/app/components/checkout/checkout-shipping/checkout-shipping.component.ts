@@ -15,7 +15,7 @@ export class OCMCheckoutShipping implements OnInit {
   faExclamationCircle = faExclamationCircle;
 
   @Input() set shipEstimates(value: ShipEstimate[]) {
-    this._shipEstimates = null;
+    this._shipEstimates = value;
     this._areAllShippingSelectionsMade = this.areAllShippingSelectionsMade(value);
     this._lineItemsByShipEstimate = value.map(shipEstimate => {
       return this.getLineItemsForShipEstimate(shipEstimate);
