@@ -35,7 +35,7 @@
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.exchangerates\ordercloud.integrations.exchangerates.csproj" />
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.freightpop\ordercloud.integrations.freightpop.csproj" />
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.library\ordercloud.integrations.library.csproj" />
-    <ProjectReference Include="..\..\ordercloud.integrations.tecra\ordercloud.integrations.tecra.csproj" />
+    <ProjectReference Include="..\..\integrations\ordercloud.integrations.tecra\ordercloud.integrations.tecra.csproj" />
   </ItemGroup>
 
   <ItemGroup>

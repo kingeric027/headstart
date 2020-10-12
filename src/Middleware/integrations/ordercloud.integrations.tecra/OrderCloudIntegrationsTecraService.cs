@@ -29,6 +29,9 @@ namespace ordercloud.integrations.tecra
         public string Environment { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public string WorkspaceID { get; set; }
+        public string SettingsID { get; set; }
+        public string StoreID { get; set; }
     }
 
 
