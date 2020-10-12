@@ -12,7 +12,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { Products, ListPage } from 'ordercloud-javascript-sdk';
 import { ChiliService, TecraDocument, TecraSpec } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
-import { ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';
+import { ChiliConfig, ChiliSpec, ChiliSpecOption } from '@ordercloud/headstart-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -160,5 +160,17 @@ export class ProductService extends ResourceCrudService<Product> {
     }
     async deleteChiliSpec(id: string) {
         this.chiliService.deleteChiliSpec(id);
+    }
+    async saveChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
+        return this.chiliService.saveChiliSpecOption(specID, spec);
+    }
+    async updateChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
+        return this.chiliService.updateChiliSpecOption(specID, spec);
+    }
+    async deleteChiliSpecOption(specID: string, optionID: string) {
+        this.chiliService.deleteChiliSpecOption(specID, optionID);
+    }
+    async getChiliTemplate(id: string) {
+        return this.chiliService.getChiliTemplate(id);
     }
 }

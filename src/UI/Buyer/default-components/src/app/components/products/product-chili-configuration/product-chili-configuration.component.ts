@@ -14,6 +14,8 @@ import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 declare var SetVariableValue: any;
+declare var saveDocument: any;
+declare var LoadChiliEditor: any;
 
 @Component({
   templateUrl: './product-chili-configuration.component.html',
@@ -60,6 +62,14 @@ export class OCMProductChiliConfig implements OnInit {
   chiliTemplate: ChiliTemplate;
   showSpecs = false;
   frameSrc: SafeResourceUrl;
+  lineImage: string = '';
+  pdfSrc: string = '';
+  currentDocID = '';
+  ShowAddToCart = false;
+  isLoading = true;
+  editor;
+  frameWindow;
+
   constructor(
     private formService: SpecFormService,
     private sanitizer: DomSanitizer,
@@ -89,17 +99,39 @@ export class OCMProductChiliConfig implements OnInit {
     this.isOrderable = !!chiliTemplate.Product.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
     this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(this.chiliTemplate.Frame);
+    this.currentDocID = this.frameSrc.toString().split("doc=")[1].split("&")[0];
+    this.loadChiliEditor(this.chiliTemplate.Frame);
   }
 
   setTecraSpec(event: any, spec: ChiliSpec): void {
-    debugger;
     const types = {
       'Text': 'string',
       'DropDown': 'list',
       'Checkbox': 'checkbox'
     };
-    const test = event.target.value;
-    SetVariableValue((spec.ListOrder -1), test, types[spec.xp.UI.ControlType])
+    SetVariableValue((spec.ListOrder - 1), event.target, types[spec.xp.UI.ControlType]);
+  }
+
+  loadChiliEditor(url: string): void {
+    setTimeout(() => {
+      LoadChiliEditor(url);
+      this.isLoading = false;
+    }, 1000);
+  }
+
+  async saveTecraDocument(): Promise<void> {
+    this.isLoading = true;
+    saveDocument();
+    setTimeout(async() => {
+      await this.context.chiliConfig.getChiliProof(this.currentDocID, "4511001").then(proofURL => {
+        this.lineImage = proofURL;
+        this.context.chiliConfig.getChiliPDF(this.currentDocID, "4511001").then(printArtworkURL => {
+          this.pdfSrc = printArtworkURL;
+          this.isLoading = false;
+          this.ShowAddToCart = true;
+        });
+      });
+    }, 5000);
   }
 
   loadScript(url: string) {
@@ -115,14 +147,10 @@ export class OCMProductChiliConfig implements OnInit {
   async ngOnInit(): Promise<void> {
     this.currentUser = this.context.currentUser.get();
     this._userCurrency = this.context.currentUser.get().Currency;
-    this.loadScript('https://chili.accuconnect.com/CHILI/scripts/index.js');
-    this.loadScript('https://www.acculync.com/four51/scripts/nd_451_enc.js');
-  }
-
-  async getTecraFrame(): Promise<void> {
-    //const frame = await this.context.chiliConfig.getChiliFrame(this.chiliTemplate.ChiliTemplateID, "4511001");
-    const frame = await this.context.chiliConfig.getChiliFrame("89c89db5-3978-498c-9b3f-bd8b9f296f08", "4511002");
-    this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(frame);
+    //this.loadScript('https://chili.accuconnect.com/CHILI/scripts/index.js');
+    //this.loadScript('https://www.acculync.com/four51/scripts/nd_451_enc.js');
+    
+    this.loadScript('https://www.acculync.com/four51/scripts/sd_451_enc.js');
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
@@ -171,19 +199,20 @@ export class OCMProductChiliConfig implements OnInit {
   async addToCart(): Promise<void> {
     this.isAddingToCart = true;
     try {
-      await this.context.order.cart.add({
+      this.context.order.cart.add({
         ProductID: this._product.ID,
         Quantity: this.quantity,
         Specs: this.specFormService.getLineItemSpecs(this._specs),
         xp: {
-          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct)
+          PrintArtworkURL: this.pdfSrc,
+          ImageUrl: this.lineImage
         }
       });
       this.isAddingToCart = false;
     } catch (ex) {
       this.isAddingToCart = false;
       throw ex;
-    }
+    }    
   }
 
   async asyncForEach(array, cb) {

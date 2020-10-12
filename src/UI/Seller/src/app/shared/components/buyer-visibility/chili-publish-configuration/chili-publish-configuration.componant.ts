@@ -8,8 +8,9 @@ import {
 } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceProduct, ChiliConfig, ChiliSpec, ChiliSpecXp, ChiliSpecUI } from '@ordercloud/headstart-sdk';
+import { MarketplaceProduct, ChiliConfig, ChiliSpec, ChiliSpecXp, ChiliSpecUI, ChiliTemplate, ChiliSpecOption, ChiliSpecOptionXp } from '@ordercloud/headstart-sdk';
 import { TecraDocument, TecraSpec } from '../../../../shared/services/middleware-api/middleware-chili.service';
+import ChiliSpecOptions from '@ordercloud/headstart-sdk/dist/api/ChiliSpecOptions';
 
 @Component({
     selector: 'chili-publish-configuration-component',
@@ -39,6 +40,9 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
     availableCatalogs: UserGroup[] = [];
     catalogAssignments: ProductAssignment[] = [];
     chiliConfigs: ChiliConfig[] = [];
+    chiliTemplate: ChiliTemplate;
+    chiliTemplateID = '';
+    showEditor = false;
 
 
     @Input()
@@ -81,7 +85,7 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
 
     async getChiliDocs(): Promise<void> {
         //TODO Update Buyer xp to associate folder(s) available to search on.
-        const docs = await this.productService.getTecraDocuments("4511001");
+        const docs = await this.productService.getTecraDocumentsByFolder("BasecampFitness");
         this.tecraDocuments = docs;
         this.showChiliDocuments = true;
     }
@@ -189,4 +193,33 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
         await this.productService.saveChiliConfig(event);
         this.listChiliConfigs();
     }
+    async editChiliTemplate(id: string): Promise<void> {
+        this.chiliTemplateID = id;
+        this.chiliTemplate = await this.productService.getChiliTemplate(this.chiliTemplateID);
+        this.showEditor = true;
+        console.log(this.chiliTemplate);
+    }
+    async saveChiliSpecOption(option: ChiliSpecOption, spec: ChiliSpec): Promise<void> {
+        const newVal = (document.getElementById(option.ID + '_option') as any).value;
+        option.Value = newVal;
+        const updatedSpecOption = await this.productService.updateChiliSpecOption(spec.ID, option);
+        spec.Options.forEach(o => {
+            if (o.ID === updatedSpecOption.ID) {
+                o.Value = updatedSpecOption.Value;
+            }
+        });
+    }
+    async deleteChiliSpecOption(option: ChiliSpecOption, spec: ChiliSpec): Promise<void> {
+        await this.productService.deleteChiliSpecOption(spec.ID, option.ID);
+        this.chiliTemplate = await this.productService.getChiliTemplate(this.chiliTemplateID);
+        
+    }
+    async saveNewChiliSpecOption(spec: ChiliSpec): Promise<void> {
+        const newOption: ChiliSpecOption = {
+            Value: (document.getElementById(spec.ID + '_newOption') as any).value
+        };
+        const updatedSpecOption = await this.productService.saveChiliSpecOption(spec.ID, newOption);
+        spec.Options.push(updatedSpecOption);
+    }
+
 }

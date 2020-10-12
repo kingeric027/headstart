@@ -1,5 +1,5 @@
 <ng-container>
-    <div>
+    <div *ngIf="!showEditor">
         <div class="row">
             <div class="col-md-5">
                 <div *ngIf="showChiliDocuments">
@@ -60,6 +60,13 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="btn-group" role="group">
+                                    <button class="btn btn-primary"
+                                            type="submit"
+                                            (click)="editChiliTemplate(config.ID)">
+                                        Edit
+                                    </button>
+                                </div>
+                                <div class="btn-group" role="group">
                                     <button class="btn btn-danger"
                                             type="submit"
                                             (click)="deleteChiliConfig(config)"
@@ -72,6 +79,69 @@
                     </td>
                 </tr>
             </table>
+        </div>
+    </div>
+    <div *ngIf="showEditor">
+        <strong>Template Specs</strong>
+        <table class='table table-bordered table-condensed table-striped table-hover'>
+            <tr class="table-row" *ngFor="let spec of chiliTemplate.TemplateSpecs">
+                <td>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Spec Name</label>
+                            <input class="form-control" type='text' name="{{spec.ID + '_name'}}" id="{{spec.ID + '_name'}}" placeholder="{{spec.Name}}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Default Value</label>
+                            <input class="form-control" type='text' name="{{spec.ID + '_defaultvalue'}}" id="{{spec.ID + '_defaultvalue'}}" placeholder="{{spec.DefaultValue}}">
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="spec.xp.UI.ControlType == 'DropDown'">
+                        <div class="col-md-6">
+                            <div>
+                                <label>Spec Options</label>
+                                <div class="input-group" *ngFor="let option of spec.Options">
+                                    <input class="form-control" type='text' name="{{option.ID + '_option'}}" id="{{option.ID + '_option'}}" [value]="option.Value">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary"
+                                                type="submit"
+                                                (click)="saveChiliSpecOption(option, spec)">
+                                            Save
+                                        </button>
+                                        <button class="btn btn-danger"
+                                                type="submit"
+                                                (click)="deleteChiliSpecOption(option, spec)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Add Option</label>
+                                    <div class="input-group">
+                                        <input class="form-control" type='text' name="{{spec.ID + '_newOption'}}" id="{{spec.ID + '_newOption'}}">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary"
+                                                    type="submit"
+                                                    (click)="saveNewChiliSpecOption(spec)">
+                                                Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-danger"
+                        type="submit"
+                        (click)="showEditor = !showEditor">
+                    Cancel
+                </button>
+            </div>
         </div>
     </div>
 </ng-container>

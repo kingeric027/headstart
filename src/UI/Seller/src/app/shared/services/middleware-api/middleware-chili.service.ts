@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { ChiliConfig, ChiliSpec } from '@ordercloud/headstart-sdk';
+import { ChiliConfig, ChiliSpec, ChiliSpecOption, ChiliTemplate } from '@ordercloud/headstart-sdk';
 import { ListPage } from 'marketplace-javascript-sdk/dist/models/ListPage';
 
 // WHOLE FILE TO BE REPLACED BY SDK
@@ -81,5 +81,25 @@ export class ChiliService {
     async deleteChiliSpec(id: string) {
         const url = `${this.appConfig.middlewareUrl}/chili/specs/${id}`;
         return await this.http.delete<ChiliSpec>(url, { headers: this.buildHeaders() }).toPromise();
+    }
+
+    //Chili Spec Options
+    async saveChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
+        const url = `${this.appConfig.middlewareUrl}/chili/specs/${specID}/options`;
+        return await this.http.post<ChiliSpecOption>(url, spec, { headers: this.buildHeaders() }).toPromise();
+    }
+    async updateChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
+        const url = `${this.appConfig.middlewareUrl}/chili/specs/${specID}/options/${spec.ID}`;
+        return await this.http.put<ChiliSpecOption>(url, spec, { headers: this.buildHeaders() }).toPromise();
+    }
+    async deleteChiliSpecOption(specID: string, optionID: string) {
+        const url = `${this.appConfig.middlewareUrl}/chili/specs/${specID}/options/${optionID}`;
+        return await this.http.delete<ChiliSpecOption>(url, { headers: this.buildHeaders() }).toPromise();
+    }
+
+    //Chili Template
+    async getChiliTemplate(id: string): Promise<ChiliTemplate> {
+        const url = `${this.appConfig.middlewareUrl}/chili/template/${id}`;
+        return await this.http.get<ChiliTemplate>(url, { headers: this.buildHeaders() }).toPromise();
     }
 }

@@ -32,7 +32,7 @@
     </div>
   </div>
   <div class="card-footer"
-       *ngIf="showAddToCart()">
+       *ngIf="showAddToCart() && !_product.xp.ArtworkRequired">
     <ocm-quantity-input class="w-50"
                         id="quantity"
                         [existingQty]="null"

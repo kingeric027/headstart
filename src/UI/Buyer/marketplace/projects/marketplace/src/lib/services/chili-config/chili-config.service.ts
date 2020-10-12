@@ -85,4 +85,31 @@ export class ChiliConfigService {
       .toPromise();
   }
 
+  async getChiliProof(id: string, storeid: string): Promise<string> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
+    });
+    let params = new HttpParams();
+    params = params.append('id', id);
+    params = params.append('storeid', storeid);
+    const url = `${this.appConfig.middlewareUrl}/tecra/proof`;
+    return this.httpClient
+      .get<string>(url, { headers, params })
+      .toPromise();
+  }
+
+  async getChiliPDF(id: string, storeid: string): Promise<string> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
+    });
+    let params = new HttpParams();
+    params = params.append('id', id);
+    params = params.append('storeid', storeid);
+    const url = `${this.appConfig.middlewareUrl}/tecra/pdf`;
+    return this.httpClient
+      .get<string>(url, { headers, params })
+      .toPromise();
+  }
 }
