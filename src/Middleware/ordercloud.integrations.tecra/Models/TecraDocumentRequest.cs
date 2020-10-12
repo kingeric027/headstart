@@ -20,5 +20,17 @@ namespace ordercloud.integrations.tecra.Models
         public string folder { get; set; }
         public string storeid { get; set; }
     }
+    public class TecraProofParams
+    {
+        public string docid { get; set; }
+        public int page { get; set; }
+        public string storeid { get; set; }
+    }
+    public class TecraPDFParams
+    {
+        public string docid { get; set; }
+        public string settingsid { get; set; }
+        public string storeid { get; set; }
+    }
 
 }

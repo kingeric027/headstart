@@ -12,10 +12,12 @@ namespace ordercloud.integrations.tecra
     public interface IOrderCloudIntegrationsTecraService
     {
         Task<TecraToken> GetToken();
-        Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string folder);
+        Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string storeid);
         Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder);
         Task<string> GetTecraFrame(string token, string id, string storeid);
         Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder);
+        Task<string> GetTecraProofByStoreID(string token, string id, string storeid);
+        Task<string> GetTecraPDFByStoreID(string token, string id, string storeid);
 
     }
     public class OrderCloudTecraConfig
@@ -61,9 +63,9 @@ namespace ordercloud.integrations.tecra
             return await this.Token("auth/token").PostStringAsync(request).ReceiveJson<TecraToken>();
         }
 
-        public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string folder)
+        public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string storeid)
         {
-            return await this.Request("api/chili/documents", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraDocument[]>();
+            return await this.Request("api/chili/documents", token).SetQueryParam("storeid", storeid).GetJsonAsync<TecraDocument[]>();
         }
         public async Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder)
         {
@@ -83,16 +85,34 @@ namespace ordercloud.integrations.tecra
         public async Task<string> GetTecraFrame(string token, string id, string storeid)
         {
             //TODO - Make wsid and folder dynamic
-            TecraDocumentRequest request = new TecraDocumentRequest();
             TecraFrameParams tparams = new TecraFrameParams();
             tparams.docid = id;
             tparams.storeid= storeid;
-            //tparams.wsid = "e3210f88-277a-4b4c-9758-6f45906f0958";
+            tparams.wsid = "e3210f88-277a-4b4c-9758-6f45906f0958";
             tparams.wsid = "";
             tparams.folder = "root";
             tparams.vpid = "";
 
             return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+        }
+        public async Task<string> GetTecraProofByStoreID(string token, string id, string storeid)
+        {
+            TecraProofParams tparams = new TecraProofParams();
+            tparams.docid = id;
+            tparams.storeid = storeid;
+            tparams.page = 1;
+
+            return await this.Request("api/v1/chili/getproofimagebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+        }
+        public async Task<string> GetTecraPDFByStoreID(string token, string id, string storeid)
+        {
+            //TODO - Make wsid and folder dynamic
+            TecraPDFParams tparams = new TecraPDFParams();
+            tparams.docid = id;
+            tparams.storeid = storeid;
+            tparams.settingsid = "9549c0ca-36df-4aaa-a564-0e27d39ec7be";
+
+            return await this.Request("api/v1/chili/generatepdfbystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }
     }
 }

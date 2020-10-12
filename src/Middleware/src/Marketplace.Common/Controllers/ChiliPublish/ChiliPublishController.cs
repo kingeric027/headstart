@@ -234,8 +234,9 @@ namespace Marketplace.Common.Controllers
             return result;
         }
     }
+
     [DocComments("\"Integration\" represents a URL to a Tecra Frame")]
-    [MarketplaceSection.Content(ListOrder = 5)]
+    [MarketplaceSection.Content(ListOrder = 6)]
     [Route("tecra/frame"), OrderCloudIntegrationsAuth]
     public class TecraFrameController : BaseController
     {
@@ -252,6 +253,50 @@ namespace Marketplace.Common.Controllers
         public async Task<string> Get(string id, string storeid)
         {
             var result = await _tecra.TecraFrame(id, storeid);
+            return result;
+        }
+    }
+
+    [DocComments("\"Integration\" represents a URL to a Tecra Proof")]
+    [MarketplaceSection.Content(ListOrder = 7)]
+    [Route("tecra/proof"), OrderCloudIntegrationsAuth]
+    public class TecraProofController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraProofController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra Proof")]
+        [HttpGet, Route("")]
+        public async Task<string> Get(string id, string storeid)
+        {
+            var result = await _tecra.TecraProof(id, storeid);
+            return result;
+        }
+    }
+
+    [DocComments("\"Integration\" represents a URL to a Tecra PDF")]
+    [MarketplaceSection.Content(ListOrder = 8)]
+    [Route("tecra/pdf"), OrderCloudIntegrationsAuth]
+    public class TecraPDFController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraPDFController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra PDF")]
+        [HttpGet, Route("")]
+        public async Task<string> Get(string id, string storeid)
+        {
+            var result = await _tecra.TecraPDF(id, storeid);
             return result;
         }
     }

@@ -9,10 +9,12 @@ namespace ordercloud.integrations.tecra
     public interface IOrderCloudIntegrationsTecraCommand
     {
         Task<string> TecraToken();
-        Task<IEnumerable<TecraDocument>> TecraDocuments(string folder);
+        Task<IEnumerable<TecraDocument>> TecraDocuments(string storeid);
         Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string folder);
         Task<IEnumerable<TecraSpec>> TecraSpecs(string id, string folder);
         Task<string> TecraFrame(string id, string storeid);
+        Task<string> TecraProof(string id, string storeid);
+        Task<string> TecraPDF(string id, string storeid);
     }
     public class OrderCloudIntegrationsTecraCommand : IOrderCloudIntegrationsTecraCommand
     {
@@ -28,10 +30,10 @@ namespace ordercloud.integrations.tecra
             TecraToken auth = await _tecra.GetToken();
             return auth.access_token;
         }
-        public async Task<IEnumerable<TecraDocument>> TecraDocuments(string folder)
+        public async Task<IEnumerable<TecraDocument>> TecraDocuments(string storeid)
         {
             TecraToken auth = await _tecra.GetToken();
-            IEnumerable<TecraDocument> documents = await _tecra.GetTecraDocuments(auth.access_token, folder);
+            IEnumerable<TecraDocument> documents = await _tecra.GetTecraDocuments(auth.access_token, storeid);
             return documents;
 
         }
@@ -53,6 +55,20 @@ namespace ordercloud.integrations.tecra
         {
             TecraToken auth = await _tecra.GetToken();
             string specs = await _tecra.GetTecraFrame(auth.access_token, id, storeid);
+            return specs;
+
+        }
+        public async Task<string> TecraProof(string id, string storeid)
+        {
+            TecraToken auth = await _tecra.GetToken();
+            string specs = await _tecra.GetTecraProofByStoreID(auth.access_token, id, storeid);
+            return specs;
+
+        }
+        public async Task<string> TecraPDF(string id, string storeid)
+        {
+            TecraToken auth = await _tecra.GetToken();
+            string specs = await _tecra.GetTecraPDFByStoreID(auth.access_token, id, storeid);
             return specs;
 
         }
