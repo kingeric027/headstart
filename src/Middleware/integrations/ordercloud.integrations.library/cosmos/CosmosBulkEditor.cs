@@ -37,20 +37,17 @@ namespace ordercloud.integrations.library
             });
         }
 
-        public async Task RunBulkUpdateAsync<T>(string collectionName, Func<JObject, List<UpdateOperation>> updateFunc) where T: CosmosObject
+        public async Task RunBulkUpdateAsync<T>(string collectionName, Func<JObject, List<UpdateOperation>> updateFunc) where T : CosmosObject
         {
             var collection = GetCollectionIfExists(client, DatabaseName, collectionName);
             var partitionKeyProperty = typeof(T).GetProperties().FirstOrDefault(prop => prop.HasAttribute<CosmosPartitionKeyAttribute>());
 
             // Prepare for bulk update.
+            int batchSize = 1000;
             long totalNumberOfDocumentsUpdated = 0;
             double totalTimeTakenSec = 0;
             BulkUpdateResponse bulkUpdateResponse = null;
             var token = new CancellationTokenSource().Token;
-
-            // Set retry options high for initialization (default values).
-            client.ConnectionPolicy.RetryOptions.MaxRetryWaitTimeInSeconds = 30;
-            client.ConnectionPolicy.RetryOptions.MaxRetryAttemptsOnThrottledRequests = 9;
 
             IBulkExecutor bulkExecutor = new BulkExecutor(client, collection);
             await bulkExecutor.InitializeAsync();
@@ -61,44 +58,45 @@ namespace ordercloud.integrations.library
 
             // Generate update items.
             var documents = await GetAllExistingDocuments(collection);
-            Console.WriteLine(String.Format("\nFound {0} Documents to update. Beginning.", documents.Count));
 
-            var updateItems = documents.Select(doc => {
+            var updateItems = documents.Select(doc =>
+            {
                 var partitionKey = doc.Value<string>(partitionKeyProperty.Name);
                 var id = doc.Value<string>("id");
                 return new UpdateItem(id, partitionKey, updateFunc(doc));
-            }).ToList();
-         
-            // Invoke bulk update
+            }).Where(ui => ui.PartitionKey != null).ToList();
+
+            var batchedUpdateItems = updateItems.Chunk(batchSize).ToList();
+
+            Console.WriteLine(String.Format("\nFound {0} Documents to update. {1} Batches of {2}. Beginning.", documents.Count, batchedUpdateItems.Count, batchSize));
+
             await Task.Run(async () =>
             {
+                var batchesRun = 0;
                 do
                 {
                     try
                     {
                         bulkUpdateResponse = await bulkExecutor.BulkUpdateAsync(
-                            updateItems: updateItems,
+                            updateItems: batchedUpdateItems[batchesRun],
                             maxConcurrencyPerPartitionKeyRange: null,
                             cancellationToken: token);
                     }
                     catch (DocumentClientException de)
                     {
                         Console.WriteLine("Document client exception: {0}", de);
-                        break;
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Exception: {0}", e);
-                        break;
                     }
-                } while (bulkUpdateResponse.NumberOfDocumentsUpdated < updateItems.Count);
 
-                LogProgress(bulkUpdateResponse);
-
-                totalNumberOfDocumentsUpdated += bulkUpdateResponse.NumberOfDocumentsUpdated;
-                totalTimeTakenSec += bulkUpdateResponse.TotalTimeTaken.TotalSeconds;
-            },
-            token);
+                    LogProgress(bulkUpdateResponse);
+                    batchesRun++;
+                    totalNumberOfDocumentsUpdated += bulkUpdateResponse.NumberOfDocumentsUpdated;
+                    totalTimeTakenSec += bulkUpdateResponse.TotalTimeTaken.TotalSeconds;
+                } while (totalNumberOfDocumentsUpdated < updateItems.Count);
+            });
         }
 
         private async Task<List<JObject>> GetAllExistingDocuments(DocumentCollection collection)
