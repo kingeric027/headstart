@@ -67,7 +67,7 @@
                 class="badge badge-pill badge-secondary ml-2">{{order.xp.OrderType}}</span>
         </td>
         <td *ngIf="columns.includes('Status')">
-          <ocm-order-status-icon [status]="order.Status"></ocm-order-status-icon> {{order.Status}}
+          <ocm-order-status-icon [status]="getOrderStatus(order)"></ocm-order-status-icon> {{getOrderStatus(order)}}
         </td>
         <td *ngIf="columns.includes('DateSubmitted')">{{order.DateSubmitted | date: 'short' || 'N/A'}}</td>
         <td *ngIf="columns.includes('SubmittedBy')">{{order.FromUser.FirstName}} {{order.FromUser.LastName}}</td>

@@ -56,7 +56,7 @@ class ProductDetailsPage {
 		this.buyerList = Selector('.list-group-item')
 	}
 
-	async createDefaultProduct() {
+	async createDefaultStandardProduct() {
 		const productName = `AutomationProduct_${randomString(5)}`
 		await t.typeText(this.nameField, productName)
 		await t.typeText(this.quantityPerUnitField, '1')
@@ -82,6 +82,18 @@ class ProductDetailsPage {
 		await t.click(this.pricingTab)
 		await t.typeText(this.priceField, '5')
 		await clickLeftOfElement(this.priceField)
+		await t.click(this.createButton)
+		await loadingHelper.waitForLoadingBar()
+
+		return productName
+	}
+
+	async createDefaultQuoteProduct() {
+		const productName = `AutomationProduct_${randomString(5)}`
+		await t.typeText(this.nameField, productName)
+		await t.typeText(this.quantityPerUnitField, '1')
+		await t.typeText(this.unitOfMeasureField, 'Unit')
+		await scrollIntoView(`button[type="submit"]`)
 		await t.click(this.createButton)
 		await loadingHelper.waitForLoadingBar()
 

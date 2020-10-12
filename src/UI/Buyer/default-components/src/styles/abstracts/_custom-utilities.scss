@@ -1,15 +1,16 @@
 // Flex uitilies
 
-.flex-shrink-0 {  flex-shrink: 0; }
-.flex-none {  flex: none; }
+.flex-shrink-0          {  flex-shrink: 0; }
+.flex-none              {  flex: none; }
 
-.cursor-pointer { cursor: pointer;  }
+.cursor-pointer         { cursor: pointer;  }
 
-.line-height-1 {  line-height: 1.2; }
-.line-height-2 {  line-height: 2.1; }
+.line-height-1          {  line-height: 1.2; }
+.line-height-2          {  line-height: 2.1; }
+.line-height-inherit    {  line-height: inherit; }
 
-.font-weight-medium    { font-weight: 500 !important; }
-.font-weight-semibold    { font-weight: 600 !important; }
+.font-weight-medium     { font-weight: 500 !important; }
+.font-weight-semibold   { font-weight: 600 !important; }
 
 .border-hover {
   transition: border-color 0.25s ease;

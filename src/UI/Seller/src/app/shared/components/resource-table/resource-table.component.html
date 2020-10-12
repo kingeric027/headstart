@@ -242,8 +242,8 @@
                             [selectedParentResouceName]="selectedParentResourceName">
             </request-status>
           </perfect-scrollbar>
-          <resource-list-meta *ngIf="selectedResourceID"
-                              [selectedResourceID]="selectedResourceID"
+          <resource-list-meta *ngIf="selectedResourceID || isCreatingNew"
+                              [selectedResourceID]="selectedResourceID || isCreatingNew"
                               [listPage]="_ocService?.resourceSubject?.value">
           </resource-list-meta>
         </div>
@@ -328,7 +328,7 @@
       </ng-template>
     </div>
   </div>
-  <resource-list-meta *ngIf="!selectedResourceID"
+  <resource-list-meta *ngIf="!selectedResourceID && !isCreatingNew"
                       [selectedResourceID]="selectedResourceID"
                       [listPage]="_ocService?.resourceSubject?.value">
   </resource-list-meta>

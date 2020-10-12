@@ -56,7 +56,7 @@
     <ul>
       <li *ngFor="let approval of approvals"
           translate>
-        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} ORDERS.HISTORICAL.ON {{ approval.DateCreated | date: 'short' }}
+        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} - {{ approval.DateCreated | date: 'short' }}
         <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
       </li>
     </ul>
