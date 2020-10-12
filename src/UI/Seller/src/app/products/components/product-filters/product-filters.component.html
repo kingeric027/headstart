@@ -45,7 +45,7 @@
               </thead>
               <tbody>
                 <ng-container *ngFor="let facet of facetOptions">
-                  <tr *ngIf="!readonly || (readonly && areFacetOptionsSelected(facet))">
+                  <tr *ngIf="!readonly || (readonly && (areFacetOptionsSelected(facet) || sellerFilterOverride))">
                     <td>
                       {{facet.Name}}
                     </td>

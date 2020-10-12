@@ -101,7 +101,7 @@ namespace ordercloud.integrations.cms
 			}
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) {
-				if (asset.Url == null) throw new AssetCreateValidationException("Must include a Url");
+				if (asset.Url == null) throw new AssetCreateValidationException("If you are not uploading a file, you must include a Url");
 				existingAsset = new AssetDO()
 				{
 					Type = asset.Type,

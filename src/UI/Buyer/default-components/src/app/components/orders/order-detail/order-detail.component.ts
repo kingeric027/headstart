@@ -46,6 +46,15 @@ export class OCMOrderDetails implements OnInit {
     return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
   }
 
+  getOrderStatus(): string {
+    //AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
+    if (this.order?.Status === "AwaitingApproval") {
+      return "AwaitingApproval"
+    } else {
+      return this.order?.xp?.SubmittedOrderStatus;
+    }
+  }
+
   canRequestReturn(): boolean {
     return CanReturnOrder(this.orderDetails.LineItems);
   }

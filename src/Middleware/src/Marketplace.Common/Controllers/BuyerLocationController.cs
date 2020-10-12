@@ -118,5 +118,12 @@ namespace Marketplace.Common.Controllers
         {
             return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, userID, VerifiedUserContext);
         }
+
+        [DocName("LIST user groups for new user")]
+        [HttpGet, Route("{buyerID}/{homeCountry}/usergroups"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
+        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry)
+        {
+            return await _locationPermissionCommand.ListUserGroupsForNewUser(args, buyerID, homeCountry, VerifiedUserContext);
+        }
     }
 }
