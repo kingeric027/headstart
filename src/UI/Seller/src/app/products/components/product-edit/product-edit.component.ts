@@ -374,6 +374,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       let superProduct = this._superMarketplaceProductStatic;
       if (JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic)) {
         superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
+        superProduct = await this.checkForFieldsToMonior(superProduct);
       }
       this.refreshProductData(superProduct);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
@@ -385,6 +386,18 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.dataIsSaving = false;
       throw ex;
     }
+  }
+
+  async checkForFieldsToMonior(editedSuperProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
+    const fieldsToMonitorForChanges = this.appConfig?.productFieldsToMonitor;
+    let superProduct = editedSuperProduct;
+    fieldsToMonitorForChanges.forEach(f => {
+      const fieldChanged = JSON.stringify(_get(editedSuperProduct, f)) !== JSON.stringify(_get(this._superMarketplaceProductStatic, f));
+      if (fieldChanged) {
+        // TODO: Call to async middleware route to set SuperProduct.Product.Active to false, and create product change notification document
+      }
+    });
+    return superProduct;
   }
 
   updateProductResource(productUpdate: any): void {
