@@ -18,8 +18,9 @@
   width: 25px;
   height:25px;
   border-radius: 0.15rem;
-  background: #ecebec;
-  padding: 1rem 1.25rem;
+  background: var(--light);
+  padding: 1rem;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;

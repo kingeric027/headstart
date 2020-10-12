@@ -231,7 +231,7 @@ namespace Marketplace.Common.Commands.Crud
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
 				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
 			});
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
@@ -251,6 +251,8 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
 		{
+			// Update the Product itself
+			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// Two spec lists to compare (requestSpecs and existingSpecs)
 			IList<Spec> requestSpecs = superProduct.Specs.ToList();
 			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
@@ -312,7 +314,7 @@ namespace Marketplace.Common.Commands.Crud
 				{
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
-					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active }, accessToken: user.AccessToken);
+					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active, Inventory = v.Inventory }, accessToken: user.AccessToken);
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
@@ -321,8 +323,6 @@ namespace Marketplace.Common.Commands.Crud
 			{
 				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
 			}
-			// Update the Product itself
-			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
 			// List Product Specs
@@ -351,6 +351,7 @@ namespace Marketplace.Common.Commands.Crud
 			if (variant.ShipLength != currVariant.ShipLength) { return true; }
 			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
 			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
+			if (variant.Inventory != currVariant.Inventory) { return true; }
 
 			return false;
 		}

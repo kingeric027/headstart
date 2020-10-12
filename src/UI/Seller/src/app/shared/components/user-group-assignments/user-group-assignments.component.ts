@@ -82,7 +82,9 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroups(ID: string): Promise<void> {
-    if (this.user.xp?.Country) {
+    if (this.userGroupType === 'UserPermissions') {
+      this.userGroups = await this.userPermissionsService.getUserGroups(ID, this.options);
+    } else if (this.userGroupType === 'BuyerLocation' && this.user.xp?.Country) {
       const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
       this.userGroups = groups;
     } else {
@@ -93,12 +95,19 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${this.userGroupType}/${userOrgID}/usergroupassignments/${userID}`;
+    let userGroupAssignments;
+    if (this.userGroupType === 'UserPermissions') {
+      userGroupAssignments = await (await this.userPermissionsService.listUserAssignments(userID, userOrgID)).Items;
+    } else {
+      const url = `${this.appConfig.middlewareUrl}/buyerlocations/${this.userGroupType}/${userOrgID}/usergroupassignments/${userID}`;
         //TO-DO - Replace with SDK (1.8.4 or later for updated arguments)
-    const userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
+      userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
+    }
     this._userUserGroupAssignmentsStatic = userGroupAssignments;
     this._userUserGroupAssignmentsEditable = userGroupAssignments;
-    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => (this.userGroups as any).Items?.find(ug => ug.ID === assignedUG.UserGroupID));
+    const match = this._userUserGroupAssignmentsStatic?.length ? 
+      this._userUserGroupAssignmentsStatic.some(assignedUG => (this.userGroups as any).Items?.find(ug => ug.ID === assignedUG.UserGroupID)) 
+      : false;
     this.hasAssignments.emit(match);
   }
 

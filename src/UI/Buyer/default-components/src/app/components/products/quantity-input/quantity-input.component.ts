@@ -21,6 +21,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() existingQty: number;
   @Input() gridDisplay?= false;
   @Input() isQtyChanging;
+  @Input() variantInventory?: number;
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
   // TODO - replace with real product info
   form: FormGroup;
@@ -126,9 +127,12 @@ export class OCMQuantityInput implements OnInit, OnChanges {
       product.Inventory &&
       product.Inventory.Enabled &&
       !product.Inventory.OrderCanExceed &&
-      product.Inventory.QuantityAvailable != null
+      product.Inventory.QuantityAvailable != null &&
+      !product.Inventory.VariantLevelTracking
     ) {
       return product.Inventory.QuantityAvailable;
+    } else if (product.Inventory && product.Inventory.VariantLevelTracking) {
+      return this.variantInventory;
     }
     return Infinity;
   }

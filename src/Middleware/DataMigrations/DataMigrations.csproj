@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Diagnostics.TextWriterTraceListener" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\src\Marketplace.Common\Marketplace.Common.csproj" />
   </ItemGroup>
 
