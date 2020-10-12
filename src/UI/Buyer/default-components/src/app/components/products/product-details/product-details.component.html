@@ -1,15 +1,17 @@
-<div class="container-fluid mt-4"
+<div class="container my-4"
      *ngIf="_product">
   <div class="row mb-5">
-    <div class="col-xl-5 col-lg-5">
+    <div class="col-md-6">
       <ocm-image-gallery *ngIf="_superProduct.Images"
                          [images]="_superProduct.Images"
                          [specs]="specForm?.value?.ctrls"></ocm-image-gallery>
     </div>
-    <div class="col-xl-5 col-lg-4">
-      <div class="pb-3 border-bottom border-medium">
-        <small><a href="javascript:;"
-             (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}</a></small>
+    <div class="col-md-6">
+      <div class="pb-3 mb-3 border-bottom border-light">
+        <a href="javascript:;"
+           (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">
+          {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}
+        </a>
         <h1 class="h3 my-0">{{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
         </h1>
         <ocm-toggle-favorite title="Favorite"
@@ -121,9 +123,9 @@
           </div>
         </div>
       </div>
-      <div *ngIf="priceBreaks && priceBreaks.length > 1">
-        <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
-        <div class=" border border-medium rounded mb-3 p-2">
+      <ng-container *ngIf="priceBreaks && priceBreaks.length > 1">
+        <strong translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD: </strong>
+        <div class=" border-bottom border-medium mb-3 pb-3">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
             <span *ngFor="let priceBreak of priceBreaks; let i = index"
@@ -132,7 +134,7 @@
             </span>
           </div>
         </div>
-      </div>
+      </ng-container>
       <div class="alert alert-success my-3"
            *ngIf="showRequestSubmittedMessage && specForm?.valid && qtyValid">
         <span translate>PRODUCTS.DETAILS.SUCCESS
@@ -148,13 +150,10 @@
         <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
         </span>
       </div>
-      <strong>
-        <span translate>PRODUCTS.DETAILS.DESCRIPTION</span>:
-      </strong>
-      <div class="p-2 border border-medium rounded">
-        <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
-        </p>
-      </div>
+      <h5 class="border-bottom border-light pb-3 mb-3"
+          translate>PRODUCTS.DETAILS.DESCRIPTION</h5>
+      <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
+      </p>
       <div *ngIf="attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
