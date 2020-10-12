@@ -153,7 +153,7 @@ namespace Marketplace.Common.Commands
 					Buyer = buyer,
 					Markup = new BuyerMarkup() { Percent = 0 }
 				};
-				await _buyerCommand.Create(superBuyer, token);
+				await _buyerCommand.Create(superBuyer, user);
 			}
 		}
 

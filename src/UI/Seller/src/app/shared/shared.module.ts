@@ -56,6 +56,7 @@ import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buye
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
 import { VariablePrintConfiguration } from './components/buyer-visibility/variable-print-configuration/variable-print-configuration.component';
 import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-publish-configuration/chili-publish-configuration.componant';
+import { ResourceListMeta } from './components/resource-list-meta/resource-list-meta.component';
 
 @NgModule({
   imports: [
@@ -135,7 +136,8 @@ import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-p
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
     VariablePrintConfiguration,
-    ChiliPublishConfiguration
+    ChiliPublishConfiguration,
+    ResourceListMeta,
   ],
   declarations: [
     SearchComponent,
@@ -168,6 +170,7 @@ import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-p
     ProductCategoryAssignment,
     VariablePrintConfiguration,
     ChiliPublishConfiguration,
+    ResourceListMeta,
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,

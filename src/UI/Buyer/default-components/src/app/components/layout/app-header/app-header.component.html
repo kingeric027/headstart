@@ -200,8 +200,9 @@
 <!-- Search / Cart Nav -->
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container">
-    <div class="category-toggle cursor-pointer"
-         (click)="showCategoryDropdown = !showCategoryDropdown">
+    <button class="btn category-toggle cursor-pointer"
+            (click)="toggleCategoryDropdown($event.detail)"
+            type="button">
       <fa-icon *ngIf="!showCategoryDropdown"
                placement="right"
                ngbTooltip="Categories"
@@ -213,7 +214,8 @@
                ngbTooltip="Categories"
                [openDelay]="500"
                [icon]="faTimes"></fa-icon>
-    </div>
+    </button>
+    <small class="ml-1 font-weight-bold text-uppercase">Shop</small>
 
     <ocm-search class="ml-3 mr-3 w-100"
                 [placeholderText]="'Products'"
@@ -258,5 +260,6 @@
 <ocm-category-dropdown (window:mouseup)="clickOutsideCategoryDropdown($event)"
                        (closeDropdown)="toggleCategoryDropdown($event.detail)"
                        [categories]="categories"
-                       *ngIf="showCategoryDropdown"></ocm-category-dropdown>
+                       *ngIf="showCategoryDropdown"
+                       style="position: fixed; height: 100vh; top: 0;"></ocm-category-dropdown>
 <!-- /Search / Cart Nav -->

@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut.Extensions;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 
@@ -47,7 +50,7 @@ namespace Marketplace.Common.Commands.Crud
         public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
         {
             var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
-            var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
+            var attachments = assets.Items.Where(a => a.Title == "Product_Attachment").ToList();
             return attachments;
         }
         public async Task<MarketplaceKitProduct> Get(string id, VerifiedUserContext user)
@@ -56,6 +59,7 @@ namespace Marketplace.Common.Commands.Crud
             var _images = GetProductImages(id, user);
             var _attachments = GetProductAttachments(id, user);
             var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
+
             return new MarketplaceKitProduct
             {
                 ID = _product.ID,
@@ -63,7 +67,7 @@ namespace Marketplace.Common.Commands.Crud
                 Product = _product,
                 Images = await _images,
                 Attachments = await _attachments,
-                ProductAssignments = _productAssignments.Doc
+                ProductAssignments = await _getKitDetails(_productAssignments.Doc, user)
             };
         }
         public async Task<MarketplaceMeKitProduct> GetMeKit(string id, VerifiedUserContext user)
@@ -71,7 +75,7 @@ namespace Marketplace.Common.Commands.Crud
             var _product = await _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
             var _images = GetProductImages(id, user);
             var _attachments = GetProductAttachments(id, user);
-            var _productAssignments = await _query.Get<KitProduct>("KitProduct", _product.ID, user);
+            var _productAssignments = await _query.Get<MeKitProduct>("KitProduct", _product.ID, user);
             return new MarketplaceMeKitProduct
             {
                 ID = _product.ID,
@@ -79,7 +83,7 @@ namespace Marketplace.Common.Commands.Crud
                 Product = _product,
                 Images = await _images,
                 Attachments = await _attachments,
-                ProductAssignments = _productAssignments.Doc
+                ProductAssignments = await _getMeKitDetails(_productAssignments.Doc, user)
             };
         }
 
@@ -100,7 +104,7 @@ namespace Marketplace.Common.Commands.Crud
                     Product = parentProduct,
                     Images = await _images,
                     Attachments = await _attachments,
-                    ProductAssignments = product.Doc
+                    ProductAssignments = await _getKitDetails(product.Doc, user)
                 });
             });
             return new ListPage<MarketplaceKitProduct>
@@ -123,7 +127,7 @@ namespace Marketplace.Common.Commands.Crud
                 Product = _product,
                 Images = new List<Asset>(),
                 Attachments = new List<Asset>(),
-                ProductAssignments = _productAssignments.Doc
+                ProductAssignments = await _getKitDetails(_productAssignments.Doc, user)
             };
         }
 
@@ -143,8 +147,64 @@ namespace Marketplace.Common.Commands.Crud
                 Product = _updatedProduct,
                 Images = _images,
                 Attachments = _attachments,
-                ProductAssignments = _productAssignments.Doc
+                ProductAssignments = await _getKitDetails(_productAssignments.Doc, user)
             };
+        }
+
+        public async Task<KitProduct> _getKitDetails(KitProduct kit, VerifiedUserContext user)
+        {
+            
+            // get product, specs, variants, and images for each product in the kit
+            foreach (var p in kit.ProductsInKit)
+            {
+                try
+                {
+                    var productRequest = _oc.Products.GetAsync<MarketplaceProduct>(p.ID);
+                    var specListRequest = ListAllAsync.List((page) => _oc.Products.ListSpecsAsync(p.ID, page: page, pageSize: 100));
+                    var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
+                    await Task.WhenAll(specListRequest, variantListRequest);
+
+                    p.Product = await productRequest;
+                    p.Specs = await specListRequest;
+                    p.Variants = await variantListRequest;
+                    p.Images = await GetProductImages(p.ID, user);
+                } catch(Exception)
+                {
+                    p.Product = null;
+                }
+            }
+
+            // filter out products in kit that we failed to retrieve details for (product might have been deleted since kit was created)
+            kit.ProductsInKit = kit.ProductsInKit.Where(p => p.Product != null).ToList();
+            return kit;
+        }
+
+        public async Task<MeKitProduct> _getMeKitDetails(MeKitProduct kit, VerifiedUserContext user)
+        {
+            // get product, specs, variants, and images for each product in the kit
+            foreach (var p in kit.ProductsInKit)
+            {
+                try
+                {
+                    var productRequest = _oc.Me.GetProductAsync<MarketplaceMeProduct>(p.ID, user.AccessToken);
+                    var specListRequest = ListAllAsync.List((page) => _oc.Products.ListSpecsAsync(p.ID, page: page, pageSize: 100));
+                    var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
+                    await Task.WhenAll(specListRequest, variantListRequest);
+
+                    p.Product = await productRequest;
+                    p.Specs = await specListRequest;
+                    p.Variants = await variantListRequest;
+                    p.Images = await GetProductImages(p.ID, user);
+                }
+                catch (Exception)
+                {
+                    p.Product = null;
+                }
+            }
+
+            // filter out products in kit that we failed to retrieve details for (product might have been deleted since kit was created)
+            kit.ProductsInKit = kit.ProductsInKit.Where(p => p.Product != null).ToList();
+            return kit;
         }
 
         public async Task Delete(string id, VerifiedUserContext user)

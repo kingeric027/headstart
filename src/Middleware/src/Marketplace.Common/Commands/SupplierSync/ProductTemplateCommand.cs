@@ -173,6 +173,7 @@ namespace Marketplace.Common.Commands.SupplierSync
 
         [OrderCloud.SDK.Required]
         public string Name { get; set; }
+        [MaxSize(2000)]
         public string Description { get; set; }
         [MinValue(1)]
         public int QuantityMultiplier { get; set; }

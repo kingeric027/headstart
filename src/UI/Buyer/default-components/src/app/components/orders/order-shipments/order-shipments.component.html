@@ -29,7 +29,7 @@
                    target="_blank">{{selectedShipment.TrackingNumber}}</a>
               </li>
               <li>
-                <b><span translate>ORDERS.SHIPMENTS.DATE_SHIPPED</span>:</b> {{selectedShipment.DateShipped | date: 'short'}}
+                <b><span translate>ORDERS.SHIPMENTS.DATE_SHIPPED</span>:</b> {{selectedShipment.DateShipped | date:'shortDate':'UTC' }}
               </li>
             </ul>
           </div>

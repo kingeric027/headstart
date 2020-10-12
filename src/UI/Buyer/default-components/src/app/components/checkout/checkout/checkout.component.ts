@@ -15,6 +15,8 @@ import { SelectedCreditCard } from '../checkout-payment/checkout-payment.compone
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { ShopperContextService } from 'marketplace';
 import { MerchantConfig } from 'src/app/config/merchant.class';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -56,8 +58,9 @@ export class OCMCheckout implements OnInit {
       valid: false,
     },
   ];
+  isLoading = false;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
@@ -78,9 +81,10 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
+    this.initLoadingIndicator('shippingAddressLoading');
     const orderWorksheet = await this.checkout.estimateShipping();
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
-    this.toSection('shippingSelection');
+    this.destoryLoadingIndicator('shippingSelection');
   }
 
   async selectShipMethod(selection: ShipMethodSelection): Promise<void> {
@@ -89,17 +93,19 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShippingRates(): Promise<void> {
+    this.initLoadingIndicator('shippingSelectionLoading');
     await this.checkout.calculateOrder();
     this.cards = await this.context.currentUser.cards.List();
     await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
     this.lineItems = this.context.order.cart.get();
-    this.toSection('payment');
+    this.destoryLoadingIndicator('payment');
   }
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
+    this.initLoadingIndicator('paymentLoading');
     // TODO - is delete still needed? There used to be an OC bug with multiple payments on an order.
-    await this.checkout.deleteExistingPayments(); 
+    await this.checkout.deleteExistingPayments();
     this.selectedCard = output;
     if (output.SavedCard) {
       await this.checkout.createSavedCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal);
@@ -111,26 +117,27 @@ export class OCMCheckout implements OnInit {
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
       await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal);
     }
-    if(this.orderSummaryMeta.POLineItemCount) {
+    if (this.orderSummaryMeta.POLineItemCount) {
       await this.checkout.createPurchaseOrderPayment(this.orderSummaryMeta.POTotal);
     }
     this.payments = await this.checkout.listPayments();
-    this.toSection('confirm');
+    this.destoryLoadingIndicator('confirm');
   }
-  
+
   async onAcknowledgePurchaseOrder(): Promise<void> {
     // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
-    await this.checkout.deleteExistingPayments(); 
+    await this.checkout.deleteExistingPayments();
     await this.checkout.createPurchaseOrderPayment(this.orderSummaryMeta.POTotal);
     this.payments = await this.checkout.listPayments();
     this.toSection('confirm');
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
+    this.initLoadingIndicator('submitLoading')
     await this.checkout.addComment(comment);
     let cleanOrderID = '';
     const merchant = MerchantConfig.getMerchant(this.order.xp.Currency);
-    if(this.orderSummaryMeta.StandardLineItemCount) {
+    if (this.orderSummaryMeta.StandardLineItemCount) {
       const ccPayment = {
         OrderId: this.order.ID,
         PaymentID: this.payments.Items[0].ID, // There's always only one at this point
@@ -146,6 +153,7 @@ export class OCMCheckout implements OnInit {
       cleanOrderID = await this.checkout.submitWithoutCreditCard();
       await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
     }
+    this.isLoading = false;
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
   }
@@ -161,9 +169,9 @@ export class OCMCheckout implements OnInit {
   toSection(id: string): void {
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
-    
+
     // set validation to true on all previous sections
-    for(let i = 0; i <= prevIdx; i++) {
+    for (let i = 0; i <= prevIdx; i++) {
       const prev = this.sections[i].id;
       this.setValidation(prev, true);
     }
@@ -192,5 +200,16 @@ export class OCMCheckout implements OnInit {
     this.orderPromotions = this.context.order.promos.get().Items;
     this.orderPromotions = promos.detail;
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, this.currentPanel)
+  }
+
+  initLoadingIndicator(toSection: string): void {
+    this.isLoading = true;
+    this.currentPanel = toSection;
+    this.spinner.show();
+  }
+
+  destoryLoadingIndicator(toSection: string): void {
+    this.isLoading = false;
+    this.currentPanel = toSection;
   }
 }

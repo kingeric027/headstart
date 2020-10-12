@@ -283,7 +283,7 @@ namespace Marketplace.Common.Commands
                     {
                         await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
                         {
-                            if (supplier.xp.NotificationRcpts.Any())
+                            if (supplier?.xp?.NotificationRcpts?.Any() ?? false)
                             {
                                 var tos = new List<EmailAddress>();
                                 foreach (var rcpt in supplier.xp.NotificationRcpts)
@@ -293,6 +293,7 @@ namespace Marketplace.Common.Commands
                                 await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
                             }
                         });
+                        
                     }
                 }
             }

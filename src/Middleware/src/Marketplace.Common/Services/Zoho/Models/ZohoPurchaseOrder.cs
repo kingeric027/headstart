@@ -8,7 +8,7 @@ namespace Marketplace.Common.Services.Zoho.Models
     public class ZohoPurchaseOrderList : ZohoListResponse
     {
         [JsonProperty(PropertyName = "purchaseorders")]
-        public List<ZohoContact> Items { get; set; }
+        public List<ZohoPurchaseOrder> Items { get; set; }
     }
 
     public class ZohoPurchaseOrder

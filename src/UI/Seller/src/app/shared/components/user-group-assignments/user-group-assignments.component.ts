@@ -6,7 +6,7 @@ import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.confi
 import { GetDisplayText } from './user-group-assignments.constants';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { MarketplaceLocationUserGroup } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, MarketplaceLocationUserGroup } from '@ordercloud/headstart-sdk';
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 interface AssignmentsToAddUpdate {
@@ -24,6 +24,7 @@ export class UserGroupAssignments implements OnChanges {
   @Input() userGroupType: string;
   @Input() isCreatingNew: boolean;
   @Input() userPermissionsService: IUserPermissionsService;
+  @Input() homeCountry: string;
   @Output() assignmentsToAdd = new EventEmitter<AssignmentsToAddUpdate>();
   @Output() hasAssignments = new EventEmitter<boolean>();
 
@@ -42,7 +43,7 @@ export class UserGroupAssignments implements OnChanges {
   searchTermInput: string;
   searching: boolean;
   viewAssignedUserGroups = false;
-  args: ListArgs = { pageSize: 100, filters: { assigned: false } };
+  args: ListArgs = { pageSize: 100, filters: { assigned: 'false' } };
   retrievingAssignments: boolean;
 
   constructor(
@@ -56,7 +57,9 @@ export class UserGroupAssignments implements OnChanges {
     this.userOrgID = await this.userPermissionsService.getParentResourceID();
     this.searchTermInput = '';
     this.args.search = null;
-    await this.getUserGroups(this.userOrgID);
+    if (this.userOrgID !== REDIRECT_TO_FIRST_PARENT) {
+      await this.getUserGroups(this.userOrgID);
+    }
     if (changes.user?.currentValue.ID && !this.userID) {
       this.userID = this.user.ID;
       if(this.userOrgID && this.userOrgID !== REDIRECT_TO_FIRST_PARENT){
@@ -79,21 +82,32 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroups(ID: string): Promise<void> {
-    if (this.user.xp?.Country) {
+    if (this.userGroupType === 'UserPermissions') {
+      this.userGroups = await this.userPermissionsService.getUserGroups(ID, this.options);
+    } else if (this.userGroupType === 'BuyerLocation' && this.user.xp?.Country) {
       const groups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
       this.userGroups = groups;
     } else {
-      this.userGroups = await this.userPermissionsService.getUserGroups(ID, this.options);
+      const url = `${this.appConfig.middlewareUrl}/buyerlocations/${ID}/${this.homeCountry}/usergroups`;
+      //TO-DO - Replace with SDK
+      this.userGroups = await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
     }
   }
 
   async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${userOrgID}/usergroupassignments/${userID}`;
-        //TO-DO - Replace with SDK
-    const userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
+    let userGroupAssignments;
+    if (this.userGroupType === 'UserPermissions') {
+      userGroupAssignments = await (await this.userPermissionsService.listUserAssignments(userID, userOrgID)).Items;
+    } else {
+      const url = `${this.appConfig.middlewareUrl}/buyerlocations/${this.userGroupType}/${userOrgID}/usergroupassignments/${userID}`;
+        //TO-DO - Replace with SDK (1.8.4 or later for updated arguments)
+      userGroupAssignments = await this.http.get<UserGroupAssignment[]>(url, { headers: this.buildHeaders() }).toPromise();
+    }
     this._userUserGroupAssignmentsStatic = userGroupAssignments;
     this._userUserGroupAssignmentsEditable = userGroupAssignments;
-    const match = this._userUserGroupAssignmentsStatic.some(assignedUG => (this.userGroups as any).Items?.find(ug => ug.ID === assignedUG.UserGroupID));
+    const match = this._userUserGroupAssignmentsStatic?.length ? 
+      this._userUserGroupAssignmentsStatic.some(assignedUG => (this.userGroups as any).Items?.find(ug => ug.ID === assignedUG.UserGroupID)) 
+      : false;
     this.hasAssignments.emit(match);
   }
 
@@ -166,9 +180,7 @@ export class UserGroupAssignments implements OnChanges {
   }
 
   async getUserGroupsByCountry(buyerID: string, userID: string): Promise<ListPage<MarketplaceLocationUserGroup>> {
-    const url = `${this.appConfig.middlewareUrl}/buyerlocations/${buyerID}/usergroups/${userID}`;
-    //TO-DO - Replace with SDK
-    const userGroups = await this.http.get<ListPage<MarketplaceLocationUserGroup>>(url, { headers: this.buildHeaders(), params: this.createHttpParams(this.args) }).toPromise();
+    const userGroups = await HeadStartSDK.BuyerLocations.ListUserGroupsByCountry(buyerID, userID, this.args);
     userGroups.Items.sort((a, b) => (a.Name > b.Name) ? 1 : ((b.Name > a.Name) ? -1 : 0));
     return userGroups;
   }
@@ -195,14 +207,14 @@ export class UserGroupAssignments implements OnChanges {
 
   async changePage(page: number) {
     this.args = { ...this.args, page };
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+    await this.getUserGroups(this.userOrgID);
   }
 
   async searchedResources(searchText: any) {
     this.searching = true;
     this.searchTermInput = searchText;
     this.args = {...this.args, search: searchText, page: 1 };
-    this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
+    await this.getUserGroups(this.userOrgID);
     this.searching = false;
 }
 
@@ -210,7 +222,7 @@ export class UserGroupAssignments implements OnChanges {
     this.viewAssignedUserGroups = value;
     this.userGroups = [];
     this.searchTermInput = '';
-    this.args = { pageSize: 100, filters: { assigned: this.viewAssignedUserGroups } };
+    this.args = { pageSize: 100, filters: { assigned: this.viewAssignedUserGroups.toString() } };
     this.retrievingAssignments = true;
     this.userGroups = await this.getUserGroupsByCountry(this.userOrgID, this.user.ID);
     this.retrievingAssignments = false;

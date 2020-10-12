@@ -8,13 +8,14 @@ import { specErrors } from '../errors';
   selector: 'spec-form-number',
   template: `
     <div [formGroup]="group">
-      <div class="form-input">
-        <label>{{ config.label }}</label>
+      <div class="form-input" [class.row]="compact">
+        <label [class.col-3]="compact">{{ config.label }}</label>
         <input
           type="number"
           [attr.min]="config.min"
           [attr.step]="config.step"
           class="form-control form-control-sm"
+          [class.col-9]="compact"
           [attr.placeholder]="config.placeholder"
           [formControlName]="config.name"
         />
@@ -44,7 +45,7 @@ export class SpecFormNumberComponent implements Field, OnInit {
   index: number;
   errorMsgs = specErrors;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.ctrls = this.group.get('ctrls') as FormArray;

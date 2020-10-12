@@ -2,26 +2,24 @@
      *ngIf="_product">
   <div class="row mb-5">
     <div class="col-xl-5 col-lg-5">
-      <ocm-image-gallery [imgUrls]="imageUrls"
-                         [imgs]="images"
-                         [specs]="specFormService?.event?.form?.ctrls"></ocm-image-gallery>
+      <ocm-image-gallery *ngIf="_superProduct.Images"
+                         [images]="_superProduct.Images"
+                         [specs]="specForm?.value?.ctrls"></ocm-image-gallery>
     </div>
     <div class="col-xl-5 col-lg-4">
       <div class="pb-3 border-bottom border-medium">
-        <small>
-          <a href="javascript:;"
-             (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}</a>
-        </small>
-        <h1 class="h3 my-0">
-          {{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
+        <small><a href="javascript:;"
+             (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}</a></small>
+        <h1 class="h3 my-0">{{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
         </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
                              [favorite]="isFavorite()"
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
-        <div class="btn-group float-right"
-             *ngIf="_specs?.Items?.length > 0">
+        <!-- TODO: Uncomment to have grid spec form option and fix related bugs
+          <div class="btn-group float-right" 
+             *ngIf="specs?.length > 0">
           <button class="btn btn-sm btn-outline-secondary"
                   [ngClass]="{'active' : !showGrid}"
                   (click)="toggleGrid(false)">
@@ -34,58 +32,17 @@
             <fa-icon [icon]="faTh">
             </fa-icon>
           </button>
-        </div>
+        </div> -->
       </div>
       <div *ngIf="supplierNote"
-           class="alert alert-info my-3">
-        <b>
+           class="alert alert-info my-3"><b>
         </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
       </div>
-      <!-- KIT PRODUCTS -->
-      <div *ngIf="isKitProduct && productsIncludedInKit">
-        <strong>
-          <span translate>Products Included</span>:
-        </strong>
-        <table class="table">
-          <thead>
-          <th>Quantity</th>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Price</th>
-          </thead>
-          <tbody>
-            <tr *ngFor="let product of ocProductsInKit; let i = index">
-              <td *ngIf="productsIncludedInKit[i].MinQty !== productsIncludedInKit[i].MaxQty">
-                <ocm-quantity-input [existingQty]="null"
-                                    [gridDisplay]="true"
-                                    [product]="product"
-                                    [priceSchedule]="priceSchedule"
-                                    (qtyChange)="changeQuantity(product.Product.ID, $event.detail)"></ocm-quantity-input>
-              </td>
-              <td *ngIf="productsIncludedInKit[i].MinQty === productsIncludedInKit[i].MaxQty">{{productsIncludedInKit[i].MinQty}}</td>
-              <td>{{product.ID}}</td>
-              <td>{{product.Name}}</td>
-              <td>{{product.PriceSchedule.PriceBreaks[0].Price}}</td>
-            </tr>
-          </tbody>
-        </table>
-        <button class="btn btn-block btn-primary mb-3"
-                type="submit"
-                [disabled]="this.isAddingToCart || !this.qtyValid || !isKitStatic"
-                (click)="addKitToCart()"
-                translate>
-          PRODUCTS.DETAILS.ADD_TO_CART
-          <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
-        </button>
-      </div>
-      <!-- KIT PRODUCTS -->
       <div>
         <div>
           <div class="d-flex justify-content-between align-items-center">
             <h4 *ngIf="!showGrid"
-                class="font-weight-bold">
-              {{ _price  | currency: _userCurrency}}
-            </h4>
+                class="font-weight-bold">{{ price | currency: userCurrency }}</h4>
             <p *ngIf="!showGrid"
                class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
@@ -94,26 +51,31 @@
             </span>
           </div>
           <!--DISPLAY SHORT SPEC FORM -->
-          <div *ngIf="(specLength < 4 && !showGrid) && !_product.xp.ArtworkRequired">
-            <ocm-spec-form *ngIf="isOrderable && _specs?.Items?.length > 0"
+          <div *ngIf="specs?.length < 4 && !showGrid && !_product.xp.ArtworkRequired">
+            <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
                            [superProduct]="_superProduct"
-                           [specs]="_specs"
+                           [specs]="specs"
+                           [disabledVariants]="_disabledVariants"
                            [currency]="_product?.xp?.Currency"
-                           (specFormChange)="onSpecFormChange($event.detail)">
+                           (specFormChange)="onSpecFormChange($event.detail)"
+                           (isSelectionInactive)="onSelectionInactive($event.detail)">
             </ocm-spec-form>
+            <div *ngIf="this.isInactiveVariant">
+              <strong class="text-danger">This option is unavailable and cannot be added to the cart. Please make another selection.</strong>
+            </div>
             <div class="d-flex flex-column"
-                 *ngIf="isOrderable">
-              <span translate>PRODUCTS.DETAILS.QUANTITY</span>
+                 *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
               <div class="d-flex flex-row">
                 <ocm-quantity-input class="d-inline-block mb-3 mr-3"
                                     (qtyChange)="qtyChange($event.detail)"
                                     [product]="_product"
-                                    [priceSchedule]="_priceSchedule"
-                                    [gridDisplay]="showGrid">
+                                    [priceSchedule]="_product.PriceSchedule"
+                                    [gridDisplay]="showGrid"
+                                    [variantInventory]="variantInventory">
                 </ocm-quantity-input>
                 <button *ngIf="isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
-                        [disabled]="!specFormService.event?.valid || !qtyValid"
+                        [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                         (click)="openQuoteForm()"
                         translate>
                   PRODUCTS.DETAILS.REQ_QUOTE
@@ -121,11 +83,10 @@
                 <button *ngIf="!isQuoteProduct()"
                         class="btn btn-block btn-primary mb-3"
                         type="submit"
-                        [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                        [disabled]="isAddingToCart || (specForm && !specForm?.valid)  || !qtyValid || isInactiveVariant"
                         (click)="addToCart()"
                         translate>
                   PRODUCTS.DETAILS.ADD_TO_CART
-                  <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
                 </button>
               </div>
               <div>
@@ -140,7 +101,7 @@
                   <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
                                              [CurrentUser]="currentUser"
                                              (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
-     </ocm-modal>
+                </ocm-modal>
               </div>
             </div>
             <div *ngIf="!isOrderable"
@@ -150,37 +111,34 @@
             </div>
           </div>
           <div *ngIf="showGrid">
-            <ocm-grid-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
-                                [specs]="_specs"
+            <ocm-grid-spec-form *ngIf="isOrderable && specs?.length > 0"
+                                [specs]="specs"
+                                [specForm]="specForm"
                                 [superProduct]="_superProduct"
                                 [product]="_product"
-                                [priceSchedule]="_priceSchedule">
+                                [priceSchedule]="priceSchedule">
             </ocm-grid-spec-form>
           </div>
         </div>
       </div>
-      <div *ngIf="_priceBreaks && _priceBreaks.length > 1">
+      <div *ngIf="priceBreaks && priceBreaks.length > 1">
         <strong><span translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</span>: </strong>
         <div class=" border border-medium rounded mb-3 p-2">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
-            <span *ngFor="let priceBreak of _priceBreaks; let i = index"
-                  class="font-weight-bold d-flex mt-2">
-              {{ getPriceBreakRange(i) }}:
-              <p class="font-weight-normal ml-1 mr-4">{{priceBreak?.Price | currency: _userCurrency}}</p>
+            <span *ngFor="let priceBreak of priceBreaks; let i = index"
+                  class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
+              <p class="font-weight-normal ml-1 mr-4">{{ priceBreak?.Price | currency: userCurrency }}</p>
             </span>
           </div>
         </div>
       </div>
       <div class="alert alert-success my-3"
-           *ngIf="showRequestSubmittedMessage && specFormService.event?.valid && qtyValid">
-        <span translate>
-          PRODUCTS.DETAILS.SUCCESS
+           *ngIf="showRequestSubmittedMessage && specForm?.valid && qtyValid">
+        <span translate>PRODUCTS.DETAILS.SUCCESS
           <button class="btn btn-link"
                   (click)="toOrderDetail()"
-                  translate>
-            PRODUCTS.DETAILS.VIEW_QUOTE
-          </button>
+                  translate>PRODUCTS.DETAILS.VIEW_QUOTE</button>
         </span>
       </div>
       <div class="alert alert-success my-3"
@@ -197,24 +155,18 @@
         <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
         </p>
       </div>
-      <div *ngIf="showConfigs">
-        <strong>Available Configurations:</strong>
-        <table class='table table-bordered table-condensed table-striped table-hover'>
-          <tr class="table-row" *ngFor="let config of _chiliConfigs"><td><a href="products/{{_product.ID}}/{{config.ID}}">{{config.ChiliTemplateName}}</a></td></tr>
-        </table>
-      </div>
-      <div *ngIf="_attachments.length > 0">
+      <div *ngIf="attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
-          <a class="border border-medium rounded p-2 mr-2"
-             *ngFor="let attachment of _attachments"
+          <a class="border border-medium border-radius p-2 mr-2"
+             *ngFor="let attachment of attachments"
              [href]="attachment.Url"
              target="_blank"
              download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
       <div *ngIf="_product.xp.ProductType === 'Standard'"
-            class="mt-2">
+           class="mt-2">
         <button type="button"
                 class="btn btn-link"
                 (click)="openContactSupplierForm()">
@@ -226,7 +178,7 @@
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"
-         *ngIf="specLength > 3">
+         *ngIf="specs?.length > 3">
       <div *ngIf="!showGrid"
            class="p-3 border border-medium rounded">
         <div class="d-flex justify-content-between align-items-center">
@@ -235,10 +187,12 @@
             <span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
           </span>
         </div>
-        <ocm-spec-form *ngIf="isOrderable && _specs.Items.length > 0"
-                       [specs]="_specs"
+        <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
+                       [specs]="specs"
+                       [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
                        (specFormChange)="onSpecFormChange($event.detail)">
+          (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"
              class="alert alert-info"
@@ -246,29 +200,28 @@
           PRODUCTS.DETAILS.VIEW_ONLY
         </div>
         <div class="d-flex flex-column"
-             *ngIf="isOrderable">
-          <span translate>PRODUCTS.DETAILS.QUANTITY</span>:
+             *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>:
           <ocm-quantity-input class="d-inline-block mb-3"
                               style="max-width: 100px"
                               (qtyChange)="qtyChange($event.detail)"
                               [product]="_product"
-                              [priceSchedule]="_priceSchedule">
+                              [priceSchedule]="priceSchedule"
+                              [variantInventory]="variantInventory">
           </ocm-quantity-input>
           <button *ngIf="isQuoteProduct()"
                   class="btn btn-block btn-primary mb-3"
-                  [disabled]="!specFormService.event?.valid || !qtyValid"
+                  [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                   (click)="openQuoteForm()"
                   translate>
-            PRODUCTS.DETAILS.REQ_QUOTE
+            PRODUCTS.DETAILS.REQ_QUOTE sss
           </button>
           <button *ngIf="!isQuoteProduct()"
                   class="btn btn-block btn-primary"
                   type="submit"
-                  [disabled]="this.isAddingToCart || !this.specFormService.event?.valid || !this.qtyValid"
+                  [disabled]="isAddingToCart || (specForm && !specForm?.valid) || !qtyValid"
                   (click)="addToCart($event)"
                   translate>
             PRODUCTS.DETAILS.ADD_TO_CART
-            <!-- <span class="badge badge-light ml-2">{{ price | currency }}</span> -->
           </button>
         </div>
       </div>
@@ -281,8 +234,8 @@
       <ocm-modal [state]="contactSupplierFormModal"
                  [modalTitle]="'Contact Supplier'">
         <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
-                                [CurrentUser]="currentUser"
-                                (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
+                                   [CurrentUser]="currentUser"
+                                   (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
       </ocm-modal>
     </div>
   </div>

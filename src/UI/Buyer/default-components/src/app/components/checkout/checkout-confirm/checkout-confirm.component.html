@@ -2,15 +2,15 @@
   <!-- Currently, payments are not created until submit. This will likely change in the future. -->
   <ocm-payment-list *ngIf="payments"
                     [payments]="payments"></ocm-payment-list>
-  <div class="row">
-    <div class="col-6">
+  <div class="row mb-4">
+    <div class="col-sm-6">
       <small class="font-weight-bold text-muted text-uppercase"><span translate>CHECKOUT.CHECKOUT_CONFIRM.SHIP_TO</span>:</small>
       <ocm-address-card *ngIf="lineItems?.Items[0].ShippingAddress"
                         [address]="lineItems?.Items[0].ShippingAddress"
                         addressTitle="Shipping Address">
       </ocm-address-card>
     </div>
-    <div class="col-6">
+    <div class="col-sm-6">
       <small class="font-weight-bold text-muted text-uppercase"><span translate>CHECKOUT.CHECKOUT_CONFIRM.BILL_TO</span>:</small>
       <ocm-address-card [address]="order.BillingAddress"
                         addressTitle="Billing Address"
@@ -20,7 +20,8 @@
   </div>
   <ocm-lineitem-table [lineItems]="lineItems?.Items"
                       [readOnly]="true"
-                      [hideStatus]="true">
+                      [hideStatus]="true"
+                      class="my-3">
   </ocm-lineitem-table>
   <form *ngIf="!isAnon"
         novalidate
@@ -33,7 +34,7 @@
     </textarea>
   </form>
 </div>
-<button class="btn btn-primary mt-4"
+<button class="btn btn-block btn-primary mt-4"
         [disabled]="isSubmittingOrder"
         (click)="saveCommentsAndSubmitOrder()"
         translate>CHECKOUT.CHECKOUT_CONFIRM.SUBMIT_ORDER</button>

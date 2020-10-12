@@ -1,9 +1,9 @@
 .card-hover {
   box-shadow: $box-shadow;
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  &:hover {
+  &:hover, &:focus, &:active {
     box-shadow: $box-shadow;
-    transform: translateY(-4px);
+    transform: translateY(-2px);
   }
 }
 

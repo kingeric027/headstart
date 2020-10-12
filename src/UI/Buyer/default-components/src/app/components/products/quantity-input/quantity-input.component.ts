@@ -19,8 +19,9 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() product: MarketplaceMeProduct;
 
   @Input() existingQty: number;
-  @Input() gridDisplay? = false;
+  @Input() gridDisplay?= false;
   @Input() isQtyChanging;
+  @Input() variantInventory?: number;
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
   // TODO - replace with real product info
   form: FormGroup;
@@ -32,7 +33,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   max: number;
   disabled = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
 
   ngOnInit(): void {
@@ -42,7 +43,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     if (endUrl.includes('cart')) {
       this.form = new FormGroup({
         quantity: new FormControl(1, {
-          validators: Validators.required, 
+          validators: Validators.required,
           updateOn: 'blur'
         }),
       });
@@ -126,9 +127,12 @@ export class OCMQuantityInput implements OnInit, OnChanges {
       product.Inventory &&
       product.Inventory.Enabled &&
       !product.Inventory.OrderCanExceed &&
-      product.Inventory.QuantityAvailable != null
+      product.Inventory.QuantityAvailable != null &&
+      !product.Inventory.VariantLevelTracking
     ) {
       return product.Inventory.QuantityAvailable;
+    } else if (product.Inventory && product.Inventory.VariantLevelTracking) {
+      return this.variantInventory;
     }
     return Infinity;
   }

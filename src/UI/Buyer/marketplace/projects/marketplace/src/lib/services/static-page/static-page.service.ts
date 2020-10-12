@@ -21,7 +21,6 @@ export class StaticPageService {
     } catch (e) {
       // might not be an error if its just not configured
       this.pages = [];
-      console.log('error retrieving static pages');
     }
   }
 }

@@ -19,16 +19,18 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
   @Input() config: FieldConfig;
   @Input() group: FormGroup;
   @Input() index: number;
+  @Input() compact?: boolean = false;
   component: ComponentRef<Field>;
   components = specFormComponents;
 
-  constructor(private resolver: ComponentFactoryResolver, private container: ViewContainerRef) {}
+  constructor(private resolver: ComponentFactoryResolver, private container: ViewContainerRef) { }
 
   ngOnChanges(): void {
     if (this.component) {
       this.component.instance.config = this.config;
       this.component.instance.group = this.group;
       this.component.instance.index = this.index;
+      this.component.instance.compact = this.compact;
     }
   }
 
@@ -45,5 +47,6 @@ export class SpecFieldDirective implements Field, OnChanges, OnInit {
     this.component.instance.config = this.config;
     this.component.instance.group = this.group;
     this.component.instance.index = this.index;
+    this.component.instance.compact = this.compact;
   }
 }

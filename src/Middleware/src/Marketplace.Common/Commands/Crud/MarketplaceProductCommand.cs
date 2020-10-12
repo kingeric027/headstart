@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Models;
+using Newtonsoft.Json;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
+
 
 namespace Marketplace.Common.Commands.Crud
 {
@@ -23,6 +26,7 @@ namespace Marketplace.Common.Commands.Crud
 		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
 		Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
 		Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
+		Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -35,11 +39,13 @@ namespace Marketplace.Common.Commands.Crud
 		private readonly IOrderCloudClient _oc;
 		private readonly IAssetedResourceQuery _assetedResources;
 		private readonly IAssetQuery _assets;
+		private readonly AppSettings _settings;
 		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
 		{
 			_assetedResources = assetedResources;
 			_assets = assets;
 			_oc = elevatedOc;
+			_settings = settings;
 		}
 
 		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
@@ -48,7 +54,7 @@ namespace Marketplace.Common.Commands.Crud
 			var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(priceScheduleID);
 			return priceSchedule;
 		}
-		
+
 		public async Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user)
 		{
 			/* must remove the price schedule from the visibility assignments
@@ -69,7 +75,7 @@ namespace Marketplace.Common.Commands.Crud
 			await AddPriceScheduleAssignmentToProductCatalogAssignments(id, buyerID, priceScheduleID);
 			return newPriceSchedule;
 		}
-		
+
 		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, VerifiedUserContext user)
 		{
 			var priceScheduleID = $"{id}-{buyerID}";
@@ -116,7 +122,7 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
-			var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
+			var attachments = assets.Items.Where(a => a.Title == "Product_Attachment").ToList();
 			return attachments;
 		}
 
@@ -126,16 +132,16 @@ namespace Marketplace.Common.Commands.Crud
 			// Get the price schedule, if it exists, if not - send empty price schedule
 			var _priceSchedule = new PriceSchedule();
 			try
-            {
-				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, user.AccessToken); 
-            } catch
-            {
+			{
+				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, user.AccessToken);
+			} catch
+			{
 				_priceSchedule = new PriceSchedule();
-            }
+			}
 			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
 			var _images = GetProductImages(id, user);
-			var _attachments =  GetProductAttachments(id, user);
+			var _attachments = GetProductAttachments(id, user);
 			try
 			{
 				return new SuperMarketplaceProduct
@@ -207,14 +213,11 @@ namespace Marketplace.Common.Commands.Crud
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Create Price Schedule
 			PriceSchedule _priceSchedule = null;
-			// If the superProduct has a price schedule, create
-			if (superProduct.PriceSchedule != null)
-            {
-				superProduct.PriceSchedule.ID = superProduct.Product.ID;
-				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
-				superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
-            }
-        	// Create Product
+			//All products must have a price schedule for orders to be submitted.  The front end provides a default Price of $0 for quote products that don't have one.
+			superProduct.PriceSchedule.ID = superProduct.Product.ID;
+			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
+			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
 			var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
@@ -228,7 +231,7 @@ namespace Marketplace.Common.Commands.Crud
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
 				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
 			});
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
@@ -248,6 +251,8 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
 		{
+			// Update the Product itself
+			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// Two spec lists to compare (requestSpecs and existingSpecs)
 			IList<Spec> requestSpecs = superProduct.Specs.ToList();
 			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
@@ -290,8 +295,17 @@ namespace Marketplace.Common.Commands.Crud
 			// Check if Variants differ
 			var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
 			var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
+			bool hasVariantChange = false;
+
+			foreach(Variant variant in requestVariants)
+            {
+				var currVariant = existingVariants.Where(v => v.ID == variant.ID);
+				if (currVariant == null || currVariant.Count() < 1) { continue; }
+				hasVariantChange = HasVariantChange(variant, currVariant.First());
+				if (hasVariantChange) { break; }
+            }
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.
-			if (variantsAdded || variantsRemoved || requestVariants.Any(v => v.xp.NewID != null))
+			if (variantsAdded || variantsRemoved || hasVariantChange || requestVariants.Any(v => v.xp.NewID != null))
 			{
 				// Re-generate Variants
 				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);
@@ -300,17 +314,15 @@ namespace Marketplace.Common.Commands.Crud
 				{
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
-					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active, Inventory = v.Inventory }, accessToken: user.AccessToken);
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
 			PriceSchedule _priceSchedule = null;
 			if (superProduct.PriceSchedule != null)
-            {
+			{
 				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
-            }
-			// Update the Product itself
-			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
+			}
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
 			// List Product Specs
@@ -330,6 +342,20 @@ namespace Marketplace.Common.Commands.Crud
 			};
 		}
 
+        private bool HasVariantChange(Variant variant, Variant currVariant)
+        {
+            if (variant.Active != currVariant.Active) { return true; }
+			if (variant.Description != currVariant.Description) { return true; }
+			if (variant.Name != currVariant.Name) { return true; }
+			if (variant.ShipHeight != currVariant.ShipHeight) { return true; }
+			if (variant.ShipLength != currVariant.ShipLength) { return true; }
+			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
+			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
+			if (variant.Inventory != currVariant.Inventory) { return true; }
+
+			return false;
+		}
+
 		public async Task Delete(string id, VerifiedUserContext user)
 		{
 			var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
@@ -345,6 +371,48 @@ namespace Marketplace.Common.Commands.Crud
 				_oc.Products.DeleteAsync(id, user.AccessToken)
 			);
 		}
+
+		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
+		{
+			//Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
+			//All suppliers have integration clients with a default user of dev_{supplierID}.
+			var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
+			var selectedSupplierClient = supplierClient.Items[0];
+			var configToUse = new OrderCloudClientConfig
+			{
+				ApiUrl = user.ApiUrl,
+				AuthUrl = user.AuthUrl,
+				ClientId = selectedSupplierClient.ID,
+				ClientSecret = selectedSupplierClient.ClientSecret,
+				GrantType = GrantType.ClientCredentials,
+				Roles = new[]
+						   {
+								 ApiRole.SupplierAdmin,
+								 ApiRole.ProductAdmin
+							},
+
+			};
+			var ocClient = new OrderCloudClient(configToUse);
+			await ocClient.AuthenticateAsync();
+			var token = ocClient.TokenResponse.AccessToken;
+
+			//Format the facet data to change for request body
+			var facetDataFormatted = new ExpandoObject();
+			var facetDataFormattedCollection = (ICollection<KeyValuePair<string, object>>) facetDataFormatted;
+			foreach (var kvp in facets)
+            {
+				facetDataFormattedCollection.Add(kvp);
+            }
+			dynamic facetDataFormattedDynamic = facetDataFormatted;
+
+			//Update the product with a supplier token
+			var updatedProduct = await ocClient.Products.PatchAsync(
+				id,
+				new PartialProduct() {  xp = new { Facets = facetDataFormattedDynamic }},
+				accessToken: token
+				);
+            return updatedProduct;
+        }
 
 		private async Task<string> GetSupplierNameForXpFacet(string supplierID, string accessToken)
 		{

@@ -89,7 +89,7 @@ namespace ordercloud.integrations.library
                 select new Tuple<string, string>(param.Item1, param.Item2))
                 .ToList();
 
-            var result = filterList.JoinString("&", t => $"{t.Item1}={t.Item2}");
+            var result = filterList.JoinString("&", t => $"{t.Item1}={t.Item2.Replace("&", "%26")}");
 
             return result;
         }
