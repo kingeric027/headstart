@@ -25,6 +25,7 @@ export class OCMCheckoutShipping implements OnInit {
   @Input() lineItems: ListPage<MarketplaceLineItem>;
   @Output() selectShipRate = new EventEmitter<ShipMethodSelection>();
   @Output() continue = new EventEmitter();
+  @Output() backToAddress = new EventEmitter();
 
   constructor() {}
 
@@ -45,6 +46,10 @@ export class OCMCheckoutShipping implements OnInit {
     if (!this.order.xp) return null;
     const line = this.getFirstLineItem(shipEstimate);
     return line?.SupplierID;
+  }
+
+  onChangeAddressClicked() {
+    this.backToAddress.emit();
   }
 
   getShipFromAddressID(shipEstimate: ShipEstimate): string {
