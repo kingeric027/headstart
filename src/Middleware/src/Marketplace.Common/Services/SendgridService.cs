@@ -265,10 +265,21 @@ namespace Marketplace.Common.Services
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
+                Address supplierAddress = null; ;
+                if(orderWorksheet.Order.xp.SupplierIDs != null && orderWorksheet.Order.xp.ShipFromAddressIDs != null)
+                {
+                    supplierAddress = await _oc.SupplierAddresses.GetAsync(orderWorksheet.Order.xp.SupplierIDs.FirstOrDefault(), orderWorksheet.Order.xp.ShipFromAddressIDs.FirstOrDefault());
+                }
                 var dynamicTemplateData = new
                 {
-                    orderWorksheet.Order.FromUser.FirstName,
-                    orderWorksheet.Order.FromUser.LastName
+                    FirstName = orderWorksheet.Order.FromUser.FirstName,
+                    LastName = orderWorksheet.Order.FromUser.LastName,
+                    Phone = orderWorksheet.Order.xp.QuoteOrderInfo.Phone,
+                    Email = orderWorksheet.Order.FromUser.Email,
+                    Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
+                    ProductID = orderWorksheet.LineItems.FirstOrDefault().Product.Name,
+                    ProductName = orderWorksheet.LineItems.FirstOrDefault().Product.Name,
+                    order = orderWorksheet.Order
                 };
                 await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, orderWorksheet.Order.FromUser.Email, BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
                 await SendSupplierOrderSubmitEmail(orderWorksheet);
