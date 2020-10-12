@@ -25,7 +25,6 @@ namespace Marketplace.Common.Commands.SupplierSync
             _oc = oc;
             _settings = settings;
 
-            // investigate potentially injecting this client at startup, didn't have any success when trying
             _ocSeller = new OrderCloudClient(new OrderCloudClientConfig
             {
                 ApiUrl = _settings.OrderCloudSettings.ApiUrl,
@@ -33,23 +32,18 @@ namespace Marketplace.Common.Commands.SupplierSync
                 ClientId = _settings.OrderCloudSettings.ClientID,
                 ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                 Roles = new[]
-                        {
+                {
                     ApiRole.FullAccess
                 }
             });
-            //7A8002F4-E22F-4A3A-A091-E8B531BB5010
-            //dwKGiqiqxBHILnzJSNgvpgMI4mBzVuJqJEt28AIZNCYWxL343st33v46kCL4
         }
 
         public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
-            var supplierOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID, user.AccessToken);
-            var buyerOrder = await _ocSeller.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, ID.Split('-')[0]);
-
             var supplierWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, ID);
-
+            
             var buyerWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, ID.Split('-')[0]);
-            var buyerLineItems = buyerWorksheet.LineItems.Where(li => li.SupplierID == supplierOrder.ToCompanyID).Select(li => li);
+            var buyerLineItems = buyerWorksheet.LineItems.Where(li => li.SupplierID == supplierWorksheet.Order.ToCompanyID).Select(li => li);
             var estimate = buyerWorksheet.ShipEstimateResponse.ShipEstimates.FirstOrDefault(e => e.ShipEstimateItems.Any(i => i.LineItemID == buyerLineItems.FirstOrDefault()?.ID));
             var ship_method = estimate?.ShipMethods.FirstOrDefault(m => m.ID == estimate.SelectedShipMethodID);
 
@@ -64,8 +58,6 @@ namespace Marketplace.Common.Commands.SupplierSync
                     new JProperty("LineItems", JToken.FromObject(buyerLineItems))
                 }},
                 { "ShipMethod", JToken.FromObject(ship_method)},
-                { "Order", JToken.FromObject(supplierOrder)},
-                { "BuyerBillingAddress", JToken.FromObject(buyerOrder.BillingAddress)}
             };
             return JObject.FromObject(returnObject);
         }
