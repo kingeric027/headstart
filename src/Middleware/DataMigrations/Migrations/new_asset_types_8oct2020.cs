@@ -49,6 +49,10 @@ namespace DataMigrations.Migrations
 			});
 			await _editor.RunBulkUpdateAsync<AssetedResourceDO>("assetedresource", assignment =>
 			{
+				var allOthers = assignment.SelectToken("AllOtherAssetIDs")?.ToObject<List<string>>();
+
+				if (allOthers != null) return new List<UpdateOperation>();
+
 				var themes = assignment.SelectToken("ThemeAssetIDs").ToObject<List<string>>();
 				var attachments = assignment.SelectToken("AttachmentAssetIDs").ToObject<List<string>>();
 				var structured = assignment.SelectToken("StructuredAssetsIDs").ToObject<List<string>>();
@@ -56,7 +60,7 @@ namespace DataMigrations.Migrations
 				var array = themes.Concat(attachments).Concat(structured).ToList();
 				return new List<UpdateOperation>()
 				{
-					new SetUpdateOperation<List<string>>("AllOtherAssetIDs", new List<string>())
+					new SetUpdateOperation<List<string>>("AllOtherAssetIDs", array)
 				};
 			});
 		}
