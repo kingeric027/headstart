@@ -15,7 +15,7 @@ export class OCMCheckoutShipping implements OnInit {
   faExclamationCircle = faExclamationCircle;
 
   @Input() set shipEstimates(value: ShipEstimate[]) {
-    this._shipEstimates = value;
+    this._shipEstimates = null;
     this._areAllShippingSelectionsMade = this.areAllShippingSelectionsMade(value);
     this._lineItemsByShipEstimate = value.map(shipEstimate => {
       return this.getLineItemsForShipEstimate(shipEstimate);
@@ -30,7 +30,8 @@ export class OCMCheckoutShipping implements OnInit {
 
   ngOnInit(): void {}
 
-  getLineItemsForShipEstimate(shipEstimate: ShipEstimate): MarketplaceLineItem[] {
+  getLineItemsForShipEstimate(shipEstimate: ShipEstimate): MarketplaceLineItem[] { 
+    if (shipEstimate?.ShipEstimateItems?.length < 1) { return; }
     return shipEstimate.ShipEstimateItems.map(shipEstimateItem => {
       return this.lineItems.Items.find(li => li.ID === shipEstimateItem.LineItemID);
     });
