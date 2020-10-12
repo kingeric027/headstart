@@ -32,5 +32,5 @@ export const environment = {
   orderCloudApiVersion: 'v1',
   buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
   buyerClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
-  productFieldsToMonitor: ["PriceSchedule"]
+  superProductFieldsToMonitor: ["PriceSchedule"]
 };

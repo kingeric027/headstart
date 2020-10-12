@@ -12,7 +12,7 @@ export const ocAppConfig: AppConfig = {
   translateBlobUrl: environment.translateBlobUrl,
   blobStorageUrl: environment.blobStorageUrl,
   buyerConfigs: environment.buyerConfigs,
-  productFieldsToMonitor: environment.productFieldsToMonitor,
+  superProductFieldsToMonitor: environment.superProductFieldsToMonitor,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
@@ -142,7 +142,7 @@ export interface AppConfig {
    * If a supplier makes a change to a field within this string array, the product will be deactivated
    * until a seller reviews the change and approves it.
    */
-  productFieldsToMonitor: string[];
+  superProductFieldsToMonitor: string[];
 
   /**
    * An array of security roles that will be requested upon login.

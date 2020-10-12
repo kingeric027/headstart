@@ -30,5 +30,5 @@ export const environment = {
       buyerUrl: 'https://sebrandsmarketplace-wax-stage.azurewebsites.net/'
     }
   },
-  productFieldsToMonitor: ["PriceSchedule"]
+  superProductFieldsToMonitor: ["PriceSchedule"]
 };

@@ -374,6 +374,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       let superProduct = this._superMarketplaceProductStatic;
       if (JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic)) {
         superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
+      }
+      if (this.appConfig?.superProductFieldsToMonitor.length > 0) {
         superProduct = await this.checkForFieldsToMonior(superProduct);
       }
       this.refreshProductData(superProduct);
@@ -389,7 +391,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async checkForFieldsToMonior(editedSuperProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
-    const fieldsToMonitorForChanges = this.appConfig?.productFieldsToMonitor;
+    const fieldsToMonitorForChanges = this.appConfig?.superProductFieldsToMonitor;
     let superProduct = editedSuperProduct;
     fieldsToMonitorForChanges.forEach(f => {
       const fieldChanged = JSON.stringify(_get(editedSuperProduct, f)) !== JSON.stringify(_get(this._superMarketplaceProductStatic, f));

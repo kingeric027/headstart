@@ -30,5 +30,5 @@ export const environment = {
       buyerUrl: 'http://marketplace-buyer-ui.azurewebsites.net/'
     }
   },
-  productFieldsToMonitor: ["PriceSchedule"]
+  superProductFieldsToMonitor: ["PriceSchedule"]
 };
