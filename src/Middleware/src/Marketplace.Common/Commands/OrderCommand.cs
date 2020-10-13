@@ -10,6 +10,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Commands
 {

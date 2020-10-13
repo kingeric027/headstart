@@ -49,7 +49,7 @@ namespace Marketplace.Common.Commands
 		private static string _buyerLocalUIApiClientID;
 		private static string _middlewareApiClientID;
 
-		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand, IOrderCloudSandboxService orderCloudSandboxService)
+		public EnvironmentSeedCommand(AppSettings settings, IOrderCloudClient oc, IDevCenterService dev, IMarketplaceSupplierCommand supplierCommand, IMarketplaceBuyerCommand buyerCommand)
 		{
 			_settings = settings;
 			_oc = oc;
@@ -276,10 +276,10 @@ namespace Marketplace.Common.Commands
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
 				ElevatedRoles = new [] { ApiRole.FullAccess },
-				ID = "freightpopshipping",
+				ID = "HeadStartCheckout",
 				EventType = IntegrationEventType.OrderCheckout,
 				CustomImplementationUrl = apiUrl,
-				Name = "FreightPOP Shipping",
+				Name = "HeadStart Checkout",
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
@@ -290,10 +290,10 @@ namespace Marketplace.Common.Commands
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
 				ElevatedRoles = new [] { ApiRole.FullAccess },
-				ID = "freightpopshippingLOCAL",
+				ID = "HeadStartCheckoutLOCAL",
 				EventType = IntegrationEventType.OrderCheckout,
 				CustomImplementationUrl = _localWebhookUrl,
-				Name = "FreightPOP Shipping LOCAL",
+				Name = "HeadStart Checkout LOCAL",
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
@@ -301,8 +301,8 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
-			await _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshippingLOCAL" }, token);
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckout" }, token);
+			await _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
 		}
 
 		public async Task CreateMarketPlaceRoles(string accessToken)
