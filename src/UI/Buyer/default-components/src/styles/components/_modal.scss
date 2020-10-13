@@ -24,11 +24,10 @@ ocm-modal {
       right: auto;
       top: 50%;
       transform: translate(-50%, -50%);
-      @include media-breakpoint-up(lg) {
-        width: 50vw;
-      }
     }
-
+    @include media-breakpoint-up(lg) {
+      width: 50vw;
+    }
     .shared-modal__background {
       position: fixed;
       top: 0;
@@ -40,8 +39,8 @@ ocm-modal {
       z-index: $zindex-modal-backdrop;
     }
   }
-
-  body.shared-modal--open {
-    /* body overflow is hidden to hide main scrollbar when modal window is open */
-    overflow: hidden;
-  }
+}
+body.shared-modal--open {
+  /* body overflow is hidden to hide main scrollbar when modal window is open */
+  overflow: hidden;
+}
