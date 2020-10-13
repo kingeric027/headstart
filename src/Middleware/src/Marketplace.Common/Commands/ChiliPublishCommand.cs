@@ -36,6 +36,7 @@ namespace Marketplace.Common.Commands
         public string OwnerClientID { get; set; }
         public string BuyerID { get; set; }
         public string CatalogID { get; set; }
+        public bool? ReadOnly { get; set; }
     }
 
     [SwaggerModel]
