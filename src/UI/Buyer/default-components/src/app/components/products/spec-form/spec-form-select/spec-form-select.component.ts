@@ -7,10 +7,13 @@ import { Field } from '../field.interface';
   selector: 'spec-form-select',
   template: `
     <div class="form-group" [formGroup]="group" [class.row]="compact">
-      <label class="text-uppercase font-weight-bolder small text-muted" [class.col-3]="compact" for="{{ config.name }}">{{
-        config.label
-      }}</label>
-      <select [formControlName]="config.name" class="form-control form-control-sm" [class.col-9]="compact" value="{{ config.value }}">
+      <label
+        class="text-uppercase font-weight-bolder small text-muted"
+        [class.col-3]="compact"
+        for="{{ config.name }}"
+        >{{ config.label }}</label
+      >
+      <select [formControlName]="config.name" class="custom-select" [class.col-9]="compact" value="{{ config.value }}">
         <option *ngIf="!config.value" value=""></option>
         <option *ngFor="let option of config.options" value="{{ option.Value }}">
           {{ option.Value }}
@@ -28,7 +31,7 @@ export class SpecFormSelectComponent implements Field, OnInit {
   compact?: boolean;
   ctrls: FormArray;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
     this.ctrls = this.group.get('ctrls') as FormArray;

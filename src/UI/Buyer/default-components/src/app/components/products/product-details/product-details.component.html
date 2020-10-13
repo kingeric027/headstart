@@ -41,87 +41,79 @@
         </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
       </div>
       <div>
-        <div>
-          <div class="d-flex justify-content-between align-items-center">
-            <h4 *ngIf="!showGrid"
-                class="font-weight-bold">{{ price | currency: userCurrency }}</h4>
-            <p *ngIf="!showGrid"
-               class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
-            <span class="badge badge-pill badge-warning"
-                  *ngIf="percentSavings > 0">
-              <span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
-            </span>
-          </div>
-          <!--DISPLAY SHORT SPEC FORM -->
-          <div *ngIf="specs?.length < 4 && !showGrid">
-            <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
-                           [superProduct]="_superProduct"
-                           [specs]="specs"
-                           [disabledVariants]="_disabledVariants"
-                           [currency]="_product?.xp?.Currency"
-                           (specFormChange)="onSpecFormChange($event.detail)"
-                           (isSelectionInactive)="onSelectionInactive($event.detail)">
-            </ocm-spec-form>
-            <div *ngIf="this.isInactiveVariant">
-              <strong class="text-danger">This option is unavailable and cannot be added to the cart. Please make another selection.</strong>
-            </div>
-            <div class="d-flex flex-column"
-                 *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
-              <div class="d-flex flex-row">
-                <ocm-quantity-input class="d-inline-block mb-3 mr-3"
-                                    (qtyChange)="qtyChange($event.detail)"
-                                    [product]="_product"
-                                    [priceSchedule]="_product.PriceSchedule"
-                                    [gridDisplay]="showGrid"
-                                    [variantInventory]="variantInventory">
-                </ocm-quantity-input>
-                <button *ngIf="isQuoteProduct()"
-                        class="btn btn-block btn-primary mb-3"
-                        [disabled]="(specForm && !specForm?.valid) || !qtyValid"
-                        (click)="openQuoteForm()"
-                        translate>
-                  PRODUCTS.DETAILS.REQ_QUOTE
-                </button>
-                <button *ngIf="!isQuoteProduct()"
-                        class="btn btn-block btn-primary mb-3"
-                        type="submit"
-                        [disabled]="isAddingToCart || (specForm && !specForm?.valid)  || !qtyValid || isInactiveVariant"
-                        (click)="addToCart()"
-                        translate>
-                  PRODUCTS.DETAILS.ADD_TO_CART
-                </button>
-              </div>
-              <div>
-                <ocm-modal [state]="quoteFormModal"
-                           [modalTitle]="'Request Quote'">
-                  <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
-                                          [CurrentUser]="currentUser"
-                                          (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
-                </ocm-modal>
-                <ocm-modal [state]="contactSupplierFormModal"
-                           [modalTitle]="'Product Inquiry'">
-                  <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
-                                             [CurrentUser]="currentUser"
-                                             (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
-                </ocm-modal>
-              </div>
-            </div>
-            <div *ngIf="!isOrderable"
-                 class="alert alert-info"
-                 translate>
-              PRODUCTS.DETAILS.VIEW_ONLY
-            </div>
-          </div>
-          <div *ngIf="showGrid">
-            <ocm-grid-spec-form *ngIf="isOrderable && specs?.length > 0"
-                                [specs]="specs"
-                                [specForm]="specForm"
-                                [superProduct]="_superProduct"
+        <ng-container *ngIf="!showGrid">
+          <h4 class="font-weight-bold">{{ price | currency: userCurrency }}</h4>
+          <!-- TODO: Plug in unit of measure when data is in OC. -->
+          <p class="text-muted">{{ _product | UofM }}</p>
+          <span class="badge badge-pill badge-warning"
+                *ngIf="percentSavings > 0">
+            <span translate>PRODUCTS.DETAILS.SAVINGS</span> {{ percentSavings }}%!
+          </span>
+        </ng-container>
+      </div>
+      <!--DISPLAY SHORT SPEC FORM -->
+      <ng-container *ngIf="specs?.length < 4 && !showGrid">
+        <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
+                       [superProduct]="_superProduct"
+                       [specs]="specs"
+                       [currency]="_product?.xp?.Currency"
+                       (specFormChange)="onSpecFormChange($event.detail)">
+        </ocm-spec-form>
+        <div class="d-flex flex-column mb-3"
+             *ngIf="isOrderable"><small class="text-uppercase font-weight-bolder text-muted"
+                 translate>PRODUCTS.DETAILS.QUANTITY</small>
+          <div class="d-flex flex-row mt-2">
+            <ocm-quantity-input class="d-inline-block mr-3"
+                                (qtyChange)="qtyChange($event.detail)"
                                 [product]="_product"
-                                [priceSchedule]="priceSchedule">
-            </ocm-grid-spec-form>
+                                [priceSchedule]="_product.PriceSchedule"
+                                [gridDisplay]="showGrid">
+            </ocm-quantity-input>
+            <button *ngIf="isQuoteProduct()"
+                    class="btn btn-block btn-primary"
+                    [disabled]="!specForm?.valid || !qtyValid"
+                    (click)="openQuoteForm()"
+                    translate>
+              PRODUCTS.DETAILS.REQ_QUOTE
+            </button>
+            <button *ngIf="!isQuoteProduct()"
+                    class="btn btn-block btn-primary mb-3"
+                    type="submit"
+                    [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                    (click)="addToCart()"
+                    translate>
+              PRODUCTS.DETAILS.ADD_TO_CART
+            </button>
+          </div>
+          <div>
+            <ocm-modal [state]="quoteFormModal"
+                       [modalTitle]="'Request Quote'">
+              <ocm-quote-request-form (formSubmitted)="submitQuoteOrder($event.detail.user)"
+                                      [CurrentUser]="currentUser"
+                                      (formDismissed)="dismissQuoteForm()"></ocm-quote-request-form>
+            </ocm-modal>
+            <ocm-modal [state]="contactSupplierFormModal"
+                       [modalTitle]="'Product Inquiry'">
+              <ocm-contact-supplier-form (contactFormSubmitted)="submitContactSupplierForm($event.detail.formData)"
+                                         [CurrentUser]="currentUser"
+                                         (contactFormDismissed)="dismissContactSupplierForm()"></ocm-contact-supplier-form>
+            </ocm-modal>
           </div>
         </div>
+        <div *ngIf="!isOrderable"
+             class="alert alert-info"
+             translate>
+          PRODUCTS.DETAILS.VIEW_ONLY
+        </div>
+      </ng-container>
+      <div *ngIf="showGrid">
+        <ocm-grid-spec-form *ngIf="isOrderable && specs?.length > 0"
+                            [specs]="specs"
+                            [specForm]="specForm"
+                            [superProduct]="_superProduct"
+                            [product]="_product"
+                            [priceSchedule]="priceSchedule">
+        </ocm-grid-spec-form>
       </div>
       <ng-container *ngIf="priceBreaks && priceBreaks.length > 1">
         <strong translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD: </strong>
@@ -150,8 +142,8 @@
         <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
         </span>
       </div>
-      <h5 class="border-bottom border-light pb-3 mb-3"
-          translate>PRODUCTS.DETAILS.DESCRIPTION</h5>
+      <p class="mb-3 text-uppercase font-weight-bolder small text-muted"
+         translate>PRODUCTS.DETAILS.DESCRIPTION</p>
       <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
       </p>
       <div *ngIf="attachments.length > 0">
@@ -164,16 +156,15 @@
              download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
-      <div *ngIf="_product.xp.ProductType === 'Standard'"
-           class="mt-2">
+      <ng-container *ngIf="_product.xp.ProductType === 'Standard'">
         <button type="button"
-                class="btn btn-link"
+                class="btn btn-link p-0 mt-2"
                 (click)="openContactSupplierForm()">
-          <small translate>PRODUCTS.DETAILS.CONTACT_PART_ONE</small>
-          <small translate>ALIAS.SUPPLIER_LOWERCASE</small>
-          <small translate>PRODUCTS.DETAILS.CONTACT_PART_TWO</small>
+          <span translate>PRODUCTS.DETAILS.CONTACT_PART_ONE</span>
+          <span translate>ALIAS.SUPPLIER_LOWERCASE</span>
+          <span translate>PRODUCTS.DETAILS.CONTACT_PART_TWO</span>
         </button>
-      </div>
+      </ng-container>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"
