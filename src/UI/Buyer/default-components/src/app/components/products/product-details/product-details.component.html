@@ -116,7 +116,7 @@
         </ocm-grid-spec-form>
       </div>
       <ng-container *ngIf="priceBreaks && priceBreaks.length > 1">
-        <strong translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD: </strong>
+        <strong translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</strong>:
         <div class=" border-bottom border-medium mb-3 pb-3">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
@@ -142,7 +142,7 @@
         <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
         </span>
       </div>
-      <!-- "Description" is self-explanatory. we don't need a headline saying so. -->
+      <strong translate>PRODUCTS.DETAILS.DESCRIPTION</strong>:
       <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
       </p>
       <div *ngIf="attachments.length > 0">
