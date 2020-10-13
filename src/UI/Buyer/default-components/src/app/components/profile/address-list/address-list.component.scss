@@ -1,13 +1,12 @@
-@import '../../../../styles/main.scss';
 .address-card {
   .hover-btn {
     opacity: 0;
-    @include media-breakpoint-down(md) {
+    @media (max-width: 768px) {
       opacity: 1;
     }
     transition: 200ms ease all;
   }
-  border-bottom: 1px solid $gray-200;
+  border-bottom: 1px solid var(--light);
   &:last-child {
     border-bottom: none;
   }

@@ -1,9 +1,8 @@
-@import '../../../../styles/main.scss';
 .user-permissions-alert {
-  border-radius: $border-radius;
-  border-left: 5px solid $primary;
+  border-radius: .25rem;
+  border-left: 5px solid var(--primary);
   .alert-icon {
-    color: $primary;
+    color: var(--primary);
     font-size: 1.4rem;
   }
 }
