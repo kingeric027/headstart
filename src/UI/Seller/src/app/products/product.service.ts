@@ -124,10 +124,8 @@ export class ProductService extends ResourceCrudService<Product> {
     await Promise.all([...addRequests, ...deleteRequests]);
     }
 
-    async getTecraDocuments(
-        folder: string
-    ): Promise<TecraDocument[]> {
-        return this.chiliService.getDocuments(folder);
+    async getTecraDocuments(): Promise<TecraDocument[]> {
+        return this.chiliService.getDocuments();
     }
     async getTecraDocumentsByFolder(
         folder: string
@@ -137,9 +135,8 @@ export class ProductService extends ResourceCrudService<Product> {
 
     async getTecraSpecs(
         docID: string,
-        folder: string
     ): Promise<TecraSpec[]> {
-        return this.chiliService.getSpecs(docID, folder);
+        return this.chiliService.getSpecs(docID);
     }
 
     async listChiliConfigs(): Promise<ListPage<ChiliConfig>>

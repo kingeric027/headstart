@@ -98,7 +98,7 @@
                     </div>
                     <div class="row" *ngIf="spec.xp.UI.ControlType == 'DropDown'">
                         <div class="col-md-6">
-                            <div>
+                            <div class="spec-options">
                                 <label>Spec Options</label>
                                 <div class="input-group" *ngFor="let option of spec.Options">
                                     <input class="form-control" type='text' name="{{option.ID + '_option'}}" id="{{option.ID + '_option'}}" [value]="option.Value">
@@ -115,7 +115,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div>
+                                <div class="spec-options">
                                     <label>Add Option</label>
                                     <div class="input-group">
                                         <input class="form-control" type='text' name="{{spec.ID + '_newOption'}}" id="{{spec.ID + '_newOption'}}">

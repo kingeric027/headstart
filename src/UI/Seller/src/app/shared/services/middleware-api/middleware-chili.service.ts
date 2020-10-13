@@ -42,17 +42,17 @@ export class ChiliService {
     }
 
     //Tecra
-    async getDocuments(folderName: string): Promise<TecraDocument[]> {
+    async getDocuments(): Promise<TecraDocument[]> {
         const url = `${this.appConfig.middlewareUrl}/tecra/documents`;
-        return await this.http.get<TecraDocument[]>(url, { headers: this.buildHeaders(), params: {folder: folderName}}).toPromise();
+        return await this.http.get<TecraDocument[]>(url, { headers: this.buildHeaders() }).toPromise();
     }
     async getDocumentsByFolder(folderName: string): Promise<TecraDocument[]> {
         const url = `${this.appConfig.middlewareUrl}/tecra/documents/byfolder`;
         return await this.http.get<TecraDocument[]>(url, { headers: this.buildHeaders(), params: {folder: folderName}}).toPromise();
     }
-    async getSpecs(docID: string, folderName: string): Promise<TecraSpec[]> {
+    async getSpecs(docID: string): Promise<TecraSpec[]> {
         const url = `${this.appConfig.middlewareUrl}/tecra/specs`;
-        return await this.http.get<TecraSpec[]>(url, { headers: this.buildHeaders(), params: { id: docID, folder: folderName } }).toPromise();
+        return await this.http.get<TecraSpec[]>(url, { headers: this.buildHeaders(), params: { id: docID } }).toPromise();
     }
 
     //Chili Config

@@ -114,7 +114,7 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
         this._documentName = this.tecraDocuments.find(x => x.id === this._documentID).name;
 
         //TODO - Update to only get configs assosociated to this buyer and product
-        const specs = await this.productService.getTecraSpecs(this._documentID, "4511001");
+        const specs = await this.productService.getTecraSpecs(this._documentID);
         this.tecraSpecs = specs;
 
         console.log(this.tecraSpecs);
@@ -129,14 +129,21 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
 
     async executeChiliConfigAssignmentRequest(): Promise<void> {
         const requests = this.tecraSpecs.map((spec, index) => {
+            const types = {
+                'string': 'Text',
+                'list': 'DropDown',
+                'checkbox': 'Checkbox'
+            };
+            const controlType = types[spec.dataType] ? types[spec.dataType] : 'Not Found';
+
             const csui: ChiliSpecUI = {
-                ControlType: (spec.dataType === "string") ? "Text" : "DropDown"
+                ControlType: controlType
             }
             const csxp: ChiliSpecXp = {
                 UI: csui
             }
             const tempSpec: ChiliSpec = {
-                ListOrder: index + 1,
+                ListOrder: index,
                 Name: spec.name,
                 DefaultValue: spec.displayValue,
                 Required: (spec.required.toLowerCase() == "true") ? true : false,
@@ -145,11 +152,20 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
                 xp: csxp
             };
 
-            return this.productService.saveChiliSpec(tempSpec);
+            if (controlType !== 'Not Found') {
+                return this.productService.saveChiliSpec(tempSpec);
+            }
         });
 
         const chiliSpecs = await Promise.all(requests);
-        const chilSpecIds = chiliSpecs.map(cspec => cspec.ID);
+        const chilSpecIds = chiliSpecs.filter(chiliSpec => {
+            if (chiliSpec && chiliSpec.ID) {
+                return true
+            }
+            else {
+                return false;
+            }
+        }).map(cspec => cspec.ID);
 
         //TODO - UPdate the Headstart SDK to use the BuyerID and CatalogID that I manually updated locally.
         const config: ChiliConfig =
