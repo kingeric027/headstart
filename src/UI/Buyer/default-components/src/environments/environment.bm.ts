@@ -18,6 +18,7 @@ export const environment: Environment = {
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
   theme: bmTheme,
+  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 /*
 
