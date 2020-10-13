@@ -1,4 +1,4 @@
-﻿using Flurl.Http;
+using Flurl.Http;
 using Microsoft.Extensions.Azure;
 using OrderCloud.SDK;
 using System;
@@ -52,6 +52,7 @@ namespace ordercloud.integrations.easypost
 					var shipMethods = EasyPostMappers.MapRates(easyPostResponse[index].rates);
 					return new ShipEstimate()
 					{
+						ID = easyPostResponse[index]?.id,
 						ShipMethods = shipMethods, // This will get filtered down based on carrierAccounts
 						ShipEstimateItems = lineItems.Select(li => new ShipEstimateItem() { LineItemID = li.ID, Quantity = li.Quantity }).ToList(),
 						xp = { AllShipMethods = shipMethods } // This is being saved so we have all data to compare rates across carrierAccounts
