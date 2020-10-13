@@ -23,6 +23,11 @@ namespace ordercloud.integrations.easypost
 					(ShipTo.Zip == other.ShipTo.Zip) &&
 					(ShipTo.City == other.ShipTo.City);
 		}
+
+		public override int GetHashCode()
+		{
+			return 1; // force Equals to be called for comparison
+		}
 	}
 
 	public interface IEasyPostShippingService
