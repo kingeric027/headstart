@@ -18,7 +18,7 @@
           <p class="mb-0">{{notification?.Doc?.Product?.FieldModified}} has been edited.</p>
         </div>
         <div>
-          <button (click)="reviewMonitoredFieldChange('ACCEPTED')"
+          <button (click)="reviewMonitoredFieldChange('ACCEPTED', notification)"
                   class="btn btn-primary">Accept</button>
           <!-- TODO: Reinstate the rejected button once functionality can handle the repercussions. -->
           <!-- <button (click)="reviewMonitoredFieldChange('REJECTED')"
@@ -162,7 +162,7 @@
                            value="{{_superMarketplaceProductStatic.Product.ID}}"
                            disabled>
                   </div>
-                  <div *ngIf="!monitoredProductFieldModifiedNotification"
+                  <div *ngIf="productInReviewNotifications?.length <= 0"
                        class="form-group">
                     <label for="Active"
                            translate>ADMIN.PRODUCT_EDIT.ACTIVE</label>
