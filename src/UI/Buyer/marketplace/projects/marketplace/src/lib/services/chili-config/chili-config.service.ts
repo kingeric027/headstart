@@ -71,42 +71,39 @@ export class ChiliConfigService {
       .toPromise();
   }
 
-  async getChiliFrame(id: string, storeid: string): Promise<string> {
+  async getChiliFrame(id: string): Promise<string> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     let params = new HttpParams();
     params = params.append('id', id);
-    params = params.append('storeid', storeid);
     const url = `${this.appConfig.middlewareUrl}/tecra/frame`;
     return this.httpClient
       .get<string>(url, { headers, params })
       .toPromise();
   }
 
-  async getChiliProof(id: string, storeid: string): Promise<string> {
+  async getChiliProof(id: string): Promise<string> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     let params = new HttpParams();
     params = params.append('id', id);
-    params = params.append('storeid', storeid);
     const url = `${this.appConfig.middlewareUrl}/tecra/proof`;
     return this.httpClient
       .get<string>(url, { headers, params })
       .toPromise();
   }
 
-  async getChiliPDF(id: string, storeid: string): Promise<string> {
+  async getChiliPDF(id: string): Promise<string> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     });
     let params = new HttpParams();
     params = params.append('id', id);
-    params = params.append('storeid', storeid);
     const url = `${this.appConfig.middlewareUrl}/tecra/pdf`;
     return this.httpClient
       .get<string>(url, { headers, params })

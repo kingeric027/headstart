@@ -10,8 +10,7 @@ export class ChiliTemplateResolver implements Resolve<ChiliTemplate> {
 
   async resolve(route: ActivatedRouteSnapshot): Promise<ChiliTemplate> {
     const template = await this.chili.getChiliTemplate(route.params.configurationID);
-    const frame = await this.chili.getChiliFrame(template.ChiliTemplateID, '4511001');
-  //  const frame = await this.chili.getChiliFrame('89c89db5-3978-498c-9b3f-bd8b9f296f08', '4511002');
+    const frame = await this.chili.getChiliFrame(template.ChiliTemplateID);
     template.Frame = frame;
     return template;
   }
