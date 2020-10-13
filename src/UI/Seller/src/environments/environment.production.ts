@@ -29,5 +29,6 @@ export const environment = {
       clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
       buyerUrl: 'http://marketplace-buyer-ui.azurewebsites.net/'
     }
-  }
+  },
+  superProductFieldsToMonitor: ["PriceSchedule"]
 };
