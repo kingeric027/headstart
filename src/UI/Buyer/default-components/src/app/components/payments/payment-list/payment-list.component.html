@@ -3,7 +3,7 @@
      *ngFor="let payment of payments?.Items">
   <ocm-credit-card-icon *ngIf="payment.Type === 'CreditCard'"
                         [cardType]="payment.xp.cardType"
-                        translate></ocm-credit-card-icon><span translate> PAYMENTS.PAYMENT_LIST.ENDING_IN</span> {{payment.xp.partialAccountNumber}}
+                        translate></ocm-credit-card-icon><span translate> PAYMENTS.PAYMENT_LIST.ENDING_IN</span> {{payment?.xp?.partialAccountNumber}}
   <span *ngIf="payment.Type === 'PurchaseOrder'"
         translate>
     PAYMENTS.PAYMENT_LIST.PO <small>{{payment.ID}}</small>

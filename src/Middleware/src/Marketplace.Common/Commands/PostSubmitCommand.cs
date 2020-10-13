@@ -13,7 +13,6 @@ using Marketplace.Common.Services.ShippingIntegration;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
-using ordercloud.integrations.freightpop;
 using Newtonsoft.Json.Converters;
 using Marketplace.Models.Extended;
 
@@ -26,11 +25,9 @@ namespace Marketplace.Common.Commands
 
     public class PostSubmitCommand : IPostSubmitCommand
     {
-        private readonly IFreightPopService _freightPopService;
         private readonly IOrderCloudClient _oc;
 
         // temporary service until we get updated sdk
-        private readonly IOrderCloudSandboxService _ocSandboxService;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
 		private readonly IExchangeRatesCommand _exchangeRates;
@@ -39,14 +36,12 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCommand _orderCommand;
         private readonly ILineItemCommand _lineItemCommand;
         
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, IFreightPopService freightPopService, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCloudSandboxService orderCloudSandboxService, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
+        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
         {
-            _freightPopService = freightPopService;
 			_oc = oc;
             _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
-            _ocSandboxService = orderCloudSandboxService;
             _locationPermissionCommand = locationPermissionCommand;
 			_exchangeRates = exchangeRates;
             _orderCommand = orderCommand;
@@ -71,7 +66,6 @@ namespace Marketplace.Common.Commands
         {
             Forwarding,
             Sengrid,
-            FreightPop,
             Zoho,
             Avalara
         }
@@ -89,7 +83,6 @@ namespace Marketplace.Common.Commands
              * 
              * step 2 has 4 parts
              * a) sendgrid emailing
-             * b) freightpop order importing
              * c) avalara transaction creation
              * d) zoho sales and purchase order creation
              *
@@ -133,7 +126,6 @@ namespace Marketplace.Common.Commands
             // quote orders do not need to flow into our integrations
             if (IsStandardOrder(updatedMarketplaceOrderWorksheet))
             {
-                integrationRequests.Add(SafeIntegrationCall(ProcessType.FreightPop, async () => await ImportSupplierOrdersIntoFreightPop(updatedSupplierOrders)));
                 integrationRequests.Add(SafeIntegrationCall(ProcessType.Avalara, async () => await HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>())));
                 integrationRequests.Add(SafeIntegrationCall(ProcessType.Zoho, async () => await HandleZohoIntegration(updatedSupplierOrders, updatedMarketplaceOrderWorksheet)));
             }
@@ -250,9 +242,8 @@ namespace Marketplace.Common.Commands
             // no relationship exists currently in the platform
             var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(buyerOrder, supplierOrders);
 
-            // leaving this in until the sdk supports type parameters on order worksheet
             // need to get fresh order worksheet because this process has changed things about the worksheet
-            var updatedWorksheet = await _ocSandboxService.GetOrderWorksheetAsync(OrderDirection.Incoming, buyerOrder.ID);
+            var updatedWorksheet =  await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, buyerOrder.ID);
             return new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet>(updatedSupplierOrders, updatedWorksheet);
         }
 
@@ -333,41 +324,6 @@ namespace Marketplace.Common.Commands
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
                 xp = new { AvalaraTaxTransactionCode = transaction.code }
             });
-        }
-
-        private async Task ImportSupplierOrdersIntoFreightPop(IList<MarketplaceOrder> supplierOrders)
-        {
-            foreach (var supplierOrder in supplierOrders)
-            {
-                await ImportSupplierOrderIntoFreightPop(supplierOrder);
-            }
-        }
-
-        private async Task ImportSupplierOrderIntoFreightPop(MarketplaceOrder supplierOrder)
-        {
-
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, supplierOrder.ID);
-            var firstLineItemOfSupplierOrder = lineItems.Items.First();
-            var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(firstLineItemOfSupplierOrder.SupplierID);
-
-            if (supplier.xp.SyncFreightPop)
-            {
-                // we further split the supplier order into multiple orders for each shipfromaddressID before it goes into freightpop
-                var freightPopOrders = lineItems.Items.GroupBy(li => li.ShipFromAddressID);
-
-                var freightPopOrderIDs = new List<string>();
-                foreach (var lineItemGrouping in freightPopOrders)
-                {
-                    var firstLineItem = lineItemGrouping.First();
-
-                    var freightPopOrderID = $"{supplierOrder.ID.Split('-').First()}-{firstLineItem.ShipFromAddressID}";
-                    freightPopOrderIDs.Add(freightPopOrderID);
-
-                    var supplierAddress = await _oc.SupplierAddresses.GetAsync(supplier.ID, firstLineItem.ShipFromAddressID);
-                    var freightPopOrderRequest = OrderRequestMapper.Map(supplierOrder, lineItemGrouping.ToList(), supplier, supplierAddress, freightPopOrderID);
-                    await _freightPopService.ImportOrderAsync(freightPopOrderRequest);
-                }
-            }
         }
     };
 }

@@ -21,12 +21,13 @@ using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
-using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
+using System.Runtime.InteropServices;
 
 namespace Marketplace.API
 {
@@ -66,21 +67,15 @@ namespace Marketplace.API
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
                 Container = _settings.ExchangeRatesSettings.Container
             };
-            var freightPopConfig = new FreightPopConfig()
-            {
-                BaseUrl = _settings.FreightPopSettings.BaseUrl,
-                Password = _settings.FreightPopSettings.Password,
-                Username = _settings.FreightPopSettings.Username
-            };
 
             services
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
-				.InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
-				.InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
-				.InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
-				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
+                .InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
+                .InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
+                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
@@ -93,19 +88,18 @@ namespace Marketplace.API
                 .Inject<ISmartyStreetsCommand>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrchestrationLogCommand>()
-                .Inject<IOCShippingIntegration>()
+                .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
                 .Inject<IEnvironmentSeedCommand>()
-                .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
                 .Inject<ILineItemCommand>()
                 .Inject<IMeProductCommand>()
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
-				.Inject<IDocumentQuery>()
-				.Inject<IBlobStorage>()
-				.Inject<ISchemaQuery>()
+                .Inject<IDocumentQuery>()
+                .Inject<IBlobStorage>()
+                .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .Inject<IChiliTemplateCommand>()
@@ -117,7 +111,7 @@ namespace Marketplace.API
                     AccessToken = _settings.ZohoSettings.AccessToken,
                     ClientId = _settings.ZohoSettings.ClientId,
                     ClientSecret = _settings.ZohoSettings.ClientSecret,
-                    OrganizationID = _settings.ZohoSettings.OrgID }, 
+                    OrganizationID = _settings.ZohoSettings.OrgID },
                     new OrderCloudClientConfig {
                         ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                         AuthUrl = _settings.OrderCloudSettings.ApiUrl,
@@ -129,10 +123,10 @@ namespace Marketplace.API
                             }
                     }
                 ))
-				.AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
+                .AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
-				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")

@@ -14,8 +14,7 @@
 
 .border-hover {
   transition: border-color 0.25s ease;
-
-  &:hover {
+  &:hover, &:focus, &:active {
     border: 1px solid $secondary;
   }
 }

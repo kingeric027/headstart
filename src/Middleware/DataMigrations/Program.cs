@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define TRACE
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DataMigrations.Migrations;
@@ -34,6 +36,10 @@ namespace DataMigrations
 				.AddSingleton(settings)
 				.AddSingleton<ICosmosBulkEditor>(new CosmosBulkEditor(cosmosConfig))
 				.BuildServiceProvider();
+
+			Trace.AutoFlush = true;
+			Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+			Trace.WriteLine("Entering Main");
 
 			var editor = _provider.GetService<ICosmosBulkEditor>();
 
