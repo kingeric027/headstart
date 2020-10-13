@@ -142,8 +142,7 @@
         <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
         </span>
       </div>
-      <p class="mb-3 text-uppercase font-weight-bolder small text-muted"
-         translate>PRODUCTS.DETAILS.DESCRIPTION</p>
+      <!-- "Description" is self-explanatory. we don't need a headline saying so. -->
       <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
       </p>
       <div *ngIf="attachments.length > 0">
