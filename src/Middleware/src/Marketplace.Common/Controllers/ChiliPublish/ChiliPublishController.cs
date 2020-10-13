@@ -198,9 +198,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Get Tecra Documents")]
         [HttpGet, Route("")]
-        public async Task<IEnumerable<TecraDocument>> Get(string folder)
+        public async Task<IEnumerable<TecraDocument>> Get()
         {
-            var result = await _tecra.TecraDocuments(folder);
+            var result = await _tecra.TecraDocuments();
             return result;
         }
 
@@ -228,9 +228,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Get Tecra Specs")]
         [HttpGet, Route("")]
-        public async Task<IEnumerable<TecraSpec>> Get(string id, string folder)
+        public async Task<IEnumerable<TecraSpec>> Get(string id)
         {
-            var result = await _tecra.TecraSpecs(id, folder);
+            var result = await _tecra.TecraSpecs(id);
             return result;
         }
     }
@@ -250,9 +250,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Get Tecra Frame")]
         [HttpGet, Route("")]
-        public async Task<string> Get(string id, string storeid)
+        public async Task<string> Get(string id)
         {
-            var result = await _tecra.TecraFrame(id, storeid);
+            var result = await _tecra.TecraFrame(id);
             return result;
         }
     }
@@ -272,9 +272,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Get Tecra Proof")]
         [HttpGet, Route("")]
-        public async Task<string> Get(string id, string storeid)
+        public async Task<string> Get(string id)
         {
-            var result = await _tecra.TecraProof(id, storeid);
+            var result = await _tecra.TecraProof(id);
             return result;
         }
     }
@@ -294,9 +294,9 @@ namespace Marketplace.Common.Controllers
 
         [DocName("Get Tecra PDF")]
         [HttpGet, Route("")]
-        public async Task<string> Get(string id, string storeid)
+        public async Task<string> Get(string id)
         {
-            var result = await _tecra.TecraPDF(id, storeid);
+            var result = await _tecra.TecraPDF(id);
             return result;
         }
     }

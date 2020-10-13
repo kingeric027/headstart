@@ -12,12 +12,12 @@ namespace ordercloud.integrations.tecra
     public interface IOrderCloudIntegrationsTecraService
     {
         Task<TecraToken> GetToken();
-        Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string storeid);
-        Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder);
-        Task<string> GetTecraFrame(string token, string id, string storeid);
+        Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token);
+        Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id);
+        Task<string> GetTecraFrame(string token, string id);
         Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder);
-        Task<string> GetTecraProofByStoreID(string token, string id, string storeid);
-        Task<string> GetTecraPDFByStoreID(string token, string id, string storeid);
+        Task<string> GetTecraProofByStoreID(string token, string id);
+        Task<string> GetTecraPDFByStoreID(string token, string id);
 
     }
     public class OrderCloudTecraConfig
@@ -66,9 +66,9 @@ namespace ordercloud.integrations.tecra
             return await this.Token("auth/token").PostStringAsync(request).ReceiveJson<TecraToken>();
         }
 
-        public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token, string storeid)
+        public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token)
         {
-            return await this.Request("api/chili/documents", token).SetQueryParam("storeid", storeid).GetJsonAsync<TecraDocument[]>();
+            return await this.Request("api/chili/documents", token).SetQueryParam("storeid", Config.StoreID).GetJsonAsync<TecraDocument[]>();
         }
         public async Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder)
         {
@@ -80,40 +80,40 @@ namespace ordercloud.integrations.tecra
             request.folder = folder;
             return await this.Request("api/chili/alldocuments", token).PostJsonAsync(request).ReceiveJson<TecraDocument[]>();
         }
-        public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id, string folder)
+        public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id)
         {
             TecraDocumentRequest request = new TecraDocumentRequest();
-            return await this.Request($"api/chili/{id}/variabledefinitions", token).SetQueryParam("storeid", folder).GetJsonAsync<TecraSpec[]>();
+            return await this.Request($"api/chili/{id}/variabledefinitions", token).SetQueryParam("storeid", Config.StoreID).GetJsonAsync<TecraSpec[]>();
         }
-        public async Task<string> GetTecraFrame(string token, string id, string storeid)
+        public async Task<string> GetTecraFrame(string token, string id)
         {
             //TODO - Make wsid and folder dynamic
             TecraFrameParams tparams = new TecraFrameParams();
             tparams.docid = id;
-            tparams.storeid= storeid;
-            tparams.wsid = "e3210f88-277a-4b4c-9758-6f45906f0958";
+            tparams.storeid= Config.StoreID;
+            tparams.wsid = Config.WorkspaceID;
             tparams.wsid = "";
             tparams.folder = "root";
             tparams.vpid = "";
 
             return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }
-        public async Task<string> GetTecraProofByStoreID(string token, string id, string storeid)
+        public async Task<string> GetTecraProofByStoreID(string token, string id)
         {
             TecraProofParams tparams = new TecraProofParams();
             tparams.docid = id;
-            tparams.storeid = storeid;
+            tparams.storeid = Config.StoreID;
             tparams.page = 1;
 
             return await this.Request("api/v1/chili/getproofimagebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }
-        public async Task<string> GetTecraPDFByStoreID(string token, string id, string storeid)
+        public async Task<string> GetTecraPDFByStoreID(string token, string id)
         {
             //TODO - Make wsid and folder dynamic
             TecraPDFParams tparams = new TecraPDFParams();
             tparams.docid = id;
-            tparams.storeid = storeid;
-            tparams.settingsid = "9549c0ca-36df-4aaa-a564-0e27d39ec7be";
+            tparams.storeid = Config.StoreID;
+            tparams.settingsid = Config.SettingsID;
 
             return await this.Request("api/v1/chili/generatepdfbystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }

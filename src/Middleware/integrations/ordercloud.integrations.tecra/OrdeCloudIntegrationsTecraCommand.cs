@@ -9,12 +9,12 @@ namespace ordercloud.integrations.tecra
     public interface IOrderCloudIntegrationsTecraCommand
     {
         Task<string> TecraToken();
-        Task<IEnumerable<TecraDocument>> TecraDocuments(string storeid);
+        Task<IEnumerable<TecraDocument>> TecraDocuments();
         Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string folder);
-        Task<IEnumerable<TecraSpec>> TecraSpecs(string id, string folder);
-        Task<string> TecraFrame(string id, string storeid);
-        Task<string> TecraProof(string id, string storeid);
-        Task<string> TecraPDF(string id, string storeid);
+        Task<IEnumerable<TecraSpec>> TecraSpecs(string id);
+        Task<string> TecraFrame(string id);
+        Task<string> TecraProof(string id);
+        Task<string> TecraPDF(string id);
     }
     public class OrderCloudIntegrationsTecraCommand : IOrderCloudIntegrationsTecraCommand
     {
@@ -30,10 +30,10 @@ namespace ordercloud.integrations.tecra
             TecraToken auth = await _tecra.GetToken();
             return auth.access_token;
         }
-        public async Task<IEnumerable<TecraDocument>> TecraDocuments(string storeid)
+        public async Task<IEnumerable<TecraDocument>> TecraDocuments()
         {
             TecraToken auth = await _tecra.GetToken();
-            IEnumerable<TecraDocument> documents = await _tecra.GetTecraDocuments(auth.access_token, storeid);
+            IEnumerable<TecraDocument> documents = await _tecra.GetTecraDocuments(auth.access_token);
             return documents;
 
         }
@@ -44,31 +44,31 @@ namespace ordercloud.integrations.tecra
             return documents;
 
         }
-        public async Task<IEnumerable<TecraSpec>> TecraSpecs(string id, string folder)
+        public async Task<IEnumerable<TecraSpec>> TecraSpecs(string id)
         {
             TecraToken auth = await _tecra.GetToken();
-            IEnumerable<TecraSpec> specs = await _tecra.GetTecraSpecs(auth.access_token, id, folder);
+            IEnumerable<TecraSpec> specs = await _tecra.GetTecraSpecs(auth.access_token, id);
             return specs;
 
         }
-        public async Task<string> TecraFrame(string id, string storeid)
+        public async Task<string> TecraFrame(string id)
         {
             TecraToken auth = await _tecra.GetToken();
-            string specs = await _tecra.GetTecraFrame(auth.access_token, id, storeid);
+            string specs = await _tecra.GetTecraFrame(auth.access_token, id);
             return specs;
 
         }
-        public async Task<string> TecraProof(string id, string storeid)
+        public async Task<string> TecraProof(string id)
         {
             TecraToken auth = await _tecra.GetToken();
-            string specs = await _tecra.GetTecraProofByStoreID(auth.access_token, id, storeid);
+            string specs = await _tecra.GetTecraProofByStoreID(auth.access_token, id);
             return specs;
 
         }
-        public async Task<string> TecraPDF(string id, string storeid)
+        public async Task<string> TecraPDF(string id)
         {
             TecraToken auth = await _tecra.GetToken();
-            string specs = await _tecra.GetTecraPDFByStoreID(auth.access_token, id, storeid);
+            string specs = await _tecra.GetTecraPDFByStoreID(auth.access_token, id);
             return specs;
 
         }
