@@ -134,7 +134,7 @@
         </div>
       </div>
       <div class="alert alert-success my-3"
-           *ngIf="showRequestSubmittedMessage && specForm?.valid && qtyValid">
+           *ngIf="showRequestSubmittedMessage && ((specForm?.valid && qtyValid) || isQuoteProduct())">
         <span translate>PRODUCTS.DETAILS.SUCCESS
           <button class="btn btn-link"
                   (click)="toOrderDetail()"
