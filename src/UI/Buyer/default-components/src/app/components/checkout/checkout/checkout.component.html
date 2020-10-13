@@ -99,7 +99,8 @@
                                      [orderPromos]="orderPromotions"
                                      [shipEstimates]="shipEstimates"
                                      (selectShipRate)="selectShipMethod($event.detail)"
-                                     (continue)="doneWithShippingRates()">
+                                     (continue)="doneWithShippingRates()"
+                                     (backToAddress)="navigateBackToAddress()">
               </ocm-checkout-shipping>
             </ng-template>
           </ngb-panel>

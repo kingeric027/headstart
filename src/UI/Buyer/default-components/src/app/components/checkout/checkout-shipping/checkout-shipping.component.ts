@@ -15,8 +15,6 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
 export class OCMCheckoutShipping implements OnInit {
   @Input() order?: MarketplaceOrder;
   @Input() lineItems?: ListPage<MarketplaceLineItem>;
-  @Output() selectShipRate = new EventEmitter<ShipMethodSelection>();
-  @Output() continue = new EventEmitter();
   @Input() set shipEstimates(value: ShipEstimate[]) {
     this._shipEstimates = value;
     this._areAllShippingSelectionsMade = this.areAllShippingSelectionsMade(value);
@@ -24,7 +22,9 @@ export class OCMCheckoutShipping implements OnInit {
       return this.getLineItemsForShipEstimate(shipEstimate);
     }).filter(notEmpty)
   }
-
+  @Output() selectShipRate = new EventEmitter<ShipMethodSelection>();
+  @Output() continue = new EventEmitter();
+  @Output() backToAddress = new EventEmitter();
   _shipEstimates?: ShipEstimate[];
   _areAllShippingSelectionsMade = false;
   _lineItemsByShipEstimate?: MarketplaceLineItem[][];
@@ -59,6 +59,10 @@ export class OCMCheckoutShipping implements OnInit {
     if (!this.order || !this.order.xp) return;
     const line = this.getFirstLineItem(shipEstimate);
     return line?.SupplierID;
+  }
+
+  onChangeAddressClicked() {
+    this.backToAddress.emit();
   }
 
   getShipFromAddressID(shipEstimate: ShipEstimate): string | undefined {
