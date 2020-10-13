@@ -15,6 +15,7 @@ namespace Marketplace.Common.Commands
     public interface INotificationCommand
     {
         Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user);
+        Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(MonitoredProductFieldModifiedNotificationDocument document, string supplierID, string productID, VerifiedUserContext user);
     }
     public class NotificationCommand : INotificationCommand
     {
@@ -44,6 +45,36 @@ namespace Marketplace.Common.Commands
             // Assign the notification to the product
             await _assignmentQuery.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user);
             return await _productCommand.Get(_product.ID, user);
+        }
+        public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(MonitoredProductFieldModifiedNotificationDocument document, string supplierID, string productID, VerifiedUserContext user)
+        {
+            if (document.Doc.Status == NotificationStatus.ACCEPTED)
+            {
+                //Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
+                //All suppliers have integration clients with a default user of dev_{supplierID}.
+                var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
+                var selectedSupplierClient = supplierClient.Items[0];
+                var configToUse = new OrderCloudClientConfig
+                {
+                    ApiUrl = user.ApiUrl,
+                    AuthUrl = user.AuthUrl,
+                    ClientId = selectedSupplierClient.ID,
+                    ClientSecret = selectedSupplierClient.ClientSecret,
+                    GrantType = GrantType.ClientCredentials,
+                    Roles = new[]
+                               {
+                                     ApiRole.SupplierAdmin,
+                                     ApiRole.ProductAdmin
+                                },
+
+                };
+                var ocClient = new OrderCloudClient(configToUse);
+                await ocClient.AuthenticateAsync();
+                var token = ocClient.TokenResponse.AccessToken;
+                await ocClient.Products.PatchAsync(productID, new PartialProduct() { Active = true }, token);
+            }
+            await _query.Save<MonitoredProductFieldModifiedNotification>("MonitoredProductFieldModifiedNotification", document.ID, document, user);
+            return await _productCommand.Get(productID, user);
         }
     }
 }
