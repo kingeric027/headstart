@@ -57,7 +57,7 @@ export class BuyerLocationEditComponent implements OnInit {
     private marketplaceCatalogService: CatalogsTempService
   ) {this.countryOptions = GeographyConfig.getCountries();}
 
-  async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
+  refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation): void {
     this.buyerLocationEditable = buyerLocation;
     this.buyerLocationStatic = buyerLocation;
     this.catalogAssignments.CatalogIDs = this.buyerLocationEditable.UserGroup.xp.CatalogAssignments;
@@ -68,12 +68,12 @@ export class BuyerLocationEditComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     if (this.buyerID !== REDIRECT_TO_FIRST_PARENT) {
-      this.getCatalogs();
+      await this.getCatalogs();
     }
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
   }
 
-  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
+  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation): void {
     this.resourceForm = new FormGroup({
       ID: new FormControl(buyerLocation.Address.ID),
       LocationName: new FormControl(buyerLocation.UserGroup.Name, Validators.required),
@@ -165,7 +165,7 @@ export class BuyerLocationEditComponent implements OnInit {
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
-  updateBuyerLocationResource(buyerLocationUpdate: any) {
+  updateBuyerLocationResource(buyerLocationUpdate: any): void {
     const resourceToEdit = this.buyerLocationEditable || this.buyerLocationService.emptyResource;
     this.buyerLocationEditable = this.buyerLocationService.getUpdatedEditableResource(
       buyerLocationUpdate,
@@ -174,7 +174,7 @@ export class BuyerLocationEditComponent implements OnInit {
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
-  handleUpdateBuyerLocation(event: any, field: string) {
+  handleUpdateBuyerLocation(event: any, field: string): void {
     const buyerLocationUpdate = {
       field,
       value: field === 'Active' ? event.target.checked : event.target.value,

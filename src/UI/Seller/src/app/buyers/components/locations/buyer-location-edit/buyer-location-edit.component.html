@@ -23,7 +23,6 @@
                      maxlength="5"
                      [resourceForm]="resourceForm"
                      formControlName="ID"
-                     (input)="handleUpdateBuyerLocation($event, 'UserGroup.ID')"
                      (input)="handleUpdateBuyerLocation($event, 'Address.ID')"
                      placeholder="Enter ID (optional)">
             </div>
@@ -243,7 +242,8 @@
        
       </div>
     </div>
-    <buyer-location-permissions [locationID]="buyerLocationEditable?.Address?.ID"></buyer-location-permissions>
+    <buyer-location-permissions *ngIf="!isCreatingNew"
+                                [locationID]="buyerLocationEditable?.Address?.ID"></buyer-location-permissions>
     <app-buyer-location-catalogs [locationUserGroup]="buyerLocationEditable?.UserGroup"
                                  [catalogs]="catalogs"
                                  [isCreatingNew]="isCreatingNew"
