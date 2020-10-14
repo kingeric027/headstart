@@ -17,7 +17,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
     public interface ICheckoutIntegrationCommand
     {
         Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
-        Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
+        Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
     }
 
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
@@ -139,19 +139,23 @@ namespace Marketplace.Common.Services.ShippingIntegration
         }
 
 
-        public async Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
+        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
             if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
                 // quote orders do not have tax cost associated with them
-                return new OrderCalculateResponse();
+                return new MarketplaceOrderCalculateResponse();
             } else
             {
                 var totalTax = await _avalara.GetEstimateAsync(orderCalculatePayload.OrderWorksheet.Reserialize<OrderWorksheet>());
 
-                return new OrderCalculateResponse
+                return new MarketplaceOrderCalculateResponse
                 {
-                    TaxTotal = totalTax,
+                    TaxTotal = totalTax.totalTax ?? 0,
+                    xp = new OrderCalculateResponseXp()
+                    {
+                        TaxResponse = totalTax
+                    }
                 };
             }
         }
