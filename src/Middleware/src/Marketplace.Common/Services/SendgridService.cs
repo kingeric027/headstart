@@ -141,18 +141,23 @@ namespace Marketplace.Common.Services
         public async Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText)
         {
             var productsList = CreateTemplateProductList(lineItems, lineItemStatusChanges);
-
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Products = productsList,
-                lineItemEmailDisplayText.EmailSubject,
-                lineItemEmailDisplayText.DynamicText,
-                lineItemEmailDisplayText.DynamicText2,
-                DateSubmitted = order.DateSubmitted.ToString(),
-                OrderID = order.ID,
-                order.Comments
+                Data = new
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Products = productsList,
+                    DateSubmitted = order?.DateSubmitted?.ToString(),
+                    OrderID = order.ID,
+                    order.Comments
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = lineItemEmailDisplayText?.EmailSubject,
+                    DynamicText = lineItemEmailDisplayText?.DynamicText,
+                    DynamicText2 = lineItemEmailDisplayText?.DynamicText2
+                }
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
@@ -172,18 +177,23 @@ namespace Marketplace.Common.Services
         public async Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText)
         {
             var productsList = CreateTemplateProductList(lineItems, lineItemStatusChanges);
-
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                FirstName = "",
-                LastName = "",
-                Products = productsList,
-                lineItemEmailDisplayText.EmailSubject,
-                lineItemEmailDisplayText.DynamicText,
-                lineItemEmailDisplayText.DynamicText2,
-                DateSubmitted = order.DateSubmitted.ToString(),
-                OrderID = order.ID,
-                order.Comments
+                Data = new
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Products = productsList,
+                    DateSubmitted = order.DateSubmitted.ToString(),
+                    OrderID = order.ID,
+                    order.Comments
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = lineItemEmailDisplayText?.EmailSubject,
+                    DynamicText = lineItemEmailDisplayText?.DynamicText,
+                    DynamicText2 = lineItemEmailDisplayText?.DynamicText2,
+                }
             };
             await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, LINE_ITEM_STATUS_CHANGE, templateData);
         }
@@ -227,13 +237,16 @@ namespace Marketplace.Common.Services
             {
                 BaseAppURL = _settings.UI.BaseBuyerUrl;
             }
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName,
-                messageNotification.EventBody.PasswordRenewalAccessToken,
-                BaseAppURL,
-                messageNotification.EventBody.Username
+                Data = new
+                {
+                    messageNotification.Recipient.FirstName,
+                    messageNotification.Recipient.LastName,
+                    messageNotification.EventBody.PasswordRenewalAccessToken,
+                    BaseAppURL,
+                    messageNotification.EventBody.Username
+                }
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
@@ -252,7 +265,12 @@ namespace Marketplace.Common.Services
         public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
         {
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
+            EmailTemplate templateData = new EmailTemplate()
+            {
+                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
+            };
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -360,14 +378,22 @@ namespace Marketplace.Common.Services
         {
             var productsList = lineItems.Select(MapLineItemToProduct);
 
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Products = productsList,
-                lineItemEmailDisplayText.EmailSubject,
-                lineItemEmailDisplayText.DynamicText,
-                lineItemEmailDisplayText.DynamicText2
+                Data = new
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Products = productsList,
+
+
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = lineItemEmailDisplayText?.EmailSubject,
+                    DynamicText = lineItemEmailDisplayText?.DynamicText,
+                    DynamicText2 = lineItemEmailDisplayText?.DynamicText2
+                }
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
