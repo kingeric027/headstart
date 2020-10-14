@@ -15,6 +15,7 @@ namespace Marketplace.Models.Models.Marketplace
         public List<LineItemClaim> Returns { get; set; }
         public List<LineItemClaim> Cancelations { get; set; }
         public string ImageUrl { get; set; }
+        public string PrintArtworkURL { get; set; }
 
         // kit specific fields
         public string KitProductImageUrl { get; set; }

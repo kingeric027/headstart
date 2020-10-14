@@ -41,7 +41,7 @@ test('Can I checkout with 1 item? | 2473', async t => {
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(productName, '3 days')
+	await checkoutPage.selectShippingOption(productName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
@@ -63,7 +63,7 @@ test('Can I checkout with multiple items in my cart? | 2475', async t => {
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(firstProductName, '3 days')
+	await checkoutPage.selectShippingOption(firstProductName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
@@ -86,8 +86,8 @@ test('Can I checkout with all items being shipped from different locations? | 24
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(firstProductName, '3 days')
-	await checkoutPage.selectShippingOption(secondProductName, '3 days')
+	await checkoutPage.selectShippingOption(firstProductName, '1 day')
+	await checkoutPage.selectShippingOption(secondProductName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
@@ -113,8 +113,7 @@ test('Can the User add an address during checkout? | 19689', async t => {
 	await checkoutPage.clickSaveAndContinueButton()
 })
 
-//failing because of https://four51.atlassian.net/browse/SEB-1074
-test.skip('Can a User checkout with a PO product in the cart? | 19977', async t => {
+test('Can a User checkout with a PO product in the cart? | 19977', async t => {
 	const productName = 'accessfob'
 	await buyerHeaderPage.search(productName)
 	await productListPage.clickProduct(productName)
@@ -122,7 +121,7 @@ test.skip('Can a User checkout with a PO product in the cart? | 19977', async t 
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(productName, '3 days')
+	await checkoutPage.selectShippingOption(productName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await loadingHelper.thisWait()
 	await checkoutPage.clickContinueButton()
@@ -131,8 +130,7 @@ test.skip('Can a User checkout with a PO product in the cart? | 19977', async t 
 	await t.expect(await orderDetailPage.productExists(productName)).ok()
 })
 
-//failing because of https://four51.atlassian.net/browse/SEB-1074
-test.skip('Can a user checkout with a PO product and standard product in their cart? | 19978', async t => {
+test('Can a user checkout with a PO product and standard product in their cart? | 19978', async t => {
 	const firstProductName = '100 CLASS T-SHIRT'
 	const secondProductName = 'accessfob'
 	await buyerHeaderPage.search(firstProductName)
@@ -144,8 +142,8 @@ test.skip('Can a user checkout with a PO product and standard product in their c
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(firstProductName, '3 days')
-	await checkoutPage.selectShippingOption(secondProductName, '3 days')
+	await checkoutPage.selectShippingOption(firstProductName, '1 day')
+	await checkoutPage.selectShippingOption(secondProductName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')

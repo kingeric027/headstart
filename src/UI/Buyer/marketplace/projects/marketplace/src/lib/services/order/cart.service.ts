@@ -29,7 +29,8 @@ export class CartService {
     if (!_isUndefined(this.order.DateCreated)) {
       const lineItems = this.state.lineItems.Items;
       const liWithSameProduct = lineItems.find(li => li.ProductID === lineItem.ProductID);
-      if (liWithSameProduct && this.hasSameSpecs(lineItem, liWithSameProduct)) {
+      const isPrintProduct = lineItem.xp.PrintArtworkURL;
+      if (!isPrintProduct && liWithSameProduct && this.hasSameSpecs(lineItem, liWithSameProduct)) {
         // combine any line items that have the same productID/specs into one line item
         lineItem.Quantity += liWithSameProduct.Quantity;
       }

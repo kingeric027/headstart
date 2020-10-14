@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.CosmosDB.BulkExecutor.BulkUpdate;
+using Microsoft.Azure.CosmosDB.BulkExecutor.BulkDelete;
 using Newtonsoft.Json.Linq;
 using NPOI.HSSF.Record.PivotTable;
 using NPOI.SS.Formula.Functions;
@@ -14,18 +15,18 @@ namespace DataMigrations.Migrations
 {
 	public class new_asset_types_8oct2020
 	{
-		private readonly ICosmosBulkEditor _editor;
+		private readonly ICosmosBulkOperations _bulk;
 
-		public new_asset_types_8oct2020(ICosmosBulkEditor editor) 
+		public new_asset_types_8oct2020(ICosmosBulkOperations bulk) 
 		{
-			_editor = editor;
+			_bulk = bulk;
 		}
 
 		// This run removes all the existing asset types except images and replaces them with types derived from the ContentType.
 		// The old Attachment type is now represented with a specific title, which can be queried on.
 		public async Task Run()
 		{
-			await _editor.RunBulkUpdateAsync<AssetDO>("assets", asset =>
+			await _bulk.UpdateAllAsync<AssetDO>("assets", asset =>
 			{
 				var updates = new List<UpdateOperation>();
 
@@ -47,7 +48,7 @@ namespace DataMigrations.Migrations
 				}
 				return updates;
 			});
-			await _editor.RunBulkUpdateAsync<AssetedResourceDO>("assetedresource", assignment =>
+			await _bulk.UpdateAllAsync<AssetedResourceDO>("assetedresource", assignment =>
 			{
 				var allOthers = assignment.SelectToken("AllOtherAssetIDs")?.ToObject<List<string>>();
 
