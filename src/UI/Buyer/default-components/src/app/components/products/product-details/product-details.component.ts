@@ -84,11 +84,7 @@ export class OCMProductDetails implements OnInit {
 
   async listChiliConfigs(): Promise<void> {
     const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
-    chiliConfigs.Items.map(item => {
-      if (item.SupplierProductID === this._product.ID) {
-        this._chiliConfigs.push(item);
-      }
-    });
+    this._chiliConfigs = chiliConfigs.Items.filter(item => item.SupplierProductID === this._product.ID);
     this.showConfigs = true;
   }
 
