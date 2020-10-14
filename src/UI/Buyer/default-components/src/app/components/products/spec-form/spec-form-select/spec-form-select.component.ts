@@ -6,20 +6,28 @@ import { Field } from '../field.interface';
 @Component({
   selector: 'spec-form-select',
   template: `
-    <div class="form-group" [formGroup]="group" [class.row]="compact">
-      <label
-        class="text-uppercase font-weight-bolder small text-muted"
-        [class.col-3]="compact"
-        for="{{ config.name }}"
-        >{{ config.label }}</label
-      >
-      <select [formControlName]="config.name" class="custom-select" [class.col-9]="compact" value="{{ config.value }}">
-        <option *ngIf="!config.value" value=""></option>
-        <option *ngFor="let option of config.options" value="{{ option.Value }}">
-          {{ option.Value }}
-          <span *ngIf="option.PriceMarkup"> (+ {{ option.PriceMarkup | currency: config.currency }})</span>
-        </option>
-      </select>
+    <div class="container px-0">
+      <div class="form-group justify-content-center" [formGroup]="group" [class.row]="compact">
+        <label
+          class="text-uppercase font-weight-bolder small text-muted mb-0 d-flex align-items-center"
+          [class.col-3]="compact"
+          for="{{ config.name }}"
+          >{{ config.label }}
+        </label>
+        <select
+          [formControlName]="config.name"
+          id="{{ config.name }}"
+          class="custom-select"
+          [class.col-7]="compact"
+          value="{{ config.value }}"
+        >
+          <option *ngIf="!config.value" value=""></option>
+          <option *ngFor="let option of config.options" value="{{ option.Value }}">
+            {{ option.Value }}
+            <span *ngIf="option.PriceMarkup"> (+ {{ option.PriceMarkup | currency: config.currency }})</span>
+          </option>
+        </select>
+      </div>
     </div>
   `,
   styleUrls: ['./spec-form-select.component.scss'],

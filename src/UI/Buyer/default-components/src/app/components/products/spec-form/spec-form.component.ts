@@ -31,6 +31,7 @@ export class OCMSpecForm implements OnChanges {
   config: FieldConfig[] = [];
   form: FormGroup;
   isValidAvailability: boolean;
+  controlInactive: boolean;
 
   @Input() currency: string;
   @Input() disabledVariants: MarketplaceVariant[]
@@ -99,10 +100,10 @@ export class OCMSpecForm implements OnChanges {
     });
   }
 
-  validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]) {
-    let controlInactive: boolean = false;
+  validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]): void {
+    let controlInactive = false;
     if (disabledVariants.length < 1){ return; }
-    for(let disabledVariant of disabledVariants){
+    for(const disabledVariant of disabledVariants){
       if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
         controlInactive = true;
         this.isSelectionInactive.emit(controlInactive);
@@ -117,12 +118,12 @@ export class OCMSpecForm implements OnChanges {
 
   isControlInactive(ctrls: string[], disabledVariant: MarketplaceVariant): boolean {
     let controlCount = 0;
-   for (let variant of disabledVariant.Specs) {
+   for (const variant of disabledVariant.Specs) {
      ctrlLoop:
-     for (let controlValue of ctrls){
-       if (variant.Value == controlValue) {
+     for (const controlValue of ctrls){
+       if (variant.Value === controlValue) {
         controlCount = controlCount + 1;
-        if (controlCount ==  ctrls.length){ return true; }
+        if (controlCount ===  ctrls.length){ return true; }
         break ctrlLoop;
        }
      }
