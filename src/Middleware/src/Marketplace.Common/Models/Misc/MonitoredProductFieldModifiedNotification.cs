@@ -1,9 +1,12 @@
 ﻿using NPOI.OpenXmlFormats.Dml;
 using ordercloud.integrations.cms;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Models
 {
+    [SwaggerModel]
     public class MonitoredProductFieldModifiedNotificationDocument : Document<MonitoredProductFieldModifiedNotification> { }
+    [SwaggerModel]
     public class MonitoredProductFieldModifiedNotification
     {
         public NotificationUser Supplier { get; set; }
@@ -30,6 +33,7 @@ namespace Marketplace.Models
         public NotificationUser ModifiedBy { get; set; }
         public NotificationUser ReviewedBy { get; set; }
         public string DateModified { get; set; }
+        public string DateReviewed { get; set; }
     }
     public static class NotificationStatus
     {

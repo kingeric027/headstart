@@ -26,6 +26,19 @@ export async function getWarehouseID(
 	if (warehouse.AddressName.includes('AutomationAddress_')) return warehouse.ID
 }
 
+export async function getSupplierAddresses(
+	supplierID: string,
+	clientAuth: string
+) {
+	const addresses = await OrderCloudSDK.SupplierAddresses.List(
+		supplierID,
+		{},
+		{ accessToken: clientAuth }
+	)
+
+	return addresses.Items
+}
+
 export async function deleteSupplierAddress(
 	warehouseID: string,
 	vendorID: string,

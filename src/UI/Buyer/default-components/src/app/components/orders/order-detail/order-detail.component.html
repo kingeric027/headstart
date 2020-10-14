@@ -90,6 +90,7 @@
             </div>
             <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
                                 [lineItems]="reorderResponse.InvalidLi"
+                                [groupByKits]="true"
                                 [readOnly]="true">
             </ocm-lineitem-table>
             <div class="row d-flex justify-content-space-between justify-content-between mr-2 ml-2">
