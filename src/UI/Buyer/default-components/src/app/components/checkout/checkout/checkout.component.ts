@@ -214,6 +214,6 @@ export class OCMCheckout implements OnInit {
 
   destoryLoadingIndicator(toSection: string): void {
     this.isLoading = false;
-    this.currentPanel = toSection;
+    this.toSection(toSection);
   }
 }
