@@ -1,13 +1,16 @@
-import { Component, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcAdminUserService, OcSupplierUserService } from '@ordercloud/angular-sdk';
+import { ListPage, OcAdminUserService, OcSupplierUserService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { AppAuthService } from '@app-seller/auth';
 import {get as _get} from 'lodash';
+import { HeadStartSDK, JDocument} from '@ordercloud/headstart-sdk';
+import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+
 
 @Component({
   selector: 'account-notifications',
@@ -28,6 +31,7 @@ export class NotificationsComponent extends AccountContent {
   }
   faExclamationCircle = faExclamationCircle;
   faTimesCircle = faTimesCircle;
+  notificationsToReview: JDocument[];
 
   toggleOrderEmails(value: boolean): void {
     //TO-DO - will need to ultimately refactor this to area to handle additional notification types more cleanly
@@ -65,5 +69,10 @@ export class NotificationsComponent extends AccountContent {
     const copiedResource = this.copyResource(this.userEditable);
     const editedArr = copiedResource.xp?.AddtlRcpts.filter(e => e !== copiedResource.xp?.AddtlRcpts[index]);
     this.updateUserFromEvent({target: {value: editedArr}}, 'xp.AddtlRcpts');
+  }
+
+  reviewNotificationAcceptance(isAccepted: boolean) { 
+      // TODO: Send request to middleware to review the change, and (if ACCEPTED) change SuperProduct.Product.Active = true
+      console.log(isAccepted);  
   }
 }

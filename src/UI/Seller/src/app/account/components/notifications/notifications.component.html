@@ -30,12 +30,29 @@
                                           (removeRcpt)="removeAddtlRcpt($event)"
                                           (addRcpt)="addAddtlRcpt()">
               </seller-email-notifications>
+              <div>
+                <ng-container *ngIf="userContext?.UserType === 'SELLER'">
+                  <div *ngFor="let notification of notificationsToReview">
+                    <notification [notification]="notification"></notification>
+                  </div>
+                </ng-container>
+              </div>
+
             </div>
+
+
             <div class="col-md-5">
               <account-summary [user]="userEditable"></account-summary>
             </div>
+            <div class="col-md-7">
+
+            </div>
+
           </div>
+
+
         </div>
+
       </perfect-scrollbar>
     </div>
   </div>
