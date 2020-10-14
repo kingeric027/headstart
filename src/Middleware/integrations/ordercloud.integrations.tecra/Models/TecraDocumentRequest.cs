@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ordercloud.integrations.tecra.Models
 {
+    [SwaggerModel]
     public class TecraDocumentRequest
     {
         public string chiliurl { get; set; }
@@ -12,6 +14,7 @@ namespace ordercloud.integrations.tecra.Models
         public string password { get; set; }
         public string folder { get; set; }
     }
+    [SwaggerModel]
     public class TecraFrameParams
     {
         public string docid { get; set; }
@@ -20,12 +23,14 @@ namespace ordercloud.integrations.tecra.Models
         public string folder { get; set; }
         public string storeid { get; set; }
     }
+    [SwaggerModel]
     public class TecraProofParams
     {
         public string docid { get; set; }
         public int page { get; set; }
         public string storeid { get; set; }
     }
+    [SwaggerModel]
     public class TecraPDFParams
     {
         public string docid { get; set; }
