@@ -73,8 +73,8 @@ export class OCMLineitemTable implements OnInit {
     this.context.order.cart.remove(lineItemID);
   }
 
-  removeKit(kitProductID: string): void {
-    this.context.order.cart
+  removeKit(kit: any): void {
+    this.context.order.cart.removeMany(kit)
   }
 
   toProductDetails(productID: string): void {
