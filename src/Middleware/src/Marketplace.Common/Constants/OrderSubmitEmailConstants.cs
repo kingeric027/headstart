@@ -1,20 +1,35 @@
-﻿using Marketplace.Models;
+﻿using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.AspNetCore.Mvc;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Marketplace.Common.Constants
 {
     class OrderSubmitEmailConstants
     {
-        public static Dictionary<VerifiedUserType, EmailDisplayText> GetOrderSubmitDictionary(string orderID, string firstName, string lastName)
+        public enum OrderEmailTypes
         {
-            return new Dictionary<VerifiedUserType, EmailDisplayText>()
+            OrderSubmitted,
+            QuoteOrderSubmitted,
+            RequiresApproval,
+            RequestedApproval,
+            Approved,
+            Declined
+        }
+
+
+        public static EmailDisplayText GetOrderSubmitText(string orderID, string firstName, string lastName, VerifiedUserType verifiedUser)
+        {
+            var dictionary = new Dictionary<VerifiedUserType, EmailDisplayText>()
             {
                 {VerifiedUserType.buyer, new EmailDisplayText()
                 {
-                    EmailSubject = "Your order has been submitted",
+                    EmailSubject = $"Your order has been submitted {orderID}",
                     DynamicText = "Thank you for your order.",
                     DynamicText2 = "We are getting your order ready to be shiped. You will be notified when it has been sent. Your order contains the folowing items."
                 } },
@@ -31,10 +46,11 @@ namespace Marketplace.Common.Constants
                     DynamicText2 = "The order contains the following items:"
                 } },
             };
+            return dictionary[verifiedUser];
         }
-        public static Dictionary<VerifiedUserType, EmailDisplayText> GetQuoteOrderSubmitDictionary(string orderID, string firstName, string lastName)
+        public static EmailDisplayText GetQuoteOrderSubmitText(VerifiedUserType verifiedUser)
         {
-            return new Dictionary<VerifiedUserType, EmailDisplayText>()
+            var dictionary = new Dictionary<VerifiedUserType, EmailDisplayText>()
             {
                 {VerifiedUserType.buyer, new EmailDisplayText()
                 {
@@ -49,6 +65,7 @@ namespace Marketplace.Common.Constants
                     DynamicText2 = "Please reach out to the customer direclty to give them more information about their quote."
                 } },
             };
+            return dictionary[verifiedUser];
         }
         public static EmailDisplayText GetOrderRequiresApprovalText()
         {
