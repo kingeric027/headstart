@@ -140,9 +140,6 @@ export class OCMProductChiliConfig implements OnInit {
     this.currentUser = this.context.currentUser.get();
     this.userCurrency = this.currentUser.Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
-    //this.loadScript('https://chili.accuconnect.com/CHILI/scripts/index.js');
-    //this.loadScript('https://www.acculync.com/four51/scripts/nd_451_enc.js');
-
     this.loadScript('https://www.acculync.com/four51/scripts/sd_451_enc.js');
   }
 
