@@ -17,7 +17,7 @@ import ChiliSpecOptions from '@ordercloud/headstart-sdk/dist/api/ChiliSpecOption
     templateUrl: './chili-publish-configuration.componant.html',
     styleUrls: ['./chili-publish-configuration.componant.scss'],
 })
-export class ChiliPublishConfiguration implements OnInit, OnChanges {
+export class ChiliPublishConfiguration implements OnInit {
     @Input()
     product: MarketplaceProduct;
     faExclamationCircle = faExclamationCircle;
@@ -73,10 +73,6 @@ export class ChiliPublishConfiguration implements OnInit, OnChanges {
     ngOnInit(): void {
         this.getChiliDocs();
         this.listChiliConfigs();
-    }
-
-    ngOnChanges(): void {
-        console.log("Something Changed.");
     }
 
     isAssigned(userGroupID: string): boolean {

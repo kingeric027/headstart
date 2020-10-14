@@ -16,7 +16,7 @@ import { TecraDocument, TecraSpec } from '../../../../shared/services/middleware
     templateUrl: './variable-print-configuration.component.html',
     styleUrls: ['./variable-print-configuration.component.scss'],
 })
-export class VariablePrintConfiguration implements OnInit, OnChanges {
+export class VariablePrintConfiguration implements OnInit {
     @Input()
     product: MarketplaceProduct;
     faExclamationCircle = faExclamationCircle;
@@ -54,9 +54,5 @@ export class VariablePrintConfiguration implements OnInit, OnChanges {
 
     ngOnInit(): void {
         
-    }
-
-    ngOnChanges(): void {
-        console.log("Something Changed.");
     }
 }
