@@ -1,12 +1,12 @@
 <div class="container my-4"
      *ngIf="_product">
   <div class="row mb-5">
-    <div class="col-md-6">
+    <div [ngClass]="specs?.length > 3 ? 'col-md-4' : 'col-md-5'">
       <ocm-image-gallery *ngIf="_superProduct.Images"
                          [images]="_superProduct.Images"
                          [specs]="specForm?.value?.ctrls"></ocm-image-gallery>
     </div>
-    <div class="col-md-6">
+    <div [ngClass]="specs?.length > 3 ? 'col-md-5' : 'col-md-7'">
       <div class="pb-3 mb-3 border-bottom border-light">
         <a href="javascript:;"
            (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">
