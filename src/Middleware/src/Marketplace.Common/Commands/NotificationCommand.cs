@@ -48,6 +48,7 @@ namespace Marketplace.Common.Commands
         }
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(MonitoredProductFieldModifiedNotificationDocument document, string supplierID, string productID, VerifiedUserContext user)
         {
+            var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
                 //Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
@@ -71,10 +72,12 @@ namespace Marketplace.Common.Commands
                 var ocClient = new OrderCloudClient(configToUse);
                 await ocClient.AuthenticateAsync();
                 var token = ocClient.TokenResponse.AccessToken;
-                await ocClient.Products.PatchAsync(productID, new PartialProduct() { Active = true }, token);
+                product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, token);
             }
             await _query.Save<MonitoredProductFieldModifiedNotification>("MonitoredProductFieldModifiedNotification", document.ID, document, user);
-            return await _productCommand.Get(productID, user);
+            var superProduct = await _productCommand.Get(productID, user);
+            superProduct.Product = product;
+            return superProduct;
         }
     }
 }
