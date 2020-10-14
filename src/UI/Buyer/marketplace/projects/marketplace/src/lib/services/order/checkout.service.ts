@@ -23,6 +23,7 @@ import {
   MarketplaceLineItem,
   MarketplaceAddressBuyer,
 } from '@ordercloud/headstart-sdk';
+import { ApplicationInsightsService } from '../application-insights/application-insights.service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +32,8 @@ export class CheckoutService {
   constructor(
     private paymentHelper: PaymentHelperService,
     private state: OrderStateService,
-    private appConfig: AppConfig
+    private appConfig: AppConfig,
+    private appInsightsService: ApplicationInsightsService
   ) {}
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
@@ -183,9 +185,13 @@ export class CheckoutService {
   // Private Methods
   private async submit(): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
-    await this.state.reset();
-    return submittedOrder.ID;
+    try {
+      const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
+      await this.state.reset();
+      return submittedOrder.ID;
+    } catch (ex) {
+      this.appInsightsService.logException(ex);
+    }
   }
 
   private async createCCPayment(
