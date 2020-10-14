@@ -50,5 +50,41 @@ namespace Marketplace.Common.Constants
                 } },
             };
         }
+        public static EmailDisplayText GetOrderRequiresApprovalText()
+        {
+            return new EmailDisplayText()
+            {
+                EmailSubject = "An order requires your approval",
+                DynamicText = "An order requires your approval. Please review the order and approve or decline the order.",
+                DynamicText2 = "The order for approval contains the following items"
+            };
+        }
+        public static EmailDisplayText GetRequestedApprovalText()
+        {
+            return new EmailDisplayText()
+            {
+                EmailSubject = "Your order was sent for approval",
+                DynamicText = "Your order was sent for approval. You will receive an email when the order is approved.",
+                DynamicText2 = "Your order awaiting approval contains the following items"
+            };
+        }
+        public static EmailDisplayText GetOrderApprovedText()
+        {
+            return new EmailDisplayText()
+            {
+                EmailSubject = "Your order was approved",
+                DynamicText = "Your order was approved and submitted.",
+                DynamicText2 = "Your order contains the following items"
+            };
+        }
+        public static EmailDisplayText GetOrderDeclinedText()
+        {
+            return new EmailDisplayText()
+            {
+                EmailSubject = "Your order was declined",
+                DynamicText = "Your order was declined. Please review the order and re-submit the order again.",
+                DynamicText2 = "Your declined order contains the following items"
+            };
+        }
     }
 }
