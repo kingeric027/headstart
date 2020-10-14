@@ -45,7 +45,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   countriesServicingOptions = [];
   countriesServicingForm: FormGroup;
   hasLogo = false;
-  logoUrl: string = "";
+  logoUrl = '';
   stagedLogoUrl: SafeUrl = null;
   logoLoading = false;
   faTimes = faTimes;
@@ -81,7 +81,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
 
   async handleSelectedSupplierChange(supplier: MarketplaceSupplier): Promise<void> {
     this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`;
-    !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } })).Items?.length > 0);
+    !this.isCreatingNew && (this.hasLogo = (await await HeadStartSDK.Assets.ListAssets('Suppliers', this._supplierEditable?.ID, { filters: { Tags: ['Logo'] } })).Items?.length > 0);
     !this.isCreatingNew && (this.supplierUsers = await this.ocSupplierUserService.List(this._supplierEditable.ID).toPromise());
     !this.router.url.startsWith('/my-supplier') && (this.buyers = await Buyers.List());
     this.setUpSupplierCountrySelectIfNeeded();
@@ -166,10 +166,10 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     } else {
       this.logoLoading = true;
       const file: File = event?.target?.files[0];
-      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } });
+      const logoAssets = await HeadStartSDK.Assets.ListAssets('Suppliers', this._supplierEditable?.ID, { filters: { Tags: ['Logo'] } });
       if (logoAssets?.Items?.length > 0) {
         // If logo exists, remove the assignment, then the logo itself
-        await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, "Suppliers", null, null);
+        await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, 'Suppliers', null, null);
         await HeadStartSDK.Assets.Delete(logoAssets.Items[0].ID);
       }
       // Then upload logo asset
@@ -195,7 +195,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       File: file,
       Type: (assetType as AssetUpload['Type']),
       FileName: file.name,
-      Tags: ["Logo"]
+      Tags: ['Logo']
     }
     // Upload the asset, then make the asset assignment to Suppliers
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
@@ -206,9 +206,9 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     this.logoLoading = true;
     try {
       // Get the logo asset
-      const logoAssets = await HeadStartSDK.Assets.ListAssets("Suppliers", this._supplierEditable?.ID, { filters: { Tags: ["Logo"] } });
+      const logoAssets = await HeadStartSDK.Assets.ListAssets('Suppliers', this._supplierEditable?.ID, { filters: { Tags: ['Logo'] } });
       // Remove the logo asset assignment
-      await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, "Suppliers", null, null);
+      await HeadStartSDK.Assets.DeleteAssetAssignment(logoAssets?.Items[0]?.ID, this._supplierEditable?.ID, 'Suppliers', null, null);
       // Remove the logo asset
       await HeadStartSDK.Assets.Delete(logoAssets.Items[0].ID);
     } catch (err) {
