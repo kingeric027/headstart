@@ -168,9 +168,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
     const productModifiedNotifications = await HeadStartSDK.Documents.ListDocuments('MonitoredProductFieldModifiedNotification', 'Products', superProduct?.Product?.ID);
-    if (productModifiedNotifications?.Items?.length > 0 && productModifiedNotifications?.Items.some(i => i?.Doc.Status === NotificationStatus.SUBMITTED)) {
-      this.productInReviewNotifications = productModifiedNotifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
-    };
+    this.productInReviewNotifications = productModifiedNotifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
     // If a seller, and not editing the product, grab the currency from the product xp.
     this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
     // copying to break reference bugs
@@ -408,7 +406,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       headers: new HttpHeaders({
           Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
       }),
-  };
+    };
     let superProduct = editedSuperProduct;
     await Promise.all(fieldsToMonitorForChanges.map(async f => {
       const fieldChanged = JSON.stringify(_get(editedSuperProduct, f)) !== JSON.stringify(_get(this._superMarketplaceProductStatic, f));
@@ -432,7 +430,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
                   Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`
               },
               ReviewedBy: {ID: '', Name: ''},
-              DateModified: new Date().toISOString()
+              DateModified: new Date().toISOString(),
+              // TODO: Figure out how to get the API to accept a null value...
+              DateReviewed: new Date().toISOString()
           }
       }
       // TODO: Replace with the SDK
@@ -442,9 +442,19 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     return superProduct;
   }
 
-  reviewMonitoredFieldChange(status: NotificationStatus): void {
-    // TODO: Send request to middleware to review the change, and (if ACCEPTED) change SuperProduct.Product.Active = true
-    console.log(status)
+  async reviewMonitoredFieldChange(status: NotificationStatus, notification: MonitoredProductFieldModifiedNotificationDocument): Promise<void> {
+    const myContext = await this.currentUserService.getUserContext();
+    notification.Doc.Status = status;
+    notification.Doc.History.ReviewedBy = { ID: myContext?.Me?.ID, Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`};
+    notification.Doc.History.DateReviewed = new Date().toISOString();
+    const headers = {
+      headers: new HttpHeaders({
+          Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+    };
+    // TODO: Replace with the SDK
+    const superProduct = await this.http.put<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`, notification, headers).toPromise()
+    this.refreshProductData(superProduct);
   }
 
   updateProductResource(productUpdate: any): void {
