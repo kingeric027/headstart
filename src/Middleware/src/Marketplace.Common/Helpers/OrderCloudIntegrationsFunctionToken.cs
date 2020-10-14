@@ -74,6 +74,8 @@ namespace Marketplace.Common.Helpers
             cid.AddClaim(new Claim("email", user.Email ?? ""));
             cid.AddClaim(new Claim("buyer", user.Buyer?.ID ?? ""));
             cid.AddClaim(new Claim("supplier", user.Supplier?.ID ?? ""));
+            cid.AddClaim(new Claim("seller", user?.Seller?.ID ?? ""));
+
             cid.AddClaims(user.AvailableRoles.Select(r => new Claim(ClaimTypes.Role, r)));
 
             //Validate the token

@@ -16,7 +16,6 @@ import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase
 import { ShopperContextService } from 'marketplace';
 import { MerchantConfig } from 'src/app/config/merchant.class';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -214,6 +213,6 @@ export class OCMCheckout implements OnInit {
 
   destoryLoadingIndicator(toSection: string): void {
     this.isLoading = false;
-    this.currentPanel = toSection;
+    this.toSection(toSection);
   }
 }

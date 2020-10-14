@@ -100,6 +100,11 @@
                                    [catalogID]="_buyer.ID"
                                    [isEditing]="isEditing"
                                    (assignmentsUpdated)="updateCategoryAssignments($event)"></product-category-assignment>
+      <variable-print-configuration-component [productID]="_product.ID"
+                                              [catalogID]="_buyer.ID"
+                                              [availableCatelogs]="catalogs"
+                                              [productAssignments]="assignedCategoriesEditable"
+                                              *ngIf="_product.xp.ArtworkRequired"></variable-print-configuration-component>
       <div class="mt-3 d-flex justify-content-end">
         <button class="btn btn-primary"
                 type="submit"

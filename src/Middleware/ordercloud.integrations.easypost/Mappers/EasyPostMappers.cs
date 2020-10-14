@@ -43,7 +43,10 @@ namespace ordercloud.integrations.easypost
 				EstimatedTransitDays = (int)rate.delivery_days,
 				xp =
 				{
-					CarrierAccountID = rate.carrier_account_id
+					CarrierAccountID = rate.carrier_account_id,
+					ListRate = decimal.Parse(rate.list_rate),
+					Guaranteed = rate.delivery_date_guaranteed,
+					OriginalCost = decimal.Parse(rate.rate)
 				}
 			};
 		}

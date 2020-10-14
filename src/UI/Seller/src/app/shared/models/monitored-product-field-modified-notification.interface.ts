@@ -27,6 +27,7 @@ export interface NotificationHistory {
     ModifiedBy: NotificationUser;
     ReviewedBy: NotificationUser;
     DateModified: string;
+    DateReviewed: string;
 }
 
 export enum NotificationStatus {
