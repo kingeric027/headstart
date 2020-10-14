@@ -3,7 +3,7 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, ChiliConfig, ChiliSpec, MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant, ChiliSpec, ChiliConfig, ChiliTemplate } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -11,13 +11,18 @@ import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { FormGroup } from '@angular/forms';
-import { ProductDetailService } from './product-detail.service';
+import { ProductDetailService } from '../product-details/product-detail.service';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+
+declare var SetVariableValue: any;
+declare var saveDocument: any;
+declare var LoadChiliEditor: any;
 
 @Component({
-  templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.scss'],
+  templateUrl: './product-chili-configuration.component.html',
+  styleUrls: ['./product-chili-configuration.component.scss'],
 })
-export class OCMProductDetails implements OnInit {
+export class OCMProductChiliConfig implements OnInit {
   // font awesome icons
   faTh = faTh;
   faListUl = faListUl;
@@ -57,21 +62,77 @@ export class OCMProductDetails implements OnInit {
   isInactiveVariant: boolean;
   _disabledVariants: MarketplaceVariant[];
   variantInventory: number;
+  chiliTemplate: ChiliTemplate;
+  showSpecs = false;
+  frameSrc: SafeResourceUrl;
+  lineImage: string = '';
+  pdfSrc: string = '';
+  currentDocID = '';
+  ShowAddToCart = false;
+  isLoading = true;
+  editor;
+  frameWindow;
+
   constructor(
     private specFormService: SpecFormService,
+    private sanitizer: DomSanitizer,
     private context: ShopperContextService,
     private productDetailService: ProductDetailService
   ) { }
 
-  @Input() set product(superProduct: SuperMarketplaceProduct) {
-    this._superProduct = superProduct;
-    this._product = superProduct.Product;
-    this.attachments = superProduct?.Attachments;
-    this.priceBreaks = superProduct.PriceSchedule?.PriceBreaks;
-    this.isOrderable = !!superProduct.PriceSchedule;
+  @Input() set template(chiliTemplate: ChiliTemplate) {
+    this.chiliTemplate = chiliTemplate;
+    this._superProduct = chiliTemplate.Product;
+    this._product = chiliTemplate.Product.Product;
+    this.attachments = chiliTemplate.Product?.Attachments;
+    this.priceBreaks = chiliTemplate.Product.PriceSchedule?.PriceBreaks;
+    this.isOrderable = !!chiliTemplate.Product.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
-    this.specs = superProduct.Specs;
-    this.populateInactiveVariants(superProduct);
+    this.specs = chiliTemplate.Product.Specs;
+    this.populateInactiveVariants(chiliTemplate.Product);
+    this.frameSrc = this.sanitizer.bypassSecurityTrustResourceUrl(this.chiliTemplate.Frame);
+    this.currentDocID = this.frameSrc.toString().split("doc=")[1].split("&")[0];
+    this.loadChiliEditor(this.chiliTemplate.Frame);
+  }
+  setTecraSpec(event: any, spec: ChiliSpec): void {
+    const types = {
+      'Text': 'string',
+      'DropDown': 'list',
+      'Checkbox': 'checkbox'
+    };
+    SetVariableValue((spec.ListOrder), event.target, types[spec.xp.UI.ControlType]);
+  }
+
+  loadChiliEditor(url: string): void {
+    setTimeout(() => {
+      LoadChiliEditor(url);
+      this.isLoading = false;
+    }, 1000);
+  }
+
+  async saveTecraDocument(): Promise<void> {
+    this.isLoading = true;
+    saveDocument();
+    setTimeout(async () => {
+      await this.context.chiliConfig.getChiliProof(this.currentDocID).then(proofURL => {
+        this.lineImage = proofURL;
+        this.context.chiliConfig.getChiliPDF(this.currentDocID).then(printArtworkURL => {
+          this.pdfSrc = printArtworkURL;
+          this.isLoading = false;
+          this.ShowAddToCart = true;
+        });
+      });
+    }, 5000);
+  }
+
+  loadScript(url: string) {
+    let body = <HTMLDivElement>document.body;
+    let script = document.createElement('script');
+    script.innerHTML = '';
+    script.src = url;
+    script.async = true;
+    script.defer = true;
+    body.appendChild(script);
   }
 
   async ngOnInit(): Promise<void> {
@@ -79,13 +140,7 @@ export class OCMProductDetails implements OnInit {
     this.currentUser = this.context.currentUser.get();
     this.userCurrency = this.currentUser.Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
-    await this.listChiliConfigs();
-  }
-
-  async listChiliConfigs(): Promise<void> {
-    const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
-    this._chiliConfigs = chiliConfigs.Items.filter(item => item.SupplierProductID === this._product.ID);
-    this.showConfigs = true;
+    this.loadScript('https://www.acculync.com/four51/scripts/sd_451_enc.js');
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
@@ -148,7 +203,8 @@ export class OCMProductDetails implements OnInit {
         Quantity: this.quantity,
         Specs: this.specFormService.getLineItemSpecs(this.specs, this.specForm),
         xp: {
-          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct.Images, this._superProduct.Specs, this.specForm)
+          PrintArtworkURL: this.pdfSrc,
+          ImageUrl: this.lineImage
         }
       });
     } finally {
