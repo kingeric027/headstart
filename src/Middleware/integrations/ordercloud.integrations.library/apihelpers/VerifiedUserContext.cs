@@ -21,7 +21,7 @@ namespace ordercloud.integrations.library
         {
             var _oc = new OrderCloudClient(config);
             var auth = await _oc.AuthenticateAsync();
-            var user = await new OrderCloudClientWithContext(auth.AccessToken).GetMeWithSellerID(auth.AccessToken);
+            var user = await new OrderCloudClientWithContext(auth.AccessToken).Me.GetAsync();
             var jwt = new JwtSecurityToken(auth.AccessToken);
 
             var cid = new ClaimsIdentity("OrderCloudIntegrations");

@@ -9,7 +9,7 @@ export const environment = {
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   appname: 'Marketplace Admin Staging',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
+  blobStorageUrl: 'https://marktplacestaging.blob.core.windows.net',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
   orderCloudApiVersion: 'v1',
   buyerConfigs: {
@@ -29,5 +29,6 @@ export const environment = {
       clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
       buyerUrl: 'https://sebrandsmarketplace-wax-stage.azurewebsites.net/'
     }
-  }
+  },
+  superProductFieldsToMonitor: ["PriceSchedule"]
 };

@@ -51,4 +51,14 @@ namespace ordercloud.integrations.cms
 	{
 		public ReorderImagesOnlyException() : base("Reorder Error", "Only Image-type assets have an ordering.", null) { }
 	}
+
+	public class NotConfiguredForAssetsException : OrderCloudIntegrationException
+	{
+		public NotConfiguredForAssetsException(string sellerID) : base("Configuration Error", $"Your OC organization with SellerID {sellerID} is not configured to use the Assets feature. Please contact oheywood@four51.com for access.", null) { }
+	}
+
+	public class MissingConfigationException : OrderCloudIntegrationException
+	{
+		public MissingConfigationException() : base("Configuration Error", $"Missing Configuration Record.", null) { }
+	}
 }

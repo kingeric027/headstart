@@ -69,12 +69,7 @@ module.exports = {
     "id-match": "error",
     "import/order": "off",
     "max-classes-per-file": "off",
-    "max-len": [
-      "error",
-      {
-        "code": 140
-      }
-    ],
+    "max-len": "off",
     "new-parens": "error",
     "no-bitwise": "off",
     "no-caller": "error",

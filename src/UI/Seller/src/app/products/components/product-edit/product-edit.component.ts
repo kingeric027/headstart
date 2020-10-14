@@ -8,6 +8,7 @@ import {
   OcSupplierAddressService,
   OcAdminAddressService,
   OcProductService,
+  OcTokenService,
 } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,7 +16,8 @@ import { Product } from '@ordercloud/angular-sdk';
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { faTrash, faTimes, faCircle, faHeart, faAsterisk, faCheckCircle, faTimesCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, 
+  faTimes, faCircle, faHeart, faAsterisk, faCheckCircle, faTimesCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
 import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties } from '@ordercloud/headstart-sdk';
@@ -23,15 +25,15 @@ import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
 import { AppAuthService } from '@app-seller/auth';
-import { environment } from 'src/environments/environment';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
 import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
 import { ValidateMinMax } from '../../../validators/validators';
 import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
 import { takeWhile } from 'rxjs/operators';
-import { SizerTiers, SizerTiersDescriptionMap } from './size-tier.constants';
+import { SizerTiersDescriptionMap } from './size-tier.constants';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { MonitoredProductFieldModifiedNotification, MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 
 @Component({
   selector: 'app-product-edit',
@@ -102,6 +104,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   active: number;
   alive = true;
   isSpecsEditing = false;
+  productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[];
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -116,7 +119,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private http: HttpClient,
+    private ocTokenService: OcTokenService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -163,12 +168,18 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async refreshProductData(superProduct: SuperMarketplaceProduct): Promise<void> {
+    const productModifiedNotifications = await HeadStartSDK.Documents.ListDocuments('MonitoredProductFieldModifiedNotification', 'Products', superProduct?.Product?.ID);
+    if (productModifiedNotifications?.Items?.length > 0 && productModifiedNotifications?.Items.some(i => i?.Doc.Status === NotificationStatus.SUBMITTED)) {
+      this.productInReviewNotifications = productModifiedNotifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
+    };
     // If a seller, and not editing the product, grab the currency from the product xp.
     this.supplierCurrency = this._exchangeRates?.find(r => r.Currency === superProduct?.Product?.xp?.Currency);
     // copying to break reference bugs
     this._superMarketplaceProductStatic = JSON.parse(JSON.stringify(superProduct));
     this._superMarketplaceProductEditable = JSON.parse(JSON.stringify(superProduct));
-    if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = { Unit: null, Qty: null };
+    if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) {
+      this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = { Unit: null, Qty: null };
+    }
     if (
       this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category
     ) {
@@ -182,7 +193,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType;
     this.createProductForm(this._superMarketplaceProductEditable);
     if (this.userContext?.UserType === 'SELLER') {
-      this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable.Product.DefaultSupplierID).toPromise();
+      this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable?.Product?.DefaultSupplierID).toPromise();
       this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
@@ -375,6 +386,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       if (JSON.stringify(this._superMarketplaceProductEditable) !== JSON.stringify(this._superMarketplaceProductStatic)) {
         superProduct = await this.updateMarketplaceProduct(this._superMarketplaceProductEditable);
       }
+      if (this.appConfig?.superProductFieldsToMonitor.length > 0) {
+        superProduct = await this.checkForFieldsToMonitor(superProduct);
+      }
       this.refreshProductData(superProduct);
       if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
       if (this.staticContentFiles.length > 0) {
@@ -385,6 +399,53 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.dataIsSaving = false;
       throw ex;
     }
+  }
+
+  async checkForFieldsToMonitor(editedSuperProduct: SuperMarketplaceProduct): Promise<SuperMarketplaceProduct> {
+    const fieldsToMonitorForChanges = this.appConfig?.superProductFieldsToMonitor;
+    const mySupplier = await this.currentUserService.getMySupplier();
+    const myContext = await this.currentUserService.getUserContext();
+    const headers = {
+      headers: new HttpHeaders({
+          Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+  };
+    let superProduct = editedSuperProduct;
+    await Promise.all(fieldsToMonitorForChanges.map(async f => {
+      const fieldChanged = JSON.stringify(_get(editedSuperProduct, f)) !== JSON.stringify(_get(this._superMarketplaceProductStatic, f));
+      if (fieldChanged) {
+        const document = {
+          Supplier: {
+              ID: mySupplier?.ID,
+              Name: mySupplier?.Name
+          },
+          Product: {
+              ID: this._superMarketplaceProductStatic?.Product?.ID,
+              Name: this._superMarketplaceProductStatic?.Product?.Name,
+              FieldModified: f,
+              PreviousValue: _get(this._superMarketplaceProductStatic, f),
+              CurrentValue: _get(this._superMarketplaceProductEditable, f)
+          },
+          Status: NotificationStatus.SUBMITTED,
+          History: {
+              ModifiedBy: {
+                  ID: myContext?.Me?.ID,
+                  Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`
+              },
+              ReviewedBy: {ID: '', Name: ''},
+              DateModified: new Date().toISOString()
+          }
+      }
+      // TODO: Replace with the SDK
+        superProduct = await this.http.post<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified`, document, headers).toPromise();
+      }
+    }));
+    return superProduct;
+  }
+
+  reviewMonitoredFieldChange(status: NotificationStatus): void {
+    // TODO: Send request to middleware to review the change, and (if ACCEPTED) change SuperProduct.Product.Active = true
+    console.log(status)
   }
 
   updateProductResource(productUpdate: any): void {
