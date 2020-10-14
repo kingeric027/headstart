@@ -181,9 +181,12 @@
                        [specs]="specs"
                        [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
-                       (specFormChange)="onSpecFormChange($event.detail)">
-          (isSelectionInactive)="onSelectionInactive($event)">
+                       (specFormChange)="onSpecFormChange($event.detail)"
+                       (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
+        <ng-container *ngIf="this.isInactiveVariant">
+          <strong class="text-danger">This option is unavailable and cannot be added to the cart. Please make another selection.</strong>
+        </ng-container>
         <div *ngIf="!isOrderable"
              class="alert alert-info"
              translate>
