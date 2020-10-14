@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, Params, ActivatedRoute } from '@angular/router';
-import { OrderStatus, OrderFilters, OrderViewContext } from '../../shopper-context';
+import { OrderStatus, OrderFilters, OrderViewContext, AppConfig } from '../../shopper-context';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { Me, Sortable } from 'ordercloud-javascript-sdk';
+import { Me, Sortable, Tokens } from 'ordercloud-javascript-sdk';
 import { filter } from 'rxjs/operators';
 import { RouteService } from '../route/route.service';
 import { HeadStartSDK, ListPage, MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { ListArgs } from '@ordercloud/headstart-sdk';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -23,11 +24,37 @@ export class OrderFilterService {
     private currentUser: CurrentUserService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private routeService: RouteService
+    private routeService: RouteService,
+    private http: HttpClient,
+    private appConfig: AppConfig,
   ) {
     this.activatedRoute.queryParams
       .pipe(filter(() => this.router.url.startsWith('/orders')))
       .subscribe(this.readFromUrlQueryParams);
+  }
+
+  buildHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      Authorization: `Bearer ${Tokens.GetAccessToken()}`,
+    });
+  }
+
+  createHttpParams(args: ListArgs): HttpParams {
+    let params = new HttpParams();
+    Object.entries(args).forEach(([key, value]) => {
+      if (key !== 'filters' && value && value.toString() !== 'null') {
+        params = params.append(key, value.toString());
+      }
+    });
+    Object.entries(args.filters).forEach(([key, value]) => {
+      if ((typeof value !== 'object' && value) || (value && value.length)) {
+        params = params.append(key, value.toString());
+      }
+      if (key === 'xp' && value.SubmittedOrderStatus) {
+        params = params.append('xp.SubmittedOrderStatus', value.SubmittedOrderStatus.toString());
+      }
+    });
+    return params;
   }
 
   toPage(pageNumber: number): void {
@@ -92,7 +119,17 @@ export class OrderFilterService {
 
   async ListLocationOrders(): Promise<ListPage<MarketplaceOrder>> {
     const locationID = this.activeFiltersSubject.value.location;
-    return await HeadStartSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
+    // Changed middleware route, awaiting next SDK bump (1.10.5?)
+    // return await HeadStartSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
+    const url = `${this.appConfig.middlewareUrl}/order/location/${locationID}`;
+    const args = this.createListOptions();
+    const params = this.createHttpParams(args);
+    return await this.http
+      .get<ListPage<MarketplaceOrder>>(url, {
+        headers: this.buildHeaders(),
+        params,
+      })
+      .toPromise();
   }
 
   async listApprovableOrders(): Promise<ListPage<MarketplaceOrder>> {
@@ -122,8 +159,8 @@ export class OrderFilterService {
 
   private createListOptions(): ListArgs<MarketplaceOrder> {
     const { page, sortBy, search, showOnlyFavorites, status, fromDate, toDate } = this.activeFiltersSubject.value;
-    const from = fromDate ? `>${fromDate}` : undefined;
-    const to = toDate ? `<${toDate}` : undefined;
+    const from = fromDate ? `${fromDate}` : undefined;
+    const to = toDate ? `${toDate}` : undefined;
     const favorites = this.currentUser.get().FavoriteOrderIDs.join('|') || undefined;
     const listOptions = {
       page,
@@ -131,7 +168,12 @@ export class OrderFilterService {
       sortBy,
       filters: {
         ID: showOnlyFavorites ? favorites : undefined,
-        DateSubmitted: [from, to].filter(x => x),
+        from,
+        to,
+        xp: {
+          SubmittedOrderStatus: undefined
+        },
+        Status: undefined
       },
     };
     return this.addStatusFilters(status, listOptions as any);
@@ -140,8 +182,10 @@ export class OrderFilterService {
   private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {
     if (status === OrderStatus.ChangesRequested) {
       listOptions.filters.DateDeclined = '*';
-    } else {
+    } else if (status === OrderStatus.AwaitingApproval) {
       listOptions.filters.Status = status;
+    } else {
+      listOptions.filters.xp.SubmittedOrderStatus = status;
     }
     return listOptions;
   }
