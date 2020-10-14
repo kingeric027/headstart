@@ -716,12 +716,13 @@
                                        description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
                           <button type="button"
                                   class="btn btn-link text-dark"
-                                  (click)="modal.dismiss()">ADMIN.PRODUCT_EDIT.CANCEL</button>
+                                  (click)="modal.dismiss()"
+                                  translate>ADMIN.PRODUCT_EDIT.CANCEL</button>
                           <button type="button"
                                   class="btn brand-button--danger"
                                   (click)="removeFile(image)"
                                   (click)="modal.dismiss()"
-                                  translate>ADMIN.PRODUCT_EDIT.YES_DELETE</button>
+                                  translate>COMMON.YES_DELETE</button>
                         </confirm-modal>
                       </ng-template>
                     </div>
