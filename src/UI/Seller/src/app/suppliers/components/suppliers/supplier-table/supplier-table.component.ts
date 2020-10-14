@@ -109,7 +109,6 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
         const asset: AssetUpload = {
           Active: true,
           File: this.file,
-          Type: ('Image' as AssetUpload['Type']),
           FileName: this.file.name,
           Tags: ['Logo']
         }
