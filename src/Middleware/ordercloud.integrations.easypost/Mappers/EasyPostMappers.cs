@@ -44,8 +44,9 @@ namespace ordercloud.integrations.easypost
 				xp =
 				{
 					CarrierAccountID = rate.carrier_account_id,
-					ListRate = rate.list_rate,
-					Guaranteed = rate.delivery_date_guaranteed
+					ListRate = decimal.Parse(rate.list_rate),
+					Guaranteed = rate.delivery_date_guaranteed,
+					OriginalCost = decimal.Parse(rate.rate)
 				}
 			};
 		}
