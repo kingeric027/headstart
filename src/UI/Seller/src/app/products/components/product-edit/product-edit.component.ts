@@ -20,13 +20,12 @@ import { faTrash,
   faTimes, faCircle, faHeart, faAsterisk, faCheckCircle, faTimesCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties, Asset } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
 import { AppAuthService } from '@app-seller/auth';
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload';
-import { Asset } from 'marketplace-javascript-sdk/dist/models/Asset';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { ValidateMinMax } from '../../../validators/validators';
 import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper';
