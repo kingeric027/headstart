@@ -1,13 +1,10 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
-    Buyer,
-    OcBuyerService,
     UserGroup,
     ProductAssignment
 } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { ProductService } from '@app-seller/products/product.service';
 import { MarketplaceProduct, ChiliConfig, ChiliSpec, ChiliSpecXp, ChiliSpecUI } from '@ordercloud/headstart-sdk';
 import { TecraDocument, TecraSpec } from '../../../../shared/services/middleware-api/middleware-chili.service';
 
@@ -48,8 +45,7 @@ export class VariablePrintConfiguration implements OnInit {
     }
 
     constructor(
-        private ocBuyerService: OcBuyerService,
-        private productService: ProductService
+
     ) { }
 
     ngOnInit(): void {
