@@ -64,18 +64,19 @@
         </ocm-spec-form>
         <div class="d-flex flex-column mb-3"
              *ngIf="isOrderable">
-          <small class="text-uppercase font-weight-bolder text-muted"
+          <small class="text-uppercase font-weight-bolder text-muted mb-2"
                  translate>PRODUCTS.DETAILS.QUANTITY</small>
-          <div class="d-flex flex-row mt-2">
-            <ocm-quantity-input class="d-inline-block mr-3"
+          <div class="d-flex flex-row">
+            <ocm-quantity-input class="d-inline-block mb-3 mr-3"
                                 (qtyChange)="qtyChange($event.detail)"
                                 [product]="_product"
                                 [priceSchedule]="_product.PriceSchedule"
-                                [gridDisplay]="showGrid">
+                                [gridDisplay]="showGrid"
+                                [variantInventory]="variantInventory">
             </ocm-quantity-input>
             <button *ngIf="isQuoteProduct()"
-                    class="btn btn-block btn-primary"
-                    [disabled]="!specForm?.valid || !qtyValid"
+                    class="btn btn-block btn-primary mb-3"
+                    [disabled]="(specForm && !specForm?.valid) || !qtyValid"
                     (click)="openQuoteForm()"
                     translate>
               PRODUCTS.DETAILS.REQ_QUOTE
@@ -83,7 +84,7 @@
             <button *ngIf="!isQuoteProduct()"
                     class="btn btn-block btn-primary mb-3"
                     type="submit"
-                    [disabled]="isAddingToCart || !specForm?.valid || !qtyValid"
+                    [disabled]="isAddingToCart || (specForm && !specForm?.valid)  || !qtyValid || isInactiveVariant"
                     (click)="addToCart()"
                     translate>
               PRODUCTS.DETAILS.ADD_TO_CART
@@ -144,7 +145,7 @@
         <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.</span>
       </div>
       <!-- description section -->
-      <h3 class="h6"
+      <h3 class="small font-weight-bolder text-muted"
           translate>PRODUCTS.DETAILS.DESCRIPTION</h3>
       <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
       </p>
