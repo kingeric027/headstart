@@ -174,7 +174,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       }
       // Then upload logo asset
       try {
-        await this.uploadAsset(this._supplierEditable?.ID, file, 'Image');
+        await this.uploadAsset(this._supplierEditable?.ID, file);
       } catch (err) {
         this.hasLogo = false;
         this.logoLoading = false;
