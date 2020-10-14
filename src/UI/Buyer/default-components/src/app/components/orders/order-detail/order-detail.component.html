@@ -100,8 +100,7 @@
               <button type="button"
                       class="btn btn-primary btn-md"
                       [disabled]="!reorderResponse?.ValidLi?.length"
-                      (click)="addToCart()"
-                      (click)="modal.dismiss()"
+                      (click)="addToCart(); modal.dismiss();"
                       translate>
                 ORDERS.DETAIL.ADD_TO_CART
               </button>
@@ -122,8 +121,7 @@
                       (click)="modal.dismiss()">Cancel</button>
               <button type="button"
                       class="btn btn-primary btn-md"
-                      (click)="moveOrderToCart()"
-                      (click)="modal.dismiss()"
+                      (click)="moveOrderToCart();modal.dismiss()"
                       translate>
                 ORDERS.DETAIL.MOVE_TO_CART
               </button>
