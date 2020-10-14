@@ -20,6 +20,7 @@ namespace Marketplace.Common.Commands
         public SuperMarketplaceProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
+        public string Frame { get; set; }
     }
 
     [SwaggerModel]
