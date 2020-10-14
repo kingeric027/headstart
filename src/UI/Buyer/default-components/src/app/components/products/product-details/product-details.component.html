@@ -155,15 +155,16 @@
              download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
-      <ng-container *ngIf="_product.xp.ProductType === 'Standard'">
+      <div class="border-top border-light mt-3"
+           *ngIf="_product.xp.ProductType === 'Standard'">
         <button type="button"
-                class="btn btn-link p-0 mt-2"
+                class="btn btn-link p-0 mt-3 float-right"
                 (click)="openContactSupplierForm()">
           <span translate>PRODUCTS.DETAILS.CONTACT_PART_ONE</span>
           <span translate>ALIAS.SUPPLIER_LOWERCASE</span>
           <span translate>PRODUCTS.DETAILS.CONTACT_PART_TWO</span>
         </button>
-      </ng-container>
+      </div>
     </div>
     <!-- DISPLAY LONG SPEC FORM TO RIGHT -->
     <div class="col-xl-2 col-lg-3"
