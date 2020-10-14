@@ -1,18 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using OrderCloud.SDK;
-using ordercloud.integrations.avalara;
-using ordercloud.integrations.library;
-using ordercloud.integrations.exchangerates;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
-using NPOI.OpenXmlFormats.Dml;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Commands
 {
     public interface ICheckoutIntegrationCommand
     {
@@ -60,7 +59,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
 
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
             {
-                shipResponse.ShipEstimates = await ConvertShipingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
+                shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
             }
 
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
@@ -83,7 +82,7 @@ namespace Marketplace.Common.Services.ShippingIntegration
             }
 		}
 
-        private async Task<List<ShipEstimate>> ConvertShipingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
+        private async Task<List<ShipEstimate>> ConvertShippingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
 		{
             var rates = (await _exchangeRates.Get(buyerCurrency)).Rates;
             var conversionRate = rates.Find(r => r.Currency == shipperCurrency).Rate;
@@ -115,11 +114,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
             foreach(var estimate in shipEstimates)
             {
                 //  get supplier and supplier subtotal
-                var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault().LineItemID).SupplierID;
-                var supplier = suppliers.Items.Where(supplier => supplier.ID == supplierID).FirstOrDefault();
-                var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier.ID);
+                var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
+                var supplier = suppliers.Items.FirstOrDefault(s => s.ID == supplierID);
+                var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier?.ID);
                 var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
-                if (supplier.xp?.FreeShippingThreshold != null && supplier.xp?.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
+                if (supplier?.xp?.FreeShippingThreshold != null && supplier.xp?.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
                 {
                     foreach (var method in estimate.ShipMethods)
                     {

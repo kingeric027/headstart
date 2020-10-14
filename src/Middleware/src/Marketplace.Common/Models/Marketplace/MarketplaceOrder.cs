@@ -6,19 +6,10 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using Avalara.AvaTax.RestClient;
+using Marketplace.Common.Exceptions;
 
 namespace Marketplace.Models
 {
-    public class MarketplaceOrderCalculateResponse : OrderCalculateResponse<OrderCalculateResponseXp>
-    {
-
-    }
-
-    public class OrderCalculateResponseXp
-    {
-        public TransactionModel TaxResponse { get; set; }
-    }
-
     [SwaggerModel]
     public class MarketplaceOrder : Order<OrderXp, MarketplaceUser, MarketplaceAddressBuyer>
     {
