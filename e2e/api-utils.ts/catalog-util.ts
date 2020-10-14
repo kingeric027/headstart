@@ -18,6 +18,16 @@ export async function getCatalogID(
 	if (catalog.Name.includes('AutomationCatalog_')) return catalog.ID
 }
 
+export async function getCatalogs(buyerID: string, clientAuth: string) {
+	const catalogs = await OrderCloudSDK.UserGroups.List(
+		buyerID,
+		{ search: 'AutomationCatalog_', searchOn: 'Name' },
+		{ accessToken: clientAuth }
+	)
+
+	return catalogs.Items
+}
+
 export async function deleteCatalog(
 	catalogID: string,
 	buyerID: string,

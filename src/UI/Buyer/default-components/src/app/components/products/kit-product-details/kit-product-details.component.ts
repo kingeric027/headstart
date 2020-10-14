@@ -148,12 +148,13 @@ export class OCMKitProductDetails implements OnInit, OnDestroy {
         const details = this.productDictionary[kitDefinition.Product.ID];
         return {
           ProductID: kitDefinition.Product.ID,
-          Quantity: kitDefinition.MinQty,
+          Quantity: details.quantity,
           Specs: kitDefinition.Static ?
             this.buildStaticKitSpecs(kitDefinition) :
             this.specFormService.getLineItemSpecs(details.specs, details.specForm),
           xp: {
             ImageUrl: this.specFormService.getLineItemImageUrl(details.images, details.specs, details.specForm),
+            KitProductName: this._product.Product.Name,
             KitProductImageUrl: this._product.Images && this._product.Images.length ? this._product.Images[0].Url : null,
             KitProductID: this._product.Product.ID // used to group kit line items during checkout
           }
