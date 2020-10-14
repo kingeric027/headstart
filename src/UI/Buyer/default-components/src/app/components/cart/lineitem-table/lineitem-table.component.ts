@@ -17,21 +17,24 @@ export class OCMLineitemTable implements OnInit {
   faTrashAlt = faTrashAlt;
   @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
     this._lineItems = lineItems;
-    this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(lineItems);
-    this.liGroupedByKit = this.groupLineItemsByKitID(lineItems)
+  }
+  @Input() set groupByKits(bool: boolean) {
+    this._groupByKits = bool;
+    this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(this._lineItems);
+    this.liGroupedByKit = this.groupLineItemsByKitID(this._lineItems);
     this.setSupplierInfo(this.liGroupedByShipFrom);
   }
-  @Input() orderType: OrderType;
   @Input() readOnly: boolean;
+  @Input() orderType: OrderType;
   @Input() hideStatus = false;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroupedByKit: MarketplaceLineItem[][];
   updatingLiIDs: string[] = [];
+  _groupByKits: boolean;
   _lineItems = [];
   _orderCurrency: string;
   showKitDetails = true;
-
   constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) {
     this._orderCurrency = this.context.currentUser.get().Currency;
   }
@@ -45,13 +48,14 @@ export class OCMLineitemTable implements OnInit {
   }
 
   groupLineItemsByKitID(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
+    if (!this._groupByKits) return [];
     const kitLineItems = lineItems.filter(li => li.xp.KitProductID);
     const liKitGroups = _groupBy(kitLineItems, li => li.xp.KitProductID);
     return Object.values(liKitGroups);
   }
 
   groupLineItemsByShipFrom(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
-    const supplierLineItems = lineItems.filter(li => !li.xp.KitProductID);
+    const supplierLineItems = this._groupByKits ? lineItems.filter(li => !li.xp.KitProductID) : lineItems;
     const liGroups = _groupBy(supplierLineItems, li => li.ShipFromAddressID);
     return Object.values(liGroups)
       .sort((a, b) => {

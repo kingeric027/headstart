@@ -60,8 +60,7 @@
       <!-- line item: Start -->
       <div *ngFor="let li of liGroup; let i = index"
            class="position-relative border-bottom border-light">
-        <div class="row no-gutters align-items-center my-3"
-             *ngIf="!li.xp.KitProductID">
+        <div class="row no-gutters align-items-center my-3">
           <div class="col-sm-6"
                *ngIf="li">
             <div class="row align-items-sm-center no-gutters">
@@ -186,11 +185,11 @@
       <!-- line item: End -->
     </div>
   </div>
-
-  
 </div>
-<div *ngIf="liGroupedByKit?.length > 0">
+
+
   <!--   KITS   -->
+<div *ngIf="liGroupedByKit?.length > 0">
   <div class="card shadow mb-4"
        *ngFor="let kit of liGroupedByKit; let i = index;">
     <div class="card-header p-3">
@@ -200,7 +199,7 @@
             <span class="text-medium font-weight-light">Kit: </span>{{ kit[i]?.xp?.KitProductName }}
           </h2>
         </div>
-        <div class="col-md d-flex flex-column justify-content-end text-md-right">
+        <div *ngIf="!readOnly" class="col-md d-flex flex-column justify-content-end text-md-right">
           <a class="text-link"
              (click)="toggleKitDetails()">{{showKitDetails ? 'Collapse' : 'Expand'}}</a>
         </div>
