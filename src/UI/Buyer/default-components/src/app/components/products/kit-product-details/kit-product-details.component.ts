@@ -146,7 +146,6 @@ export class OCMKitProductDetails implements OnInit, OnDestroy {
     try {
       const lineItems = this._product.ProductAssignments.ProductsInKit.map(kitDefinition => {
         const details = this.productDictionary[kitDefinition.Product.ID];
-        debugger;
         return {
           ProductID: kitDefinition.Product.ID,
           Quantity: details.quantity,

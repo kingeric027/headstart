@@ -16,7 +16,7 @@ export class CartService {
   private initializingOrder = false;
 
   constructor(private state: OrderStateService,
-              private tempSdk: TempSdk) {}
+    private tempSdk: TempSdk) { }
 
   get(): ListPage<MarketplaceLineItem> {
     return this.lineItems;
@@ -51,6 +51,11 @@ export class CartService {
     } finally {
       this.state.reset();
     }
+  }
+
+  async removeMany(lineItems: MarketplaceLineItem[]): Promise<void[]> {
+    const req = lineItems.map(li => this.remove(li.ID));
+    return Promise.all(req);
   }
 
   async setQuantity(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
@@ -102,14 +107,14 @@ export class CartService {
   }
 
   private hasSameSpecs(line1: MarketplaceLineItem, line2: MarketplaceLineItem): boolean {
-    const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({SpecID: s.SpecID, OptionID: s.OptionID}));
-    const sortedSpecs2 = line2.Specs.sort(this.sortSpecs).map(s => ({SpecID: s.SpecID, OptionID: s.OptionID}));
+    const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
+    const sortedSpecs2 = line2.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
     return JSON.stringify(sortedSpecs1) === JSON.stringify(sortedSpecs2);
   }
 
   private sortSpecs(a: LineItemSpec, b: LineItemSpec): number {
     // sort by SpecID, if SpecID is the same, then sort by OptionID
-    if(a.SpecID === b.SpecID) {
+    if (a.SpecID === b.SpecID) {
       return (a.OptionID < b.OptionID) ? -1 : (a.OptionID > b.OptionID) ? 1 : 0;
     } else {
       return a.SpecID < b.SpecID ? -1 : 1;
