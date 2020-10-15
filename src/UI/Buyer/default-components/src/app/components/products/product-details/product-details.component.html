@@ -212,8 +212,8 @@
                        [specs]="specs"
                        [superProduct]="_superProduct"
                        [currency]="_product?.xp?.Currency"
-                       (specFormChange)="onSpecFormChange($event.detail)">
-          (isSelectionInactive)="onSelectionInactive($event)">
+                       (specFormChange)="onSpecFormChange($event.detail)"
+                       (isSelectionInactive)="onSelectionInactive($event)">
         </ocm-spec-form>
         <div *ngIf="!isOrderable"
              class="alert alert-info"
