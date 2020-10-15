@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Exceptions;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
-using Newtonsoft.Json.Converters;
 using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
@@ -26,159 +26,136 @@ namespace Marketplace.Common.Commands
     public class PostSubmitCommand : IPostSubmitCommand
     {
         private readonly IOrderCloudClient _oc;
-
-        // temporary service until we get updated sdk
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
-		private readonly IExchangeRatesCommand _exchangeRates;
+        private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
         private readonly IOrderCommand _orderCommand;
         private readonly ILineItemCommand _lineItemCommand;
-        
+
         public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
         {
-			_oc = oc;
+            _oc = oc;
             _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
-			_exchangeRates = exchangeRates;
+            _exchangeRates = exchangeRates;
             _orderCommand = orderCommand;
             _lineItemCommand = lineItemCommand;
         }
 
-        private class PostSubmitErrorResponse
-        {
-            public List<ProcessResult> ProcessResults { get; set; }
-        }
-        
-        private class ProcessResult
-        {
-            public bool Failed { get; set; }
-            public ProcessType Type { get; set; }
-            public Exception ErrorDetail { get; set; }
-        }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-
-        private enum ProcessType
-        {
-            Forwarding,
-            Sengrid,
-            Zoho,
-            Avalara
-        }
-
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
+            var results = new List<ProcessResult>();
 
-            /* post order submit can be broken out into two steps
-             * 
-             * 1) orders forwarding process
-             * 2) integration orchestration
-             * 
-             * if step 1 fails, step two should not take place; if step 1 succeeds every integration should have a chance to run
-             * regardless of the success or failure of other integration processes
-             * 
-             * step 2 has 4 parts
-             * a) sendgrid emailing
-             * c) avalara transaction creation
-             * d) zoho sales and purchase order creation
-             *
-             * b, c, and d only run on standard (non-quote) orders
-             */
-
-            // maintaining a list of order for marking orders as needing attention
-            // if forwarding process fails we are only relying on marking the buyer order
-            var ordersRelatingToProcess = new List<MarketplaceOrder> { orderWorksheet.Order };
-
-            try
+            // STEP 1
+            var (supplierOrders, buyerOrder, activities) = await HandlingForwarding(orderWorksheet);
+            results.Add(new ProcessResult()
             {
-                var (updatedSupplierOrders, updatedOrderWorksheet) = await HandlingForwarding(orderWorksheet);
-                return await HandleIntegrations(updatedSupplierOrders, updatedOrderWorksheet);
-            }
-            catch (Exception ex)
-            {
-                var processResults = new List<ProcessResult>
-                    {
-                        new ProcessResult()
-                        {
-                            Failed = true,
-                            Type = ProcessType.Forwarding,
-                            ErrorDetail = ex
-                        }
-                    };
-                return await CreateOrderSubmitResponse(processResults, ordersRelatingToProcess);
-            }
+                Type = ProcessType.Forwarding,
+                Activity = activities
+            });
+            // step 1 failed. we don't want to attempt the integrations. return error for further action
+            if (activities.Any(a => !a.Success))
+                return await CreateOrderSubmitResponse(results, new List<MarketplaceOrder> { orderWorksheet.Order });
+            
+            // STEP 2 (integrations)
+            var integrations = await HandleIntegrations(supplierOrders, buyerOrder);
+            results.AddRange(integrations);
+
+            // STEP 3: return OrderSubmitResponse
+            return await CreateOrderSubmitResponse(results, new List<MarketplaceOrder> { orderWorksheet.Order });
         }
 
-        private async Task<OrderSubmitResponse> HandleIntegrations(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
+        private async Task<List<ProcessResult>> HandleIntegrations(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
         {
-            var ordersRelatingToProcess = new List<MarketplaceOrder> { updatedMarketplaceOrderWorksheet.Order };
-            ordersRelatingToProcess.AddRange(updatedSupplierOrders);
+            // STEP 1: SendGrid notifications
+            var results = new List<ProcessResult>();
 
-            var integrationRequests = new List<Task<ProcessResult>>
+            var notifications = await ProcessActivityCall(
+                ProcessType.Notification,
+                "Sending Order Submit Emails",
+                _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet));
+            results.Add(new ProcessResult()
             {
-                SafeIntegrationCall(ProcessType.Sengrid, async () => await _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet))
-            };
+                Type = ProcessType.Notification,
+                Activity = new List<ProcessResultAction>() { notifications }
+            });
 
-            // quote orders do not need to flow into our integrations
-            if (IsStandardOrder(updatedMarketplaceOrderWorksheet))
+            if (!updatedMarketplaceOrderWorksheet.IsStandardOrder())
+                return results;
+
+            // STEP 2: Avalara tax transaction
+            var tax = await ProcessActivityCall(
+                ProcessType.Tax,
+                "Creating Tax Transaction",
+                HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>()));
+            results.Add(new ProcessResult()
             {
-                integrationRequests.Add(SafeIntegrationCall(ProcessType.Avalara, async () => await HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>())));
-                integrationRequests.Add(SafeIntegrationCall(ProcessType.Zoho, async () => await HandleZohoIntegration(updatedSupplierOrders, updatedMarketplaceOrderWorksheet)));
-            }
+                Type = ProcessType.Tax,
+                Activity = new List<ProcessResultAction>() { tax }
+            });
 
-            var integrationResponses = await Throttler.RunAsync(integrationRequests, 100, 4, (request) => request);
+            // STEP 3: Zoho orders
 
-            return await CreateOrderSubmitResponse(integrationResponses.ToList(), ordersRelatingToProcess);
+            var (salesAction, zohoSalesOrder) = await ProcessActivityCall(
+                ProcessType.Accounting,
+                "Create Zoho Sales Order",
+                _zoho.CreateSalesOrder(updatedMarketplaceOrderWorksheet));
+            
+            var (poAction, zohoPurchaseOrder) = await ProcessActivityCall(
+                ProcessType.Accounting,
+                "Create Zoho Purchase Order",
+                _zoho.CreateOrUpdatePurchaseOrder(zohoSalesOrder, updatedSupplierOrders));
+
+            var (shippingAction, zohoShippingOrder) = await ProcessActivityCall(
+                ProcessType.Accounting,
+                "Create Zoho Shipping Purchase Order",
+                _zoho.CreateShippingPurchaseOrder(zohoSalesOrder, updatedMarketplaceOrderWorksheet));
+
+            results.Add(new ProcessResult()
+            {
+                Type = ProcessType.Accounting,
+                Activity = new List<ProcessResultAction>() { salesAction, poAction, shippingAction }
+            });
+            return results;
         }
-
+        
         private async Task<OrderSubmitResponse> CreateOrderSubmitResponse(List<ProcessResult> processResults, List<MarketplaceOrder> ordersRelatingToProcess)
         {
             try
             {
-                if (processResults.Any(i => i.Failed))
-                {
-                    await MarkOrdersAsNeedingAttention(ordersRelatingToProcess);
-
-                    var errorResponse = new PostSubmitErrorResponse()
-                    {
-                        ProcessResults = processResults
-                    };
-
-                    var response = new OrderSubmitResponse()
-                    {
-                        HttpStatusCode = 500,
-                        /*
-                         * consider changing this to an xp value, could then deserialize on the front end
-                         * know which integrations failed on the ui, and retrigger when the issue is resolved 
-                         * through the ui potentially
-                         */
-                         xp = errorResponse
-                    };
-                    return response;
-                }
-                else
-                {
-                    var response = new OrderSubmitResponse()
+                if (processResults.All(i => i.Activity.All(a => !a.Success)))
+                    return new OrderSubmitResponse()
                     {
                         HttpStatusCode = 200,
+                        xp = new OrderSubmitResponseXp()
+                        {
+                            ProcessResults = processResults
+                        }
                     };
-                    return response;
-                }
-            } catch (Exception ex)
-            {
-                // handle failure in the order failure handling process, please don't get here
+                await MarkOrdersAsNeedingAttention(ordersRelatingToProcess); 
                 return new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
-                    UnhandledErrorBody = "Failure handling failure marking process"
+                    xp = new OrderSubmitResponseXp()
+                    {
+                        ProcessResults = processResults
+                    }
+                };
+            }
+            catch (OrderCloudException ex)
+            {
+                return new OrderSubmitResponse()
+                {
+                    HttpStatusCode = 500,
+                    UnhandledErrorBody = JsonConvert.SerializeObject(ex.Errors)
                 };
             }
         }
-
+        
         private async Task MarkOrdersAsNeedingAttention(List<MarketplaceOrder> orders)
         {
             var partialOrder = new PartialOrder() { xp = new { NeedsAttention = true } };
@@ -190,80 +167,115 @@ namespace Marketplace.Common.Commands
             orders.RemoveAt(0);
             orderInfos.AddRange(orders.Select(o => new Tuple<OrderDirection, string>(OrderDirection.Outgoing, o.ID)));
 
-            await Throttler.RunAsync(orderInfos, 100, 3, (orderInfo) =>
-            {
-                return _oc.Orders.PatchAsync(orderInfo.Item1, orderInfo.Item2, partialOrder);
-            });
+            await Throttler.RunAsync(orderInfos, 100, 3, (orderInfo) => _oc.Orders.PatchAsync(orderInfo.Item1, orderInfo.Item2, partialOrder));
 
         }
 
-        private bool IsStandardOrder(MarketplaceOrderWorksheet marketplaceOrderWorkSheet)
-        {
-            return marketplaceOrderWorkSheet.Order.xp == null || marketplaceOrderWorkSheet.Order.xp.OrderType != OrderType.Quote;
-        }
-
-        private async Task HandleZohoIntegration(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
-        {
-            var zoho_salesorder = await _zoho.CreateSalesOrder(updatedMarketplaceOrderWorksheet);
-            //TODO: put into a throttler the lines below
-            await _zoho.CreateOrUpdatePurchaseOrder(zoho_salesorder, updatedSupplierOrders);
-            await _zoho.CreateShippingPurchaseOrder(zoho_salesorder, updatedMarketplaceOrderWorksheet);
-        }
-
-        private async Task<ProcessResult> SafeIntegrationCall(ProcessType processType, Func<Task> func)
+        private static async Task<ProcessResultAction> ProcessActivityCall(ProcessType type, string description, Task func)
         {
             try
             {
-                await func();
-                return new ProcessResult()
-                {
-                    Failed = false,
-                    Type = processType,
+                await func;
+                return new ProcessResultAction() {
+                        ProcessType = type,
+                        Description = description,
+                        Success = true
                 };
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                return new ProcessResult()
-                {
-                    Failed = true,
-                    Type = processType,
-                    ErrorDetail = ex
+                return new ProcessResultAction() {
+                    Description = description,
+                    ProcessType = type,
+                    Success = false,
+                    Exception = new ProcessResultException(ex)
                 };
             }
         }
 
-        private async Task<Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet>> HandlingForwarding(MarketplaceOrderWorksheet orderWorksheet)
+        private static async Task<Tuple<ProcessResultAction, T>> ProcessActivityCall<T>(ProcessType type, string description, Task<T> func) where T : class, new()
         {
+            // T must be a class and be newable so the error response can be handled.
+            try
+            {
+                return new Tuple<ProcessResultAction, T>(
+                    new ProcessResultAction()
+                    {
+                        ProcessType = type,
+                        Description = description,
+                        Success = true
+                    },
+                    await func
+                );
+            }
+            catch (Exception ex)
+            {
+                return new Tuple<ProcessResultAction, T>(new ProcessResultAction()
+                {
+                    Description = description,
+                    ProcessType = type,
+                    Success = false,
+                    Exception = new ProcessResultException(ex)
+                }, new T());
+            }
+        }
+
+        private async Task<Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet, List<ProcessResultAction>>> HandlingForwarding(MarketplaceOrderWorksheet orderWorksheet)
+        {
+            var activities = new List<ProcessResultAction>();
             // forwarding
-            var buyerOrder = orderWorksheet.Order;
-            var orderSplitResult = await _oc.Orders.ForwardAsync(OrderDirection.Incoming, buyerOrder.ID);
-            var supplierOrders = orderSplitResult.OutgoingOrders.ToList();
+            var (forwardAction, forwardedOrders) = await ProcessActivityCall(
+                ProcessType.Forwarding,
+                "OrderCloud API Order.ForwardAsync",
+                _oc.Orders.ForwardAsync(OrderDirection.Incoming, orderWorksheet.Order.ID)
+            );
+            activities.Add(forwardAction);
+
+            var supplierOrders = forwardedOrders.OutgoingOrders.ToList();
 
             // creating relationship between the buyer order and the supplier order
             // no relationship exists currently in the platform
-            var updatedSupplierOrders = await CreateOrderRelationshipsAndTransferXP(buyerOrder, supplierOrders);
+            var (updateAction, marketplaceOrders) = await ProcessActivityCall(
+                ProcessType.Forwarding, "Create Order Relationships And Transfer XP",
+                CreateOrderRelationshipsAndTransferXP(orderWorksheet.Order, supplierOrders));
+            activities.Add(updateAction);
 
             // need to get fresh order worksheet because this process has changed things about the worksheet
-            var updatedWorksheet =  await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, buyerOrder.ID);
-            return new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet>(updatedSupplierOrders, updatedWorksheet);
+            var (getAction, marketplaceOrderWorksheet) = await ProcessActivityCall(
+                ProcessType.Forwarding, 
+                "Get Updated Order Worksheet",
+                _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderWorksheet.Order.ID));
+            activities.Add(getAction);
+
+            return await Task.FromResult(new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet, List<ProcessResultAction>>(marketplaceOrders, marketplaceOrderWorksheet, activities));
         }
 
+        //TODO: probably want to move this to a command so it's isolated and testable
         private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
         {
             var updatedSupplierOrders = new List<MarketplaceOrder>();
             var supplierIDs = new List<string>();
             var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.ID);
-            var shipFromAddressIDs = GetShipFromAddressIDs(lineItems.Items.ToList());
+            var shipFromAddressIDs = lineItems.Items.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
 
             foreach (var supplierOrder in supplierOrders)
             {
-                var supplierID = supplierOrder.ToCompanyID;
-                supplierIDs.Add(supplierID);
-                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierID)).ToList();
-                var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
-                var supplierOrderPatch = new PartialOrder()
-                {
-                    ID = $"{buyerOrder.ID}-{supplierID}",
-                    xp = GetNewOrderXP(buyerOrder, supplier, shipFromAddressIDsForSupplierOrder)
+                supplierIDs.Add(supplierOrder.ToCompanyID);
+                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierOrder.ToCompanyID)).ToList();
+                var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierOrder.ToCompanyID);
+                var supplierOrderPatch = new PartialOrder() {
+                    ID = $"{buyerOrder.ID}-{supplierOrder.ToCompanyID}",
+                    xp = new OrderXp() {
+                        ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
+                        SupplierIDs = new List<string>() { supplier.ID },
+                        StopShipSync = false,
+                        OrderType = buyerOrder.xp.OrderType,
+                        QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
+                        Currency = supplier.xp.Currency,
+                        ClaimStatus = ClaimStatus.NoClaim,
+                        ShippingStatus = ShippingStatus.Processing,
+                        SubmittedOrderStatus = SubmittedOrderStatus.Open
+                    }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
@@ -271,10 +283,8 @@ namespace Marketplace.Common.Commands
 
             await _lineItemCommand.SetInitialSubmittedLineItemStatuses(buyerOrder.ID);
 
-            var buyerOrderPatch = new PartialOrder()
-            {
-                xp = new
-                {
+            var buyerOrderPatch = new PartialOrder() {
+                xp = new {
                     ShipFromAddressIDs = shipFromAddressIDs,
                     SupplierIDs = supplierIDs,
                     ClaimStatus = ClaimStatus.NoClaim,
@@ -282,38 +292,9 @@ namespace Marketplace.Common.Commands
                     SubmittedOrderStatus = SubmittedOrderStatus.Open
                 }
             };
-            
+
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
             return updatedSupplierOrders;
-        }
-
-        private OrderXp GetNewOrderXP(MarketplaceOrder buyerOrder, MarketplaceSupplier supplier, List<string> shipFromAddressIDsForSupplierOrder)
-        {
-            var supplierOrderXp = new OrderXp()
-            {
-                ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
-                SupplierIDs = new List<string>() { supplier.ID },
-                StopShipSync = false,
-                OrderType = buyerOrder.xp.OrderType,
-                QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
-				Currency = supplier.xp.Currency,
-                ClaimStatus = ClaimStatus.NoClaim,
-                ShippingStatus = ShippingStatus.Processing,
-                SubmittedOrderStatus = SubmittedOrderStatus.Open
-            };
-            return supplierOrderXp;
-        }
-
-        private List<string> GetShipFromAddressIDs(List<LineItem> lineItems)
-        {
-            var shipFromAddressIDs = new List<string>();
-            lineItems.ForEach(li => {
-                if (!shipFromAddressIDs.Contains(li.ShipFromAddressID))
-                {
-                    shipFromAddressIDs.Add(li.ShipFromAddressID);
-                }
-            });
-            return shipFromAddressIDs;
         }
 
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)

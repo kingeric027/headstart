@@ -147,8 +147,6 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             item.sku = item.sku;
             item.quantity = 1;
             item.unit = "each";
-            //item.account_id = "2237685000000014001";
-            //item.purchase_account_id = "2237685000000677015";
             item.purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit";
             return item;
         }
@@ -184,6 +182,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 sku = variant?.ID ?? product.ID, // debug removal
                 unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
+                quantity = item.Quantity,
                 product_type = "goods",
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
@@ -205,6 +204,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 sku = variant?.ID ?? product.ID,
                 unit = product.xp?.UnitOfMeasure?.Unit,
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
+                quantity = item.Quantity,
                 product_type = "goods",
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
