@@ -4,7 +4,6 @@
         <div class="flex-column justify-content-start align-items-center">
 
              <div style="font-weight:bolder; margin-bottom:4px; font-size: larger;">{{notification?.Doc?.Product?.Name}}</div>
-      <p class="mb-0 font-italic"><strong>{{notification?.Doc?.Product?.FieldModified}}</strong> has been edited.</p>
         </div>
       <button (click)="notificationAccept('ACCEPTED')"
             class="btn btn-primary">Accept</button>
@@ -17,13 +16,41 @@
 <div class="card-body">
   <div class="d-flex justify-content-between align-items-center">
     <div class="d-flex flex-column">
-      <small class="mb-0 text-uppercase text-muted font-weight-bolder">Previous Value</small>
-      <pre class="notification-value"><code>{{notification?.Doc?.Product?.PreviousValue | json}}</code></pre>
+      <small class="mb-0 text-uppercase text-muted font-weight-bolder">Property Changed</small>
+      <div style="font-weight:bolder; margin-bottom:4px;">{{notification?.Doc?.Product?.FieldModified}}</div>
     </div>
+        <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex flex-column">
+      <small class="mb-0 text-uppercase text-muted font-weight-bolder">Previous Value</small>
+ <div *ngIf="hasPriceBreak">
+          <div *ngFor="let priceBreak of getJsonValues(notification?.Doc?.Product?.PreviousValue)">
+            <div>
+              Quantity: {{priceBreak?.Quantity}},
+              Price: {{priceBreak?.Price}}
+            </div>
+
+        </div>
+        </div>
+        <div *ngIf="!hasPriceBreak">
+                <div>{{getJsonValues(notification?.Doc?.Product?.PreviousValue)| json}}</div>
+        </div>   
+       </div>
+  </div>
     <div class="d-flex justify-content-between align-items-center">
       <div class="d-flex flex-column">
         <small class="mb-0 text-uppercase text-muted font-weight-bolder">New Value</small>
-        <pre class="notification-value"><code>{{notification?.Doc?.Product?.CurrentValue | json}}</code></pre>
+        <div *ngIf="hasPriceBreak">
+          <div *ngFor="let priceBreak of getJsonValues(notification?.Doc?.Product?.CurrentValue)">
+            <div>
+              Quantity: {{priceBreak?.Quantity}},
+              Price: {{priceBreak?.Price}}
+            </div>
+
+        </div>
+        </div>
+        <div *ngIf="!hasPriceBreak">
+                <div>{{getJsonValues(notification?.Doc?.Product?.CurrentValue) | json}}</div>
+        </div>
       </div>
     </div>
   </div>
