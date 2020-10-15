@@ -5,21 +5,20 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { environment } from 'src/environments/environment';
 import { UserContext } from '@app-seller/config/user-context';
-import { MeUser, OcAdminUserService, OcSupplierUserService, ListPage } from '@ordercloud/angular-sdk';
+import { MeUser } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { isEqual as _isEqual, set as _set, get as _get } from 'lodash';
 import { HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
-import { first } from 'rxjs/operators';
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string;
   currentUserInitials: string;
-  hasProfileImg: boolean = false;
+  hasProfileImg = false;
   contentHeight: number;
   userContext: UserContext;
   myProfileImg: string;
-  profileImgLoading: boolean = false;
+  profileImgLoading = false;
   organizationName: string;
   areChanges: boolean;
   user: MeUser;
@@ -47,21 +46,21 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.userContext.Me.Supplier ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
     this.refresh(this.userContext.Me);
     this.setProfileImgSrc();
-}
+  }
 
-setUpSubs(): void {
+  setUpSubs(): void {
     this.currentUserService.userSubject.subscribe(user => {
-        this.user = user;
-        this.setCurrentUserInitials(this.user);
+      this.user = user;
+      this.setCurrentUserInitials(this.user);
     });
     this.currentUserService.profileImgSubject.subscribe(img => {
-        this.hasProfileImg = Object.keys(img).length > 0;
+      this.hasProfileImg = Object.keys(img).length > 0;
     })
   }
 
   setCurrentUserInitials(user: MeUser): void {
-    const firstFirst = user?.FirstName?.substr(0,1);
-    const firstLast = user?.LastName?.substr(0,1);
+    const firstFirst = user?.FirstName?.substr(0, 1);
+    const firstLast = user?.LastName?.substr(0, 1);
     this.currentUserInitials = `${firstFirst}${firstLast}`;
   }
 
@@ -114,7 +113,7 @@ setUpSubs(): void {
   }
 
   async patchUser(fieldsToPatch: string[]): Promise<void> {
-    let patch: any = {};
+    const patch: any = {};
     fieldsToPatch.map(f => {
       patch[f] = this.userEditable[f];
     });
@@ -123,55 +122,54 @@ setUpSubs(): void {
   }
 
   async manualFileUpload(event): Promise<void> {
-      this.profileImgLoading = true;
-      const file: File = event?.target?.files[0];
-      if (this.userContext.UserType === 'SELLER') {
-        // seller stuff
-        if (Object.keys(this.currentUserService.profileImgSubject.value).length > 0) {
-          // If logo exists, remove the assignment, then the logo itself
-          await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "AdminUsers", null, null);
-          await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
-        }
+    this.profileImgLoading = true;
+    const file: File = event?.target?.files[0];
+    if (this.userContext.UserType === 'SELLER') {
+      // seller stuff
+      if (Object.keys(this.currentUserService.profileImgSubject.value).length > 0) {
+        // If logo exists, remove the assignment, then the logo itself
+        await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, 'AdminUsers', null, null);
+        await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
+      }
     } else {
-        // supplier stuff
-        if (Object.keys(this.currentUserService.profileImgSubject.value).length > 0) {
-          // If logo exists, remove the assignment, then the logo itself
-          await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "SupplierUsers", this.userContext?.Me?.Supplier?.ID, "Suppliers");
-          await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
-        }
+      // supplier stuff
+      if (Object.keys(this.currentUserService.profileImgSubject.value).length > 0) {
+        // If logo exists, remove the assignment, then the logo itself
+        await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, 'SupplierUsers', this.userContext?.Me?.Supplier?.ID, 'Suppliers');
+        await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
       }
-      // Then upload logo asset
-      try {
-        await this.uploadProfileImg(this.userContext?.Me?.ID, file, 'Image').then(img => {
-            this.currentUserService.profileImgSubject.next(img);
-        });
-      } catch (err) {
-        this.hasProfileImg = false;
-        this.profileImgLoading = false;
-        throw err;
-      } finally {
-        this.hasProfileImg = true;
-        this.profileImgLoading = false;
-        // Reset the img src for profileImg
-        this.setProfileImgSrc();
-      }
+    }
+    // Then upload logo asset
+    try {
+      await this.uploadProfileImg(this.userContext?.Me?.ID, file).then(img => {
+        this.currentUserService.profileImgSubject.next(img);
+      });
+    } catch (err) {
+      this.hasProfileImg = false;
+      this.profileImgLoading = false;
+      throw err;
+    } finally {
+      this.hasProfileImg = true;
+      this.profileImgLoading = false;
+      // Reset the img src for profileImg
+      this.setProfileImgSrc();
+    }
   }
 
-  async uploadProfileImg(userID: string, file: File, assetType: string): Promise<Asset> {
+  async uploadProfileImg(userID: string, file: File): Promise<Asset> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const asset: AssetUpload = {
       Active: true,
       File: file,
-      Type: (assetType as AssetUpload['Type']),
       FileName: file.name,
-      Tags: ["ProfileImg"]
+      Tags: ['ProfileImg']
     }
     // Upload the asset, then make the asset assignment to Suppliers
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
     if (this.userContext.UserType === 'SELLER') {
-        await HeadStartSDK.Assets.SaveAssetAssignment({ResourceType: 'AdminUsers', ResourceID: userID, AssetID: newAsset.ID }, accessToken);
+      await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'AdminUsers', ResourceID: userID, AssetID: newAsset.ID }, accessToken);
     } else {
-        await HeadStartSDK.Assets.SaveAssetAssignment({ParentResourceType: 'Suppliers', ParentResourceID: this.userContext.Me.Supplier.ID, ResourceType: "SupplierUsers", ResourceID: userID, AssetID: newAsset.ID }, accessToken);
+      await HeadStartSDK.Assets.SaveAssetAssignment({ ParentResourceType: 'Suppliers', ParentResourceID: this.userContext.Me.Supplier.ID, ResourceType: 'SupplierUsers', ResourceID: userID, AssetID: newAsset.ID }, accessToken);
     }
     return newAsset;
   }
@@ -180,16 +178,16 @@ setUpSubs(): void {
     this.profileImgLoading = true;
     try {
       if (this.userContext.UserType === 'SELLER') {
-          // Remove the profile img asset assignment
-          await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "AdminUsers", null, null);
-          // Remove the profile img asset
-          await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
-        } else {
-            // Remove the profile img asset assignment
-            await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, "SupplierUsers", this.userContext?.Me?.Supplier?.ID, "Suppliers");
-            // Remove the profile img asset
-            await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
-        }
+        // Remove the profile img asset assignment
+        await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, 'AdminUsers', null, null);
+        // Remove the profile img asset
+        await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
+      } else {
+        // Remove the profile img asset assignment
+        await HeadStartSDK.Assets.DeleteAssetAssignment(this.currentUserService.profileImgSubject.value.ID, this.userContext?.Me?.ID, 'SupplierUsers', this.userContext?.Me?.Supplier?.ID, 'Suppliers');
+        // Remove the profile img asset
+        await HeadStartSDK.Assets.Delete(this.currentUserService.profileImgSubject.value.ID);
+      }
       this.currentUserService.profileImgSubject.next({});
     } catch (err) {
       throw err;
@@ -201,11 +199,11 @@ setUpSubs(): void {
 
   setProfileImgSrc(): void {
     if (this.userContext.UserType === 'SELLER') {
-        const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/AdminUsers/${this.userContext.Me.ID}/thumbnail?size=m`;
-        this.myProfileImg = url;
+      const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/AdminUsers/${this.userContext.Me.ID}/thumbnail?size=m`;
+      this.myProfileImg = url;
     } else {
-        const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this.userContext.Me.Supplier.ID}/SupplierUsers/${this.userContext.Me.ID}/thumbnail?size=m`;
-        this.myProfileImg = url;
+      const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this.userContext.Me.Supplier.ID}/SupplierUsers/${this.userContext.Me.ID}/thumbnail?size=m`;
+      this.myProfileImg = url;
     }
   }
 }

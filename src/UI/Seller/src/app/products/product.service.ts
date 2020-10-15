@@ -10,7 +10,9 @@ import {
 } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { Products } from 'ordercloud-javascript-sdk';
+import { Products, ListPage } from 'ordercloud-javascript-sdk';
+import { ChiliService, TecraDocument, TecraSpec } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
+import { ChiliConfig, ChiliSpec, ChiliSpecOption } from '@ordercloud/headstart-sdk';
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -83,7 +85,8 @@ export class ProductService extends ResourceCrudService<Product> {
     private ocCategoryService: OcCategoryService,
     private ocPriceScheduleService: OcPriceScheduleService,
     private ocCatalogService: OcCatalogService,
-    public currentUserService: CurrentUserService
+    public currentUserService: CurrentUserService,
+    public chiliService: ChiliService
   ) {
     super(router, activatedRoute, Products, currentUserService, '/products', 'products');
   }
@@ -119,5 +122,52 @@ export class ProductService extends ResourceCrudService<Product> {
         .toPromise()
     );
     await Promise.all([...addRequests, ...deleteRequests]);
-  }
+    }
+
+    async getTecraDocuments(): Promise<TecraDocument[]> {
+        return this.chiliService.getDocuments();
+    }
+    async getTecraDocumentsByFolder(
+        folder: string
+    ): Promise<TecraDocument[]> {
+        return this.chiliService.getDocumentsByFolder(folder);
+    }
+
+    async getTecraSpecs(
+        docID: string,
+    ): Promise<TecraSpec[]> {
+        return this.chiliService.getSpecs(docID);
+    }
+
+    async listChiliConfigs(): Promise<ListPage<ChiliConfig>>
+    {
+        return this.chiliService.listChiliConfigs();
+    }
+
+    async saveChiliConfig(config: ChiliConfig): Promise<ChiliConfig>
+    {
+        return this.chiliService.saveChiliConfig(config);
+    }
+    async deleteChiliConfig(id: string)
+    {
+        this.chiliService.deleteChiliConfig(id);
+    }
+    async saveChiliSpec(spec: ChiliSpec): Promise<ChiliSpec> {
+        return this.chiliService.saveChiliSpec(spec);
+    }
+    async deleteChiliSpec(id: string) {
+        this.chiliService.deleteChiliSpec(id);
+    }
+    async saveChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
+        return this.chiliService.saveChiliSpecOption(specID, spec);
+    }
+    async updateChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
+        return this.chiliService.updateChiliSpecOption(specID, spec);
+    }
+    async deleteChiliSpecOption(specID: string, optionID: string) {
+        this.chiliService.deleteChiliSpecOption(specID, optionID);
+    }
+    async getChiliTemplate(id: string) {
+        return this.chiliService.getChiliTemplate(id);
+    }
 }

@@ -3,7 +3,7 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, ChiliConfig, ChiliSpec, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -46,6 +46,12 @@ export class OCMProductDetails implements OnInit {
   submittedQuoteOrder: any;
   showGrid = false;
   isAddingToCart = false;
+  isKitProduct: boolean;
+  productsIncludedInKit: ProductInKit[];
+  ocProductsInKit: any[];
+  isKitStatic = false;
+  _chiliConfigs: ChiliConfig[] = [];
+  showConfigs = false;
   contactRequest: ContactSupplierBody;
   specForm: FormGroup;
   isInactiveVariant: boolean;
@@ -68,11 +74,18 @@ export class OCMProductDetails implements OnInit {
     this.populateInactiveVariants(superProduct);
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.calculatePrice();
     this.currentUser = this.context.currentUser.get();
     this.userCurrency = this.currentUser.Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
+    await this.listChiliConfigs();
+  }
+
+  async listChiliConfigs(): Promise<void> {
+    const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
+    this._chiliConfigs = chiliConfigs.Items.filter(item => item.SupplierProductID === this._product.ID);
+    this.showConfigs = true;
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
@@ -218,4 +231,5 @@ export class OCMProductDetails implements OnInit {
   toOrderDetail(): void {
     this.context.router.toMyOrderDetails(this.submittedQuoteOrder.ID);
   }
+
 }

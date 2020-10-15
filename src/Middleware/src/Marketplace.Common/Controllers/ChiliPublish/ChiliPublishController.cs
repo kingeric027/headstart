@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
+using ordercloud.integrations.tecra;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands;
+using ordercloud.integrations.tecra.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -180,4 +182,122 @@ namespace Marketplace.Common.Controllers
             await _command.Delete(configID);
         }
 	}
+
+    [DocComments("\"Integration\" represents an array of Tecra Documents")]
+    [MarketplaceSection.Content(ListOrder = 4)]
+    [Route("tecra/documents"), OrderCloudIntegrationsAuth]
+    public class TecraDocumentController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraDocumentController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra Documents")]
+        [HttpGet, Route("")]
+        public async Task<IEnumerable<TecraDocument>> Get()
+        {
+            var result = await _tecra.TecraDocuments();
+            return result;
+        }
+
+        [DocName("Get Tecra Documents By Folder")]
+        [HttpGet, Route("byfolder")]
+        public async Task<IEnumerable<TecraDocument>> GetByFolder(string folder)
+        {
+            var result = await _tecra.TecraDocumentsByFolder(folder);
+            return result;
+        }
+    }
+
+    [DocComments("\"Integration\" represents an array of Tecra Specs")]
+    [MarketplaceSection.Content(ListOrder = 5)]
+    [Route("tecra/specs"), OrderCloudIntegrationsAuth]
+    public class TecraSpecsController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraSpecsController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra Specs")]
+        [HttpGet, Route("")]
+        public async Task<IEnumerable<TecraSpec>> Get(string id)
+        {
+            var result = await _tecra.TecraSpecs(id);
+            return result;
+        }
+    }
+
+    [DocComments("\"Integration\" represents a URL to a Tecra Frame")]
+    [MarketplaceSection.Content(ListOrder = 6)]
+    [Route("tecra/frame"), OrderCloudIntegrationsAuth]
+    public class TecraFrameController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraFrameController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra Frame")]
+        [HttpGet, Route("")]
+        public async Task<string> Get(string id)
+        {
+            var result = await _tecra.TecraFrame(id);
+            return result;
+        }
+    }
+
+    [DocComments("\"Integration\" represents a URL to a Tecra Proof")]
+    [MarketplaceSection.Content(ListOrder = 7)]
+    [Route("tecra/proof"), OrderCloudIntegrationsAuth]
+    public class TecraProofController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraProofController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra Proof")]
+        [HttpGet, Route("")]
+        public async Task<string> Get(string id)
+        {
+            var result = await _tecra.TecraProof(id);
+            return result;
+        }
+    }
+
+    [DocComments("\"Integration\" represents a URL to a Tecra PDF")]
+    [MarketplaceSection.Content(ListOrder = 8)]
+    [Route("tecra/pdf"), OrderCloudIntegrationsAuth]
+    public class TecraPDFController : BaseController
+    {
+        private readonly IOrderCloudIntegrationsTecraCommand _tecra;
+        private readonly AppSettings _settings;
+        public TecraPDFController(AppSettings settings, IOrderCloudIntegrationsTecraCommand tecra) : base(settings)
+        {
+            _settings = settings;
+            _tecra = tecra;
+        }
+
+        [DocName("Get Tecra PDF")]
+        [HttpGet, Route("")]
+        public async Task<string> Get(string id)
+        {
+            var result = await _tecra.TecraPDF(id);
+            return result;
+        }
+    }
 }
