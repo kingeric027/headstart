@@ -48,7 +48,6 @@ namespace Marketplace.Common.Services
     {
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
-        private const string NO_REPLY_EMAIL_ADDRESS = "noreply@four51.com";
         private const string ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
@@ -205,7 +204,7 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -220,7 +219,7 @@ namespace Marketplace.Common.Services
                 },
                 Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -258,7 +257,7 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
                 Message = OrderSubmitEmailConstants.GetOrderApprovedText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
@@ -269,7 +268,7 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
                 Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -300,9 +299,9 @@ namespace Marketplace.Common.Services
                 var sellerEmailList = await GetSellerEmails();
 
                 //  send emails
-                await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, supplierEmailList, ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
-                await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, sellerEmailList, ORDER_SUBMIT_TEMPLATE_ID, sellerTemplateData);
-                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, orderWorksheet.Order.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
+                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierEmailList, ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
+                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, sellerEmailList, ORDER_SUBMIT_TEMPLATE_ID, sellerTemplateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
@@ -325,8 +324,8 @@ namespace Marketplace.Common.Services
                 };
 
                 //  send emails
-                await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, supplierEmailList, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
-                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, orderWorksheet.Order.FromUser.Email, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
+                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierEmailList, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
             }
         }
 
@@ -394,7 +393,7 @@ namespace Marketplace.Common.Services
                     DynamicText2 = lineItemEmailDisplayText?.DynamicText2
                 }
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendContactSupplierAboutProductEmail(ContactSupplierBody template)
