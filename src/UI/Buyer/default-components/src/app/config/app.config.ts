@@ -15,6 +15,7 @@ export const ocAppConfig: AppConfig = {
   theme: environment.theme,
   anonymousShoppingEnabled: false,
   avalaraCompanyId: 280411,
+  instrumentationKey: environment.instrumentationKey,
   scope: [
     'MeAddressAdmin',
     'AddressAdmin', // Only for location owners
