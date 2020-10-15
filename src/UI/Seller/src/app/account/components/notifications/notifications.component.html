@@ -4,33 +4,44 @@
       <account-menu></account-menu>
     </div>
     <div class="col-md-9 bg-light">
-      <perfect-scrollbar style="width: 100%;" [ngStyle]="{'height.px': contentHeight}">
+      <perfect-scrollbar style="width: 100%;"
+                         [ngStyle]="{'height.px': contentHeight}">
         <div class="container-fluid py-3">
           <div class="row">
             <div class="col-md-7">
               <div class="d-flex justify-content-between align-items-center">
-                <h1 class="resource-name mb-0" translate>Email Notifications</h1>
+                <h1 class="resource-name mb-0"
+                    translate>Email Notifications</h1>
                 <div>
-                  <button class="btn btn-primary btn-sm" *ngIf="areChanges" (click)="patchUser(['xp'])">Save
+                  <button class="btn btn-primary btn-sm"
+                          *ngIf="areChanges"
+                          (click)="patchUser(['xp'])">Save
                     Changes</button>
-                  <button class="btn btn-outline-teal btn-sm ml-2" *ngIf="areChanges" (click)="discardChanges()">Discard
+                  <button class="btn btn-outline-teal btn-sm ml-2"
+                          *ngIf="areChanges"
+                          (click)="discardChanges()">Discard
                     Changes</button>
                 </div>
               </div>
-              <seller-email-notifications *ngIf="userContext?.UserType === 'SELLER'" [user]="userEditable"
-                [sellerUserForm]="userForm" (toggleReceiveOrderEmails)="toggleOrderEmails($event)"
-                (toggleReceiveRequestInfoEmails)="toggleRequestInfoEmails($event)"
-                (toggleReceiveProductEmails)="toggleProductEmails($event)" (removeRcpt)="removeAddtlRcpt($event)"
-                (addRcpt)="addAddtlRcpt()">
+              <seller-email-notifications *ngIf="userContext?.UserType === 'SELLER'"
+                                          [user]="userEditable"
+                                          [sellerUserForm]="userForm"
+                                          (toggleReceiveOrderEmails)="toggleOrderEmails($event)"
+                                          (toggleReceiveRequestInfoEmails)="toggleRequestInfoEmails($event)"
+                                          (toggleReceiveProductEmails)="toggleProductEmails($event)"
+                                          (removeRcpt)="removeAddtlRcpt($event)"
+                                          (addRcpt)="addAddtlRcpt()">
               </seller-email-notifications>
               <div>
                 <ng-container *ngIf="userContext?.UserType === 'SELLER'">
                   <div *ngFor="let notification of notificationsToReview">
-                    <notification 
-                    *ngIf="!notificationsAccepted[notification.ID]"
-                    [notification]="notification"
-                    (onActionTaken)="notificationActionTaken($event, notification)">
-                  </notification>
+                    <ng-container>
+                      <notification *ngIf="!notificationsAccepted.get(notification.ID)"
+                                    [notification]="notification"
+                                    (onActionTaken)="notificationActionTaken($event, notification)">
+                      </notification>
+                    </ng-container>
+
                   </div>
                 </ng-container>
               </div>

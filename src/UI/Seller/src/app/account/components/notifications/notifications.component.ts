@@ -50,7 +50,7 @@ export class NotificationsComponent extends AccountContent {
   notificationActionTaken(event: string, notification: JDocument) {
     console.log(event);
     if (event === "ACCEPTED"){
-      if (this.notificationsAccepted.get(notification.ID)) {
+      if (this.notificationsAccepted.get(notification.ID) !== null) {
         this.notificationsAccepted.set(notification.ID, true);
       }
     }

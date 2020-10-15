@@ -37,26 +37,4 @@ async reviewMonitoredFieldChange(status: NotificationStatus, notification: Monit
     const superProduct = await this.http.put<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`, notification, headers).toPromise()
     this.onActionTaken.emit("ACCEPTED");
   }
-
-  getJsonValues(jsonObject): any | PriceBreak[] {
-    if (jsonObject !== Object(jsonObject)) {
-      return String(jsonObject);
-    }
-    for (var key in jsonObject) {
-      if (jsonObject[key] instanceof Object && jsonObject[key][0]?.Price >= 0) {
-        return this.getPriceBreaks(jsonObject[key]);
-      }
-    }
-  }
-
-  getPriceBreaks(jsonObject): PriceBreak[] {
-    this.hasPriceBreak = true;
-    let priceBreakList: PriceBreak[] = [];
-    jsonObject.forEach(element => {
-      let priceBreak;
-      priceBreak = { Quantity: element.Quantity, Price: element.Price };
-      priceBreakList.push(priceBreak);
-    });
-    return priceBreakList;
-  }
 }
