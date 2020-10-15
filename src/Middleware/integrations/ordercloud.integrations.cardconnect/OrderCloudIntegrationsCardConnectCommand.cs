@@ -11,12 +11,15 @@ namespace ordercloud.integrations.cardconnect
 		Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user);
-    }
+
+        Task<CardConnectAuthorizationResponse> AuthorizeValidationPayment(OrderCloudIntegrationsCreditCardPayment payment, decimal amount, string testcase, VerifiedUserContext user);
+
+	}
 
 	public class OrderCloudIntegrationsCardConnectCommand : IOrderCloudIntegrationsCardConnectCommand
 	{
 		private readonly IOrderCloudIntegrationsCardConnectService _cardConnect;
-		private readonly IOrderCloudClient _oc; 
+		private readonly IOrderCloudClient _oc;
 
 		public OrderCloudIntegrationsCardConnectCommand(IOrderCloudIntegrationsCardConnectService card, IOrderCloudClient oc)
 		{
@@ -36,8 +39,15 @@ namespace ordercloud.integrations.cardconnect
 			return buyerCreditCard;
 		}
 
+		public async Task<CardConnectAuthorizationResponse> AuthorizeValidationPayment(OrderCloudIntegrationsCreditCardPayment payment, decimal amount, string testcase, VerifiedUserContext user)
+		{
+			var cc = await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
+			var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, new Order() { ID = testcase }, payment, amount));
+            return call;
+        }
+
 		public async Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment,
-            VerifiedUserContext user)
+			VerifiedUserContext user)
 		{
 			Require.That((payment.CreditCardID != null) || (payment.CreditCardDetails != null),
 				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID"));
@@ -64,7 +74,7 @@ namespace ordercloud.integrations.cardconnect
 		}
 
 		private decimal GetAmountToCharge(OrderWorksheet orderWorksheet)
-        {
+		{
 			var purchaseOrderLineItems = orderWorksheet.LineItems.Where(li => li.Product.xp.ProductType == "PurchaseOrder");
 			var purchaseOrderSubtotal =
 				purchaseOrderLineItems
@@ -89,7 +99,7 @@ namespace ordercloud.integrations.cardconnect
 
 			return orderWorksheet.Order.Total - purchaseOrderTotal;
 		}
-		
+
 		private async Task<BuyerCreditCard> GetMeCardDetails(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
 		{
 			if (payment.CreditCardID != null)
