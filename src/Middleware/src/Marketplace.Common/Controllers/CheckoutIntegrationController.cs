@@ -44,13 +44,13 @@ namespace Marketplace.Common.Controllers
 			return response;
 		}
 
-        //[HttpPost, Route("ordersubmit/retry/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
-        //public async Task RetryOrderSubmit([FromBody] string orderID)
-        //{
+        [HttpPost, Route("ordersubmit/retry/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        public async Task RetryOrderSubmit([FromBody] string orderID)
+        {
 
-        //}
+        }
 
-		[HttpPost, Route("orderapproved")]
+        [HttpPost, Route("orderapproved")]
 		[OrderCloudWebhookAuth]
 		public async Task<OrderSubmitResponse> HandleOrderApproved([FromBody] MarketplaceOrderCalculatePayload payload)
 		{

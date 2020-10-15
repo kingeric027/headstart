@@ -46,6 +46,11 @@ namespace Marketplace.Common.Commands
             _lineItemCommand = lineItemCommand;
         }
 
+        //public async Task<OrderSubmitResponse> HandleBuyerOrderSubmitRetry(string OrderID)
+        //{
+
+        //}
+
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
             var results = new List<ProcessResult>();
