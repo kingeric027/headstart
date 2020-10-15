@@ -151,12 +151,12 @@
         <span translate>PRODUCTS.DETAILS.THANK_YOU</span>
         <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.</span>
       </div>
-      <!-- description section -->
+      <!-- PRODUCT DESCRIPTION -->
       <h3 class="small font-weight-bolder text-muted"
           translate>PRODUCTS.DETAILS.DESCRIPTION</h3>
       <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
       </p>
-      <div *ngIf="showConfigs">
+      <ng-container *ngIf="_chiliConfigs && _chiliConfigs.length">
         <strong>Available Configurations:</strong>
         <table class='table table-bordered table-condensed table-striped table-hover'>
           <tr class="table-row"
@@ -164,7 +164,7 @@
             <td><a href="products/{{_product.ID}}/{{config.ID}}">{{config.ChiliTemplateName}}</a></td>
           </tr>
         </table>
-      </div>
+      </ng-container>
       <ng-container *ngIf="attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
         <div class="mt-2">
