@@ -51,7 +51,6 @@ import { filter } from 'rxjs/operators';
       this.router.events.pipe(filter(event => event instanceof ResolveEnd)).subscribe((event: ResolveEnd) => {
         const activatedComponent = this.getActivatedComponent(event.state.root)
         if (activatedComponent) {
-          console.log(`Logging view for ${activatedComponent}`)
           this.logPageView(
             `${activatedComponent.name} ${this.getRouteTemplate(
               event.state.root
@@ -60,7 +59,6 @@ import { filter } from 'rxjs/operators';
           );
         } else {
           this.logPageView(null, event.urlAfterRedirects);
-          console.log(`${event.urlAfterRedirects}`)
         }
       });
     }
