@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { AppConfig } from '../../shopper-context';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import { ActivatedRouteSnapshot, ResolveEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
     providedIn: 'root',
@@ -14,9 +15,14 @@ import { filter } from 'rxjs/operators';
 
     constructor(
       private appConfig: AppConfig,
-      private router: Router
+      private router: Router,
+      @Inject(PLATFORM_ID) private platformId: Record<string, any>
     ) {
-        if (this.appConfig.instrumentationKey) {
+      let isDeployed = false;
+      if (isPlatformBrowser(this.platformId)) {
+        isDeployed = window.location.hostname !== 'localhost';
+      }
+        if (this.appConfig.instrumentationKey && isDeployed) {
           this.appInsights = new ApplicationInsights({
             config: {
               instrumentationKey: this.appConfig.instrumentationKey,
