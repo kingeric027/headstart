@@ -54,10 +54,6 @@ namespace Marketplace.Common.Services
         private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
-        private const string BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID = "d-4c674afcd6ef44e9b7793eb6c5b917ea";
-        private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
-        private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
-        private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
         private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
         private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-8d60fcbc191b4fd1ae526e28713e6abe";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
@@ -106,12 +102,15 @@ namespace Marketplace.Common.Services
 
         public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName,
-                messageNotification.EventBody.PasswordRenewalAccessToken,
-                messageNotification.EventBody.PasswordRenewalUrl
+                Data = new
+                {
+                    messageNotification.Recipient.FirstName,
+                    messageNotification.Recipient.LastName,
+                    messageNotification.EventBody.PasswordRenewalAccessToken,
+                    messageNotification.EventBody.PasswordRenewalUrl
+                }
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
@@ -206,7 +205,7 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -221,7 +220,7 @@ namespace Marketplace.Common.Services
                 },
                 Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -259,7 +258,7 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
                 Message = OrderSubmitEmailConstants.GetOrderApprovedText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_APPROVED_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
@@ -270,7 +269,7 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
                 Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -402,16 +401,19 @@ namespace Marketplace.Common.Services
         {
             var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(template.Product.DefaultSupplierID);
             var supplierEmail = supplier.xp.SupportContact.Email;
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                ProductID = template.Product.ID,
-                ProductName = template.Product.Name,
-                template.BuyerRequest.FirstName,
-                template.BuyerRequest.LastName,
-                Location = template.BuyerRequest.BuyerLocation,
-                template.BuyerRequest.Phone,
-                template.BuyerRequest.Email,
-                Note = template.BuyerRequest.Comments
+                Data = new
+                {
+                    ProductID = template.Product.ID,
+                    ProductName = template.Product.Name,
+                    template.BuyerRequest.FirstName,
+                    template.BuyerRequest.LastName,
+                    Location = template.BuyerRequest.BuyerLocation,
+                    template.BuyerRequest.Phone,
+                    template.BuyerRequest.Email,
+                    Note = template.BuyerRequest.Comments
+                }
             };
             await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
             var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<MarketplaceUser>(
