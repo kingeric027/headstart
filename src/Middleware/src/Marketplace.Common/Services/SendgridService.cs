@@ -63,7 +63,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent) //temp function until all endpoints are accessible for template data
         {
-            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
@@ -72,7 +72,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
@@ -81,7 +81,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             await client.SendEmailAsync(msg);
@@ -89,7 +89,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             using (Stream stream = await fileReference.OpenReadAsync())
