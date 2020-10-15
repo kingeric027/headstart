@@ -35,7 +35,9 @@ namespace Marketplace.Common.Commands.SupplierSync
                     ClientId = user.ClientID
                 });
 
-                var type = Assembly.GetExecutingAssembly().GetTypeByAttribute<SupplierSyncAttribute>(attribute => attribute.SupplierID == user.SupplierID); 
+                var type = 
+                    Assembly.GetExecutingAssembly().GetTypeByAttribute<SupplierSyncAttribute>(attribute => attribute.SupplierID == user.SupplierID) ??
+                    Assembly.GetExecutingAssembly().GetTypeByAttribute<SupplierSyncAttribute>(attribute => attribute.SupplierID == "Generic");
                 if (type == null) throw new MissingMethodException($"Command for {user.SupplierID} is unavailable");
 
                 var command = (ISupplierSyncCommand) Activator.CreateInstance(type, _settings, oc);
