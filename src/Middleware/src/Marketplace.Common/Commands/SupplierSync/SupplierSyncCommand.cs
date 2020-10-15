@@ -40,7 +40,7 @@ namespace Marketplace.Common.Commands.SupplierSync
                     Assembly.GetExecutingAssembly().GetTypeByAttribute<SupplierSyncAttribute>(attribute => attribute.SupplierID == "Generic");
                 if (type == null) throw new MissingMethodException($"Command for {user.SupplierID} is unavailable");
 
-                var command = (ISupplierSyncCommand) Activator.CreateInstance(type, _settings, oc);
+                var command = (ISupplierSyncCommand) Activator.CreateInstance(type, _settings);
                 var method = command.GetType().GetMethod($"GetOrderAsync", BindingFlags.Public | BindingFlags.Instance);
                 if (method == null)
                     throw new MissingMethodException($"Get Order Method for {user.SupplierID} is unavailable");
