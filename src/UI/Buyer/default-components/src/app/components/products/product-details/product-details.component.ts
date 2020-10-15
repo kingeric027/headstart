@@ -51,7 +51,6 @@ export class OCMProductDetails implements OnInit {
   ocProductsInKit: any[];
   isKitStatic = false;
   _chiliConfigs: ChiliConfig[] = [];
-  showConfigs = false;
   contactRequest: ContactSupplierBody;
   specForm: FormGroup;
   isInactiveVariant: boolean;
@@ -83,9 +82,11 @@ export class OCMProductDetails implements OnInit {
   }
 
   async listChiliConfigs(): Promise<void> {
+    if (!this._product?.xp?.ArtworkRequired) {
+      return;
+    }
     const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
     this._chiliConfigs = chiliConfigs.Items.filter(item => item.SupplierProductID === this._product.ID);
-    this.showConfigs = true;
   }
 
   onSpecFormChange(event: SpecFormEvent): void {

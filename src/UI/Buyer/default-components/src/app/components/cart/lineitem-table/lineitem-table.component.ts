@@ -17,12 +17,11 @@ export class OCMLineitemTable implements OnInit {
   faTrashAlt = faTrashAlt;
   @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
     this._lineItems = lineItems;
+    this.initLineItems();
   }
   @Input() set groupByKits(bool: boolean) {
     this._groupByKits = bool;
-    this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(this._lineItems);
-    this.liGroupedByKit = this.groupLineItemsByKitID(this._lineItems);
-    this.setSupplierInfo(this.liGroupedByShipFrom);
+
   }
   @Input() readOnly: boolean;
   @Input() orderType: OrderType;
@@ -37,6 +36,15 @@ export class OCMLineitemTable implements OnInit {
   showKitDetails = true;
   constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) {
     this._orderCurrency = this.context.currentUser.get().Currency;
+  }
+
+  initLineItems(): void {
+    if (!this._lineItems || !this._lineItems.length) {
+      return;
+    }
+    this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(this._lineItems);
+    this.liGroupedByKit = this.groupLineItemsByKitID(this._lineItems);
+    this.setSupplierInfo(this.liGroupedByShipFrom);
   }
 
   ngOnInit(): void {

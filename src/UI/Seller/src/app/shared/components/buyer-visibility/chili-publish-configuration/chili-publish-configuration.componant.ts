@@ -93,7 +93,7 @@ export class ChiliPublishConfiguration implements OnInit {
         const configs = await this.productService.listChiliConfigs();
         if (configs.Items.length > 0) {
             configs.Items.forEach(item => {
-                if (item.BuyerID === this._buyerID) {
+                if (item.BuyerID === this._buyerID && item.SupplierProductID === this._productID) {
                     item.ReadOnly = true;
                     this.chiliConfigs.push(item);
                 }
@@ -112,8 +112,6 @@ export class ChiliPublishConfiguration implements OnInit {
         //TODO - Update to only get configs assosociated to this buyer and product
         const specs = await this.productService.getTecraSpecs(this._documentID);
         this.tecraSpecs = specs;
-
-        console.log(this.tecraSpecs);
         this.showAvailableCategories = true;
     }
 
