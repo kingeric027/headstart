@@ -167,10 +167,13 @@
         <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
         </p>
       </div>
-      <div *ngIf="showConfigs">
+      <div *ngIf="_chiliConfigs && _chiliConfigs.length">
         <strong>Available Configurations:</strong>
         <table class='table table-bordered table-condensed table-striped table-hover'>
-          <tr class="table-row" *ngFor="let config of _chiliConfigs"><td><a href="products/{{_product.ID}}/{{config.ID}}">{{config.ChiliTemplateName}}</a></td></tr>
+          <tr class="table-row"
+              *ngFor="let config of _chiliConfigs">
+            <td><a href="products/{{_product.ID}}/{{config.ID}}">{{config.ChiliTemplateName}}</a></td>
+          </tr>
         </table>
       </div>
       <div *ngIf="attachments.length > 0">
