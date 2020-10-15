@@ -12,4 +12,5 @@ export interface Environment {
   translateBlobUrl: string;
   ordercloudEnv: OrdercloudEnv;
   theme?: Theme;
+  instrumentationKey: string;
 }

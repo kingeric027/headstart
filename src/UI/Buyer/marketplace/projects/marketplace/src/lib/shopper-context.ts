@@ -258,6 +258,10 @@ export class AppConfig {
    */
   scope: ApiRole[];
   theme: Theme;
+  /**
+   * Microsoft Azure Application Insights instrumentation key
+   */
+  instrumentationKey: string;
 }
 
 export interface DecodedOCToken {
