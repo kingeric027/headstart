@@ -23,7 +23,6 @@ import {
   MarketplaceLineItem,
   MarketplaceAddressBuyer,
 } from '@ordercloud/headstart-sdk';
-import { ApplicationInsightsService } from '../application-insights/application-insights.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,8 +31,7 @@ export class CheckoutService {
   constructor(
     private paymentHelper: PaymentHelperService,
     private state: OrderStateService,
-    private appConfig: AppConfig,
-    private appInsightsService: ApplicationInsightsService
+    private appConfig: AppConfig
   ) {}
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {

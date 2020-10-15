@@ -1,10 +1,9 @@
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { AppConfig } from '../../shopper-context';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveEnd, Router } from '@angular/router';
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { isPlatformBrowser } from '@angular/common';
+import { AppConfig } from '../../shopper-context';
 
 @Injectable({
     providedIn: 'root',
@@ -16,22 +15,21 @@ import { isPlatformBrowser } from '@angular/common';
     constructor(
       private appConfig: AppConfig,
       private router: Router,
-      @Inject(PLATFORM_ID) private platformId: Record<string, any>
     ) {
       let isDeployed = false;
-      if (isPlatformBrowser(this.platformId)) {
+      if (window) {
         isDeployed = window.location.hostname !== 'localhost';
       }
-        if (this.appConfig.instrumentationKey && isDeployed) {
-          this.appInsights = new ApplicationInsights({
-            config: {
-              instrumentationKey: this.appConfig.instrumentationKey,
-              enableAutoRouteTracking: true,
-            },
-          });
-          this.appInsights.loadAppInsights();
-          this.createRouterSubscription();
-        }
+      if (this.appConfig.instrumentationKey && isDeployed) {
+        this.appInsights = new ApplicationInsights({
+          config: {
+            instrumentationKey: this.appConfig.instrumentationKey,
+            enableAutoRouteTracking: true,
+          },
+        });
+        this.appInsights.loadAppInsights();
+        this.createRouterSubscription();
+      }
     }
 
     public setUserID(username: string): void {
