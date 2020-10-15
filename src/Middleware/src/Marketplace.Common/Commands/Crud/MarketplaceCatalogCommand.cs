@@ -129,8 +129,8 @@ namespace Marketplace.Common.Commands.Crud
 		{
 			try
 			{
-				var addedAssignments = newAssignments.Where(newAssignment => !oldAssignments.Contains(newAssignment)).ToList();
-				var deletedAssignments = oldAssignments.Where(oldAssignment => !newAssignments.Contains(oldAssignment)).ToList();
+				var addedAssignments = oldAssignments == null ? newAssignments : newAssignments.Where(newAssignment => !oldAssignments.Contains(newAssignment)).ToList();
+				var deletedAssignments = oldAssignments == null ? new List<string>() : oldAssignments.Where(oldAssignment => !newAssignments.Contains(oldAssignment)).ToList();
 
 				var users = await _oc.Users.ListAsync(buyerID, userGroupID: locationID, pageSize: 100);
 				if (addedAssignments.Count() > 0)
