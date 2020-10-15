@@ -8,9 +8,12 @@
     </div>
     <div class="col-xl-5 col-lg-4">
       <div class="pb-3 border-bottom border-medium">
-        <small><a href="javascript:;"
-             (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}</a></small>
-        <h1 class="h3 my-0">{{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
+        <small>
+          <a href="javascript:;"
+             (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">{{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}</a>
+        </small>
+        <h1 class="h3 my-0">
+          {{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
         </h1>
         <ocm-toggle-favorite title="Favorite"
                              (click)="$event.stopPropagation()"
@@ -18,31 +21,34 @@
                              (favoriteChanged)="setIsFavorite($event.detail)">
         </ocm-toggle-favorite>
         <!-- TODO: Uncomment to have grid spec form option and fix related bugs
-          <div class="btn-group float-right" 
-             *ngIf="specs?.length > 0">
-          <button class="btn btn-sm btn-outline-secondary"
-                  [ngClass]="{'active' : !showGrid}"
-                  (click)="toggleGrid(false)">
-            <fa-icon [icon]="faListUl">
-            </fa-icon>
-          </button>
-          <button class="btn btn-sm btn-outline-secondary"
-                  [ngClass]="{'active' : showGrid}"
-                  (click)="toggleGrid(true)">
-            <fa-icon [icon]="faTh">
-            </fa-icon>
-          </button>
-        </div> -->
+      <div class="btn-group float-right"
+         *ngIf="specs?.length > 0">
+      <button class="btn btn-sm btn-outline-secondary"
+              [ngClass]="{'active' : !showGrid}"
+              (click)="toggleGrid(false)">
+        <fa-icon [icon]="faListUl">
+        </fa-icon>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary"
+              [ngClass]="{'active' : showGrid}"
+              (click)="toggleGrid(true)">
+        <fa-icon [icon]="faTh">
+        </fa-icon>
+      </button>
+    </div> -->
       </div>
       <div *ngIf="supplierNote"
-           class="alert alert-info my-3"><b>
+           class="alert alert-info my-3">
+        <b>
         </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
       </div>
       <div>
         <div>
           <div class="d-flex justify-content-between align-items-center">
             <h4 *ngIf="!showGrid"
-                class="font-weight-bold">{{ price | currency: userCurrency }}</h4>
+                class="font-weight-bold">
+              {{ price | currency: userCurrency }}
+            </h4>
             <p *ngIf="!showGrid"
                class="text-muted ml-3 float-right">{{ _product | UofM }}</p> <!-- TODO: Plug in unit of measure when data is in OC. -->
             <span class="badge badge-pill badge-warning"
@@ -51,7 +57,7 @@
             </span>
           </div>
           <!--DISPLAY SHORT SPEC FORM -->
-          <div *ngIf="specs?.length < 4 && !showGrid">
+          <div *ngIf="specs?.length < 4 && !showGrid && !_product.xp.ArtworkRequired">
             <ocm-spec-form *ngIf="isOrderable && specs?.length > 0"
                            [superProduct]="_superProduct"
                            [specs]="specs"
@@ -64,7 +70,8 @@
               <strong class="text-danger">This option is unavailable and cannot be added to the cart. Please make another selection.</strong>
             </div>
             <div class="d-flex flex-column"
-                 *ngIf="isOrderable"><span translate>PRODUCTS.DETAILS.QUANTITY</span>
+                 *ngIf="isOrderable">
+              <span translate>PRODUCTS.DETAILS.QUANTITY</span>
               <div class="d-flex flex-row">
                 <ocm-quantity-input class="d-inline-block mb-3 mr-3"
                                     (qtyChange)="qtyChange($event.detail)"
@@ -104,7 +111,7 @@
                 </ocm-modal>
               </div>
             </div>
-            <div *ngIf="!isOrderable'"
+            <div *ngIf="!isOrderable"
                  class="alert alert-info"
                  translate>
               PRODUCTS.DETAILS.VIEW_ONLY
@@ -127,25 +134,30 @@
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row">
             <span *ngFor="let priceBreak of priceBreaks; let i = index"
-                  class="font-weight-bold d-flex mt-2">{{ getPriceBreakRange(i) }}:
+                  class="font-weight-bold d-flex mt-2">
+              {{ getPriceBreakRange(i) }}:
               <p class="font-weight-normal ml-1 mr-4">{{ priceBreak?.Price | currency: userCurrency }}</p>
             </span>
           </div>
         </div>
       </div>
       <div class="alert alert-success my-3"
-           *ngIf="showRequestSubmittedMessage && specForm?.valid && qtyValid">
+           *ngIf="showRequestSubmittedMessage && ((specForm?.valid && qtyValid) || isQuoteProduct())">
         <span translate>PRODUCTS.DETAILS.SUCCESS
           <button class="btn btn-link"
                   (click)="toOrderDetail()"
-                  translate>PRODUCTS.DETAILS.VIEW_QUOTE</button>
+                  translate>
+            PRODUCTS.DETAILS.VIEW_QUOTE
+          </button>
         </span>
       </div>
       <div class="alert alert-success my-3"
            *ngIf="showContactSupplierFormSubmittedMessage">
         <span translate>
-          PRODUCTS.DETAILS.THANK_YOU</span>
-        <span> {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
+          PRODUCTS.DETAILS.THANK_YOU
+        </span>
+        <span>
+          {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}.
         </span>
       </div>
       <strong>
@@ -154,6 +166,12 @@
       <div class="p-2 border border-medium rounded">
         <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
         </p>
+      </div>
+      <div *ngIf="showConfigs">
+        <strong>Available Configurations:</strong>
+        <table class='table table-bordered table-condensed table-striped table-hover'>
+          <tr class="table-row" *ngFor="let config of _chiliConfigs"><td><a href="products/{{_product.ID}}/{{config.ID}}">{{config.ChiliTemplateName}}</a></td></tr>
+        </table>
       </div>
       <div *ngIf="attachments.length > 0">
         <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>

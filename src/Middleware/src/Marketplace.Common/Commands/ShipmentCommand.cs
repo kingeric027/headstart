@@ -13,7 +13,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IShipmentCommand
     {
-        Task<ShipmentCreateResponse> CreateShipment(SuperShipment superShipment, string supplierToken);
+        Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -25,7 +25,7 @@ namespace Marketplace.Common.Commands
             _oc = oc;
             _lineItemCommand = lineItemCommand;
         }
-        public async Task<ShipmentCreateResponse> CreateShipment(SuperShipment superShipment, string supplierToken)
+        public async Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken)
         {
             var firstShipmentItem = superShipment.ShipmentItems.First();
             var supplierOrderID = firstShipmentItem.OrderID;
@@ -48,7 +48,7 @@ namespace Marketplace.Common.Commands
                 5, 
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
             var ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
-            return new ShipmentCreateResponse()
+            return new SuperShipment()
             {
                 Shipment = ocShipmentWithDateShipped,
                 ShipmentItems = shipmentItemResponses.ToList()

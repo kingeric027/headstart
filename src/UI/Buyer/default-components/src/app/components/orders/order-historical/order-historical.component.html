@@ -76,6 +76,9 @@
     <p>
       {{order.xp?.QuoteOrderInfo?.Email}}
     </p>
+    <p>
+      {{order.xp?.QuoteOrderInfo?.BuyerLocation}}
+    </p>
     <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
          class="alert alert-secondary small">
       <strong translate>ORDERS.HISTORICAL.COMMENTS </strong>: {{order.xp?.QuoteOrderInfo?.Comments}}
@@ -83,6 +86,7 @@
   </div>
 </div>
 <ocm-lineitem-table [lineItems]="lineItems"
+[groupByKits]="true"
                     [orderType]="order?.xp?.OrderType"
                     [readOnly]="true">
 </ocm-lineitem-table>
