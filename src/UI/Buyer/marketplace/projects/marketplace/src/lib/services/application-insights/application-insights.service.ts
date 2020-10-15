@@ -40,12 +40,6 @@ import { filter } from 'rxjs/operators';
       }
     }
 
-    public logException(exception: Error): void {
-      if (this.appInsights) {
-        this.appInsights.trackException({ exception });
-      }
-    }
-
     private createRouterSubscription(): void
     {
       this.router.events.pipe(filter(event => event instanceof ResolveEnd)).subscribe((event: ResolveEnd) => {

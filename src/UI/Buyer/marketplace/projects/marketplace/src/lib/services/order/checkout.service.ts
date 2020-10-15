@@ -185,13 +185,10 @@ export class CheckoutService {
   // Private Methods
   private async submit(): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    try {
-      const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
-      await this.state.reset();
-      return submittedOrder.ID;
-    } catch (ex) {
-      this.appInsightsService.logException(ex);
-    }
+    const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
+    await this.state.reset();
+    return submittedOrder.ID;
+
   }
 
   private async createCCPayment(
