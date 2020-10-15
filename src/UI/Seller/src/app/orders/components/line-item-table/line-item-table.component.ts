@@ -1,13 +1,12 @@
 import { Component, Input, Inject, Output, EventEmitter, OnInit } from '@angular/core';
 import { groupBy as _groupBy } from 'lodash';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { MarketplaceLineItem, HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, HeadStartSDK, MarketplaceOrder } from '@ordercloud/headstart-sdk';
 import { LineItemTableStatus } from '../order-details/order-details.component';
 import { NumberCanChangeTo, CanChangeTo, CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
 import { FormArray, Validators, FormControl } from '@angular/forms';
 import { getPrimaryLineItemImage } from '@app-seller/products/product-image.helper';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MeUser } from '@ordercloud/angular-sdk';
 
 @Component({
@@ -21,9 +20,8 @@ export class LineItemTableComponent {
   _statusChangeForm = new FormArray([]);
   _tableStatus = LineItemTableStatus.Default;
   _user: MeUser;
-  @Input() orderID: string;
+  @Input() order: MarketplaceOrder;
   @Input() orderDirection: 'Incoming' | 'Outgoing';
-  @Input() currency: string;
   @Output() orderChange = new EventEmitter();
   isSaving = false;
 
@@ -46,6 +44,17 @@ export class LineItemTableComponent {
     } else {
       this.setLineItemGroups(this._lineItems);
     }
+  }
+
+  getShipMethodString(lineItem: MarketplaceLineItem): string {
+    const shipFromID = lineItem.ShipFromAddressID;
+    const shipMethod = (this.order.xp.SelectedShipMethodsSupplierView || [])
+                        .find(sm => sm.ShipFromAddressID === shipFromID);
+    if (shipMethod == null) return 'No Data';
+    const name = shipMethod.Name.replace(/_/g, ' ');     
+    const delivery = new Date(this.order.DateSubmitted);
+    delivery.setDate(delivery.getDate() + shipMethod.EstimatedTransitDays);  
+    return `${name}, ${delivery.toLocaleDateString('en-US')} Delivery`;             
   }
 
   setupForm(): void {
@@ -96,7 +105,7 @@ export class LineItemTableComponent {
     this.isSaving = true;
     try {
       const lineItemChanges = this.buildLineItemChanges();
-      await HeadStartSDK.Orders.SellerSupplierUpdateLineItemStatusesWithNotification(this.orderID, this.orderDirection, lineItemChanges);
+      await HeadStartSDK.Orders.SellerSupplierUpdateLineItemStatusesWithNotification(this.order.ID, this.orderDirection, lineItemChanges);
       this.orderChange.emit();
       this.changeTableStatus('Default')
       this.isSaving = false;
