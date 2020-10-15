@@ -25,6 +25,8 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
 import { LocationManagementWrapperComponent } from './wrapper-components/location-management-wrapper.component';
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component';
 import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component';
+import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/product-chili-configuration-wrapper.component';
+import { ChiliTemplateResolver } from './resolves/chili-template.resolve';
 
 export const MarketplaceRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
@@ -59,6 +61,18 @@ export const MarketplaceRoutes: Routes = [
           {
             path: '',
             component: ProductDetailWrapperComponent,
+          },
+        ],
+      },
+      {
+        path: 'products/:productID/:configurationID',
+        resolve: {
+          template: ChiliTemplateResolver,
+        },
+        children: [
+          {
+            path: '',
+            component: ProductChiliConfigurationWrapperComponent,
           },
         ],
       },

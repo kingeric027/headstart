@@ -77,3 +77,13 @@ export async function getUserID(
 
 	if (user.Username.includes('.hpmqx9la@mailosaur.io')) return user.ID
 }
+
+export async function getUsers(buyerID: string, clientAuth: string) {
+	const users = await OrderCloudSDK.Users.List(
+		buyerID,
+		{},
+		{ accessToken: clientAuth }
+	)
+
+	return users.Items
+}

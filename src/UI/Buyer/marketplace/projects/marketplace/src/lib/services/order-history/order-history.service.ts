@@ -71,8 +71,13 @@ export class OrderHistoryService {
       const line = group[0];
       if (line?.SupplierID) {
         const supplier = await Suppliers.Get(line.SupplierID);
-        const shipFrom = await SupplierAddresses.Get(line.SupplierID, line.ShipFromAddressID);
-        suppliers.push({ supplier, shipFrom });
+        if(line.ShipFromAddressID) {
+          const shipFrom = await SupplierAddresses.Get(line.SupplierID, line.ShipFromAddressID);
+          suppliers.push({ supplier, shipFrom });
+        } else {
+          suppliers.push({  supplier, shipFrom: null })
+        }
+        
       }
     }
     return suppliers;

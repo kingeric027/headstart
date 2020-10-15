@@ -8,7 +8,7 @@
       <span *ngIf="!orderSummaryMeta.POLineItemCount"
             translate>ORDERS.SUMMARY.ITEM_COUNT</span>
       <span *ngIf="orderSummaryMeta.POLineItemCount"
-            translate>Item(s) paid by CC</span>
+            translate>Item(s) paid by Credit Card</span>
     </h3>
     <div class="text-right">
       <span class="float-left"
@@ -48,7 +48,7 @@
     <div *ngIf="orderSummaryMeta.POLineItemCount"
          class="text-right lead">
       <span class="float-left"
-            translate>CC total</span>
+            translate>Credit Card total</span>
       <span class="order-total">{{ orderSummaryMeta.CreditCardTotal | currency: _orderCurrency }}</span>
     </div>
     <div *ngIf="!orderSummaryMeta.POLineItemCount"

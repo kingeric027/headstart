@@ -18,6 +18,7 @@ import { t } from 'testcafe'
 import { setHeadstartSDKUrl } from './headstart-sdk-helper'
 import { createCreditCard } from '../api-utils.ts/credit-card-util'
 import { deleteOrdersForUser } from '../api-utils.ts/order-util'
+import loadingHelper from './loading-helper'
 
 export async function adminClientSetup() {
 	await axiosSetup()
@@ -117,6 +118,8 @@ export async function buyerTestSetup(authToken: string) {
 	await createCreditCard(t.ctx.userAuth, user.FirstName, user.LastName)
 
 	await t.navigateTo(`${testConfig.buyerAppUrl}home`)
+
+	await loadingHelper.waitForLoadingBar()
 
 	return user
 }

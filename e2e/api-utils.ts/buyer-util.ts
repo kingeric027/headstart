@@ -13,6 +13,18 @@ export async function getBuyerID(buyerName: string, clientAuth: string) {
 	if (buyer.Name.includes('AutomationBrand_')) return buyer.ID
 }
 
+export async function getAutomationBuyers(clientAuth: string) {
+	const searchResponse = await OrderCloudSDK.Buyers.List(
+		{
+			search: 'AutomationBuyer_',
+			searchOn: 'Name',
+		},
+		{ accessToken: clientAuth }
+	)
+
+	return searchResponse.Items
+}
+
 export async function deleteBuyer(buyerID: string, clientAuth: string) {
 	await OrderCloudSDK.Buyers.Delete(buyerID, { accessToken: clientAuth })
 }

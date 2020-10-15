@@ -2,6 +2,7 @@
   <div *ngFor="let shipEstimate of _shipEstimates; let i = index">
     <ocm-lineitem-table [lineItems]="_lineItemsByShipEstimate[i]"
                         [readOnly]="true"
+                        [groupByKits]="false"
                         [hideStatus]="true">
       <ocm-shipping-selection-form [shipEstimate]="shipEstimate"
                                    [supplierID]="getSupplierID(shipEstimate)"
@@ -26,3 +27,8 @@
     CHECKOUT.CHECKOUT_SHIPPING.SAVE_CONTINUE
   </button>
 </div>
+<div *ngIf="!_shipEstimates">
+  <div>
+    <div class="text-danger">We apologize for the inconvenience, we are currently unable to display your shipping estimates for this cart. Please try a different address or contact the vendor with further questions.</div>
+    <button class="btn btn-block btn-primary" title="Change Shipping Address" (click)="onChangeAddressClicked()" translate>CHECKOUT.CHECKOUT.CHANGE_ADDRESS</button>
+  </div>
