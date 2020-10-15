@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
     public interface IOrderCommand
     {
         Task<Order> AcknowledgeQuoteOrder(string orderID);
-        Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceOrder>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
@@ -63,7 +63,7 @@ namespace Marketplace.Common.Commands
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
         }
 
-        public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<MarketplaceOrder>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
         {
             await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
             if(listArgs.Filters == null)
@@ -74,10 +74,11 @@ namespace Marketplace.Common.Commands
             {
                 QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
             });
-            return await _oc.Orders.ListAsync(OrderDirection.Incoming,
+            return await _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Incoming,
                 page: listArgs.Page,
                 pageSize: listArgs.PageSize,
                 search: listArgs.Search,
+                sortBy: listArgs.SortBy.FirstOrDefault(),
                 filters: listArgs.ToFilterString());
         }
 
