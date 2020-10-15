@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk'
 import { ShipEstimate, ListPage, ShipMethodSelection } from 'ordercloud-javascript-sdk';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+
 
 @Component({
   templateUrl: './checkout-shipping.component.html',
@@ -10,6 +12,7 @@ export class OCMCheckoutShipping implements OnInit {
   _shipEstimates = null;
   _areAllShippingSelectionsMade = false;
   _lineItemsByShipEstimate = null;
+  faExclamationCircle = faExclamationCircle;
 
   @Input() set shipEstimates(value: ShipEstimate[]) {
     this._shipEstimates = value;

@@ -24,11 +24,10 @@ namespace Marketplace.Common.Controllers
         }
 
 		[DocName("GET MarketplaceSupplier")]
-		[HttpGet, Route("me/{supplierID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierAdmin, ApiRole.SupplierReader)]
+		[HttpGet, Route("me/{supplierID}"), OrderCloudIntegrationsAuth]
 		public async Task<MarketplaceSupplier> GetMySupplier(string supplierID)
 		{
 			//ocAuth is the token for the organization that is specified in the AppSettings
-
 		   var ocAuth = await _oc.AuthenticateAsync();
 			return await _command.GetMySupplier(supplierID, VerifiedUserContext, ocAuth.AccessToken);
 		}

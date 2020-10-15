@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
-import { Spec, PriceBreak } from 'ordercloud-javascript-sdk';
+import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -48,12 +48,15 @@ export class OCMProductDetails implements OnInit {
   isAddingToCart = false;
   contactRequest: ContactSupplierBody;
   specForm: FormGroup;
+  isInactiveVariant: boolean;
+  _disabledVariants: MarketplaceVariant[];
+  variantInventory: number;
   constructor(
     private specFormService: SpecFormService,
     private context: ShopperContextService,
     private productDetailService: ProductDetailService
-  ) {
-  }
+  ) { }
+
   @Input() set product(superProduct: SuperMarketplaceProduct) {
     this._superProduct = superProduct;
     this._product = superProduct.Product;
@@ -62,18 +65,46 @@ export class OCMProductDetails implements OnInit {
     this.isOrderable = !!superProduct.PriceSchedule;
     this.supplierNote = this._product.xp && this._product.xp.Note;
     this.specs = superProduct.Specs;
+    this.populateInactiveVariants(superProduct);
   }
 
   ngOnInit(): void {
     this.calculatePrice();
     this.currentUser = this.context.currentUser.get();
-    this.userCurrency = this.context.currentUser.get().Currency;
+    this.userCurrency = this.currentUser.Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
     this.specForm = event.form;
+    if (this._superProduct?.Product?.Inventory?.Enabled && this._superProduct?.Product?.Inventory?.VariantLevelTracking) {
+      this.variantInventory = this.getVariantInventory();
+    }
     this.calculatePrice();
+  }
+
+  getVariantInventory(): number {
+    let specCombo = "";
+    let specOptions: SpecOption[] = [];
+    this._superProduct?.Specs?.forEach(s => s.Options.forEach(o => specOptions = specOptions.concat(o)));
+    for (var i = 0; i < this.specForm.value.ctrls.length; i++) {
+      const matchingOption = specOptions.find(o => o.Value === this.specForm.value.ctrls[i])
+      i === 0 ? specCombo += matchingOption.ID : specCombo += `-${matchingOption.ID}`
+    }
+    return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
+  }
+
+  onSelectionInactive(event: boolean) {
+    this.isInactiveVariant = event;
+  }
+
+  populateInactiveVariants(superProduct: SuperMarketplaceProduct) {
+    this._disabledVariants = [];
+    superProduct.Variants?.forEach(variant => {
+      if (!variant.Active) {
+        this._disabledVariants.push(variant);
+      }
+    })
   }
 
   toggleGrid(showGrid: boolean): void {
@@ -104,7 +135,7 @@ export class OCMProductDetails implements OnInit {
         Quantity: this.quantity,
         Specs: this.specFormService.getLineItemSpecs(this.specs, this.specForm),
         xp: {
-          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct, this.specForm)
+          ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct.Images, this._superProduct.Specs, this.specForm)
         }
       });
     } finally {
@@ -160,7 +191,7 @@ export class OCMProductDetails implements OnInit {
       lineItem.ProductID = this._product.ID;
       lineItem.Specs = this.specFormService.getLineItemSpecs(this.specs, this.specForm);
       lineItem.xp = {
-        ImageUrl: this.specFormService.getLineItemImageUrl(this._product, this.specForm),
+        ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct.Images, this._superProduct.Specs, this.specForm),
       };
       this.submittedQuoteOrder = await this.context.order.submitQuoteOrder(info, lineItem);
       this.quoteFormModal = ModalState.Closed;

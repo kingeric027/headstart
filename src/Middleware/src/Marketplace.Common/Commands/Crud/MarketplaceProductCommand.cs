@@ -122,7 +122,7 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
 		{
 			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
-			var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
+			var attachments = assets.Items.Where(a => a.Title == "Product_Attachment").ToList();
 			return attachments;
 		}
 
@@ -213,13 +213,10 @@ namespace Marketplace.Common.Commands.Crud
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Create Price Schedule
 			PriceSchedule _priceSchedule = null;
-			// If the superProduct has a price schedule, create
-			if (superProduct.PriceSchedule != null)
-			{
-				superProduct.PriceSchedule.ID = superProduct.Product.ID;
-				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
-				superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
-			}
+			//All products must have a price schedule for orders to be submitted.  The front end provides a default Price of $0 for quote products that don't have one.
+			superProduct.PriceSchedule.ID = superProduct.Product.ID;
+			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
 			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
@@ -234,7 +231,7 @@ namespace Marketplace.Common.Commands.Crud
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
 				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
 			});
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
@@ -254,6 +251,8 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
 		{
+			// Update the Product itself
+			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// Two spec lists to compare (requestSpecs and existingSpecs)
 			IList<Spec> requestSpecs = superProduct.Specs.ToList();
 			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
@@ -296,8 +295,17 @@ namespace Marketplace.Common.Commands.Crud
 			// Check if Variants differ
 			var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
 			var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
+			bool hasVariantChange = false;
+
+			foreach(Variant variant in requestVariants)
+            {
+				var currVariant = existingVariants.Where(v => v.ID == variant.ID);
+				if (currVariant == null || currVariant.Count() < 1) { continue; }
+				hasVariantChange = HasVariantChange(variant, currVariant.First());
+				if (hasVariantChange) { break; }
+            }
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.
-			if (variantsAdded || variantsRemoved || requestVariants.Any(v => v.xp.NewID != null))
+			if (variantsAdded || variantsRemoved || hasVariantChange || requestVariants.Any(v => v.xp.NewID != null))
 			{
 				// Re-generate Variants
 				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);
@@ -306,7 +314,7 @@ namespace Marketplace.Common.Commands.Crud
 				{
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
-					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active, Inventory = v.Inventory }, accessToken: user.AccessToken);
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
@@ -315,8 +323,6 @@ namespace Marketplace.Common.Commands.Crud
 			{
 				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
 			}
-			// Update the Product itself
-			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
 			// List Product Specs
@@ -334,6 +340,20 @@ namespace Marketplace.Common.Commands.Crud
 				Images = _images,
 				Attachments = _attachments
 			};
+		}
+
+        private bool HasVariantChange(Variant variant, Variant currVariant)
+        {
+            if (variant.Active != currVariant.Active) { return true; }
+			if (variant.Description != currVariant.Description) { return true; }
+			if (variant.Name != currVariant.Name) { return true; }
+			if (variant.ShipHeight != currVariant.ShipHeight) { return true; }
+			if (variant.ShipLength != currVariant.ShipLength) { return true; }
+			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
+			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
+			if (variant.Inventory != currVariant.Inventory) { return true; }
+
+			return false;
 		}
 
 		public async Task Delete(string id, VerifiedUserContext user)

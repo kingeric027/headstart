@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FooterComponent } from 'src/app/layout/footer/footer.component';
+import { OCMAppFooter } from '../app-footer/app-footer.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
-describe('FooterComponent', () => {
-  let component: FooterComponent;
-  let fixture: ComponentFixture<FooterComponent>;
+describe('OCMAppFooter', () => {
+  let component: OCMAppFooter;
+  let fixture: ComponentFixture<OCMAppFooter>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [FooterComponent, FaIconComponent],
+      declarations: [OCMAppFooter, FaIconComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FooterComponent);
+    fixture = TestBed.createComponent(OCMAppFooter);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -117,7 +117,7 @@
                translate>PAYMENTS.CC_FORM.STATE</label>
         <select *ngIf="stateOptions.length !== 0"
                 formControlName="state"
-                class="form-control"
+                class="custom-select"
                 id="State"
                 showErrors>
           <option [ngValue]="null"
@@ -153,7 +153,7 @@
              for="country"
              translate>PAYMENTS.CC_FORM.COUNTRY</label>
       <select formControlName="country"
-              class="form-control"
+              class="custom-select"
               id="Country"
               showErrors
               (change)="onCountryChange($event)">
@@ -166,13 +166,13 @@
     </div>
   </div>
   <button type="submit"
-          class="btn btn-primary btn-block-xs mt-4 mr-2"
+          class="btn btn-sm btn-secondary mt-2"
           [disabled]="!cardForm.valid">
     {{ submitText }}
   </button>
   <button (click)="dismissForm()"
           *ngIf="!_showCVV"
-          class="btn btn-link text-danger mt-4"
+          class="btn btn-link text-danger mt-2"
           type="button"
           translate>PAYMENTS.CC_FORM.CANCEL</button>
 </form>
