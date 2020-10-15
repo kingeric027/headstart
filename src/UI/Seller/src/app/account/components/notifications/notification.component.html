@@ -5,7 +5,7 @@
 
              <div style="font-weight:bolder; margin-bottom:4px; font-size: larger;">{{notification?.Doc?.Product?.Name}}</div>
         </div>
-      <button (click)="notificationAccept('ACCEPTED')"
+      <button (click)="reviewMonitoredFieldChange('ACCEPTED', notification)"
             class="btn btn-primary">Accept</button>
     <!-- TODO: Reinstate the rejected button once functionality can handle the repercussions. -->
     <!-- <button (click)="reviewMonitoredFieldChange('REJECTED')"

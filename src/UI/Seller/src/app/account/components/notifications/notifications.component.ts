@@ -1,15 +1,13 @@
-import { Component, ChangeDetectorRef, Inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { ListPage, OcAdminUserService, OcSupplierUserService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { AppAuthService } from '@app-seller/auth';
 import {get as _get} from 'lodash';
-import { HeadStartSDK, JDocument} from '@ordercloud/headstart-sdk';
-import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+import { JDocument} from '@ordercloud/headstart-sdk';
 
 
 @Component({
@@ -49,6 +47,15 @@ export class NotificationsComponent extends AccountContent {
     this.updateUserFromEvent({ target: { value: value } }, 'xp.ProductEmails')
   }
 
+  notificationActionTaken(event: string, notification: JDocument) {
+    console.log(event);
+    if (event === "ACCEPTED"){
+      if (this.notificationsAccepted.get(notification.ID)) {
+        this.notificationsAccepted.set(notification.ID, true);
+      }
+    }
+  }
+
   addAddtlRcpt() {
     const addtlEmail = (document.getElementById('AdditionalEmail') as any).value;
     const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(addtlEmail);
@@ -69,10 +76,5 @@ export class NotificationsComponent extends AccountContent {
     const copiedResource = this.copyResource(this.userEditable);
     const editedArr = copiedResource.xp?.AddtlRcpts.filter(e => e !== copiedResource.xp?.AddtlRcpts[index]);
     this.updateUserFromEvent({target: {value: editedArr}}, 'xp.AddtlRcpts');
-  }
-
-  reviewNotificationAcceptance(isAccepted: boolean) { 
-      // TODO: Send request to middleware to review the change, and (if ACCEPTED) change SuperProduct.Product.Active = true
-      console.log(isAccepted);  
   }
 }

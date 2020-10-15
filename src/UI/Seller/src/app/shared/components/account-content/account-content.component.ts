@@ -5,11 +5,12 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { environment } from 'src/environments/environment';
 import { UserContext } from '@app-seller/config/user-context';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { ListPage, MeUser } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { isEqual as _isEqual, set as _set, get as _get } from 'lodash';
 import { HeadStartSDK, Asset, AssetUpload, JDocument } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
+import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string;
@@ -26,6 +27,8 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   userStatic: MeUser;
   userEditable: MeUser;
   notificationsToReview: JDocument[];
+  notificationsAccepted = new Map<string, boolean>();
+
   constructor(
     private router: Router,
     activatedRoute: ActivatedRoute,
@@ -64,9 +67,15 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification').then((notifications: ListPage<JDocument>) => {
       if (notifications?.Items?.length > 0 && notifications?.Items.some(i => i?.Doc.Status === NotificationStatus.SUBMITTED)) {
       this.notificationsToReview = notifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
+      this.hydrateNotificationReviewStatus();
     };
     });
-    
+  }
+
+  hydrateNotificationReviewStatus() {
+    this.notificationsToReview.forEach(notification => {
+      this.notificationsAccepted.set(notification.ID, false);
+    });
   }
 
   setCurrentUserInitials(user: MeUser): void {

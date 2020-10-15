@@ -1,5 +1,11 @@
-import { Component, Input, ChangeDetectorRef } from '@angular/core';
-import { JDocument, PriceBreak } from '@ordercloud/headstart-sdk';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, Inject, Input, Output } from '@angular/core';
+import { MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+import { JDocument, PriceBreak, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
+import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
+import { OcTokenService } from '@ordercloud/angular-sdk';
+import { EventEmitter } from 'protractor';
 
 @Component({
   selector: 'notification',
@@ -7,13 +13,30 @@ import { JDocument, PriceBreak } from '@ordercloud/headstart-sdk';
   styleUrls: ['./notification.component.scss'],
 })
 export class NotificationComponent {
-  @Input()
-  notification: JDocument;
-  constructor(private ref: ChangeDetectorRef) {}
-
+  @Input() notification: JDocument;
+  @Output() onActionTaken = new EventEmitter;
   hasPriceBreak = false;
-  notificationAccept(action: string) {
-    console.log(action);
+
+  constructor(
+    private http: HttpClient, 
+    @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private currentUserService: CurrentUserService,
+    private ocTokenService: OcTokenService
+) {}
+
+async reviewMonitoredFieldChange(status: NotificationStatus, notification: MonitoredProductFieldModifiedNotificationDocument): Promise<void> {
+    const myContext = await this.currentUserService.getUserContext();
+    notification.Doc.Status = status;
+    notification.Doc.History.ReviewedBy = { ID: myContext?.Me?.ID, Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`};
+    notification.Doc.History.DateReviewed = new Date().toISOString();
+    const headers = {
+      headers: new HttpHeaders({
+          Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+    };
+    // TODO: Replace with the SDK
+    //const superProduct = await this.http.put<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`, notification, headers).toPromise()
+    this.onActionTaken.emit("ACCEPTED");
   }
 
   getJsonValues(jsonObject): any | PriceBreak[] {
