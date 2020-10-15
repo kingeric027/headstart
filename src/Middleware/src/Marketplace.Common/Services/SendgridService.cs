@@ -42,7 +42,6 @@ namespace Marketplace.Common.Services
     {
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
-        private const string NO_REPLY_EMAIL_ADDRESS = "noreply@sebvendorportal.com";
         private const string BUYER_ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID = "d-777af54b1e414b0b853f983697889267";
@@ -64,7 +63,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent) //temp function until all endpoints are accessible for template data
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
@@ -73,7 +72,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
@@ -82,7 +81,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             await client.SendEmailAsync(msg);
@@ -90,7 +89,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.SendgridApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             using (Stream stream = await fileReference.OpenReadAsync())
@@ -109,7 +108,7 @@ namespace Marketplace.Common.Services
                 messageNotification.EventBody.PasswordRenewalAccessToken,
                 messageNotification.EventBody.PasswordRenewalUrl
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
 
         private List<object> CreateTemplateProductList(List<MarketplaceLineItem> lineItems, LineItemStatusChanges lineItemStatusChanges)
@@ -150,7 +149,7 @@ namespace Marketplace.Common.Services
                 OrderID = order.ID,
                 order.Comments
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName)
@@ -160,7 +159,7 @@ namespace Marketplace.Common.Services
             {
                 date = yesterday
             };
-            await SendSingleTemplateEmailMultipleRcptsAttachment(NO_REPLY_EMAIL_ADDRESS, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
+            await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
             //string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName
 
         }
@@ -181,14 +180,14 @@ namespace Marketplace.Common.Services
                 OrderID = order.ID,
                 order.Comments
             };
-            await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, LINE_ITEM_STATUS_CHANGE, templateData);
+            await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, tos, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
             var order = messageNotification.EventBody.Order;
             var templateData = GetOrderTemplateData(order, messageNotification.EventBody.LineItems);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -199,7 +198,7 @@ namespace Marketplace.Common.Services
                 messageNotification.Recipient.LastName,
                 OrderID = messageNotification.EventBody.Order.ID
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -223,19 +222,19 @@ namespace Marketplace.Common.Services
                 BaseAppURL,
                 messageNotification.EventBody.Username
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
         {
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_APPROVED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, BUYER_ORDER_APPROVED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
         }
 
         public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
         {
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -260,7 +259,7 @@ namespace Marketplace.Common.Services
                     };
                 };
                 tos.Add(new EmailAddress(orderWorksheet.Order.FromUser.Email));
-                await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, BUYER_ORDER_SUBMIT_TEMPLATE_ID, GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems));
+                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, tos, BUYER_ORDER_SUBMIT_TEMPLATE_ID, GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems));
                 await SendSupplierOrderSubmitEmail(orderWorksheet);
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
@@ -281,7 +280,7 @@ namespace Marketplace.Common.Services
                     ProductName = orderWorksheet.LineItems.FirstOrDefault().Product.Name,
                     order = orderWorksheet.Order
                 };
-                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, orderWorksheet.Order.FromUser.Email, BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
                 await SendSupplierOrderSubmitEmail(orderWorksheet);
             }
         }
@@ -299,7 +298,7 @@ namespace Marketplace.Common.Services
                 lineItemEmailDisplayText.StatusChangeDetail,
                 lineItemEmailDisplayText.StatusChangeDetail2
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -340,11 +339,11 @@ namespace Marketplace.Common.Services
                 if (tos.Any() && orderWorksheet.Order.xp.OrderType == OrderType.Quote)
                 {
                     var quoteOrderData = new { supplierInfo.xp.SupportContact.Name };
-                    await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, templateID, quoteOrderData);
+                    await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, tos, templateID, quoteOrderData);
                 }
                 else if (tos.Any())
                 {
-                    await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, templateID, templateData);
+                    await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, tos, templateID, templateData);
                 }
             };
         }
@@ -364,7 +363,7 @@ namespace Marketplace.Common.Services
                 template.BuyerRequest.Email,
                 Note = template.BuyerRequest.Comments
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
             var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<MarketplaceUser>(
                     filters: $"xp.RequestInfoEmails=true",
                     page: page,
@@ -372,12 +371,12 @@ namespace Marketplace.Common.Services
                  ));
             foreach (var sellerUser in sellerUsers)
             {
-                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, sellerUser.Email, INFORMATION_REQUEST, templateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, sellerUser.Email, INFORMATION_REQUEST, templateData);
                 if (sellerUser.xp.AddtlRcpts.Any())
                 {
                     foreach (var rcpt in sellerUser.xp.AddtlRcpts)
                     {
-                        await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, rcpt, INFORMATION_REQUEST, templateData);
+                        await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, rcpt, INFORMATION_REQUEST, templateData);
                     }
                 }
             }
