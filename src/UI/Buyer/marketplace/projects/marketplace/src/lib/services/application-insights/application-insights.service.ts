@@ -28,9 +28,9 @@ import { filter } from 'rxjs/operators';
         }
     }
 
-    public setUserID(userID: string): void {
+    public setUserID(username: string): void {
       if (this.appInsights) {
-        this.appInsights.setAuthenticatedUserContext(userID);
+        this.appInsights.setAuthenticatedUserContext(username);
       }
     }
   

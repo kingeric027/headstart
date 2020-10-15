@@ -86,7 +86,6 @@ export class AuthService {
   setToken(token: string): void {
     if (!token) return;
     Tokens.SetAccessToken(token);
-    this.appInsightsService.setUserID(this.currentUser.get().ID);
     this.isLoggedIn = true;
   }
 
@@ -106,6 +105,7 @@ export class AuthService {
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
+    this.appInsightsService.setUserID(userName);
     this.loginWithTokens(creds.access_token, creds.refresh_token, false, rememberMe);
     return creds;
   }
