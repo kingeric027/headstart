@@ -35,7 +35,7 @@ async reviewMonitoredFieldChange(status: NotificationStatus, notification: Monit
       }),
     };
     // TODO: Replace with the SDK
-    //const superProduct = await this.http.put<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`, notification, headers).toPromise()
+    const superProduct = await this.http.put<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`, notification, headers).toPromise()
     this.onActionTaken.emit("ACCEPTED");
   }
 
