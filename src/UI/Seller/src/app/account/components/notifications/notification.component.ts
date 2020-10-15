@@ -1,11 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, Inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 import { JDocument, PriceBreak, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { OcTokenService } from '@ordercloud/angular-sdk';
-import { EventEmitter } from 'protractor';
 
 @Component({
   selector: 'notification',
@@ -18,7 +17,7 @@ export class NotificationComponent {
   hasPriceBreak = false;
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private currentUserService: CurrentUserService,
     private ocTokenService: OcTokenService
