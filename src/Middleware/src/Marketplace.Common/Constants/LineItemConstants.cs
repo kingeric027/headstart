@@ -200,7 +200,7 @@ namespace Marketplace.Common.Constants
                     {
                         EmailSubject = "Items on your order have shipped",
                         DynamicText = $"{supplierName} has shipped items from your order",
-                        DynamicText2 = "The following items are on there way"
+                        DynamicText2 = "The following items are on their way"
                     } }
                 } },
                 { LineItemStatus.ReturnRequested, new Dictionary<VerifiedUserType, EmailDisplayText>() {
