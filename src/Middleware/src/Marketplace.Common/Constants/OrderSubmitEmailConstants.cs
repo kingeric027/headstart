@@ -31,7 +31,7 @@ namespace Marketplace.Common.Constants
                 {
                     EmailSubject = $"Your order has been submitted {orderID}",
                     DynamicText = "Thank you for your order.",
-                    DynamicText2 = "We are getting your order ready to be shiped. You will be notified when it has been sent. Your order contains the folowing items."
+                    DynamicText2 = "We are getting your order ready to be shiped. You will be notified when it has been sent. Your order contains the following items."
                 } },
                 {VerifiedUserType.admin, new EmailDisplayText()
                 {
