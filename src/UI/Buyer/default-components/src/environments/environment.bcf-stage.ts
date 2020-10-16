@@ -12,11 +12,13 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'https://sebrandsmarketplace-basecamp-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: bcfTheme,
+  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 /*
 

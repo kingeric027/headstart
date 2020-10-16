@@ -2,7 +2,6 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators';
-import { removeSpacesFrom } from 'src/app/services/card-validation.helper';
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { GeographyConfig } from 'src/app/config/geography.class';
 
@@ -41,6 +40,7 @@ export class OCMCreditCardForm implements OnInit {
 
   _showCVV = false;
   _showCardDetails = true;
+  cardError?: string;
   cardForm = new FormGroup({});
   monthOptions = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   yearOptions = this.buildYearOptions();
@@ -57,10 +57,15 @@ export class OCMCreditCardForm implements OnInit {
     this.buildCardDetailsForm(this.card);
   }
 
+  ccEntered({ message, validationError }: { message: string; validationError: string }): void {
+    this.cardForm.controls.token.setValue(message);
+    this.cardError = validationError;
+  }
+
   onSubmit(): void {
     this.formSubmitted.emit({
       card: {
-        AccountNumber: removeSpacesFrom(this.cardForm.value.number || ''),
+        AccountNumber: this.cardForm.value.token,
         CardholderName: this.cardForm.value.name,
         ExpirationDate: `${this.cardForm.value.month}${this.cardForm.value.year}`,
         CCBillingAddress: {
@@ -98,7 +103,7 @@ export class OCMCreditCardForm implements OnInit {
   private buildCardDetailsForm(card: OrderCloudIntegrationsCreditCardToken): void {
     const form = {
       name: card?.CardholderName || '',
-      number: card?.AccountNumber ?  this.creditCardFormatPipe.transform(card.AccountNumber) : '',
+      token: card?.AccountNumber ? this.creditCardFormatPipe.transform(card.AccountNumber) : '',
       month: card?.ExpirationDate?.substring(0, 2) || this.monthOptions[0],
       year: card?.ExpirationDate?.substring(2, 4) || this.yearOptions[1].slice(-2),
       street: card?.CCBillingAddress?.Street1 || '',
@@ -108,7 +113,7 @@ export class OCMCreditCardForm implements OnInit {
       country: card?.CCBillingAddress?.Country || this.defaultCountry
     }
 
-    this.cardForm.addControl('number', new FormControl(form.number, [Validators.required, ValidateCreditCard]));
+    this.cardForm.addControl('token', new FormControl(form.token, [Validators.required, ValidateCreditCard]));
     this.cardForm.addControl('name', new FormControl(name, Validators.required));
     this.cardForm.addControl('month', new FormControl(form.month, Validators.required));
     this.cardForm.addControl('year', new FormControl(form.year, Validators.required));
@@ -121,6 +126,7 @@ export class OCMCreditCardForm implements OnInit {
 
   private removeCardDetailsForm(): void {
     const nonCVVCtrls = [
+      'token',
       'name',
       'number',
       'month',

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
+using Marketplace.Common.Constants;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
@@ -25,7 +26,6 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
 
-        Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
@@ -33,27 +33,26 @@ namespace Marketplace.Common.Services
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
         Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
-        Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText);
-        Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, LineItemEmailDisplayText lineItemEmailDisplayText);
+        Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText);
+        Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText);
         Task SendContactSupplierAboutProductEmail(ContactSupplierBody template);
         Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName);
+    }
+
+    public class EmailTemplate
+    {
+        public object Data { get; set; }
+        public EmailDisplayText Message { get; set; }
     }
     public class SendgridService : ISendgridService
     {
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
-        private const string NO_REPLY_EMAIL_ADDRESS = "noreply@four51.com";
-        private const string BUYER_ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
-        private const string SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID = "d-777af54b1e414b0b853f983697889267";
-        private const string BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
-        private const string SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-5776a6c57b344aeda605444c96ff39e8";
+        private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
-        private const string BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID = "d-4c674afcd6ef44e9b7793eb6c5b917ea";
-        private const string BUYER_ORDER_APPROVED_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
-        private const string BUYER_ORDER_DECLINED_TEMPLATE_ID = "d-3b6167f40d6b407b95759d1cb01fff30";
-        private const string ORDER_REQUIRES_APPROVAL_TEMPLATE_ID = "d-fbe9f4e9fabd4a37ba2364201d238316";
         private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
         private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-8d60fcbc191b4fd1ae526e28713e6abe";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
@@ -64,7 +63,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent) //temp function until all endpoints are accessible for template data
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
@@ -73,7 +72,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
@@ -82,7 +81,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             await client.SendEmailAsync(msg);
@@ -90,7 +89,7 @@ namespace Marketplace.Common.Services
 
         public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
         {
-            var client = new SendGridClient(_settings.SendgridApiKey);
+            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
             using (Stream stream = await fileReference.OpenReadAsync())
@@ -102,14 +101,17 @@ namespace Marketplace.Common.Services
 
         public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName,
-                messageNotification.EventBody.PasswordRenewalAccessToken,
-                messageNotification.EventBody.PasswordRenewalUrl
+                Data = new
+                {
+                    messageNotification.Recipient.FirstName,
+                    messageNotification.Recipient.LastName,
+                    messageNotification.EventBody.PasswordRenewalAccessToken,
+                    messageNotification.EventBody.PasswordRenewalUrl
+                }
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_PASSWORD_RESET_TEMPLATE_ID, templateData);
         }
 
         private List<object> CreateTemplateProductList(List<MarketplaceLineItem> lineItems, LineItemStatusChanges lineItemStatusChanges)
@@ -134,23 +136,28 @@ namespace Marketplace.Common.Services
             };
         }
 
-        public async Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText)
+        public async Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText)
         {
             var productsList = CreateTemplateProductList(lineItems, lineItemStatusChanges);
-
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Products = productsList,
-                lineItemEmailDisplayText.EmailSubject,
-                lineItemEmailDisplayText.StatusChangeDetail,
-                lineItemEmailDisplayText.StatusChangeDetail2,
-                DateSubmitted = order.DateSubmitted.ToString(),
-                OrderID = order.ID,
-                order.Comments
+                Data = new
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Products = productsList,
+                    DateSubmitted = order?.DateSubmitted?.ToString(),
+                    OrderID = order.ID,
+                    order.Comments
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = lineItemEmailDisplayText?.EmailSubject,
+                    DynamicText = lineItemEmailDisplayText?.DynamicText,
+                    DynamicText2 = lineItemEmailDisplayText?.DynamicText2
+                }
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName)
@@ -160,46 +167,59 @@ namespace Marketplace.Common.Services
             {
                 date = yesterday
             };
-            await SendSingleTemplateEmailMultipleRcptsAttachment(NO_REPLY_EMAIL_ADDRESS, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
+            await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
             //string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName
 
         }
 
-        public async Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, LineItemEmailDisplayText lineItemEmailDisplayText)
+        public async Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText)
         {
             var productsList = CreateTemplateProductList(lineItems, lineItemStatusChanges);
-
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                FirstName = "",
-                LastName = "",
-                Products = productsList,
-                lineItemEmailDisplayText.EmailSubject,
-                lineItemEmailDisplayText.StatusChangeDetail,
-                lineItemEmailDisplayText.StatusChangeDetail2,
-                DateSubmitted = order.DateSubmitted.ToString(),
-                OrderID = order.ID,
-                order.Comments
+                Data = new
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Products = productsList,
+                    DateSubmitted = order.DateSubmitted.ToString(),
+                    OrderID = order.ID,
+                    order.Comments
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = lineItemEmailDisplayText?.EmailSubject,
+                    DynamicText = lineItemEmailDisplayText?.DynamicText,
+                    DynamicText2 = lineItemEmailDisplayText?.DynamicText2,
+                }
             };
-            await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, LINE_ITEM_STATUS_CHANGE, templateData);
+            await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, tos, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
             var order = messageNotification.EventBody.Order;
-            var templateData = GetOrderTemplateData(order, messageNotification.EventBody.LineItems);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_ORDER_SUBMITTED_FOR_APPROVAL_TEMPLATE_ID, templateData);
+            EmailTemplate templateData = new EmailTemplate()
+            {
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
+                Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
+            };
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName,
-                OrderID = messageNotification.EventBody.Order.ID
+                Data = new
+                {
+                    messageNotification.Recipient.FirstName,
+                    messageNotification.Recipient.LastName,
+                    OrderID = messageNotification.EventBody.Order.ID
+                },
+                Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, ORDER_REQUIRES_APPROVAL_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -215,53 +235,68 @@ namespace Marketplace.Common.Services
             {
                 BaseAppURL = _settings.UI.BaseBuyerUrl;
             }
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                messageNotification.Recipient.FirstName,
-                messageNotification.Recipient.LastName,
-                messageNotification.EventBody.PasswordRenewalAccessToken,
-                BaseAppURL,
-                messageNotification.EventBody.Username
+                Data = new
+                {
+                    messageNotification.Recipient.FirstName,
+                    messageNotification.Recipient.LastName,
+                    messageNotification.EventBody.PasswordRenewalAccessToken,
+                    BaseAppURL,
+                    messageNotification.EventBody.Username
+                }
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
         {
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_APPROVED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
+            EmailTemplate templateData = new EmailTemplate()
+            {
+                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Message = OrderSubmitEmailConstants.GetOrderApprovedText()
+            };
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
         {
             var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, payload.Response.Body.FromUser.Email, BUYER_ORDER_DECLINED_TEMPLATE_ID, GetOrderTemplateData(payload.Response.Body, lineItems.Items));
+            EmailTemplate templateData = new EmailTemplate()
+            {
+                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
+            };
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
         {
+            var supplierEmailList = await GetSupplierEmails(orderWorksheet);
+            var firstName = orderWorksheet.Order.FromUser.FirstName;
+            var lastName = orderWorksheet.Order.FromUser.LastName;
             if (orderWorksheet.Order.xp.OrderType == OrderType.Standard)
             {
-                // Loop over seller users, pull out THEIR boolean, as well as the List<string> of AddtlRcpts
-                var sellerUsers = await _oc.AdminUsers.ListAsync<MarketplaceSellerUser>();
-                var tos = new List<EmailAddress>();
-                foreach (var seller in sellerUsers.Items)
+                var orderData = GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems);
+                EmailTemplate sellerTemplateData = new EmailTemplate()
                 {
-                    if (seller?.xp?.OrderEmails ?? false)
-                    {
-                        tos.Add(new EmailAddress(seller.Email));
-                    };
-                    if (seller?.xp?.AddtlRcpts?.Any() ?? false)
-                    {
-                        foreach (var rcpt in seller.xp.AddtlRcpts)
-                        {
-                            tos.Add(new EmailAddress(rcpt));
-                        };
-                    };
+                    Data = orderData,
+                    Message = OrderSubmitEmailConstants.GetOrderSubmitText(orderWorksheet.Order.ID, firstName, lastName, VerifiedUserType.admin)
                 };
-                tos.Add(new EmailAddress(orderWorksheet.Order.FromUser.Email));
-                await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, BUYER_ORDER_SUBMIT_TEMPLATE_ID, GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems));
-                await SendSupplierOrderSubmitEmail(orderWorksheet);
+                EmailTemplate buyerTemplateData = new EmailTemplate()
+                {
+                    Data = orderData,
+                    Message = OrderSubmitEmailConstants.GetOrderSubmitText(orderWorksheet.Order.ID, firstName, lastName, VerifiedUserType.buyer)
+                };
+
+                var sellerEmailList = await GetSellerEmails();
+
+                //  send emails
+                
+                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, sellerEmailList, ORDER_SUBMIT_TEMPLATE_ID, sellerTemplateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
+                await SendSupplierOrderSubmitEmails(orderWorksheet);
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
@@ -270,101 +305,173 @@ namespace Marketplace.Common.Services
                 {
                     supplierAddress = await _oc.SupplierAddresses.GetAsync(orderWorksheet.Order.xp.SupplierIDs.FirstOrDefault(), orderWorksheet.Order.xp.ShipFromAddressIDs.FirstOrDefault());
                 }
-                var dynamicTemplateData = new
+                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems, supplierAddress);
+
+                EmailTemplate buyerTemplateData = new EmailTemplate()
                 {
-                    FirstName = orderWorksheet.Order.FromUser.FirstName,
-                    LastName = orderWorksheet.Order.FromUser.LastName,
-                    Phone = orderWorksheet.Order.xp.QuoteOrderInfo.Phone,
-                    Email = orderWorksheet.Order.FromUser.Email,
-                    Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
-                    ProductID = orderWorksheet.LineItems.FirstOrDefault().Product.ID,
-                    ProductName = orderWorksheet.LineItems.FirstOrDefault().Product.Name,
-                    order = orderWorksheet.Order
+                    Data = orderData,
+                    Message = OrderSubmitEmailConstants.GetQuoteOrderSubmitText(VerifiedUserType.buyer)
                 };
-                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, orderWorksheet.Order.FromUser.Email, BUYER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, dynamicTemplateData);
-                await SendSupplierOrderSubmitEmail(orderWorksheet);
+                EmailTemplate supplierTemplateData = new EmailTemplate()
+                {
+                    Data = orderData,
+                    Message = OrderSubmitEmailConstants.GetQuoteOrderSubmitText(VerifiedUserType.supplier)
+                };
+
+                //  send emails
+                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierEmailList, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
             }
         }
-       
-        public async Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, LineItemEmailDisplayText lineItemEmailDisplayText)
+
+        private async Task SendSupplierOrderSubmitEmails(MarketplaceOrderWorksheet orderWorksheet)
+        {
+            ListPage<MarketplaceSupplier> suppliers = null;
+            if (orderWorksheet.Order.xp.SupplierIDs != null)
+            {
+                var filterString = String.Join("|", orderWorksheet.Order.xp.SupplierIDs);
+                suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={filterString}");
+            }
+            foreach(var supplier in suppliers.Items)
+            {
+                if(supplier?.xp?.NotificationRcpts?.Count() >0)
+                {
+                    // get orderworksheet for supplier order and fill in some information from buyer order worksheet
+                    var supplierOrderWorksheet = await BuildSupplierOrderWorksheet(orderWorksheet, supplier.ID);
+                    EmailTemplate supplierTemplateData = new EmailTemplate()
+                    {
+                        Data = GetOrderTemplateData(supplierOrderWorksheet.Order, supplierOrderWorksheet.LineItems),
+                        Message = OrderSubmitEmailConstants.GetOrderSubmitText(orderWorksheet.Order.ID, supplierOrderWorksheet.Order.FromUser.FirstName, supplierOrderWorksheet.Order.FromUser.LastName, VerifiedUserType.supplier)
+                    };
+                    var supplierTos = new List<EmailAddress>();
+                    foreach (var rcpt in supplier.xp.NotificationRcpts)
+                    {
+                        supplierTos.Add(new EmailAddress(rcpt));
+                    };
+                    await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierTos, ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
+                }   
+            }
+        }
+
+        private async Task<MarketplaceOrderWorksheet> BuildSupplierOrderWorksheet(MarketplaceOrderWorksheet orderWorksheet, string supplierID)
+        {
+            var supplierOrderWorksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{orderWorksheet.Order.ID}-{supplierID}");
+            supplierOrderWorksheet.Order.BillingAddress = orderWorksheet.Order.BillingAddress;
+            supplierOrderWorksheet.Order.FromUser = orderWorksheet.Order.FromUser;
+
+            //  Get the shipping total from selected shipping methods for that supplier
+            var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
+            var supplierShippingSelections = new List<ShipMethod>();
+            foreach (var estimate in supplierShipEstimates)
+            {
+                var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
+                supplierShippingSelections.Add(selection);
+            }
+            supplierOrderWorksheet.Order.ShippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+
+            //  now get correct tax for line items on supplier order
+            var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
+            var supplierShippintRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
+            var supplierTax = 0.0;
+            foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
+            {
+                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippintRateIDs.Contains(line?.lineNumber) && line.tax != null)
+                {
+                    //  Add tax from line items and shipping rates associated with this supplier
+                    supplierTax += line?.tax;
+                }
+            }
+            supplierOrderWorksheet.Order.TaxCost = (decimal)supplierTax;
+            supplierOrderWorksheet.Order.Total = supplierOrderWorksheet.Order.Total + supplierOrderWorksheet.Order.TaxCost + supplierOrderWorksheet.Order.ShippingCost;
+            return supplierOrderWorksheet;
+        }
+
+        private async Task<List<EmailAddress>> GetSupplierEmails(MarketplaceOrderWorksheet orderWorksheet)
+        {
+            ListPage<MarketplaceSupplier> suppliers = null;
+            if (orderWorksheet.Order.xp.SupplierIDs != null)
+            {
+                var filterString = String.Join("|", orderWorksheet.Order.xp.SupplierIDs);
+                suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={filterString}");
+            }
+            var supplierTos = new List<EmailAddress>();
+            foreach (var supplier in suppliers.Items)
+            {
+                if (supplier?.xp?.NotificationRcpts?.Count() > 0)
+                {
+                    foreach (var rcpt in supplier.xp.NotificationRcpts)
+                    {
+                        supplierTos.Add(new EmailAddress(rcpt));
+                    };
+                }
+            }
+            return supplierTos;
+        }
+
+        private async Task<List<EmailAddress>> GetSellerEmails()
+        {
+            var sellerUsers = await _oc.AdminUsers.ListAsync<MarketplaceSellerUser>();
+            var sellerTos = new List<EmailAddress>();
+            foreach (var seller in sellerUsers.Items)
+            {
+                if (seller?.xp?.OrderEmails ?? false)
+                {
+                    sellerTos.Add(new EmailAddress(seller.Email));
+                };
+                if (seller?.xp?.AddtlRcpts?.Any() ?? false)
+                {
+                    foreach (var rcpt in seller.xp.AddtlRcpts)
+                    {
+                        sellerTos.Add(new EmailAddress(rcpt));
+                    };
+                };
+            };
+            return sellerTos;
+        }
+
+        public async Task SendLineItemStatusChangeEmail(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText)
         {
             var productsList = lineItems.Select(MapLineItemToProduct);
 
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Products = productsList,
-                lineItemEmailDisplayText.EmailSubject,
-                lineItemEmailDisplayText.StatusChangeDetail,
-                lineItemEmailDisplayText.StatusChangeDetail2
-            };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, email, LINE_ITEM_STATUS_CHANGE, templateData);
-        }
+                Data = new
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Products = productsList,
 
-        public async Task SendSupplierOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
-        {
-            if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
-            {
-                var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderWorksheet.Order.ID);
-                var supplierList = GetSupplierInfo(lineItems);
-                foreach (string supplier in supplierList)
-                {
-                    MarketplaceSupplier supplierInfo = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplier);
-                    var quoteOrderData = new { supplierInfo.xp.SupportContact.Name };
-                    await SendOrderSupplierEmails(orderWorksheet, SUPPLIER_QUOTE_ORDER_SUBMIT_TEMPLATE_ID, quoteOrderData);
-                }
-            }
-            else
-            {
-                await SendOrderSupplierEmails(orderWorksheet, SUPPLIER_ORDER_SUBMIT_TEMPLATE_ID, GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems));
-            }
-        }
 
-        public async Task SendOrderSupplierEmails(MarketplaceOrderWorksheet orderWorksheet, string templateID, object templateData)
-        {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderWorksheet.Order.ID);
-            var supplierList = GetSupplierInfo(lineItems);
-            foreach (string supplier in supplierList)
-            {
-                MarketplaceSupplier supplierInfo = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplier);
-                // the list of emails to notify lives on Supplier.xp.NotificationRcpts as List<string>
-                var tos = new List<EmailAddress>();
-                if(supplierInfo?.xp?.NotificationRcpts.Count() >0 )
+                },
+                Message = new EmailDisplayText()
                 {
-                    foreach (var rcpt in supplierInfo.xp.NotificationRcpts)
-                    {
-                        tos.Add(new EmailAddress(rcpt));
-                    };
-                }
-                if (tos.Any() && orderWorksheet.Order.xp.OrderType == OrderType.Quote)
-                {
-                    var quoteOrderData = new { supplierInfo.xp.SupportContact.Name };
-                    await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, templateID, quoteOrderData);
-                }
-                else if (tos.Any())
-                {
-                    await SendSingleTemplateEmailMultipleRcpts(NO_REPLY_EMAIL_ADDRESS, tos, templateID, templateData);
+                    EmailSubject = lineItemEmailDisplayText?.EmailSubject,
+                    DynamicText = lineItemEmailDisplayText?.DynamicText,
+                    DynamicText2 = lineItemEmailDisplayText?.DynamicText2
                 }
             };
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, LINE_ITEM_STATUS_CHANGE, templateData);
         }
 
         public async Task SendContactSupplierAboutProductEmail(ContactSupplierBody template)
         {
             var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(template.Product.DefaultSupplierID);
             var supplierEmail = supplier.xp.SupportContact.Email;
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                ProductID = template.Product.ID,
-                ProductName = template.Product.Name,
-                template.BuyerRequest.FirstName,
-                template.BuyerRequest.LastName,
-                Location = template.BuyerRequest.BuyerLocation,
-                template.BuyerRequest.Phone,
-                template.BuyerRequest.Email,
-                Note = template.BuyerRequest.Comments
+                Data = new
+                {
+                    ProductID = template.Product.ID,
+                    ProductName = template.Product.Name,
+                    template.BuyerRequest.FirstName,
+                    template.BuyerRequest.LastName,
+                    Location = template.BuyerRequest.BuyerLocation,
+                    template.BuyerRequest.Phone,
+                    template.BuyerRequest.Email,
+                    Note = template.BuyerRequest.Comments
+                }
             };
-            await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
             var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<MarketplaceUser>(
                     filters: $"xp.RequestInfoEmails=true",
                     page: page,
@@ -372,12 +479,12 @@ namespace Marketplace.Common.Services
                  ));
             foreach (var sellerUser in sellerUsers)
             {
-                await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, sellerUser.Email, INFORMATION_REQUEST, templateData);
+                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, sellerUser.Email, INFORMATION_REQUEST, templateData);
                 if (sellerUser.xp.AddtlRcpts.Any())
                 {
                     foreach (var rcpt in sellerUser.xp.AddtlRcpts)
                     {
-                        await SendSingleTemplateEmail(NO_REPLY_EMAIL_ADDRESS, rcpt, INFORMATION_REQUEST, templateData);
+                        await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, rcpt, INFORMATION_REQUEST, templateData);
                     }
                 }
             }
@@ -417,18 +524,33 @@ namespace Marketplace.Common.Services
                 order.BillingAddressID,
                 BillingAddress = new
                 {
-                    order.BillingAddress.Street1,
-                    order.BillingAddress.Street2,
-                    order.BillingAddress.City,
-                    order.BillingAddress.State,
-                    order.BillingAddress.Zip
+                    order.BillingAddress?.Street1,
+                    order.BillingAddress?.Street2,
+                    order.BillingAddress?.City,
+                    order.BillingAddress?.State,
+                    order.BillingAddress?.Zip
                 },
                 Products = productsList,
-                order.Subtotal, 
+                order.Subtotal,
                 order.TaxCost,
                 order.ShippingCost,
                 PromotionalDiscount = order.PromotionDiscount,
-                order.Total
+                order.Total,
+            };
+        }
+
+        private object GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems, Address supplierAddress)
+        {
+            return new
+            {
+                FirstName = order.FromUser.FirstName,
+                LastName = order.FromUser.LastName,
+                Phone = order.xp.QuoteOrderInfo.Phone,
+                Email = order.FromUser.Email,
+                Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
+                ProductID = lineItems.FirstOrDefault().Product.ID,
+                ProductName = lineItems.FirstOrDefault().Product.Name,
+                order = order,
             };
         }
 

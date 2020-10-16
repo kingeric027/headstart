@@ -2,7 +2,6 @@ import { Component, Input, Inject } from '@angular/core';
 import { OrderService } from '@app-seller/orders/order.service';
 import {
   Address,
-  LineItem,
   OcLineItemService,
   OcPaymentService,
   Order,
@@ -10,7 +9,6 @@ import {
   OcOrderService,
   OrderDirection,
 } from '@ordercloud/angular-sdk';
-import { groupBy as _groupBy } from 'lodash';
 
 // temporarily any with sdk update
 // import { ProductImage } from '@ordercloud/headstart-sdk';
@@ -22,8 +20,6 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { AppAuthService } from '@app-seller/auth';
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface';
 import { MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
-import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
-import { CanChangeLineItemsOnOrderTo } from '@app-seller/orders/line-item-status.helper';
 
 export const LineItemTableStatus = {
   Default: 'Default',
@@ -92,26 +88,27 @@ export class OrderDetailsComponent {
   setOrderProgress(order: MarketplaceOrder): void {
     switch(order?.xp?.ShippingStatus) {
       case 'Processing':
-        this.orderProgress = { StatusDisplay: "Processing", Value: 25, ProgressBarType: 'primary', Striped: false, Animated: false }
+        this.orderProgress = { StatusDisplay: 'Processing', Value: 25, ProgressBarType: 'primary', Striped: false, Animated: false }
         break;
       case 'PartiallyShipped':
-        this.orderProgress = { StatusDisplay: "Partially Shipped", Value: 50, ProgressBarType: 'primary', Striped: false, Animated: false }
+        this.orderProgress = { StatusDisplay: 'Partially Shipped', Value: 50, ProgressBarType: 'primary', Striped: false, Animated: false }
         break;
       case 'Backordered':
-        this.orderProgress = { StatusDisplay: "Item Backordered", Value: 75, ProgressBarType: 'danger', Striped: true, Animated: true }
+        this.orderProgress = { StatusDisplay: 'Item Backordered', Value: 75, ProgressBarType: 'danger', Striped: true, Animated: true }
+        break;
       case 'Shipped': 
-        this.orderProgress = { StatusDisplay: "Complete", Value: 100, ProgressBarType: 'success', Striped: false, Animated: false }
+        this.orderProgress = { StatusDisplay: 'Complete', Value: 100, ProgressBarType: 'success', Striped: false, Animated: false }
         break;
     }
     if (order?.xp?.ClaimStatus === 'Pending') {
-      this.orderProgress = { StatusDisplay: "Needs Attention", Value: 100, ProgressBarType: 'danger', Striped: true, Animated: true }
+      this.orderProgress = { StatusDisplay: 'Needs Attention', Value: 100, ProgressBarType: 'danger', Striped: true, Animated: true }
     }
     if (order?.xp?.SubmittedOrderStatus === 'Canceled') {
-      this.orderProgress = { StatusDisplay: "Canceled", Value: 100, ProgressBarType: 'danger', Striped: false, Animated: false }
+      this.orderProgress = { StatusDisplay: 'Canceled', Value: 100, ProgressBarType: 'danger', Striped: false, Animated: false }
     }
   }
 
-  setCardType(payment) {
+  setCardType(payment): string {
     if (!payment.xp.cardType || payment.xp.cardType === null) {
       return 'Card';
     }
@@ -123,23 +120,27 @@ export class OrderDetailsComponent {
     return ReturnReason[reasonCode];
   }
 
-  getFullName(address: Address) {
+  getFullName(address: Address): string {
     const fullName = `${address?.FirstName || ''} ${address?.LastName || ''}`;
     return fullName.trim();
   }
 
-  getIncomingOrOutgoing() {
+  getIncomingOrOutgoing(): void {
     const url = window.location.href;
-    url.includes('Outgoing') ? (this.orderDirection = 'Outgoing') : (this.orderDirection = 'Incoming');
+    if (url.includes('Outgoing')) {
+      this.orderDirection = 'Outgoing'
+    } else {
+      this.orderDirection = 'Incoming'
+    }
   }
 
-  async setOrderStatus() {
+  async setOrderStatus(): Promise<void> {
     await this.middleware
       .acknowledgeQuoteOrder(this._order.ID)
       .then(completedOrder => this.handleSelectedOrderChange(completedOrder));
   }
 
-  isQuoteOrder(order: Order) {
+  isQuoteOrder(order: Order): boolean {
     return this.orderService.isQuoteOrder(order);
   }
 
@@ -161,7 +162,7 @@ export class OrderDetailsComponent {
     this.handleSelectedOrderChange(order);
   }
 
-  toggleCreateShipment(createShipment: boolean) {
+  toggleCreateShipment(createShipment: boolean): void {
     this.createShipment = createShipment;
   }
 

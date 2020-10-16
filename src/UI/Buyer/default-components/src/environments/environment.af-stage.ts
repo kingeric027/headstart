@@ -12,12 +12,14 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'https://sebrandsmarketplace-anytime-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=7f9257b2-8a27-4527-9efa-225f4cb172da&redirect_uri=https://seb-four51-integration-stage.azurewebsites.net/api/anytime/authorize',
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: afTheme,
+  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 /*
 

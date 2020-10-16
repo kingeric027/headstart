@@ -186,6 +186,7 @@ export class CheckoutService {
     const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
     await this.state.reset();
     return submittedOrder.ID;
+
   }
 
   private async createCCPayment(
