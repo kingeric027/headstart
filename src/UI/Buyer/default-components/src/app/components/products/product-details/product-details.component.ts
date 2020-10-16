@@ -100,10 +100,12 @@ export class OCMProductDetails implements OnInit {
   getVariantInventory(): number {
     let specCombo = '';
     let specOptions: SpecOption[] = [];
-    this._superProduct?.Specs?.forEach(s => s.Options.forEach(o => specOptions = specOptions.concat(o)));
+    this._superProduct?.Specs?.filter(s => s.DefinesVariant).forEach(s => s.Options.forEach(o => specOptions = specOptions.concat(o)));
     for (let i = 0; i < this.specForm.value.ctrls.length; i++) {
       const matchingOption = specOptions.find(o => o.Value === this.specForm.value.ctrls[i])
-      i === 0 ? specCombo += matchingOption.ID : specCombo += `-${matchingOption.ID}`
+      if (matchingOption) {
+        i === 0 ? specCombo += matchingOption?.ID : specCombo += `-${matchingOption?.ID}`
+      }
     }
     return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
   }

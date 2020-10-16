@@ -282,7 +282,7 @@ namespace Marketplace.Common.Commands
                 supplierIDs.Add(supplierOrder.ToCompanyID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierOrder.ToCompanyID)).ToList();
                 var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierOrder.ToCompanyID);
-                var suppliersShipEstimates = buyerOrder.ShipEstimateResponse.ShipEstimates.Where(se => se.xp.SupplierID == supplier.ID);
+                var suppliersShipEstimates = buyerOrder.ShipEstimateResponse?.ShipEstimates?.Where(se => se.xp.SupplierID == supplier.ID);
                 var supplierOrderPatch = new PartialOrder() {
                     ID = $"{buyerOrder.Order.ID}-{supplierOrder.ToCompanyID}",
                     xp = new OrderXp() {
@@ -295,7 +295,7 @@ namespace Marketplace.Common.Commands
                         ClaimStatus = ClaimStatus.NoClaim,
                         ShippingStatus = ShippingStatus.Processing,
                         SubmittedOrderStatus = SubmittedOrderStatus.Open,
-                        SelectedShipMethodsSupplierView = MapSelectedShipMethod(suppliersShipEstimates)
+                        SelectedShipMethodsSupplierView = suppliersShipEstimates != null ? MapSelectedShipMethod(suppliersShipEstimates) : null
                     }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);

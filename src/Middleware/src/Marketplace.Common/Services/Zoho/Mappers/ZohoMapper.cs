@@ -148,6 +148,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             item.quantity = 1;
             item.unit = "each";
             item.purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit";
+            item.avatax_tax_code = "FR";
             return item;
         }
 
@@ -162,8 +163,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 name = $"Shipping: {method.Name}",
                 quantity = 1,
                 unit = "each",
-                //account_id = "2237685000000014001",
-                purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit"
+                purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit",
+                avatax_tax_code = "FR"
             };
             return item;
         }
@@ -187,7 +188,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
                 //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code ?? "P000000"
             };
         }
 
@@ -209,7 +210,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
                 //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code ?? "P000000"
             };
         }
     }
@@ -230,7 +231,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
                 //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code ?? "P000000"
             };
         }
 
@@ -251,7 +252,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
                 //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code ?? "P000000",
             };
         }
     }

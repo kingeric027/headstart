@@ -18,6 +18,7 @@ namespace Marketplace.Common.Commands
     {
         Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
         Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
+        Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
     }
 
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
@@ -53,8 +54,20 @@ namespace Marketplace.Common.Commands
             for (int i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
+                var supplierShippingAccount = GetShippingAccountForSupplier(supplierID);
                 shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(shipResponse.ShipEstimates[i].ShipMethods)
-                .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList();
+                .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList()
+                .Select(s =>
+                {
+                    if (supplierShippingAccount == _settings.EasyPostSettings.SEBDistributionFedexAccountId)
+                    {
+                        s.Cost = s.Cost * (decimal)1.1; //  Apply markup for the SEBDistributionFedexAccount
+                    } else if(supplierShippingAccount == _settings.EasyPostSettings.SMGFedexAccountId)
+                    {
+                        s.Cost = s.Cost * (decimal)1.4;
+                    }
+                    return s;
+                }).ToList();
             }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
 
@@ -143,6 +156,16 @@ namespace Marketplace.Common.Commands
                 
             }
             return updatedEstimates;
+        }
+
+        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            return await this.CalculateOrder(new MarketplaceOrderCalculatePayload()
+            {
+                ConfigData = null,
+                OrderWorksheet = worksheet
+            });
         }
 
         public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)

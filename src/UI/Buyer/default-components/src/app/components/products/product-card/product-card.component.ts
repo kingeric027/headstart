@@ -20,6 +20,7 @@ export class OCMProductCard {
   isViewOnlyProduct = true;
   hasSpecs = false;
   isAddingToCart = false;
+  productImageHeight: any;
 
   constructor(private cdr: ChangeDetectorRef, private context: ShopperContextService) {}
 
@@ -52,6 +53,25 @@ export class OCMProductCard {
       throw ex;
     }
   }
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.applyAspectRatioChange();
+    }, 0);
+  }
+
+  applyAspectRatioChange(): void {
+    const productImages = document.getElementsByClassName(
+      'product-card-image'
+    );
+    Array.from(productImages).forEach((productImage: any) => {
+      const aspectRatio =
+        productImage.naturalHeight / productImage.naturalWidth;
+      if (aspectRatio === 1) {
+        productImage.classList.add('object-fit-cover');
+      }
+    });
+   }
 
   getImageUrl(): string {
     return getPrimaryImageUrl(this._product, this.context.currentUser.get());

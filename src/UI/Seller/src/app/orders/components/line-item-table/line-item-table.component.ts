@@ -48,7 +48,7 @@ export class LineItemTableComponent {
 
   getShipMethodString(lineItem: MarketplaceLineItem): string {
     const shipFromID = lineItem.ShipFromAddressID;
-    const shipMethod = (this.order.xp.SelectedShipMethodsSupplierView || [])
+    const shipMethod = (this.order?.xp?.SelectedShipMethodsSupplierView || [])
                         .find(sm => sm.ShipFromAddressID === shipFromID);
     if (shipMethod == null) return 'No Data';
     const name = shipMethod.Name.replace(/_/g, ' ');     
