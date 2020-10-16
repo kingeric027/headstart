@@ -10,7 +10,6 @@ using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Commands.Zoho
 {
@@ -141,7 +140,7 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, List<ZohoLineItem> items, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact)
         {
-            var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = order.ID });
+            var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = order.ID });
             if (po.Items.Any())
                 return await _zoho.PurchaseOrders.SaveAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact, po.Items.FirstOrDefault()));
             return await _zoho.PurchaseOrders.CreateAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact));
@@ -321,8 +320,9 @@ namespace Marketplace.Common.Commands.Zoho
             var currencies = await _zoho.Currencies.ListAsync();
 
             var zContactList = await _zoho.Contacts.ListAsync(
-                new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}"}, 
-                new ZohoFilter() { Key = "company_name", Value = $"{ocBuyer.Name} - {location.Address?.xp.LocationID}"});
+                new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}" },
+                new ZohoFilter() { Key = "company_name", Value = $"{ocBuyer.Name} - {location.Address?.xp.LocationID}" });
+            
             var zContact = await _zoho.Contacts.GetAsync(zContactList.Items.FirstOrDefault()?.contact_id);
             if (zContact.Item != null)
             {
