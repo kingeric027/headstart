@@ -9,12 +9,12 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.SupplierSync
 {
-    [SupplierSync("027"), SupplierSync("093"), SupplierSync("waxinthecitydistribution")]
-    public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
+    [SupplierSync("Generic")]
+    public class GenericSupplierCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _ocSeller;
 
-        public WaxInTheCityDistributionCommand(AppSettings settings)
+        public GenericSupplierCommand(AppSettings settings)
         {
             _ocSeller = new OrderCloudClient(new OrderCloudClientConfig
             {
