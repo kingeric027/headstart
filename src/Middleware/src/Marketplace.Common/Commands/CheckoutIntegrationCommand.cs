@@ -18,6 +18,7 @@ namespace Marketplace.Common.Commands
     {
         Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
         Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
+        Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
     }
 
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
@@ -143,6 +144,16 @@ namespace Marketplace.Common.Commands
                 
             }
             return updatedEstimates;
+        }
+
+        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            return await this.CalculateOrder(new MarketplaceOrderCalculatePayload()
+            {
+                ConfigData = null,
+                OrderWorksheet = worksheet
+            });
         }
 
         public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)

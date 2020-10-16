@@ -56,5 +56,6 @@ namespace Marketplace.Common.Services.Zoho.Models
         public string product_type { get; set; }
         public string purchase_description { get; set; }
         public double? discount { get; set; }
+        public string avatax_tax_code { get; set; }
     }
 }
