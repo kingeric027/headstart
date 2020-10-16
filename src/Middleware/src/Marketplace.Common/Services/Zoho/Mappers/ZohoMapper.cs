@@ -231,7 +231,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
                 //tax_exemption_id = "",
-                avatax_tax_code = product.xp?.Tax.Code ?? "P000000"
+                avatax_tax_code = product.xp?.Tax.Code ?? "FR"
             };
         }
 
@@ -252,7 +252,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //TODO: MODEL ~ Avalara integration evaluation
                 //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
                 //tax_exemption_id = "",
-                avatax_tax_code = product.xp?.Tax.Code ?? "P000000",
+                avatax_tax_code = product.xp?.Tax.Code ?? "FR",
             };
         }
     }

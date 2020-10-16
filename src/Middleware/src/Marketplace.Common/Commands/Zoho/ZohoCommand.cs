@@ -7,6 +7,7 @@ using Marketplace.Common.Services.Zoho;
 using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
+using Marketplace.Models.Extended;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -78,14 +79,22 @@ namespace Marketplace.Common.Commands.Zoho
                             new MarketplaceLineItem() {
                                 ID = $"{z_order.reference_number} - 41000",
                                 UnitPrice = shipping_method?.Cost,
-                                ProductID = $"{shipping_method.Name} Shipping (41000)",
+                                ProductID = $"{shipping_method.xp["Carrier"]} {shipping_method.Name} Shipping (41000)",
                                 SupplierID = "SMG Shipping",
                                 Product = new MarketplaceLineItemProduct()
                                 {
                                     Description = "Shipping Charge",
                                     Name = $"{shipping_method.Name} Shipping (41000)",
                                     ID = $"{shipping_method.Name} Shipping (41000)",
-                                    QuantityMultiplier = 1
+                                    QuantityMultiplier = 1,
+                                    xp = new ProductXp()
+                                    {
+                                        Tax = new TaxProperties()
+                                        {
+                                            Code = "FR",
+                                            Description = "Shipping Charge"
+                                        }
+                                    }
                                 }
                             }
                         }
