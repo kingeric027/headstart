@@ -33,6 +33,7 @@ export class ChiliPublishConfiguration implements OnInit {
     _documentID = '';
     _documentName = '';
     _catalogID = '';
+    _folderName = '';
 
     tecraDocuments: TecraDocument[] = [];
     tecraSpecs: TecraSpec[] = [];
@@ -53,6 +54,11 @@ export class ChiliPublishConfiguration implements OnInit {
     @Input()
     set catalogID(value: string) {
         this._buyerID = value;
+    }
+
+    @Input()
+    set folderName(value: string) {
+        this._folderName = value;
     }
 
     @Input()
@@ -80,10 +86,11 @@ export class ChiliPublishConfiguration implements OnInit {
     }
 
     async getChiliDocs(): Promise<void> {
-        //TODO Update Buyer xp to associate folder(s) available to search on.
-        const docs = await this.productService.getTecraDocumentsByFolder("BasecampFitness");
-        this.tecraDocuments = docs;
-        this.showChiliDocuments = true;
+        if (this._folderName) {
+            const docs = await this.productService.getTecraDocumentsByFolder(this._folderName);
+            this.tecraDocuments = docs;
+            this.showChiliDocuments = true;
+        }
     }
 
     async listChiliConfigs(): Promise<void> {

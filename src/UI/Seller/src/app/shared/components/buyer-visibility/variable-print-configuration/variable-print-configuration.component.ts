@@ -20,6 +20,7 @@ export class VariablePrintConfiguration implements OnInit {
 
     _buyerID = '';
     _productID = '';
+    _folderName = '';
     catalogs: UserGroup[] = [];
     catalogAssignments: ProductAssignment[][] = [];
 
@@ -27,6 +28,11 @@ export class VariablePrintConfiguration implements OnInit {
     @Input()
     set productID(value: string) {
         this._productID = value;
+    }
+
+    @Input()
+    set folderName(value: string) {
+        this._folderName = value;
     }
 
     @Input()
