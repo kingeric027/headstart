@@ -102,7 +102,8 @@ export class OCMSpecForm implements OnChanges {
 
   validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]): void {
     let controlInactive = false;
-    if (disabledVariants.length < 1){ return; }
+    if (!disabledVariants) { return; }
+    if (disabledVariants?.length < 1){ return; }
     for(const disabledVariant of disabledVariants){
       if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
         controlInactive = true;
