@@ -1,4 +1,4 @@
-import { AppConfig } from 'marketplace';
+import { AppConfig, OrdercloudEnv } from 'marketplace';
 import { environment } from 'src/environments/environment';
 import { ApiRole } from '../../../../marketplace/node_modules/ordercloud-javascript-sdk/dist';
 
@@ -14,7 +14,7 @@ export const ocAppConfig: AppConfig = {
   ordercloudEnv: environment.ordercloudEnv,
   theme: environment.theme,
   anonymousShoppingEnabled: false,
-  avalaraCompanyId: 280411,
+  avalaraCompanyId: environment.ordercloudEnv === OrdercloudEnv.Production ? 902271 : 280411,  
   instrumentationKey: environment.instrumentationKey,
   scope: [
     'MeAddressAdmin',
