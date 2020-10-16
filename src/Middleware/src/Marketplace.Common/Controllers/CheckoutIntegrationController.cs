@@ -35,6 +35,14 @@ namespace Marketplace.Common.Controllers
 			return orderCalculationResponse;
 		}
 
+        [Route("taxcalculate/{orderID}")]
+        [HttpPost, OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        public async Task<OrderCalculateResponse> CalculateOrder(string orderID)
+        {
+            var orderCalculationResponse = await _checkoutIntegrationCommand.CalculateOrder(orderID, this.VerifiedUserContext);
+            return orderCalculationResponse;
+        }
+
 		[HttpPost, Route("ordersubmit")]
 		[OrderCloudWebhookAuth]
 		public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] MarketplaceOrderCalculatePayload payload)
