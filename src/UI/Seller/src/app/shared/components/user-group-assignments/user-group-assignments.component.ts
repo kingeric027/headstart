@@ -72,12 +72,12 @@ export class UserGroupAssignments implements OnChanges {
     }
   }
 
-  updateForUserGroupAssignmentType() {
+  updateForUserGroupAssignmentType(): void {
     this.options.filters['xp.Type'] = this.userGroupType;
     this.displayText = GetDisplayText(this.userGroupType);
   }
 
-  requestUserConfirmation() {
+  requestUserConfirmation(): void {
     this.requestedUserConfirmation = true;
   }
 
@@ -147,7 +147,7 @@ export class UserGroupAssignments implements OnChanges {
     this.checkForUserUserGroupAssignmentChanges();
   }
 
-  isAssigned(userGroup: UserGroup) {
+  isAssigned(userGroup: UserGroup): boolean {
     return (
       this._userUserGroupAssignmentsEditable?.some(
         groupAssignment => groupAssignment.UserGroupID === userGroup.ID
@@ -155,7 +155,7 @@ export class UserGroupAssignments implements OnChanges {
     );
   }
 
-  checkForUserUserGroupAssignmentChanges() {
+  checkForUserUserGroupAssignmentChanges(): void {
     this.add = this._userUserGroupAssignmentsEditable.filter(
       editableAssignment => !this._userUserGroupAssignmentsStatic.some(staticAssignment => staticAssignment.UserGroupID === editableAssignment.UserGroupID)
     );
