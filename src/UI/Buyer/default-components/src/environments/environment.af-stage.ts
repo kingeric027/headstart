@@ -12,6 +12,7 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'https://sebrandsmarketplace-anytime-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink:
