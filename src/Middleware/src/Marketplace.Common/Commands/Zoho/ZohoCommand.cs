@@ -79,11 +79,11 @@ namespace Marketplace.Common.Commands.Zoho
                             new MarketplaceLineItem() {
                                 ID = $"{z_order.reference_number} - 41000",
                                 UnitPrice = shipping_method?.Cost,
-                                ProductID = $"{shipping_method.xp["Carrier"]} {shipping_method.Name} Shipping (41000)",
+                                ProductID = $"{shipping_method?.Name} Shipping (41000)",
                                 SupplierID = "SMG Shipping",
                                 Product = new MarketplaceLineItemProduct()
                                 {
-                                    Description = "Shipping Charge",
+                                    Description = $"{shipping_method?.xp?.Carrier} Shipping Charge",
                                     Name = $"{shipping_method.Name} Shipping (41000)",
                                     ID = $"{shipping_method.Name} Shipping (41000)",
                                     QuantityMultiplier = 1,
