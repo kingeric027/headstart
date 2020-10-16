@@ -48,12 +48,13 @@ export class NotificationsComponent extends AccountContent {
   }
 
   notificationActionTaken(event: string, notification: JDocument) {
-    console.log(event);
     if (event === "ACCEPTED"){
-      if (this.notificationsAccepted.get(notification.ID) !== null) {
-        this.notificationsAccepted.set(notification.ID, true);
-      }
+      this.notificationsToReview.splice(this.notificationsToReview.indexOf(notification), 1);
     }
+  }
+
+  goToProductPage(product: string) {
+    this.navigateToPage(`/products/${product}`)
   }
 
   addAddtlRcpt() {

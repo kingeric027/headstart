@@ -27,7 +27,6 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   userStatic: MeUser;
   userEditable: MeUser;
   notificationsToReview: JDocument[];
-  notificationsAccepted = new Map<string, boolean>();
 
   constructor(
     private router: Router,
@@ -67,14 +66,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification').then((notifications: ListPage<JDocument>) => {
       if (notifications?.Items?.length > 0 && notifications?.Items.some(i => i?.Doc.Status === NotificationStatus.SUBMITTED)) {
       this.notificationsToReview = notifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
-      this.hydrateNotificationReviewStatus();
     };
-    });
-  }
-
-  hydrateNotificationReviewStatus() {
-    this.notificationsToReview.forEach(notification => {
-      this.notificationsAccepted.set(notification.ID, false);
     });
   }
 
@@ -98,6 +90,10 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.userEditable = this.copyResource(user);
     this.createUserForm(user);
     this.areChanges = this.checkIfAreChanges(this.userStatic, this.userEditable);
+  }
+
+  navigateToPage(route: string){
+    this.router.navigateByUrl(route);
   }
 
   createUserForm(me: MeUser): void {

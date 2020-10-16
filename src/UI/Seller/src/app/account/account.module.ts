@@ -6,8 +6,8 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { AccountMenuComponent } from './components/account-menu/account-menu.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AccountSummaryComponent } from './components/account-summary/account-summary.component';
-import { SellerEmailNotifications } from './components/seller-email-notifications/seller-email-notifications.component';
-import { NotificationComponent } from './components/notifications/notification.component';
+import { MonitoredProductNotificationComponent } from './components/notifications/monitored-product-notifications/monitored-product-notification.component';
+import { SellerEmailNotifications } from './components/notifications/seller-email-notifications/seller-email-notifications.component';
 @NgModule({
   imports: [SharedModule, AccountRoutingModule, PerfectScrollbarModule],
   declarations: [
@@ -16,7 +16,7 @@ import { NotificationComponent } from './components/notifications/notification.c
     AccountMenuComponent,
     NotificationsComponent,
     SellerEmailNotifications,
-    NotificationComponent,
+    MonitoredProductNotificationComponent,
   ],
 })
 export class AccountModule {}

@@ -7,13 +7,14 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { OcTokenService } from '@ordercloud/angular-sdk';
 
 @Component({
-  selector: 'notification',
-  templateUrl: './notification.component.html',
-  styleUrls: ['./notification.component.scss'],
+  selector: 'monitored-product-notification',
+  templateUrl: './monitored-product-notification.component.html',
+  styleUrls: ['./monitored-product-notification.component.scss'],
 })
-export class NotificationComponent {
-  @Input() notification: JDocument;
-  @Output() onActionTaken = new EventEmitter;
+export class MonitoredProductNotificationComponent {
+  @Input() notification: MonitoredProductFieldModifiedNotificationDocument;
+  @Output() onActionTaken = new EventEmitter<string>();
+  @Output() goToProductPage = new EventEmitter<string>();
   hasPriceBreak = false;
 
   constructor(
@@ -36,5 +37,8 @@ async reviewMonitoredFieldChange(status: NotificationStatus, notification: Monit
     // TODO: Replace with the SDK
     const superProduct = await this.http.put<SuperMarketplaceProduct>(`${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`, notification, headers).toPromise()
     this.onActionTaken.emit("ACCEPTED");
+  }
+  navigateToProductPage(productId: string) {
+    this.goToProductPage.emit(productId);
   }
 }
