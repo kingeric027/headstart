@@ -256,7 +256,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   async updateResource(originalID: string, resource: any): Promise<any> {
     const args = await this.createListArgs([originalID, resource]);
-    const newResource =  await this.ocService.Save(...args);
+    const newResource = await this.ocService.Save(...args);
     this.updateResourceSubject(newResource);
     return newResource;
   }
@@ -477,6 +477,6 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   getResourceID(resource: any): string {
-    return resource.ID;
+    return resource?.ID;
   }
 }

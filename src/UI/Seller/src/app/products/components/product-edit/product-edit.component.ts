@@ -191,7 +191,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.createProductForm(this._superMarketplaceProductEditable);
     if (this.userContext?.UserType === 'SELLER') {
       this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable?.Product?.DefaultSupplierID).toPromise();
-      this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
+      if (superProduct.Product?.ShipFromAddressID) this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
