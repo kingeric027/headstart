@@ -53,6 +53,7 @@
       <div class="d-flex justify-content-end align-items-start">
         <div *ngIf="_lineItems[0]?.ShippingAddress && !isQuoteOrder(_order)">
           <small class="font-weight-bolder text-muted text-uppercase d-block">Ship To</small>
+          <small class="mb-0 text-capitalize d-block font-weight-bold">{{_lineItems[0]?.ShippingAddress?.CompanyName}}</small>
           <small class="mb-0 text-capitalize d-block">{{_lineItems[0]?.ShippingAddress?.Street1}}<span *ngIf="_lineItems[0]?.ShippingAddress?.Street2">, {{_lineItems[0]?.ShippingAddress?.Street2}}</span></small>
           <small class="mb-0 text-capitalize d-block">{{_lineItems[0]?.ShippingAddress?.City}}, {{_lineItems[0]?.ShippingAddress?.State}} {{_lineItems[0]?.ShippingAddress?.Zip}}</small>
           <small *ngIf="getFullName(_lineItems[0].ShippingAddress) !== ''"
@@ -63,6 +64,7 @@
         <div *ngIf="_order?.BillingAddress && !isQuoteOrder(_order)"
              class="pl-4 ml-4 border-left">
           <small class="font-weight-bolder text-muted text-uppercase d-block">Bill To</small>
+          <small class="mb-0 text-capitalize d-block font-weight-bold">{{_order?.BillingAddress?.CompanyName}}</small>
           <small class="mb-0 text-capitalize d-block">{{_order?.BillingAddress?.Street1}}<span *ngIf="_order?.BillingAddress?.Street2">, {{_order?.BillingAddress?.Street2}}</span></small>
           <small class="mb-0 text-capitalize d-block">{{_order?.BillingAddress?.City}}, {{_order?.BillingAddress?.State}} {{_order?.BillingAddress?.Zip}}</small>
           <small *ngIf="getFullName(_order.BillingAddress) !== ''"
