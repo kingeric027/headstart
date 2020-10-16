@@ -54,15 +54,14 @@ namespace Marketplace.Common.Commands
             for (int i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                var supplierShippingAccount = GetShippingAccountForSupplier(supplierID);
-                shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(shipResponse.ShipEstimates[i].ShipMethods)
-                .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList()
-                .Select(s =>
+                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID));
+                shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(methods).Select(s =>
                 {
-                    if (supplierShippingAccount == _settings.EasyPostSettings.SEBDistributionFedexAccountId)
+                    if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SEBDistributionFedexAccountId)
                     {
                         s.Cost = s.Cost * (decimal)1.1; //  Apply markup for the SEBDistributionFedexAccount
-                    } else if(supplierShippingAccount == _settings.EasyPostSettings.SMGFedexAccountId)
+                    }
+                    else if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SMGFedexAccountId)
                     {
                         s.Cost = s.Cost * (decimal)1.4;
                     }
@@ -96,7 +95,7 @@ namespace Marketplace.Common.Commands
             }
 		}
 
-        public static IEnumerable<ShipMethod> WhereRateIsCheapestOfItsKind(IList<ShipMethod> methods)
+        public static IEnumerable<ShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<ShipMethod> methods)
 		{
             return methods
                 .GroupBy(method => method.EstimatedTransitDays)
