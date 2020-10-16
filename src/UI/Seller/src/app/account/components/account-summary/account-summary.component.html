@@ -39,7 +39,7 @@
     </div>
   </div>
   <ng-container *ngIf="!(user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails || user?.xp?.ProductEmails)">
-    <p>Notifications are turned off.</p>
+    <p>Email notifications are turned off.</p>
   </ng-container>
   <ng-container *ngIf="user?.xp?.OrderEmails || user?.xp?.RequestInfoEmails || user?.xp?.ProductEmails">
     <li *ngIf="user?.xp?.OrderEmails">Order Updates</li>
