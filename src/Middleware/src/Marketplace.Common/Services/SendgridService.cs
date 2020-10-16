@@ -279,12 +279,6 @@ namespace Marketplace.Common.Services
             if (orderWorksheet.Order.xp.OrderType == OrderType.Standard)
             {
                 var orderData = GetOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems);
-                EmailTemplate supplierTemplateData = new EmailTemplate()
-                {
-                    Data = orderData,
-                    Message = OrderSubmitEmailConstants.GetOrderSubmitText(orderWorksheet.Order.ID, firstName, lastName, VerifiedUserType.supplier)
-                };
-
                 EmailTemplate sellerTemplateData = new EmailTemplate()
                 {
                     Data = orderData,
@@ -299,9 +293,10 @@ namespace Marketplace.Common.Services
                 var sellerEmailList = await GetSellerEmails();
 
                 //  send emails
-                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierEmailList, ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
+                
                 await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, sellerEmailList, ORDER_SUBMIT_TEMPLATE_ID, sellerTemplateData);
                 await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
+                await SendSupplierOrderSubmitEmails(orderWorksheet);
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
@@ -327,6 +322,68 @@ namespace Marketplace.Common.Services
                 await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierEmailList, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
                 await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, QUOTE_ORDER_SUBMIT_TEMPLATE_ID, buyerTemplateData);
             }
+        }
+
+        private async Task SendSupplierOrderSubmitEmails(MarketplaceOrderWorksheet orderWorksheet)
+        {
+            ListPage<MarketplaceSupplier> suppliers = null;
+            if (orderWorksheet.Order.xp.SupplierIDs != null)
+            {
+                var filterString = String.Join("|", orderWorksheet.Order.xp.SupplierIDs);
+                suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={filterString}");
+            }
+            foreach(var supplier in suppliers.Items)
+            {
+                if(supplier?.xp?.NotificationRcpts?.Count() >0)
+                {
+                    // get orderworksheet for supplier order and fill in some information from buyer order worksheet
+                    var supplierOrderWorksheet = await BuildSupplierOrderWorksheet(orderWorksheet, supplier.ID);
+                    EmailTemplate supplierTemplateData = new EmailTemplate()
+                    {
+                        Data = GetOrderTemplateData(supplierOrderWorksheet.Order, supplierOrderWorksheet.LineItems),
+                        Message = OrderSubmitEmailConstants.GetOrderSubmitText(orderWorksheet.Order.ID, supplierOrderWorksheet.Order.FromUser.FirstName, supplierOrderWorksheet.Order.FromUser.LastName, VerifiedUserType.supplier)
+                    };
+                    var supplierTos = new List<EmailAddress>();
+                    foreach (var rcpt in supplier.xp.NotificationRcpts)
+                    {
+                        supplierTos.Add(new EmailAddress(rcpt));
+                    };
+                    await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierTos, ORDER_SUBMIT_TEMPLATE_ID, supplierTemplateData);
+                }   
+            }
+        }
+
+        private async Task<MarketplaceOrderWorksheet> BuildSupplierOrderWorksheet(MarketplaceOrderWorksheet orderWorksheet, string supplierID)
+        {
+            var supplierOrderWorksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{orderWorksheet.Order.ID}-{supplierID}");
+            supplierOrderWorksheet.Order.BillingAddress = orderWorksheet.Order.BillingAddress;
+            supplierOrderWorksheet.Order.FromUser = orderWorksheet.Order.FromUser;
+
+            //  Get the shipping total from selected shipping methods for that supplier
+            var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
+            var supplierShippingSelections = new List<ShipMethod>();
+            foreach (var estimate in supplierShipEstimates)
+            {
+                var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
+                supplierShippingSelections.Add(selection);
+            }
+            supplierOrderWorksheet.Order.ShippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+
+            //  now get correct tax for line items on supplier order
+            var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
+            var supplierShippintRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
+            var supplierTax = 0.0;
+            foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
+            {
+                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippintRateIDs.Contains(line?.lineNumber) && line.tax != null)
+                {
+                    //  Add tax from line items and shipping rates associated with this supplier
+                    supplierTax += line?.tax;
+                }
+            }
+            supplierOrderWorksheet.Order.TaxCost = (decimal)supplierTax;
+            supplierOrderWorksheet.Order.Total = supplierOrderWorksheet.Order.Total + supplierOrderWorksheet.Order.TaxCost + supplierOrderWorksheet.Order.ShippingCost;
+            return supplierOrderWorksheet;
         }
 
         private async Task<List<EmailAddress>> GetSupplierEmails(MarketplaceOrderWorksheet orderWorksheet)
@@ -467,11 +524,11 @@ namespace Marketplace.Common.Services
                 order.BillingAddressID,
                 BillingAddress = new
                 {
-                    order.BillingAddress.Street1,
-                    order.BillingAddress.Street2,
-                    order.BillingAddress.City,
-                    order.BillingAddress.State,
-                    order.BillingAddress.Zip
+                    order.BillingAddress?.Street1,
+                    order.BillingAddress?.Street2,
+                    order.BillingAddress?.City,
+                    order.BillingAddress?.State,
+                    order.BillingAddress?.Zip
                 },
                 Products = productsList,
                 order.Subtotal,
