@@ -321,8 +321,9 @@ namespace Marketplace.Common.Commands.Zoho
             var currencies = await _zoho.Currencies.ListAsync();
 
             var zContactList = await _zoho.Contacts.ListAsync(
-                new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}"}, 
-                new ZohoFilter() { Key = "company_name", Value = $"{ocBuyer.Name} - {location.Address?.xp.LocationID}"});
+                new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}" },
+                new ZohoFilter() { Key = "company_name", Value = $"{ocBuyer.Name} - {location.Address?.xp.LocationID}" });
+            
             var zContact = await _zoho.Contacts.GetAsync(zContactList.Items.FirstOrDefault()?.contact_id);
             if (zContact.Item != null)
             {

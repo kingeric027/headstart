@@ -45,9 +45,10 @@ namespace Marketplace.Common.Controllers
 		}
 
         [HttpPost, Route("ordersubmit/retry/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
-        public async Task RetryOrderSubmit([FromBody] string orderID)
+        public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
         {
-
+            var retry = await _postSubmitCommand.HandleBuyerOrderSubmitRetry(orderID, this.VerifiedUserContext);
+            return retry;
         }
 
         [HttpPost, Route("orderapproved")]

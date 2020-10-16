@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Flurl.Http;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using Marketplace.Common.Commands.Zoho;
@@ -21,6 +22,7 @@ namespace Marketplace.Common.Commands
     public interface IPostSubmitCommand
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
+        Task<OrderSubmitResponse> HandleBuyerOrderSubmitRetry(string orderID, VerifiedUserContext user);
     }
 
     public class PostSubmitCommand : IPostSubmitCommand
@@ -46,10 +48,19 @@ namespace Marketplace.Common.Commands
             _lineItemCommand = lineItemCommand;
         }
 
-        //public async Task<OrderSubmitResponse> HandleBuyerOrderSubmitRetry(string OrderID)
-        //{
-
-        //}
+        public async Task<OrderSubmitResponse> HandleBuyerOrderSubmitRetry(string orderID, VerifiedUserContext user)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            var (salesAction, zohoSalesOrder) = await ProcessActivityCall(
+                ProcessType.Accounting,
+                "Create Zoho Sales Order",
+                _zoho.CreateSalesOrder(worksheet));
+            return await CreateOrderSubmitResponse(new List<ProcessResult>() {
+                new ProcessResult() {
+                Type = ProcessType.Accounting,
+                Activity = new List<ProcessResultAction>() { salesAction }
+            }}, new List<MarketplaceOrder> { worksheet.Order });
+        }
 
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
         {
@@ -74,7 +85,7 @@ namespace Marketplace.Common.Commands
             return await CreateOrderSubmitResponse(results, new List<MarketplaceOrder> { orderWorksheet.Order });
         }
 
-        private async Task<List<ProcessResult>> HandleIntegrations(List<MarketplaceOrder> updatedSupplierOrders, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
+        private async Task<List<ProcessResult>> HandleIntegrations(List<MarketplaceOrder> supplierOrders, MarketplaceOrderWorksheet orderWorksheet)
         {
             // STEP 1: SendGrid notifications
             var results = new List<ProcessResult>();
@@ -82,21 +93,21 @@ namespace Marketplace.Common.Commands
             var notifications = await ProcessActivityCall(
                 ProcessType.Notification,
                 "Sending Order Submit Emails",
-                _sendgridService.SendOrderSubmitEmail(updatedMarketplaceOrderWorksheet));
+                _sendgridService.SendOrderSubmitEmail(orderWorksheet));
             results.Add(new ProcessResult()
             {
                 Type = ProcessType.Notification,
                 Activity = new List<ProcessResultAction>() { notifications }
             });
 
-            if (!updatedMarketplaceOrderWorksheet.IsStandardOrder())
+            if (!orderWorksheet.IsStandardOrder())
                 return results;
 
             // STEP 2: Avalara tax transaction
             var tax = await ProcessActivityCall(
                 ProcessType.Tax,
                 "Creating Tax Transaction",
-                HandleTaxTransactionCreationAsync(updatedMarketplaceOrderWorksheet.Reserialize<OrderWorksheet>()));
+                HandleTaxTransactionCreationAsync(orderWorksheet.Reserialize<OrderWorksheet>()));
             results.Add(new ProcessResult()
             {
                 Type = ProcessType.Tax,
@@ -108,17 +119,17 @@ namespace Marketplace.Common.Commands
             var (salesAction, zohoSalesOrder) = await ProcessActivityCall(
                 ProcessType.Accounting,
                 "Create Zoho Sales Order",
-                _zoho.CreateSalesOrder(updatedMarketplaceOrderWorksheet));
+                _zoho.CreateSalesOrder(orderWorksheet));
             
             var (poAction, zohoPurchaseOrder) = await ProcessActivityCall(
                 ProcessType.Accounting,
                 "Create Zoho Purchase Order",
-                _zoho.CreateOrUpdatePurchaseOrder(zohoSalesOrder, updatedSupplierOrders));
+                _zoho.CreateOrUpdatePurchaseOrder(zohoSalesOrder, supplierOrders));
 
             var (shippingAction, zohoShippingOrder) = await ProcessActivityCall(
                 ProcessType.Accounting,
                 "Create Zoho Shipping Purchase Order",
-                _zoho.CreateShippingPurchaseOrder(zohoSalesOrder, updatedMarketplaceOrderWorksheet));
+                _zoho.CreateShippingPurchaseOrder(zohoSalesOrder, orderWorksheet));
 
             results.Add(new ProcessResult()
             {
@@ -212,6 +223,16 @@ namespace Marketplace.Common.Commands
                     },
                     await func
                 );
+            }
+            catch (FlurlHttpException flurlEx)
+            {
+                return new Tuple<ProcessResultAction, T>(new ProcessResultAction()
+                {
+                    Description = description,
+                    ProcessType = type,
+                    Success = false,
+                    Exception = new ProcessResultException(flurlEx)
+                }, new T());
             }
             catch (Exception ex)
             {
