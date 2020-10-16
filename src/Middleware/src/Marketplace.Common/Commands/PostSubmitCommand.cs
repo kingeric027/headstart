@@ -14,7 +14,6 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
-using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
 
 namespace Marketplace.Common.Commands
@@ -22,7 +21,7 @@ namespace Marketplace.Common.Commands
     public interface IPostSubmitCommand
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
-        Task<OrderSubmitResponse> HandleBuyerOrderSubmitRetry(string orderID, VerifiedUserContext user);
+        Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user);
     }
 
     public class PostSubmitCommand : IPostSubmitCommand
@@ -30,36 +29,50 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
         private readonly IZohoCommand _zoho;
         private readonly IAvalaraCommand _avalara;
-        private readonly IExchangeRatesCommand _exchangeRates;
         private readonly ISendgridService _sendgridService;
-        private readonly ILocationPermissionCommand _locationPermissionCommand;
-        private readonly IOrderCommand _orderCommand;
         private readonly ILineItemCommand _lineItemCommand;
 
-        public PostSubmitCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, IOrderCommand orderCommand, ILineItemCommand lineItemCommand)
+        public PostSubmitCommand(ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, ILineItemCommand lineItemCommand)
         {
             _oc = oc;
             _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
-            _locationPermissionCommand = locationPermissionCommand;
-            _exchangeRates = exchangeRates;
-            _orderCommand = orderCommand;
             _lineItemCommand = lineItemCommand;
         }
 
-        public async Task<OrderSubmitResponse> HandleBuyerOrderSubmitRetry(string orderID, VerifiedUserContext user)
+        public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user)
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            var supplierOrders = await Throttler.RunAsync(worksheet.LineItems, 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
+                $"{worksheet.Order.ID}-{item.SupplierID}", user.AccessToken));
+
+            return await CreateOrderSubmitResponse(
+                new List<ProcessResult>() { await this.PerformZohoTasks(worksheet, supplierOrders) }, 
+                new List<MarketplaceOrder> { worksheet.Order });
+        }
+
+        private async Task<ProcessResult> PerformZohoTasks(MarketplaceOrderWorksheet worksheet, IList<MarketplaceOrder> supplierOrders)
+        {
             var (salesAction, zohoSalesOrder) = await ProcessActivityCall(
                 ProcessType.Accounting,
                 "Create Zoho Sales Order",
                 _zoho.CreateSalesOrder(worksheet));
-            return await CreateOrderSubmitResponse(new List<ProcessResult>() {
-                new ProcessResult() {
+
+            var (poAction, zohoPurchaseOrder) = await ProcessActivityCall(
+                ProcessType.Accounting,
+                "Create Zoho Purchase Order",
+                _zoho.CreateOrUpdatePurchaseOrder(zohoSalesOrder, supplierOrders.ToList()));
+
+            var (shippingAction, zohoShippingOrder) = await ProcessActivityCall(
+                ProcessType.Accounting,
+                "Create Zoho Shipping Purchase Order",
+                _zoho.CreateShippingPurchaseOrder(zohoSalesOrder, worksheet));
+            return new ProcessResult()
+            {
                 Type = ProcessType.Accounting,
-                Activity = new List<ProcessResultAction>() { salesAction }
-            }}, new List<MarketplaceOrder> { worksheet.Order });
+                Activity = new List<ProcessResultAction>() {salesAction, poAction, shippingAction}
+            };
         }
 
         public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
@@ -115,27 +128,7 @@ namespace Marketplace.Common.Commands
             });
 
             // STEP 3: Zoho orders
-
-            var (salesAction, zohoSalesOrder) = await ProcessActivityCall(
-                ProcessType.Accounting,
-                "Create Zoho Sales Order",
-                _zoho.CreateSalesOrder(orderWorksheet));
-            
-            var (poAction, zohoPurchaseOrder) = await ProcessActivityCall(
-                ProcessType.Accounting,
-                "Create Zoho Purchase Order",
-                _zoho.CreateOrUpdatePurchaseOrder(zohoSalesOrder, supplierOrders));
-
-            var (shippingAction, zohoShippingOrder) = await ProcessActivityCall(
-                ProcessType.Accounting,
-                "Create Zoho Shipping Purchase Order",
-                _zoho.CreateShippingPurchaseOrder(zohoSalesOrder, orderWorksheet));
-
-            results.Add(new ProcessResult()
-            {
-                Type = ProcessType.Accounting,
-                Activity = new List<ProcessResultAction>() { salesAction, poAction, shippingAction }
-            });
+            results.Add(await this.PerformZohoTasks(orderWorksheet, supplierOrders));
             return results;
         }
         

@@ -40,10 +40,7 @@ namespace Marketplace.Common.Services.Zoho
         protected internal async Task<T> Put<T>(object obj, params object[] segments) => 
             await Parse<T>(await _client.Put(obj, this.AppendSegments(segments)).PutAsync(null));
 
-        private async Task<T> Parse<T>(HttpResponseMessage res)
-        {
-            var o = JObject.Parse(await res.Content.ReadAsStringAsync()).SelectToken(_resource).ToObject<T>();
-            return o;
-        }
+        private async Task<T> Parse<T>(HttpResponseMessage res) => 
+            JObject.Parse(await res.Content.ReadAsStringAsync()).SelectToken(_resource).ToObject<T>();
     }
 }

@@ -1,5 +1,4 @@
-﻿using Marketplace.Common.Services.ShippingIntegration;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;
@@ -44,10 +43,10 @@ namespace Marketplace.Common.Controllers
 			return response;
 		}
 
-        [HttpPost, Route("ordersubmit/retry/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        [HttpPost, Route("ordersubmit/retry/zoho/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
         public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
         {
-            var retry = await _postSubmitCommand.HandleBuyerOrderSubmitRetry(orderID, this.VerifiedUserContext);
+            var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
             return retry;
         }
 
