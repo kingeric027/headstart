@@ -25,18 +25,13 @@
     </div>
     <div class="form-group d-flex justify-content-between mb-0">
       <div class="form-group card-number mr-2 flex-fill">
-        <label class="sr-only"
-               for="cardNumber"
+        <label for="cardNumber"
                translate>PAYMENTS.CC_FORM.NUMBER</label>
-        <input type="text"
-               formControlName="number"
-               class="form-control"
-               id="cardNumber"
-               placeholder="Card Number"
-               autofocus="true"
-               showErrors
-               appCreditCardInput
-               autocomplete="off" />
+        <input type="hidden"
+               formControlName="token">
+        <ocm-credit-card-iframe (ccEntered)="ccEntered($event.detail)"></ocm-credit-card-iframe>
+        <span *ngIf="cardError"
+              class="error">{{cardError}}</span>
       </div>
       <div class="form-group mr-2 flex-fill">
         <label class="sr-only"

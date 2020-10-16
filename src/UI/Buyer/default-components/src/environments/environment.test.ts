@@ -13,6 +13,7 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   ssoLink:

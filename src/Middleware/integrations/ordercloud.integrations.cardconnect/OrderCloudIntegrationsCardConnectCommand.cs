@@ -10,7 +10,7 @@ namespace ordercloud.integrations.cardconnect
 		//Task<CreditCardAuthorization> Authorize(CreditCardAuthorization auth);
 		Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
-		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user);
+		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user, string merchantID);
     }
 
 	public class OrderCloudIntegrationsCardConnectCommand : IOrderCloudIntegrationsCardConnectCommand
@@ -36,8 +36,11 @@ namespace ordercloud.integrations.cardconnect
 			return buyerCreditCard;
 		}
 
-		public async Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment,
-            VerifiedUserContext user)
+		public async Task<Payment> AuthorizePayment(
+			OrderCloudIntegrationsCreditCardPayment payment,
+            VerifiedUserContext user,
+			string merchantID
+		)
 		{
 			Require.That((payment.CreditCardID != null) || (payment.CreditCardDetails != null),
 				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID"));
@@ -56,7 +59,7 @@ namespace ordercloud.integrations.cardconnect
 			var ccAmount = GetAmountToCharge(orderWorksheet);
 
 			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, payment.PaymentID);
-			var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, ccAmount));
+			var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
 			ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
 			var transaction = await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
 				CardConnectMapper.Map(order, ocPayment, call));
