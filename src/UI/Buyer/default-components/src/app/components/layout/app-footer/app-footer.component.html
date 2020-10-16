@@ -1,41 +1,48 @@
-<footer class="py-4 mt-2 bg-light">
+<footer class="bg-light py-4 mt-3">
   <div class="container">
-    <div class="row">
+    <div class="row justify-content-center align-items-center">
       <div class="col-md-3 d-flex flex-column">
-        <a class="text-muted link cursor-pointer"
+        <a name="Contact Support"
            (click)="toSupport()">
-          <fa-icon class="mr-1"
+          <fa-icon class="mr-2 text-muted"
                    [icon]="faPhone"></fa-icon>
-          <small translate>LAYOUT.APP_FOOTER.SUPPORT</small>
+          <span class="text-secondary"
+                translate>LAYOUT.APP_FOOTER.SUPPORT</span>
         </a>
-        <a class="text-muted link cursor-pointer"
+        <a name="FAQ"
            (click)="toFAQ()">
-          <fa-icon class="mr-1 text-muted"
+          <fa-icon class="mr-2 text-muted"
                    [icon]="faQuestionCircle"></fa-icon>
-          <small translate>LAYOUT.APP_FOOTER.FAQ</small>
+          <span class="text-secondary"
+                translate>LAYOUT.APP_FOOTER.FAQ</span>
         </a>
         <a (click)="toTermsAndConditions()"
-           class="mr-1 text-muted link cursor-pointer">
-          <fa-icon class="mr-1 d-md-none"
+           name="Terms & Conditions">
+          <fa-icon class="mr-2 text-muted"
                    [icon]="faFileAlt"></fa-icon>
-          <small translate>LAYOUT.APP_FOOTER.TERMS_CONDITIONS</small>
+          <span class="text-secondary"
+                translate>LAYOUT.APP_FOOTER.TERMS_CONDITIONS</span>
         </a>
       </div>
-      <div class="col-md-4">
-        <p class="mb-1 text-muted font-weight-bold text-uppercase">Questions or comments?</p>
-        <p class="mb-0">Ring: 877-771-9123</p>
-        <!-- TODO: Reinstate when email is retrieved from Bob Bernier -->
-        <!-- <p class="mb-0">Write: support@test.com</p> -->
+      <div class="col-md-3 d-flex flex-column">
+        <p class="text-muted font-weight-bold text-uppercase border-bottom mb-2 pb-2">Questions or comments?</p>
+        <p class="text-muted mb-0">Ring: <a class="text-secondary"
+             href="tel:8777719123">877-771-9123</a></p>
+        <p class="text-muted mb-0">Write: <a class="text-secondary"
+             href="mailto:support@sebvendorportal.com">support@sebvendorportal.com</a></p>
       </div>
       <!-- TODO: Reinstate when we are ready to support -->
       <!-- <div class="col-md-5">
         <button class="btn btn-sm btn-primary"
                 (click)="submitClaim()">Submit Claim</button>
       </div> -->
-      <div class="col-md-12">
-        <small class="text-muted"
-               translate>LAYOUT.APP_FOOTER.CREATED_BY</small>
-      </div>
     </div>
   </div>
 </footer>
+
+<div class="bg-medium">
+  <div class="container py-2 text-center">
+    <small class="text-dark"
+           translate>LAYOUT.APP_FOOTER.CREATED_BY</small>
+  </div>
+</div>
