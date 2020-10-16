@@ -91,8 +91,7 @@
     <app-line-item-table [lineItems]="_lineItems"
                          [orderDirection]="orderDirection"
                          (orderChange)="refreshOrder()"
-                         [orderID]="_order.ID"
-                         [currency]="_order?.xp?.Currency">
+                         [order]="_order">
     </app-line-item-table>
     <div class="row">
       <div class="col-md-7">

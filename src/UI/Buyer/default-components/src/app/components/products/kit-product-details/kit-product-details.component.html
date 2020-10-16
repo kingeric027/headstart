@@ -1,11 +1,11 @@
-<div class="container-fluid mt-4">
+<div class="container mt-4">
   <div class="row">
-    <div class="col-xl-5 col-lg-5">
+    <div class="col-md-5">
       <ocm-image-gallery *ngIf="_product"
                          [images]="_product.Images"></ocm-image-gallery>
     </div>
-    <div class="col-xl-5 col-lg-4">
-      <h5><strong>Products Included</strong></h5>
+    <div class="col-md-7">
+      <h1 class="h5 mt-0 mb-4">Products Included</h1>
       <ngb-accordion #accordion
                      [closeOthers]="false"
                      [activeIds]="panelActiveIDs"
@@ -14,27 +14,47 @@
                    [id]="productKitDetails.Product.ID">
           <ng-template ngbPanelHeader
                        ngbPanelToggle>
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <img [src]="productDictionary[productKitDetails.Product.ID].imageUrl"
-                     alt="{{'Image for ' + productKitDetails.Product.Name }}">
-                <div> <a (click)="context.router.toProductDetails(productKitDetails.Product.ID)"
-                     class="text-dark font-weight-medium line-height-1">{{ productKitDetails.Product.Name }}</a> | {{ productDictionary[productKitDetails.Product.ID].price | currency: userCurrency }} <span *ngIf="productKitDetails.MinQty === productKitDetails.MaxQty"> | (qty: {{ productKitDetails.MinQty }})</span></div>
+            <div class="row align-items-center">
+              <div class="col-md flex-grow-0">
+                <a class="d-block"
+                   style="width:100px"
+                   name="{{ productKitDetails.Product.Name }}"
+                   (click)="context.router.toProductDetails(productKitDetails.Product.ID)">
+                  <img class="img-thumbnail"
+                       [src]="productDictionary[productKitDetails.Product.ID].imageUrl"
+                       alt="{{'Image for ' + productKitDetails.Product.Name }}">
+                </a>
+              </div>
+              <div class="col-md">
+                <h2 class="h5 mb-0">{{ productKitDetails.Product.Name }}</h2>
+                <p class="mb-0">{{ productDictionary[productKitDetails.Product.ID].price | currency: userCurrency }}</p>
+              </div>
+              <!-- product min-quantity, quantity input, qty error message -->
+              <div class="col-md-3 d-flex flex-column"
+                   [ngClass]="{'align-self-end': productDictionary[productKitDetails.Product.ID].errorMessage}">
+                <span *ngIf="productKitDetails.MinQty === productKitDetails.MaxQty">(qty: {{ productKitDetails.MinQty }})</span>
                 <ocm-quantity-input *ngIf="productKitDetails.MinQty !== productKitDetails.MaxQty"
                                     [gridDisplay]="true"
+                                    style="min-width: 35px;"
                                     [product]="productKitDetails.Product"
                                     [priceSchedule]="productKitDetails.Product.PriceSchedule"
                                     (qtyChange)="qtyChange(productKitDetails.Product.ID, $event.detail)"></ocm-quantity-input>
-                <div *ngIf="productDictionary[productKitDetails.Product.ID].errorMessage"
-                     class="error-message">
-                  {{productDictionary[productKitDetails.Product.ID].errorMessage}}
-                </div>
+                <ng-container *ngIf="productDictionary[productKitDetails.Product.ID].errorMessage">
+                  <small class="text-danger">{{productDictionary[productKitDetails.Product.ID].errorMessage}}</small>
+                </ng-container>
               </div>
-              <button ngbPanelToggle
-                      class="btn btn-secondary"
-                      *ngIf="productDictionary[productKitDetails.Product.ID]?.specs?.length > 0">
-                {{ accordion.isExpanded(productKitDetails.Product.ID) ? 'collapse' : 'expand' }}
-              </button>
+              <!-- accordion toggle -->
+              <div class="col-md flex-grow-0">
+                <button ngbPanelToggle
+                        type="button"
+                        class="btn icon-button"
+                        *ngIf="productDictionary[productKitDetails.Product.ID]?.specs?.length > 0">
+                  <fa-icon class="icon-wrapper"
+                           [icon]="accordion.isExpanded(productKitDetails.Product.ID) ? faCaretDown : faCaretRight">
+                    <span class="sr-only">Expand and collapse {{ productKitDetails.Product.Name }}</span>
+                  </fa-icon>
+                </button>
+              </div>
             </div>
           </ng-template>
           <ng-template ngbPanelContent>
@@ -59,7 +79,7 @@
              download="attachment.FileName">{{attachment.FileName}}</a>
         </div>
       </div>
-      <button class="btn btn-block btn-primary mb-3"
+      <button class="btn btn-block btn-primary my-4 shadow"
               type="submit"
               [disabled]="isAddingToCart || !areQuantitesValid()"
               (click)="addToCart()"

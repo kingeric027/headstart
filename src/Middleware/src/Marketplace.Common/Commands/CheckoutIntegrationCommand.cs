@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dynamitey;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
@@ -52,8 +53,8 @@ namespace Marketplace.Common.Commands
             for (int i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                shipResponse.ShipEstimates[i].ShipMethods = shipResponse.ShipEstimates[i].ShipMethods
-                    .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList();
+                shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(shipResponse.ShipEstimates[i].ShipMethods)
+                .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList();
             }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
 
@@ -81,6 +82,13 @@ namespace Marketplace.Common.Commands
                 return _settings.EasyPostSettings.SMGFedexAccountId;
             }
 		}
+
+        public static IEnumerable<ShipMethod> WhereRateIsCheapestOfItsKind(IList<ShipMethod> methods)
+		{
+            return methods
+                .GroupBy(method => method.EstimatedTransitDays)
+                .Select(kind => kind.OrderBy(method => method.Cost).First());
+        }
 
         private async Task<List<ShipEstimate>> ConvertShippingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
 		{

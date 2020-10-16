@@ -143,7 +143,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     } else {
       this.logoLoading = true;
       try {
-        await this.uploadAsset(this._supplierEditable?.ID, event[0].File, 'Image');
+        await this.uploadAsset(this._supplierEditable?.ID, event[0].File);
       } catch (err) {
         this.hasLogo = false;
         this.logoLoading = false;
@@ -174,7 +174,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       }
       // Then upload logo asset
       try {
-        await this.uploadAsset(this._supplierEditable?.ID, file, 'Image');
+        await this.uploadAsset(this._supplierEditable?.ID, file);
       } catch (err) {
         this.hasLogo = false;
         this.logoLoading = false;
@@ -188,12 +188,11 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     }
   }
 
-  async uploadAsset(supplierID: string, file: File, assetType: string): Promise<void> {
+  async uploadAsset(supplierID: string, file: File): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const asset: AssetUpload = {
       Active: true,
       File: file,
-      Type: (assetType as AssetUpload['Type']),
       FileName: file.name,
       Tags: ['Logo']
     }

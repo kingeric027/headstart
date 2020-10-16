@@ -263,7 +263,7 @@ namespace Marketplace.Common.Commands
             // no relationship exists currently in the platform
             var (updateAction, marketplaceOrders) = await ProcessActivityCall(
                 ProcessType.Forwarding, "Create Order Relationships And Transfer XP",
-                CreateOrderRelationshipsAndTransferXP(orderWorksheet.Order, supplierOrders));
+                CreateOrderRelationshipsAndTransferXP(orderWorksheet, supplierOrders));
             activities.Add(updateAction);
 
             // need to get fresh order worksheet because this process has changed things about the worksheet
@@ -277,11 +277,11 @@ namespace Marketplace.Common.Commands
         }
 
         //TODO: probably want to move this to a command so it's isolated and testable
-        private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrder buyerOrder, List<Order> supplierOrders)
+        private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrderWorksheet buyerOrder, List<Order> supplierOrders)
         {
             var updatedSupplierOrders = new List<MarketplaceOrder>();
             var supplierIDs = new List<string>();
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.ID);
+            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.Order.ID);
             var shipFromAddressIDs = lineItems.Items.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
 
             foreach (var supplierOrder in supplierOrders)
@@ -289,25 +289,27 @@ namespace Marketplace.Common.Commands
                 supplierIDs.Add(supplierOrder.ToCompanyID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID.Contains(supplierOrder.ToCompanyID)).ToList();
                 var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierOrder.ToCompanyID);
+                var suppliersShipEstimates = buyerOrder.ShipEstimateResponse.ShipEstimates.Where(se => se.xp.SupplierID == supplier.ID);
                 var supplierOrderPatch = new PartialOrder() {
-                    ID = $"{buyerOrder.ID}-{supplierOrder.ToCompanyID}",
+                    ID = $"{buyerOrder.Order.ID}-{supplierOrder.ToCompanyID}",
                     xp = new OrderXp() {
                         ShipFromAddressIDs = shipFromAddressIDsForSupplierOrder,
                         SupplierIDs = new List<string>() { supplier.ID },
                         StopShipSync = false,
-                        OrderType = buyerOrder.xp.OrderType,
-                        QuoteOrderInfo = buyerOrder.xp.QuoteOrderInfo,
+                        OrderType = buyerOrder.Order.xp.OrderType,
+                        QuoteOrderInfo = buyerOrder.Order.xp.QuoteOrderInfo,
                         Currency = supplier.xp.Currency,
                         ClaimStatus = ClaimStatus.NoClaim,
                         ShippingStatus = ShippingStatus.Processing,
-                        SubmittedOrderStatus = SubmittedOrderStatus.Open
+                        SubmittedOrderStatus = SubmittedOrderStatus.Open,
+                        SelectedShipMethodsSupplierView = MapSelectedShipMethod(suppliersShipEstimates)
                     }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
-            await _lineItemCommand.SetInitialSubmittedLineItemStatuses(buyerOrder.ID);
+            await _lineItemCommand.SetInitialSubmittedLineItemStatuses(buyerOrder.Order.ID);
 
             var buyerOrderPatch = new PartialOrder() {
                 xp = new {
@@ -319,8 +321,23 @@ namespace Marketplace.Common.Commands
                 }
             };
 
-            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.ID, buyerOrderPatch);
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrder.Order.ID, buyerOrderPatch);
             return updatedSupplierOrders;
+        }
+
+        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<ShipEstimate> shipEstimates)
+		{
+            var selectedShipMethods = shipEstimates.Select(se =>
+            {
+                var selected = se.ShipMethods.First(sm => sm.ID == se.SelectedShipMethodID);
+                return new ShipMethodSupplierView()
+                {
+                    EstimatedTransitDays = selected.EstimatedTransitDays,
+                    Name = selected.Name,
+                    ShipFromAddressID = se.xp.ShipFromAddressID
+                };
+            }).ToList();
+            return selectedShipMethods;
         }
 
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)

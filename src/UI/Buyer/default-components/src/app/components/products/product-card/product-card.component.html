@@ -10,8 +10,7 @@
      name="{{_product.Name}}"
      (click)="toDetails()">
     <figure class="card-img-top">
-      <img class="img-fluid w-100"
-           [src]="getImageUrl()"
+      <img [src]="getImageUrl()"
            alt="{{ _product.ID }}" />
     </figure>
     <div class="card-body">
@@ -43,11 +42,10 @@
                         [priceSchedule]="_product.PriceSchedule"
                         (qtyChange)="setQuantity($event.detail)">
     </ocm-quantity-input>
-    <button (click)="$event.stopPropagation()"
+    <button (click)="$event.stopPropagation();addToCart();"
             [disabled]="isAddingToCart || !qtyValid"
             class="btn btn-outline-secondary btn-block btn-sm"
             type="submit"
-            (click)="addToCart()"
             translate>
       PRODUCTS.CARD.ADD <span class="d-md-none d-lg-inline"
             translate> PRODUCTS.CARD.TO_CART</span>

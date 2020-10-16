@@ -26,9 +26,9 @@ namespace Marketplace.Common
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
-        public string SendgridApiKey { get; set; }
         public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
         public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
+        public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
     }
 
     public class UI
@@ -37,9 +37,9 @@ namespace Marketplace.Common
         public string BaseAdminUrl { get; set; }
     }
 
-	public class EnvironmentSettings
-	{
-		public string BaseUrl { get; set; }
+    public class EnvironmentSettings
+    {
+        public string BaseUrl { get; set; }
 	}
 
 	public class SmartyStreetSettings
@@ -88,5 +88,10 @@ namespace Marketplace.Common
         public string ProvisionFedexAccountId { get; set; } 
         public string SEBDistributionFedexAccountId { get; set; }
 
+    }
+    public class SendgridSettings
+    {
+        public string ApiKey { get; set; }
+        public string FromEmail { get; set; }
     }
 }
