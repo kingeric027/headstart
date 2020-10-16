@@ -72,12 +72,12 @@ export class UserGroupAssignments implements OnChanges {
     }
   }
 
-  updateForUserGroupAssignmentType() {
+  updateForUserGroupAssignmentType(): void {
     this.options.filters['xp.Type'] = this.userGroupType;
     this.displayText = GetDisplayText(this.userGroupType);
   }
 
-  requestUserConfirmation() {
+  requestUserConfirmation(): void {
     this.requestedUserConfirmation = true;
   }
 
@@ -147,7 +147,7 @@ export class UserGroupAssignments implements OnChanges {
     this.checkForUserUserGroupAssignmentChanges();
   }
 
-  isAssigned(userGroup: UserGroup) {
+  isAssigned(userGroup: UserGroup): boolean {
     return (
       this._userUserGroupAssignmentsEditable?.some(
         groupAssignment => groupAssignment.UserGroupID === userGroup.ID
@@ -155,7 +155,7 @@ export class UserGroupAssignments implements OnChanges {
     );
   }
 
-  checkForUserUserGroupAssignmentChanges() {
+  checkForUserUserGroupAssignmentChanges(): void {
     this.add = this._userUserGroupAssignmentsEditable.filter(
       editableAssignment => !this._userUserGroupAssignmentsStatic.some(staticAssignment => staticAssignment.UserGroupID === editableAssignment.UserGroupID)
     );
@@ -167,14 +167,14 @@ export class UserGroupAssignments implements OnChanges {
     if (this.isCreatingNew) this.assignmentsToAdd.emit({ UserGroupType: this.userGroupType, Assignments: this.add});
   }
 
-  discardUserUserGroupAssignmentChanges() {
+  discardUserUserGroupAssignmentChanges(): void {
     this._userUserGroupAssignmentsEditable = this._userUserGroupAssignmentsStatic;
     this.checkForUserUserGroupAssignmentChanges();
   }
 
   async executeUserUserGroupAssignmentRequests(): Promise<void> {
     this.requestedUserConfirmation = false;
-    await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del, this.userGroupType === "BuyerLocation");
+    await this.userPermissionsService.updateUserUserGroupAssignments(this.userOrgID, this.add, this.del, this.userGroupType === 'BuyerLocation');
     await this.getUserGroupAssignments(this.userID, this.userOrgID);
     this.checkForUserUserGroupAssignmentChanges();
   }
@@ -205,12 +205,12 @@ export class UserGroupAssignments implements OnChanges {
     return params;
   }
 
-  async changePage(page: number) {
+  async changePage(page: number): Promise<void>  {
     this.args = { ...this.args, page };
     await this.getUserGroups(this.userOrgID);
   }
 
-  async searchedResources(searchText: any) {
+  async searchedResources(searchText: any): Promise<void> {
     this.searching = true;
     this.searchTermInput = searchText;
     this.args = {...this.args, search: searchText, page: 1 };
