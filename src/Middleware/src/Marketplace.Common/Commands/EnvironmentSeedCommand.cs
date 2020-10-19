@@ -70,12 +70,12 @@ namespace Marketplace.Common.Commands
             await CreateWebhooks(apiClients.BuyerUiApiClient.ID, apiClients.AdminUiApiClient.ID, orgToken);
             await CreateMessageSenders(orgToken);
             await CreateIncrementors(orgToken); // must be before CreateBuyers
-            await CreateBuyers(seed, orgToken);
-            await CreateXPIndices(orgToken);
-            await CreateAndAssignIntegrationEvents(apiClients.BuyerUiApiClient.ID, apiClients.BuyerLocalUiApiClient.ID, orgToken);
-
+            
             var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
-            await CreateSuppliers(userContext, seed, orgToken);
+			await CreateBuyers(seed, userContext);
+			await CreateXPIndices(orgToken);
+			await CreateAndAssignIntegrationEvents(apiClients.BuyerUiApiClient.ID, apiClients.BuyerLocalUiApiClient.ID, orgToken);
+			await CreateSuppliers(userContext, seed, orgToken);
             await CreateContentDocSchemas(userContext);
             await CreateDefaultContentDocs(userContext);
 			
@@ -145,7 +145,7 @@ namespace Marketplace.Common.Commands
 			}, orgToken);
 		}
 
-		private async Task CreateBuyers(EnvironmentSeed seed, string token) {
+		private async Task CreateBuyers(EnvironmentSeed seed, VerifiedUserContext user) {
 			seed.Buyers.Add(new MarketplaceBuyer
 			{
 				ID = "Default_HeadStart_Buyer",
@@ -462,8 +462,8 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckout" }, token);
-			await _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
+			await _oc.ApiClients.PatchAsync(buyerUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckout" }, token);
+			await _oc.ApiClients.PatchAsync(buyerLocalUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
 		}
 
 		public async Task CreateSecurityProfiles(EnvironmentSeed seed, string accessToken)

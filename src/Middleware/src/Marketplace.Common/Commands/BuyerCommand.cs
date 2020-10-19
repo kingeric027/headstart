@@ -85,10 +85,10 @@ namespace Marketplace.Common.Commands
             {
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
-            }, token);
+            }, user.AccessToken);
 
             // list message senders
-            var msList = await _oc.MessageSenders.ListAsync(accessToken: token);
+            var msList = await _oc.MessageSenders.ListAsync(accessToken: user.AccessToken);
             // create message sender assignment
             var assignmentList = msList.Items.Select(ms =>
             {
@@ -98,10 +98,10 @@ namespace Marketplace.Common.Commands
                     BuyerID = ocBuyerID
                 };
             });
-            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a, token));
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a, user.AccessToken));
 
-            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" }, token);
-            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" }, token);
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" }, user.AccessToken);
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" }, user.AccessToken);
 
             await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
             {
@@ -109,7 +109,7 @@ namespace Marketplace.Common.Commands
                 CatalogID = ocBuyer.ID,
                 ViewAllCategories = true,
                 ViewAllProducts = false
-            }, token);
+            }, user.AccessToken);
             return buyer;
         }
 
