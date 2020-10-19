@@ -10,7 +10,7 @@ export const environment: Environment = {
   appname: 'Anytime Fitness',
   clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  baseUrl: 'https://anytimefitness.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
