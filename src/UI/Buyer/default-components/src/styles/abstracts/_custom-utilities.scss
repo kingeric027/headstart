@@ -12,6 +12,8 @@
 .font-weight-medium     { font-weight: 500 !important; }
 .font-weight-semibold   { font-weight: 600 !important; }
 
+.white-space-pre        { white-space: pre !important;  }
+
 .border-hover {
   transition: border-color 0.25s ease;
   &:hover, &:focus, &:active {

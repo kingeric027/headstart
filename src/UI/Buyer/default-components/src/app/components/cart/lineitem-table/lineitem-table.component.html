@@ -28,28 +28,31 @@
       <div class="d-none d-sm-block border-bottom border-light pb-2"
            *ngIf="orderType !== 'Quote'">
         <div class="row">
-          <div class="col-sm-6"></div>
-          <div class="col-sm-6">
-            <div class="row">
-              <div *ngIf="!hasReturnInfo()"
+          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-7'"></div>
+          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-5'">
+            <div class="row align-items-center">
+              <div *ngIf="!hasReturnInfo() && activePath === '/orders'"
                    class="col-2 text-center text-medium"></div>
-              <div *ngIf="!hasCancelInfo()"
+              <div *ngIf="!hasCancelInfo() && activePath === '/orders'"
                    class="col-2 text-center text-medium"></div>
-              <div class="col-3 text-center text-medium">
+              <div class="col-3 text-right text-medium"
+                   id="label_lineItemPrice">
                 <small translate>CART.LINEITEM_TABLE.PRICE</small>
               </div>
-              <div class="col-2 text-center text-medium">
+              <div class="col-5 text-right text-medium"
+                   id="label_lineItemQty">
                 <small translate>CART.LINEITEM_TABLE.QTY</small>
               </div>
-              <div *ngIf="hasReturnInfo()"
-                   class="col-2 text-center text-medium">
+              <div *ngIf="hasReturnInfo() && activePath === '/orders'"
+                   class="col text-center text-medium">
                 <small translate>CART.LINEITEM_TABLE.QTY_RETURNED</small>
               </div>
-              <div *ngIf="hasCancelInfo()"
-                   class="col-2 text-right text-medium">
+              <div *ngIf="hasCancelInfo() && activePath === '/orders'"
+                   class="col text-center text-medium">
                 <small translate>CART.LINEITEM_TABLE.QTY_CANCELED</small>
               </div>
-              <div class="col-3 text-right text-medium">
+              <div class="col-4 text-right text-medium"
+                   id="label_lineItemTotal">
                 <small translate>CART.LINEITEM_TABLE.TOTAL</small>
               </div>
             </div>
@@ -59,11 +62,11 @@
       <!-- Line Item Labels: End -->
       <!-- line item: Start -->
       <div *ngFor="let li of liGroup; let i = index"
-           class="position-relative border-bottom border-light">
-        <div class="row no-gutters align-items-center my-3">
-          <div class="col-sm-6"
+           class="position-relative border-bottom border-light px-0">
+        <div class="row align-items-center my-3">
+          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-7'"
                *ngIf="li">
-            <div class="row align-items-sm-center no-gutters">
+            <div class="row align-items-sm-center">
               <div class="col-md-3 col-sm-6 pr-md-3">
                 <a class="d-block"
                    (click)="toProductDetails(li.Product.ID)">
@@ -111,21 +114,21 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-6">
+          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-5'">
             <div class="row align-items-center pt-3 pt-sm-0"
                  *ngIf="orderType !== 'Quote'">
-              <div *ngIf="!hasReturnInfo()"
+              <div *ngIf="!hasReturnInfo() && activePath === '/orders'"
                    class="col-2 text-center"></div>
-              <div *ngIf="!hasCancelInfo()"
+              <div *ngIf="!hasCancelInfo() && activePath === '/orders'"
                    class="col-2 text-center"></div>
-              <div class="
-                 col-3
-                 text-center">
-                <small class="d-block d-sm-none"
+              <div class="col-3 text-right"
+                   id="label_unitPrice">
+                <small class="d-block d-sm-none white-space-pre"
                        translate>CART.LINEITEM_TABLE.UNIT_PRICE</small>
                 <span class="text-nowrap">{{ li.UnitPrice | currency: _orderCurrency }}</span>
               </div>
-              <div class="col-2 text-center">
+              <div class="text-right col-5"
+                   id="colQuantityInput">
                 <small class="d-block d-sm-none"
                        translate>CART.LINEITEM_TABLE.QTY</small>
                 <ocm-quantity-input *ngIf="!readOnly"
@@ -137,21 +140,22 @@
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
-              <div *ngIf="hasReturnInfo()"
-                   class="col-2 text-center">
+              <div *ngIf="hasReturnInfo() && activePath === '/orders'"
+                   class="col flex-grow-0 text-center">
                 <small class="d-block d-sm-none"
                        translate>CART.LINEITEM_TABLE.QTY_RETURNED</small>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ (li.xp?.LineItemReturnInfo?.QuantityToReturn | number) || 0 }}</span>
               </div>
-              <div *ngIf="hasCancelInfo()"
+              <div *ngIf="hasCancelInfo() && activePath === '/orders'"
                    class="col-2 text-center">
                 <small class="d-block d-sm-none"
                        translate>CART.LINEITEM_TABLE.QTY_CANCELED</small>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ (li.xp?.LineItemCancelInfo?.QuantityToCancel | number) || 0 }}</span>
               </div>
-              <div class="col-3 text-right">
+              <div class="col-4 text-right"
+                   id="col_lineItemTotal">
                 <ngx-spinner *ngIf="isQtyChanging(li.ID)"
                              bdColor="null"
                              size="small"
@@ -188,7 +192,7 @@
 </div>
 
 
-  <!--   KITS   -->
+<!--   KITS   -->
 <div *ngIf="liGroupedByKit?.length > 0">
   <div class="card shadow mb-4"
        *ngFor="let kit of liGroupedByKit; let i = index;">
@@ -199,7 +203,8 @@
             <span class="text-medium font-weight-light">Kit: </span>{{ kit[i]?.xp?.KitProductName }}
           </h2>
         </div>
-        <div *ngIf="!readOnly" class="col-md d-flex flex-column justify-content-end text-md-right">
+        <div *ngIf="!readOnly"
+             class="col-md d-flex flex-column justify-content-end text-md-right">
           <a class="text-link"
              (click)="toggleKitDetails()">{{showKitDetails ? 'Collapse' : 'Expand'}}</a>
         </div>
@@ -216,21 +221,21 @@
           <div class="col-sm-6">
             <div class="row">
               <div *ngIf="!hasReturnInfo()"
-                   class="col-2 text-center text-medium"></div>
+                   class="col-2 text-center text-medium how-about-this-1111"></div>
               <div *ngIf="!hasCancelInfo()"
-                   class="col-2 text-center text-medium"></div>
+                   class="col-2 text-center text-medium how-about-this-2222"></div>
               <div class="col-3 text-center text-medium">
                 <small translate>CART.LINEITEM_TABLE.PRICE</small>
               </div>
-              <div class="col-2 text-center text-medium">
+              <div class="col-2 text-center text-medium how-about-this-qty">
                 <small translate>CART.LINEITEM_TABLE.QTY</small>
               </div>
               <div *ngIf="hasReturnInfo()"
-                   class="col-2 text-center text-medium">
+                   class="col-2 text-center text-medium how-about-this-qty-ret">
                 <small translate>CART.LINEITEM_TABLE.QTY_RETURNED</small>
               </div>
               <div *ngIf="hasCancelInfo()"
-                   class="col-2 text-right text-medium">
+                   class="col-2 text-right text-medium how-about-this-qty-canc">
                 <small translate>CART.LINEITEM_TABLE.QTY_CANCELED</small>
               </div>
               <div class="col-3 text-right text-medium">
@@ -244,7 +249,7 @@
       <!-- line item: Start -->
       <div *ngFor="let li of kit; let i = index"
            class="position-relative border-bottom border-light">
-        <div class="row no-gutters align-items-center my-3">
+        <div class="row align-items-center my-3">
           <div class="col-sm-6"
                *ngIf="li">
             <div class="row align-items-sm-center no-gutters">
@@ -298,16 +303,17 @@
           <div class="col-sm-6">
             <div class="row align-items-center pt-3 pt-sm-0"
                  *ngIf="orderType !== 'Quote'">
-              <div *ngIf="!hasReturnInfo()"
+              <div *ngIf="!hasReturnInfo() && activePath === '/orders'"
                    class="col-2 text-center"></div>
-              <div *ngIf="!hasCancelInfo()"
+              <div *ngIf="!hasCancelInfo() && activePath === '/orders'"
                    class="col-2 text-center"></div>
               <div class="col-3 text-center">
                 <small class="d-block d-sm-none"
                        translate>CART.LINEITEM_TABLE.UNIT_PRICE</small>
                 <span class="text-nowrap">{{ li.UnitPrice | currency: _orderCurrency }}</span>
               </div>
-              <div class="col-2 text-center">
+              <div class="text-center"
+                   [ngClass]="(activePath === '/orders') ? 'col-2' : 'col-5'">
                 <small class="d-block d-sm-none"
                        translate>CART.LINEITEM_TABLE.QTY</small>
                 <ocm-quantity-input *ngIf="!readOnly"
