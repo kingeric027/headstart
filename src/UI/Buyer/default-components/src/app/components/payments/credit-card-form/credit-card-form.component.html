@@ -160,11 +160,15 @@
       </select>
     </div>
   </div>
-  <button type="submit"
-          class="btn btn-sm btn-secondary mt-2"
-          [disabled]="!cardForm.valid">
-    {{ submitText }}
-  </button>
+  <span placement="right"
+        [ngbTooltip]="!termsAccepted ? 'You must accept the PO terms before continuing' : ''"
+        [openDelay]="200">
+    <button type="submit"
+            class="btn btn-sm btn-secondary mt-2"
+            [disabled]="!cardForm.valid || !termsAccepted">
+      {{ submitText }}
+    </button>
+  </span>
   <button (click)="dismissForm()"
           *ngIf="!_showCVV"
           class="btn btn-link text-danger mt-2"
