@@ -28,7 +28,7 @@ namespace ordercloud.integrations.cms
 			}
 			var query = store.Query($"select * from c where c.id IN ({string.Join(", ", paramNames)})", parameters, options);
 			var list = await query.WithPagination(args.Page, args.PageSize).ToPagedListAsync();
-			return list.ToListPage(args.Page, args.PageSize, count);
+			return list.ToListPage(args.Page, args.PageSize, list.Results.Count);
 		}
 	}
 }
