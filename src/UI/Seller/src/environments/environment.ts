@@ -22,7 +22,7 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const appName: AppName = FAST_SIGNS;
+const appName: AppName = HEADSTART_DEMO;
 const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
 const localMiddlewareURL = 'https://localhost:5001';
 // ====================================================================

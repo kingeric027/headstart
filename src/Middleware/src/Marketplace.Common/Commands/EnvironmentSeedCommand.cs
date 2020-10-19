@@ -163,7 +163,7 @@ namespace Marketplace.Common.Commands
 					Buyer = buyer,
 					Markup = new BuyerMarkup() { Percent = 0 }
 				};
-				await _buyerCommand.Create(superBuyer, user);
+				await _buyerCommand.Create(superBuyer, user, isSeedingEnvironment: true);
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace Marketplace.Common.Commands
 			// Create Suppliers and necessary user groups and security profile assignments
 			foreach (MarketplaceSupplier supplier in seed.Suppliers)
 			{
-				await _supplierCommand.Create(supplier, user, token);
+				await _supplierCommand.Create(supplier, user, isSeedingEnvironment: true);
 			}
 		}
 
