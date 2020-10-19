@@ -1,28 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Me, ListPage } from 'ordercloud-javascript-sdk';
-import { HeadStartSDK, OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
+import { Me, ListPage, BuyerCreditCard } from 'ordercloud-javascript-sdk';
+import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { MarketplaceBuyerCreditCard } from '../../shopper-context';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CreditCardService {
-  private readonly cardTypes = {
-    Visa: RegExp('^4[0-9]{12}(?:[0-9]{3})?$'), // e.g. 4000000000000000
-    MasterCard: RegExp('^5[1-5][0-9]{14}$'), // e.g. 5100000000000000
-    Discover: RegExp('^6(?:011|5[0-9]{2})[0-9]{12}$'), // e.g. 6011000000000000
-    Amex: RegExp('^3[47][0-9]{13}$'),
-    BCGlobal: RegExp('^(6541|6556)[0-9]{12}$'),
-    DinersClub: RegExp('^3(?:0[0-5]|[68][0-9])[0-9]{11}$'),
-    JCB: RegExp(`^(?:2131|1800|35\d{3})\d{11}$`),
-    UnionPay: RegExp('^(62[0-9]{14,17})$'),
-  };
-
   constructor() {}
 
-  async Save(card: OrderCloudIntegrationsCreditCardToken): Promise<MarketplaceBuyerCreditCard> {
-    card.CardType = this.getCardType(card.AccountNumber);
-    return await HeadStartSDK.MeCreditCardAuthorizations.MePost(card);
+  async Save(card: OrderCloudIntegrationsCreditCardToken): Promise<BuyerCreditCard> {
+    const cardType = this.getCardType(card.AccountNumber);
+    const partialAcctNumber = this.getPartialAccountNumber(card.AccountNumber);
+    return await Me.CreateCreditCard({
+      Token: card.AccountNumber,
+      CardType: cardType,
+      PartialAccountNumber: partialAcctNumber,
+      CardholderName: card.CardholderName,
+      ExpirationDate: this.getIsoDate(card.ExpirationDate),
+      xp: {
+        CCBillingAddress: card.CCBillingAddress
+      }
+    })
   }
 
   async Delete(cardID: string): Promise<void> {
@@ -33,16 +32,34 @@ export class CreditCardService {
     return await Me.ListCreditCards({ pageSize: 100 });
   }
 
-  private getCardType(cardNumber: string): string {
-    if (!cardNumber) return null;
+  private getPartialAccountNumber(token: string): string {
+    // https://developer.cardconnect.com/guides/cardsecure
+    return token.slice(-4)
+  }
 
-    for (const type in this.cardTypes) {
-      if (this.cardTypes.hasOwnProperty(type)) {
-        if (this.cardTypes[type].test(cardNumber)) {
-          return type;
-        }
-      }
+  private getCardType(token: string): string {
+    if (!token) return null;
+
+    // https://developer.cardconnect.com/guides/cardsecure
+    const secondChar = token.charAt(1);
+    if(secondChar === '3') {
+      return 'Amex';
+    } else if(secondChar === '4') {
+      return 'Visa';
+    } else if(secondChar === '5') {
+      return 'Mastercard';
+    } else {
+      return 'Discover';
     }
-    return null;
+  }
+
+  private getIsoDate(mmyy: string): string {
+    const month = mmyy.slice(0, 2);
+    const year = mmyy.slice(-2);
+    const date = new Date();
+    date.setMonth(parseInt(month, 10));
+    date.setFullYear(parseInt(`20${year}`, 10))
+    const dateString = date.toISOString();
+    return dateString;
   }
 }

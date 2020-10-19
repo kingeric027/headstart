@@ -163,7 +163,7 @@ namespace Marketplace.Common.Commands
 					Buyer = buyer,
 					Markup = new BuyerMarkup() { Percent = 0 }
 				};
-				await _buyerCommand.Create(superBuyer, token);
+				await _buyerCommand.Create(superBuyer, user);
 			}
 		}
 
@@ -317,7 +317,9 @@ namespace Marketplace.Common.Commands
 			new XpIndex { ThingType = XpThingType.Order, Key = "NeedsAttention" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "StopShipSync" },       
 			new XpIndex { ThingType = XpThingType.Order, Key = "OrderType" },       
-			new XpIndex { ThingType = XpThingType.Order, Key = "LocationID" },       
+			new XpIndex { ThingType = XpThingType.Order, Key = "LocationID" },
+			new XpIndex { ThingType = XpThingType.Order, Key = "SubmittedOrderStatus" },
+			new XpIndex { ThingType = XpThingType.Order, Key = "IsResubmitting" },
 			new XpIndex { ThingType = XpThingType.User, Key = "UserGroupID" },
 			new XpIndex { ThingType = XpThingType.User, Key = "RequestInfoEmails" },       
 		};
@@ -435,10 +437,10 @@ namespace Marketplace.Common.Commands
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
 				ElevatedRoles = new [] { ApiRole.FullAccess },
-				ID = "freightpopshipping",
+				ID = "HeadStartCheckout",
 				EventType = IntegrationEventType.OrderCheckout,
+				Name = "HeadStart Checkout",
 				CustomImplementationUrl = _settings.EnvironmentSettings.BaseUrl,
-				Name = "FreightPOP Shipping",
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
@@ -449,10 +451,10 @@ namespace Marketplace.Common.Commands
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
 				ElevatedRoles = new [] { ApiRole.FullAccess },
-				ID = "freightpopshippingLOCAL",
+				ID = "HeadStartCheckoutLOCAL",
 				EventType = IntegrationEventType.OrderCheckout,
 				CustomImplementationUrl = "https://marketplaceteam.ngrok.io", // local webhook url
-				Name = "FreightPOP Shipping LOCAL",
+				Name = "HeadStart Checkout LOCAL",
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
@@ -460,8 +462,8 @@ namespace Marketplace.Common.Commands
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(buyerUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshipping" }, token);
-			await _oc.ApiClients.PatchAsync(buyerLocalUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "freightpopshippingLOCAL" }, token);
+			await _oc.ApiClients.PatchAsync(_buyerUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckout" }, token);
+			await _oc.ApiClients.PatchAsync(_buyerLocalUIApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
 		}
 
 		public async Task CreateSecurityProfiles(EnvironmentSeed seed, string accessToken)

@@ -13,12 +13,14 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: wtcTheme,
+  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 
 /*

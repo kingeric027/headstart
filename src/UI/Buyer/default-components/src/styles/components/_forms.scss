@@ -1,6 +1,8 @@
-.error-message {
-  font-size: 15px;
-  color: $form-feedback-invalid-color;
+// ensure inputs, selects, and textareas use the correct typeface
+input,
+select,
+textarea {
+  font-family: $font-family-base;
 }
 
 // Custom checkboxes

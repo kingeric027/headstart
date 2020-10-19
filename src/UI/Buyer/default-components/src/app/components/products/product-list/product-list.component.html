@@ -109,9 +109,9 @@
                           [rows]="4">
       </ocm-loading-layout>
       <div *ngIf="products && products.Items.length > 0">
-        <div class="product-list-grid row align-items-stretch">
+        <div class="row align-items-stretch">
           <ocm-product-card *ngFor="let product of products.Items; let i = index"
-                            class="col-sm-6 col-md-4 col-xl-3 d-flex"
+                            class="col-md-6 col-lg-4 d-flex"
                             [product]="product"
                             [isFavorite]="isFavorite(product.ID)">
           </ocm-product-card>

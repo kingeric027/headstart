@@ -11,6 +11,14 @@
     <div *ngIf="createShipment && canShipLineItems()"
          class="p-3 mt-3 mb-2 border bg-light text-dark">
       <h5 class="mb-3 font-weight-bold">1) Enter Shipment Data</h5>
+      <div *ngIf="currentUser?.mySupplier?.xp?.SyncFreightPop"
+            class="alert alert-info d-flex justify-content-start align-items-center"
+            style="top: 0;">
+        <fa-icon [icon]="faExclamationCircle"
+                  class="mr-3">
+        </fa-icon>
+        <p class="mb-0">Use FedEx Account Number 303197303 to create your shipment.</p>
+      </div>
       <form (ngSubmit)="onSubmit()"
             novalidate
             [formGroup]="shipmentForm"
@@ -190,8 +198,8 @@
                 <div class="col-sm-9">
                   <div class="ml-3">
                     <h6>
-                      <span>{{ li.Product.Name }}</span>
-                      <small class="text-muted d-block">{{ li.Product.ID }}</small>
+                      <span>{{ li.Product.Name }} <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span> </span>
+                      <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
                     </h6>
                     <img [id]="i"
                          [src]="getImageUrl(li)"
@@ -236,7 +244,7 @@
       <div class="row">
         <div class="col-md-5">
           <small class="font-weight-bolder text-uppercase text-muted mb-0">
-            Shipped via {{superShipment?.Shipment?.Shipper}} {{superShipment?.Shipment?.xp?.Service}} on {{superShipment?.Shipment.DateShipped | date}}
+            Shipped via {{superShipment?.Shipment?.Shipper}} {{superShipment?.Shipment?.xp?.Service}} on {{superShipment?.Shipment.DateShipped | date:'shortDate':'UTC' }}
           </small>
           <h6>Tracking #{{superShipment?.Shipment?.TrackingNumber}}</h6>
           <div class="my-1"

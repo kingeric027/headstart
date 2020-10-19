@@ -112,10 +112,10 @@ export class KitsEditComponent implements OnInit {
     }
 
     async getProductsInKit(product: MarketplaceKitProduct): Promise<void> {
-        let productAssignments = [];
+        const productAssignments = [];
         const accessToken = await this.appAuthService.fetchToken().toPromise();
         product.ProductAssignments.ProductsInKit.forEach(async p => {
-            let ocProduct = await HeadStartSDK.Products.Get(p.ID, accessToken);
+            const ocProduct = await HeadStartSDK.Products.Get(p.ID, accessToken);
             productAssignments.push({
                 ID: p.ID, Name: ocProduct.Product.Name, Variants: p.Variants, MinQty: p.MinQty, MaxQty: p.MaxQty, Static: p.Static, SpecCombo: p.SpecCombo
             });
@@ -134,7 +134,7 @@ export class KitsEditComponent implements OnInit {
         }
         const productUpdate = {
             field,
-            value: typeOfValue === "boolean" ? event.target.checked :
+            value: typeOfValue === 'boolean' ? event.target.checked :
                 typeOfValue === 'number' ? Number(event.target.value) : event.target.value
         };
         this.updateProductResource(productUpdate);
@@ -195,6 +195,7 @@ export class KitsEditComponent implements OnInit {
     handleDiscardChanges(): void {
         this.imageFiles = [];
         this.staticContentFiles = [];
+        this.productsToAdd = [];
         this.kitProductEditable = this.kitProductStatic;
         this.refreshProductData(this.kitProductStatic);
     }
@@ -208,15 +209,15 @@ export class KitsEditComponent implements OnInit {
             this.imageFiles?.length > 0 || this.staticContentFiles?.length > 0;
     }
 
-    /*********************************************
+    /** *******************************************
     ******** PRODUCT ASSIGNMENT FUNCTIONS ********
     *********************************************/
 
     async handleCreateAssignment() {
-        let updatedAssignments = this.isCreatingNew ? [] : this.kitProductEditable.ProductAssignments.ProductsInKit;
+        const updatedAssignments = this.isCreatingNew ? [] : this.kitProductEditable.ProductAssignments.ProductsInKit;
         const accessToken = await this.appAuthService.fetchToken().toPromise();
         await this.asyncForEach(this.productsToAdd, async (productID) => {
-            let ocProduct = await HeadStartSDK.Products.Get(productID, accessToken);
+            const ocProduct = await HeadStartSDK.Products.Get(productID, accessToken);
             const newProduct = {
                 ID: productID, Name: ocProduct.Product.Name,
                 Variants: ocProduct.Variants, SpecCombo: '',
@@ -224,8 +225,9 @@ export class KitsEditComponent implements OnInit {
             };
             const productInKit = { ID: productID, MinQty: null, MaxQty: null, Static: false, Variants: ocProduct.Variants, SpecCombo: '' };
             if (!this.productsIncluded.includes(newProduct)) this.productsIncluded.push(newProduct);
-            updatedAssignments.push(productInKit);
+            if (!updatedAssignments.includes(productInKit)) updatedAssignments.push(productInKit);
         });
+        this.productsToAdd = [];
         const updatedProduct = { field: 'ProductAssignments.ProductsInKit', value: updatedAssignments };
         this.updateProductResource(updatedProduct);
     }
@@ -238,11 +240,9 @@ export class KitsEditComponent implements OnInit {
     }
 
     handleDeleteAssignment(product: any): void {
-        const updatedAssignments = this.kitProductEditable.ProductAssignments.ProductsInKit;
-        for (let i = 0; i < updatedAssignments.length; i++) {
-            if (updatedAssignments[i].ID === product.ID) { updatedAssignments.splice(i, 1); }
-            if (this.productsIncluded[i]?.ID === product.ID) { this.productsIncluded.splice(i, 1); }
-        }
+        let updatedAssignments = this.kitProductEditable.ProductAssignments.ProductsInKit;
+        updatedAssignments = updatedAssignments.filter(p => p.ID !== product.ID);
+        this.productsIncluded = this.productsIncluded.filter(includedProduct => includedProduct.ID !== product.ID);
         const updatedProduct = {
             field: 'ProductAssignments.ProductsInKit',
             value: updatedAssignments
@@ -266,12 +266,10 @@ export class KitsEditComponent implements OnInit {
     }
 
     selectProductsToAdd(event: any, productID: string): void {
-        if (event.target.checked && !this.isProductInKit(productID)) {
+        if (event.target.checked && !this.isProductInKit(productID) && !this.productsToAdd.includes(productID)) {
             this.productsToAdd.push(productID);
         } else if (!event.target.checked) {
-            for (let i = 0; i < this.productsToAdd.length; i++) {
-                if (productID === this.productsToAdd[i]) this.productsToAdd.splice(i, 1);
-            }
+            this.productsToAdd = this.productsToAdd.filter(product => productID !== product)
         }
     }
 
@@ -286,7 +284,7 @@ export class KitsEditComponent implements OnInit {
         this.location.replaceState(newLocation);
     }
 
-    /*********************************************
+    /** *******************************************
     **** PRODUCT IMAGE / DOC UPLOAD FUNCTIONS ****
     *********************************************/
 
@@ -324,7 +322,7 @@ export class KitsEditComponent implements OnInit {
     async addDocuments(files: FileHandle[], productID: string): Promise<void> {
         let superProduct;
         for (const file of files) {
-            superProduct = await this.uploadAsset(productID, file, 'Attachment');
+            superProduct = await this.uploadAsset(productID, file, true);
         }
         this.staticContentFiles = [];
         // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
@@ -334,25 +332,26 @@ export class KitsEditComponent implements OnInit {
     async addImages(files: FileHandle[], productID: string): Promise<void> {
         let superProduct;
         for (const file of files) {
-            superProduct = await this.uploadAsset(productID, file, 'Image');
+            superProduct = await this.uploadAsset(productID, file);
         }
         this.imageFiles = []
         // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
         superProduct = Object.assign(this.kitProductStatic || {}, superProduct);
         this.refreshProductData(superProduct);
     }
-    async uploadAsset(productID: string, file: FileHandle, assetType: string): Promise<MarketplaceKitProduct> {
+    async uploadAsset(productID: string, file: FileHandle, isAttachment = false): Promise<SuperMarketplaceProduct> {
         const accessToken = await this.appAuthService.fetchToken().toPromise();
-        const asset: AssetUpload = {
-            Active: true,
-            File: file.File,
-            Type: (assetType as AssetUpload['Type']),
-            FileName: file.Filename
-        }
+        const asset = {
+          Active: true,
+          Title: isAttachment ? 'Product_Attachment' : null,
+          File: file.File,
+          FileName: file.Filename
+        } as AssetUpload;
         const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-        await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken);
-        return await this.middlewareKitService.Get(productID);
+        await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
+        return await HeadStartSDK.Products.Get(productID, accessToken);   
     }
+
     async removeFile(file: Asset): Promise<void> {
         const accessToken = await this.appAuthService.fetchToken().toPromise();
         // Remove the image assignment, then remove the image

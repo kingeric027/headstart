@@ -25,18 +25,13 @@
     </div>
     <div class="form-group d-flex justify-content-between mb-0">
       <div class="form-group card-number mr-2 flex-fill">
-        <label class="sr-only"
-               for="cardNumber"
+        <label for="cardNumber"
                translate>PAYMENTS.CC_FORM.NUMBER</label>
-        <input type="text"
-               formControlName="number"
-               class="form-control"
-               id="cardNumber"
-               placeholder="Card Number"
-               autofocus="true"
-               showErrors
-               appCreditCardInput
-               autocomplete="off" />
+        <input type="hidden"
+               formControlName="token">
+        <ocm-credit-card-iframe (ccEntered)="ccEntered($event.detail)"></ocm-credit-card-iframe>
+        <span *ngIf="cardError"
+              class="error">{{cardError}}</span>
       </div>
       <div class="form-group mr-2 flex-fill">
         <label class="sr-only"
@@ -117,7 +112,7 @@
                translate>PAYMENTS.CC_FORM.STATE</label>
         <select *ngIf="stateOptions.length !== 0"
                 formControlName="state"
-                class="form-control"
+                class="custom-select"
                 id="State"
                 showErrors>
           <option [ngValue]="null"
@@ -153,7 +148,7 @@
              for="country"
              translate>PAYMENTS.CC_FORM.COUNTRY</label>
       <select formControlName="country"
-              class="form-control"
+              class="custom-select"
               id="Country"
               showErrors
               (change)="onCountryChange($event)">
@@ -166,13 +161,13 @@
     </div>
   </div>
   <button type="submit"
-          class="btn btn-primary btn-block-xs mt-4 mr-2"
+          class="btn btn-sm btn-secondary mt-2"
           [disabled]="!cardForm.valid">
     {{ submitText }}
   </button>
   <button (click)="dismissForm()"
           *ngIf="!_showCVV"
-          class="btn btn-link text-danger mt-4"
+          class="btn btn-link text-danger mt-2"
           type="button"
           translate>PAYMENTS.CC_FORM.CANCEL</button>
 </form>

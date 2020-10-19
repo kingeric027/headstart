@@ -56,7 +56,7 @@
     <ul>
       <li *ngFor="let approval of approvals"
           translate>
-        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} ORDERS.HISTORICAL.ON {{ approval.DateCreated | date: 'short' }}
+        {{ approval.Approver.FirstName }} {{ approval.Approver.LastName }} {{ approval.Status }} - {{ approval.DateCreated | date: 'short' }}
         <div><small *ngIf="approval.Comments">"{{ approval.Comments }}"</small></div>
       </li>
     </ul>
@@ -76,13 +76,18 @@
     <p>
       {{order.xp?.QuoteOrderInfo?.Email}}
     </p>
+    <p>
+      {{order.xp?.QuoteOrderInfo?.BuyerLocation}}
+    </p>
     <div *ngIf="order?.xp?.QuoteOrderInfo?.Comments"
          class="alert alert-secondary small">
-      <strong translate>ORDERS.HISTORICAL.COMMENTS: </strong> {{order.xp?.QuoteOrderInfo?.Comments}}
+      <strong translate>ORDERS.HISTORICAL.COMMENTS </strong>: {{order.xp?.QuoteOrderInfo?.Comments}}
     </div>
   </div>
 </div>
-<ocm-lineitem-table [lineItems]="lineItems"
+<ocm-lineitem-table *ngIf="lineItems && lineItems.length"
+                    [lineItems]="lineItems"
                     [orderType]="order?.xp?.OrderType"
+                    [groupByKits]="true"
                     [readOnly]="true">
 </ocm-lineitem-table>

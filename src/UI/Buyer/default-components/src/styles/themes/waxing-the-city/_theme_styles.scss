@@ -32,3 +32,20 @@ h6,
     box-shadow: 0 .125rem .25rem rgba($purple, .25)
   }
 }
+
+// Product Card
+ocm-product-card {
+  .card,
+  .card-img-top {
+    border-radius: 0;
+  }
+}
+
+// Product Card's Footer Input
+.card-footer {
+  ocm-quantity-input {
+    input {
+      border-radius: 0;
+    }
+  }
+}

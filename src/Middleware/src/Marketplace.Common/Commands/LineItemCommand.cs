@@ -239,7 +239,7 @@ namespace Marketplace.Common.Commands
             // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
             var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
 
-            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status]) {
+            foreach (KeyValuePair<VerifiedUserType, EmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status]) {
                 var userType = entry.Key;
                 var emailText = entry.Value;
 
@@ -283,7 +283,7 @@ namespace Marketplace.Common.Commands
                     {
                         await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
                         {
-                            if (supplier.xp.NotificationRcpts.Any())
+                            if (supplier?.xp?.NotificationRcpts?.Any() ?? false)
                             {
                                 var tos = new List<EmailAddress>();
                                 foreach (var rcpt in supplier.xp.NotificationRcpts)
@@ -293,6 +293,7 @@ namespace Marketplace.Common.Commands
                                 await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
                             }
                         });
+                        
                     }
                 }
             }
@@ -396,6 +397,10 @@ namespace Marketplace.Common.Commands
         private bool LineItemsMatch(LineItem li1, LineItem li2)
         {
             if (li1.ProductID != li2.ProductID) return false;
+            if (!String.IsNullOrEmpty(li2.xp.PrintArtworkURL)) 
+            {
+                if (li2.xp.PrintArtworkURL != li1.xp.PrintArtworkURL) return false;
+            }
             foreach (var spec1 in li1.Specs) {
                 var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
                 if (spec1?.Value != spec2?.Value) return false;

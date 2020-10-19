@@ -39,7 +39,8 @@ namespace ordercloud.integrations.avalara
 				type = docType,
 				customerCode = buyerLocationID,
 				date = DateTime.Now,
-				lines = productLines.Concat(shipingLines).ToList()
+				lines = productLines.Concat(shipingLines).ToList(),
+				purchaseOrderNo = order.Order.ID
 			};
 		}
 

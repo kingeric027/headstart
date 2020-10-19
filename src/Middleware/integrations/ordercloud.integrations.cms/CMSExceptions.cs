@@ -16,11 +16,6 @@ namespace ordercloud.integrations.cms
 		public AssetCreateValidationException(string message) : base("Asset Create Validation", message, null) { }
 	}
 
-	public class TokenExpiredException : OrderCloudIntegrationException
-	{
-		public TokenExpiredException() : base("Token", "Token has expired", null) { }
-	}
-
 	public class DuplicateIDException : OrderCloudIntegrationException
 	{
 		public DuplicateIDException() : base("IdExists", "Object already exists.", null) { }
@@ -50,6 +45,20 @@ namespace ordercloud.integrations.cms
 	public class ValidationException : OrderCloudIntegrationException
 	{
 		public ValidationException(string field, string message) : base(field, message, null) { }
+	}
 
+	public class ReorderImagesOnlyException : OrderCloudIntegrationException
+	{
+		public ReorderImagesOnlyException() : base("Reorder Error", "Only Image-type assets have an ordering.", null) { }
+	}
+
+	public class NotConfiguredForAssetsException : OrderCloudIntegrationException
+	{
+		public NotConfiguredForAssetsException(string sellerID) : base("Configuration Error", $"Your OC organization with SellerID {sellerID} is not configured to use the Assets feature. Please contact oheywood@four51.com for access.", null) { }
+	}
+
+	public class MissingConfigationException : OrderCloudIntegrationException
+	{
+		public MissingConfigationException() : base("Configuration Error", $"Missing Configuration Record.", null) { }
 	}
 }

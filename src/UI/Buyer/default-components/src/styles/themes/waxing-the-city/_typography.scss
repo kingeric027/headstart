@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap');
+
 // Waxing The City Font Declarations
 // Separating them in order to keep _theme_variables.scss cleaner
 
@@ -42,44 +44,4 @@
   font-display: auto;
   font-style: normal;
   font-weight: 900;
-}
-
-@font-face {
-  font-family: "Nunito";
-  src: url("https://use.typekit.net/af/055185/00000000000000003b9b2f7f/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"), 
-       url("https://use.typekit.net/af/055185/00000000000000003b9b2f7f/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"), 
-       url("https://use.typekit.net/af/055185/00000000000000003b9b2f7f/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-  font-display: auto;
-  font-style: normal;
-  font-weight: 700;
-}
-
-@font-face {
-  font-family: "Nunito";
-  src: url("https://use.typekit.net/af/99f86d/00000000000000003b9b2f7b/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"), 
-       url("https://use.typekit.net/af/99f86d/00000000000000003b9b2f7b/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"), 
-       url("https://use.typekit.net/af/99f86d/00000000000000003b9b2f7b/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
-  font-display: auto;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Nunito";
-  src: url("https://use.typekit.net/af/064810/00000000000000003b9b2f7c/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3") format("woff2"), 
-       url("https://use.typekit.net/af/064810/00000000000000003b9b2f7c/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3") format("woff"), 
-       url("https://use.typekit.net/af/064810/00000000000000003b9b2f7c/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3") format("opentype");
-  font-display: auto;
-  font-style: italic;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Nunito";
-  src: url("https://use.typekit.net/af/a349aa/00000000000000003b9b2f80/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3") format("woff2"), 
-       url("https://use.typekit.net/af/a349aa/00000000000000003b9b2f80/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3") format("woff"), 
-       url("https://use.typekit.net/af/a349aa/00000000000000003b9b2f80/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3") format("opentype");
-  font-display: auto;
-  font-style: italic;
-  font-weight: 700;
 }

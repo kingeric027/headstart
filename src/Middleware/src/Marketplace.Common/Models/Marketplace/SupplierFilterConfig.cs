@@ -6,6 +6,7 @@ using ordercloud.integrations.cms;
 using Newtonsoft.Json.Linq;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
 namespace Marketplace.Models
 {
@@ -34,6 +35,12 @@ namespace Marketplace.Models
     {
         public string Text {get; set;}
         public string Value {get; set; }
+    }
+
+    public class BuyerAppFilterType
+    {
+        public const string SelectOption = "SelectOption";
+        public const string NonUI = "NonUI";
     }
 
 }

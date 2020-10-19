@@ -26,6 +26,16 @@ export async function getBuyerLocationID(
 	if (location.AddressName.includes('AutomationLocation_')) return location.ID
 }
 
+export async function getBuyerLocations(buyerID: string, clientAuth: string) {
+	const buyerLocations = await OrderCloudSDK.Addresses.List(
+		buyerID,
+		{},
+		{ accessToken: clientAuth }
+	)
+
+	return buyerLocations.Items
+}
+
 export async function deleteBuyerLocationWithName(
 	locationName: string,
 	buyerID: string,

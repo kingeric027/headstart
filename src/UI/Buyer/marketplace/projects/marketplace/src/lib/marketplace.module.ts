@@ -45,6 +45,8 @@ import { OrderHistoryWrapperComponent } from './wrapper-components/order-history
 import { OrdercloudEnv } from './shopper-context';
 import { TempSdk } from './services/temp-sdk/temp-sdk.service';
 import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component';
+import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/product-chili-configuration-wrapper.component';
+import { ChiliTemplateResolver } from './resolves/chili-template.resolve';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -70,6 +72,7 @@ import { StaticPageWrapperComponent } from './wrapper-components/static-page-wra
     CheckoutService,
     OrderStateService,
     ShopperContextService,
+    ChiliTemplateResolver,
   ],
   declarations: [
     CartWrapperComponent,
@@ -92,6 +95,7 @@ import { StaticPageWrapperComponent } from './wrapper-components/static-page-wra
     OrderShipmentsWrapperComponent,
     OrderHistoryWrapperComponent,
     SupplierListWrapperComponent,
+    ProductChiliConfigurationWrapperComponent
   ],
 })
 export class MarketplaceModule {

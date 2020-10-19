@@ -42,13 +42,20 @@ export class ProductFilters implements OnInit{
   }
 
   async getFacets(): Promise<void> {
-    const facets = await this.ocFacetService.List().toPromise();
-    this.facetOptions = facets.Items.filter(f => f?.xp?.Options?.length);
+    let facetsListPage = await this.ocFacetService.List({ pageSize: 100 }).toPromise();
+    let facets = facetsListPage.Items;
+    if (facetsListPage.Meta.TotalPages > 1) {
+      for (let i = 2; i <= facetsListPage.Meta.TotalPages; i++) {
+        let additionalFacets = await this.ocFacetService.List({ pageSize: 100, page: i}).toPromise();
+        facets = facets.concat(additionalFacets.Items);
+      }
+    }
+    this.facetOptions = facets.filter(f => f?.xp?.Options?.length);
   }
 
   areFacetOptionsSelected(facet: ProductFacet): boolean {
     const productXpFacetKey = facet?.XpPath.split('.')[1];
-    return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey);
+    return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey) && this.facetsOnProductEditable[productXpFacetKey].length;
   }
 
   isFacetOptionApplied(facet: ProductFacet, option: string): boolean {
@@ -98,11 +105,12 @@ export class ProductFilters implements OnInit{
   }
 
   checkForFacetOverrides(): boolean {
-    const keys = Object.keys(this.facetsOnProductStatic);
+    const keys = Object.keys(this.facetsOnProductEditable);
     let changeDetected = false;
     keys.forEach(key => {
       if (this.facetsOnProductEditable[key]?.length !== this.facetsOnProductStatic[key]?.length ||
-          !this.facetsOnProductEditable[key].every(item => this.facetsOnProductStatic[key].includes(item))) {
+          !this.facetsOnProductEditable[key].every(item => this.facetsOnProductStatic[key].includes(item)) ||
+          (!(key in this.facetsOnProductStatic))) {
         changeDetected = true;
       }
     });

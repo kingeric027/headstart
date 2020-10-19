@@ -8,6 +8,11 @@ export interface Environment {
     blobStorageUrl: string;
     orderCloudApiUrl: string;
     orderCloudApiVersion: string;
+    buyerConfigs: Record<string, BuyerConfig>;
+    superProductFieldsToMonitor: string[];
+}
+
+export interface BuyerConfig {
+    clientID: string;
     buyerUrl: string;
-    buyerClientID: string;
 }

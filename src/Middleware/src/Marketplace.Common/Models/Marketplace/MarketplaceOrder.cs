@@ -5,6 +5,8 @@ using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
+using Avalara.AvaTax.RestClient;
+using Marketplace.Common.Exceptions;
 
 namespace Marketplace.Models
 {
@@ -33,6 +35,16 @@ namespace Marketplace.Models
         public ClaimStatus ClaimStatus { get; set; }
         public string PaymentMethod { get; set; }
         public MarketplaceAddressBuyer ShippingAddress { get; set; }
+        public List<ShipMethodSupplierView> SelectedShipMethodsSupplierView { get; set; }
+    }
+
+    [SwaggerModel]
+    public class ShipMethodSupplierView 
+    {
+        public int EstimatedTransitDays { get; set; }
+        public string Name { get; set; } // e.g. "Fedex PRIORITY_OVERNIGHT"
+        public string ShipFromAddressID { get; set; }
+        // Do not include buyer's cost. That is none of the supplier's beeswax 
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

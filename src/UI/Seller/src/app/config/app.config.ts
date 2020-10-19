@@ -11,8 +11,8 @@ export const ocAppConfig: AppConfig = {
   orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
   blobStorageUrl: environment.blobStorageUrl,
-  buyerUrl: environment.buyerUrl,
-  buyerClientID: environment.buyerClientID,
+  buyerConfigs: environment.buyerConfigs,
+  superProductFieldsToMonitor: environment.superProductFieldsToMonitor,
   // sellerName is being hard-coded until this is available to store in OrderCloud
   sellerName: 'SEB Seller',
   scope: [
@@ -135,8 +135,14 @@ export interface AppConfig {
   sellerName: string;
 
   //  buyer url and client ID are needed for impersonating buyers
-  buyerUrl: string;
-  buyerClientID: string;
+  buyerConfigs: any;
+  
+  /**
+   * An array of fields on a product that should be monitored for changes.
+   * If a supplier makes a change to a field within this string array, the product will be deactivated
+   * until a seller reviews the change and approves it.
+   */
+  superProductFieldsToMonitor: string[];
 
   /**
    * An array of security roles that will be requested upon login.

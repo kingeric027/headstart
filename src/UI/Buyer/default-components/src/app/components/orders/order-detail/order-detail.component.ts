@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons';
-import { ShopperContextService, OrderReorderResponse, OrderViewContext, ShippingStatus } from 'marketplace';
+import { ShopperContextService, OrderReorderResponse, OrderViewContext } from 'marketplace';
 import { MarketplaceOrder, OrderDetails, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isQuoteOrder } from '../../../services/orderType.helper';
@@ -44,6 +44,15 @@ export class OCMOrderDetails implements OnInit {
 
   isFavorite(orderID: string): boolean {
     return this.context.currentUser.get().FavoriteOrderIDs.includes(orderID);
+  }
+
+  getOrderStatus(): string {
+    // AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
+    if (this.order?.Status === 'AwaitingApproval') {
+      return 'AwaitingApproval'
+    } else {
+      return this.order?.xp?.SubmittedOrderStatus;
+    }
   }
 
   canRequestReturn(): boolean {

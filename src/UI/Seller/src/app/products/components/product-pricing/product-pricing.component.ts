@@ -7,6 +7,7 @@ import { SupportedRates } from '@app-seller/shared/models/supported-rates.interf
 import { BuyerTempService, SuperMarketplaceBuyer } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 import { SuperMarketplaceProduct, MarketplaceBuyer, HeadStartSDK, MarketplacePriceSchedule } from '@ordercloud/headstart-sdk';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'product-pricing-component',
@@ -42,6 +43,7 @@ export class ProductPricingComponent {
 
   @Output()
   updateProduct = new EventEmitter<ResourceUpdate>();
+  faExclamationCircle = faExclamationCircle;
   supplierPriceSchedule: PriceSchedule;
   buyerMarkedUpSupplierPrices: PriceSchedule;
 
@@ -84,22 +86,23 @@ export class ProductPricingComponent {
   }
 
   getBuyerPercentMarkupPrice(supplierPrice: number): number {
-    const markupMultiplier = (this.selectedSuperMarketplaceBuyer?.Markup?.Percent || 0)/100 + 1; 
+    const markupMultiplier = (this.selectedSuperMarketplaceBuyer?.Markup?.Percent || 0) / 100 + 1;
     const conversionRate = this.supplierToSellerCurrencyRate * markupMultiplier;
-    return Math.round(supplierPrice * conversionRate);
+    return supplierPrice * conversionRate;
+
   }
 
   updateSupplierPriceSchedule(event: PriceSchedule): void {
-    this.updateProduct.emit({field: 'PriceSchedule', value: event});
+    this.updateProduct.emit({ field: 'PriceSchedule', value: event });
   }
-  
+
   updateOverridePriceSchedule(event: PriceSchedule): void {
     this.overridePriceScheduleEditable = event;
     this.diffBuyerVisibility();
   }
 
   diffBuyerVisibility(): void {
-    if(!this.isSavedOverride && this.isUsingPriceOverride) {
+    if (!this.isSavedOverride && this.isUsingPriceOverride) {
       this.areChangesToBuyerVisibility = true;
     } else if (this.isSavedOverride && !this.isUsingPriceOverride) {
       this.areChangesToBuyerVisibility = true;

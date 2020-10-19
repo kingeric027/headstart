@@ -94,10 +94,10 @@ export class TemplateEditComponent implements OnChanges {
   }
 
   async populateFilters(): Promise<void> {
-    for (let filter of this.filters) {
+    for (const filter of this.filters) {
       switch (filter.sourceType) {
         case 'oc':
-          let data = await this[filter.source].List().toPromise();
+          const data = await this[filter.source].List().toPromise();
           filter.filterValues = data.Items;
           break;
         case 'model':
@@ -105,7 +105,7 @@ export class TemplateEditComponent implements OnChanges {
             filter.filterValues = GeographyConfig.getCountries();
           }
           if (filter.name === 'State') {
-            //For now, filtering is setup only for US states.  Will eventually need a way to get all states relevant to Seller organization.
+            // For now, filtering is setup only for US states.  Will eventually need a way to get all states relevant to Seller organization.
             filter.filterValues = this.geographyService.getStates('US');
           }
           if (filter.name === 'Order Type') {
@@ -127,7 +127,7 @@ export class TemplateEditComponent implements OnChanges {
   }
 
   toggleHeader(selectedHeader: string): void {
-    let headers = [...this.updatedResource.Headers];
+    const headers = [...this.updatedResource.Headers];
     const i = headers?.indexOf(selectedHeader);
     if (i > -1) {
       headers?.splice(i, 1);
@@ -136,17 +136,17 @@ export class TemplateEditComponent implements OnChanges {
     }
     const headersToCompare = this.headers.map(header => header.path);
     headers?.sort((a, b) => headersToCompare.indexOf(a) - headersToCompare.indexOf(b));
-    this.resourceForm.controls['Headers'].setValue(headers);
+    this.resourceForm.controls.Headers.setValue(headers);
     this.updateResource.emit({ value: headers, field: 'Headers'});
   }
 
   toggleFilter(filter: Filter, filterValue: any): void {
-    let filters = cloneDeep(this.updatedResource.Filters);
-    var selectedFilterValues = filters[filter.path];
+    const filters = cloneDeep(this.updatedResource.Filters);
+    const selectedFilterValues = filters[filter.path];
     if (!selectedFilterValues || !selectedFilterValues.length) {
       filters[filter.path] = filter.dataKey ? [filterValue[filter.dataKey]] : [filterValue];
     } else {
-      let selectedValue = filter.dataKey ? filterValue[filter.dataKey] : filterValue;
+      const selectedValue = filter.dataKey ? filterValue[filter.dataKey] : filterValue;
       const i = selectedFilterValues.indexOf(selectedValue);
       if (i > -1) {
         selectedFilterValues.splice(i, 1);
@@ -155,7 +155,7 @@ export class TemplateEditComponent implements OnChanges {
       }
     }
     selectedFilterValues?.sort();
-    this.resourceForm.controls['Filters'].setValue(filters);
+    this.resourceForm.controls.Filters.setValue(filters);
     this.updateResource.emit({ value: filters, field: 'Filters'});
   }
 
@@ -163,16 +163,16 @@ export class TemplateEditComponent implements OnChanges {
     if (includeAll) {
       const i = this.filterChipsToDisplay.indexOf(filter);
       this.filterChipsToDisplay.splice(i, 1);
-      let filterValues = this.filters.find(f => f.path === filter.path).filterValues;
+      const filterValues = this.filters.find(f => f.path === filter.path).filterValues;
       this.updatedResource.Filters[filter.path] = filterValues.map(value => {
         return filter.dataKey ? value[filter.dataKey] : filter;
       });
-      this.resourceForm.controls['Filters'].setValue(this.updatedResource.Filters);
+      this.resourceForm.controls.Filters.setValue(this.updatedResource.Filters);
       this.updateResource.emit({ value: this.updatedResource.Filters, field: 'Filters'});
     } else {
       this.filterChipsToDisplay.push(filter);
       this.updatedResource.Filters[filter.path] = [];
-      this.resourceForm.controls['Filters'].setValue(this.updatedResource.Filters);
+      this.resourceForm.controls.Filters.setValue(this.updatedResource.Filters);
       this.updateResource.emit({ value: this.updatedResource.Filters, field: 'Filters'});
     }
   }
@@ -182,14 +182,14 @@ export class TemplateEditComponent implements OnChanges {
   }
 
   handleSelectAllHeaders(): void {
-    let headersPaths = this.headers.map(header => header.path);
-    this.resourceForm.controls['Headers'].setValue(headersPaths);
+    const headersPaths = this.headers.map(header => header.path);
+    this.resourceForm.controls.Headers.setValue(headersPaths);
     this.updateResource.emit({ value: headersPaths, field: 'Headers'});
   }
 
   handleUnselectAllHeaders(): void {
     this.updatedResource.Headers = [];
-    this.resourceForm.controls['Headers'].setValue(this.updatedResource.Headers);
+    this.resourceForm.controls.Headers.setValue(this.updatedResource.Headers);
     this.updateResource.emit({ value: this.updatedResource.Headers, field: 'Headers'});
   }
 }

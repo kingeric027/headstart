@@ -1,8 +1,8 @@
 <div class="container">
   <div *ngIf="order">
-    <nav class="breadcrumb"
+    <nav class="breadcrumb mt-3 bg-light"
          aria-label="breadcrumb">
-      <a class="breadcrumb-item link text-primary"
+      <a class="breadcrumb-item text-primary"
          (click)="toAllOrders()"
          translate>ORDERS.DETAIL.ALL</a>
       <a class="breadcrumb-item link text-primary"
@@ -19,7 +19,7 @@
     </div>
     <div class="row">
       <div class="col-md-4">
-        <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="order.xp.SubmittedOrderStatus"></ocm-order-status-icon> {{ order.xp.SubmittedOrderStatus }}</div>
+        <div><span translate>ORDERS.DETAIL.STATUS</span>: <ocm-order-status-icon [status]="getOrderStatus()"></ocm-order-status-icon> {{ getOrderStatus() }}</div>
         <div><span translate>ORDERS.DETAIL.SHIPPING_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ShippingStatus"></ocm-order-status-icon> {{ order.xp.ShippingStatus | orderStatusDisplay}}</div>
         <div><span translate>ORDERS.DETAIL.CLAIM_STATUS</span>: <ocm-order-status-icon [status]="order.xp.ClaimStatus"></ocm-order-status-icon> {{ order.xp.ClaimStatus | orderStatusDisplay}}</div>
         <small class="float-left"><span translate>ORDERS.DETAIL.SUBMITTED</span> {{ order.DateSubmitted | date: 'short' }}</small>
@@ -90,6 +90,7 @@
             </div>
             <ocm-lineitem-table *ngIf="reorderResponse.InvalidLi.length"
                                 [lineItems]="reorderResponse.InvalidLi"
+                                [groupByKits]="true"
                                 [readOnly]="true">
             </ocm-lineitem-table>
             <div class="row d-flex justify-content-space-between justify-content-between mr-2 ml-2">
@@ -100,8 +101,7 @@
               <button type="button"
                       class="btn btn-primary btn-md"
                       [disabled]="!reorderResponse?.ValidLi?.length"
-                      (click)="addToCart()"
-                      (click)="modal.dismiss()"
+                      (click)="addToCart(); modal.dismiss();"
                       translate>
                 ORDERS.DETAIL.ADD_TO_CART
               </button>
@@ -122,8 +122,7 @@
                       (click)="modal.dismiss()">Cancel</button>
               <button type="button"
                       class="btn btn-primary btn-md"
-                      (click)="moveOrderToCart()"
-                      (click)="modal.dismiss()"
+                      (click)="moveOrderToCart();modal.dismiss()"
                       translate>
                 ORDERS.DETAIL.MOVE_TO_CART
               </button>

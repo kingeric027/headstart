@@ -149,7 +149,7 @@ namespace Orchestration.Tests
                 ProductID = productId,
                 Title = Guid.NewGuid().ToString(),
                 Url = Guid.NewGuid().ToString(),
-                Type = AssetType.Attachment,
+                Type = AssetType.Unknown,
                 Tags = new List<string>(),
                 FileName = Guid.NewGuid().ToString()
             };

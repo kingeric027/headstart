@@ -10,6 +10,11 @@ export const environment: Environment = {
     blobStorageUrl: 'https://stfour51demotest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
-    buyerUrl: 'https://headstartdemo-buyer-ui-test.azurewebsites.net/',
-    buyerClientID: 'A482C18B-527B-4BA1-A2E9-0E7C65C2E39F',
+    buyerConfigs: {
+        'Default Buyer': {
+            clientID: 'A482C18B-527B-4BA1-A2E9-0E7C65C2E39F',
+            buyerUrl: 'https://headstartdemo-buyer-ui-test.azurewebsites.net/'
+        }
+    },
+    superProductFieldsToMonitor: []
 }

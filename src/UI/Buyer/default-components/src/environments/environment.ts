@@ -40,9 +40,9 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const appName: AppName = GO2PARTNERS;
-const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
-const localMiddlewareURL = 'https://localhost:5001';
+const appName: AppName = WAXING_THE_CITY;
+const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
+const localMiddlewareURL = 'https://localhost:44381';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -60,11 +60,13 @@ const devEnvironments = {
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: afTheme,
+    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
   },
   WAXING_THE_CITY: {
     hostedApp: false,
@@ -73,11 +75,13 @@ const devEnvironments = {
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: wtcTheme,
+    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
   },
   BASECAMP_FITNESS: {
     hostedApp: false,
@@ -86,11 +90,13 @@ const devEnvironments = {
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bcfTheme,
+    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
   },
   BAR_METHOD: {
     hostedApp: false,
@@ -99,11 +105,13 @@ const devEnvironments = {
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bmTheme,
+    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
   },
   HEADSTART_DEMO: {
     hostedApp: false,

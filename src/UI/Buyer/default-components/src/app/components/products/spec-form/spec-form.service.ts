@@ -1,7 +1,7 @@
 import { find as _find, sortBy as _sortBy } from 'lodash';
 import { SpecOption, Spec, LineItemSpec, PriceBreak } from 'ordercloud-javascript-sdk';
 import { Injectable } from '@angular/core';
-import { SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
+import { Asset } from '@ordercloud/headstart-sdk';
 import { FormGroup } from '@angular/forms';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class SpecFormService {
   constructor() { }
 
   public getSpecMarkup(specs: Spec[], selectedBreak: PriceBreak, qty: number, specForm: FormGroup): number {
-    const formValues = specForm.value;
+    const formValues = specForm.value || undefined;
     const markups: Array<number> = new Array<number>();
     for (const value in formValues) {
       if (formValues.hasOwnProperty(value)) {
@@ -28,7 +28,7 @@ export class SpecFormService {
   }
 
   public getLineItemSpecs(buyerSpecs: Spec[], specForm: FormGroup): Array<LineItemSpec> {
-    const formValues = specForm.value;
+    const formValues = specForm ? specForm.value : undefined;
     const specs: Array<LineItemSpec> = new Array<LineItemSpec>();
     for (const value in formValues) {
       if (formValues.hasOwnProperty(value)) {
@@ -67,15 +67,20 @@ export class SpecFormService {
     return specs;
   }
 
-  public getLineItemImageUrl(product: SuperMarketplaceProduct, specForm: FormGroup): string {
-    const image = product.Images?.find(img => this.isImageMatchingSpecs(img, product, specForm));
+  public getLineItemImageUrl(images: Asset[], specs: Spec[], specForm: FormGroup): string {
+    if (!specs.length) {
+      const firstImage = images[0];
+      return firstImage?.Url;
+    }
+    const image = images?.find(img => this.isImageMatchingSpecs(img, specs, specForm));
+    if (!image) return images[0]?.Url;
     return image?.Url;
   }
 
-  private isImageMatchingSpecs(image: Asset, product: SuperMarketplaceProduct, specForm: FormGroup): boolean {
+  private isImageMatchingSpecs(image: Asset, specs: Spec[], specForm: FormGroup): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    const specs = this.getLineItemSpecs(product.Specs, specForm);
-    return specs.
+    const liSpecs = this.getLineItemSpecs(specs, specForm);
+    return liSpecs.
       every(spec => image.Tags
         .find(tag => tag?.split('-')
           .includes(spec.Value.replace(/\s/g, ''))));

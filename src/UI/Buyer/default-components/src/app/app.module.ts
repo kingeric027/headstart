@@ -121,6 +121,7 @@ import { OCMPaymentList } from './components/payments/payment-list/payment-list.
 import { OCMAddressCard } from './components/profile/address-card/address-card.component';
 import { OCMCreditCardIcon } from './components/payments/credit-card-icon/credit-card-icon.component';
 import { OCMCreditCardDisplay } from './components/payments/credit-card-display/credit-card-display.component';
+import { OCMCreditCardIframe } from './components/payments/credit-card-iframe/credit-card-iframe.component';
 import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
 import { OCMProfileForm } from './components/profile/profile-form/profile-form.component';
 import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/checkout-shipping.component';
@@ -143,6 +144,8 @@ import { OCMBuyerLocationPermissions } from './components/profile/buyer-location
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component';
 import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { OCMStaticPage } from './components/layout/static-page/static-page.component';
+import { OCMProductChiliConfig } from './components/products/product-chili-configuration/product-chili-configuration.component';
+import { OCMKitProductDetails } from './components/products/kit-product-details/kit-product-details.component';
 
 export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
@@ -158,6 +161,7 @@ const components = [
   OCMQuantityInput,
   OCMProductCarousel,
   OCMProductDetails,
+  OCMKitProductDetails,
   OCMImageGallery,
   OCMSpecForm,
   OCMOrderSummary,
@@ -178,6 +182,7 @@ const components = [
   OCMAddressCard,
   OCMCreditCardIcon,
   OCMCreditCardDisplay,
+  OCMCreditCardIframe,
   OCMCreditCardForm,
   OCMModal,
   OCMOrderStatusIcon,
@@ -231,6 +236,7 @@ const components = [
   OCMLocationListItem,
   OCMLocationManagement,
   OCMCertificateForm,
+  OCMProductChiliConfig
 ];
 
 // @dynamic
@@ -320,6 +326,8 @@ export class AppModule {
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table');
 
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
+    this.buildWebComponent(OCMProductChiliConfig, 'ocm-product-chili-configuration');
+    this.buildWebComponent(OCMKitProductDetails, 'ocm-kit-product-details');
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
     this.buildWebComponent(OCMStaticPage, 'ocm-static-page');
@@ -340,6 +348,7 @@ export class AppModule {
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
     this.buildWebComponent(OCMCreditCardIcon, 'ocm-credit-card-icon');
     this.buildWebComponent(OCMCreditCardDisplay, 'ocm-credit-card-display');
+    this.buildWebComponent(OCMCreditCardIframe, 'ocm-credit-card-iframe');
     this.buildWebComponent(OCMCreditCardForm, 'ocm-credit-card-form');
     this.buildWebComponent(OCMModal, 'ocm-modal');
     this.buildWebComponent(OCMOrderStatusIcon, 'ocm-order-status-icon');

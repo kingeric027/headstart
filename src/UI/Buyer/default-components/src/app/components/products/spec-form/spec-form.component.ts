@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormBuilder } from '@angular/forms';
 import { FormGroup, Validators } from '@angular/forms';
 import { map as _map, find as _find } from 'lodash';
-
 import { FieldConfig } from './field-config.interface';
 import { SpecOption, Spec } from 'ordercloud-javascript-sdk';
 import { SpecFormEvent } from './spec-form-values.interface';
@@ -24,12 +24,17 @@ import { ShopperContextService } from 'marketplace';
   `,
   styleUrls: ['./spec-form.component.scss'],
 })
+
 export class OCMSpecForm implements OnChanges {
   @Output() specFormChange: EventEmitter<SpecFormEvent> = new EventEmitter<SpecFormEvent>();
+  @Output() isSelectionInactive: EventEmitter<boolean> = new EventEmitter<boolean>();
   config: FieldConfig[] = [];
   form: FormGroup;
+  isValidAvailability: boolean;
+  controlInactive: boolean;
 
   @Input() currency: string;
+  @Input() disabledVariants: MarketplaceVariant[]
   @Input() compact?: boolean = false; // displays inputs in a compact way by setting them on a single line
   @Input() specs: Spec[]
 
@@ -88,10 +93,43 @@ export class OCMSpecForm implements OnChanges {
     return new FormControl({ disabled, value }, validation);
   }
 
-  handleChange(): void {
+  handleChange(): void { 
+    this.validateChangeAvailability(this.form, this.disabledVariants);
     this.specFormChange.emit({
       form: this.form,
     });
+  }
+
+  validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]): void {
+    let controlInactive = false;
+    if (!disabledVariants) { return; }
+    if (disabledVariants?.length < 1){ return; }
+    for(const disabledVariant of disabledVariants){
+      if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
+        controlInactive = true;
+        this.isSelectionInactive.emit(controlInactive);
+        return;
+      }
+    }
+
+    if (!controlInactive) {
+      this.isSelectionInactive.emit(controlInactive);
+    }
+  }
+
+  isControlInactive(ctrls: string[], disabledVariant: MarketplaceVariant): boolean {
+    let controlCount = 0;
+   for (const variant of disabledVariant.Specs) {
+     ctrlLoop:
+     for (const controlValue of ctrls){
+       if (variant.Value === controlValue) {
+        controlCount = controlCount + 1;
+        if (controlCount ===  ctrls.length){ return true; }
+        break ctrlLoop;
+       }
+     }
+   }
+   return false;
   }
 
   private createCheckboxField(spec: Spec): FieldConfig {
@@ -132,6 +170,7 @@ export class OCMSpecForm implements OnChanges {
         }).Value
         : null,
       options: _map(spec.Options),
+      disabledVariants: this.disabledVariants,
       validation: [spec.Required ? Validators.required : Validators.nullValidator],
       currency: this.context.currentUser.get().Currency
     }

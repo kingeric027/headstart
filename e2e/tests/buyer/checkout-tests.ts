@@ -34,77 +34,78 @@ fixture`Checkout Tests`
 	.page(testConfig.buyerAppUrl)
 
 test('Can I checkout with 1 item? | 2473', async t => {
-	await buyerHeaderPage.search('7 Mile T-Shirt')
-	await productListPage.clickProduct('7 Mile T-Shirt')
+	const productName = '100 CLASS T-SHIRT'
+	await buyerHeaderPage.search(productName)
+	await productListPage.clickProduct(productName)
 	await productDetailPage.clickAddToCartButton()
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption('7 Mile T-Shirt', '3 days')
+	await checkoutPage.selectShippingOption(productName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.clickSubmitOrderButton()
 	await loadingHelper.thisWait()
-	await t.expect(await orderDetailPage.productExists('7 Mile T-Shirt')).ok()
+	await t.expect(await orderDetailPage.productExists(productName)).ok()
 })
 
 test('Can I checkout with multiple items in my cart? | 2475', async t => {
-	await buyerHeaderPage.search('7 Mile T-Shirt')
-	await productListPage.clickProduct('7 Mile T-Shirt')
+	const firstProductName = '100 CLASS T-SHIRT'
+	const secondProductName = '500 CLASS HOODIE'
+	await buyerHeaderPage.search(firstProductName)
+	await productListPage.clickProduct(firstProductName)
 	await productDetailPage.clickAddToCartButton()
-	await buyerHeaderPage.search('Neon T-shirt')
-	await productListPage.clickProduct('Neon T-shirt')
+	await buyerHeaderPage.search(secondProductName)
+	await productListPage.clickProduct(secondProductName)
 	await productDetailPage.clickAddToCartButton()
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption('7 Mile T-Shirt', '3 days')
+	await checkoutPage.selectShippingOption(firstProductName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.clickSubmitOrderButton()
 	await loadingHelper.thisWait()
-	await t.expect(await orderDetailPage.productExists('7 Mile T-Shirt')).ok()
-	await t.expect(await orderDetailPage.productExists('Neon T-shirt')).ok()
+	await t.expect(await orderDetailPage.productExists(firstProductName)).ok()
+	await t.expect(await orderDetailPage.productExists(secondProductName)).ok()
 })
 
 test('Can I checkout with all items being shipped from different locations? | 2477', async t => {
-	await buyerHeaderPage.search('7 Mile T-Shirt')
-	await productListPage.clickProduct('7 Mile T-Shirt')
+	const firstProductName = '100 CLASS T-SHIRT'
+	const secondProductName = 'Rubber Octagonal Dumbbell'
+	await buyerHeaderPage.search(firstProductName)
+	await productListPage.clickProduct(firstProductName)
 	await productDetailPage.clickAddToCartButton()
-	await buyerHeaderPage.search('Rubber Octagonal Dumbbell')
-	await productListPage.clickProduct('Rubber Octagonal Dumbbell')
+	await buyerHeaderPage.search(secondProductName)
+	await productListPage.clickProduct(secondProductName)
 	await productDetailPage.clickAddToCartButton()
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption('7 Mile T-Shirt', '3 days')
-	await checkoutPage.selectShippingOption(
-		'Rubber Octagonal Dumbbell',
-		'3 days'
-	)
+	await checkoutPage.selectShippingOption(firstProductName, '1 day')
+	await checkoutPage.selectShippingOption(secondProductName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.clickSubmitOrderButton()
 	await loadingHelper.thisWait()
-	await t.expect(await orderDetailPage.productExists('7 Mile T-Shirt')).ok()
-	await t
-		.expect(await orderDetailPage.productExists('Rubber Octagonal Dumbbell'))
-		.ok()
+	await t.expect(await orderDetailPage.productExists(firstProductName)).ok()
+	await t.expect(await orderDetailPage.productExists(secondProductName)).ok()
 })
 
 test('Can the User add an address during checkout? | 19689', async t => {
-	await buyerHeaderPage.search('7 Mile T-Shirt')
-	await productListPage.clickProduct('7 Mile T-Shirt')
+	const productName = '100 CLASS T-SHIRT'
+	await buyerHeaderPage.search(productName)
+	await productListPage.clickProduct(productName)
 	await productDetailPage.clickAddToCartButton()
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
-	await checkoutPage.selectAddNewAddress()
+	await checkoutPage.clickAddNewAddressButton()
 	await checkoutPage.enterDefaultAddress(
 		t.ctx.testUser.FirstName,
 		t.ctx.testUser.LastName
@@ -113,57 +114,53 @@ test('Can the User add an address during checkout? | 19689', async t => {
 })
 
 test('Can a User checkout with a PO product in the cart? | 19977', async t => {
-	await buyerHeaderPage.search('accessfob')
-	await productListPage.clickProduct('accessfob')
+	const productName = 'accessfob'
+	await buyerHeaderPage.search(productName)
+	await productListPage.clickProduct(productName)
 	await productDetailPage.clickAddToCartButton()
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption('accessfob', '3 days')
+	await checkoutPage.selectShippingOption(productName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await loadingHelper.thisWait()
 	await checkoutPage.clickContinueButton()
 	await checkoutPage.clickSubmitOrderButton()
 	await loadingHelper.thisWait()
-	await t.expect(await orderDetailPage.productExists('accessfob')).ok()
+	await t.expect(await orderDetailPage.productExists(productName)).ok()
 })
 
 test('Can a user checkout with a PO product and standard product in their cart? | 19978', async t => {
-	await buyerHeaderPage.search('7 Mile T-Shirt')
-	await productListPage.clickProduct('7 Mile T-Shirt')
+	const firstProductName = '100 CLASS T-SHIRT'
+	const secondProductName = 'accessfob'
+	await buyerHeaderPage.search(firstProductName)
+	await productListPage.clickProduct(firstProductName)
 	await productDetailPage.clickAddToCartButton()
-	await buyerHeaderPage.search('accessfob')
-	await productListPage.clickProduct('accessfob')
+	await buyerHeaderPage.search(secondProductName)
+	await productListPage.clickProduct(secondProductName)
 	await productDetailPage.clickAddToCartButton()
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption('7 Mile T-Shirt', '3 days')
-	await checkoutPage.selectShippingOption('accessfob', '3 days')
+	await checkoutPage.selectShippingOption(firstProductName, '1 day')
+	await checkoutPage.selectShippingOption(secondProductName, '1 day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(t.ctx.testUser.FirstName)
 	await checkoutPage.enterCVV('900')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.clickSubmitOrderButton()
 	await loadingHelper.thisWait()
-	await t.expect(await orderDetailPage.productExists('7 Mile T-Shirt')).ok()
-	await t.expect(await orderDetailPage.productExists('accessfob')).ok()
+	await t.expect(await orderDetailPage.productExists(firstProductName)).ok()
+	await t.expect(await orderDetailPage.productExists(secondProductName)).ok()
 })
 
 test('Can I request a quote product? | 19979', async t => {
-	await buyerHeaderPage.search('4 X 4 Foot Siege Storage Rack - X1 Package')
-	await productListPage.clickProduct(
-		'4 X 4 Foot Siege Storage Rack - X1 Package'
-	)
+	const productName = '4 X 4 Foot Siege Storage Rack - X1 Package'
+	await buyerHeaderPage.search(productName)
+	await productListPage.clickProduct(productName)
 	await productDetailPage.clickRequestQuoteButton()
 	await requestQuoteForm.enterPhoneNumber('1231231234')
 	await requestQuoteForm.clickSubmitForQuoteButton()
 	await productDetailPage.clickViewQuoteRequestButton()
-	await t
-		.expect(
-			await orderDetailPage.productExists(
-				'4 X 4 Foot Siege Storage Rack - X1 Package'
-			)
-		)
-		.ok()
+	await t.expect(await orderDetailPage.productExists(productName)).ok()
 })

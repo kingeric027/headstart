@@ -8,16 +8,18 @@ import afTheme from '../../styles/themes/anytime-fitness/theme-config';
 export const environment: Environment = {
   hostedApp: true,
   appname: 'Anytime Fitness',
-  clientID: 'ACE199F7-CC6D-403A-B833-9B0C8D84E7C8',
+  clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
   marketplaceID: 'SEB',
   baseUrl: 'https://sebrandsmarketplace-anytime-stage.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=7f9257b2-8a27-4527-9efa-225f4cb172da&redirect_uri=https://seb-four51-integration-stage.azurewebsites.net/api/anytime/authorize',
-  ordercloudEnv: OrdercloudEnv.Production,
+  ordercloudEnv: OrdercloudEnv.Staging,
   theme: afTheme,
+  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 /*
 

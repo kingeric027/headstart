@@ -9,6 +9,7 @@
            formControlName="quantity"
            class="form-control text-center"
            placeholder="0"
+           [attr.max]="variantInventory && !product?.Inventory?.OrderCanExceed ? variantInventory : null"
            [attr.disabled]="disabled ? '' : null"
            style="min-width:55px"
            aria-label="Quantity Input Selector"

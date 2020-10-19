@@ -29,8 +29,7 @@
         <li class="nav-item clickable cursor-pointer"
             [ngClass]="{ active: activePath === '/products' }">
           <a class="nav-link"
-             (click)="isCollapsed = !isCollapsed"
-             (click)="context.router.toProductList()"
+             (click)="isCollapsed = !isCollapsed; context.router.toProductList();"
              translate>
             LAYOUT.APP_HEADER.PRODUCTS
           </a>
@@ -38,8 +37,7 @@
         <li class="nav-item clickable cursor-pointer">
           <a class="nav-link"
              [ngClass]="{ active: activePath === '/suppliers' }"
-             (click)="isCollapsed = !isCollapsed"
-             (click)="context.router.toSupplierList()"
+             (click)="isCollapsed = !isCollapsed; context.router.toSupplierList()"
              translate>ALIAS.SUPPLIERS</a>
         </li>
         <li class="nav-item clickable cursor-pointer"
@@ -55,8 +53,7 @@
           <li class="nav-item clickable cursor-pointer">
             <a class="nav-link"
                [ngClass]="{ active: activePath?.indexOf('/profile') === 0 }"
-               (click)="isCollapsed = !isCollapsed"
-               (click)="context.router.toMyProfile()"
+               (click)="isCollapsed = !isCollapsed; context.router.toMyProfile();"
                translate>LAYOUT.APP_HEADER.PROFILE</a>
           </li>
         </div>
@@ -65,12 +62,10 @@
       <div class="form-inline"
            *ngIf="user.IsAnonymous">
         <a class="btn btn-sm btn-outline-dark"
-           (click)="isCollapsed = !isCollapsed"
-           (click)="context.router.toLogin()"
+           (click)="isCollapsed = !isCollapsed; context.router.toLogin();"
            translate>COMMON.LOGIN</a>
         <a class="btn btn-sm btn-primary d-none d-sm-block ml-2"
-           (click)="isCollapsed = !isCollapsed"
-           (click)="context.router.toRegister()"
+           (click)="isCollapsed = !isCollapsed; context.router.toRegister();"
            translate>LAYOUT.APP_HEADER.REGISTER</a>
       </div>
 
@@ -155,7 +150,7 @@
             ngbDropdown
             placement="bottom-right">
           <div class="nav-link dropdown-toggle text-nowrap"
-               id="account-dropdown"
+               id="accountDropdown"
                ngbDropdownToggle>
             <span class="d-none d-md-inline"
                   translate>
@@ -164,7 +159,7 @@
             <fa-icon [icon]="faUserCircle"></fa-icon>
           </div>
           <div class="dropdown-menu account-dropdown-alignment"
-               aria-labelledby="account-dropdown"
+               aria-labelledby="accountDropdown"
                ngbDropdownMenu>
             <h4 class="dropdown-header"><span translate>LAYOUT.APP_HEADER.GREETING</span>, {{ user?.FirstName }}!</h4>
             <ng-container *ngFor="let profileRoute of profileRoutes">
@@ -200,8 +195,9 @@
 <!-- Search / Cart Nav -->
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container">
-    <div class="category-toggle cursor-pointer"
-         (click)="showCategoryDropdown = !showCategoryDropdown">
+    <button class="btn category-toggle cursor-pointer"
+            (click)="toggleCategoryDropdown($event.detail)"
+            type="button">
       <fa-icon *ngIf="!showCategoryDropdown"
                placement="right"
                ngbTooltip="Categories"
@@ -213,7 +209,8 @@
                ngbTooltip="Categories"
                [openDelay]="500"
                [icon]="faTimes"></fa-icon>
-    </div>
+    </button>
+    <small class="ml-1 font-weight-bold text-uppercase">Shop</small>
 
     <ocm-search class="ml-3 mr-3 w-100"
                 [placeholderText]="'Products'"

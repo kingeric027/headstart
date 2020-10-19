@@ -24,6 +24,7 @@ import {
 } from '../../api-utils.ts/buyer-locations-util'
 import userDetailsPage from '../../pages/admin/user-details-page'
 import { getUserID, deleteUser } from '../../api-utils.ts/users-util'
+import { refreshPage } from '../../helpers/page-helper'
 
 fixture`Brand Tests`
 	.meta('TestRun', '1')
@@ -63,6 +64,9 @@ test.after(async () => {
 	await t.expect(await mainResourcePage.resourceExists(brandName)).ok()
 })
 
+//Catalog not being shown in UI after create, new to reload page to see
+//https://four51.atlassian.net/browse/SEB-725
+//added work around to refresh page after creating product for all create product tests
 test.after(async () => {
 	await deleteCatalogWithName(
 		t.ctx.createdCatalogName,
@@ -75,6 +79,9 @@ test.after(async () => {
 	await minorResourcePage.clickCreateButton()
 	const createdCatalogName = await catalogDetailsPage.createDefaultCatalog()
 	t.ctx.createdCatalogName = createdCatalogName
+	await t.wait(5000)
+	await refreshPage() //refresh because of bug
+	await t.wait(3000)
 	await t
 		.expect(await minorResourcePage.resourceExists(createdCatalogName))
 		.ok('Brand Catalog not found in resource list')
@@ -104,7 +111,6 @@ test('Assign Brand Location to Brand Catalog | 19974', async t => {
 	await locationDetailsPage.assignCatalogToLocation(t.fixtureCtx.catalogName)
 })
 
-//failing because of https://four51.atlassian.net/browse/SEB-924
 test.after(async t => {
 	const createdUserID = await getUserID(
 		t.ctx.createdUserEmail,

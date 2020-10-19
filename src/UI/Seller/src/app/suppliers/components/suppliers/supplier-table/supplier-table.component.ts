@@ -49,12 +49,12 @@ function createSupplierForm(supplier: MarketplaceSupplier) {
     SyncFreightPop: new FormControl({ value: supplier.xp?.SyncFreightPop || false, disabled: this.isSupplierUser }),
     Currency: new FormControl({ value: _get(supplier, 'xp.Currency'), disabled: !this.isCreatingNew || this.isSupplierUser }, Validators.required),
     ProductTypes: new FormGroup({
-      Standard: new FormControl({ value: (supplier as any).xp?.ProductTypes?.includes('Standard') || false, disabled: this.isSupplierUser }),
-      Quote: new FormControl({ value: (supplier as any).xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser }),
-      PurchaseOrder: new FormControl({ value: (supplier as any).xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser })
+      Standard: new FormControl({ value: supplier.xp?.ProductTypes?.includes('Standard') || false, disabled: this.isSupplierUser }),
+      Quote: new FormControl({ value: supplier.xp?.ProductTypes?.includes('Quote') || false, disabled: this.isSupplierUser }),
+      PurchaseOrder: new FormControl({ value: supplier.xp?.ProductTypes?.includes('PurchaseOrder') || false, disabled: this.isSupplierUser })
     }, RequireCheckboxesToBeChecked()),
-    FreeShippingEnabled: new FormControl((supplier as any).xp?.FreeShippingThreshold != null),
-    FreeShippingThreshold: new FormControl((supplier as any).xp?.FreeShippingThreshold),
+    FreeShippingEnabled: new FormControl(supplier.xp?.FreeShippingThreshold != null),
+    FreeShippingThreshold: new FormControl(supplier.xp?.FreeShippingThreshold),
     Categories: new FormControl({ value: _get(supplier, 'xp.Categories', []), disabled: this.isSupplierUser }, ValidateSupplierCategorySelection),
   });
 }
@@ -109,7 +109,6 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
         const asset: AssetUpload = {
           Active: true,
           File: this.file,
-          Type: ('Image' as AssetUpload['Type']),
           FileName: this.file.name,
           Tags: ['Logo']
         }

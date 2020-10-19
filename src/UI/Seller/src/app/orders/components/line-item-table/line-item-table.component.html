@@ -32,12 +32,16 @@
           <div class="col">
             <small class="font-weight-bolder text-uppercase text-muted">Ship From</small>
             <h5 class="card-title mb-0">
-              {{ liGroup[0].ShipFromAddress.CompanyName }}
+              {{ liGroup[0].ShipFromAddress?.CompanyName }}
               <small class="text-muted d-block">
-                <span>{{ liGroup[0].ShipFromAddress.Street1 }}<span *ngIf="liGroup[0].ShipFromAddress?.Street2">, {{liGroup[0].ShipFromAddress.Street2}}</span>,
-                  {{ liGroup[0].ShipFromAddress.City }}, {{ liGroup[0].ShipFromAddress.State }} {{ liGroup[0].ShipFromAddress.Zip }}</span>
+                <span>{{ liGroup[0].ShipFromAddress?.Street1 }}<span *ngIf="liGroup[0].ShipFromAddress?.Street2">, {{liGroup[0].ShipFromAddress.Street2}}</span>,
+                  {{ liGroup[0].ShipFromAddress?.City }}, {{ liGroup[0].ShipFromAddress?.State }} {{ liGroup[0].ShipFromAddress?.Zip }}</span>
               </small>
             </h5>
+          </div>
+          <div class="col text-right">
+            <small class="font-weight-bolder text-uppercase text-muted">Ship Method</small>
+            <h5 class="card-title mb-0">{{ getShipMethodString(liGroup[0]) }}</h5>
           </div>
         </div>
         <ng-content></ng-content>
@@ -110,7 +114,7 @@
                              [lineItem]="li"></return-form>
               </td>
               <td class="align-middle">
-                {{li.LineTotal | currency: currency}}
+                {{li.LineTotal | currency: order?.xp?.currency }}
               </td>
             </tr>
           </tbody>

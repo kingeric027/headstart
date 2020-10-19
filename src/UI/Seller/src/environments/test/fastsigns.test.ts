@@ -10,6 +10,11 @@ export const environment: Environment = {
     blobStorageUrl: 'https://stfastsignstest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
-    buyerUrl: 'https://fastsigns-buyer-ui-test.azurewebsites.net/',
-    buyerClientID: '3B7CD2F7-36D8-4DC4-9616-0CB1C86C9FB3',
+    buyerConfigs: {
+        'Default Buyer': {
+            clientID: '3B7CD2F7-36D8-4DC4-9616-0CB1C86C9FB3',
+            buyerUrl: 'https://fastsigns-buyer-ui-test.azurewebsites.net/'
+        }
+    },
+    superProductFieldsToMonitor: []
 }

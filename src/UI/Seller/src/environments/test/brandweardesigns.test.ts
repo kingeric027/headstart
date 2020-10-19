@@ -10,6 +10,11 @@ export const environment: Environment = {
     blobStorageUrl: 'https://stbrandweartest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
-    buyerUrl: 'https://brandweardesigns-buyer-ui-test.azurewebsites.net/',
-    buyerClientID: '2F33BE12-D914-419C-B3D0-41AEFB72BE93',
+    buyerConfigs: {
+        'Default Buyer': {
+            clientID: '2F33BE12-D914-419C-B3D0-41AEFB72BE93',
+            buyerUrl: 'https://brandweardesigns-buyer-ui-test.azurewebsites.net/'
+        }
+    },
+    superProductFieldsToMonitor: []
 }

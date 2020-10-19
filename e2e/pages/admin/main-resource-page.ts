@@ -6,6 +6,8 @@ class MainResourcePage {
 	createButton: Selector
 	resourceList: Selector
 	standardProductButton: Selector
+	quoteProductButton: Selector
+	purchaseOrderProductButton: Selector
 	searchBar: Selector
 
 	constructor() {
@@ -13,6 +15,12 @@ class MainResourcePage {
 		this.resourceList = Selector('table').find('tr.selectable-row')
 		this.standardProductButton = Selector('button').withText(
 			createRegExp('standard product')
+		)
+		this.quoteProductButton = Selector('button').withText(
+			createRegExp('quote product')
+		)
+		this.purchaseOrderProductButton = Selector('button').withText(
+			createRegExp('purchase order product')
 		)
 		this.searchBar = Selector('#product-search')
 	}
@@ -22,12 +30,22 @@ class MainResourcePage {
 	}
 
 	async resourceExists(resource: string) {
-		return await this.resourceList.withText(resource).exists
+		return this.resourceList.withText(resource).exists
 	}
 
 	async clickCreateNewStandardProduct() {
 		await t.click(this.createButton)
 		await t.click(this.standardProductButton)
+	}
+
+	async clickCreateNewQuoteProduct() {
+		await t.click(this.createButton)
+		await t.click(this.quoteProductButton)
+	}
+
+	async clickCreateNewPurchaseOrderProduct() {
+		await t.click(this.createButton)
+		await t.click(this.purchaseOrderProductButton)
 	}
 
 	async searchForResource(resourceName: string) {

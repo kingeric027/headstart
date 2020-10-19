@@ -10,6 +10,11 @@ export const environment: Environment = {
     blobStorageUrl: 'https://stgo2partnerstest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
-    buyerUrl: 'https://go2partners-buyer-ui-test.azurewebsites.net/',
-    buyerClientID: 'B1FEB16F-9E3E-4534-88FE-F3AE29941986',
+    buyerConfigs: {
+        'Default Buyer': {
+            clientID: 'B1FEB16F-9E3E-4534-88FE-F3AE29941986',
+            buyerUrl: 'https://go2partners-buyer-ui-test.azurewebsites.net/'
+        }
+    },
+    superProductFieldsToMonitor: []
 }
