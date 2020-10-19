@@ -71,14 +71,14 @@ export class OCMProductDetails implements OnInit {
     this.supplierNote = this._product.xp && this._product.xp.Note;
     this.specs = superProduct.Specs;
     this.populateInactiveVariants(superProduct);
+    this.listChiliConfigs();
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.calculatePrice();
     this.currentUser = this.context.currentUser.get();
     this.userCurrency = this.currentUser.Currency;
     this.context.currentUser.onChange(user => (this.favoriteProducts = user.FavoriteProductIDs));
-    await this.listChiliConfigs();
   }
 
   async listChiliConfigs(): Promise<void> {
