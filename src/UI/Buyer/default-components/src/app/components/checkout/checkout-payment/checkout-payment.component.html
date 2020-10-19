@@ -45,7 +45,21 @@
     </span>
   </h5>
   <small class="d-block font-italic text-muted"
-         *ngIf="orderSummaryMeta.POLineItemCount">Please note - Key fob and/or wallet card orders will NOT be charged to your credit card. The cost of key fobs, wallet cards, sales tax, and shipping will be deducted via an ABC remit. The price reflected on this order is an estimate, and actual final cost may vary based on applicable sales tax rates. By placing an order with this item in your cart, you accept these terms.</small>
+         *ngIf="orderSummaryMeta.POLineItemCount">Please note - Key fob and/or wallet card orders will NOT be charged to your credit card. The cost of key fobs, wallet cards, sales tax, and shipping will be deducted via an ABC remit. The price reflected on this order is an estimate, and actual final cost may vary based on applicable sales tax rates. By placing an order with this item in your cart, you accept these terms.
+  </small>
+  <div class="mt-3"
+       *ngIf="orderSummaryMeta.POLineItemCount">
+    <button *ngIf="orderSummaryMeta.POLineItemCount"
+            [disabled]="POTermsAccepted"
+            type="submit"
+            (click)="acceptPOTerms()"
+            class="btn btn-info btn-block-xs mr-2">
+      Accept
+    </button>
+    <fa-icon *ngIf="POTermsAccepted"
+             [icon]="faCheckCircle"
+             class="text-success"></fa-icon>
+  </div>
   <h5 class="my-3"
       *ngIf="!orderSummaryMeta.POLineItemCount">
     All Items to Be Paid By Credit Card
@@ -59,15 +73,9 @@
   </h5>
   <ocm-payment-credit-card *ngIf="orderSummaryMeta.StandardLineItemCount"
                            [cards]="cards"
+                           [termsAccepted]="POTermsAccepted"
                            (cardSelected)="onCardSelected($event.detail)">
   </ocm-payment-credit-card>
-  <button *ngIf="orderSummaryMeta.POLineItemCount"
-          [disabled]="POTermsAccepted"
-          type="submit"
-          (click)="acceptPOTerms()"
-          class="btn btn-info btn-block-xs mt-4 mr-2">
-    Accept
-  </button>
   <button type="submit"
           (click)="onContinue()"
           *ngIf="!orderSummaryMeta.StandardLineItemCount"
