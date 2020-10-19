@@ -10,7 +10,7 @@ export const environment: Environment = {
   appname: 'Waxing The City',
   clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  baseUrl: 'https://waxingthecity.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
