@@ -14,22 +14,13 @@ ocm-modal {
     margin: 0 auto;
     z-index: $zindex-modal;
     overflow: auto;
-    background: #fff;
-    border-radius: $border-radius;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    @include media-breakpoint-up(md) {
-      width: 75vw;
-      height: 75vh;
-      left: auto;
-      right: auto;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-    @include media-breakpoint-up(lg) {
-      width: 50vw;
+    .shared-modal-body {
+      background-color: $white;
+      padding: 3rem;
+      box-shadow: 0 1rem 3rem rgba(23, 17, 24, 0.75); // .shadow-lg with *significantly* more opacity
     }
   }
   .shared-modal__background {

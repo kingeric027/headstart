@@ -15,11 +15,11 @@ export class OCMAppFooter {
   constructor(private context: ShopperContextService, private toastrService: ToastrService) {}
 
   toTermsAndConditions(): void {
-    this.context.router.toRoute('/terms-and-conditions');
+    this.context.router.toRoute('/policy');
   }
 
   toSupport(): void {
-    this.context.router.toRoute('/support');
+    this.context.router.toRoute('/customer-service');
   }
 
   toFAQ(): void {

@@ -38,11 +38,12 @@ namespace ordercloud.integrations.easypost
 			return new ShipMethod()
 			{
 				ID = rate.id,
-				Name = $"{rate.carrier} {rate.service}",
+				Name = rate.service,
 				Cost = decimal.Parse(rate.rate),
 				EstimatedTransitDays = (int)rate.delivery_days,
 				xp =
 				{
+					Carrier = rate.carrier,
 					CarrierAccountID = rate.carrier_account_id,
 					ListRate = decimal.Parse(rate.list_rate),
 					Guaranteed = rate.delivery_date_guaranteed,

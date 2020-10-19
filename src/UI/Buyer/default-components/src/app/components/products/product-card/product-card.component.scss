@@ -1,13 +1,14 @@
 .card-img-top {
   margin: 0;
-  min-height: 300px;
-  max-height: 40vh;
+  height: 344px;
   background: var(--white);
   color: var(--medium);
   display: flex;
-  @media (min-width: 577px) {
-    min-height: 250px;
-    max-height: 275px;
+  @media (min-width: 768px) {
+    height: 209px;
+  }
+  @media (min-width: 992px) {
+    height: 254px;
   }
   img {
     height: 100%;

@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ namespace Marketplace.Common.Constants
                 {
                     EmailSubject = $"Your order has been submitted {orderID}",
                     DynamicText = "Thank you for your order.",
-                    DynamicText2 = "We are getting your order ready to be shiped. You will be notified when it has been sent. Your order contains the folowing items."
+                    DynamicText2 = "We are getting your order ready to be shipped. You will be notified when it has been sent. Your order contains the folowing items."
                 } },
                 {VerifiedUserType.admin, new EmailDisplayText()
                 {

@@ -10,7 +10,8 @@
      name="{{_product.Name}}"
      (click)="toDetails()">
     <figure class="card-img-top">
-      <img [src]="getImageUrl()"
+      <img class="product-card-image"
+           [src]="getImageUrl()"
            alt="{{ _product.ID }}" />
     </figure>
     <div class="card-body">
