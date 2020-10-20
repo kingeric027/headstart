@@ -2,7 +2,9 @@
 // The build system defaults to the dev environment which uses `environment.ts`, but if you do
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 
-export const environment = {
+import { Environment } from './environment.interface';
+
+export const environment: Environment = {
   hostedApp: true,
   buyerConfigs: {
     'Anytime Fitness': {
@@ -30,7 +32,5 @@ export const environment = {
   blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
   orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
   orderCloudApiVersion: 'v1',
-  buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
-  buyerClientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
-  superProductFieldsToMonitor: ["PriceSchedule"]
+  superProductFieldsToMonitor: ['PriceSchedule']
 };

@@ -1,29 +1,28 @@
 // This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
-// The list of file replacements can be found in `angular.json`.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
-import { Environment } from './env.interface';
 import { OrdercloudEnv } from 'marketplace';
-import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
+import { Environment } from './environment.interface';
+import bmTheme from '../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Marketplace Test',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  appname: 'The Bar Method',
+  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
-  baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
-  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+  baseUrl: 'https://thebarmethod.sebvendorportal.com',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
-  ordercloudEnv: OrdercloudEnv.Staging,
-  theme: wtcTheme,
+  ordercloudEnv: OrdercloudEnv.Production,
+  theme: bmTheme,
   instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
-
 /*
+
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *

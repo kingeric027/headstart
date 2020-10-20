@@ -43,22 +43,13 @@ namespace Marketplace.Common.Helpers
                 if (string.IsNullOrEmpty(token))
                     return AuthenticateResult.Fail("The DevCenter bearer token was not provided in the Authorization header.");
 
-                var jwt = new JwtSecurityToken(token);
-                var clientId = jwt.Claims.FirstOrDefault(x => x.Type == "cid")?.Value;
-                var usrtype = jwt.Claims.FirstOrDefault(x => x.Type == "usrtype")?.Value;
-                if (clientId == null)
-                    return AuthenticateResult.Fail("The provided bearer token does not contain a 'cid' (Client ID) claim.");
-
-                // we've validated the token as much as we can on this end, go make sure it's ok on OC
-
                 var cid = new ClaimsIdentity("DevCenterUser");
-                cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
                 var user = await _dc.GetMe(token);
                 cid.AddClaim(new Claim("username", user.Username));
-                cid.AddClaim(new Claim("userid", user.ID.ToString()));
                 cid.AddClaim(new Claim("email", user.Email));
+                cid.AddClaim(new Claim("name", user.Name));
                 cid.AddClaim(new Claim(ClaimTypes.Role, "DevCenter"));
 
                 var ticket = new AuthenticationTicket(new ClaimsPrincipal(cid), "DevCenterUser");
