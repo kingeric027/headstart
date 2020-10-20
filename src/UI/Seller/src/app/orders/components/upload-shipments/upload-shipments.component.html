@@ -1,1 +1,42 @@
-<button class="btn btn-primary" (click)="downloadTemplate()">Download Template</button>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 bg-light">
+        <div class="container-fluid py-3">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="d-flex justify-content-between align-items-center">
+                <h1 class="resource-name mb-0"
+                    translate>Upload Shipments</h1>
+         
+              </div>
+            </div>       
+          </div>
+        </div>
+    </div>
+    <div class="col-sm-12 d-flex" style="flex-direction: column; flex-flow: column; align-items: center;">
+
+     <div class="card">Use this tool to import tracking numbers for items on orders you have received.  You will need to use the Order Reports to identify OrderIDs as well as Line Item IDs before shipping.  Once you have this information, you can add the tracking number, carrier, and ship date for the shipment</div>
+        <div class="process-step">
+    <button class="btn btn-primary" (click)="downloadTemplate()">Download Template</button>
+</div>
+        <div class="process-step">
+    Step 2: Add all necessary information to the spreadsheet for the orders
+</div>
+        <div class="process-step">
+    Step 3: Upload spreadsheet here:
+</div>
+<label class="rmpm dropzone"
+                         for="imageUpload"
+                         appDrag
+                         (files)="stageImages($event)">
+                  </label>
+                  <input class="d-none"
+                         id="imageUpload"
+                         type="file"
+                         (change)="manualFileUpload($event, 'image')"
+                         >
+                </div>
+    </div>
+
+</div>
