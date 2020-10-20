@@ -168,6 +168,7 @@
                            translate>ADMIN.PRODUCT_EDIT.ACTIVE</label>
                     <label class="d-block switch mb-0">
                       <input class="form-check-input"
+                            [attr.disabled]="readonly ? true : null"
                              type="checkbox"
                              (click)="handleUpdateProduct($event, 'Product.Active')"
                              [checked]="_superMarketplaceProductEditable?.Product.Active">
