@@ -23,12 +23,12 @@ namespace ordercloud.integrations.cms
 
 	public class SchemaNotValidException : OrderCloudIntegrationException
 	{
-		public SchemaNotValidException(IList<string> errors) : base("Schema Invalid", "Errors with Json Schema", errors) { }
+		public SchemaNotValidException(List<string> errors) : base("Schema Invalid", "Errors with Json Schema", errors) { }
 	}
 
 	public class DocumentNotValidException : OrderCloudIntegrationException
 	{
-		public DocumentNotValidException(string schemaInteropID, IList<string> errors) : base("Document Invalid", $"This Document does not conform to schema \"{schemaInteropID}\"", errors) { }
+		public DocumentNotValidException(string schemaInteropID, List<string> errors) : base("Document Invalid", $"This Document does not conform to schema \"{schemaInteropID}\"", errors) { }
 	}
 
 	public class InvalidAssignmentException : OrderCloudIntegrationException
