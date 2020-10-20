@@ -8,7 +8,7 @@
     "start": "ng serve --configuration=dev --port=4300 --open",
     "preinstall": "npm run build-marketplace",
     "lint": "eslint src/**/*.ts --quiet",
-    "blah": "ng serve --configuration=waxingthecity-test",
+    "blah": "ng serve --configuration=brandweardesigns-test",
     "build-marketplace": "cd ../marketplace && npm run build"
   },
   "private": true,
