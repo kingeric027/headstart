@@ -37,7 +37,8 @@ export class OCMCreditCardForm implements OnInit {
     }
     this._showCardDetails = value;
   }
-
+  @Input() termsAccepted: boolean;
+  
   _showCVV = false;
   _showCardDetails = true;
   cardError?: string;

@@ -46,10 +46,27 @@ namespace Marketplace.Common.Commands
 
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
-            int index = orderID.IndexOf("-");
-            string buyerOrderID = orderID.Substring(0, index);
-            await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
-            return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+            var orderPatch = new PartialOrder()
+            {
+                xp = new
+                {
+                    SubmittedOrderStatus = SubmittedOrderStatus.Completed
+                }
+            };
+            //  Need to complete sales and purchase order and patch the xp.SubmittedStatus of both orders            
+            var salesOrderID = orderID.Split('-')[0];
+            var completeSalesOrder = _oc.Orders.CompleteAsync(OrderDirection.Incoming, salesOrderID);
+            var patchSalesOrder = _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, salesOrderID, orderPatch);
+            var completedSalesOrder = await completeSalesOrder;
+            var patchedSalesOrder = await patchSalesOrder;
+
+            var purchaseOrderID = $"{salesOrderID}-{patchedSalesOrder?.xp?.SupplierIDs?.FirstOrDefault()}";
+            var completePurchaseOrder = _oc.Orders.CompleteAsync(OrderDirection.Outgoing, purchaseOrderID);
+            var patchPurchaseOrder = _oc.Orders.PatchAsync(OrderDirection.Outgoing, purchaseOrderID, orderPatch);
+            var completedPurchaseOrder = await completePurchaseOrder;
+            var patchedPurchaseOrder = await patchPurchaseOrder;
+
+            return orderID == salesOrderID ? patchedSalesOrder : patchedPurchaseOrder;
         }
        
         public async Task PatchOrderRequiresApprovalStatus(string orderID)
