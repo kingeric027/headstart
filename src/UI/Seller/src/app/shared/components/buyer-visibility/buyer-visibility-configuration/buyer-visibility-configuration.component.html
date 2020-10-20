@@ -102,6 +102,7 @@
                                    (assignmentsUpdated)="updateCategoryAssignments($event)"></product-category-assignment>
       <variable-print-configuration-component [productID]="_product.ID"
                                               [catalogID]="_buyer.ID"
+                                              [folderName]="_buyer.xp.ChiliPublishFolder"
                                               [availableCatelogs]="catalogs"
                                               [productAssignments]="assignedCategoriesEditable"
                                               *ngIf="_product.xp.ArtworkRequired"></variable-print-configuration-component>
