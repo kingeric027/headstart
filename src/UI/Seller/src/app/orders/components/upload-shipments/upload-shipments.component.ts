@@ -1,7 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcTokenService } from '@ordercloud/angular-sdk';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -10,11 +9,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./upload-shipments.component.scss'],
 })
 export class UploadShipmentsComponent {
-  constructor(
-    private http: HttpClient,
-    private ocTokenService: OcTokenService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  constructor(private http: HttpClient, @Inject(applicationConfiguration) private appConfig: AppConfig) {}
 
   async downloadTemplate() {
     const file = 'Shipment_Import_Template.xlsx';
@@ -26,12 +21,6 @@ export class UploadShipmentsComponent {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    });
-  }
-  private buildHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     });
   }
 
