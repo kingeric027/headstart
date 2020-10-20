@@ -4,7 +4,7 @@
 
 import { Environment } from './environment.interface';
 import { OrdercloudEnv } from 'marketplace';
-import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
+import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
