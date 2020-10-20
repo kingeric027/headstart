@@ -48,8 +48,20 @@ namespace Marketplace.Common.Commands
         {
             int index = orderID.IndexOf("-");
             string buyerOrderID = orderID.Substring(0, index);
-            await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
-            return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+            //  Need to complete sales and purchase order and patch the xp.SubmittedStatus of both orders
+            var orderPatch = new PartialOrder()
+            {
+                xp = new
+                {
+                    SubmittedOrderStatus = SubmittedOrderStatus.Completed
+                }
+            };
+            var completeBuyerOrder = _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
+            var patchBuyerOrder = _oc.Orders.PatchAsync(OrderDirection.Incoming, buyerOrderID, orderPatch);
+            var completeOrder = _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+
+            await Task.WhenAll(completeBuyerOrder, patchBuyerOrder, completeOrder);
+            return await _oc.Orders.PatchAsync(OrderDirection.Outgoing, orderID, orderPatch);
         }
        
         public async Task PatchOrderRequiresApprovalStatus(string orderID)
