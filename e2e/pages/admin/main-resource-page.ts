@@ -30,6 +30,8 @@ class MainResourcePage {
 	}
 
 	async resourceExists(resource: string) {
+		//I think this line may refresh the selector to get new elements, not sure though
+		this.resourceList
 		return this.resourceList.withText(resource).exists
 	}
 

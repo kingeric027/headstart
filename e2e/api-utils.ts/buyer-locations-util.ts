@@ -57,6 +57,7 @@ export async function createDefaultBuyerLocation(
 
 	const location: OrderCloudSDK.Address = {
 		ID: `${buyerID}-{${buyerID}-LocationIncrementor}`,
+		// ID: '',
 		AddressName: addressName,
 		City: 'King of Prussia',
 		CompanyName: addressName,
@@ -78,6 +79,7 @@ export async function createDefaultBuyerLocation(
 	const locationUserGroup: MarketplaceLocationUserGroup = {
 		Name: addressName,
 		ID: `${buyerID}-{${buyerID}-LocationIncrementor}`,
+		// ID: '',
 		xp: {
 			Country: 'US',
 			Currency: 'USD',
