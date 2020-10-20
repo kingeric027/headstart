@@ -20,7 +20,7 @@ export class LineItemTableComponent {
   _statusChangeForm = new FormArray([]);
   _tableStatus = LineItemTableStatus.Default;
   _user: MeUser;
-  @Input() order: MarketplaceOrder;
+  @Input() order: MarketplaceOrder | any;
   @Input() orderDirection: 'Incoming' | 'Outgoing';
   @Output() orderChange = new EventEmitter();
   isSaving = false;

@@ -1,3 +1,4 @@
+import { UploadShipmentsComponent } from './orders/components/upload-shipments/upload-shipments.component';
 // components
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
@@ -12,6 +13,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
+      { path: 'orders/uploadshipments', component: UploadShipmentsComponent },
       {
         path: 'products',
         loadChildren: () => import('./products/products.module').then(m => m.ProductsModule),
