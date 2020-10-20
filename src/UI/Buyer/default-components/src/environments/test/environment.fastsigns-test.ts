@@ -9,6 +9,8 @@ export const environment: Environment = {
     marketplaceID: 'FS',
     baseUrl: 'https://fastsigns-buyer-ui-test.azurewebsites.net/',
     middlewareUrl: 'https://fastsigns-middleware-test.azurewebsites.net',
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+    instrumentationKey: '',
     translateBlobUrl: 'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'FASTSIGNS_TEST',
     ssoLink: null,

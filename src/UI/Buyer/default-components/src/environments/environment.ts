@@ -46,20 +46,14 @@ const localMiddlewareURL = 'https://localhost:44381';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
-// Enviroment Settings
-const middlewareUrls = {
-  TEST: 'https://marketplace-middleware-test.azurewebsites.net',
-  LOCAL: localMiddlewareURL,
-};
-
-const devEnvironments = {
+const devEnvironments: Record<string, Environment> = {
   ANYTIME_FITNESS: {
     hostedApp: false,
     appname: 'Anytime Fitness',
     clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
@@ -74,7 +68,7 @@ const devEnvironments = {
     clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
@@ -89,7 +83,7 @@ const devEnvironments = {
     clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
@@ -104,7 +98,7 @@ const devEnvironments = {
     clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
@@ -119,12 +113,14 @@ const devEnvironments = {
     clientID: 'A482C18B-527B-4BA1-A2E9-0E7C65C2E39F',
     marketplaceID: 'DEMO',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://headstartdemo-middleware-test.azurewebsites.net',
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
     sellerID: 'Headstart_Demo_Test',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: headstartdemoTheme,
+    instrumentationKey: ''
   },
   FASTSIGNS: {
     hostedApp: false,
@@ -132,12 +128,14 @@ const devEnvironments = {
     clientID: '3B7CD2F7-36D8-4DC4-9616-0CB1C86C9FB3',
     marketplaceID: 'FS',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://fastsigns-middleware-test.azurewebsites.net',
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'FASTSIGNS_TEST',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: fastsignsTheme,
+    instrumentationKey: ''
   },
   GO2PARTNERS: {
     hostedApp: false,
@@ -145,12 +143,14 @@ const devEnvironments = {
     clientID: 'B1FEB16F-9E3E-4534-88FE-F3AE29941986',
     marketplaceID: 'GO2',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://go2partners-middleware-test.azurewebsites.net',
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'GO2PARTNERS_TEST',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: go2partnersTheme,
+    instrumentationKey: ''
   },
   BRANDWEAR_DESIGNS: {
     hostedApp: false,
@@ -158,12 +158,14 @@ const devEnvironments = {
     clientID: '2F33BE12-D914-419C-B3D0-41AEFB72BE93',
     marketplaceID: 'BW',
     baseUrl: 'https://localhost:4200',
-    middlewareUrl: middlewareUrls[middlewareLocationSelection],
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://brandweardesigns-middleware-test.azurewebsites.net',
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://stbrandweartest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'BRANDWEARDESIGNS_TEST',
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: brandweardesignsTheme,
+    instrumentationKey: ''
   }
 };
 export const environment: Environment = devEnvironments[appName];

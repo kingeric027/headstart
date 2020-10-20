@@ -9,6 +9,8 @@ export const environment: Environment = {
     marketplaceID: 'DEMO',
     baseUrl: 'https://headstartdemo-buyer-ui-test.azurewebsites.net/',
     middlewareUrl: 'https://headstartdemo-middleware-test.azurewebsites.net',
+    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+    instrumentationKey: '',
     translateBlobUrl: 'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
     sellerID: 'Headstart_Demo_Test',
     ssoLink: null,
