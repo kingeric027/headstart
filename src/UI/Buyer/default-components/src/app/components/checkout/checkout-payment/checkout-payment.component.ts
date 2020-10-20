@@ -43,8 +43,7 @@ export class OCMCheckoutPayment implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this._orderCurrency = this.context.currentUser.get().Currency;
-    this._orderPromos = this.context.order.promos.get().Items;
-    this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
+    this.setOrderPromos();
     
     this.createPromoForm(this.promoCode);
   }
@@ -66,8 +65,7 @@ export class OCMCheckoutPayment implements OnInit, OnChanges {
   async applyPromo(): Promise<void> {
     try {
       await this.context.order.promos.applyPromo(this.promoCode);
-      this._orderPromos = this.context.order.promos.get().Items;
-      this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
+      this.setOrderPromos()
       await this.checkout.calculateOrder();
       this.promoCode = '';
     } catch (ex) {
@@ -80,7 +78,7 @@ export class OCMCheckoutPayment implements OnInit, OnChanges {
   async removePromo(promoCode: string): Promise<void> {
     try {
       await this.context.order.promos.removePromo(promoCode);
-      this._orderPromos = this.context.order.promos.get().Items;
+      this.setOrderPromos();
       await this.checkout.calculateOrder();
     } finally {
       this.promosChanged.emit(this._orderPromos);
@@ -95,6 +93,11 @@ export class OCMCheckoutPayment implements OnInit, OnChanges {
 
   onCardSelected(card: SelectedCreditCard): void {
     this.cardSelected.emit(card);
+  }
+
+  setOrderPromos(): void {
+    this._orderPromos = this.context.order.promos.get().Items;
+    this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
   }
 
   acceptPOTerms(): void {
