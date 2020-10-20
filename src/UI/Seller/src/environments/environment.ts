@@ -22,9 +22,9 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const appName: AppName = HEADSTART_DEMO;
-const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
-const localMiddlewareURL = 'https://localhost:5001';
+const appName: AppName = SELF_ESTEEM_BRANDS;
+const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
+const localMiddlewareURL = 'https://localhost:44381';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -33,7 +33,7 @@ const devEnvironments: Record<string, Environment> = {
     hostedApp: false,
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
-    middlewareUrl: middlewareLocationSelection === 'LOCAL' ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
     appname: 'Marketplace Admin',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
@@ -51,7 +51,7 @@ const devEnvironments: Record<string, Environment> = {
     hostedApp: false,
     sellerID: 'Headstart_Demo_Test',
     clientID: 'FF151BA7-0207-4134-8A7D-52235BEE4E7A',
-    middlewareUrl: middlewareLocationSelection === 'LOCAL' ? localMiddlewareURL : 'https://headstartdemo-middleware-test.azurewebsites.net',
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://headstartdemo-middleware-test.azurewebsites.net',
     appname: 'Headstart Demo Admin',
     translateBlobUrl: 'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
     blobStorageUrl: 'https://stfour51demotest.blob.core.windows.net',
@@ -69,7 +69,7 @@ const devEnvironments: Record<string, Environment> = {
     hostedApp: false,
     sellerID: 'FASTSIGNS_TEST',
     clientID: 'E8B2E3BD-2FAE-4C26-9BE3-054953393C2C',
-    middlewareUrl: middlewareLocationSelection === 'LOCAL' ? localMiddlewareURL : 'https://fastsigns-middleware-test.azurewebsites.net',
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://fastsigns-middleware-test.azurewebsites.net',
     appname: 'FASTSIGNS Admin',
     translateBlobUrl: 'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://stfastsignstest.blob.core.windows.net',
@@ -87,7 +87,7 @@ const devEnvironments: Record<string, Environment> = {
     hostedApp: false,
     sellerID: 'GO2PARTNERS_TEST',
     clientID: '1C414E48-B027-4C6D-85CF-873723EB7A70',
-    middlewareUrl: middlewareLocationSelection === 'LOCAL' ? localMiddlewareURL : 'https://go2partners-middleware-test.azurewebsites.net',
+    middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://go2partners-middleware-test.azurewebsites.net',
     appname: 'GO2 Partners Admin',
     translateBlobUrl: 'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://stgo2partnerstest.blob.core.windows.net',

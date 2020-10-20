@@ -10,7 +10,7 @@ export const environment: Environment = {
   appname: 'Basecamp Fitness',
   clientID: '0045BB67-84CC-42BD-9FA7-009875628F7C',
   marketplaceID: 'SEB',
-  baseUrl: 'https://sebrandsmarketplace-basecamp-stage.azurewebsites.net/',
+  baseUrl: 'https://basecampfitness-staging.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
