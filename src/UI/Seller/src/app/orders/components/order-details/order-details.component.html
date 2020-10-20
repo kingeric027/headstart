@@ -13,7 +13,7 @@
             class="small badge badge-pill badge-warning  ml-2"
             style="font-size: 45%">{{_order?.xp?.OrderType}}</span>
     </h3>
-    <button *ngIf="_order?.xp?.OrderType === 'Quote' && _order?.Status !== 'Completed'"
+    <button *ngIf="_order?.xp?.OrderType === 'Quote' && _order?.xp?.SubmittedOrderStatus !== 'Completed'"
             class="btn btn-outline-primary d-print-none"
             (click)="setOrderStatus()">Acknowledge Quote</button>
     <button *ngIf="_order?.xp?.OrderType !== 'Quote' && orderDirection === 'Incoming'"
