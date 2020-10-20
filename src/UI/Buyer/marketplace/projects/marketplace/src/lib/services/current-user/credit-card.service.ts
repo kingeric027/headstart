@@ -57,7 +57,7 @@ export class CreditCardService {
     const month = mmyy.slice(0, 2);
     const year = mmyy.slice(-2);
     const date = new Date();
-    date.setMonth(parseInt(month, 10));
+    date.setMonth(parseInt(month, 10) - 1); // subtract 1, month is zero-based in javascript
     date.setFullYear(parseInt(`20${year}`, 10))
     const dateString = date.toISOString();
     return dateString;
