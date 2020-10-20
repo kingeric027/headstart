@@ -37,6 +37,22 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
   }
 
   private handleFiltersChange = async (): Promise<void> => {
-    this.products = await this.context.productFilters.listProducts();
-  };
+    const user = this.context.currentUser.get();
+    if (user?.UserGroups?.length) {
+      this.products = await this.context.productFilters.listProducts();
+    } else {
+      this.products = {
+        Meta: {
+          Page: 1,
+          PageSize: 20,
+          TotalCount: 0,
+          TotalPages: 0,
+          ItemRange: [
+            1,
+            0
+          ]
+        }, Items: []
+      }
+    };
+  }
 }
