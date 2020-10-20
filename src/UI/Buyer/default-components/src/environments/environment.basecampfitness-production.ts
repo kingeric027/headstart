@@ -2,22 +2,22 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from '../env.interface';
-import afTheme from '../../styles/themes/anytime-fitness/theme-config';
+import { Environment } from './environment.interface';
+import bcfTheme from '../styles/themes/basecamp/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Anytime Fitness',
-  clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
+  appname: 'Basecamp Fitness',
+  clientID: '0045BB67-84CC-42BD-9FA7-009875628F7C',
   marketplaceID: 'SEB',
-  baseUrl: 'https://anytimefitness.sebvendorportal.com',
+  baseUrl: 'https://basecampfitness.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: afTheme,
+  theme: bcfTheme,
   instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 /*

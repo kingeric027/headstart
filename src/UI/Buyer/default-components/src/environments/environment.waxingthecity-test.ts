@@ -2,7 +2,7 @@
 // `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-import { Environment } from '../env.interface';
+import { Environment } from './environment.interface';
 import { OrdercloudEnv } from 'marketplace';
 import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
 

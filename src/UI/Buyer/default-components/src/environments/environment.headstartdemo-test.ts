@@ -1,6 +1,6 @@
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from '../env.interface';
-import theme from '../../styles/themes/headstartdemo/theme-config';
+import { Environment } from './environment.interface';
+import theme from '../styles/themes/headstartdemo/theme-config';
 
 export const environment: Environment = {
     hostedApp: true,

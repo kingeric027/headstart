@@ -1,6 +1,6 @@
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from '../env.interface';
-import theme from '../../styles/themes/go2partners/theme-config';
+import { Environment } from './environment.interface';
+import theme from '../styles/themes/brandweardesigns/theme-config';
 
 export const environment: Environment = {
     hostedApp: true,

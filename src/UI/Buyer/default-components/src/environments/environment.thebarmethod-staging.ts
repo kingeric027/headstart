@@ -2,8 +2,8 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from '../env.interface';
-import bmTheme from '../../styles/themes/bar-method/theme-config';
+import { Environment } from './environment.interface';
+import bmTheme from '../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,

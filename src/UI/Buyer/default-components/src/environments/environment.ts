@@ -2,7 +2,7 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
+import { Environment } from './environment.interface';
 import afTheme from '../styles/themes/anytime-fitness/theme-config';
 import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 import bcfTheme from '../styles/themes/basecamp/theme-config';
