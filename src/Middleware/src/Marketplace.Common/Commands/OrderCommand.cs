@@ -109,14 +109,15 @@ namespace Marketplace.Common.Commands
             var promotions = _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
             var payments = _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
             var approvals = _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
-			return new OrderDetails
-            {
-                Order = order,
-                LineItems = (await lineItems).Items,
-                Promotions = (await promotions).Items,
-                Payments = (await payments).Items,
-                Approvals = (await approvals).Items
-			};
+            throw new Exception("No Address!");
+			//return new OrderDetails
+   //         {
+   //             Order = order,
+   //             LineItems = (await lineItems).Items,
+   //             Promotions = (await promotions).Items,
+   //             Payments = (await payments).Items,
+   //             Approvals = (await approvals).Items
+			//};
         }
 
         public async Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
