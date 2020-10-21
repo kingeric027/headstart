@@ -14,8 +14,9 @@
             <ul id="progress-container"
                 class="vertical visible-xs">
               <li class="active">
-                <div class="process-step">
-                  <div style="margin-left:-3em; padding-right: 16px;">Step 1:</div>
+                <div class="process-step"
+                     style="display: flex; justify-content: center; flex-direction: column;">
+                  <div style="display: flex; justify-content: center;">No template? No problem! Click here to download it.</div>
                   <button class="btn btn-primary"
                           (click)="downloadTemplate()">Download Template</button>
                 </div>
@@ -41,16 +42,15 @@
                    id="imageUpload"
                    type="file"
                    (change)="manualFileUpload($event, 'image')">
-          </div>         
+          </div>
           <div class="card col-sm-2 flex">
             <h3 class="info">What is this tool?</h3>
             <div style="display: flex; justify-content: center;">
-            Use this tool to import tracking numbers for items on orders you have received. You will need to use the Order Reports to identify OrderIDs as well as Line Item IDs before shipping. Once you have this information, you can add the tracking number, carrier, and ship date for the shipment</div>
-            </div>
+              Use this tool to import tracking numbers for items on orders you have received. You will need to use the Order Reports to identify OrderIDs as well as Line Item IDs before shipping. Once you have this information, you can add the tracking number, carrier, and ship date for the shipment</div>
+          </div>
         </div>
       </div>
     </div>
-    
+
   </div>
 </div>
-
