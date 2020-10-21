@@ -35,14 +35,13 @@ namespace Marketplace.Tests
         private const string INFORMATION_REQUEST = "information_request";
         private const string PRODUCT_UPDATE_TEMPLATE_ID = "product_update_template_id";
 
-        //[SetUp]
-        //public void Setup()
-        //{
-        //    _oc = Substitute.For<IOrderCloudClient>();
-        //    _settings = Substitute.For<AppSettings>();
-        //    _command = new SendgridService(_settings, _oc);
-
-        //}
+        [SetUp]
+        public void Setup()
+        {
+            _oc = Substitute.For<IOrderCloudClient>();
+            _settings = Substitute.For<AppSettings>();
+            _command = new SendgridService(_settings, _oc);
+        }
 
         public class TestConstants {
             public const string orderID = "testorder";
@@ -74,22 +73,64 @@ namespace Marketplace.Tests
         [Test]
         public async Task TestOrderSubmitEmail()
         {
-            var _oc = Substitute.For<IOrderCloudClient>();
-            var _settings = Substitute.For<AppSettings>();
-
             var orderWorksheet = GetOrderWorksheet();
             _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier1ID}").Returns(GetSupplierWorksheet(TestConstants.supplier1ID, TestConstants.lineItem1ID, TestConstants.lineItem1Total));
             _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier2ID}").Returns(GetSupplierWorksheet(TestConstants.supplier2ID, TestConstants.lineItem2ID, TestConstants.lineItem2Total));
             _oc.Suppliers.ListAsync<MarketplaceSupplier>(Arg.Any<string>()).ReturnsForAnyArgs(Task.FromResult(GetSupplierList()));
             _oc.AdminUsers.ListAsync<MarketplaceSellerUser>().ReturnsForAnyArgs(Task.FromResult(GetSellerUserList()));
             var _commandSub = Substitute.ForPartsOf<SendgridService>(_settings, _oc);
-            _commandSub.WhenForAnyArgs(x => x.SendSingleTemplateEmailMultipleRcpts(default, default, default, default)).DoNotCallBase();
+            _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmailMultipleRcpts(default, default, default, default)).DoNotCallBase();
             //_commandSub.Configure().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Any<List<EmailAddress>>(), Arg.Any<string>(), Arg.Any<object>()).Returns(Task.FromResult);
 
             await _commandSub.SendOrderSubmitEmail(orderWorksheet);
 
             //assert
-            await _commandSub.Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Any<List<EmailAddress>>(), Arg.Any<string>(), Arg.Any<object>());
+            var expectedSellerEmailList = new List<EmailAddress>()
+            {
+                new EmailAddress() { Email = TestConstants.sellerUser1email},
+                new EmailAddress() { Email = TestConstants.sellerUser1AdditionalRcpts[0] }
+            };
+            var expectedSupplier1EmailList = new List<EmailAddress>()
+            {
+                new EmailAddress() { Email=TestConstants.supplier1NotificationRcpts[0] },
+                new EmailAddress() { Email=TestConstants.supplier1NotificationRcpts[1] },
+            };
+            var expectedSupplier2EmailList = new List<EmailAddress>()
+            {
+                new EmailAddress() { Email=TestConstants.supplier2NotificationRcpts[0] }
+            };
+            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSellerEmailList)), Arg.Any<string>(), Arg.Any<object>());
+            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSupplier1EmailList)), Arg.Any<string>(), Arg.Any<object>());
+            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSupplier2EmailList)), Arg.Any<string>(), Arg.Any<object>());
+
+        }
+
+        private bool equalEmailLists(List<EmailAddress> list1, List<EmailAddress> list2)
+        {
+            if(list1.Count() != list2.Count())
+            {
+                return false;
+            } else
+            {
+                var isEqual = true;
+                var list2Emails = list2.Select(item => item.Email);
+                var list1Emails = list1.Select(item => item.Email);
+                foreach (var item in list1)
+                {
+                    if(!list2Emails.Contains(item.Email))
+                    {
+                        isEqual = false;
+                    }
+                }
+                foreach (var item in list2)
+                {
+                    if (!list1Emails.Contains(item.Email))
+                    {
+                        isEqual = false;
+                    }
+                }
+                return isEqual;
+            }
         }
 
 

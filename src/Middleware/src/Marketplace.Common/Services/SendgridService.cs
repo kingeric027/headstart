@@ -79,7 +79,7 @@ namespace Marketplace.Common.Services
             await client.SendEmailAsync(msg);
         }
 
-        public async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
+        public virtual async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
