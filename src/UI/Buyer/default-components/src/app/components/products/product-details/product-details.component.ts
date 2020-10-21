@@ -110,8 +110,8 @@ export class OCMProductDetails implements OnInit {
         i === 0 ? specCombo += matchingOption?.ID : specCombo += `-${matchingOption?.ID}`
       }
     }
-    this.variant = this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo);
-    return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
+    this.variant = this._superProduct?.Variants?.find(v => v.xp?.SpecCombo === specCombo);
+    return this._superProduct?.Variants?.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
   }
 
   onSelectionInactive(event: boolean): void {
