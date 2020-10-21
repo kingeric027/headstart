@@ -136,7 +136,9 @@
                                     [product]="li.Product"
                                     [priceSchedule]="li.Product.PriceSchedule"
                                     [isQtyChanging]="isQtyChanging(li.ID)"
-                                    (qtyChange)="changeQuantity(li.ID, $event.detail)"></ocm-quantity-input>
+                                    [variantID]="li.Variant?.ID"
+                                    (qtyChange)="changeQuantity(li.ID, $event.detail)">
+                </ocm-quantity-input>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
@@ -321,7 +323,9 @@
                                     [product]="li.Product"
                                     [priceSchedule]="li.Product.PriceSchedule"
                                     [isQtyChanging]="isQtyChanging(li.ID)"
-                                    (qtyChange)="changeQuantity(li.ID, $event.detail)"></ocm-quantity-input>
+                                    [variantID]="li.Variant?.ID"
+                                    (qtyChange)="changeQuantity(li.ID, $event.detail)">
+                </ocm-quantity-input>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
