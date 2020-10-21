@@ -16,11 +16,10 @@ import { ToastrService } from 'ngx-toastr';
 export class OCMLineitemTable implements OnInit {
   @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
     this._lineItems = lineItems;
-    this.initLineItems();
   }
   @Input() set groupByKits(bool: boolean) {
     this._groupByKits = bool;
-    
+    this.initLineItems();
   }
   @Input() readOnly: boolean;
   @Input() orderType: OrderType;
@@ -30,6 +29,7 @@ export class OCMLineitemTable implements OnInit {
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroupedByKit: MarketplaceLineItem[][];
+  productsInKit: MarketplaceKitProduct[] = [];
   updatingLiIDs: string[] = [];
   _groupByKits: boolean;
   _lineItems = [];
@@ -57,10 +57,12 @@ export class OCMLineitemTable implements OnInit {
   }
 
   groupLineItemsByKitID(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
+    console.log(this._groupByKits);
     if (!this._groupByKits) return [];
     const kitLineItems = lineItems.filter(li => li.xp.KitProductID);
     const liKitGroups = _groupBy(kitLineItems, li => li.xp.KitProductID);
-    return Object.values(liKitGroups);
+    const kitGroups = Object.values(liKitGroups);
+    return kitGroups;
   }
 
   groupLineItemsByShipFrom(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
