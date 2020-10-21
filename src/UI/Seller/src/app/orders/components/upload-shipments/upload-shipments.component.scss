@@ -17,6 +17,121 @@
     font-size: larger;
     font-weight: 500;
     margin: .5em;
+    display: flex;
+    margin-top:4em;
+    justify-content: center;
 
 
+}
+#progress-container.vertical {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid #999;
+  position: relative;
+}
+
+#progress-container.vertical li {
+  margin: 0 0 25px;
+  padding: 0 0 0 50px;
+  list-style: none;
+  position: relative;
+  font-size: 16px;
+  color: #2A668A;
+  display: block;
+  left: -18px;
+}
+
+#progress-container.vertical li::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 0;
+  background: #e95e23;
+  padding: 5px 12px;
+  font-size: 18px;
+  text-align: center;
+ border-radius: 50%;
+ color: #FFF;
+ font-weight: bold;
+ }
+
+ #progress-container.vertical li.active::before {
+   background:#e95e23;
+ }
+
+ #progress-container.vertical li:nth-child(1)::before {
+   content: '1';
+ }
+
+ #progress-container.vertical li:nth-child(2)::before {
+   content: '2';
+ }
+
+ #progress-container.vertical li:nth-child(3)::before {
+   content: '3';
+ }
+
+ .info {
+   border-bottom: 2px solid #999;
+   justify-content: center;
+   display: flex;
+   padding: 15px;
+ }
+
+
+
+#progress {
+  padding: 0;
+  list-style-type: none;
+  font-family: arial;
+  font-size: 12px;
+  clear: both;
+  line-height: 1em;
+  margin: 0 -1px;
+  text-align: center;
+}
+
+#progress li {
+  float: left;
+  padding: 10px 30px 10px 40px;
+  background: #333;
+  color: #fff;
+  position: relative;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+  width: 32%;
+  margin: 0 1px;
+}
+
+#progress li:before {
+  content: '';
+  border-left: 16px solid #fff;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+}
+
+#progress li:after {
+  content: '';
+  border-left: 16px solid #333;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  z-index: 20;
+}
+* {
+  box-sizing: border-box;
+}
+#progress li.active {
+  background: #555;
+}
+
+#progress li.active:after {
+  border-left-color: #555;
 }
