@@ -121,6 +121,7 @@ import { OCMPaymentList } from './components/payments/payment-list/payment-list.
 import { OCMAddressCard } from './components/profile/address-card/address-card.component';
 import { OCMCreditCardIcon } from './components/payments/credit-card-icon/credit-card-icon.component';
 import { OCMCreditCardDisplay } from './components/payments/credit-card-display/credit-card-display.component';
+import { OCMCreditCardIframe } from './components/payments/credit-card-iframe/credit-card-iframe.component';
 import { OCMCreditCardForm } from './components/payments/credit-card-form/credit-card-form.component';
 import { OCMProfileForm } from './components/profile/profile-form/profile-form.component';
 import { OCMCheckoutShipping } from './components/checkout/checkout-shipping/checkout-shipping.component';
@@ -181,6 +182,7 @@ const components = [
   OCMAddressCard,
   OCMCreditCardIcon,
   OCMCreditCardDisplay,
+  OCMCreditCardIframe,
   OCMCreditCardForm,
   OCMModal,
   OCMOrderStatusIcon,
@@ -346,6 +348,7 @@ export class AppModule {
     this.buildWebComponent(OCMAddressCard, 'ocm-address-card');
     this.buildWebComponent(OCMCreditCardIcon, 'ocm-credit-card-icon');
     this.buildWebComponent(OCMCreditCardDisplay, 'ocm-credit-card-display');
+    this.buildWebComponent(OCMCreditCardIframe, 'ocm-credit-card-iframe');
     this.buildWebComponent(OCMCreditCardForm, 'ocm-credit-card-form');
     this.buildWebComponent(OCMModal, 'ocm-modal');
     this.buildWebComponent(OCMOrderStatusIcon, 'ocm-order-status-icon');

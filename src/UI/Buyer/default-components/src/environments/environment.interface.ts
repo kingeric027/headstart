@@ -4,9 +4,12 @@ export interface Environment {
   hostedApp: boolean;
   appname: string;
   clientID: string;
+
+  // used as a prefix for order incrementor
   marketplaceID: string;
   baseUrl: string;
   middlewareUrl: string;
+  creditCardIframeUrl: string;
   sellerID: string;
   ssoLink: string;
   translateBlobUrl: string;

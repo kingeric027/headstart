@@ -5,11 +5,12 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 import { environment } from 'src/environments/environment';
 import { UserContext } from '@app-seller/config/user-context';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { ListPage, MeUser } from '@ordercloud/angular-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
 import { isEqual as _isEqual, set as _set, get as _get } from 'lodash';
-import { HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, Asset, AssetUpload, JDocument } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
+import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string;
@@ -25,6 +26,8 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   userForm: FormGroup;
   userStatic: MeUser;
   userEditable: MeUser;
+  notificationsToReview: JDocument[];
+
   constructor(
     private router: Router,
     activatedRoute: ActivatedRoute,
@@ -46,7 +49,8 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.userContext.Me.Supplier ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
     this.refresh(this.userContext.Me);
     this.setProfileImgSrc();
-  }
+    this.retrieveNotifications();
+}
 
   setUpSubs(): void {
     this.currentUserService.userSubject.subscribe(user => {
@@ -56,6 +60,14 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.currentUserService.profileImgSubject.subscribe(img => {
       this.hasProfileImg = Object.keys(img).length > 0;
     })
+  }
+
+  retrieveNotifications() {
+    HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification').then((notifications: ListPage<JDocument>) => {
+      if (notifications?.Items?.length > 0 && notifications?.Items.some(i => i?.Doc.Status === NotificationStatus.SUBMITTED)) {
+      this.notificationsToReview = notifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
+    };
+    });
   }
 
   setCurrentUserInitials(user: MeUser): void {
@@ -78,6 +90,10 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.userEditable = this.copyResource(user);
     this.createUserForm(user);
     this.areChanges = this.checkIfAreChanges(this.userStatic, this.userEditable);
+  }
+
+  navigateToPage(route: string){
+    this.router.navigateByUrl(route);
   }
 
   createUserForm(me: MeUser): void {

@@ -2,11 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Documents.SystemFunctions;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -16,21 +12,16 @@ namespace Marketplace.Common.Commands.SupplierSync
     [SupplierSync("027"), SupplierSync("093"), SupplierSync("waxinthecitydistribution")]
     public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
     {
-        private readonly IOrderCloudClient _oc;
         private readonly IOrderCloudClient _ocSeller;
-        private AppSettings _settings;
 
-        public WaxInTheCityDistributionCommand(AppSettings settings, IOrderCloudClient oc)
+        public WaxInTheCityDistributionCommand(AppSettings settings)
         {
-            _oc = oc;
-            _settings = settings;
-
             _ocSeller = new OrderCloudClient(new OrderCloudClientConfig
             {
-                ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                AuthUrl = _settings.OrderCloudSettings.ApiUrl,
-                ClientId = _settings.OrderCloudSettings.ClientID,
-                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                AuthUrl = settings.OrderCloudSettings.ApiUrl,
+                ClientId = settings.OrderCloudSettings.ClientID,
+                ClientSecret = settings.OrderCloudSettings.ClientSecret,
                 Roles = new[]
                 {
                     ApiRole.FullAccess

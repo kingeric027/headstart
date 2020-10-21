@@ -20,7 +20,7 @@ import { faTrash,
   faTimes, faCircle, faHeart, faAsterisk, faCheckCircle, faTimesCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties, Asset } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties, Asset, MarketplaceSupplier } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
@@ -98,12 +98,13 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   newPriceBreakPrice = 0;
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
-  availableProductTypes = [];
+  availableProductTypes: any = [];
   availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
   isSpecsEditing = false;
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[];
+  supplier: MarketplaceSupplier;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -191,7 +192,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.createProductForm(this._superMarketplaceProductEditable);
     if (this.userContext?.UserType === 'SELLER') {
       this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable?.Product?.DefaultSupplierID).toPromise();
-      this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
+      if (superProduct.Product?.ShipFromAddressID) this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
@@ -336,8 +337,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async getAvailableProductTypes(): Promise<void> {
-    const supplier = await this.currentUserService.getMySupplier();
-    this.availableProductTypes = supplier?.xp?.ProductTypes || ['Standard', 'Quote', 'PurchaseOrder', 'Kit'];
+    this.supplier = await this.currentUserService.getMySupplier();
+    this.availableProductTypes = this.supplier?.xp?.ProductTypes || ['Standard', 'Quote', 'PurchaseOrder', 'Kit'];
   }
 
   async handleSave(): Promise<void> {

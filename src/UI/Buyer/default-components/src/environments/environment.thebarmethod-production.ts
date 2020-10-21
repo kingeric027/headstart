@@ -2,21 +2,23 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
-import afTheme from '../styles/themes/anytime-fitness/theme-config';
+import { Environment } from './environment.interface';
+import bmTheme from '../styles/themes/bar-method/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Anytime Fitness',
-  clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
+  appname: 'The Bar Method',
+  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
+  baseUrl: 'https://thebarmethod.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
-  ssoLink: null,
+  ssoLink:
+    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
   ordercloudEnv: OrdercloudEnv.Production,
-  theme: afTheme,
+  theme: bmTheme,
   instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
 /*

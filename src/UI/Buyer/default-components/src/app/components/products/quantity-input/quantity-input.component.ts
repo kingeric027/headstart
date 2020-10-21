@@ -123,6 +123,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   getInventory(product: MarketplaceMeProduct): number {
+    if (product?.Inventory?.OrderCanExceed) return Infinity;
     if (
       product.Inventory &&
       product.Inventory.Enabled &&

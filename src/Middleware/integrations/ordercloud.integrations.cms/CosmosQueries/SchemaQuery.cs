@@ -71,7 +71,7 @@ namespace ordercloud.integrations.cms
 			var existing = await GetWithoutExceptions(dataObject.InteropID, user);
 			if (existing != null) throw new DuplicateIDException();
 			dataObject = Init(dataObject, user);
-			dataObject = Validate(dataObject);
+			dataObject = await Validate(dataObject);
 			var newSchema = await _store.AddAsync(dataObject);
 			return SchemaMapper.MapTo(newSchema);
 		}
@@ -89,7 +89,7 @@ namespace ordercloud.integrations.cms
 			existingSchema.RestrictedAssignmentTypes = schema.RestrictedAssignmentTypes;
 			existingSchema.Schema = schema.Schema;
 			existingSchema.History = HistoryBuilder.OnUpdate(existingSchema.History, user);
-			existingSchema = Validate(existingSchema);
+			existingSchema = await Validate(existingSchema);
 			var newSchema = await _store.UpsertAsync(existingSchema);
 			return SchemaMapper.MapTo(newSchema);
 		}
@@ -100,11 +100,11 @@ namespace ordercloud.integrations.cms
 			await _store.RemoveByIdAsync(schema.id, schema.SellerOrgID);
 		}
 
-		private DocSchemaDO Validate(DocSchemaDO schema)
+		private async Task<DocSchemaDO> Validate(DocSchemaDO schema)
 		{
 			schema.Schema["$schema"] = $"{_settings.BaseUrl}/schema-specs/metaschema";
 			schema.Schema["$id"] = $"{_settings.BaseUrl}/schema-specs/{schema.id}";
-			return SchemaHelper.ValidateSchema(schema);
+			return await SchemaHelper.ValidateSchema(schema);
 		}
 
 		private async Task<DocSchemaDO> GetWithoutExceptions(string schemaInteropID, VerifiedUserContext user)

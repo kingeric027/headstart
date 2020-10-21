@@ -1,27 +1,29 @@
 // This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+// `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
+// The list of file replacements can be found in `angular.json`.
 
+import { Environment } from './environment.interface';
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
-import bmTheme from '../styles/themes/bar-method/theme-config';
+import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'The Bar Method',
-  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
+  appname: 'Marketplace Test',
+  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
   marketplaceID: 'SEB',
-  baseUrl: 'http://marketplace-buyer-ui.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
+  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
+  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
   ssoLink:
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
-  ordercloudEnv: OrdercloudEnv.Production,
-  theme: bmTheme,
+  ordercloudEnv: OrdercloudEnv.Staging,
+  theme: wtcTheme,
   instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
-/*
 
+/*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *

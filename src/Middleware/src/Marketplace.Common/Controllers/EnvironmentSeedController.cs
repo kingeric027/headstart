@@ -17,9 +17,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("seed"), DevCenterUserAuth()]
-        public async Task<ImpersonationToken> Seed([FromBody] EnvironmentSeed seed)
+        public async Task Seed([FromBody] EnvironmentSeed seed)
         {
-            return await _command.Seed(seed, this.VerifiedUserContext);
+            await _command.Seed(seed, this.VerifiedUserContext);
         }
 
 		[HttpPost, Route("post-staging-restore")] // TODO - add webhook auth

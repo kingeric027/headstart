@@ -242,6 +242,7 @@ export class AppConfig {
   ordercloudEnv: OrdercloudEnv;
   avalaraCompanyId: number;
   middlewareUrl: string;
+  creditCardIframeUrl: string;
   /**
    *  The ID of the seller organization.
    */

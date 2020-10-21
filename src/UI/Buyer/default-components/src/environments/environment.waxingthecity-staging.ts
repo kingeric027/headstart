@@ -2,7 +2,7 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './env.interface';
+import { Environment } from './environment.interface';
 import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
@@ -10,8 +10,9 @@ export const environment: Environment = {
   appname: 'Waxing The City',
   clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB',
-  baseUrl: 'https://sebrandsmarketplace-wax-stage.azurewebsites.net/',
+  baseUrl: 'https://waxingthecity-staging.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,

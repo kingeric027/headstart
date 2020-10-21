@@ -146,7 +146,7 @@ namespace Marketplace.Common.Controllers
         public async void HandleSupplierUpdate([FromBody] WebhookPayloads.Suppliers.Patch payload)
         {
             // to mp manager when a supplier is updated
-            await _sendgridService.SendSingleEmail("noreply@four51.com", "to", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
+            await _sendgridService.SendSingleEmail(_settings.SendgridSettings.FromEmail, "to", "Supplier Updated", "<h1>this is a test email for supplier update</h1>");
         }
     }
 }

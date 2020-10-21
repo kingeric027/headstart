@@ -33,6 +33,7 @@ export class ChiliPublishConfiguration implements OnInit {
     _documentID = '';
     _documentName = '';
     _catalogID = '';
+    _folderName = '';
 
     tecraDocuments: TecraDocument[] = [];
     tecraSpecs: TecraSpec[] = [];
@@ -53,6 +54,11 @@ export class ChiliPublishConfiguration implements OnInit {
     @Input()
     set catalogID(value: string) {
         this._buyerID = value;
+    }
+
+    @Input()
+    set folderName(value: string) {
+        this._folderName = value;
     }
 
     @Input()
@@ -80,10 +86,11 @@ export class ChiliPublishConfiguration implements OnInit {
     }
 
     async getChiliDocs(): Promise<void> {
-        //TODO Update Buyer xp to associate folder(s) available to search on.
-        const docs = await this.productService.getTecraDocumentsByFolder("BasecampFitness");
-        this.tecraDocuments = docs;
-        this.showChiliDocuments = true;
+        if (this._folderName) {
+            const docs = await this.productService.getTecraDocumentsByFolder(this._folderName);
+            this.tecraDocuments = docs;
+            this.showChiliDocuments = true;
+        }
     }
 
     async listChiliConfigs(): Promise<void> {
@@ -93,7 +100,7 @@ export class ChiliPublishConfiguration implements OnInit {
         const configs = await this.productService.listChiliConfigs();
         if (configs.Items.length > 0) {
             configs.Items.forEach(item => {
-                if (item.BuyerID === this._buyerID) {
+                if (item.BuyerID === this._buyerID && item.SupplierProductID === this._productID) {
                     item.ReadOnly = true;
                     this.chiliConfigs.push(item);
                 }
@@ -112,8 +119,6 @@ export class ChiliPublishConfiguration implements OnInit {
         //TODO - Update to only get configs assosociated to this buyer and product
         const specs = await this.productService.getTecraSpecs(this._documentID);
         this.tecraSpecs = specs;
-
-        console.log(this.tecraSpecs);
         this.showAvailableCategories = true;
     }
 

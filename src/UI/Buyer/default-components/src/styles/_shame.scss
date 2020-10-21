@@ -13,14 +13,6 @@ How to use _shame.scss:
 
 *******************************************************************************************************************************/
 
-.c-error-message {
-  position: absolute;
-  z-index: 999;
-  padding: 0.5rem;
-  border-radius: $border-radius;
-  font-size: $small-font-size;
-}
-
 // this makes all address cards the same height
 shared-address-display {
   display: flex;

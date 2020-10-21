@@ -1,5 +1,5 @@
 import { Component, Inject, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { faShippingFast, faWindowClose, faPlus, faCog, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faShippingFast, faWindowClose, faPlus, faCog, faExclamationCircle, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import {
   LineItem,
@@ -38,6 +38,7 @@ export class OrderShipmentsComponent implements OnChanges {
   faPlus = faPlus;
   faWindowClose = faWindowClose;
   faCog = faCog; // TO-DO - Use for edit button for Ship From address.
+  faExclamationCircle = faExclamationCircle;
   createShipment = false;
   viewShipments = true;
   editShipFromAddress = false; // TO-DO - Use for editing Ship From address.

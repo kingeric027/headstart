@@ -9,6 +9,7 @@ import { ProductDetailService } from '../product-details/product-detail.service'
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { SpecFormService } from '../spec-form/spec-form.service';
+import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   templateUrl: './kit-product-details.component.html',
@@ -20,6 +21,8 @@ export class OCMKitProductDetails implements OnInit, OnDestroy {
   userCurrency: string;
   _product: MarketplaceMeKitProduct;
   routeSubscription: Subscription;
+  faCaretDown = faCaretDown;
+  faCaretRight = faCaretRight;
 
   // holds everything about a product needed for this view, easily referenced by productID
   productDictionary: {

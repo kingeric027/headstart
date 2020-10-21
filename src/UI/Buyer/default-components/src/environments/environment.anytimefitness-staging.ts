@@ -1,28 +1,28 @@
 // This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
-// The list of file replacements can be found in `angular.json`.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
-import { Environment } from './env.interface';
 import { OrdercloudEnv } from 'marketplace';
-import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
+import { Environment } from './environment.interface';
+import afTheme from '../styles/themes/anytime-fitness/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'Marketplace Test',
-  clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+  appname: 'Anytime Fitness',
+  clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
   marketplaceID: 'SEB',
-  baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  baseUrl: 'https://anytimefitness-staging.sebvendorportal.com',
+  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink:
-    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=7f9257b2-8a27-4527-9efa-225f4cb172da&redirect_uri=https://seb-four51-integration-stage.azurewebsites.net/api/anytime/authorize',
   ordercloudEnv: OrdercloudEnv.Staging,
-  theme: wtcTheme,
+  theme: afTheme,
   instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
 };
-
 /*
+
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *
