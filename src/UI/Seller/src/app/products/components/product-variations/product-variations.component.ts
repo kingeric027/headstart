@@ -125,7 +125,7 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
-    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9_-]/g, '');
+    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, '');
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
   }
