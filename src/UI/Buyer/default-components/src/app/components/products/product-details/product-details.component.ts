@@ -3,7 +3,7 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, ChiliConfig, ChiliSpec, MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, ProductInKit, ChiliConfig, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -12,6 +12,7 @@ import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { FormGroup } from '@angular/forms';
 import { ProductDetailService } from './product-detail.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -55,11 +56,13 @@ export class OCMProductDetails implements OnInit {
   specForm: FormGroup;
   isInactiveVariant: boolean;
   _disabledVariants: MarketplaceVariant[];
+  variant: MarketplaceVariant;
   variantInventory: number;
   constructor(
     private specFormService: SpecFormService,
     private context: ShopperContextService,
-    private productDetailService: ProductDetailService
+    private productDetailService: ProductDetailService,
+    private toastrService: ToastrService
   ) { }
 
   @Input() set product(superProduct: SuperMarketplaceProduct) {
@@ -107,6 +110,7 @@ export class OCMProductDetails implements OnInit {
         i === 0 ? specCombo += matchingOption?.ID : specCombo += `-${matchingOption?.ID}`
       }
     }
+    this.variant = this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo);
     return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
   }
 
@@ -154,6 +158,9 @@ export class OCMProductDetails implements OnInit {
           ImageUrl: this.specFormService.getLineItemImageUrl(this._superProduct.Images, this._superProduct.Specs, this.specForm)
         }
       });
+    } catch (err) {
+      this.toastrService.error('Something went wrong')
+      console.log(err) 
     } finally {
       this.isAddingToCart = false;
     }

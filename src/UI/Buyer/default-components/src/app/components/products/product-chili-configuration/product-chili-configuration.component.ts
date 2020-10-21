@@ -72,6 +72,7 @@ export class OCMProductChiliConfig implements OnInit {
   isLoading = true;
   editor;
   frameWindow;
+  variant: MarketplaceVariant;
 
   constructor(
     private specFormService: SpecFormService,
@@ -159,6 +160,7 @@ export class OCMProductChiliConfig implements OnInit {
       const matchingOption = specOptions.find(o => o.Value === this.specForm.value.ctrls[i])
       i === 0 ? specCombo += matchingOption.ID : specCombo += `-${matchingOption.ID}`
     }
+    this.variant = this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo);
     return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
   }
 
