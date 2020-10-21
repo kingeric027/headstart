@@ -22,8 +22,7 @@ namespace Marketplace.Common.Controllers
 		[OrderCloudWebhookAuth]
 		public async Task<ShipEstimateResponse> GetShippingRates([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)
 		{
-			var shipmentEstimates = await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
-			return shipmentEstimates;
+			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
 
 		[Route("ordercalculate")]
