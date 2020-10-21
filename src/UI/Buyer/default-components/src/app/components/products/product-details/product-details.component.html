@@ -75,6 +75,7 @@
                                 [product]="_product"
                                 [priceSchedule]="_product.PriceSchedule"
                                 [gridDisplay]="showGrid"
+                                [selectedVariant]="variant"
                                 [variantInventory]="variantInventory">
             </ocm-quantity-input>
             <button *ngIf="isQuoteProduct()"
@@ -216,6 +217,7 @@
                               style="max-width: 100px"
                               (qtyChange)="qtyChange($event.detail)"
                               [product]="_product"
+                              [selectedVariant]="variant"
                               [priceSchedule]="priceSchedule"
                               [variantInventory]="variantInventory">
           </ocm-quantity-input>
