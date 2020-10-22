@@ -2,30 +2,31 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, MarketplaceLineItem, MarketplaceVariant, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './lineitem-table.component.html',
   styleUrls: ['./lineitem-table.component.scss'],
 })
 export class OCMLineitemTable implements OnInit {
-  closeIcon = faTimes;
-  faTrashAlt = faTrashAlt;
   @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
     this._lineItems = lineItems;
     this.initLineItems();
   }
   @Input() set groupByKits(bool: boolean) {
     this._groupByKits = bool;
-
+    
   }
   @Input() readOnly: boolean;
   @Input() orderType: OrderType;
   @Input() hideStatus = false;
+  closeIcon = faTimes;
+  faTrashAlt = faTrashAlt;
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroupedByKit: MarketplaceLineItem[][];
@@ -34,7 +35,7 @@ export class OCMLineitemTable implements OnInit {
   _lineItems = [];
   _orderCurrency: string;
   showKitDetails = true;
-  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) {
+  constructor(private context: ShopperContextService, private spinner: NgxSpinnerService, private toastrService: ToastrService) {
     this._orderCurrency = this.context.currentUser.get().Currency;
   }
 

@@ -74,23 +74,9 @@ namespace ordercloud.integrations.cardconnect
 				.Select(li => li.Quantity * li.UnitPrice)
 				.Sum();
 
-			var puchaseOrderLineItemIDs = purchaseOrderLineItems.Select(li => li.ID);
-			var purchaseOrderShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(shipEstimate =>
-			{
-				return shipEstimate.ShipEstimateItems.Any(item => puchaseOrderLineItemIDs.Contains(item.LineItemID));
-			});
-
-			var poShippingCosts = purchaseOrderShipEstimates.Select(shipEstimate =>
-			{
-				var selectedShipMethod = shipEstimate.ShipMethods.First(ShipMethod => ShipMethod.ID == shipEstimate.SelectedShipMethodID);
-				return selectedShipMethod.Cost;
-			});
-
-			var poShippingCost = poShippingCosts.Sum();
-
-			var purchaseOrderTotal = (purchaseOrderSubtotal ?? 0) + poShippingCost;
-
-			return orderWorksheet.Order.Total - purchaseOrderTotal;
+			// PurchaseOrder products (aka keyfob products) are excluded when calculating
+			// shipping so we only need to account for the subtotal here
+			return orderWorksheet.Order.Total - (purchaseOrderSubtotal ?? 0);
 		}
 		
 		private async Task<BuyerCreditCard> GetMeCardDetails(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
