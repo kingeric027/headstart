@@ -56,8 +56,8 @@ export async function createDefaultBuyerLocation(
 	const addressName = `AutomationLocation_${randomString(5)}`
 
 	const location: OrderCloudSDK.Address = {
-		ID: `${buyerID}-{${buyerID}-LocationIncrementor}`,
-		// ID: '',
+		// ID: `${buyerID}-{${buyerID}-LocationIncrementor}`,
+		ID: '',
 		AddressName: addressName,
 		City: 'King of Prussia',
 		CompanyName: addressName,
@@ -65,21 +65,22 @@ export async function createDefaultBuyerLocation(
 		State: 'PA',
 		Street1: '700 American Ave #200',
 		Zip: '19406',
+		Phone: '1231231234',
 		//not sure if these xp values are needed, but this is returned from the API for a created location
 		xp: {
 			Accessorials: null,
 			AvalaraCertificateExpiration: null,
 			AvalaraCertificateID: null,
 			Coordinates: null,
-			Email: '',
-			LocationID: null,
+			Email: `${addressName}.hpmqx9la@mailosaur.io`,
+			LocationID: addressName,
 		},
 	}
 
 	const locationUserGroup: MarketplaceLocationUserGroup = {
 		Name: addressName,
-		ID: `${buyerID}-{${buyerID}-LocationIncrementor}`,
-		// ID: '',
+		// ID: `${buyerID}-{${buyerID}-LocationIncrementor}`,
+		ID: '',
 		xp: {
 			Country: 'US',
 			Currency: 'USD',

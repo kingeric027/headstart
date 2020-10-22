@@ -30,9 +30,11 @@ class MainResourcePage {
 	}
 
 	async resourceExists(resource: string) {
-		//I think this line may refresh the selector to get new elements, not sure though
-		this.resourceList
-		return this.resourceList.withText(resource).exists
+		//wait for element to exist, then return if it exists
+		//kinda silly, but want to do the assertion in the test, not here
+		const resourceElement = this.resourceList.withText(resource)
+		await t.expect(resourceElement.exists).ok()
+		return await resourceElement.exists
 	}
 
 	async clickCreateNewStandardProduct() {

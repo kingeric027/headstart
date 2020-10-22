@@ -34,8 +34,12 @@ class MinorResourcePage {
 		await loadingHelper.waitForLoadingBar()
 	}
 
-	async resourceExists(resouce: string) {
-		return await this.resourceList.withText(resouce).exists
+	async resourceExists(resource: string) {
+		//wait for element to exist, then return if it exists
+		//kinda silly, but want to do the assertion in the test, not here
+		const resourceElement = this.resourceList.withText(resource)
+		await t.expect(resourceElement.exists).ok()
+		return await resourceElement.exists
 	}
 
 	async clickResource(resource: string) {
