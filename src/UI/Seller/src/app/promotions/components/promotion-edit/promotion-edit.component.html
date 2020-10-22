@@ -23,7 +23,6 @@
           <div class="custom-control custom-checkbox mt-3">
             <input type="checkbox"
                    class="custom-control-input"
-                   [resourceForm]="resourceForm"
                    formControlName="Automatic"
                    (input)="handleUpdatePromo($event, 'xp.Automatic')"
                    id="Automatic">
@@ -116,11 +115,6 @@
           <hr />
           <h6 class="font-weight-medium"
               translate>ADMIN.PROMOTIONS.APPLIES_TO</h6>
-          <small>
-            <fa-icon style="color: #cccccc"
-                     [icon]="faExclamationCircle"></fa-icon>
-            <span translate>ADMIN.PROMOTIONS.ALL_PROMOS_ORDERWIDE</span>
-          </small>
           <div class="form-check">
             <input class="form-check-input"
                    type="radio"
@@ -143,8 +137,7 @@
                    id="SpecificSupplier"
                    value="SpecificSupplier"
                    formControlName="AppliesTo"
-                   (change)="handleUpdatePromo($event, 'xp.AppliesTo')"
-                   (change)="toggleApplyToSpecificSupplier()"
+                   (change)="handleUpdatePromo($event, 'xp.AppliesTo'); _promotionEditable.LineItemLevel = true"
                    [checked]="promoTypeCheck('SpecificSupplier')">
             <label class="form-check-label"
                    for="SpecificSupplier"
@@ -152,6 +145,58 @@
               ADMIN.PROMOTIONS.SPECIFIC_SUPPLIER
             </label>
           </div>
+          <div class="form-check">
+            <input class="form-check-input"
+                   type="radio"
+                   name="AppliesTo"
+                   id="SpecificSKUs"
+                   value="SpecificSKUs"
+                   formControlName="AppliesTo"
+                   (change)="handleUpdatePromo($event, 'xp.AppliesTo'); _promotionEditable.LineItemLevel = true"
+                   [checked]="promoTypeCheck('SpecificSKUs')">
+            <label class="form-check-label"
+                   for="SpecificSKUs"
+                   translate>
+              Specific SKUs
+            </label>
+          </div>
+          <!-- PRODUCT SELECT AND SEARCH -->
+          <span *ngIf="_promotionEditable?.xp?.AppliesTo === 'SpecificSKUs'">
+            <div ngbDropdown
+                 class="parent-resource-dropdown btn-block">
+              <button class="resource-btn btn btn-outline-dark additional-item-resource-select-dropdown"
+                      id="parentresourcedropdown"
+                      ngbDropdownToggle>{{getSKUsBtnPlaceholderValue()}}</button>
+              <div ngbDropdownMenu
+                   aria-labelledby="parent resource dropdown">
+                <search-component class="mr-3 w-100 additional-item-resource-select-dropdown"
+                                  id="resource-search"
+                                  [placeholderText]="''"
+                                  [searchTermInput]="searchTerm"
+                                  (searched)="searchedResources($event)">
+                </search-component>
+                <perfect-scrollbar class="dropdown-ps"
+                                   (psYReachEnd)="handleScrollEnd()"
+                                   [ngStyle]="{'height.px': 400}">
+                  <button ngbDropdownItem
+                          *ngFor="let resource of products?.value?.Items"
+                          (click)="addSKU(resource.ID)"
+                          [disabled]="alreadySelected(resource.ID)">
+                    <summary-resource-display-component [resource]="resource"
+                                                        [resourceType]="'products'">
+                    </summary-resource-display-component>
+                  </button>
+                </perfect-scrollbar>
+              </div>
+            </div>
+            <div *ngFor="let sku of _promotionEditable?.xp?.SKUs"
+                 class="d-flex justify-content-between align-items-center">
+              <p class="mb-0">{{sku}}</p>
+              <button class="btn btn-link text-warning"
+                      (click)="removeSku(sku)">Delete</button>
+            </div>
+          </span>
+          <!-- END PRODUCT SELECT AND SEARCH -->
           <span *ngIf="_promotionEditable?.xp?.AppliesTo === 'SpecificSupplier'">
             <div ngbDropdown
                  *ngIf="suppliers?.length && selectedSupplier"

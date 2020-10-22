@@ -35,6 +35,7 @@ export class PromotionService extends ResourceCrudService<Promotion> {
       AppliesTo: MarketplacePromoEligibility.EntireOrder,
       ScopeToSupplier: false,
       Supplier: null,
+      SKUs: [],
       Automatic: false,
       MinReq: {
         Type: null,
