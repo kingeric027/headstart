@@ -79,6 +79,7 @@
                     <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
                     <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                           class="badge badge-pill badge-primary">Purchase Order</span>
+                      <a *ngIf="li.Product.xp.ArtworkRequired" href="{{li.xp.PrintArtworkURL}}" target="_blank">Download PDF</a>
                   </h6>
                 </div>
               </td>
