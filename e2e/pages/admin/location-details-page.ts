@@ -55,7 +55,7 @@ class LocationDetailsPage {
 		await t.typeText(this.locationNameField, locationName)
 		await t.typeText(this.companyNameField, locationName)
 		await t.typeText(this.street1Field, '700 American Ave #200')
-		await t.typeText(this.cityField, 'King Of Prussia')
+		await t.typeText(this.cityField, 'King of Prussia')
 		await t.typeText(this.stateField, 'PA')
 		await t.typeText(this.zipField, '19406')
 		await t.click(this.countryCodeDropdown)

@@ -79,8 +79,8 @@ fixture`Product Tests`
 			ctx.clientAuth
 		)
 		ctx.locationID = location.Address.ID
-		//wait 20 seconds to let everything get setup
-		await delay(20000)
+		//wait 30 seconds to let everything get setup
+		await delay(30000)
 	})
 	.after(async ctx => {
 		await deleteProduct(ctx.productID, ctx.supplierUserAuth)

@@ -10,7 +10,7 @@ class BuyerHeaderPage {
 	cartButton: Selector
 
 	constructor() {
-		this.accountDropdown = Selector('#account-dropdown').withText(
+		this.accountDropdown = Selector('#accountDropdown').withText(
 			createRegExp('account')
 		)
 		this.logoutButton = Selector('a').withAttribute('href', '/login')
