@@ -166,14 +166,17 @@
           </tr>
         </table>
       </ng-container>
+      <!-- PRODUCT DOCS -->
       <ng-container *ngIf="attachments.length > 0">
-        <strong><span translate>PRODUCTS.DETAILS.DOCS</span>:</strong>
-        <div class="mt-2">
-          <a class="border border-medium border-radius p-2 mr-2"
-             *ngFor="let attachment of attachments"
+        <h3 class="small font-weight-bolder text-muted"
+            translate>
+          PRODUCTS.DETAILS.DOCS</h3>
+        <div class="list-group my-2">
+          <a *ngFor="let attachment of attachments"
              [href]="attachment.Url"
              target="_blank"
-             download="attachment.FileName">{{attachment.FileName}}</a>
+             download="attachment.FileName"
+             class="list-group-item list-group-item-action">{{attachment.FileName}}</a>
         </div>
       </ng-container>
       <div class="border-top border-light mt-3"
