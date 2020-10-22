@@ -6,6 +6,8 @@ using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using Microsoft.AspNetCore.Http;
+using Marketplace.Common.Models.Misc;
 
 namespace Marketplace.Common.Controllers
 {
@@ -31,5 +33,13 @@ namespace Marketplace.Common.Controllers
             // todo add auth to make sure suppliers are creating shipments for their own orders
             return await _command.CreateShipment(superShipment, VerifiedUserContext.AccessToken);
         } 
+
+        [DocName("POST Batch Shipment Update")]
+        [Route("batch/uploadshipment")]
+        [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ShipmentAdmin)]
+        public async Task<UploadShipmentResponse> UploadShipments([FromBody] IFormFile file)
+        {
+            return  await _command.UploadShipments(file);
+        }
     }
 }
