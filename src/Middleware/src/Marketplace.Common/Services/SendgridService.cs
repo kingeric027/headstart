@@ -536,6 +536,7 @@ namespace Marketplace.Common.Services
                 order.ShippingCost,
                 PromotionalDiscount = order.PromotionDiscount,
                 order.Total,
+                order.xp.Currency
             };
         }
 
