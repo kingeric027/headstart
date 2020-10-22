@@ -43,7 +43,8 @@ namespace Marketplace.Tests
             _command = new SendgridService(_settings, _oc);
         }
 
-        public class TestConstants {
+        public class TestConstants
+        {
             public const string orderID = "testorder";
             public const string buyerEmail = "buyer@test.com";
             public const string lineItem1ID = "testlineitem1";
@@ -55,7 +56,7 @@ namespace Marketplace.Tests
             public const string product2ID = "testproduct2";
             public const string product2Name = "pants";
             public const string supplier1ID = "001";
-            public static readonly string[] supplier1NotificationRcpts = {"001user@test.com", "001user2@test.com"};
+            public static readonly string[] supplier1NotificationRcpts = { "001user@test.com", "001user2@test.com" };
             public static readonly string[] supplier2NotificationRcpts = { "002user@test.com" };
             public const string supplier2ID = "002";
             public const string selectedShipMethod1ID = "selectedmethod001";
@@ -103,25 +104,26 @@ namespace Marketplace.Tests
             };
             //  confirm emails sent to buyer, seller users, supplier 1 notification recipients, supplier 2 notification recipients
             await _commandSub.Configure().Received().SendSingleTemplateEmail(Arg.Any<string>(), TestConstants.buyerEmail, Arg.Any<string>(), Arg.Any<object>());
-            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSellerEmailList)), Arg.Any<string>(), Arg.Any<object>());
-            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSupplier1EmailList)), Arg.Any<string>(), Arg.Any<object>());
-            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSupplier2EmailList)), Arg.Any<string>(), Arg.Any<object>());
+            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => EqualEmailLists(x, expectedSellerEmailList)), Arg.Any<string>(), Arg.Any<object>());
+            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => EqualEmailLists(x, expectedSupplier1EmailList)), Arg.Any<string>(), Arg.Any<object>());
+            await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => EqualEmailLists(x, expectedSupplier2EmailList)), Arg.Any<string>(), Arg.Any<object>());
 
         }
 
-        private bool equalEmailLists(List<EmailAddress> list1, List<EmailAddress> list2)
+        private bool EqualEmailLists(List<EmailAddress> list1, List<EmailAddress> list2)
         {
-            if(list1.Count() != list2.Count())
+            if (list1.Count() != list2.Count())
             {
                 return false;
-            } else
+            }
+            else
             {
                 var isEqual = true;
                 var list2Emails = list2.Select(item => item.Email);
                 var list1Emails = list1.Select(item => item.Email);
                 foreach (var item in list1)
                 {
-                    if(!list2Emails.Contains(item.Email))
+                    if (!list2Emails.Contains(item.Email))
                     {
                         isEqual = false;
                     }
@@ -180,7 +182,7 @@ namespace Marketplace.Tests
                         LastName = "johnson",
                         Email = TestConstants.buyerEmail
                     },
-                    BillingAddressID="testbillingaddressid",
+                    BillingAddressID = "testbillingaddressid",
                     BillingAddress = new MarketplaceAddressBuyer()
                     {
                         ID = "testbillingaddress",
