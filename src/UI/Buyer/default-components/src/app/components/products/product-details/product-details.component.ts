@@ -160,7 +160,7 @@ export class OCMProductDetails implements OnInit {
       });
     } catch (err) {
       this.toastrService.error('Something went wrong')
-      console.log(err) 
+      console.log(err)
     } finally {
       this.isAddingToCart = false;
     }
