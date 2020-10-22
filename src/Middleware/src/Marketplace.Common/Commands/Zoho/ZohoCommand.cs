@@ -206,8 +206,8 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
                 if (z_item.Key != null)
-                    return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
-                return await _zoho.Items.CreateAsync(ZohoSalesLineItemMapper.Map(lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
+                    return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item.Value, lineItem));
+                return await _zoho.Items.CreateAsync(ZohoSalesLineItemMapper.Map(lineItem));
             });
             return items.ToList();
         }
@@ -235,8 +235,8 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
                 if (z_item.Key != null)
-                    return await _zoho.Items.SaveAsync(ZohoPurchaseLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
-                return await _zoho.Items.CreateAsync(ZohoPurchaseLineItemMapper.Map(lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
+                    return await _zoho.Items.SaveAsync(ZohoPurchaseLineItemMapper.Map(z_item.Value, lineItem));
+                return await _zoho.Items.CreateAsync(ZohoPurchaseLineItemMapper.Map(lineItem));
             });
             return items.ToList();
         }
@@ -263,8 +263,9 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
                 if (z_item.Key != null)
-                    return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item.Value, lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
-                return await _zoho.Items.CreateAsync(ZohoSalesLineItemMapper.Map(lineitems.First(i => i.ProductID == lineItem.Product.ID), lineItem.Product, lineItem.Variant));
+                    return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item.Value, lineItem));
+                return await _zoho.Items.CreateAsync(ZohoSalesLineItemMapper.Map(lineItem));
+
             });
             return items.ToList();
         }
@@ -272,6 +273,7 @@ namespace Marketplace.Common.Commands.Zoho
         private async Task<List<ZohoLineItem>> ApplyShipping(MarketplaceOrderWorksheet orderWorksheet)
         {
             var list = new List<ZohoLineItem>();
+            if (orderWorksheet.ShipEstimateResponse == null) return list;
             foreach (var shipment in orderWorksheet.ShipEstimateResponse.ShipEstimates)
             {
                 var method = shipment.ShipMethods.FirstOrDefault(s => s.ID == shipment.SelectedShipMethodID);
