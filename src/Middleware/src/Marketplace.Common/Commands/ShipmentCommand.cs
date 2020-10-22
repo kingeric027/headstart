@@ -10,11 +10,15 @@ using System.Collections.Generic;
 using Marketplace.Models.Models.Marketplace;
 using System.Dynamic;
 
+using Microsoft.AspNetCore.Http;
+using Misc = Marketplace.Common.Models.Misc;
+
 namespace Marketplace.Common.Commands
 {
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
+        Task<Misc.UploadShipmentResponse> UploadShipments(IFormFile file);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -31,7 +35,7 @@ namespace Marketplace.Common.Commands
             var firstShipmentItem = superShipment.ShipmentItems.First();
             var supplierOrderID = firstShipmentItem.OrderID;
             var buyerOrderID = supplierOrderID.Split("-").First();
-            
+
             // in the platform, in order to make sure the order has the proper Order.Status, you must 
             // create a shipment without a DateShipped and then patch the DateShipped after
             var dateShipped = superShipment.Shipment.DateShipped;
@@ -61,9 +65,9 @@ namespace Marketplace.Common.Commands
                     });
             });
             var shipmentItemResponses = await Throttler.RunAsync(
-                superShipment.ShipmentItems, 
-                100, 
-                5, 
+                superShipment.ShipmentItems,
+                100,
+                5,
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
             var ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
             return new SuperShipment()
@@ -98,6 +102,35 @@ namespace Marketplace.Common.Commands
             var buyerOrderID = supplierOrderID.Split("-").First();
             var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
             return relatedBuyerOrder.FromCompanyID;
+        }
+
+        public async Task<Misc.UploadShipmentResponse> UploadShipments(IFormFile file)
+        {
+            Misc.UploadShipmentResponse response;
+            List<Misc.Shipment> shipmentList;
+
+            shipmentList = await GetShipmentListFromFile(file);
+            response = new Misc.UploadShipmentResponse();
+            response.ErrorList = new List<Misc.Error>();
+
+            response.SuccessfulShipments = shipmentList;
+
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorList.Add(new Misc.Error() { ErrorMessage = ex.Message, StackTrace = ex.StackTrace });
+                Console.WriteLine(ex);
+            }
+
+            return response;
+        }
+
+        private Task<List<Misc.Shipment>> GetShipmentListFromFile(IFormFile file)
+        {
+            throw new NotImplementedException();
         }
     }
 }

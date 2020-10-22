@@ -28,20 +28,20 @@
               </li>
               <li>
                 <div class="process-step">
-                  Step 3: Upload spreadsheet here:
+                  Step 3: Upload filled out spreadsheet here:
                 </div>
               </li>
             </ul>
 
             <label class="rmpm dropzone"
-                   for="imageUpload"
+                   for="shipmentUpload"
                    appDrag
-                   (files)="stageImages($event)">
+                   (files)="stageDocument($event)">
             </label>
             <input class="d-none"
-                   id="imageUpload"
+                   id="shipmentUpload"
                    type="file"
-                   (change)="manualFileUpload($event, 'image')">
+                   (change)="manualFileUpload($event, 'staticContent')">
           </div>
           <div class="card col-sm-2 flex">
             <h3 class="info">What is this tool?</h3>
