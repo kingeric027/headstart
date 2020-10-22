@@ -44,7 +44,7 @@
                       </monitored-product-notification>
                   </div>
                 </ng-container>
-                <div *ngIf="notificationsToReview?.length == 0">
+                <div *ngIf="notificationsToReview?.length == 0 || userContext?.UserType !== 'SELLER'">
                   <div class="card align-items-center" style="padding: 20px;">
                   <h5 class="mb-0">You are all caught up! </h5> 
                   <div>Your notifications will show up here. </div>

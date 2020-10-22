@@ -11,6 +11,7 @@ import { isEqual as _isEqual, set as _set, get as _get } from 'lodash';
 import { HeadStartSDK, Asset, AssetUpload, JDocument } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
 import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+import { NoResultsComponent } from '@ordercloud/angular-cms-components/shared/components/no-results/no-results.component';
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string;
@@ -63,9 +64,9 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   }
 
   retrieveNotifications() {
-    HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification').then((notifications: ListPage<JDocument>) => {
-      if (notifications?.Items?.length > 0 && notifications?.Items.some(i => i?.Doc.Status === NotificationStatus.SUBMITTED)) {
-      this.notificationsToReview = notifications?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
+    HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification', {pageSize: 100, sortBy: ['!History.DateUpdated'], filters:{['Doc'.'Status' === "SUBMITTED"}]}).then((results: any) => {
+      if (results?.Items?.length > 0) {
+      this.notificationsToReview = results?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
     };
     });
   }
