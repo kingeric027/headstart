@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avalara.AvaTax.RestClient;
 using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
@@ -151,6 +151,7 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
+            services.AddApplicationInsightsTelemetry(_settings.ApplicationInsightsSettings.InstrumentationKey);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
