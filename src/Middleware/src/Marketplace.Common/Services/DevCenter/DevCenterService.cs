@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Flurl.Http;
 using Marketplace.Common.Services.DevCenter.Models;
 using OrderCloud.SDK;
@@ -7,10 +8,10 @@ namespace Marketplace.Common.Services.DevCenter
 {
     public interface IDevCenterService
     {
-        Task<ListPage<DevAccessibleCompany>> GetOrganizations(int ownerDevId, string token);
+        Task<string> GetOrgToken(string orgID, string token);
         Task<DevCenterUser> GetMe(string token);
-        Task<ImpersonationToken> Impersonate(int id, string token);
-        Task<AdminCompany> PostOrganization(Organization org, string token);
+        Task CreateOrganization(Organization org, string token);
+        Task<Organization> GetOrganization(string orgID, string token);
     }
 
     public class DevCenterService : IDevCenterService
@@ -21,46 +22,39 @@ namespace Marketplace.Common.Services.DevCenter
         public DevCenterService(AppSettings settings)
         {
             _settings = settings;
-            _client = new FlurlClient(settings.OrderCloudSettings.ApiUrl);
-        }
-
-        private IFlurlRequest Get(string resource, string token)
-        {
-            return _client.Request($"devcenter/{resource}").WithOAuthBearerToken(token);
-        }
-
-        private IFlurlRequest Post(string resource, string token)
-        {
-            return _client.Request($"devcenter/{resource}").WithOAuthBearerToken(token);
+            _client = new FlurlClient($"{settings.OrderCloudSettings.DevcenterApiUrl}/api/v1/");
         }
 
         public async Task<DevCenterUser> GetMe(string token)
         {
-            var user = await this.Get("me", token).GetJsonAsync<DevCenterUser>();
-            return user;
+            return await _client.Request("me")
+                        .WithOAuthBearerToken(token)
+                        .GetJsonAsync<DevCenterUser>();
         }
 
-        public async Task<ListPage<DevAccessibleCompany>> GetOrganizations(int ownerDevId, string token)
+        public async Task<Organization> GetOrganization(string orgID, string token)
         {
-            var orgs = await this.Get("me/DevAccessibleCompanies", token)
-                .SetQueryParam("OwnerDevID", ownerDevId)
-                .GetJsonAsync<ListPage<DevAccessibleCompany>>();
-            return orgs;
+            return await _client.Request("organizations", orgID)
+                        .WithOAuthBearerToken(token)
+                        .GetJsonAsync<Organization>();
         }
 
-        public async Task<ImpersonationToken> Impersonate(int id, string token)
+        // The devcenter API allows you to get an admin token for that org that isn't related to any user
+        // and the roles granted are roles defined for the dev user. If you're the owner, that is full access
+        public async Task<string> GetOrgToken(string orgID, string token)
         {
-            var request = await this.Get($"me/DevAccessibleCompanies/{id}/impersonateToken", token)
-                .GetJsonAsync<ImpersonationToken>();
-            return request;
+            var request = await _client.Request("organizations", orgID, "token")
+                            .WithOAuthBearerToken(token)
+                            .GetJsonAsync<OrgTokenResponse>();
+
+            return request.access_token;
         }
 
-        public async Task<AdminCompany> PostOrganization(Organization org, string token)
+        public async Task CreateOrganization(Organization org, string token)
         {
-            var post = await this.Post("adminCompanies", token)
-                .PostJsonAsync(org)
-                .ReceiveJson<AdminCompany>();
-            return post;
+            // doesn't return anything
+            await _client.Request("organizations", token)
+                .PutJsonAsync(org);
         }
     }
 }

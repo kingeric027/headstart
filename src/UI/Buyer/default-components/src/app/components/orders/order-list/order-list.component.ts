@@ -44,9 +44,9 @@ export class OCMOrderList {
   }
 
   getOrderStatus(order: Order): string {
-    //AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
-    if (order?.Status === "AwaitingApproval") {
-      return "AwaitingApproval"
+    // AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
+    if (order?.Status === 'AwaitingApproval') {
+      return 'AwaitingApproval'
     } else {
       return order?.xp?.SubmittedOrderStatus;
     }

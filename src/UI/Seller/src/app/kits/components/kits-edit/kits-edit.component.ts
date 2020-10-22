@@ -195,6 +195,7 @@ export class KitsEditComponent implements OnInit {
     handleDiscardChanges(): void {
         this.imageFiles = [];
         this.staticContentFiles = [];
+        this.productsToAdd = [];
         this.kitProductEditable = this.kitProductStatic;
         this.refreshProductData(this.kitProductStatic);
     }
@@ -224,8 +225,9 @@ export class KitsEditComponent implements OnInit {
             };
             const productInKit = { ID: productID, MinQty: null, MaxQty: null, Static: false, Variants: ocProduct.Variants, SpecCombo: '' };
             if (!this.productsIncluded.includes(newProduct)) this.productsIncluded.push(newProduct);
-            updatedAssignments.push(productInKit);
+            if (!updatedAssignments.includes(productInKit)) updatedAssignments.push(productInKit);
         });
+        this.productsToAdd = [];
         const updatedProduct = { field: 'ProductAssignments.ProductsInKit', value: updatedAssignments };
         this.updateProductResource(updatedProduct);
     }
@@ -238,11 +240,9 @@ export class KitsEditComponent implements OnInit {
     }
 
     handleDeleteAssignment(product: any): void {
-        const updatedAssignments = this.kitProductEditable.ProductAssignments.ProductsInKit;
-        for (let i = 0; i < updatedAssignments.length; i++) {
-            if (updatedAssignments[i].ID === product.ID) { updatedAssignments.splice(i, 1); }
-            if (this.productsIncluded[i]?.ID === product.ID) { this.productsIncluded.splice(i, 1); }
-        }
+        let updatedAssignments = this.kitProductEditable.ProductAssignments.ProductsInKit;
+        updatedAssignments = updatedAssignments.filter(p => p.ID !== product.ID);
+        this.productsIncluded = this.productsIncluded.filter(includedProduct => includedProduct.ID !== product.ID);
         const updatedProduct = {
             field: 'ProductAssignments.ProductsInKit',
             value: updatedAssignments
@@ -266,12 +266,10 @@ export class KitsEditComponent implements OnInit {
     }
 
     selectProductsToAdd(event: any, productID: string): void {
-        if (event.target.checked && !this.isProductInKit(productID)) {
+        if (event.target.checked && !this.isProductInKit(productID) && !this.productsToAdd.includes(productID)) {
             this.productsToAdd.push(productID);
         } else if (!event.target.checked) {
-            for (let i = 0; i < this.productsToAdd.length; i++) {
-                if (productID === this.productsToAdd[i]) this.productsToAdd.splice(i, 1);
-            }
+            this.productsToAdd = this.productsToAdd.filter(product => productID !== product)
         }
     }
 

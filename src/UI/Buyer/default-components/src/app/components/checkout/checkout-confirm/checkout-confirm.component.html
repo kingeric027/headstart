@@ -1,3 +1,8 @@
+<button class="btn btn-block btn-primary mb-4"
+        [disabled]="isSubmittingOrder"
+        (click)="saveCommentsAndSubmitOrder()"
+        translate>CHECKOUT.CHECKOUT_CONFIRM.SUBMIT_ORDER</button>
+
 <div *ngIf="lineItems">
   <!-- Currently, payments are not created until submit. This will likely change in the future. -->
   <ocm-payment-list *ngIf="payments"
@@ -20,6 +25,7 @@
   </div>
   <ocm-lineitem-table [lineItems]="lineItems?.Items"
                       [readOnly]="true"
+                      [groupByKits]="false"
                       [hideStatus]="true"
                       class="my-3">
   </ocm-lineitem-table>
@@ -34,7 +40,3 @@
     </textarea>
   </form>
 </div>
-<button class="btn btn-block btn-primary mt-4"
-        [disabled]="isSubmittingOrder"
-        (click)="saveCommentsAndSubmitOrder()"
-        translate>CHECKOUT.CHECKOUT_CONFIRM.SUBMIT_ORDER</button>

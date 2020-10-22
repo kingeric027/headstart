@@ -1,9 +1,9 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-3 bg-white border-right">
+    <div class="col-md-2 bg-white border-right">
       <account-menu></account-menu>
     </div>
-    <div class="col-md-9 bg-light">
+    <div class="col-md-10 bg-light">
       <perfect-scrollbar style="width: 100%;"
                          [ngStyle]="{'height.px': contentHeight}">
         <div class="container-fluid py-3">
@@ -15,10 +15,12 @@
                 <div>
                   <button class="btn btn-primary btn-sm"
                           *ngIf="areChanges"
-                          (click)="patchUser(['xp'])">Save Changes</button>
+                          (click)="patchUser(['xp'])">Save
+                    Changes</button>
                   <button class="btn btn-outline-teal btn-sm ml-2"
                           *ngIf="areChanges"
-                          (click)="discardChanges()">Discard Changes</button>
+                          (click)="discardChanges()">Discard
+                    Changes</button>
                 </div>
               </div>
               <seller-email-notifications *ngIf="userContext?.UserType === 'SELLER'"
@@ -30,6 +32,25 @@
                                           (removeRcpt)="removeAddtlRcpt($event)"
                                           (addRcpt)="addAddtlRcpt()">
               </seller-email-notifications>
+              <div class="mb-0" style="margin-top: 35px;">
+                <h1 class="resource-name mb-0" style="padding-bottom: 20px;" translate> Notification Center</h1>
+
+                <ng-container *ngIf="userContext?.UserType === 'SELLER' && notificationsToReview?.length > 0">
+                  <div *ngFor="let notification of notificationsToReview">
+                      <monitored-product-notification
+                                    [notification]="notification"
+                                    (onActionTaken)="notificationActionTaken($event, notification)"
+                                    (goToProductPage)="goToProductPage($event)">
+                      </monitored-product-notification>
+                  </div>
+                </ng-container>
+                <div *ngIf="notificationsToReview?.length == 0">
+                  <div class="card align-items-center" style="padding: 20px;">
+                  <h5 class="mb-0">You are all caught up! </h5> 
+                  <div>Your notifications will show up here. </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="col-md-5">
               <account-summary [user]="userEditable"></account-summary>

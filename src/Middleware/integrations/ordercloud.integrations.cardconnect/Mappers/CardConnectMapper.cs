@@ -57,7 +57,7 @@ namespace ordercloud.integrations.cardconnect
             return acct;
         }
 
-        public static CardConnectAuthorizationRequest Map(BuyerCreditCard card, Order order, OrderCloudIntegrationsCreditCardPayment payment, decimal amount)
+        public static CardConnectAuthorizationRequest Map(BuyerCreditCard card, Order order, OrderCloudIntegrationsCreditCardPayment payment, string merchantID, decimal amount)
         {
 			var address = card.xp.CCBillingAddress;
 			var req = new CardConnectAuthorizationRequest()
@@ -66,14 +66,12 @@ namespace ordercloud.integrations.cardconnect
                 account = card.Token,
                 address = address.Street1,
                 amount = amount.ToString(),
-                //capture = auth.capture,
-                //bin = auth.bin,
                 city = address.City,
                 country = address.Country,
                 currency = payment.Currency,
                 cvv2 = payment.CVV,
                 expiry = $"{card.ExpirationDate.Value:MMyyyy}",
-                merchid = payment.MerchantID,
+                merchid = merchantID,
                 orderid = order.ID,
                 postal = address.Zip,
                 region = address.State

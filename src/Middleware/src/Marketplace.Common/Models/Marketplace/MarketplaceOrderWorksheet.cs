@@ -23,4 +23,12 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		public bool ExcludePOProductsFromShipping { get; set; }
 		public bool ExcludePOProductsFromTax { get; set; }
 	}
+
+    public static class MarketplaceOrderWorksheetExtensions
+    {
+        public static bool IsStandardOrder(this MarketplaceOrderWorksheet sheet)
+        {
+			return sheet.Order.xp == null || sheet.Order.xp.OrderType != OrderType.Quote;
+		}
+    }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/quotes */
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { removeSpacesFrom, isValidLength, isValidPerLuhnAlgorithm } from '../services/card-validation.helper';
+import { isValidLength, isValidPerLuhnAlgorithm } from '../services/card-validation.helper';
 
 export const ErrorDictionary = {
   name: "Name can only contain characters Aa-Zz 0-9 - ' .",
@@ -126,12 +126,11 @@ export function DateValidator(control: AbstractControl): ValidationErrors | null
 // Credit Card Validation
 
 export function ValidateCreditCard(control: AbstractControl): ValidationErrors | null {
-  const cardNumber = removeSpacesFrom(control.value);
+  const cardToken = control.value;
   if (!control.value) {
     return null;
   }
 
-  if (!isValidLength(cardNumber)) return { creditCardLength: true };
-  if (!isValidPerLuhnAlgorithm(cardNumber)) return { creditCardNumber: true };
+  if (!isValidLength(cardToken)) return { creditCardLength: true };
   return null;
 }

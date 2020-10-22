@@ -147,9 +147,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             item.sku = item.sku;
             item.quantity = 1;
             item.unit = "each";
-            //item.account_id = "2237685000000014001";
-            //item.purchase_account_id = "2237685000000677015";
             item.purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit";
+            item.avatax_tax_code = "FR";
             return item;
         }
 
@@ -164,8 +163,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 name = $"Shipping: {method.Name}",
                 quantity = 1,
                 unit = "each",
-                //account_id = "2237685000000014001",
-                purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit"
+                purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit",
+                avatax_tax_code = "FR"
             };
             return item;
         }
@@ -184,11 +183,9 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 sku = variant?.ID ?? product.ID, // debug removal
                 unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
+                quantity = item.Quantity,
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code ?? "P000000"
             };
         }
 
@@ -205,11 +202,9 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 sku = variant?.ID ?? product.ID,
                 unit = product.xp?.UnitOfMeasure?.Unit,
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
+                quantity = item.Quantity,
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code ?? "P000000"
             };
         }
     }
@@ -227,16 +222,12 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 sku = variant?.ID ?? product.ID, // debug removal
                 unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code
             };
         }
 
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
         {
-            // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
             {
                 item_id = zItem.item_id,
@@ -248,10 +239,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 sku = variant?.ID ?? product.ID,
                 unit = product.xp?.UnitOfMeasure?.Unit, 
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = product.xp?.Tax.Code,
             };
         }
     }

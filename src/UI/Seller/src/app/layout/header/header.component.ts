@@ -8,6 +8,8 @@ import {
   faMapMarkerAlt,
   faSitemap,
   faUserCircle,
+  faEnvelope,
+  faVectorSquare
 } from '@fortawesome/free-solid-svg-icons';
 import { MeUser, OcTokenService } from '@ordercloud/angular-sdk';
 import { Router, NavigationEnd } from '@angular/router';
@@ -34,6 +36,7 @@ export class HeaderComponent implements OnInit {
   faMapMarker = faMapMarkerAlt;
   faSitemap = faSitemap;
   faUserCircle = faUserCircle;
+  faEnvelope = faEnvelope;
   activeTitle = '';
   headerConfig: MPRoute[];
   hasProfileImg: boolean = false;
@@ -111,6 +114,10 @@ export class HeaderComponent implements OnInit {
 
   toAccount(): void {
     this.router.navigate(['account']);
+  }
+
+  toNotifications(): void {
+    this.router.navigate(['account/notifications']);
   }
 
   setCurrentUserInitials(user: MeUser): void {

@@ -57,6 +57,7 @@ export class BuyerEditComponent {
       Name: new FormControl(buyer.Name, Validators.required),
       Active: new FormControl(buyer.Active),
       Markup: new FormControl(markup.Percent),
+      ChiliPublishFolder: new FormControl(buyer.xp.ChiliPublishFolder),
     });
   }
 

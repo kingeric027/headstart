@@ -11,7 +11,6 @@ import {
   Auth,
   MeUser,
   ForgottenPassword,
-  PasswordReset,
   AccessTokenBasic,
   TokenPasswordReset,
 } from 'ordercloud-javascript-sdk';
@@ -23,6 +22,7 @@ import { CurrentOrderService } from '../order/order.service';
 import { HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service';
 import { TokenHelperService } from '../token-helper/token-helper.service';
+import { ApplicationInsightsService } from '../application-insights/application-insights.service';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +41,8 @@ export class AuthService {
     private currentUser: CurrentUserService,
     private ordersToApproveStateService: OrdersToApproveStateService,
     private appConfig: AppConfig,
-    private tokenHelper: TokenHelperService
+    private tokenHelper: TokenHelperService,
+    private appInsightsService: ApplicationInsightsService
   ) {}
 
   // All this isLoggedIn stuff is only used in the header wrapper component
@@ -104,6 +105,7 @@ export class AuthService {
 
   async profiledLogin(userName: string, password: string, rememberMe: boolean = false): Promise<AccessToken> {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
+    this.appInsightsService.setUserID(userName);
     this.loginWithTokens(creds.access_token, creds.refresh_token, false, rememberMe);
     return creds;
   }
@@ -141,6 +143,7 @@ export class AuthService {
     Tokens.RemoveAccessToken();
     HeadStartSDK.Tokens.RemoveAccessToken();
     this.isLoggedIn = false;
+    this.appInsightsService.clearUser()
     if (this.appConfig.anonymousShoppingEnabled) {
       this.router.navigate(['/home']);
       await this.currentUser.reset();

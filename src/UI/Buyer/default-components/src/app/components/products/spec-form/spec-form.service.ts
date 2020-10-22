@@ -68,7 +68,12 @@ export class SpecFormService {
   }
 
   public getLineItemImageUrl(images: Asset[], specs: Spec[], specForm: FormGroup): string {
+    if (!specs.length) {
+      const firstImage = images[0];
+      return firstImage?.Url;
+    }
     const image = images?.find(img => this.isImageMatchingSpecs(img, specs, specForm));
+    if (!image) return images[0]?.Url;
     return image?.Url;
   }
 

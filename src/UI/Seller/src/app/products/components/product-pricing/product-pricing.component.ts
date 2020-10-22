@@ -7,6 +7,7 @@ import { SupportedRates } from '@app-seller/shared/models/supported-rates.interf
 import { BuyerTempService, SuperMarketplaceBuyer } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
 import { SuperMarketplaceProduct, MarketplaceBuyer, HeadStartSDK, MarketplacePriceSchedule } from '@ordercloud/headstart-sdk';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'product-pricing-component',
@@ -42,6 +43,7 @@ export class ProductPricingComponent {
 
   @Output()
   updateProduct = new EventEmitter<ResourceUpdate>();
+  faExclamationCircle = faExclamationCircle;
   supplierPriceSchedule: PriceSchedule;
   buyerMarkedUpSupplierPrices: PriceSchedule;
 

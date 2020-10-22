@@ -1,5 +1,3 @@
-@import "../../../../styles/main.scss"; // TODO - may not be needed
-
 /* form starting stylings ------------------------------- */
 .group {
   position: relative;
@@ -35,7 +33,7 @@ select:valid ~ label {
   padding-right: 0.25rem;
   background-color: white;
   font-size: 10px;
-  color: $dark;
+  color: var(--dark);
   font-weight: bold;
 }
 
@@ -58,7 +56,7 @@ select:focus ~ .highlight {
 /* ANIMATIONS ================ */
 @keyframes selectHighlighter {
   from {
-    background: $primary;
+    background: var(--primary);
   }
   to {
     width: 0;
@@ -73,7 +71,7 @@ select:focus ~ .highlight {
       top: -10px;
       right: -12px;
       font-size: 45px;
-      background-color: $primary;
+      background-color: var(--primary);
     }
   }
 }

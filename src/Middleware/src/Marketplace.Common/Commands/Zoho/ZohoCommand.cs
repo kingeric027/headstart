@@ -7,10 +7,10 @@ using Marketplace.Common.Services.Zoho;
 using Marketplace.Common.Services.Zoho.Mappers;
 using Marketplace.Common.Services.Zoho.Models;
 using Marketplace.Models;
+using Marketplace.Models.Extended;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using ErrorCodes = Marketplace.Models.ErrorCodes;
 
 namespace Marketplace.Common.Commands.Zoho
 {
@@ -18,7 +18,7 @@ namespace Marketplace.Common.Commands.Zoho
     {
         Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet);
         Task<List<ZohoPurchaseOrder>> CreateOrUpdatePurchaseOrder(ZohoSalesOrder z_order, List<MarketplaceOrder> orders);
-        Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet);
+        Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet order);
         Task<ZohoOrganizationList> ListOrganizations();
     }
 
@@ -61,14 +61,14 @@ namespace Marketplace.Common.Commands.Zoho
             return results;
         }
 
-        public async Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet updatedMarketplaceOrderWorksheet)
+        public async Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet order)
         {
             // special request by SMG for creating PO of shipments
             // we definitely don't want this stopping orders from flowing into Zoho so I'm going to handle exceptions and allow to proceed
             try
             {
                 var list = new List<ZohoPurchaseOrder>();
-                foreach (var item in updatedMarketplaceOrderWorksheet.ShipEstimateResponse.ShipEstimates)
+                foreach (var item in order.ShipEstimateResponse.ShipEstimates)
                 {
                     var shipping_method = item.ShipMethods.FirstOrDefault(s => s.ID == item.SelectedShipMethodID);
                     var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = "SMG Shipping" });
@@ -79,14 +79,22 @@ namespace Marketplace.Common.Commands.Zoho
                             new MarketplaceLineItem() {
                                 ID = $"{z_order.reference_number} - 41000",
                                 UnitPrice = shipping_method?.Cost,
-                                ProductID = $"{shipping_method.Name} Shipping (41000)",
+                                ProductID = $"{shipping_method?.Name} Shipping (41000)",
                                 SupplierID = "SMG Shipping",
                                 Product = new MarketplaceLineItemProduct()
                                 {
-                                    Description = "Shipping Charge",
+                                    Description = $"{shipping_method?.xp?.Carrier} Shipping Charge",
                                     Name = $"{shipping_method.Name} Shipping (41000)",
                                     ID = $"{shipping_method.Name} Shipping (41000)",
-                                    QuantityMultiplier = 1
+                                    QuantityMultiplier = 1,
+                                    xp = new ProductXp()
+                                    {
+                                        Tax = new TaxProperties()
+                                        {
+                                            Code = "FR",
+                                            Description = "Shipping Charge"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -94,11 +102,11 @@ namespace Marketplace.Common.Commands.Zoho
                     var z_item = await CreateOrUpdateShippingLineItem(oc_lineitems.Items);
                     var oc_order = new Order()
                     {
-                        ID = $"{updatedMarketplaceOrderWorksheet.Order.ID} - {item.ID} - {shipping_method.Name} - 41000", Subtotal = shipping_method.Cost, Total = shipping_method.Cost, TaxCost = 0M
+                        ID = $"{order.Order.ID}-{order.LineItems.FirstOrDefault()?.SupplierID} - 41000", Subtotal = shipping_method.Cost, Total = shipping_method.Cost, TaxCost = 0M
                     };
                     var oc_lineitem = new ListPage<MarketplaceLineItem>() {Items = new List<MarketplaceLineItem>() {new MarketplaceLineItem() {Quantity = 1}}};
                     var z_po = ZohoPurchaseOrderMapper.Map(z_order, oc_order, z_item, oc_lineitems, null, vendor.Items.FirstOrDefault());
-                    var shipping_po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = $"{updatedMarketplaceOrderWorksheet.Order.ID} - {item.ID} - {shipping_method.Name} - 41000"});
+                    var shipping_po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = $"{order.Order.ID} - {item.ID} - {shipping_method.Name} - 41000"});
                     if (shipping_po.Items.Any())
                     {
                         z_po.purchaseorder_id = shipping_po.Items.FirstOrDefault()?.purchaseorder_id;
@@ -141,7 +149,7 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, List<ZohoLineItem> items, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact)
         {
-            var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = order.ID });
+            var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = order.ID });
             if (po.Items.Any())
                 return await _zoho.PurchaseOrders.SaveAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact, po.Items.FirstOrDefault()));
             return await _zoho.PurchaseOrders.CreateAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact));
@@ -320,9 +328,12 @@ namespace Marketplace.Common.Commands.Zoho
             // TODO: MODEL update ~ eventually add a filter to get the primary contact user
             var currencies = await _zoho.Currencies.ListAsync();
 
-            var zContactList = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}"});
+            var zContactList = await _zoho.Contacts.ListAsync(
+                new ZohoFilter() { Key = "contact_name", Value = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}" },
+                new ZohoFilter() { Key = "company_name", Value = $"{ocBuyer.Name} - {location.Address?.xp.LocationID}" });
+            
             var zContact = await _zoho.Contacts.GetAsync(zContactList.Items.FirstOrDefault()?.contact_id);
-            if (zContact != null)
+            if (zContact.Item != null)
             {
                 var map = ZohoContactMapper.Map(
                     zContact.Item,

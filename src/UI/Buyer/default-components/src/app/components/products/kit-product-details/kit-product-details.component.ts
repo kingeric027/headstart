@@ -9,6 +9,7 @@ import { ProductDetailService } from '../product-details/product-detail.service'
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { SpecFormService } from '../spec-form/spec-form.service';
+import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   templateUrl: './kit-product-details.component.html',
@@ -20,6 +21,8 @@ export class OCMKitProductDetails implements OnInit, OnDestroy {
   userCurrency: string;
   _product: MarketplaceMeKitProduct;
   routeSubscription: Subscription;
+  faCaretDown = faCaretDown;
+  faCaretRight = faCaretRight;
 
   // holds everything about a product needed for this view, easily referenced by productID
   productDictionary: {
@@ -148,12 +151,13 @@ export class OCMKitProductDetails implements OnInit, OnDestroy {
         const details = this.productDictionary[kitDefinition.Product.ID];
         return {
           ProductID: kitDefinition.Product.ID,
-          Quantity: kitDefinition.MinQty,
+          Quantity: details.quantity,
           Specs: kitDefinition.Static ?
             this.buildStaticKitSpecs(kitDefinition) :
             this.specFormService.getLineItemSpecs(details.specs, details.specForm),
           xp: {
             ImageUrl: this.specFormService.getLineItemImageUrl(details.images, details.specs, details.specForm),
+            KitProductName: this._product.Product.Name,
             KitProductImageUrl: this._product.Images && this._product.Images.length ? this._product.Images[0].Url : null,
             KitProductID: this._product.Product.ID // used to group kit line items during checkout
           }
