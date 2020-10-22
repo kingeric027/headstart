@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using SendGrid.Helpers.Mail;
 using System.Dynamic;
 using NSubstitute.Extensions;
+using AutoFixture;
 
 namespace Marketplace.Tests
 {
@@ -142,6 +143,8 @@ namespace Marketplace.Tests
 
         private MarketplaceOrderWorksheet GetOrderWorksheet()
         {
+            Fixture fixture = new Fixture();
+
             dynamic shipEstimatexp1 = new ExpandoObject();
             dynamic shipEstimatexp2 = new ExpandoObject();
             shipEstimatexp1.SupplierID = TestConstants.supplier1ID;
@@ -183,13 +186,7 @@ namespace Marketplace.Tests
                         Email = TestConstants.buyerEmail
                     },
                     BillingAddressID = "testbillingaddressid",
-                    BillingAddress = new MarketplaceAddressBuyer()
-                    {
-                        ID = "testbillingaddress",
-                        Street1 = "210 lakewood drive",
-                        City = "springfield",
-                        State = "MN"
-                    },
+                    BillingAddress = fixture.Create<MarketplaceAddressBuyer>(),
                     xp = new OrderXp()
                     {
                         OrderType = OrderType.Standard,
@@ -213,16 +210,8 @@ namespace Marketplace.Tests
                         {
                             Name=TestConstants.product1Name
                         },
-                        ShippingAddress = new MarketplaceAddressBuyer()
-                        {
-                            Street1 = "234 Hennepin Ave",
-                            City = "Minneapolis",
-                            State = "MN"
-                        },
-                        xp=new LineItemXp()
-                        {
-                            ImageUrl="image.jpg"
-                        }
+                        ShippingAddress = fixture.Create<MarketplaceAddressBuyer>(),
+                        xp = fixture.Create<LineItemXp>(),
                     },
                     new MarketplaceLineItem()
                     {
@@ -234,16 +223,8 @@ namespace Marketplace.Tests
                         {
                             Name=TestConstants.product2Name
                         },
-                        ShippingAddress = new MarketplaceAddressBuyer()
-                        {
-                            Street1 = "234 Hennepin Ave",
-                            City = "Minneapolis",
-                            State = "MN"
-                        },
-                        xp=new LineItemXp()
-                        {
-                            ImageUrl="image.jpg"
-                        }
+                        ShippingAddress = fixture.Create<MarketplaceAddressBuyer>(),
+                        xp = fixture.Create<LineItemXp>()
                     }
                 },
                 ShipEstimateResponse = new ShipEstimateResponse()
@@ -261,11 +242,7 @@ namespace Marketplace.Tests
                                     ID=TestConstants.selectedShipMethod1ID,
                                     Cost=TestConstants.selectedShipMethod1Cost
                                 },
-                                new ShipMethod()
-                                {
-                                    ID="unselectedmethod001",
-                                    Cost=15
-                                }
+                                fixture.Create<ShipMethod>()
                             }
                         },
                         new ShipEstimate()
@@ -279,11 +256,7 @@ namespace Marketplace.Tests
                                     ID=TestConstants.selectedShipMethod2ID,
                                     Cost=TestConstants.selectedShipMethod2Cost
                                 },
-                                new ShipMethod()
-                                {
-                                    ID="unselectedmethod002",
-                                    Cost=15
-                                }
+                                fixture.Create<ShipMethod>()
                             }
                         }
                     }
@@ -297,6 +270,7 @@ namespace Marketplace.Tests
 
         private MarketplaceOrderWorksheet GetSupplierWorksheet(string supplierID, string lineItemID, decimal total)
         {
+            Fixture fixture = new Fixture();
             return new MarketplaceOrderWorksheet()
             {
                 Order = new MarketplaceOrder()
@@ -316,16 +290,8 @@ namespace Marketplace.Tests
                         {
                             Name = lineItemID == TestConstants.lineItem1ID ? TestConstants.product1Name : TestConstants.product2Name
                         },
-                        xp = new LineItemXp()
-                        {
-                            ImageUrl="image.jpg"
-                        },
-                        ShippingAddress = new MarketplaceAddressBuyer()
-                        {
-                            Street1="street",
-                            City="city",
-                            State="state"
-                        }
+                        xp = fixture.Create<LineItemXp>(),
+                        ShippingAddress = fixture.Create<MarketplaceAddressBuyer>()
                     }
                 }
             };
