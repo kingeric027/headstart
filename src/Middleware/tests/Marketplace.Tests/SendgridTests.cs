@@ -45,6 +45,7 @@ namespace Marketplace.Tests
 
         public class TestConstants {
             public const string orderID = "testorder";
+            public const string buyerEmail = "buyer@test.com";
             public const string lineItem1ID = "testlineitem1";
             public const string lineItem2ID = "testlineitem2";
             public const decimal lineItem1Total = 15;
@@ -80,7 +81,8 @@ namespace Marketplace.Tests
             _oc.AdminUsers.ListAsync<MarketplaceSellerUser>().ReturnsForAnyArgs(Task.FromResult(GetSellerUserList()));
             var _commandSub = Substitute.ForPartsOf<SendgridService>(_settings, _oc);
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmailMultipleRcpts(default, default, default, default)).DoNotCallBase();
-            //_commandSub.Configure().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Any<List<EmailAddress>>(), Arg.Any<string>(), Arg.Any<object>()).Returns(Task.FromResult);
+            _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmail(default, default, default, default)).DoNotCallBase();
+
 
             await _commandSub.SendOrderSubmitEmail(orderWorksheet);
 
@@ -99,6 +101,8 @@ namespace Marketplace.Tests
             {
                 new EmailAddress() { Email=TestConstants.supplier2NotificationRcpts[0] }
             };
+            //  confirm emails sent to buyer, seller users, supplier 1 notification recipients, supplier 2 notification recipients
+            await _commandSub.Configure().Received().SendSingleTemplateEmail(Arg.Any<string>(), TestConstants.buyerEmail, Arg.Any<string>(), Arg.Any<object>());
             await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSellerEmailList)), Arg.Any<string>(), Arg.Any<object>());
             await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSupplier1EmailList)), Arg.Any<string>(), Arg.Any<object>());
             await _commandSub.Configure().Received().SendSingleTemplateEmailMultipleRcpts(Arg.Any<string>(), Arg.Is<List<EmailAddress>>(x => equalEmailLists(x, expectedSupplier2EmailList)), Arg.Any<string>(), Arg.Any<object>());
@@ -173,7 +177,8 @@ namespace Marketplace.Tests
                     FromUser = new MarketplaceUser()
                     {
                         FirstName = "john",
-                        LastName = "johnson"
+                        LastName = "johnson",
+                        Email = TestConstants.buyerEmail
                     },
                     BillingAddressID="testbillingaddressid",
                     BillingAddress = new MarketplaceAddressBuyer()
