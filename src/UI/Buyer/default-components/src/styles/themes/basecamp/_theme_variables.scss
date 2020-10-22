@@ -6,38 +6,50 @@
 // check out node_modules/bootstrap/variables.scss
 // --------------------------------------------------------------------------------------
 
-$blue: #1c3f65;
-$indigo: #0824f5; // intense blue
-$purple: #6f42c1;
-$pink: #e83e8c;
-$red: #fe0701; // intense red
-$orange: #e65727;
-$yellow: #ffc107;
-$teal: #20c997;
-$cyan: #94a8cd;
-$green: #28a745;
-$intense-blue: #0824f5;
-$intense-red: #fe0701;
-$iron-gray: #636466;
+$blue:              #1c3f65;
+$indigo:            #0824f5;    // intense blue
+$purple:            #83167B; 
+$pink:              #e83e8c;
+$red:               #fe0701;    // intense red
+$orange:            #FE7601;
+$yellow:            #ffc107;
+$cyan:              #94a8cd;
+$green:             #78B700;
 
-$white: #fff;
-$gray-100: #f8f9fa;
-$gray-200: #e9ecef;
-$gray-300: #dee2e6;
-$gray-400: #ced4da;
-$gray-500: #adb5bd;
-$gray-600: #6c757d;
-$gray-700: #495057;
-$gray-800: #343a40;
-$gray-900: #212529;
-$black: #000;
+$white:             #fff;
+$gray-100:          #F6F6F6;
+$gray-200:          #E8E8E8;
+$gray-300:          #D8D9D9;
+$gray-400:          #C8C9CA;
+$gray-500:          #B1B2B3;
+$gray-600:          #636466;    // iron-gray; 
+$gray-700:          #474849;
+$gray-800:          #353638;
+$gray-900:          #222224;
+$black:             #000;
 
-$primary: $blue;
-$secondary: $iron-gray;
-$success: $green;
-$info: $cyan;
-$warning: $yellow;
-$danger: $red;
-$light: $gray-100;
-$medium: $gray-300;
-$dark: $gray-800;
+$primary:            $blue;
+$secondary:          $gray-600;
+$success:            $green;
+$info:               $cyan;
+$warning:            $yellow;
+$danger:             $red;
+$light:              $gray-200;
+$medium:             $gray-500;
+$dark:               $gray-800;
+
+// .img-thumbnail
+$thumbnail-border-color:      $light;
+$thumbnail-border-width:      .5px;
+$thumbnail-box-shadow:        0 .125rem .25rem rgba($black, .075); // this is $box-shadow-sm
+$thumbnail-border-radius:     unset;
+$thumbnail-padding:           unset;
+
+// Typography
+
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,700;0,900;1,900&display=swap');
+
+$font-family-sans-serif:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-base:            'Nunito Sans', $font-family-sans-serif;
+$headings-font-family:        'Krona One', $font-family-sans-serif;
