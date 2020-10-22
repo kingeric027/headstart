@@ -70,7 +70,7 @@ namespace Marketplace.Common.Services
             await client.SendEmailAsync(msg);
         }
 
-        public async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
+        public virtual async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
@@ -79,7 +79,7 @@ namespace Marketplace.Common.Services
             await client.SendEmailAsync(msg);
         }
 
-        public async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
+        public virtual async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
@@ -371,17 +371,17 @@ namespace Marketplace.Common.Services
 
             //  now get correct tax for line items on supplier order
             var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
-            var supplierShippintRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
-            var supplierTax = 0.0;
+            var supplierShippingRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
+            var supplierTax = (decimal)0.0;
             foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
             {
-                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippintRateIDs.Contains(line?.lineNumber) && line.tax != null)
+                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippingRateIDs.Contains(line?.lineNumber) && line.tax != null)
                 {
                     //  Add tax from line items and shipping rates associated with this supplier
-                    supplierTax += line?.tax;
+                    supplierTax += (decimal)line?.tax;
                 }
             }
-            supplierOrderWorksheet.Order.TaxCost = (decimal)supplierTax;
+            supplierOrderWorksheet.Order.TaxCost = supplierTax;
             supplierOrderWorksheet.Order.Total = supplierOrderWorksheet.Order.Total + supplierOrderWorksheet.Order.TaxCost + supplierOrderWorksheet.Order.ShippingCost;
             return supplierOrderWorksheet;
         }

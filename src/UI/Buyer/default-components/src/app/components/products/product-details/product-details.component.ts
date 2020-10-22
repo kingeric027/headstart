@@ -89,7 +89,7 @@ export class OCMProductDetails implements OnInit {
       return;
     }
     const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
-    this._chiliConfigs = chiliConfigs.Items.filter(item => item.SupplierProductID === this._product.ID);
+    this._chiliConfigs = chiliConfigs.Items.filter(item => (item.SupplierProductID === this._product.ID && item.BuyerID === this.currentUser.Buyer.ID));
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
@@ -160,7 +160,7 @@ export class OCMProductDetails implements OnInit {
       });
     } catch (err) {
       this.toastrService.error('Something went wrong')
-      console.log(err) 
+      console.log(err)
     } finally {
       this.isAddingToCart = false;
     }
