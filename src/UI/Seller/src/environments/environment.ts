@@ -1,19 +1,61 @@
 import { Environment } from './environment.interface';
 
-export const environment = {
-  hostedApp: false,
-  sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
-  clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
-  middlewareUrl: 'https://localhost:44385',
-  appname: 'Marketplace Admin Local',
-  translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-  blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
-  orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
-  orderCloudApiVersion: 'v1',
-  buyerConfigs: {
-    'Anytime Fitness': {
-      clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
-      buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+// App Constants
+const BRANDWEAR_DESIGNS = 'BRANDWEAR_DESIGNS';
+type BRANDWEAR_DESIGNS = typeof BRANDWEAR_DESIGNS;
+const FAST_SIGNS = 'FAST_SIGNS';
+type FAST_SIGNS = typeof FAST_SIGNS;
+const HEADSTART_DEMO = 'HEADSTART_DEMO';
+type HEADSTART_DEMO = typeof HEADSTART_DEMO;
+const SELF_ESTEEM_BRANDS = 'SELF_ESTEEM_BRANDS';
+type SELF_ESTEEM_BRANDS = typeof SELF_ESTEEM_BRANDS;
+const GO2PARTNERS = 'GO2PARTNERS';
+type GO2PARTNERS = typeof GO2PARTNERS;
+
+type AppName = BRANDWEAR_DESIGNS | FAST_SIGNS | HEADSTART_DEMO | SELF_ESTEEM_BRANDS | GO2PARTNERS;
+
+const LOCAL = 'LOCAL';
+type LOCAL = typeof LOCAL;
+const TEST = 'TEST';
+type TEST = typeof TEST;
+type MiddlewareLocationSelection = LOCAL | TEST;
+
+// ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
+// ====================================================================
+const appName: AppName = SELF_ESTEEM_BRANDS;
+const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
+const localMiddlewareURL = 'https://localhost:44381';
+// ====================================================================
+// ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
+
+const devEnvironments: Record<string, Environment> = {
+  SELF_ESTEEM_BRANDS: {
+    hostedApp: false,
+    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+    clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
+    middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+    appname: 'Marketplace Admin Local',
+    translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
+    orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
+    orderCloudApiVersion: 'v1',
+    buyerConfigs: {
+      'Anytime Fitness': {
+        clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+        buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+      },
+      'Basecamp Fitness': {
+        clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+        buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+      },
+      'The Bar Method': {
+        clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+        buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+      },
+      'Waxing The City': {
+        clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+        buyerUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/'
+      }
     },
     superProductFieldsToMonitor: ['PriceSchedule', 'Product.xp.IsResale']
   },
