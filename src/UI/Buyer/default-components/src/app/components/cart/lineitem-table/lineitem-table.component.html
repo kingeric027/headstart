@@ -28,8 +28,8 @@
       <div class="d-none d-sm-block border-bottom border-light pb-2"
            *ngIf="orderType !== 'Quote'">
         <div class="row">
-          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-7'"></div>
-          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-5'">
+          <div class="col-md-6"></div>
+          <div class="col-md-6">
             <div class="row align-items-center">
               <div *ngIf="!hasReturnInfo() && activePath === '/orders'"
                    class="col-2 text-center text-medium"></div>
@@ -64,7 +64,7 @@
       <div *ngFor="let li of liGroup; let i = index"
            class="position-relative border-bottom border-light px-0">
         <div class="row align-items-center my-3">
-          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-7'"
+          <div class="col-md-6"
                *ngIf="li">
             <div class="row align-items-sm-center">
               <div class="col-md-3 col-sm-6 pr-md-3">
@@ -90,7 +90,9 @@
                   <span class="text-muted"
                         translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
                 </small>
-                <a *ngIf="li.Product.xp.ArtworkRequired" href="{{ li.xp.PrintArtworkURL }}" target="_blank">Download PDF</a>
+                <a *ngIf="li.Product.xp.ArtworkRequired"
+                   href="{{ li.xp.PrintArtworkURL }}"
+                   target="_blank">Download PDF</a>
                 <small *ngIf="li.xp?.LineItemReturnInfo?.Comment">
                   <span translate>CART.LINEITEM_TABLE.SELLER_COMMENT</span>:
                   <span class="text-muted">{{li.xp?.LineItemReturnInfo?.Comment}}</span>
@@ -118,7 +120,7 @@
               </div>
             </div>
           </div>
-          <div [ngClass]="(activePath === '/orders') ? 'col-sm-6' : 'col-sm-5'">
+          <div class="col-md-6">
             <div class="row align-items-center pt-3 pt-sm-0"
                  *ngIf="orderType !== 'Quote'">
               <div *ngIf="!hasReturnInfo() && activePath === '/orders'"
@@ -131,6 +133,7 @@
                        translate>CART.LINEITEM_TABLE.UNIT_PRICE</small>
                 <span class="text-nowrap">{{ li.UnitPrice | currency: _orderCurrency }}</span>
               </div>
+              <!-- Quantity Input -->
               <div class="text-right col-5"
                    id="colQuantityInput">
                 <small class="d-block d-sm-none"
@@ -143,8 +146,7 @@
                                     [variantID]="li.Variant?.ID"
                                     (qtyChange)="changeQuantity(li.ID, $event.detail)">
                 </ocm-quantity-input>
-                <span class="text-nowrap"
-                      *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
+                <span *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
               <div *ngIf="hasReturnInfo() && activePath === '/orders'"
                    class="col flex-grow-0 text-center">
