@@ -10,7 +10,7 @@ export const environment: Environment = {
     baseUrl: 'https://brandweardesigns-buyer-ui-test.azurewebsites.net/',
     middlewareUrl: 'https://brandweardesigns-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
-    instrumentationKey: '',
+  instrumentationKey: '0b1879d3-d708-49cb-bd48-7363be74a837',
     translateBlobUrl: 'https://stbrandweartest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'BRANDWEARDESIGNS_TEST',
     ssoLink: null,
