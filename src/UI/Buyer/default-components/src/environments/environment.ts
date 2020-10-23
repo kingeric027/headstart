@@ -42,7 +42,7 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 // ====================================================================
 const appName: AppName = WAXING_THE_CITY;
 const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
-const localMiddlewareURL = 'https://localhost:44385';
+const localMiddlewareURL = 'https://localhost:44381';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
