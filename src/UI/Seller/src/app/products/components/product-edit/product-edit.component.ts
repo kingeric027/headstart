@@ -668,6 +668,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   ): Promise<SuperMarketplaceProduct> {
     const supplier = await this.currentUserService.getMySupplier();
     superMarketplaceProduct.Product.xp.ProductType = this.productType;
+    (superMarketplaceProduct.Product.xp as any).PromotionEligible = this.productType === 'PurchaseOrder' ? false : true;
     superMarketplaceProduct.Product.xp.Status = 'Draft';
     superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;
