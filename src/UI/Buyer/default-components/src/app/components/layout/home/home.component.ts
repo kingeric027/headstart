@@ -15,8 +15,13 @@ export class OCMHomePage implements OnInit {
   constructor(private context: ShopperContextService, public staticPageService: StaticPageService) { }
 
   async ngOnInit(): Promise<void> {
-    const products = await this.context.tempSdk.listMeProducts({ filters: { 'xp.Featured': true } });
-    this.featuredProducts = products.Items;
+    const user = this.context.currentUser.get();
+    if (!user?.UserGroups?.length) {
+      this.featuredProducts = [];
+    } else {
+      const products = await this.context.tempSdk.listMeProducts({ filters: { 'xp.Featured': true } });
+      this.featuredProducts = products.Items;
+    }
   }
 
   // TODO: add PageDocument type to cms library so this is strongly typed

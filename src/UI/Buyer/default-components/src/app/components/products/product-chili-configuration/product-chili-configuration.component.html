@@ -4,10 +4,15 @@
   <div class="row mb-5">
     <div class="col-md-6">
       <div [hidden]="ShowAddToCart">
-        <iframe id="editor-iframe" class="chili-frame" [src]="frameSrc" frameborder="0"></iframe>
+        <iframe id="editor-iframe"
+                class="chili-frame"
+                [src]="frameSrc"
+                frameborder="0"></iframe>
       </div>
       <div [hidden]="!ShowAddToCart">
-        <img id="proof-image" class="chili-proof" [src]="lineImage" />
+        <img id="proof-image"
+             class="chili-proof"
+             [src]="lineImage" />
       </div>
     </div>
     <div class="col-md-6">
@@ -17,7 +22,12 @@
             <div *ngFor="let spec of chiliTemplate.TemplateSpecs; let i = index">
               <div *ngIf="spec.xp.UI.ControlType == 'Text'">
                 <label>{{spec.Name}}</label>
-                <input class="form-control" type='text' name="{{spec.Name}}" id="{{spec.ID}}" placeholder="{{spec.Name}}" (change)="setTecraSpec($event, spec)">
+                <input class="form-control"
+                       type='text'
+                       name="{{spec.Name}}"
+                       id="{{spec.ID}}"
+                       placeholder="{{spec.Name}}"
+                       (change)="setTecraSpec($event, spec)">
               </div>
               <div *ngIf="spec.xp.UI.ControlType == 'DropDown'">
                 <label>{{spec.Name}}</label>
@@ -42,7 +52,8 @@
             Save and Continue
           </button>
           <div class="mb-3">
-            <a class="btn btn-block btn-dark" href="products/{{_product.ID}}">Back To Product</a>
+            <a class="btn btn-block btn-dark"
+               href="products/{{_product.ID}}">Back To Product</a>
           </div>
         </div>
       </div>
@@ -91,6 +102,7 @@
                                         [product]="_product"
                                         [priceSchedule]="_product.PriceSchedule"
                                         [gridDisplay]="showGrid"
+                                        [selectedVariant]="variant"
                                         [variantInventory]="variantInventory">
                     </ocm-quantity-input>
                     <button *ngIf="isQuoteProduct()"
@@ -192,15 +204,19 @@
             </div>
           </div>
           <div class="card-footer footer-btns">
-            <div class="mb-3" *ngIf="pdfSrc">
-              <a class="btn btn-block btn-info" [href]="pdfSrc" target="_blank">Download PDF</a>
+            <div class="mb-3"
+                 *ngIf="pdfSrc">
+              <a class="btn btn-block btn-info"
+                 [href]="pdfSrc"
+                 target="_blank">Download PDF</a>
             </div>
             <button class="btn btn-block btn-secondary mb-3"
                     (click)="ShowAddToCart = !ShowAddToCart">
               Edit Document
             </button>
             <div class="mb-3">
-              <a class="btn btn-block btn-dark" href="products/{{_product.ID}}">Back To Product</a>
+              <a class="btn btn-block btn-dark"
+                 href="products/{{_product.ID}}">Back To Product</a>
             </div>
           </div>
         </div>

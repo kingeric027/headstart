@@ -36,7 +36,7 @@ namespace DataMigrations.Migrations
 
 				if (type != AssetType.Image)
 				{
-					var newType = contentType?.ConvertFromContentType() ?? null;
+					var newType = AssetMapper.DetectAssetTypeFromContentType(contentType);
 					var updateType = new SetUpdateOperation<AssetType?>("Type", newType);
 					updates.Add(updateType);
 

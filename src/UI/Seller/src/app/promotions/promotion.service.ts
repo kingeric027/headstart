@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Promotion, OcPromotionService } from '@ordercloud/angular-sdk';
+import { Promotion } from '@ordercloud/angular-sdk';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import {
   MarketplacePromoType,
@@ -27,7 +27,7 @@ export class PromotionService extends ResourceCrudService<Promotion> {
     ExpirationDate: '',
     EligibleExpression: 'true',
     ValueExpression: '',
-    CanCombine: false,
+    CanCombine: true,
     AllowAllBuyers: true,
     xp: {
       Type: MarketplacePromoType.Percentage,

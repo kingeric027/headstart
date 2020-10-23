@@ -45,6 +45,7 @@ export class PromotionEditComponent implements OnInit {
   capShipCost = false;
   areChanges = false;
   isExpired = false;
+  hasNotBegun = false;
   dataIsSaving = false;
   isCreatingNew: boolean;
   faTimesCircle = faTimesCircle;
@@ -60,6 +61,7 @@ export class PromotionEditComponent implements OnInit {
   refreshPromoData(promo: Promotion<PromotionXp>): void {
     const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm');
     this.isExpired = promo.ExpirationDate ? (Date.parse(promo.ExpirationDate) < Date.parse(now)) : false;
+    this.hasNotBegun = Date.parse(promo.StartDate) > Date.parse(now);
     // Modify the datetime to work with the UI
     if(promo.StartDate) promo.StartDate = moment(promo.StartDate).format('YYYY-MM-DD[T]hh:mm');
     if (promo.ExpirationDate) {
@@ -88,7 +90,7 @@ export class PromotionEditComponent implements OnInit {
     if (this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier') this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
   }
 
-  createPromotionForm(promotion: Promotion) {
+  createPromotionForm(promotion: Promotion): void {
     this.resourceForm = new FormGroup({
       Code: new FormControl(promotion.Code, Validators.required),
       Type: new FormControl(_get(promotion, 'xp.Type')),
@@ -101,7 +103,6 @@ export class PromotionEditComponent implements OnInit {
       FinePrint: new FormControl(promotion.FinePrint),
       StartDate: new FormControl(promotion.StartDate, Validators.required),
       ExpirationDate: new FormControl(promotion.ExpirationDate),
-      CanCombine: new FormControl(promotion.CanCombine),
       Automatic: new FormControl(_get(promotion, 'xp.Automatic')),
       AllowAllBuyers: new FormControl(promotion.AllowAllBuyers),
       MinReqType: new FormControl(_get(promotion, 'xp.MinReq.Type')),
@@ -114,7 +115,7 @@ export class PromotionEditComponent implements OnInit {
     const randomCode = Math.random().toString(36).slice(2).substr(0, 5).toUpperCase();
     this.handleUpdatePromo({target: {value: randomCode}}, 'Code');
     this._promotionEditable.Code = randomCode;
-    this.resourceForm.controls['Code'].setValue(randomCode);
+    this.resourceForm.controls.Code.setValue(randomCode);
   }
 
   handleUpdatePromo(event: any, field: string, typeOfValue?: string): void {
@@ -146,11 +147,11 @@ export class PromotionEditComponent implements OnInit {
   getValueDisplay(): string {
     const promo = this._promotionEditable;
     let valueString = promo?.xp?.AppliesTo === 'SpecificSupplier' ? `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}` : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
-    if (promo?.xp?.Type === "FixedAmount") valueString = `$${promo?.xp?.Value} ${valueString}`;
-    if (promo?.xp?.Type === "Percentage") valueString = `${promo?.xp?.Value}% ${valueString}`;
-    if (promo?.xp?.Type === "FreeShipping") valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
-    if (promo?.xp?.MinReq?.Type === "MinPurchase" && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
-    if (promo?.xp?.MinReq?.Type === "MinItemQty" && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
+    if (promo?.xp?.Type === 'FixedAmount') valueString = `$${promo?.xp?.Value} ${valueString}`;
+    if (promo?.xp?.Type === 'Percentage') valueString = `${promo?.xp?.Value}% ${valueString}`;
+    if (promo?.xp?.Type === 'FreeShipping') valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
+    if (promo?.xp?.MinReq?.Type === 'MinPurchase' && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
+    if (promo?.xp?.MinReq?.Type === 'MinItemQty' && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
     // Update `promotion.Description` with this value string
     this.handleUpdatePromo({target: {value: valueString}}, 'Description');
     return valueString;
@@ -183,7 +184,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   getMinDate(): string {
-    return moment().format("YYYY-MM-DD[T]hh:mm")
+    return moment().format('YYYY-MM-DD[T]hh:mm')
   }
 
   toggleHasRedemptionLimit(): void {
@@ -215,8 +216,8 @@ export class PromotionEditComponent implements OnInit {
   }
 
   handleClearMinReq(): void {
-    this._promotionEditable.EligibleExpression = "true";
-    this.handleUpdatePromo({target: { value: {Type: null, Int: null} }}, "xp.MinReq");
+    this._promotionEditable.EligibleExpression = 'true';
+    this.handleUpdatePromo({target: { value: {Type: null, Int: null} }}, 'xp.MinReq');
   }
 
   handleDiscardChanges(): void {
@@ -224,7 +225,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   buildValueExpression(): void {
-    let valueExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? "item.LineSubtotal" : "Order.Subtotal";
+    let valueExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 'item.LineSubtotal' : 'Order.Subtotal';
     switch(this._promotionEditable.xp?.Type) {
       case 'FixedAmount':
         valueExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
@@ -236,14 +237,14 @@ export class PromotionEditComponent implements OnInit {
         valueExpression = `${valueExpression} * ${(this._promotionEditable.xp?.Value / 100)}`
         break;
       case 'FreeShipping':
-        valueExpression = `Order.ShippingCost`;
+        valueExpression = 'Order.ShippingCost';
         break;
     }
     this._promotionEditable.ValueExpression = valueExpression;
   }
 
   buildEligibleExpression(): void {
-    let eligibleExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? `item.SupplierID = '${this.selectedSupplier?.ID}'` : `true`;
+    let eligibleExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? `item.SupplierID = '${this.selectedSupplier?.ID}'` : 'true';
     switch (this._promotionEditable.xp?.MinReq?.Type) {
       case 'MinPurchase':
         eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
@@ -302,7 +303,7 @@ export class PromotionEditComponent implements OnInit {
     }
   }
 
-  async handleDelete(event: any): Promise<void> {
+  async handleDelete(): Promise<void> {
     await this.ocPromotionService.Delete(this._promotionStatic.ID).toPromise();
     this.router.navigateByUrl('/promotions');
   }

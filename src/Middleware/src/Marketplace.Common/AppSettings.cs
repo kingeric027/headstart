@@ -17,7 +17,8 @@ namespace Marketplace.Common
 		public AppEnvironment Env { get; set; }
         public UI UI { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
-		public AvalaraSettings AvalaraSettings { get; set; }
+		public ApplicationInsightsSettings ApplicationInsightsSettings { get; set; } = new ApplicationInsightsSettings();
+        public AvalaraSettings AvalaraSettings { get; set; }
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
@@ -42,6 +43,11 @@ namespace Marketplace.Common
         public string BaseUrl { get; set; }
 	}
 
+    public class ApplicationInsightsSettings
+    {
+        public string InstrumentationKey { get; set; }
+    }
+
 	public class SmartyStreetSettings
 	{
 		public string AuthID { get; set; }
@@ -64,6 +70,7 @@ namespace Marketplace.Common
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
+        public string DevcenterApiUrl { get; set; }
         public string SEBDistributionSupplierID { get; set; }
         public string ProvisionSupplierID { get; set; }
     }

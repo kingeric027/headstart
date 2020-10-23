@@ -2,15 +2,15 @@
 // `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-import { Environment } from './env.interface';
+import { Environment } from './environment.interface';
 import { OrdercloudEnv } from 'marketplace';
-import wtcTheme from 'src/styles/themes/waxing-the-city/theme-config';
+import wtcTheme from '../styles/themes/waxing-the-city/theme-config';
 
 export const environment: Environment = {
   hostedApp: true,
   appname: 'Marketplace Test',
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
-  marketplaceID: 'SEB',
+  marketplaceID: 'SEB_TEST',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
   creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',

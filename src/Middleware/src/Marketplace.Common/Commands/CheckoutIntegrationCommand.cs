@@ -57,6 +57,12 @@ namespace Marketplace.Common.Commands
                 var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID));
                 shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(methods).Select(s =>
                 {
+                    // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112
+                    if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
+                    {
+                        s.Cost = 0;
+                    }
+
                     if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SEBDistributionFedexAccountId)
                     {
                         s.Cost = s.Cost * (decimal)1.1; //  Apply markup for the SEBDistributionFedexAccount

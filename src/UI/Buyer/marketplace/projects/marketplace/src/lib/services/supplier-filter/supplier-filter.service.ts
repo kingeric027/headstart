@@ -40,7 +40,7 @@ export class SupplierFilterService {
     return await Suppliers.List({
       page,
       search,
-      sortBy,
+      sortBy: sortBy ? sortBy : 'Name',
       filters: this.createFilters(allFilters, supplierID),
     });
   }

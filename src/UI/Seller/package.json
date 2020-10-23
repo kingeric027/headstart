@@ -4,18 +4,12 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --open",
+    "start": "ng serve --configuration=dev --open",
     "build": "ng build --configuration=production",
     "test": "ng test --code-coverage",
     "lint": "eslint src/**/*.ts",
     "e2e": "ng e2e",
-    "precommit": "lint-staged --config ./lint-staged.config.js",
-    "serve-test": "ng serve --configuration=test",
-    "build-test": "ng build --configuration=test",
-    "serve-staging": "ng serve --configuration=staging",
-    "build-staging": "ng build --configuration=staging",
-    "serve-production": "ng serve --configuration=production",
-    "build-production": "ng build --configuration=production"
+    "precommit": "lint-staged --config ./lint-staged.config.js"
   },
   "private": true,
   "dependencies": {
@@ -44,7 +38,7 @@
     "@ngx-translate/http-loader": "^5.0.0",
     "@ordercloud/angular-cms-components": "^1.0.0-beta.38",
     "@ordercloud/angular-sdk": "1.0.0-12",
-    "@ordercloud/headstart-sdk": "1.11.4",
+    "@ordercloud/headstart-sdk": "1.12.4",
     "@tinymce/tinymce-angular": "^4.1.0",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",

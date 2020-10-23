@@ -60,7 +60,7 @@
                 }
               ]
             },
-            "af": {
+            "anytimefitness-production": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/anytime-fitness"
@@ -68,7 +68,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.af.ts"
+                "with": "src/environments/environment.anytimefitness-production.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -89,7 +89,7 @@
                 }
               ]
             },
-            "af-stage": {
+            "anytimefitness-staging": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/anytime-fitness"
@@ -97,7 +97,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.af-stage.ts"
+                "with": "src/environments/environment.anytimefitness-staging.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -118,7 +118,7 @@
                 }
               ]
             },
-            "bcf": {
+            "basecampfitness-production": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/basecamp"
@@ -126,7 +126,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bcf.ts"
+                "with": "src/environments/environment.basecampfitness-production.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -147,7 +147,7 @@
                 }
               ]
             },
-            "bcf-stage": {
+            "basecampfitness-staging": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/basecamp"
@@ -155,7 +155,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bcf-stage.ts"
+                "with": "src/environments/environment.basecampfitness-staging.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -176,7 +176,7 @@
                 }
               ]
             },
-            "wtc": {
+            "waxingthecity-production": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/waxing-the-city"
@@ -184,7 +184,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.wtc.ts"
+                "with": "src/environments/environment.waxingthecity-production.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -205,7 +205,7 @@
                 }
               ]
             },
-            "wtc-stage": {
+            "waxingthecity-staging": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/waxing-the-city"
@@ -213,7 +213,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.wtc-stage.ts"
+                "with": "src/environments/environment.waxingthecity-staging.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -234,7 +234,7 @@
                 }
               ]
             },
-            "bm": {
+            "thebarmethod-production": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/bar-method"
@@ -242,7 +242,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bm.ts"
+                "with": "src/environments/environment.thebarmethod-production.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -263,7 +263,7 @@
                 }
               ]
             },
-            "bm-stage": {
+            "thebarmethod-staging": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/bar-method"
@@ -271,7 +271,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.bm-stage.ts"
+                "with": "src/environments/environment.thebarmethod-staging.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -292,7 +292,123 @@
                 }
               ]
             },
-            "test": {
+            "headstartdemo-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/headstartdemo"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.headstartdemo-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "brandweardesigns-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/brandweardesigns"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.brandweardesigns-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "fastsigns-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/fastsigns"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.fastsigns-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "go2partners-test": {
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "src/styles/themes/go2partners"
+                ]
+              },
+              "fileReplacements": [ {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.go2partners-test.ts"
+              } ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [ {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "waxingthecity-test": {
               "stylePreprocessorOptions": {
                 "includePaths": [
                   "src/styles/themes/waxing-the-city"
@@ -300,7 +416,7 @@
               },
               "fileReplacements": [ {
                 "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.test.ts"
+                "with": "src/environments/environment.waxingthecity-test.ts"
               } ],
               "optimization": true,
               "outputHashing": "all",
@@ -336,32 +452,44 @@
             "dev": {
               "browserTarget": "default-components:build:dev"
             },
-            "af": {
-              "browserTarget": "default-components:build:af"
+            "anytimefitness-production": {
+              "browserTarget": "default-components:build:anytimefitness-production"
             },
-            "af-stage": {
-              "browserTarget": "default-components:build:af-stage"
+            "anytimefitness-staging": {
+              "browserTarget": "default-components:build:anytimefitness-staging"
             },
-            "bcf": {
-              "browserTarget": "default-components:build:bcf"
+            "basecampfitness-production": {
+              "browserTarget": "default-components:build:basecampfitness-production"
             },
-            "bcf-stage": {
-              "browserTarget": "default-components:build:bcf-stage"
+            "basecampfitness-staging": {
+              "browserTarget": "default-components:build:basecampfitness-staging"
             },
-            "wtc": {
-              "browserTarget": "default-components:build:wtc"
+            "waxingthecity-production": {
+              "browserTarget": "default-components:build:waxingthecity-production"
             },
-            "wtc-stage": {
-              "browserTarget": "default-components:build:wtc-stage"
+            "waxingthecity-staging": {
+              "browserTarget": "default-components:build:waxingthecity-staging"
             },
-            "bm": {
-              "browserTarget": "default-components:build:bm"
+            "thebarmethod-production": {
+              "browserTarget": "default-components:build:thebarmethod-production"
             },
-            "bm-stage": {
-              "browserTarget": "default-components:build:bm-stage"
+            "thebarmethod-staging": {
+              "browserTarget": "default-components:build:thebarmethod-staging"
             },
-            "test": {
-              "browserTarget": "default-components:build:test"
+            "headstartdemo-test": {
+              "browserTarget": "default-components:build:headstartdemo-test"
+            },
+            "brandweardesigns-test": {
+              "browserTarget": "default-components:build:brandweardesigns-test"
+            },
+            "fastsigns-test": {
+              "browserTarget": "default-components:build:fastsigns-test"
+            },
+            "go2partners-test": {
+              "browserTarget": "default-components:build:go2partners-test"
+            },
+            "waxingthecity-test": {
+              "browserTarget": "default-components:build:waxingthecity-test"
             }
           }
         },
