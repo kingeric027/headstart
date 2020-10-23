@@ -152,7 +152,7 @@
                    id="SpecificSKUs"
                    value="SpecificSKUs"
                    formControlName="AppliesTo"
-                   (change)="handleUpdatePromo($event, 'xp.AppliesTo'); _promotionEditable.LineItemLevel = true"
+                   (change)="handleUpdatePromo($event, 'xp.AppliesTo'); _promotionEditable.LineItemLevel = true; productsCollapsed = false"
                    [checked]="promoTypeCheck('SpecificSKUs')">
             <label class="form-check-label"
                    for="SpecificSKUs"
@@ -161,39 +161,37 @@
             </label>
           </div>
           <!-- PRODUCT SELECT AND SEARCH -->
-          <span *ngIf="_promotionEditable?.xp?.AppliesTo === 'SpecificSKUs'">
-            <div ngbDropdown
-                 class="parent-resource-dropdown btn-block">
-              <button class="resource-btn btn btn-outline-dark additional-item-resource-select-dropdown"
-                      id="parentresourcedropdown"
-                      ngbDropdownToggle>{{getSKUsBtnPlaceholderValue()}}</button>
-              <div ngbDropdownMenu
-                   aria-labelledby="parent resource dropdown">
-                <search-component class="mr-3 w-100 additional-item-resource-select-dropdown"
-                                  id="resource-search"
-                                  [placeholderText]="''"
-                                  [searchTermInput]="searchTerm"
-                                  (searched)="searchedResources($event)">
-                </search-component>
-                <perfect-scrollbar class="dropdown-ps"
-                                   (psYReachEnd)="handleScrollEnd()"
-                                   [ngStyle]="{'height.px': 400}">
-                  <button ngbDropdownItem
-                          *ngFor="let resource of products?.value?.Items"
-                          (click)="addSKU(resource.ID)"
-                          [disabled]="alreadySelected(resource.ID)">
+          <span *ngIf="_promotionEditable?.xp?.AppliesTo === 'SpecificSKUs'"
+                class="mt-2">
+            <div id="productsCollapse"
+                 [ngbCollapse]="productsCollapsed"
+                 aria-labelledby="parent resource dropdown">
+              <search-component class="mr-3 w-100"
+                                id="resource-search"
+                                [placeholderText]="''"
+                                [searchTermInput]="searchTerm"
+                                (searched)="searchedResources($event)">
+              </search-component>
+              <perfect-scrollbar class="dropdown-ps"
+                                 (psYReachEnd)="handleScrollEnd($event)"
+                                 suppressScrollX
+                                 [ngStyle]="{'max-height.px': 175, 'width': 'auto'}">
+                <button ngbDropdownItem
+                        *ngFor="let resource of products | async"
+                        (click)="addSKU(resource.ID)"
+                        [disabled]="alreadySelected(resource.ID)">
+                  <div class="overflow-hidden">
                     <summary-resource-display-component [resource]="resource"
                                                         [resourceType]="'products'">
                     </summary-resource-display-component>
-                  </button>
-                </perfect-scrollbar>
-              </div>
+                  </div>
+                </button>
+              </perfect-scrollbar>
             </div>
-            <div *ngFor="let sku of _promotionEditable?.xp?.SKUs"
-                 class="d-flex justify-content-between align-items-center">
-              <p class="mb-0">{{sku}}</p>
-              <button class="btn btn-link text-warning"
-                      (click)="removeSku(sku)">Delete</button>
+            <div class="chip"
+                 *ngFor="let sku of _promotionEditable?.xp?.SKUs">{{sku}}
+              <fa-icon (click)="removeSku(sku)"
+                       [icon]="faTimesCircle"></fa-icon>
             </div>
           </span>
           <!-- END PRODUCT SELECT AND SEARCH -->

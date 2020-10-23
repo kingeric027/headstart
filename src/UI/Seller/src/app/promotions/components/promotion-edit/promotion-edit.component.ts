@@ -1,16 +1,16 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { faTimesCircle, faCalendar, faExclamationCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { Promotion, OcPromotionService, OcSupplierService, Product, ListPage } from '@ordercloud/angular-sdk';
 import { PromotionService } from '@app-seller/promotions/promotion.service';
-import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility } from '@app-seller/shared/models/marketplace-promo.interface';
+import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility, MinRequirementType } from '@app-seller/shared/models/marketplace-promo.interface';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
 import { ListArgs, MarketplaceSupplier } from '@ordercloud/headstart-sdk';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
-import { Products } from 'ordercloud-javascript-sdk';
+import { Products, Meta } from 'ordercloud-javascript-sdk';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject } from 'rxjs';
 @Component({
@@ -18,7 +18,7 @@ import { BehaviorSubject } from 'rxjs';
   templateUrl: './promotion-edit.component.html',
   styleUrls: ['./promotion-edit.component.scss'],
 })
-export class PromotionEditComponent implements OnInit {
+export class PromotionEditComponent implements OnInit, OnChanges {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   @Input()
@@ -38,7 +38,8 @@ export class PromotionEditComponent implements OnInit {
   @Output()
   updateResource = new EventEmitter<any>();
   suppliers: MarketplaceSupplier[];
-  products = new BehaviorSubject<ListPage<Product>>({});
+  products = new BehaviorSubject<Product[]>([]);
+  productMeta: Meta;
   selectedSupplier: MarketplaceSupplier;
   resourceForm: FormGroup;
   _promotionEditable: Promotion<PromotionXp>;
@@ -57,14 +58,20 @@ export class PromotionEditComponent implements OnInit {
   faExclamationCircle = faExclamationCircle;
   faQuestionCircle = faQuestionCircle;
   faCalendar = faCalendar;
-  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService, private toastrService: ToastrService) {}
+  productsCollapsed = true;
+  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService, private toastrService: ToastrService, private cdr: ChangeDetectorRef) {}
 
   async ngOnInit(): Promise<void> {
     this.isCreatingNew = this.promotionService.checkIfCreatingNew();
     await this.listResources();
   }
 
+  ngOnChanges(): void {
+    this.productsCollapsed = this._promotionEditable?.xp?.AppliesTo !== MarketplacePromoEligibility.SpecificSKUs;
+  }
+
   refreshPromoData(promo: Promotion<PromotionXp>): void {
+    this.productsCollapsed = promo?.xp?.AppliesTo !== MarketplacePromoEligibility.SpecificSKUs;
     const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm');
     this.isExpired = promo.ExpirationDate ? (Date.parse(promo.ExpirationDate) < Date.parse(now)) : false;
     this.hasNotBegun = Date.parse(promo.StartDate) > Date.parse(now);
@@ -93,7 +100,7 @@ export class PromotionEditComponent implements OnInit {
   async selectSupplier(supplierID: string): Promise<void> {
     const s = await this.ocSupplierService.Get(supplierID).toPromise();
     this.selectedSupplier = s;
-    if (this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier') this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
+    if (this._promotionEditable?.xp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier) this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
   }
 
   searchedResources(searchText: any): void {
@@ -118,29 +125,31 @@ export class PromotionEditComponent implements OnInit {
   }
 
   setNewResources(resourceResponse: ListPage<Product>): void {
-    this.products.next(resourceResponse);
+    this.productMeta = resourceResponse?.Meta;
+    this.products.next(resourceResponse?.Items);
   }
 
   addResources(resourceResponse: ListPage<Product>): void {
-    this.products.next({
-      Meta: resourceResponse.Meta,
-      Items: [...this.products?.value?.Items, ...resourceResponse.Items],
-    })
-    console.log(this.products)
+    this.products.next([...this.products.value, ...resourceResponse?.Items]);
+    this.productMeta = resourceResponse?.Meta;
   }
 
-  handleScrollEnd(): void {
-    const totalPages = this.products?.value?.Meta?.TotalPages;
-    const nextPageNumber = this.products?.value?.Meta?.Page + 1;
-    if (totalPages >= nextPageNumber) this.listResources(nextPageNumber, this.searchTerm);
+  handleScrollEnd(event: any): void {
+    // This event check prevents the scroll-end event from firing when dropdown is closed
+    // It limits the action within the if block to only fire when you truly hit the scroll-end
+    if (event.target.classList.value.includes('active')) {
+      const totalPages = this.productMeta?.TotalPages;
+      const nextPageNumber = this.productMeta?.Page + 1;
+      if (totalPages >= nextPageNumber) { 
+        this.listResources(nextPageNumber, this.searchTerm).then(() => this.cdr.detectChanges())
+      };
+    }
   }
 
   addSKU(sku: string): void {
     if (this._promotionEditable?.xp?.SKUs.includes(sku)) {
-      console.log('doesn`t exist yet');
       this.toastrService.warning('You have already selected this product')
     } else {
-      // ADD
       const newSKUs = [...this._promotionEditable?.xp?.SKUs, sku];
       this.handleUpdatePromo({target: {value: newSKUs}}, 'xp.SKUs');
     }
@@ -209,10 +218,9 @@ export class PromotionEditComponent implements OnInit {
   updatePromoResource(promoUpdate: any): void {
     const resourceToUpdate = this._promotionEditable || this.promotionService.emptyResource;
     this._promotionEditable = this.promotionService.getUpdatedEditableResource(promoUpdate, resourceToUpdate);
-    console.log(this._promotionEditable)
     this.areChanges = this.promotionService.checkForChanges(this._promotionEditable, this._promotionStatic);
-    this.buildValueExpression();
-    this.buildEligibleExpression();
+    this._promotionEditable.ValueExpression = this.promotionService.buildValueExpression(this._promotionEditable?.xp, this.selectedSupplier);
+    this._promotionEditable.EligibleExpression = this.promotionService.buildEligibleExpression(this._promotionEditable?.xp, this.selectedSupplier);
   }
 
   promoTypeCheck(type: MarketplacePromoType): boolean {
@@ -228,20 +236,20 @@ export class PromotionEditComponent implements OnInit {
     const safeXp = this._promotionEditable?.xp;
     let valueString = '';
     switch(safeXp?.AppliesTo) {
-      case 'SpecificSupplier':
+      case MarketplacePromoEligibility.SpecificSupplier:
         valueString = `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}`
         break;
-      case 'SpecificSKUs':
+      case MarketplacePromoEligibility.SpecificSKUs:
         valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_SELECT_PRODUCTS');
         break;
       default: valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
     }
-    // let valueString = promo?.xp?.AppliesTo === 'SpecificSupplier' ? `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}` : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
-    if (promo?.xp?.Type === 'FixedAmount') valueString = `$${promo?.xp?.Value} ${valueString}`;
-    if (promo?.xp?.Type === 'Percentage') valueString = `${promo?.xp?.Value}% ${valueString}`;
-    if (promo?.xp?.Type === 'FreeShipping') valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
-    if (promo?.xp?.MinReq?.Type === 'MinPurchase' && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
-    if (promo?.xp?.MinReq?.Type === 'MinItemQty' && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
+    // let valueString = promo?.xp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier ? `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}` : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
+    if (promo?.xp?.Type === MarketplacePromoType.FixedAmount) valueString = `$${promo?.xp?.Value} ${valueString}`;
+    if (promo?.xp?.Type === MarketplacePromoType.Percentage) valueString = `${promo?.xp?.Value}% ${valueString}`;
+    if (promo?.xp?.Type === MarketplacePromoType.FreeShipping) valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
+    if (promo?.xp?.MinReq?.Type === MinRequirementType.MinPurchase && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
+    if (promo?.xp?.MinReq?.Type === MinRequirementType.MinItemQty && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
     // Update `promotion.Description` with this value string
     this.handleUpdatePromo({target: {value: valueString.trim()}}, 'Description');
     return valueString.trim();
@@ -308,74 +316,6 @@ export class PromotionEditComponent implements OnInit {
 
   handleDiscardChanges(): void {
     this.refreshPromoData(this._promotionStatic)
-  }
-
-  buildValueExpression(): void {
-    const safeXp = this._promotionEditable?.xp;
-    let valueExpression = 'Order.Subtotal';
-    switch(safeXp?.AppliesTo) {
-      case 'SpecificSupplier': 
-        valueExpression = 'item.LineSubtotal'
-        if (safeXp?.Type === 'Percentage') { valueExpression = `item.LineSubtotal * ${safeXp?.Value / 100}`}
-        if (safeXp?.Type === 'FixedAmount') { valueExpression = `${safeXp?.Value} / items.count(SupplierID = '${this.selectedSupplier?.ID}')`}
-        break;
-      case 'SpecificSKUs':
-        if (safeXp?.Type === 'Percentage') { valueExpression = `item.LineSubtotal * ${safeXp?.Value / 100}` } 
-        if (safeXp?.Type === 'FixedAmount') { valueExpression = `item.Quantity * ${safeXp?.Value}` }
-        break;
-      default: 
-      console.log('doing the default thang')
-        if (safeXp?.Type === 'Percentage') { valueExpression = `${valueExpression} * ${safeXp.Value / 100}` }
-        if (safeXp?.Type === 'FixedAmount') { valueExpression = `${valueExpression} - ${safeXp?.Value}` }
-        break;
-    };
-    if (safeXp?.Type === 'FreeShipping') { valueExpression = 'Order.ShippingCost'};
-    console.log(valueExpression.trim())
-    this._promotionEditable.ValueExpression = valueExpression.trim();
-  }
-
-  buildEligibleExpression(): void {
-    const safeXp = this._promotionEditable?.xp;
-    let eligibleExpression = '';
-    switch(safeXp?.AppliesTo) {
-      case 'SpecificSupplier':
-        eligibleExpression = `item.SupplierID = '${this.selectedSupplier?.ID}'`;
-        break;
-      case 'SpecificSKUs':
-        const skuArr = safeXp?.SKUs?.map(sku => `item.ProductID = '${sku}'`);
-        skuArr.forEach((exp, i) => eligibleExpression = i === 0 ? `${eligibleExpression} ${exp}` : `${eligibleExpression} or ${exp}`);
-        break;
-      default: 
-        eligibleExpression = 'true';
-        break;
-    };
-    switch (safeXp?.MinReq?.Type) {
-      case 'MinPurchase':
-        if (safeXp?.AppliesTo === 'SpecificSupplier') {
-          eligibleExpression = `${eligibleExpression} and items.total(SupplierID = '${this.selectedSupplier?.ID}') >= ${safeXp?.MinReq?.Int}`;
-        } else if (safeXp?.AppliesTo === 'SpecificSKUs') {
-          eligibleExpression = `${eligibleExpression} and Order.Subtotal >= ${safeXp?.MinReq?.Int}`
-        } else {
-          `Order.Subtotal >= ${safeXp?.MinReq?.Int}`;
-        }
-        break;
-      case 'MinItemQty':
-        if (safeXp.AppliesTo === 'SpecificSupplier') {
-          eligibleExpression = `${eligibleExpression} and items.Quantity(SupplierID = '${this.selectedSupplier?.ID}') >= ${safeXp?.MinReq?.Int}`
-        } else if (safeXp?.AppliesTo === 'SpecificSKUs') {
-          eligibleExpression = `${eligibleExpression} and Order.LineItemCount >= ${safeXp?.MinReq?.Int}`
-        } else {
-          eligibleExpression = `Order.LineItemCount >= ${safeXp?.MinReq?.Int}`
-        }
-        break;
-    }
-    if (safeXp?.MaxShipCost) {
-      safeXp?.MinReq?.Type ? eligibleExpression = `Order.ShippingCost < ${safeXp?.MaxShipCost}`
-      :
-      eligibleExpression = `Order.ShippingCost < ${safeXp?.MaxShipCost}`
-    }
-    console.log(eligibleExpression.trim())
-    this._promotionEditable.EligibleExpression = eligibleExpression.trim();
   }
 
   async handleSave(): Promise<void> {
