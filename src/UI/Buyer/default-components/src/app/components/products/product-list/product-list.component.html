@@ -3,11 +3,11 @@
     <div class="col-12">
       <nav class="breadcrumb"
            aria-label="breadcrumb">
-        <a class="breadcrumb-item link text-primary"
+        <a class="breadcrumb-item"
            (click)="clearAllFilters()"
            translate>PRODUCTS.LIST.ALL</a>
         <a *ngFor="let category of categoryCrumbs"
-           class="breadcrumb-item link text-primary"
+           class="breadcrumb-item"
            (click)="setActiveCategory(category.ID)">
           {{ category.Name }}
         </a>
@@ -35,12 +35,11 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-4 col-lg-3 d-md-block d-sm-none d-none">
-      <div class="card mb-4">
+    <div class="col-md-4 col-lg-3 d-md-block d-none">
+      <div class="card squared shadow-sm mb-4">
         <div class="card-header p-3">
-          <h5 class="card-title mb-0">
-            <strong translate>PRODUCTS.LIST.REFINE</strong>
-          </h5>
+          <h2 class="h5 card-title mb-0"
+              translate>PRODUCTS.LIST.REFINE</h2>
         </div>
         <div class="p-3">
           <button *ngIf="hasFilters"
@@ -105,6 +104,7 @@
                           width="100%"
                           mb="1.5rem"
                           [resource]="products"
+                          [isLoading]="isProductListLoading"
                           [columns]="4"
                           [rows]="4">
       </ocm-loading-layout>

@@ -11,5 +11,5 @@
   <span *ngIf="payment.Type === 'SpendingAccount'"><span translate>PAYMENTS.PAYMENT_LIST.SPENDING_ACC</span>
     : {{ payment.Details.Name }}
   </span>
-  <span class="font-weight-bold">-{{payment.Amount | currency}}</span>
+  <span class="font-weight-bold">-{{payment.Amount | currency: _userCurrency}}</span>
 </div>

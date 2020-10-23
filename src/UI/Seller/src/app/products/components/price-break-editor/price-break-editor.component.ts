@@ -57,7 +57,7 @@ export class PriceBreakEditor {
   }
 
   updateNewBreak(event: any, field: string): void {
-    this.newPriceBreak[field] = event.target.value;
+    this.newPriceBreak[field] = field === 'Quantity' ? parseInt(event.target.value, 10) : event.target.value;
     const areErrors = this.handlePriceBreakErrors(this.priceScheduleEditable.PriceBreaks);
     this.isValidNewBreak = !areErrors && !!this.newPriceBreak.Price && !!this.newPriceBreak.Quantity;
   }

@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { debounceTime } from 'rxjs/operators';
-import { MarketplaceMeProduct } from 'marketplace';
+import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
 import { Router } from '@angular/router';
+import { HeadStartSDK, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 
 export interface QtyChangeEvent {
   qty: number;
@@ -17,11 +17,13 @@ export interface QtyChangeEvent {
 export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() priceSchedule: PriceSchedule;
   @Input() product: MarketplaceMeProduct;
+  @Input() selectedVariant: MarketplaceVariant;
+  @Input() variantInventory?: number;
+  @Input() variantID: string;
 
   @Input() existingQty: number;
   @Input() gridDisplay?= false;
   @Input() isQtyChanging;
-  @Input() variantInventory?: number;
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
   // TODO - replace with real product info
   form: FormGroup;
@@ -33,7 +35,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   max: number;
   disabled = false;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private context: ShopperContextService) { }
 
 
   ngOnInit(): void {
@@ -56,7 +58,13 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes?.variantID?.previousValue !== changes?.variantID?.currentValue) {
+      const _product = await HeadStartSDK.Mes.GetSuperProduct(this.product?.ID);
+      const variant = _product?.Variants?.find(v => v.ID === this.variantID);
+      this.variantInventory = variant?.Inventory?.QuantityAvailable;
+      this.inventory = this.getInventory(_product.Product);
+    }
     if (this.product && this.priceSchedule) this.init(this.product, this.priceSchedule);
   }
 
@@ -90,7 +98,28 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     this.qtyChange.emit({ qty, valid: this.validateQty(qty) });
   }
 
+  getMaxQty(): number {
+    if (this.variantInventory && !this.product?.Inventory?.OrderCanExceed) {
+      return this.variantInventory;
+    } else if(this.product?.Inventory?.Enabled 
+      && !this.product?.Inventory?.OrderCanExceed 
+      && !this.product?.Inventory?.VariantLevelTracking) {
+      return this.product?.Inventory?.QuantityAvailable;
+    }
+  }
+
   validateQty(qty: number): boolean {
+    const routeUrl = this.router.routerState.snapshot.url;
+    const splitUrl = routeUrl.split('/');
+    const endUrl = splitUrl[splitUrl.length - 1];
+    if (!endUrl.includes('cart')) {
+      const productInCart = this.context.order.cart.get()?.Items
+      ?.filter(i => i.ProductID === this.product?.ID)
+      ?.find(p => p.Variant?.ID === this.selectedVariant?.ID);
+      if (productInCart) {
+        qty = qty + productInCart.Quantity;
+      }
+    }
     if (isNaN(qty)) {
       this.errorMsg = 'Please Enter a Quantity';
       return false;

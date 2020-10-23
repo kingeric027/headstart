@@ -136,7 +136,6 @@ class UserDetailsPage {
 	}
 
 	async updateUserPermissions() {
-		await t.debug()
 		const permissionToggles = this.userGroupAssignments
 			.find('input')
 			.withAttribute('type', 'checkbox')

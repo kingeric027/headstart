@@ -3,7 +3,7 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, LineItem, MarketplaceKitProduct, ProductInKit, MarketplaceVariant, ChiliSpec, ChiliConfig, ChiliTemplate } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, ProductInKit, MarketplaceVariant, ChiliSpec, ChiliConfig, ChiliTemplate } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -12,7 +12,7 @@ import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { FormGroup } from '@angular/forms';
 import { ProductDetailService } from '../product-details/product-detail.service';
-import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 declare var SetVariableValue: any;
 declare var saveDocument: any;
@@ -65,13 +65,14 @@ export class OCMProductChiliConfig implements OnInit {
   chiliTemplate: ChiliTemplate;
   showSpecs = false;
   frameSrc: SafeResourceUrl;
-  lineImage: string = '';
-  pdfSrc: string = '';
+  lineImage = '';
+  pdfSrc  = '';
   currentDocID = '';
   ShowAddToCart = false;
   isLoading = true;
   editor;
   frameWindow;
+  variant: MarketplaceVariant;
 
   constructor(
     private specFormService: SpecFormService,
@@ -125,9 +126,9 @@ export class OCMProductChiliConfig implements OnInit {
     }, 5000);
   }
 
-  loadScript(url: string) {
-    let body = <HTMLDivElement>document.body;
-    let script = document.createElement('script');
+  loadScript(url: string): void {
+    const body = <HTMLDivElement>document.body;
+    const script = document.createElement('script');
     script.innerHTML = '';
     script.src = url;
     script.async = true;
@@ -152,21 +153,22 @@ export class OCMProductChiliConfig implements OnInit {
   }
 
   getVariantInventory(): number {
-    let specCombo = "";
+    let specCombo = '';
     let specOptions: SpecOption[] = [];
-    this._superProduct?.Specs?.forEach(s => s.Options.forEach(o => specOptions = specOptions.concat(o)));
-    for (var i = 0; i < this.specForm.value.ctrls.length; i++) {
-      const matchingOption = specOptions.find(o => o.Value === this.specForm.value.ctrls[i])
-      i === 0 ? specCombo += matchingOption.ID : specCombo += `-${matchingOption.ID}`
+    this._superProduct?.Specs?.forEach(s => s.Options.forEach(o => specOptions = specOptions?.concat(o)));
+    for (let i = 0; i < this.specForm?.value?.ctrls?.length; i++) {
+      const matchingOption = specOptions?.find(o => o.Value === this.specForm.value.ctrls[i])
+      i === 0 ? specCombo += matchingOption?.ID : specCombo += `-${matchingOption?.ID}`
     }
-    return this._superProduct.Variants.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
+    this.variant = this._superProduct?.Variants?.find(v => v.xp?.SpecCombo === specCombo);
+    return this._superProduct?.Variants?.find(v => v.xp?.SpecCombo === specCombo)?.Inventory?.QuantityAvailable
   }
 
-  onSelectionInactive(event: boolean) {
+  onSelectionInactive(event: boolean): void {
     this.isInactiveVariant = event;
   }
 
-  populateInactiveVariants(superProduct: SuperMarketplaceProduct) {
+  populateInactiveVariants(superProduct: SuperMarketplaceProduct): void {
     this._disabledVariants = [];
     superProduct.Variants?.forEach(variant => {
       if (!variant.Active) {

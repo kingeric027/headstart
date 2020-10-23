@@ -6,7 +6,7 @@ export const environment: Environment = {
     hostedApp: true,
     appname: 'Headstart Demo',
     clientID: 'A482C18B-527B-4BA1-A2E9-0E7C65C2E39F',
-    marketplaceID: 'DEMO',
+    marketplaceID: 'DEMO_TEST',
     baseUrl: 'https://headstartdemo-buyer-ui-test.azurewebsites.net/',
     middlewareUrl: 'https://headstartdemo-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',

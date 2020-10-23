@@ -92,7 +92,6 @@ namespace ordercloud.integrations.tecra
             tparams.docid = id;
             tparams.storeid= Config.StoreID;
             tparams.wsid = Config.WorkspaceID;
-            tparams.wsid = "";
             tparams.folder = "root";
             tparams.vpid = "";
 

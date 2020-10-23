@@ -77,9 +77,11 @@
               </div>
               <div class="col-md-9 col-sm-6">
                 <a (click)="toProductDetails(li.Product.ID)"
-                   class="text-dark font-weight-medium line-height-1">{{
+                   class="text-dark font-weight-medium line-height-1">
+                  {{
                     li | productNameWithSpecs
-                  }}</a>
+                  }}
+                </a>
                 <small class="text-muted d-block">{{ li.Product.ID }}</small>
                 <small *ngIf="li.xp?.LineItemReturnInfo?.ReturnReason"
                        class="text-dark d-block"
@@ -88,6 +90,7 @@
                   <span class="text-muted"
                         translate>{{ getReturnReason(li.xp?.LineItemReturnInfo?.ReturnReason) }}</span>
                 </small>
+                <a *ngIf="li.Product.xp.ArtworkRequired" href="{{ li.xp.PrintArtworkURL }}" target="_blank">Download PDF</a>
                 <small *ngIf="li.xp?.LineItemReturnInfo?.Comment">
                   <span translate>CART.LINEITEM_TABLE.SELLER_COMMENT</span>:
                   <span class="text-muted">{{li.xp?.LineItemReturnInfo?.Comment}}</span>
@@ -98,7 +101,8 @@
                         badge-pill
                         badge-primary">Purchase Order</span>
 
-                <div *ngIf="readOnly && !hideStatus"><span translate>ORDERS.DETAIL.STATUS</span>:
+                <div *ngIf="readOnly && !hideStatus">
+                  <span translate>ORDERS.DETAIL.STATUS</span>:
                   <span *ngFor="let entry of li.xp.StatusByQuantity | keyvalue">
                     <span *ngIf="entry.value">
                       <ocm-order-status-icon [status]="entry.key"></ocm-order-status-icon>
@@ -136,7 +140,9 @@
                                     [product]="li.Product"
                                     [priceSchedule]="li.Product.PriceSchedule"
                                     [isQtyChanging]="isQtyChanging(li.ID)"
-                                    (qtyChange)="changeQuantity(li.ID, $event.detail)"></ocm-quantity-input>
+                                    [variantID]="li.Variant?.ID"
+                                    (qtyChange)="changeQuantity(li.ID, $event.detail)">
+                </ocm-quantity-input>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>
@@ -321,7 +327,9 @@
                                     [product]="li.Product"
                                     [priceSchedule]="li.Product.PriceSchedule"
                                     [isQtyChanging]="isQtyChanging(li.ID)"
-                                    (qtyChange)="changeQuantity(li.ID, $event.detail)"></ocm-quantity-input>
+                                    [variantID]="li.Variant?.ID"
+                                    (qtyChange)="changeQuantity(li.ID, $event.detail)">
+                </ocm-quantity-input>
                 <span class="text-nowrap"
                       *ngIf="readOnly">&times;{{ li.Quantity | number }}</span>
               </div>

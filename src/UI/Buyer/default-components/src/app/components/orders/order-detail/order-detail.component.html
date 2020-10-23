@@ -1,11 +1,11 @@
 <div class="container">
   <div *ngIf="order">
-    <nav class="breadcrumb mt-3 bg-light"
+    <nav class="breadcrumb"
          aria-label="breadcrumb">
-      <a class="breadcrumb-item text-primary"
+      <a class="breadcrumb-item"
          (click)="toAllOrders()"
          translate>ORDERS.DETAIL.ALL</a>
-      <a class="breadcrumb-item link text-primary"
+      <a class="breadcrumb-item"
          aria-current="page">{{ order.ID }}</a>
     </nav>
     <div class="pb-2 mt-4 mb-2">
