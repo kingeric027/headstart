@@ -101,11 +101,13 @@ ocm-product-card {
   }
   // DESIGN: There is a better way to do this, but I think this button looks better using their "Intense Blue" color.
   // but I don't want change it for every instance. Just overriding it in this spot.
-  button {
-    .btn-outline-secondary {
+  button.btn-outline-secondary {
       color: $indigo;
       border-color: $indigo;
-    }
+      &:hover, &:focus {
+        background-color: $indigo;
+        color: white;
+      }
   }
 }
 
