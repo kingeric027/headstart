@@ -20,8 +20,8 @@
           <button class="btn btn-link font-weight-bold"
                   translate>
             ORDERS.LIST.STATUS
-            <fa-icon *ngIf="sortBy === 'Status' || sortBy === '!Status'"
-                     [icon]="sortBy === 'Status' ? faCaretDown : faCaretUp"></fa-icon>
+            <fa-icon *ngIf="sortBy === 'xp?.SubmittedOrderStatus' || sortBy === '!xp?.SubmittedOrderStatus'"
+                     [icon]="sortBy === 'xp?.SubmittedOrderStatusStatus' ? faCaretDown : faCaretUp"></fa-icon>
           </button>
         </th>
         <th (click)="updateSort('DateSubmitted')"

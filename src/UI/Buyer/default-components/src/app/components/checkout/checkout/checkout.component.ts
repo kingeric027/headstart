@@ -14,9 +14,7 @@ import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/servic
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { ShopperContextService } from 'marketplace';
-import { MerchantConfig } from 'src/app/config/merchant.class';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -140,7 +138,6 @@ export class OCMCheckout implements OnInit {
     this.initLoadingIndicator('submitLoading')
     await this.checkout.addComment(comment);
     let cleanOrderID = '';
-    const merchant = MerchantConfig.getMerchant(this.order.xp.Currency);
     if (this.orderSummaryMeta.StandardLineItemCount) {
       const ccPayment = {
         OrderId: this.order.ID,
@@ -148,8 +145,7 @@ export class OCMCheckout implements OnInit {
         CreditCardID: this.selectedCard?.SavedCard?.ID,
         CreditCardDetails: this.selectedCard.NewCard,
         Currency: this.order.xp.Currency,
-        CVV: this.selectedCard.CVV,
-        MerchantID: merchant.cardConnectMerchantID
+        CVV: this.selectedCard.CVV
       }
       cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
       await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
@@ -214,6 +210,6 @@ export class OCMCheckout implements OnInit {
 
   destoryLoadingIndicator(toSection: string): void {
     this.isLoading = false;
-    this.currentPanel = toSection;
+    this.toSection(toSection);
   }
 }

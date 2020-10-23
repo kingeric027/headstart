@@ -30,95 +30,48 @@ namespace CMS.Tests
 				}")]
 		public async Task valid_documents_produce_no_errors(string document)
 		{
-			Assert.DoesNotThrow(() =>
-				SchemaHelper.ValidateDocumentAgainstSchema(GetSchema(ValidSchema), GetDocument(document))
-			);
-		}
-
-		[Test, TestCase(@"{
-                'name': 'Spider Man',
-				'roles': ['superhero', 'arachnid'],
-				'brand-equity': 1000
-				}")]
-		public async Task document_with_additionalProperties_errors(string document)
-		{
-			Assert.Throws<DocumentNotValidException>(() =>
-				SchemaHelper.ValidateDocumentAgainstSchema(GetSchema(ValidSchema), GetDocument(document))
-			);
-		}
-
-		[Test, TestCase(@"{
-				'roles': ['superhero', 'arachnid'],
-				}")]
-		public async Task document_missing_required_field_errors(string document)
-		{
-			Assert.Throws<DocumentNotValidException>(() =>
-				SchemaHelper.ValidateDocumentAgainstSchema(GetSchema(ValidSchema), GetDocument(document))
+			Assert.DoesNotThrowAsync(async () =>
+				await SchemaHelper.ValidateDocumentAgainstSchema(GetSchema(ValidSchema), GetDocument(document))
 			);
 		}
 
 		[Test, TestCase(@"{
                 'name': false,
 				'roles': ['superhero', 'arachnid']
+				}"),
+				TestCase(@"{ 'roles': ['superhero', 'arachnid'] }"),
+				TestCase(@"{
+                'name': 'Spider Man',
+				'roles': ['superhero', 'arachnid'],
+				'brand-equity': 1000
 				}")]
-		public async Task document_with_wrong_type_errors(string document)
+		public async Task invalid_document_errors(string document)
 		{
-			Assert.Throws<DocumentNotValidException>(() => 
-				SchemaHelper.ValidateDocumentAgainstSchema(GetSchema(ValidSchema), GetDocument(document))
+			Assert.ThrowsAsync<DocumentNotValidException>(async () => 
+				await SchemaHelper.ValidateDocumentAgainstSchema(GetSchema(ValidSchema), GetDocument(document))
 			);
 		}
 
 		[Test, TestCase(ValidSchema)]
 		public async Task valid_schemas_produce_no_errors(string schema)
 		{
-			Assert.DoesNotThrow(() =>
-				SchemaHelper.ValidateSchema(GetSchema(schema))
+			Assert.DoesNotThrowAsync(async () =>
+				await SchemaHelper.ValidateSchema(GetSchema(schema))
 			);
 		}
 
 		[Test, TestCase(@"{ 
-							'type': 'object',
-							'properties': {
-								'name': {'type': 'InvalidType'},
-								'roles': {'type': 'array'}
-							},
-							'required': ['name']
-						}")]
-		public async Task schema_with_invalid_type_errors(string schema)
+					'type': 'object',
+					'properties': {
+						'name': {'type': 'InvalidType'},
+						'roles': {'type': 'array'}
+					},
+					'required': ['name']
+				}")]
+		public async Task invalid_schema_errors(string schema)
 		{
-			Assert.Throws<SchemaNotValidException>(() =>
-				SchemaHelper.ValidateSchema(GetSchema(schema))
-			);
-		}
-
-		[Test, TestCase(@"{ 
-							'type': 'object',
-							'properties': {
-								'name': {'type': 'string'},
-								'roles': {'type': 'array'}
-							},
-							'required': ['name'],
-							'Extraneous': 'field'
-						}")]
-		public async Task schema_with_extra_field_errors(string schema)
-		{
-			Assert.Throws<SchemaNotValidException>(() =>
-				SchemaHelper.ValidateSchema(GetSchema(schema))
-			);
-		}
-
-		[Test, TestCase(@"{ 
-							'type': 'object',
-							'propertiez': {
-								'name': {'type': 'string'},
-								'roles': {'type': 'array'}
-							},
-							'required': ['name']
-						}")]
-		public async Task schema_with_misspelling_errors(string schema)
-		{
-			Assert.Throws<SchemaNotValidException>(() =>
-				SchemaHelper.ValidateSchema(GetSchema(schema))
+			Assert.ThrowsAsync<SchemaNotValidException>(async () =>
+				await SchemaHelper.ValidateSchema(GetSchema(schema))
 			);
 		}
 	}

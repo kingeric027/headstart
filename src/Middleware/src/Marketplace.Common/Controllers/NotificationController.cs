@@ -29,5 +29,13 @@ namespace Marketplace.Common.Controllers
 		{
 			return await _command.CreateModifiedMonitoredSuperProductNotification(notification, VerifiedUserContext);
 		}
+
+		[DocName("PUT Monitored Product Field Modified")]
+		[HttpPut, Route("monitored-product-field-modified/{documentID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus([FromBody] MonitoredProductFieldModifiedNotificationDocument document)
+		{
+			return await _command.UpdateMonitoredSuperProductNotificationStatus(document, document.Doc.Supplier.ID, document.Doc.Product.ID, VerifiedUserContext);
+		}
+
 	}
 }

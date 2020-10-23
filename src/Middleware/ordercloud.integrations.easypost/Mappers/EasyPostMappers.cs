@@ -1,4 +1,5 @@
 ﻿using OrderCloud.SDK;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,8 @@ namespace ordercloud.integrations.easypost
 {
 	public static class EasyPostMappers
 	{
+		public static int MINIMUM_SHIP_DIMENSION = 22; // inches 
+
 		public static EasyPostAddress MapAddress(Address address)
 		{
 			return new EasyPostAddress()
@@ -25,12 +28,20 @@ namespace ordercloud.integrations.easypost
 		// TODO - does this need to be more intelligient?
 		public static EasyPostParcel MapParcel(IEnumerable<LineItem> lineItems)
 		{
+			var argregateHight = (double) Math.Max(MINIMUM_SHIP_DIMENSION, lineItems.Select(li => li.Product.ShipHeight ?? 0).Max());
+			var argregateWidth = (double) Math.Max(MINIMUM_SHIP_DIMENSION, lineItems.Select(li => li.Product.ShipWidth ?? 0).Max());
+			var argregateLength = (double) Math.Max(MINIMUM_SHIP_DIMENSION, lineItems.Select(li => li.Product.ShipLength ?? 0).Max());
 			var totalWeight = lineItems.Aggregate(0.0, (sum, lineItem) => 
 			{
 				var productShipWeight = lineItem.Product.ShipWeight ?? 1;
 				return sum += ((double)productShipWeight * lineItem.Quantity);
 			});
-			return new EasyPostParcel() { weight = totalWeight };
+			return new EasyPostParcel() { 
+				weight = totalWeight,
+				height = argregateHight,
+				width = argregateWidth,
+				length = argregateLength
+			};
 		}
 
 		public static ShipMethod MapRate(EasyPostRate rate)
@@ -38,12 +49,16 @@ namespace ordercloud.integrations.easypost
 			return new ShipMethod()
 			{
 				ID = rate.id,
-				Name = $"{rate.carrier} {rate.service}",
+				Name = rate.service,
 				Cost = decimal.Parse(rate.rate),
 				EstimatedTransitDays = (int)rate.delivery_days,
 				xp =
 				{
-					CarrierAccountID = rate.carrier_account_id
+					Carrier = rate.carrier,
+					CarrierAccountID = rate.carrier_account_id,
+					ListRate = decimal.Parse(rate.list_rate),
+					Guaranteed = rate.delivery_date_guaranteed,
+					OriginalCost = decimal.Parse(rate.rate)
 				}
 			};
 		}

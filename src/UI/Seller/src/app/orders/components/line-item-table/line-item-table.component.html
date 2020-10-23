@@ -39,6 +39,10 @@
               </small>
             </h5>
           </div>
+          <div class="col text-right">
+            <small class="font-weight-bolder text-uppercase text-muted">Ship Method</small>
+            <h5 class="card-title mb-0">{{ getShipMethodString(liGroup[0]) }}</h5>
+          </div>
         </div>
         <ng-content></ng-content>
       </div>
@@ -75,6 +79,7 @@
                     <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
                     <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                           class="badge badge-pill badge-primary">Purchase Order</span>
+                      <a *ngIf="li.Product.xp.ArtworkRequired" href="{{li.xp.PrintArtworkURL}}" target="_blank">Download PDF</a>
                   </h6>
                 </div>
               </td>
@@ -110,7 +115,7 @@
                              [lineItem]="li"></return-form>
               </td>
               <td class="align-middle">
-                {{li.LineTotal | currency: currency}}
+                {{li.LineTotal | currency: order?.xp?.currency }}
               </td>
             </tr>
           </tbody>

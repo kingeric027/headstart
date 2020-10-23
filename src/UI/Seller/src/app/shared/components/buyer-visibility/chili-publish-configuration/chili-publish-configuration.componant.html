@@ -1,0 +1,147 @@
+<ng-container>
+    <div *ngIf="!showEditor">
+        <div class="row">
+            <div class="col-md-5">
+                <div *ngIf="showChiliDocuments">
+                    <label translate>ADMIN.PRODUCT_EDIT.SELECT_CHILI_TEMPLATE</label>
+                    <select class="form-control"
+                            (change)="selectChiliTemplate($event)">
+                        <option selected
+                                disabled
+                                [ngValue]="null">
+                            Select
+                        </option>
+                        <option *ngFor="let document of tecraDocuments"
+                                [value]="document.id">
+                            {{document.name}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div *ngIf="showAvailableCategories">
+                    <label translate>ADMIN.PRODUCT_EDIT.CATALOG_ASSIGNMENT</label>
+                    <select class="form-control"
+                            (change)="setCatalogSelection($event)">
+                        <option selected
+                                disabled
+                                [ngValue]="null">
+                            Select
+                        </option>
+                        <option *ngFor="let cat of catalogAssignments"
+                                [value]="cat.ID">
+                            {{cat.Name}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div *ngIf="showAssignmentButton">
+                    <button class="btn btn-primary btn-chili"
+                            type="submit"
+                            (click)="executeChiliConfigAssignmentRequest()"
+                            translate>
+                        ADMIN.PRODUCT_EDIT.SAVE_CHILI_CONFIG
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="showChiliConfigs" class="selected-configs">
+            <strong translate>ADMIN.PRODUCT_EDIT.SELECTED_CHILI_CONFIGURATIONS</strong>
+            <table class='table table-bordered table-condensed table-striped table-hover'>
+                <tr class="table-row" *ngFor="let config of chiliConfigs">
+                    <td>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <p>Template: {{config.ChiliTemplateName}}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p>Catalog: {{config.CatalogID}}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-primary"
+                                            type="submit"
+                                            (click)="editChiliTemplate(config.ID)">
+                                        Edit
+                                    </button>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-danger"
+                                            type="submit"
+                                            (click)="deleteChiliConfig(config)"
+                                            translate>
+                                        ADMIN.DELETE.DELETE
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div *ngIf="showEditor">
+        <strong>Template Specs</strong>
+        <table class='table table-bordered table-condensed table-striped table-hover'>
+            <tr class="table-row" *ngFor="let spec of chiliTemplate.TemplateSpecs">
+                <td>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Spec Name</label>
+                            <input class="form-control" type='text' name="{{spec.ID + '_name'}}" id="{{spec.ID + '_name'}}" placeholder="{{spec.Name}}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Default Value</label>
+                            <input class="form-control" type='text' name="{{spec.ID + '_defaultvalue'}}" id="{{spec.ID + '_defaultvalue'}}" placeholder="{{spec.DefaultValue}}">
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="spec.xp.UI.ControlType == 'DropDown'">
+                        <div class="col-md-6">
+                            <div class="spec-options">
+                                <label>Spec Options</label>
+                                <div class="input-group" *ngFor="let option of spec.Options">
+                                    <input class="form-control" type='text' name="{{option.ID + '_option'}}" id="{{option.ID + '_option'}}" [value]="option.Value">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary"
+                                                type="submit"
+                                                (click)="saveChiliSpecOption(option, spec)">
+                                            Save
+                                        </button>
+                                        <button class="btn btn-danger"
+                                                type="submit"
+                                                (click)="deleteChiliSpecOption(option, spec)">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="spec-options">
+                                    <label>Add Option</label>
+                                    <div class="input-group">
+                                        <input class="form-control" type='text' name="{{spec.ID + '_newOption'}}" id="{{spec.ID + '_newOption'}}">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary"
+                                                    type="submit"
+                                                    (click)="saveNewChiliSpecOption(spec)">
+                                                Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-danger"
+                        type="submit"
+                        (click)="showEditor = !showEditor">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-container>

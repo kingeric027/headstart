@@ -8,18 +8,11 @@ How to use _shame.scss:
         (b) Why was this needed?
         (c) How does this fix it?
         (d) How might you fix it properly, given more time?
+        (e) AT VERY MINIMUM: INCLUDE A COMMENT WITH EVERY DECLARATION.
     (3) Do not blame the developer; if they explained why they had to do it then their reasons are probably (hopefully) valid.
     (4) Try and clean shame.css up when you have some time.
 
 *******************************************************************************************************************************/
-
-.c-error-message {
-  position: absolute;
-  z-index: 999;
-  padding: 0.5rem;
-  border-radius: $border-radius;
-  font-size: $small-font-size;
-}
 
 // this makes all address cards the same height
 shared-address-display {
@@ -133,4 +126,13 @@ ng-progress {
 
 #zsiqwidget {
   bottom: 120px;
+}
+
+// where should breadcrumb styles live?
+.breadcrumb {
+  background-color: $light;
+  margin-top: 1rem;
+  .breadcrumb-item {
+    color: $dark;
+  }
 }

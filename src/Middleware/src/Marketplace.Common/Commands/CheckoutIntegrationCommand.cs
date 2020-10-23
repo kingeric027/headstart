@@ -1,23 +1,24 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dynamitey;
+using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration.Models;
-using OrderCloud.SDK;
-using ordercloud.integrations.avalara;
-using ordercloud.integrations.library;
-using ordercloud.integrations.exchangerates;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
-using NPOI.OpenXmlFormats.Dml;
+using ordercloud.integrations.exchangerates;
+using ordercloud.integrations.library;
+using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.ShippingIntegration
+namespace Marketplace.Common.Commands
 {
     public interface ICheckoutIntegrationCommand
     {
         Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
-        Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
+        Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
+        Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
     }
 
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
@@ -53,14 +54,31 @@ namespace Marketplace.Common.Services.ShippingIntegration
             for (int i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                shipResponse.ShipEstimates[i].ShipMethods = shipResponse.ShipEstimates[i].ShipMethods
-                    .Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID)).ToList();
+                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID));
+                shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(methods).Select(s =>
+                {
+                    // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112
+                    if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
+                    {
+                        s.Cost = 0;
+                    }
+
+                    if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SEBDistributionFedexAccountId)
+                    {
+                        s.Cost = s.Cost * (decimal)1.1; //  Apply markup for the SEBDistributionFedexAccount
+                    }
+                    else if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SMGFedexAccountId)
+                    {
+                        s.Cost = s.Cost * (decimal)1.4;
+                    }
+                    return s;
+                }).ToList();
             }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
 
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
             {
-                shipResponse.ShipEstimates = await ConvertShipingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
+                shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
             }
 
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
@@ -83,7 +101,14 @@ namespace Marketplace.Common.Services.ShippingIntegration
             }
 		}
 
-        private async Task<List<ShipEstimate>> ConvertShipingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
+        public static IEnumerable<ShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<ShipMethod> methods)
+		{
+            return methods
+                .GroupBy(method => method.EstimatedTransitDays)
+                .Select(kind => kind.OrderBy(method => method.Cost).First());
+        }
+
+        private async Task<List<ShipEstimate>> ConvertShippingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
 		{
             var rates = (await _exchangeRates.Get(buyerCurrency)).Rates;
             var conversionRate = rates.Find(r => r.Currency == shipperCurrency).Rate;
@@ -115,11 +140,11 @@ namespace Marketplace.Common.Services.ShippingIntegration
             foreach(var estimate in shipEstimates)
             {
                 //  get supplier and supplier subtotal
-                var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault().LineItemID).SupplierID;
-                var supplier = suppliers.Items.Where(supplier => supplier.ID == supplierID).FirstOrDefault();
-                var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier.ID);
+                var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
+                var supplier = suppliers.Items.FirstOrDefault(s => s.ID == supplierID);
+                var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplier?.ID);
                 var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
-                if (supplier.xp?.FreeShippingThreshold != null && supplier.xp?.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
+                if (supplier?.xp?.FreeShippingThreshold != null && supplier.xp?.FreeShippingThreshold < supplierSubTotal) // free shipping for this supplier
                 {
                     foreach (var method in estimate.ShipMethods)
                     {
@@ -138,20 +163,33 @@ namespace Marketplace.Common.Services.ShippingIntegration
             return updatedEstimates;
         }
 
+        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            return await this.CalculateOrder(new MarketplaceOrderCalculatePayload()
+            {
+                ConfigData = null,
+                OrderWorksheet = worksheet
+            });
+        }
 
-        public async Task<OrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
+        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
             if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
                 // quote orders do not have tax cost associated with them
-                return new OrderCalculateResponse();
+                return new MarketplaceOrderCalculateResponse();
             } else
             {
                 var totalTax = await _avalara.GetEstimateAsync(orderCalculatePayload.OrderWorksheet.Reserialize<OrderWorksheet>());
 
-                return new OrderCalculateResponse
+                return new MarketplaceOrderCalculateResponse
                 {
-                    TaxTotal = totalTax,
+                    TaxTotal = totalTax.totalTax ?? 0,
+                    xp = new OrderCalculateResponseXp()
+                    {
+                        TaxResponse = totalTax
+                    }
                 };
             }
         }

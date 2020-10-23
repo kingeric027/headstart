@@ -13,7 +13,7 @@ namespace ordercloud.integrations.avalara
 	public interface IAvalaraCommand
 	{
 		// Use this before checkout. No records will be saved in avalara.
-		Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet);
+		Task<TransactionModel> GetEstimateAsync(OrderWorksheet orderWorksheet);
 		// Use this during submit.
 		Task<TransactionModel> CreateTransactionAsync(OrderWorksheet orderWorksheet);
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
@@ -43,9 +43,9 @@ namespace ordercloud.integrations.avalara
 					.WithSecurity(_settings.AccountID, _settings.LicenseKey);
 		}
 
-		public async Task<decimal> GetEstimateAsync(OrderWorksheet orderWorksheet)
+		public async Task<TransactionModel> GetEstimateAsync(OrderWorksheet orderWorksheet)
 		{
-			var taxEstimate = (await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet)).totalTax ?? 0;
+			var taxEstimate = await CreateTransactionAsync(DocumentType.SalesOrder, orderWorksheet);
 			return taxEstimate;
 		}
 

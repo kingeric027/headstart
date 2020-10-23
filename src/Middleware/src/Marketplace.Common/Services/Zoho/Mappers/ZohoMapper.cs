@@ -147,9 +147,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             item.sku = item.sku;
             item.quantity = 1;
             item.unit = "each";
-            //item.account_id = "2237685000000014001";
-            //item.purchase_account_id = "2237685000000677015";
             item.purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit";
+            item.avatax_tax_code = "FR";
             return item;
         }
 
@@ -164,8 +163,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 name = $"Shipping: {method.Name}",
                 quantity = 1,
                 unit = "each",
-                //account_id = "2237685000000014001",
-                purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit"
+                purchase_description = $"{method.Name} - {method.EstimatedTransitDays} days transit",
+                avatax_tax_code = "FR"
             };
             return item;
         }
@@ -173,85 +172,76 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoPurchaseLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
+        public static ZohoLineItem Map(MarketplaceLineItem item)
         {
             return new ZohoLineItem()
             {
                 item_type = "sales_and_purchases",
-                name = variant?.Name ?? product.Name,
-                purchase_description = $"{variant?.Name ?? product.Name} from {item.SupplierID}", // debug removal
-                description = $"{variant?.Name ?? product.Name} from {item.SupplierID}",
-                sku = variant?.ID ?? product.ID, // debug removal
-                unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
+                name = item.Variant?.Name ?? item.Product.Name,
+                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", // debug removal
+                description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
+                sku = item.Variant?.ID ?? item.Product.ID, // debug removal
+                unit = item.Product.xp?.UnitOfMeasure?.Unit, // debug removal
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
+                quantity = item.Quantity,
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000"
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
         {
             // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
             {
                 item_id = zItem.item_id,
                 item_type = "sales_and_purchases",
-                name = variant?.Name ?? product.Name,
-                purchase_description = $"{variant?.Name ?? product.Name} from {item.SupplierID}", // debug removal
-                description = $"{variant?.Name ?? product.Name} from {item.SupplierID}",
-                sku = variant?.ID ?? product.ID,
-                unit = product.xp?.UnitOfMeasure?.Unit,
+                name = item.Variant?.Name ?? item.Product.Name,
+                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", // debug removal
+                description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
+                sku = item.Variant?.ID ?? item.Product.ID,
+                unit = item.Product.xp?.UnitOfMeasure?.Unit,
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
+                quantity = item.Quantity,
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000"
             };
         }
     }
     public static class ZohoSalesLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
+        public static ZohoLineItem Map(MarketplaceLineItem item)
         {
             return new ZohoLineItem()
             {
                 item_type = "sales_and_purchases",
-                name = variant?.Name ?? product.Name,
+                name = item.Variant?.Name ?? item.Product.Name,
                 rate = decimal.ToDouble(item.UnitPrice.Value),
-                purchase_description = $"{variant?.Name ?? product.Name} from {item.SupplierID}", // debug removal
-                description = $"{variant?.Name ?? product.Name} from {item.SupplierID}",
-                sku = variant?.ID ?? product.ID, // debug removal
-                unit = product.xp?.UnitOfMeasure?.Unit, // debug removal
+                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", 
+                description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
+                sku = item.Variant?.ID ?? item.Product.ID,
+                unit = item.Product.xp?.UnitOfMeasure?.Unit, 
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = item.Product.xp?.Tax.Code,
+                quantity = item.Quantity
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, MarketplaceLineItemProduct product, LineItemVariant variant)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
         {
-            // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
             return new ZohoLineItem()
             {
                 item_id = zItem.item_id,
                 item_type = "sales_and_purchases",
-                name = variant?.Name ?? product.Name,
+                name = item.Variant?.Name ?? item.Product.Name,
                 rate = decimal.ToDouble(item.UnitPrice.Value),
-                purchase_description = $"{variant?.Name ?? product.Name} from {item.SupplierID}", // debug removal
-                description = $"{variant?.Name ?? product.Name} from {item.SupplierID}",
-                sku = variant?.ID ?? product.ID,
-                unit = product.xp?.UnitOfMeasure?.Unit, 
+                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", // debug removal
+                description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
+                sku = item.Variant?.ID ?? item.Product.ID,
+                unit = item.Product.xp?.UnitOfMeasure?.Unit, 
                 product_type = "goods",
-                //TODO: MODEL ~ Avalara integration evaluation
-                //is_taxable = true, // product?.xp?.IsResale //TODO: this fails when false unless "tax_exemption_id" is included. Need to figure out what that value is.
-                //tax_exemption_id = "",
-                //avatax_tax_code = product.xp.Tax.Code,
+                avatax_tax_code = item.Product.xp?.Tax.Code,
+                quantity = item.Quantity
             };
         }
     }
@@ -266,7 +256,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 item_id = p.item_id,
                 description = p.description,
                 rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                quantity = lineitems.Items.FirstOrDefault(l => l.ProductID == p.sku)?.Quantity
+                quantity = lineitems.Items.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == p.sku : li.ProductID == p.sku)?.Quantity
             }).ToList();
             po.salesorder_id = salesorder.salesorder_id;
             po.purchaseorder_number = order.ID;
@@ -289,7 +279,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     item_id = p.item_id,
                     description = p.description,
                     rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                    quantity = lineitems.Items.FirstOrDefault(l => l.ProductID == p.sku)?.Quantity
+                    quantity = lineitems.Items.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku)?.Quantity
                 }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
                 purchaseorder_number = order.ID,

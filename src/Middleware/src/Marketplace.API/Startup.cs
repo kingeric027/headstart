@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avalara.AvaTax.RestClient;
 using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +8,6 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Controllers;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -16,7 +15,6 @@ using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
-using Marketplace.Models.Extended;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
@@ -27,6 +25,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
+using ordercloud.integrations.tecra;
 using System.Runtime.InteropServices;
 
 namespace Marketplace.API
@@ -102,8 +101,10 @@ namespace Marketplace.API
                 .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliTemplateCommand>()
                 .Inject<IChiliConfigCommand>()
+                .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -129,6 +130,7 @@ namespace Marketplace.API
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
+                .AddSingleton<IOrderCloudIntegrationsTecraService>(x => new OrderCloudIntegrationsTecraService(_settings.TecraSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations")
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
@@ -149,6 +151,7 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
+            services.AddApplicationInsightsTelemetry(_settings.ApplicationInsightsSettings.InstrumentationKey);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

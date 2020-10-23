@@ -115,9 +115,9 @@ export class ProductVariations {
 
   getVariantStatusDisplay(variant: Variant): string {
     if (variant.Active) {
-      return "Active";
+      return 'Active';
     } else {
-      return "Inactive";
+      return 'Inactive';
     }
   }
 
@@ -125,7 +125,7 @@ export class ProductVariations {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
-    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9 -]/g, '');
+    updateProductResourceCopy.Variants[i].xp.NewID = $event.target.value.replace(/[^a-zA-Z0-9_-]/g, '');
     this.superProductEditable = updateProductResourceCopy;
     this.productVariationsChanged.emit(this.superProductEditable);
   }
@@ -349,7 +349,7 @@ export class ProductVariations {
   }
 
   getVariantDetailColSpan(): number {
-    let colSpan = 4 + this.superProductEditable?.Specs?.length;
+    const colSpan = 4 + this.superProductEditable?.Specs?.length;
     if (this.superProductEditable?.Product?.Inventory?.VariantLevelTracking) colSpan + 1;
     return colSpan;
   }

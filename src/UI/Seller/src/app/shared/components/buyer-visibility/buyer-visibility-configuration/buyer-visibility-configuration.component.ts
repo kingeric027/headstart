@@ -31,7 +31,7 @@ export class BuyerVisibilityConfiguration {
 
   @Input()
   set product(value: MarketplaceProduct) {
-    this._product = value;
+      this._product = value;
     this.fetchData();
   }
 
@@ -87,7 +87,7 @@ export class BuyerVisibilityConfiguration {
 
   resetCatalogAssignments(catalogAssignments: ProductAssignment[]): void {
     this.catalogAssignmentsEditable = catalogAssignments;
-    this.catalogAssignmentsStatic = catalogAssignments;
+      this.catalogAssignmentsStatic = catalogAssignments;
   }
 
   resetCategoryAssignments(categoryAssignments: Category[][]): void {
@@ -181,7 +181,7 @@ export class BuyerVisibilityConfiguration {
     this.catalogs = catalogsResponse.Items;
   }
 
-  async getCatalogAssignments(): Promise<void> {
+    async getCatalogAssignments(): Promise<void> {
     const catalogAssignmentRequests = this.catalogs.map(c =>
       this.ocProductService.ListAssignments({ userGroupID: c.ID, productID: this._product.ID }).toPromise()
     );
