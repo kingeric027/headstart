@@ -6,7 +6,7 @@ export const environment: Environment = {
     hostedApp: true,
     appname: 'GO2 Partners',
     clientID: 'B1FEB16F-9E3E-4534-88FE-F3AE29941986',
-    marketplaceID: 'GO2',
+    marketplaceID: 'GO2_TEST',
     baseUrl: 'https://go2partners-buyer-ui-test.azurewebsites.net/',
     middlewareUrl: 'https://go2partners-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',

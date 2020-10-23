@@ -10,7 +10,7 @@ export const environment: Environment = {
   hostedApp: true,
   appname: 'Marketplace Test',
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
-  marketplaceID: 'SEB',
+  marketplaceID: 'SEB_TEST',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
   creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
