@@ -120,7 +120,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: headstartdemoTheme,
-    instrumentationKey: ''
+    instrumentationKey: '731925bd-018c-447e-8ba5-06b432d708c8',
   },
   FASTSIGNS: {
     hostedApp: false,
@@ -135,7 +135,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: fastsignsTheme,
-    instrumentationKey: ''
+    instrumentationKey: 'e68a2c8b-3684-4ba9-bbca-5cc9795afd65',
   },
   GO2PARTNERS: {
     hostedApp: false,
@@ -150,7 +150,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: go2partnersTheme,
-    instrumentationKey: ''
+    instrumentationKey: '38f23bfa-b9af-4670-8441-4376ced20620',
   },
   BRANDWEAR_DESIGNS: {
     hostedApp: false,

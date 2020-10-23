@@ -10,7 +10,7 @@ export const environment: Environment = {
     baseUrl: 'https://fastsigns-buyer-ui-test.azurewebsites.net/',
     middlewareUrl: 'https://fastsigns-middleware-test.azurewebsites.net',
     creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
-    instrumentationKey: '',
+  instrumentationKey: 'e68a2c8b-3684-4ba9-bbca-5cc9795afd65',
     translateBlobUrl: 'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
     sellerID: 'FASTSIGNS_TEST',
     ssoLink: null,
