@@ -1,24 +1,24 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService, OcProductService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { ToastrService } from 'ngx-toastr';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HeadStartSDK, SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
-import { environment } from 'src/environments/environment';
+import { HeadStartSDK, SuperMarketplaceProduct, Asset, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
+import { BehaviorSubject } from 'rxjs';
+import { Products } from 'ordercloud-javascript-sdk';
 
 @Component({
   selector: 'product-variations-component',
   templateUrl: './product-variations.component.html',
   styleUrls: ['./product-variations.component.scss'],
 })
-export class ProductVariations {
+export class ProductVariations implements OnChanges {
   @Input()
   set superMarketplaceProductEditable(superProductEditable: SuperMarketplaceProduct) {
     this.superProductEditable = superProductEditable;
-    this.variants = superProductEditable?.Variants;
+    this.variants.next(superProductEditable?.Variants);
     this.variantInSelection = {};
     this.canConfigureVariations = !!superProductEditable?.Product?.ID;
   };
@@ -32,10 +32,10 @@ export class ProductVariations {
   @Input() checkForChanges;
   @Input() copyProductResource;
   @Input() isCreatingNew = false;
-  get specsWithVariations() {
+  get specsWithVariations(): Spec[] {
     return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant) as Spec[];
   };
-  get specsWithoutVariations() {
+  get specsWithoutVariations(): Spec[] {
     return this.superProductEditable?.Specs?.filter(s => !s.DefinesVariant);
   };
   @Output()
@@ -45,7 +45,7 @@ export class ProductVariations {
   @Output() isSpecsEditing = new EventEmitter<boolean>();
   superProductEditable: SuperMarketplaceProduct;
   superProductStatic: SuperMarketplaceProduct;
-  variants: Variant[] = [];
+  variants: BehaviorSubject<MarketplaceVariant[]>;
   specOptAdded = new EventEmitter<SpecOption>();
   canConfigureVariations = false;
   areSpecChanges = false;
@@ -66,7 +66,22 @@ export class ProductVariations {
   variantInSelection: Variant;
   imageInSelection: Asset;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private ocProductService: OcProductService, private appAuthService: AppAuthService,) { }
+  constructor(
+    private productService: ProductService, 
+    private toasterService: ToastrService, 
+    private ocSpecService: OcSpecService, 
+    private changeDetectorRef: ChangeDetectorRef, 
+    private ocProductService: OcProductService, 
+    private appAuthService: AppAuthService) {
+      this.variants = new BehaviorSubject<MarketplaceVariant[]>([]);
+    }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+     if (changes?.superMarketplaceProductEditable) {
+       this.variants.next(changes?.superMarketplaceProductEditable?.currentValue?.Variants);
+     }
+  }
+
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -93,16 +108,16 @@ export class ProductVariations {
 
   shouldDefinesVariantBeChecked(): boolean {
     if (this.definesVariant) return true;
-    if (this.variants?.length >= 100) return false;
+    if (this.variants?.getValue()?.length >= 100) return false;
   }
 
   shouldDisableAddSpecOptBtn(spec: Spec): boolean {
-    if (this.variants?.length === 100 && spec.DefinesVariant) return true;
-    if (this.variants?.length === 100 && !spec.DefinesVariant) return false;
+    if (this.variants?.getValue().length === 100 && spec.DefinesVariant) return true;
+    if (this.variants?.getValue().length === 100 && !spec.DefinesVariant) return false;
     if (!this.variantsValid) return true;
   }
 
-  toggleActive(variant: Variant) {
+  toggleActive(variant: Variant): void {
     variant.Active = !variant.Active;
 
     const updateProductResourceCopy = this.productService.copyResource(
@@ -316,8 +331,10 @@ export class ProductVariations {
   }
 
   openVariantDetails(variant: Variant): void {
+    const variantBehaviorSubjectValue = this.variants?.getValue();
     this.viewVariantDetails = true;
     this.variantInSelection = variant;
+    this.variantInSelection = variantBehaviorSubjectValue[variantBehaviorSubjectValue.indexOf(variant)];
   }
 
   closeVariantDetails(): void {
@@ -354,7 +371,7 @@ export class ProductVariations {
     return colSpan;
   }
 
-  async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
+  async variantShippingDimensionUpdate(event: any, field: string, index: number): Promise<void> {
     let partialVariant: Variant = {};
     // If there's no value, or the value didn't change, don't send request.
     if (event.target.value === '') return;
@@ -375,7 +392,11 @@ export class ProductVariations {
         break;
     }
     try {
-      await this.ocProductService.PatchVariant(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant).toPromise();
+      const patchedVariant = await Products.PatchVariant<MarketplaceVariant>(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant);
+      const variants = this.variants?.getValue();
+      variants[index] = JSON.parse(JSON.stringify(patchedVariant));
+      this.variants.next(variants)
+      this.variantInSelection = this.variants?.getValue()[index];
       this.toasterService.success('Shipping dimensions updated', 'OK');
     } catch (err) {
       console.log(err)
