@@ -186,6 +186,11 @@
                     </summary-resource-display-component>
                   </div>
                 </button>
+                <button *ngIf="!products?.length"
+                        ngbDropdownItem
+                        disabled>
+                  No results. Broaden your search and try again.
+                </button>
               </perfect-scrollbar>
             </div>
             <div class="chip"
