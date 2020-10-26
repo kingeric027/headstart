@@ -18,7 +18,7 @@ export const environment: Environment = {
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: bcfTheme,
-  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+  instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
 };
 /*
 

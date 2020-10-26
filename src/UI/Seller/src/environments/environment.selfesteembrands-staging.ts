@@ -16,19 +16,19 @@ export const environment: Environment = {
   buyerConfigs: {
     'Anytime Fitness': {
       clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
-      buyerUrl: 'https://anytimefitness-staging.sebvendorportal.com'
+      buyerUrl: 'https://anytimefitness-staging.sebvendorportal.com/'
     },
     'Basecamp Fitness': {
       clientID: '0045BB67-84CC-42BD-9FA7-009875628F7C',
-      buyerUrl: 'https://basecampfitness-staging.sebvendorportal.com'
+      buyerUrl: 'https://basecampfitness-staging.sebvendorportal.com/'
     },
     'The Bar Method': {
       clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
-      buyerUrl: 'https://thebarmethod-staging.sebvendorportal.com'
+      buyerUrl: 'https://thebarmethod-staging.sebvendorportal.com/'
     },
     'Waxing The City': {
       clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
-      buyerUrl: 'https://waxingthecity-staging.sebvendorportal.com'
+      buyerUrl: 'https://waxingthecity-staging.sebvendorportal.com/'
     }
   },
   superProductFieldsToMonitor: ['PriceSchedule']

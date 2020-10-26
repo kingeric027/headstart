@@ -1,5 +1,3 @@
-<div class="component-background p-3">
-  <div *ngFor="let facet of facetList">
-    <ocm-facet-multiselect [facet]="facet"></ocm-facet-multiselect>
-  </div>
-</div>
+<ocm-facet-multiselect *ngFor="let facet of facetList"
+                       [facet]="facet"
+                       class="py-2"></ocm-facet-multiselect>
