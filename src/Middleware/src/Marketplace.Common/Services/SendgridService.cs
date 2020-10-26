@@ -300,12 +300,7 @@ namespace Marketplace.Common.Services
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
-                Address supplierAddress = null; ;
-                if(orderWorksheet.Order.xp.SupplierIDs != null && orderWorksheet.Order.xp.ShipFromAddressIDs != null)
-                {
-                    supplierAddress = await _oc.SupplierAddresses.GetAsync(orderWorksheet.Order.xp.SupplierIDs.FirstOrDefault(), orderWorksheet.Order.xp.ShipFromAddressIDs.FirstOrDefault());
-                }
-                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems, supplierAddress);
+                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems);
 
                 EmailTemplate buyerTemplateData = new EmailTemplate()
                 {
@@ -541,7 +536,7 @@ namespace Marketplace.Common.Services
             };
         }
 
-        private object GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems, Address supplierAddress)
+        private object GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
         {
             return new
             {
@@ -549,7 +544,7 @@ namespace Marketplace.Common.Services
                 LastName = order.FromUser.LastName,
                 Phone = order.xp.QuoteOrderInfo.Phone,
                 Email = order.FromUser.Email,
-                Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
+                Location = order.xp.QuoteOrderInfo.BuyerLocation,
                 ProductID = lineItems.FirstOrDefault().Product.ID,
                 ProductName = lineItems.FirstOrDefault().Product.Name,
                 order = order,
