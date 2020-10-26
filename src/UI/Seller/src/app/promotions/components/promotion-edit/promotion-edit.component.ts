@@ -62,9 +62,9 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   currentDateTime: string;
   constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService, private toastrService: ToastrService, private cdr: ChangeDetectorRef) {}
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.isCreatingNew = this.promotionService.checkIfCreatingNew();
-    await this.listResources();
+    this.listResources();
   }
 
   ngOnChanges(): void {
