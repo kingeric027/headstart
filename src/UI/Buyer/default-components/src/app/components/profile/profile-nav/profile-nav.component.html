@@ -1,33 +1,24 @@
-<div class="container mt-3">
-  <div class="row">
-    <div class="row d-md-none flex-grow-1 mx-1">
-      <div class="col-sm-12">
-        <div ngbDropdown>
-          <button class="btn btn-block btn-default btn-outline-dark mb-2"
-                  id="dropdownBasic1"
-                  ngbDropdownToggle
-                  translate>PROFILE.PROFILE_NAV.ACC_SELECTIONS</button>
-          <div ngbDropdownMenu
-               aria-labelledby="dropdownBasic1"
-               class="w-100 text-center">
-            <button *ngFor="let profileRoute of profileRoutes"
-                    class="dropdown-item"
-                    (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3  d-none d-md-flex">
-      <ul class="nav flex-column">
-        <li *ngFor="let profileRoute of profileRoutes"
-            class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="text-primary"
-             (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</a>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-9 col-sm-12">
-      <slot></slot>
-    </div>
+<div class="d-md-none"
+     ngbDropdown>
+  <button class="btn btn-block btn-outline-light mb-2"
+          id="myProfileNav"
+          ngbDropdownToggle
+          translate>PROFILE.PROFILE_NAV.ACC_SELECTIONS</button>
+  <div ngbDropdownMenu
+       aria-labelledby="myProfileNav"
+       class="w-100 text-center">
+    <button *ngFor="let profileRoute of profileRoutes"
+            class="dropdown-item"
+            (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</button>
   </div>
 </div>
+
+
+<ul class="nav nav-fill flex-column d-none d-md-flex gap-2">
+  <li *ngFor="let profileRoute of profileRoutes"
+      class="nav-item cursor-pointer text-left">
+    <a class="nav-link"
+       [ngClass]="{ active: activePath === profileRoute }"
+       (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</a>
+  </li>
+</ul>
