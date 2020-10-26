@@ -172,10 +172,8 @@
                                 [searchTermInput]="searchTerm"
                                 (searched)="searchedResources($event)">
               </search-component>
-              <perfect-scrollbar class="dropdown-ps"
-                                 (psYReachEnd)="handleScrollEnd($event)"
-                                 suppressScrollX
-                                 [ngStyle]="{'max-height.px': 175, 'width': 'auto'}">
+              <perfect-scrollbar class="dropdown-ps product-search-area"
+                                 (psYReachEnd)="handleScrollEnd($event)">
                 <button ngbDropdownItem
                         *ngFor="let resource of products | async"
                         (click)="addSKU(resource.ID)"
