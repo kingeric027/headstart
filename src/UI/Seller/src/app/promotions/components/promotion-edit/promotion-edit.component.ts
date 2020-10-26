@@ -59,6 +59,7 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   faQuestionCircle = faQuestionCircle;
   faCalendar = faCalendar;
   productsCollapsed = true;
+  currentDateTime: string;
   constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService, private toastrService: ToastrService, private cdr: ChangeDetectorRef) {}
 
   async ngOnInit(): Promise<void> {
@@ -68,6 +69,7 @@ export class PromotionEditComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.productsCollapsed = this._promotionEditable?.xp?.AppliesTo !== MarketplacePromoEligibility.SpecificSKUs;
+    this.currentDateTime = moment().format('YYYY-MM-DD[T]hh:mm');
   }
 
   refreshPromoData(promo: Promotion<PromotionXp>): void {
@@ -288,7 +290,7 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   }
 
   getMinDate(): string {
-    return moment().format('YYYY-MM-DD[T]hh:mm')
+    return this.currentDateTime;
   }
 
   toggleHasRedemptionLimit(): void {
