@@ -14,9 +14,9 @@ import { FormGroup } from '@angular/forms';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-declare var SetVariableValue: any;
-declare var saveDocument: any;
-declare var LoadChiliEditor: any;
+declare let SetVariableValue: any;
+declare let saveDocument: any;
+declare let LoadChiliEditor: any;
 
 @Component({
   templateUrl: './product-chili-configuration.component.html',
@@ -66,7 +66,7 @@ export class OCMProductChiliConfig implements OnInit {
   showSpecs = false;
   frameSrc: SafeResourceUrl;
   lineImage = '';
-  pdfSrc  = '';
+  pdfSrc = '';
   currentDocID = '';
   ShowAddToCart = false;
   isLoading = true;
@@ -97,9 +97,9 @@ export class OCMProductChiliConfig implements OnInit {
   }
   setTecraSpec(event: any, spec: ChiliSpec): void {
     const types = {
-      'Text': 'string',
-      'DropDown': 'list',
-      'Checkbox': 'checkbox'
+      Text: 'string',
+      DropDown: 'list',
+      Checkbox: 'checkbox'
     };
     SetVariableValue((spec.ListOrder), event.target, types[spec.xp.UI.ControlType]);
   }
@@ -136,7 +136,7 @@ export class OCMProductChiliConfig implements OnInit {
     body.appendChild(script);
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.calculatePrice();
     this.currentUser = this.context.currentUser.get();
     this.userCurrency = this.currentUser.Currency;
