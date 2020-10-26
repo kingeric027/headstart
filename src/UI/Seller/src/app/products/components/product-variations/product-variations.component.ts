@@ -8,6 +8,7 @@ import { AppAuthService } from '@app-seller/auth';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
 import { BehaviorSubject } from 'rxjs';
 import { Products } from 'ordercloud-javascript-sdk';
+import { truncate } from 'lodash';
 
 @Component({
   selector: 'product-variations-component',
@@ -112,9 +113,11 @@ export class ProductVariations implements OnChanges {
   }
 
   shouldDisableAddSpecOptBtn(spec: Spec): boolean {
-    if (this.variants?.getValue().length === 100 && spec.DefinesVariant) return true;
-    if (this.variants?.getValue().length === 100 && !spec.DefinesVariant) return false;
-    if (!this.variantsValid) return true;
+    if (!this.variantsValid) {
+      return true;
+    } else {
+      return this.variants?.getValue().length === 100 && spec.DefinesVariant;
+    }
   }
 
   toggleActive(variant: Variant): void {
@@ -334,7 +337,9 @@ export class ProductVariations implements OnChanges {
     const variantBehaviorSubjectValue = this.variants?.getValue();
     this.viewVariantDetails = true;
     this.variantInSelection = variant;
-    this.variantInSelection = variantBehaviorSubjectValue[variantBehaviorSubjectValue.indexOf(variant)];
+    if (variantBehaviorSubjectValue !== null) {
+      this.variantInSelection = variantBehaviorSubjectValue[variantBehaviorSubjectValue?.indexOf(variant)];
+    }
   }
 
   closeVariantDetails(): void {
@@ -394,9 +399,11 @@ export class ProductVariations implements OnChanges {
     try {
       const patchedVariant = await Products.PatchVariant<MarketplaceVariant>(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant);
       const variants = this.variants?.getValue();
-      variants[index] = JSON.parse(JSON.stringify(patchedVariant));
-      this.variants.next(variants)
-      this.variantInSelection = this.variants?.getValue()[index];
+      if (variants !== null) {
+        variants[index] = JSON.parse(JSON.stringify(patchedVariant));
+        this.variants.next(variants)
+        this.variantInSelection = this.variants?.getValue()[index];
+      }
       this.toasterService.success('Shipping dimensions updated', 'OK');
     } catch (err) {
       console.log(err)
