@@ -102,7 +102,9 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   async selectSupplier(supplierID: string): Promise<void> {
     const s = await this.ocSupplierService.Get(supplierID).toPromise();
     this.selectedSupplier = s;
-    if (this._promotionEditable?.xp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier) this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
+    if (this._promotionEditable?.xp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier) {
+      this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
+    }
   }
 
   searchedResources(searchText: any): void {
@@ -240,7 +242,6 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   }
 
   getValueDisplay(): string {
-    const promo = this._promotionEditable;
     const safeXp = this._promotionEditable?.xp;
     let valueString = '';
     switch(safeXp?.AppliesTo) {
@@ -252,15 +253,29 @@ export class PromotionEditComponent implements OnInit, OnChanges {
         break;
       default: valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
     }
-    // let valueString = promo?.xp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier ? `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}` : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
-    if (promo?.xp?.Type === MarketplacePromoType.FixedAmount) valueString = `$${promo?.xp?.Value} ${valueString}`;
-    if (promo?.xp?.Type === MarketplacePromoType.Percentage) valueString = `${promo?.xp?.Value}% ${valueString}`;
-    if (promo?.xp?.Type === MarketplacePromoType.FreeShipping) valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
-    if (promo?.xp?.MinReq?.Type === MinRequirementType.MinPurchase && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
-    if (promo?.xp?.MinReq?.Type === MinRequirementType.MinItemQty && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
+    valueString = this.arrangeValueString(safeXp, valueString);
     // Update `promotion.Description` with this value string
     this.handleUpdatePromo({target: {value: valueString.trim()}}, 'Description');
     return valueString.trim();
+  }
+
+  arrangeValueString(safeXp: PromotionXp, valueString: string): string {
+    if (safeXp?.Type === MarketplacePromoType.FixedAmount) {
+      valueString = `$${safeXp?.Value} ${valueString}`;
+    }
+    if (safeXp?.Type === MarketplacePromoType.Percentage) {
+      valueString = `${safeXp?.Value}% ${valueString}`;
+    }
+    if (safeXp?.Type === MarketplacePromoType.FreeShipping) {
+      valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
+    }
+    if (safeXp?.MinReq?.Type === MinRequirementType.MinPurchase && safeXp?.MinReq?.Int) {
+      valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${safeXp?.MinReq?.Int}`;
+    }
+    if (safeXp?.MinReq?.Type === MinRequirementType.MinItemQty && safeXp?.MinReq?.Int) {
+      `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`;
+    }
+    return valueString;
   }
 
   getDateRangeDisplay(): string {
