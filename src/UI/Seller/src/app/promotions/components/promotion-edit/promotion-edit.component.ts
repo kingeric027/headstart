@@ -206,6 +206,12 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   }
 
   handleUpdatePromo(event: any, field: string, typeOfValue?: string): void {
+    if (field === 'xp.AppliesTo' && event?.target?.value === MarketplacePromoEligibility.SpecificSupplier) {
+      this.updatePromoResource({field: 'LineItemLevel', value: true })
+    } else if (field === 'xp.AppliesTo' && event?.target?.value === MarketplacePromoEligibility.SpecificSKUs) {
+      this.updatePromoResource({field: 'LineItemLevel', value: true });
+      this.productsCollapsed = false;
+    }
     const promoUpdate = {
       field,
       value:

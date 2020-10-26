@@ -137,7 +137,7 @@
                    id="SpecificSupplier"
                    value="SpecificSupplier"
                    formControlName="AppliesTo"
-                   (change)="handleUpdatePromo($event, 'xp.AppliesTo'); _promotionEditable.LineItemLevel = true"
+                   (change)="handleUpdatePromo($event, 'xp.AppliesTo');"
                    [checked]="promoTypeCheck('SpecificSupplier')">
             <label class="form-check-label"
                    for="SpecificSupplier"
@@ -152,7 +152,7 @@
                    id="SpecificSKUs"
                    value="SpecificSKUs"
                    formControlName="AppliesTo"
-                   (change)="handleUpdatePromo($event, 'xp.AppliesTo'); _promotionEditable.LineItemLevel = true; productsCollapsed = false"
+                   (change)="handleUpdatePromo($event, 'xp.AppliesTo');"
                    [checked]="promoTypeCheck('SpecificSKUs')">
             <label class="form-check-label"
                    for="SpecificSKUs"
