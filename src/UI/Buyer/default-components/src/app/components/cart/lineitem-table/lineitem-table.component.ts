@@ -57,12 +57,10 @@ export class OCMLineitemTable implements OnInit {
   }
 
   groupLineItemsByKitID(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
-    console.log(this._groupByKits);
     if (!this._groupByKits) return [];
     const kitLineItems = lineItems.filter(li => li.xp.KitProductID);
     const liKitGroups = _groupBy(kitLineItems, li => li.xp.KitProductID);
-    const kitGroups = Object.values(liKitGroups);
-    return kitGroups;
+    return Object.values(liKitGroups);
   }
 
   groupLineItemsByShipFrom(lineItems: MarketplaceLineItem[]): MarketplaceLineItem[][] {
