@@ -30,16 +30,6 @@ body {
   box-sizing: inherit;
 }
 
-// Basic styles for links
-
-.icon-button--hover-reactive {
-  font-size: 18px;
-  :hover {
-    opacity: 0.5;
-  }
-}
-
-.link,
 .btn,
 a,
 button {

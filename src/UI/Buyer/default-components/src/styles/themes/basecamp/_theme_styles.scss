@@ -15,6 +15,7 @@ button {
   z-index: 1; // important for smooth transitioning gradients!
   position: relative;
   overflow: hidden;
+  border: none;
   &::before {
     content: "";
     position: absolute;
@@ -32,12 +33,15 @@ button {
     transform: translateX(0%);
   }
 }
-// background: linear-gradient(120deg, $indigo 0%, darken($purple, 15%) 40%, darken($indigo, 44%) 80%, $black 100%);
 
-
-.btn-primary.btn-sm {
-  font-weight: normal;
-  text-transform: none;
+// My apologies for the !important flag. Since `styles.scss` comes before `base.scss` in the cascade, 
+// we need to find a better way to make sure buttons are branded but also able to be overwritten when a scenario like this arises
+.btn,
+button {
+  font-family: 'Sequel 100 Wide 45', $font-family-base !important;
+  &.btn-sm {
+    font-size: .75rem;
+  }
 }
 
 .form-control {
@@ -56,25 +60,24 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: 'Sequel 100 Wide 45', $font-family-base;
+  letter-spacing: .0375rem;
   text-transform: uppercase;
   -webkit-text-stroke-width: 1px;
 }
 
 h1,
-h2,
-.h1,
-.h2 {
-  font-weight: 900;
-  letter-spacing: -.0375rem;
-  -webkit-text-stroke-width: 1.5px;
+.h1 {
+  font-family: 'Sequel 100 Black 105', $font-family-base;
+  letter-spacing: .125rem;
+  font-size: $h1-font-size;
 }
 
 // login + register page text color
 .headline-text {
-  font-weight: 900;
-  letter-spacing: -.0375rem;
+  font-family: 'Sequel 100 Black 105', $font-family-base;
+  letter-spacing: .125rem;
   color: $indigo;
-  -webkit-text-stroke: 1.5px currentColor;
   margin: 2rem 0;
 }
 
@@ -102,28 +105,31 @@ ocm-product-card {
   // DESIGN: There is a better way to do this, but I think this button looks better using their "Intense Blue" color.
   // but I don't want change it for every instance. Just overriding it in this spot.
   button.btn-outline-secondary {
-      color: $indigo;
-      border-color: $indigo;
-      &:hover, &:focus {
-        background-color: $indigo;
-        color: white;
-      }
+    color: $indigo;
+    border-color: $indigo;
+    &:hover,
+    &:focus {
+      background-color: $indigo;
+      color: white;
+    }
   }
 }
 
 .text-gradient {
   color: transparent;
-  background: linear-gradient(160deg, $indigo 0%, darken($purple, 5%) 100%,);
+  background: linear-gradient(160deg, $indigo 0%, darken($purple, 5%) 100%, );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-a,button,.btn {
+a,
+button,
+.btn {
   &.text-gradient {
-  &:hover {
-    background: $indigo;
-    text-decoration: underline;
-  }
+    &:hover {
+      background: $indigo;
+      text-decoration: underline;
+    }
   }
 }
