@@ -21,7 +21,7 @@
       <ul class="nav flex-column">
         <li *ngFor="let profileRoute of profileRoutes"
             class="nav-item side-nav-button mb-3 cursor-pointer">
-          <a class="link text-primary"
+          <a class="text-primary"
              (click)="context.router[profileRoute.routerCall]()">{{profileRoute.displayText}}</a>
         </li>
       </ul>
