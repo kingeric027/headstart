@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { groupBy as _groupBy } from 'lodash';
 import { ShopperContextService, LineItemGroupSupplier, OrderType } from 'marketplace';
-import { HeadStartSDK, MarketplaceLineItem, MarketplaceVariant, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, MarketplaceKitProduct, MarketplaceLineItem, MarketplaceVariant, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component';
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers';
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum';
@@ -16,11 +16,10 @@ import { ToastrService } from 'ngx-toastr';
 export class OCMLineitemTable implements OnInit {
   @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
     this._lineItems = lineItems;
-    this.initLineItems();
   }
   @Input() set groupByKits(bool: boolean) {
     this._groupByKits = bool;
-    
+    this.initLineItems();
   }
   @Input() readOnly: boolean;
   @Input() orderType: OrderType;
@@ -30,6 +29,7 @@ export class OCMLineitemTable implements OnInit {
   suppliers: LineItemGroupSupplier[];
   liGroupedByShipFrom: MarketplaceLineItem[][];
   liGroupedByKit: MarketplaceLineItem[][];
+  productsInKit: MarketplaceKitProduct[] = [];
   updatingLiIDs: string[] = [];
   _groupByKits: boolean;
   _lineItems = [];
