@@ -513,6 +513,7 @@ namespace Marketplace.Common.Services
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
+            var currencyString = order.xp.Currency.ToString();
             return new
             {
                 order.FromUser.FirstName,
@@ -536,7 +537,7 @@ namespace Marketplace.Common.Services
                 order.ShippingCost,
                 PromotionalDiscount = order.PromotionDiscount,
                 order.Total,
-                order.xp.Currency
+                Currency = currencyString
             };
         }
 
