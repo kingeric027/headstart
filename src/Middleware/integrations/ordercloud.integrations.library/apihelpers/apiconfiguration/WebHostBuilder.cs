@@ -15,6 +15,7 @@ namespace ordercloud.integrations.library
             WebHost.CreateDefaultBuilder(args)
                 .UseDefaultServiceProvider(options => options.ValidateScopes = false)
                 .UseStartup<TStartup>()
+                .UseIISIntegration()
 
                 .ConfigureServices((ctx, services) =>
                 {
@@ -30,6 +31,7 @@ namespace ordercloud.integrations.library
                     config.AddAzureAppConfiguration(appSettingsConnectionString);
                 })
                 .UseStartup<TStartup>()
+                .UseIISIntegration()
 
                 .ConfigureServices((ctx, services) =>
                 {
