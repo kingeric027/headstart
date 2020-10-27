@@ -109,7 +109,7 @@ export class PromotionService extends ResourceCrudService<Promotion> {
         if (safeXp?.Type === MarketplacePromoType.FixedAmount) { valueExpression = `item.Quantity * ${safeXp?.Value}` }
         break;
       default: 
-        if (safeXp?.Type === MarketplacePromoType.Percentage) { valueExpression = `${valueExpression} * ${safeXp.Value / 100}` }
+        if (safeXp?.Type === MarketplacePromoType.Percentage) { valueExpression = `items.total(Product.xp.PromotionEligible=\'true\') * ${safeXp.Value / 100}` }
         if (safeXp?.Type === MarketplacePromoType.FixedAmount) { valueExpression = `${valueExpression} - ${safeXp?.Value}` }
         break;
     };
