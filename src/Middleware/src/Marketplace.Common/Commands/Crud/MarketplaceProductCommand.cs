@@ -393,7 +393,9 @@ namespace Marketplace.Common.Commands.Crud
 			var matchingOption = currentOptions.Find(currentOption => currentOption.ID == requestOption.ID);
 			if (matchingOption == null) { return false; };
 			if (matchingOption.PriceMarkup != requestOption.PriceMarkup) { return true; };
-			// Add other keys when needed
+			if (matchingOption.IsOpenText != requestOption.IsOpenText) { return true; };
+			if (matchingOption.ListOrder != requestOption.ListOrder) { return true; };
+			if (matchingOption.PriceMarkupType != requestOption.PriceMarkupType) { return true; };
 
 			return false;
         }
