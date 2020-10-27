@@ -38,8 +38,6 @@ export class KitsEditComponent implements OnInit {
     @Input() readonly: boolean;
     @Input()
     filterConfig;
-    @Output()
-    updateResource = new EventEmitter<any>();
     isCreatingNew: boolean;
     isLoading = false;
     dataIsSaving = false;
@@ -48,7 +46,6 @@ export class KitsEditComponent implements OnInit {
     productsIncluded: any[] = [];
     productList: ListPage<SuperMarketplaceProduct>;
     productsToAdd: string[] = [];
-    newProductAssignments: ProductInKit[] = [];
     imageFiles: FileHandle[] = [];
     images: Asset[] = [];
     staticContentFiles: FileHandle[] = [];
@@ -214,7 +211,8 @@ export class KitsEditComponent implements OnInit {
     *********************************************/
 
     async handleCreateAssignment() {
-        const updatedAssignments = this.isCreatingNew ? [] : this.kitProductEditable.ProductAssignments.ProductsInKit;
+        const updatedAssignments = this.isCreatingNew && !this.productsIncluded.length ?
+            [] : this.kitProductEditable.ProductAssignments.ProductsInKit;
         const accessToken = await this.appAuthService.fetchToken().toPromise();
         await this.asyncForEach(this.productsToAdd, async (productID) => {
             const ocProduct = await HeadStartSDK.Products.Get(productID, accessToken);
