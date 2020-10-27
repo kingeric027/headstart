@@ -41,8 +41,8 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
 const appName: AppName = WAXING_THE_CITY;
-const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
-const localMiddlewareURL = 'https://localhost:44381';
+const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
+const localMiddlewareURL = 'https://localhost:44369';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -65,7 +65,7 @@ const devEnvironments: Record<string, Environment> = {
   WAXING_THE_CITY: {
     hostedApp: false,
     appname: 'Waxing The City',
-    clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+    clientID: '90E20A6D-F56B-4C0F-A3D3-F4476036032B',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
