@@ -104,10 +104,13 @@ export class OrderShipmentsComponent implements OnChanges {
       Service: new FormControl(''),
       Comment: new FormControl(''),
       Quantities: new FormGroup({}),
+      LineItemComments: new FormGroup({})
     });
-    const group = this.shipmentForm.get('Quantities') as FormGroup;
+    const QuantityGroup = this.shipmentForm.get('Quantities') as FormGroup;
+    const LineItemComments = this.shipmentForm.get('LineItemComments') as FormGroup;
     this.lineItems.forEach(item => {
-      group.addControl(item.ID, new FormControl(0));
+      QuantityGroup.addControl(item.ID, new FormControl(0));
+      LineItemComments.addControl(item.ID, new FormControl(0));
     });
   }
 
@@ -285,7 +288,7 @@ export class OrderShipmentsComponent implements OnChanges {
       },
       ShipmentItems: this.lineItems
         .map(li => {
-          return { LineItemID: li.ID, OrderID: this._order?.ID, QuantityShipped: shipment.Quantities[li.ID] };
+          return { LineItemID: li.ID, OrderID: this._order?.ID, QuantityShipped: shipment.Quantities[li.ID], Comments: shipment.LineItemComments[li.ID] };
         })
         .filter(li => li !== undefined),
     };
