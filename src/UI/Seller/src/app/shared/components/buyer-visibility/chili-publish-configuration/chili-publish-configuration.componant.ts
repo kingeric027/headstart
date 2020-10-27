@@ -8,7 +8,7 @@ import {
 } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceProduct, ChiliConfig, ChiliSpec, ChiliSpecXp, ChiliSpecUI, ChiliTemplate, ChiliSpecOption, ChiliSpecOptionXp } from '@ordercloud/headstart-sdk';
+import { MarketplaceProduct, ChiliConfig, ChiliSpec, ChiliSpecXp, ChiliSpecUI, ChiliTemplate, ChiliSpecOption, ChiliSpecOptionXp, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { TecraDocument, TecraSpec } from '../../../../shared/services/middleware-api/middleware-chili.service';
 import ChiliSpecOptions from '@ordercloud/headstart-sdk/dist/api/ChiliSpecOptions';
 
@@ -97,7 +97,7 @@ export class ChiliPublishConfiguration implements OnInit {
         // TODO - Update to only get configs assosociated to this buyer and product
         this.showChiliConfigs = false;
         this.chiliConfigs = [];
-        const configs = await this.productService.listChiliConfigs();
+        const configs = await HeadStartSDK.ChiliConfigs.List({ filters: { SupplierProductID: this._productID }, pageSize: 100 })
         if (configs.Items.length > 0) {
             configs.Items.forEach(item => {
                 if (item.BuyerID === this._buyerID && item.SupplierProductID === this._productID) {
@@ -228,7 +228,7 @@ export class ChiliPublishConfiguration implements OnInit {
     async deleteChiliSpecOption(option: ChiliSpecOption, spec: ChiliSpec): Promise<void> {
         await this.productService.deleteChiliSpecOption(spec.ID, option.ID);
         this.chiliTemplate = await this.productService.getChiliTemplate(this.chiliTemplateID);
-        
+
     }
     async saveNewChiliSpecOption(spec: ChiliSpec): Promise<void> {
         const newOption: ChiliSpecOption = {
