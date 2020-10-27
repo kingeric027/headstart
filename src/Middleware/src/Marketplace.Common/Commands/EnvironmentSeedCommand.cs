@@ -514,38 +514,6 @@ namespace Marketplace.Common.Commands
 		{
 			var DefaultWebhooks = new List<Webhook>() {
 			new Webhook() {
-			  Name = "Order Approved",
-			  Description = "Triggers email letting user know the order was approved.",
-			  Url = "/orderapproved",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/approve", Verb = "POST" }
-			  },
-			  ApiClientIDs = new [] { buyerUiApiClientID }
-			},
-			new Webhook() {
-			  Name = "Order Declined",
-			  Description = "Triggers email letting user know the order was declined.",
-			  Url = "/orderdeclined",
-			  ElevatedRoles =
-				new List<ApiRole>
-				{
-					ApiRole.FullAccess
-				},
-			  BeforeProcessRequest = false,
-			  WebhookRoutes = new List<WebhookRoute>
-			  {
-				new WebhookRoute() { Route = "v1/orders/{direction}/{orderID}/decline", Verb = "POST" }
-			  },
-			  ApiClientIDs = new [] { buyerUiApiClientID }
-			},
-			new Webhook() {
 			  Name = "Order Shipped",
 			  Description = "Triggers email letting user know the order was shipped.",
 			  Url = "/ordershipped",
