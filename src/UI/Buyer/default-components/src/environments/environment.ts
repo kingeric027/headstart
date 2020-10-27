@@ -60,7 +60,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: afTheme,
-    instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   WAXING_THE_CITY: {
     hostedApp: false,
@@ -75,7 +75,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: wtcTheme,
-    instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   BASECAMP_FITNESS: {
     hostedApp: false,
@@ -90,7 +90,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bcfTheme,
-    instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   BAR_METHOD: {
     hostedApp: false,
@@ -105,7 +105,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bmTheme,
-    instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   HEADSTART_DEMO: {
     hostedApp: false,
