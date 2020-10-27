@@ -10,13 +10,14 @@ using System.Collections.Generic;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
 using Misc = Marketplace.Common.Models.Misc;
+using ordercloud.integrations.cms;
 
 namespace Marketplace.Common.Commands
 {
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
-        Task<Misc.UploadShipmentResponse> UploadShipments(IFormFile file);
+        Task<Misc.UploadShipmentResponse> UploadShipments(AssetUpload file);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -85,7 +86,7 @@ namespace Marketplace.Common.Commands
             return relatedBuyerOrder.FromCompanyID;
         }
 
-        public async Task<Misc.UploadShipmentResponse> UploadShipments(IFormFile file)
+        public async Task<Misc.UploadShipmentResponse> UploadShipments(AssetUpload file)
         {
             Misc.UploadShipmentResponse response;
             List<Misc.Shipment> shipmentList;
@@ -109,7 +110,7 @@ namespace Marketplace.Common.Commands
             return response;
         }
 
-        private Task<List<Misc.Shipment>> GetShipmentListFromFile(IFormFile file)
+        private Task<List<Misc.Shipment>> GetShipmentListFromFile(AssetUpload file)
         {
             throw new NotImplementedException();
         }
