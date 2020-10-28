@@ -4,7 +4,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Models;
-using Newtonsoft.Json;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
@@ -292,6 +291,7 @@ namespace Marketplace.Common.Commands.Crud
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Make assignments for the new specs
 			await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = s.ID }, accessToken: user.AccessToken));
+			HandleSpecOptionChanges(requestSpecs, existingSpecs, user);
 			// Check if Variants differ
 			var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
 			var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
@@ -356,7 +356,51 @@ namespace Marketplace.Common.Commands.Crud
 			return false;
 		}
 
-		public async Task Delete(string id, VerifiedUserContext user)
+		private async void HandleSpecOptionChanges(IList<Spec> requestSpecs, IList<Spec> existingSpecs, VerifiedUserContext user)
+        {
+			var requestSpecOptions = new Dictionary<string, List<SpecOption>>();
+			var existingSpecOptions = new List<SpecOption>();
+			foreach (Spec requestSpec in requestSpecs)
+			{
+				List<SpecOption> specOpts = new List<SpecOption>();
+				foreach (SpecOption requestSpecOption in requestSpec.Options)
+				{
+					specOpts.Add(requestSpecOption);
+				}
+				requestSpecOptions.Add(requestSpec.ID, specOpts);
+			}
+			foreach (Spec existingSpec in existingSpecs)
+            {
+				foreach (SpecOption existingSpecOption in existingSpec.Options)
+                {
+					existingSpecOptions.Add(existingSpecOption);
+				}
+            }
+			foreach (var spec in requestSpecOptions)
+			{
+				IList<SpecOption> changedSpecOptions = ChangedSpecOptions(spec.Value, existingSpecOptions);
+				await Throttler.RunAsync(changedSpecOptions, 100, 5, option => _oc.Specs.SaveOptionAsync(spec.Key, option.ID, option, user.AccessToken));
+			}
+		}
+
+        private IList<SpecOption> ChangedSpecOptions(List<SpecOption> requestOptions, List<SpecOption> existingOptions)
+        {
+            return requestOptions.FindAll(requestOption => OptionHasChanges(requestOption, existingOptions));
+        }
+
+        private bool OptionHasChanges(SpecOption requestOption, List<SpecOption> currentOptions)
+        {
+			var matchingOption = currentOptions.Find(currentOption => currentOption.ID == requestOption.ID);
+			if (matchingOption == null) { return false; };
+			if (matchingOption.PriceMarkup != requestOption.PriceMarkup) { return true; };
+			if (matchingOption.IsOpenText != requestOption.IsOpenText) { return true; };
+			if (matchingOption.ListOrder != requestOption.ListOrder) { return true; };
+			if (matchingOption.PriceMarkupType != requestOption.PriceMarkupType) { return true; };
+
+			return false;
+        }
+
+        public async Task Delete(string id, VerifiedUserContext user)
 		{
 			var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
 			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
