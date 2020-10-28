@@ -9,6 +9,8 @@ using System.Dynamic;
 using System;
 using Marketplace.Common.Commands.Crud;
 using ordercloud.integrations.library.Cosmos;
+using System.Collections.Generic;
+using Marketplace.Common.Extensions;
 
 namespace Marketplace.Common.Commands
 {
@@ -53,14 +55,20 @@ namespace Marketplace.Common.Commands
             {
                 //Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
                 //All suppliers have integration clients with a default user of dev_{supplierID}.
-                var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
-                var selectedSupplierClient = supplierClient.Items[0];
+                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
+
+                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}, ProductID: {productID}"); }
+
+                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+
+                if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
+
                 var configToUse = new OrderCloudClientConfig
                 {
                     ApiUrl = user.ApiUrl,
                     AuthUrl = user.AuthUrl,
-                    ClientId = selectedSupplierClient.ID,
-                    ClientSecret = selectedSupplierClient.ClientSecret,
+                    ClientId = supplierClient.ID,
+                    ClientSecret = supplierClient.ClientSecret,
                     GrantType = GrantType.ClientCredentials,
                     Roles = new[]
                                {
