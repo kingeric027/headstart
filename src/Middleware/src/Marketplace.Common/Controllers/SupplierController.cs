@@ -17,9 +17,10 @@ namespace Marketplace.Common.Controllers
 
 		private readonly IMarketplaceSupplierCommand _command;
         private readonly IOrderCloudClient _oc;
-        public SupplierController(IMarketplaceSupplierCommand command, AppSettings settings) : base(settings)
+        public SupplierController(IMarketplaceSupplierCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
         {
             _command = command;
+			_oc = oc;
         }
 
 		[DocName("GET MarketplaceSupplier")]
