@@ -8,7 +8,7 @@ import {
   ValidateStrongPassword,
   ValidateFieldMatches,
 } from '../../../validators/validators';
-import { ShopperContextService } from 'marketplace';
+import { AppConfig, ShopperContextService } from 'marketplace';
 
 @Component({
   templateUrl: './register.component.html',
@@ -18,7 +18,7 @@ export class OCMRegister implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService) {}
+  constructor(private context: ShopperContextService, public appConfig: AppConfig) {}
 
   // TODO: validation isn't working
   ngOnInit(): void {

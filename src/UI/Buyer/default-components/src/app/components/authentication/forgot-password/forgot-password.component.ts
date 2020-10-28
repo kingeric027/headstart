@@ -1,7 +1,7 @@
 // angular
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ShopperContextService } from 'marketplace';
+import { ShopperContextService, AppConfig } from 'marketplace';
 
 @Component({
   templateUrl: './forgot-password.component.html',
@@ -11,7 +11,7 @@ export class OCMForgotPassword implements OnInit {
   form: FormGroup;
   appName: string;
 
-  constructor(private context: ShopperContextService) { }
+  constructor(private context: ShopperContextService, public appConfig: AppConfig) {}
 
   ngOnInit(): void {
     this.appName = this.context.appSettings.appname;
@@ -23,4 +23,3 @@ export class OCMForgotPassword implements OnInit {
     await this.context.authentication.forgotPasssword(email);
   }
 }
-
