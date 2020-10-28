@@ -16,7 +16,7 @@
       (keyup.enter)="search()"
     />
     <div *ngIf="showClear()" class="input-group-append">
-      <button (click)="clear()" class="btn btn-outline-danger border-rounded-right">
+      <button (click)="clear()" type="button" class="btn btn-outline-danger border-rounded-right">
         <fa-icon [icon]="faTimes">
           <span class="sr-only">Button To Clear Current Search</span>
         </fa-icon>
