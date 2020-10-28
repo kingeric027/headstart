@@ -1,16 +1,16 @@
 <div class="card">
-  <div class="card-header text-center"
-       translate>CART.MINI_CART.MY_CART</div>
+  <h5 class="card-header text-center bg-white"
+      translate>CART.MINI_CART.MY_CART</h5>
   <div class="list-group list-group-flush">
     <div class="list-group-item"
          *ngFor="let li of lineItems | slice:0:maxLines">
-      <a class="link text-primary"
+      <a href="javascript:;"
          (click)="toProductDetails(li.Product.ID)">{{ li | productNameWithSpecs }}</a>
       <div class="d-flex justify-content-between">
-        <div><span class="text-muted"
-                translate>CART.MINI_CART.QTY</span>: {{ li.Quantity | number}}</div>
-        <div><span class="text-muted"
-                translate>CART.MINI_CART.UNIT_PRICE</span>: {{ li.UnitPrice || 0 | currency: _orderCurrency}}</div>
+        <small><span class="text-muted"
+                translate>CART.MINI_CART.QTY</span>: {{ li.Quantity | number}}</small>
+        <small><span class="text-muted"
+                translate>CART.MINI_CART.UNIT_PRICE</span>: {{ li.UnitPrice || 0 | currency: _orderCurrency}}</small>
       </div>
     </div>
     <h4 *ngIf="lineItems.length > maxLines"
@@ -18,26 +18,23 @@
       <fa-icon [icon]="faEllipsisH"></fa-icon>
     </h4>
     <div class="list-group-item">
-      <div class="d-flex justify-content-between">
-        <div translate>CART.MINI_CART.SUBTOTAL</div>
-        <div>{{ order?.Subtotal | currency: _orderCurrency}}</div>
+      <div class="d-flex justify-content-between font-weight-bold">
+        <small translate>CART.MINI_CART.SUBTOTAL</small>
+        <small>{{ order?.Subtotal | currency: _orderCurrency}}</small>
       </div>
     </div>
   </div>
   <div class="card-body"
        *ngIf="lineItems.length === 0"
-       translate>CART.MINI_CART.CART_IS_EMPTY</div>
+       translate>CART.MINI_CART.CART_IS_EMPTY
+  </div>
   <div *ngIf="lineItems.length > 0"
-       class="d-flex justify-content-between card-footer">
-    <div>
-      <button class="btn btn-sm btn-primary"
-              (click)="toFullCart()"
-              translate>CART.MINI_CART.EDIT_CART</button>
-    </div>
-    <div>
-      <button class="btn btn-sm btn-primary"
-              (click)="toCheckout()"
-              translate>CART.MINI_CART.CHECKOUT</button>
-    </div>
+       class="d-flex justify-content-between card-footer bg-white">
+    <button class="btn btn-sm btn-link"
+            (click)="toFullCart()"
+            translate>CART.MINI_CART.EDIT_CART</button>
+    <button class="btn btn-sm btn-primary"
+            (click)="toCheckout()"
+            translate>CART.MINI_CART.CHECKOUT</button>
   </div>
 </div>
