@@ -29,7 +29,6 @@ export class NotificationsComponent extends AccountContent {
   }
   faExclamationCircle = faExclamationCircle;
   faTimesCircle = faTimesCircle;
-  notificationsToReview: JDocument[];
 
   toggleOrderEmails(value: boolean): void {
     //TO-DO - will need to ultimately refactor this to area to handle additional notification types more cleanly

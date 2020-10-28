@@ -10,7 +10,7 @@
       <p class="mb-0"
          *ngIf="variants"><span translate>ADMIN.PRODUCT_EDIT.THIS_PRODUCT_HAS </span>
         <span [ngClass]="{'text-danger': !variantsValid}"
-              class="font-weight-bold">{{variants?.length}}</span>
+              class="font-weight-bold">{{variants?.getValue()?.length}}</span>
         <span translate> ADMIN.PRODUCT_EDIT.VARIANTS_LIMIT_100</span></p>
       <p *ngIf="!variantsValid"
          class="text-danger">
@@ -43,7 +43,7 @@
           <input type="checkbox"
                  [checked]="shouldDefinesVariantBeChecked()"
                  (change)="definesVariant = !definesVariant"
-                 [disabled]="!variantsValid || variants.length === 100"
+                 [disabled]="!variantsValid || variants?.getValue()?.length === 100"
                  id="DefinesVariant">
           <span class="checkmark"></span>
         </label>
@@ -183,7 +183,7 @@
       </div>
     </div>
     <div class="col-md-12">
-      <div *ngIf="variants?.length > 0">
+      <div *ngIf="variants?.getValue()?.length > 0">
         <h6 translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_HAVE</h6>
         <perfect-scrollbar class="product-table"
                            style="width: 100%; max-height: 600px;">
@@ -193,7 +193,7 @@
                 <th scope="col"
                     translate>ADMIN.PRODUCT_EDIT.DETAILS</th>
                 <th *ngFor="let spec of specsWithVariations; let i = index"
-                    scope="col">{{variants[0]?.xp?.SpecValues[i]?.SpecName}}</th>
+                    scope="col">{{variants.getValue()[0]?.xp?.SpecValues[i]?.SpecName}}</th>
                 <th scope="col"
                     translate>ADMIN.PRODUCT_EDIT.ACTIVE</th>
                 <th scope="col"
@@ -206,7 +206,7 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let variant of variants; let i = index">
+              <ng-container *ngFor="let variant of variants | async; let i = index">
                 <tr [ngClass]="{'selected-variant': variant === variantInSelection}">
                   <td class="d-flex">
                     <div class="icon-button ripple"
@@ -278,7 +278,7 @@
                                id="shipWidth"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipWidth"
-                               (focusout)="variantShippingDimensionUpdate($event, 'ShipWidth')"
+                               (focusout)="variantShippingDimensionUpdate($event, 'ShipWidth', i)"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.WIDTH' | translate}}">
                       </div>
                       <div class="form-group col-3">
@@ -288,7 +288,7 @@
                                id="shipHeight"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipHeight"
-                               (focusout)="variantShippingDimensionUpdate($event, 'ShipHeight')"
+                               (focusout)="variantShippingDimensionUpdate($event, 'ShipHeight', i)"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.HEIGHT' | translate}}">
                       </div>
                       <div class="form-group col-3">
@@ -298,7 +298,7 @@
                                id="shipLength"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipLength"
-                               (focusout)="variantShippingDimensionUpdate($event, 'ShipLength')"
+                               (focusout)="variantShippingDimensionUpdate($event, 'ShipLength', i)"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.LENGTH' | translate}}">
                       </div>
                       <div class="form-group col-3">
@@ -308,7 +308,7 @@
                                id="shipWeight"
                                [disabled]="readonly"
                                [value]="variantInSelection?.ShipWeight"
-                               (focusout)="variantShippingDimensionUpdate($event, 'ShipWeight')"
+                               (focusout)="variantShippingDimensionUpdate($event, 'ShipWeight', i)"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.WEIGHT' | translate}}">
                       </div>
                     </div>

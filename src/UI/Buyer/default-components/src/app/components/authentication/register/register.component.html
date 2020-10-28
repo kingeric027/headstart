@@ -1,14 +1,18 @@
 <div class="text-center mt-3">
-  <p translate>AUTHENTICATION.REGISTER.EXISTING_ACC<button type="button"
+  <p translate>AUTHENTICATION.REGISTER.EXISTING_ACC
+    <button type="button"
             class="btn btn-link"
             routerLink="/login"
             translate>COMMON.LOGIN</button></p>
-  <h1 class="display-4">{{appName}}</h1>
+  <img class="img-fluid"
+       width="300px"
+       alt="{{appName}}"
+       [src]="appConfig.theme.logoSrc" />
 </div>
 <div class="row">
   <div class="col-lg-6 mx-auto"
        style="max-width:400px">
-    <h3 class="text-center headline-text mb-3"
+    <h3 class="text-center text-gradient headline-text"
         translate>AUTHENTICATION.REGISTER.SIGN_UP</h3>
     <form (ngSubmit)="onSubmit()"
           novalidate

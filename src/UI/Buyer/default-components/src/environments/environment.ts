@@ -60,7 +60,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: afTheme,
-    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   WAXING_THE_CITY: {
     hostedApp: false,
@@ -75,7 +75,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: wtcTheme,
-    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   BASECAMP_FITNESS: {
     hostedApp: false,
@@ -90,7 +90,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bcfTheme,
-    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   BAR_METHOD: {
     hostedApp: false,
@@ -105,7 +105,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Staging,
     theme: bmTheme,
-    instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
   },
   HEADSTART_DEMO: {
     hostedApp: false,
@@ -120,7 +120,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: headstartdemoTheme,
-    instrumentationKey: ''
+    instrumentationKey: '731925bd-018c-447e-8ba5-06b432d708c8',
   },
   FASTSIGNS: {
     hostedApp: false,
@@ -135,7 +135,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: fastsignsTheme,
-    instrumentationKey: ''
+    instrumentationKey: 'e68a2c8b-3684-4ba9-bbca-5cc9795afd65',
   },
   GO2PARTNERS: {
     hostedApp: false,
@@ -150,7 +150,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: go2partnersTheme,
-    instrumentationKey: ''
+    instrumentationKey: '38f23bfa-b9af-4670-8441-4376ced20620',
   },
   BRANDWEAR_DESIGNS: {
     hostedApp: false,
@@ -165,7 +165,7 @@ const devEnvironments: Record<string, Environment> = {
     ssoLink: null,
     ordercloudEnv: OrdercloudEnv.Sandbox,
     theme: brandweardesignsTheme,
-    instrumentationKey: ''
+    instrumentationKey: '0b1879d3-d708-49cb-bd48-7363be74a837',
   }
 };
 export const environment: Environment = devEnvironments[appName];

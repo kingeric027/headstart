@@ -1,21 +1,24 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { get as _get } from 'lodash';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { faTimesCircle, faCalendar, faExclamationCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
-import { Promotion, OcPromotionService, OcSupplierService } from '@ordercloud/angular-sdk';
+import { Promotion, OcPromotionService, OcSupplierService, Product, ListPage } from '@ordercloud/angular-sdk';
 import { PromotionService } from '@app-seller/promotions/promotion.service';
-import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility } from '@app-seller/shared/models/marketplace-promo.interface';
+import { PromotionXp, MarketplacePromoType, MarketplacePromoEligibility, MinRequirementType } from '@app-seller/shared/models/marketplace-promo.interface';
 import * as moment from 'moment';
 import { Router } from '@angular/router';
-import { MarketplaceSupplier } from '@ordercloud/headstart-sdk';
+import { ListArgs, MarketplaceSupplier } from '@ordercloud/headstart-sdk';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
+import { Products, Meta } from 'ordercloud-javascript-sdk';
+import { ToastrService } from 'ngx-toastr';
+import { BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'app-promotion-edit',
   templateUrl: './promotion-edit.component.html',
   styleUrls: ['./promotion-edit.component.scss'],
 })
-export class PromotionEditComponent implements OnInit {
+export class PromotionEditComponent implements OnInit, OnChanges {
   @ViewChild('popover', { static: false })
   public popover: NgbPopover;
   @Input()
@@ -35,6 +38,8 @@ export class PromotionEditComponent implements OnInit {
   @Output()
   updateResource = new EventEmitter<any>();
   suppliers: MarketplaceSupplier[];
+  products = new BehaviorSubject<Product[]>([]);
+  productMeta: Meta;
   selectedSupplier: MarketplaceSupplier;
   resourceForm: FormGroup;
   _promotionEditable: Promotion<PromotionXp>;
@@ -48,17 +53,27 @@ export class PromotionEditComponent implements OnInit {
   hasNotBegun = false;
   dataIsSaving = false;
   isCreatingNew: boolean;
+  searchTerm = '';
   faTimesCircle = faTimesCircle;
   faExclamationCircle = faExclamationCircle;
   faQuestionCircle = faQuestionCircle;
   faCalendar = faCalendar;
-  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService) {}
+  productsCollapsed = true;
+  currentDateTime: string;
+  constructor(public promotionService: PromotionService, private ocPromotionService: OcPromotionService, private ocSupplierService: OcSupplierService, private router: Router, private translate: TranslateService, private toastrService: ToastrService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.isCreatingNew = this.promotionService.checkIfCreatingNew();
+    this.listResources();
+  }
+
+  ngOnChanges(): void {
+    this.productsCollapsed = this._promotionEditable?.xp?.AppliesTo !== MarketplacePromoEligibility.SpecificSKUs;
+    this.currentDateTime = moment().format('YYYY-MM-DD[T]hh:mm');
   }
 
   refreshPromoData(promo: Promotion<PromotionXp>): void {
+    this.productsCollapsed = promo?.xp?.AppliesTo !== MarketplacePromoEligibility.SpecificSKUs;
     const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm');
     this.isExpired = promo.ExpirationDate ? (Date.parse(promo.ExpirationDate) < Date.parse(now)) : false;
     this.hasNotBegun = Date.parse(promo.StartDate) > Date.parse(now);
@@ -87,8 +102,84 @@ export class PromotionEditComponent implements OnInit {
   async selectSupplier(supplierID: string): Promise<void> {
     const s = await this.ocSupplierService.Get(supplierID).toPromise();
     this.selectedSupplier = s;
-    if (this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier') this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
+    if (this._promotionEditable?.xp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier) {
+      this.handleUpdatePromo({target: { value: s.ID }}, 'xp.Supplier');
+    }
   }
+
+  searchedResources(searchText: any): void {
+    this.listResources(1, searchText);
+    this.searchTerm = searchText;
+  }
+
+  async listResources(pageNumber = 1, searchText = ''): Promise<void> {
+    const options: ListArgs = {
+      page: pageNumber,
+      search: searchText,
+      sortBy: ['Name'],
+      pageSize: 25,
+      filters: {},
+    };
+    const resourceResponse = await Products.List(options);
+    if (pageNumber === 1) {
+      this.setNewResources(resourceResponse);
+    } else {
+      this.addResources(resourceResponse);
+    }
+  }
+
+  setNewResources(resourceResponse: ListPage<Product>): void {
+    this.productMeta = resourceResponse?.Meta;
+    this.products.next(resourceResponse?.Items);
+  }
+
+  addResources(resourceResponse: ListPage<Product>): void {
+    this.products.next([...this.products.value, ...resourceResponse?.Items]);
+    this.productMeta = resourceResponse?.Meta;
+  }
+
+  handleScrollEnd(event: any): void {
+    // This event check prevents the scroll-end event from firing when dropdown is closed
+    // It limits the action within the if block to only fire when you truly hit the scroll-end
+    if (event.target.classList.value.includes('active')) {
+      const totalPages = this.productMeta?.TotalPages;
+      const nextPageNumber = this.productMeta?.Page + 1;
+      if (totalPages >= nextPageNumber) { 
+        this.listResources(nextPageNumber, this.searchTerm).then(() => this.cdr.detectChanges())
+      };
+    }
+  }
+
+  addSKU(sku: string): void {
+    if (this._promotionEditable?.xp?.SKUs.includes(sku)) {
+      this.toastrService.warning('You have already selected this product')
+    } else {
+      const newSKUs = [...this._promotionEditable?.xp?.SKUs, sku];
+      this.handleUpdatePromo({target: {value: newSKUs}}, 'xp.SKUs');
+    }
+  }
+
+  removeSku(sku: string): void {
+    const modifiedSkus = this._promotionEditable?.xp?.SKUs?.filter(s => s !== sku);
+    this.handleUpdatePromo({target: {value: modifiedSkus}}, 'xp.SKUs');
+  }
+
+  alreadySelected(sku: string): boolean {
+    return this._promotionEditable?.xp?.SKUs?.includes(sku);
+  }
+
+  getSKUsBtnPlaceholderValue(): string {
+    let placeholder = '';
+    const path = this._promotionEditable?.xp?.SKUs;
+    if (path?.length === 1) {
+      placeholder = path?.[0];
+    } else if (path?.length > 1) {
+      placeholder = `${path?.[0]} +${path?.length - 1} more`;
+    } else {
+      placeholder = 'Choose a product'
+    }
+    return placeholder;
+  };
 
   createPromotionForm(promotion: Promotion): void {
     this.resourceForm = new FormGroup({
@@ -119,6 +210,12 @@ export class PromotionEditComponent implements OnInit {
   }
 
   handleUpdatePromo(event: any, field: string, typeOfValue?: string): void {
+    if (field === 'xp.AppliesTo' && event?.target?.value === MarketplacePromoEligibility.SpecificSupplier) {
+      this.updatePromoResource({field: 'LineItemLevel', value: true })
+    } else if (field === 'xp.AppliesTo' && event?.target?.value === MarketplacePromoEligibility.SpecificSKUs) {
+      this.updatePromoResource({field: 'LineItemLevel', value: true });
+      this.productsCollapsed = false;
+    }
     const promoUpdate = {
       field,
       value:
@@ -132,8 +229,8 @@ export class PromotionEditComponent implements OnInit {
     const resourceToUpdate = this._promotionEditable || this.promotionService.emptyResource;
     this._promotionEditable = this.promotionService.getUpdatedEditableResource(promoUpdate, resourceToUpdate);
     this.areChanges = this.promotionService.checkForChanges(this._promotionEditable, this._promotionStatic);
-    this.buildValueExpression();
-    this.buildEligibleExpression();
+    this._promotionEditable.ValueExpression = this.promotionService.buildValueExpression(this._promotionEditable?.xp, this.selectedSupplier);
+    this._promotionEditable.EligibleExpression = this.promotionService.buildEligibleExpression(this._promotionEditable?.xp, this.selectedSupplier);
   }
 
   promoTypeCheck(type: MarketplacePromoType): boolean {
@@ -145,15 +242,39 @@ export class PromotionEditComponent implements OnInit {
   }
 
   getValueDisplay(): string {
-    const promo = this._promotionEditable;
-    let valueString = promo?.xp?.AppliesTo === 'SpecificSupplier' ? `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}` : this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
-    if (promo?.xp?.Type === 'FixedAmount') valueString = `$${promo?.xp?.Value} ${valueString}`;
-    if (promo?.xp?.Type === 'Percentage') valueString = `${promo?.xp?.Value}% ${valueString}`;
-    if (promo?.xp?.Type === 'FreeShipping') valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
-    if (promo?.xp?.MinReq?.Type === 'MinPurchase' && promo?.xp?.MinReq?.Int) valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${promo?.xp?.MinReq?.Int}`;
-    if (promo?.xp?.MinReq?.Type === 'MinItemQty' && promo?.xp?.MinReq?.Int) `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`
+    const safeXp = this._promotionEditable?.xp;
+    let valueString = '';
+    switch(safeXp?.AppliesTo) {
+      case MarketplacePromoEligibility.SpecificSupplier:
+        valueString = `${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE')} ${this.selectedSupplier?.Name} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER')}`
+        break;
+      case MarketplacePromoEligibility.SpecificSKUs:
+        valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_SELECT_PRODUCTS');
+        break;
+      default: valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE_ORDER');
+    }
+    valueString = this.arrangeValueString(safeXp, valueString);
     // Update `promotion.Description` with this value string
-    this.handleUpdatePromo({target: {value: valueString}}, 'Description');
+    this.handleUpdatePromo({target: {value: valueString.trim()}}, 'Description');
+    return valueString.trim();
+  }
+
+  arrangeValueString(safeXp: PromotionXp, valueString: string): string {
+    if (safeXp?.Type === MarketplacePromoType.FixedAmount) {
+      valueString = `$${safeXp?.Value} ${valueString}`;
+    }
+    if (safeXp?.Type === MarketplacePromoType.Percentage) {
+      valueString = `${safeXp?.Value}% ${valueString}`;
+    }
+    if (safeXp?.Type === MarketplacePromoType.FreeShipping) {
+      valueString = this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER');
+    }
+    if (safeXp?.MinReq?.Type === MinRequirementType.MinPurchase && safeXp?.MinReq?.Int) {
+      valueString = `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} $${safeXp?.MinReq?.Int}`;
+    }
+    if (safeXp?.MinReq?.Type === MinRequirementType.MinItemQty && safeXp?.MinReq?.Int) {
+      `${valueString} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.OVER')} ${this._promotionEditable?.xp?.MinReq?.Int} ${this.translate.instant('ADMIN.PROMOTIONS.DISPLAY.VALUE.ITEMS')}`;
+    }
     return valueString;
   }
 
@@ -184,7 +305,7 @@ export class PromotionEditComponent implements OnInit {
   }
 
   getMinDate(): string {
-    return moment().format('YYYY-MM-DD[T]hh:mm')
+    return this.currentDateTime;
   }
 
   toggleHasRedemptionLimit(): void {
@@ -207,10 +328,6 @@ export class PromotionEditComponent implements OnInit {
     if (!this.capShipCost) this._promotionEditable.xp.MaxShipCost = null;
   }
 
-  toggleApplyToSpecificSupplier(): void {
-    (this._promotionEditable as any).LineItemLevel = !(this._promotionEditable as any).LineItemLevel;
-  }
-
   getSaveBtnText(): string {
     return this.promotionService.getSaveBtnText(this.dataIsSaving, this.isCreatingNew)
   }
@@ -222,49 +339,6 @@ export class PromotionEditComponent implements OnInit {
 
   handleDiscardChanges(): void {
     this.refreshPromoData(this._promotionStatic)
-  }
-
-  buildValueExpression(): void {
-    let valueExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 'item.LineSubtotal' : 'Order.Subtotal';
-    switch(this._promotionEditable.xp?.Type) {
-      case 'FixedAmount':
-        valueExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
-        `${this._promotionEditable.xp?.Value} / items.count(SupplierID = '${this.selectedSupplier?.ID}')` 
-          : 
-        `${this._promotionEditable.xp?.Value}`
-        break;
-      case 'Percentage':
-        valueExpression = `${valueExpression} * ${(this._promotionEditable.xp?.Value / 100)}`
-        break;
-      case 'FreeShipping':
-        valueExpression = 'Order.ShippingCost';
-        break;
-    }
-    this._promotionEditable.ValueExpression = valueExpression;
-  }
-
-  buildEligibleExpression(): void {
-    let eligibleExpression: string = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? `item.SupplierID = '${this.selectedSupplier?.ID}'` : 'true';
-    switch (this._promotionEditable.xp?.MinReq?.Type) {
-      case 'MinPurchase':
-        eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
-        `${eligibleExpression} and items.total(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
-          :
-        `Order.Subtotal >= ${this._promotionEditable.xp?.MinReq?.Int}`;
-        break;
-      case 'MinItemQty':
-        eligibleExpression = this._promotionEditable?.xp?.AppliesTo === 'SpecificSupplier' ? 
-        `${eligibleExpression} and items.Quantity(SupplierID = '${this.selectedSupplier?.ID}') >= ${this._promotionEditable.xp?.MinReq?.Int}`
-          :
-        `Order.LineItemCount >= ${this._promotionEditable.xp?.MinReq?.Int}`
-        break;
-    }
-    if (this._promotionEditable.xp?.MaxShipCost) {
-      this._promotionEditable.xp?.MinReq?.Type ? eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
-      :
-      eligibleExpression = `Order.ShippingCost < ${this._promotionEditable.xp?.MaxShipCost}`
-    }
-    this._promotionEditable.EligibleExpression = eligibleExpression;
   }
 
   async handleSave(): Promise<void> {
