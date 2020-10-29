@@ -11,6 +11,7 @@ import { SelectedCreditCard } from '../../checkout/checkout-payment/checkout-pay
 export class OCMPaymentCreditCard implements OnInit {
   @Input() cards: ListPage<BuyerCreditCard>;
   @Input() termsAccepted: boolean;
+  @Input() paymentError: string;
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   showNewCCForm = false;
 
