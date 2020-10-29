@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 using Flurl.Http;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -58,8 +59,27 @@ namespace ordercloud.integrations.cardconnect
 
             // Each payment processor has a unique set of response codes. Generally, a processor response code(respcode) beginning with "00" or "000" is a successful authorization request; any other code is a decline.  
             // https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
-            if (!PassedAVSCheck(attempt))
+            if(attempt.respcode == "101")
             {
+                throw new OrderCloudIntegrationException(new ApiError()
+                {
+                    Data = attempt,
+                    Message = $"Card has expired",
+                    ErrorCode = attempt.respcode
+                });
+            }
+            else if(attempt.respcode == "500")
+            {
+                throw new OrderCloudIntegrationException(new ApiError()
+                {
+                    Data = attempt,
+                    Message = $"Card was declined",
+                    ErrorCode = attempt.respcode
+                });
+            }
+            else if (!PassedAVSCheck(attempt))
+            {
+                Console.WriteLine(attempt);
                 throw new OrderCloudIntegrationException(new ApiError()
                 {
                     Data = attempt,
