@@ -4,6 +4,11 @@ using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using System.Linq;
 using Marketplace.Common.Constants;
+using ordercloud.integrations.library.helpers;
+using Marketplace.Models;
+using System;
+using System.Dynamic;
+using System.Collections.Generic;
 
 namespace Marketplace.Common.Commands
 {
@@ -33,7 +38,42 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user)
         {
             Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
-            return await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
+            var updatedSupplier = await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
+
+            // Get all products for supplier.  Then, obtain supplier token and patch the supplier name facet on all existing supplier products.
+            var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<MarketplaceProduct>(
+                supplierID: supplierID,
+                page: page,
+                pageSize: 100,
+                accessToken: user.AccessToken
+                ));
+            var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
+            var selectedSupplierClient = supplierClient.Items[0];
+            var configToUse = new OrderCloudClientConfig
+            {
+                ApiUrl = user.ApiUrl,
+                AuthUrl = user.AuthUrl,
+                ClientId = selectedSupplierClient.ID,
+                ClientSecret = selectedSupplierClient.ClientSecret,
+                GrantType = GrantType.ClientCredentials,
+                Roles = new[]
+                           {
+                                 ApiRole.SupplierAdmin,
+                                 ApiRole.ProductAdmin
+                            },
+
+            };
+            var ocClient = new OrderCloudClient(configToUse);
+            await ocClient.AuthenticateAsync();
+            var token = ocClient.TokenResponse.AccessToken;
+            foreach (var product in productsToUpdate)
+            {
+                product.xp.Facets["supplier"] = new List<string>() { supplier.Name };
+            }
+            await Throttler.RunAsync(productsToUpdate, 100, 5, product => ocClient.Products.SaveAsync(product.ID, product, accessToken: token));
+
+            return updatedSupplier;
+
         }
         public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
