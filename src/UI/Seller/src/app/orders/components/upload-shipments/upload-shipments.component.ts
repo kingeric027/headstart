@@ -6,6 +6,7 @@ import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppAuthService } from '@app-seller/auth';
 import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk';
+import paramsSerializer from './ParamsSerializer';
 
 @Component({
   selector: 'upload-shipments',
@@ -17,7 +18,7 @@ export class UploadShipmentsComponent {
     private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private sanitizer: DomSanitizer,
-        private appAuthService: AppAuthService
+    private appAuthService: AppAuthService
   ) {}
 
   files: FileHandle[] = [];
@@ -41,46 +42,55 @@ export class UploadShipmentsComponent {
 
   async manualFileUpload(event, fileType: string) {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-
+    var asset: AssetUpload = {};
 
     if (fileType === 'staticContent') {
       const mappedFiles: FileHandle[] = Array.from(event.target.files).map((file: File) => {
-        const URL = this.sanitizer.bypassSecurityTrustUrl(window.URL.createObjectURL(file));
+        asset = {
+          Active: true,
+          Title: 'document',
+          File: file,
+          FileName: 'shipments_to_process',
+        } as AssetUpload;
         return { File: file, URL, Filename: 'shipments_to_process' };
       });
 
-
-
-
-       const asset = {
-      Active: true,
-      Title: "document",
-      File: mappedFiles[0].File,
-      FileName: 'shipments_to_process'
-    } as AssetUpload;
-
-
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${accessToken}`,
+      });
 
       const formData = new FormData();
-      formData.append('file', mappedFiles[0]?.File);
-      this.http.post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', asset).subscribe(result => {
-                console.log(result)
+
+      for (const prop in asset) {
+        if (asset.hasOwnProperty(prop)) {
+          formData.append(prop, asset[prop]);
+        }
       }
-      );
+
+      this.http
+        .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, {
+          headers,
+        })
+        .subscribe(result => {
+          console.log(result);
+        });
       console.log(mappedFiles);
     }
   }
 
-    async uploadAsset(productID: string, file: FileHandle, isAttachment = false): Promise<any> {
+  async uploadAsset(productID: string, file: FileHandle, isAttachment = false): Promise<any> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     const asset = {
       Active: true,
       Title: isAttachment ? 'Product_Attachment' : null,
       File: file.File,
-      FileName: file.Filename
+      FileName: file.Filename,
     } as AssetUpload;
     const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-    await HeadStartSDK.Assets.SaveAssetAssignment({ ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID }, accessToken)
+    await HeadStartSDK.Assets.SaveAssetAssignment(
+      { ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID },
+      accessToken
+    );
     return await HeadStartSDK.Products.Get(productID, accessToken);
   }
 
