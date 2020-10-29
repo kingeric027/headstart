@@ -9,6 +9,7 @@ using Marketplace.Models;
 using System;
 using System.Dynamic;
 using System.Collections.Generic;
+using Marketplace.Common.Extensions;
 
 namespace Marketplace.Common.Commands
 {
@@ -38,39 +39,44 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user)
         {
             Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
+            var currentSupplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
             var updatedSupplier = await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
-
-            // Get all products for supplier.  Then, obtain supplier token and patch the supplier name facet on all existing supplier products.
-            var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<MarketplaceProduct>(
+            // Update supplier products only on a name change
+            if (currentSupplier.Name != supplier.Name)
+            {
+                var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<MarketplaceProduct>(
                 supplierID: supplierID,
                 page: page,
                 pageSize: 100,
                 accessToken: user.AccessToken
                 ));
-            var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
-            var selectedSupplierClient = supplierClient.Items[0];
-            var configToUse = new OrderCloudClientConfig
-            {
-                ApiUrl = user.ApiUrl,
-                AuthUrl = user.AuthUrl,
-                ClientId = selectedSupplierClient.ID,
-                ClientSecret = selectedSupplierClient.ClientSecret,
-                GrantType = GrantType.ClientCredentials,
-                Roles = new[]
-                           {
+                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
+                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
+                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+                if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
+                var configToUse = new OrderCloudClientConfig
+                {
+                    ApiUrl = user.ApiUrl,
+                    AuthUrl = user.AuthUrl,
+                    ClientId = supplierClient.ID,
+                    ClientSecret = supplierClient.ClientSecret,
+                    GrantType = GrantType.ClientCredentials,
+                    Roles = new[]
+                               {
                                  ApiRole.SupplierAdmin,
                                  ApiRole.ProductAdmin
                             },
 
-            };
-            var ocClient = new OrderCloudClient(configToUse);
-            await ocClient.AuthenticateAsync();
-            var token = ocClient.TokenResponse.AccessToken;
-            foreach (var product in productsToUpdate)
-            {
-                product.xp.Facets["supplier"] = new List<string>() { supplier.Name };
+                };
+                var ocClient = new OrderCloudClient(configToUse);
+                await ocClient.AuthenticateAsync();
+                var token = ocClient.TokenResponse.AccessToken;
+                foreach (var product in productsToUpdate)
+                {
+                    product.xp.Facets["supplier"] = new List<string>() { supplier.Name };
+                }
+                await Throttler.RunAsync(productsToUpdate, 100, 5, product => ocClient.Products.SaveAsync(product.ID, product, accessToken: token));
             }
-            await Throttler.RunAsync(productsToUpdate, 100, 5, product => ocClient.Products.SaveAsync(product.ID, product, accessToken: token));
 
             return updatedSupplier;
 

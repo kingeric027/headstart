@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Extensions;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
@@ -419,15 +420,16 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
 		{
 			//Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-			//All suppliers have integration clients with a default user of dev_{supplierID}.
-			var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
-			var selectedSupplierClient = supplierClient.Items[0];
+			var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
+			if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
+			ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+			if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
 			var configToUse = new OrderCloudClientConfig
 			{
 				ApiUrl = user.ApiUrl,
 				AuthUrl = user.AuthUrl,
-				ClientId = selectedSupplierClient.ID,
-				ClientSecret = selectedSupplierClient.ClientSecret,
+				ClientId = supplierClient.ID,
+				ClientSecret = supplierClient.ClientSecret,
 				GrantType = GrantType.ClientCredentials,
 				Roles = new[]
 						   {
