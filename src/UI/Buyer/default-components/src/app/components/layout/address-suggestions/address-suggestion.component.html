@@ -5,7 +5,7 @@
        *ngFor="let address of suggestedAddresses">
     <ocm-address-card [address]="address"
                       [highlight]="activeAddress === address">
-      <div class="icon-button ripple hover-btn"
+      <div class="btn btn-light btn-icon ripple"
            (click)="setActiveAddress(address)">
         <div class="icon-wrapper">
           <fa-icon *ngIf="activeAddress !== address"

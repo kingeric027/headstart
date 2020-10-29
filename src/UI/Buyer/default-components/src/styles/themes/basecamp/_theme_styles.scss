@@ -1,32 +1,140 @@
+// remove button border radius
+.btn,
+button {
+  border-radius: initial;
+}
+
 // override btn-primary with gradient
 .btn-primary {
   color: $gray-100;
-  border: none;
-  font-weight: bolder;
+  font-weight: 700;
   text-transform: uppercase;
-  kerning: 2rem;
-  border-radius: 0;
-  background: linear-gradient(128.04deg, rgba($black, 0.9) 39.63%, rgba($blue, 0.9) 93.79%);
-  transition: 200ms ease all;
-  &:hover,
-  &:focus {
-    background: linear-gradient(128.04deg, $black 39.63%, $blue 93.79%);
-    border: none;
-    color: white !important;
+  letter-spacing: .1rem;
+  padding: .5rem 1.75rem;
+  background: linear-gradient(160deg, $indigo 0%, darken($purple, 15%) 40%, darken($indigo, 44%) 80%, $black 90%);
+  z-index: 1; // important for smooth transitioning gradients!
+  position: relative;
+  overflow: hidden;
+  border: none;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(160deg, $indigo 0%, darken($purple, 15%) 50%, darken($indigo, 44%) 80%, $black 90%);
+    z-index: -1;
+    transform: translateX(-25%);
+    transition: transform 400ms;
   }
-  // wish I could dry this up a little better, but needs to explicitly override the disabled styles
-  &.disabled,
-  &:disabled {
-    color: white;
-    background: linear-gradient(128.04deg, darken($black, 5) 39.63%, darken($blue, 5) 93.79%);
-    border: none;
+  &:not(:disabled):hover::before,
+  &:not(:disabled):focus::before {
+    transform: translateX(0%);
   }
 }
-.btn-primary.btn-sm {
-  font-weight: normal;
-  text-transform: none;
+
+// My apologies for the !important flag. Since `styles.scss` comes before `base.scss` in the cascade, 
+// we need to find a better way to make sure buttons are branded but also able to be overwritten when a scenario like this arises
+.btn,
+button {
+  font-family: 'Sequel 100 Wide 45', $font-family-base !important;
+  &.btn-sm {
+    font-size: .75rem;
+  }
 }
 
 .form-control {
+  border-radius: 0;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Sequel 100 Wide 45', $font-family-base;
+  letter-spacing: .0375rem;
+  text-transform: uppercase;
+  -webkit-text-stroke-width: 1px;
+}
+
+h1,
+.h1 {
+  font-family: 'Sequel 100 Black 105', $font-family-base;
+  letter-spacing: .125rem;
+  font-size: $h1-font-size;
+}
+
+// login + register page text color
+.headline-text {
+  font-family: 'Sequel 100 Black 105', $font-family-base;
+  letter-spacing: .125rem;
+  color: $indigo;
+  margin: 2rem 0;
+}
+
+.text-outlined {
+  color: transparent;
+  letter-spacing: .0375rem;
+  -webkit-text-stroke: 1.25px $dark;
+}
+
+// Product Card
+ocm-product-card {
+  .card,
+  .card-img-top {
+    border-radius: 0;
+  }
+}
+
+// Product Card's Footer Input
+.card-footer {
+  ocm-quantity-input {
+    input {
+      border-radius: 0;
+    }
+  }
+  // DESIGN: There is a better way to do this, but I think this button looks better using their "Intense Blue" color.
+  // but I don't want change it for every instance. Just overriding it in this spot.
+  button.btn-outline-secondary {
+    color: $indigo;
+    border-color: $indigo;
+    &:hover,
+    &:focus {
+      background-color: $indigo;
+      color: white;
+    }
+  }
+}
+
+.text-gradient {
+  color: transparent;
+  background: linear-gradient(160deg, $indigo 0%, darken($purple, 5%) 100%, );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+a,
+button,
+.btn {
+  &.text-gradient {
+    &:hover {
+      background: $indigo;
+      text-decoration: underline;
+    }
+  }
+}
+
+// profile nav
+.nav-link {
   border-radius: 0;
 }
