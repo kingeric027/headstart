@@ -79,7 +79,6 @@ namespace ordercloud.integrations.cardconnect
             }
             else if (!PassedAVSCheck(attempt))
             {
-                Console.WriteLine(attempt);
                 throw new OrderCloudIntegrationException(new ApiError()
                 {
                     Data = attempt,
