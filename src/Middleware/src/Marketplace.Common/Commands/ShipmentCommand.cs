@@ -4,22 +4,40 @@ using Marketplace.Models.Misc;
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
+using OrderCloud.SDK;
 using System;
-using Marketplace.Models.Extended;
 using System.Collections.Generic;
 using Marketplace.Models.Models.Marketplace;
 using System.Dynamic;
 
 using Microsoft.AspNetCore.Http;
 using Misc = Marketplace.Common.Models.Misc;
-using ordercloud.integrations.cms;
 
 namespace Marketplace.Common.Commands
 {
+    public class DocumentRowError
+    {
+        public int Row { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+    public class DocumentImportSummary
+    {
+        public int TotalCount { get; set; }
+        public int ValidCount { get; set; }
+        public int InvalidCount { get; set; }
+    }
+
+    public class DocumentImportResult
+    {
+        public DocumentImportSummary Meta { get; set; }
+        public List<Misc.Shipment> Valid = new List<Misc.Shipment>();
+        public List<DocumentRowError> Invalid = new List<DocumentRowError>();
+    }
+
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
-        Task<Misc.UploadShipmentResponse> UploadShipments(AssetUpload file);
+        Task<DocumentImportResult> UploadShipments(IFormFile file);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -105,33 +123,64 @@ namespace Marketplace.Common.Commands
             return relatedBuyerOrder.FromCompanyID;
         }
 
-        public async Task<Misc.UploadShipmentResponse> UploadShipments(AssetUpload file)
+        public async Task<DocumentImportResult> UploadShipments(IFormFile file)
         {
-            Misc.UploadShipmentResponse response;
-            List<Misc.Shipment> shipmentList;
+            DocumentImportResult documentImportResult;
 
-            shipmentList = await GetShipmentListFromFile(file);
-            response = new Misc.UploadShipmentResponse();
-            response.ErrorList = new List<Misc.Error>();
+            documentImportResult = await GetShipmentListFromFile(file);
 
-            response.SuccessfulShipments = shipmentList;
-
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                response.ErrorList.Add(new Misc.Error() { ErrorMessage = ex.Message, StackTrace = ex.StackTrace });
-                Console.WriteLine(ex);
-            }
-
-            return response;
+            return documentImportResult;
         }
 
-        private Task<List<Misc.Shipment>> GetShipmentListFromFile(AssetUpload file)
+        private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file)
         {
-            throw new NotImplementedException();
+            using var stream = file.OpenReadStream();
+            var shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
+            var result = Validate(shipments.Where(p => p.Value?.LineItemID != null).Select(p => p).ToList());
+            return await Task.FromResult(result);
+        }
+
+        public static DocumentImportResult Validate(List<RowInfo<Misc.Shipment>> rows)
+        {
+            var result = new DocumentImportResult()
+            {
+                Invalid = new List<DocumentRowError>(),
+                Valid = new List<Misc.Shipment>()
+            };
+
+            foreach (var row in rows)
+            {
+                if (row.ErrorColumnIndex > -1)
+                    result.Invalid.Add(new DocumentRowError()
+                    {
+                        ErrorMessage = row.ErrorMessage,
+                        Row = row.RowNumber++
+                    });
+                else
+                {
+                    var results = new List<ValidationResult>();
+                    if (Validator.TryValidateObject(row.Value, new ValidationContext(row.Value), results, true) == false)
+                    {
+                        result.Invalid.Add(new DocumentRowError()
+                        {
+                            ErrorMessage = $"{results.FirstOrDefault()?.ErrorMessage}",
+                            Row = row.RowNumber++
+                        });
+                    }
+                    else
+                    {
+                        result.Valid.Add(row.Value);
+                    }
+                }
+            }
+
+            result.Meta = new DocumentImportSummary()
+            {
+                InvalidCount = result.Invalid.Count,
+                ValidCount = result.Valid.Count,
+                TotalCount = rows.Count
+            };
+            return result;
         }
     }
 }

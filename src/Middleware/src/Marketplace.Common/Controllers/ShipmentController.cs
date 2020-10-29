@@ -38,9 +38,9 @@ namespace Marketplace.Common.Controllers
         [DocName("POST Batch Shipment Update")]
         [Route("batch/uploadshipment")]
         [HttpPost]
-        public async Task<UploadShipmentResponse> UploadShipments([FromBody] AssetUpload file)
+        public async Task<DocumentImportResult> UploadShipments([FromForm] AssetUpload fileRequest)
         {
-            return  await _command.UploadShipments(file);
+            return  await _command.UploadShipments(fileRequest?.File);
         }
     }
 }

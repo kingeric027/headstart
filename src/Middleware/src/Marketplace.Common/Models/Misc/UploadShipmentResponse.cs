@@ -28,10 +28,4 @@ namespace Marketplace.Common.Models.Misc
         public string Comments { get; set; }
 
     }
-
-    public class UploadShipmentResponse
-    {
-        public List<Error> ErrorList { get; set; }
-        public List<Shipment> SuccessfulShipments { get; set; }
-    }
 }
