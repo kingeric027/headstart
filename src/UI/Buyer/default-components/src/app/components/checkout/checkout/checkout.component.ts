@@ -9,7 +9,7 @@ import {
   BuyerCreditCard,
   OrderPromotion,
 } from 'ordercloud-javascript-sdk';
-import { MarketplaceOrder, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
+import { MarketplaceOrder, MarketplaceLineItem, OrderCloudIntegrationsCreditCardPayment } from '@ordercloud/headstart-sdk';
 import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component';
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
@@ -32,6 +32,7 @@ export class OCMCheckout implements OnInit {
   selectedCard: SelectedCreditCard;
   shipEstimates: ShipEstimate[] = [];
   currentPanel: string;
+  paymentError: string;
   faCheck = faCheck;
   checkout: CheckoutService = this.context.order.checkout;
   sections: any = [
@@ -139,23 +140,47 @@ export class OCMCheckout implements OnInit {
     await this.checkout.addComment(comment);
     let cleanOrderID = '';
     if (this.orderSummaryMeta.StandardLineItemCount) {
-      const ccPayment = {
-        OrderId: this.order.ID,
-        PaymentID: this.payments.Items[0].ID, // There's always only one at this point
-        CreditCardID: this.selectedCard?.SavedCard?.ID,
-        CreditCardDetails: this.selectedCard.NewCard,
-        Currency: this.order.xp.Currency,
-        CVV: this.selectedCard.CVV
+      try {
+        const ccPayment = this.getCCPaymentData();
+        cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
+        await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
+      } catch (e) {
+        return this.handleSubmitError(e)
       }
-      cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
-      await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
     } else {
-      cleanOrderID = await this.checkout.submitWithoutCreditCard();
-      await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
+      try {
+        cleanOrderID = await this.checkout.submitWithoutCreditCard();
+        await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
+      } catch (e) {
+        return this.handleSubmitError(e)
+      }
     }
     this.isLoading = false;
     // todo: "Order Submitted Successfully" message
     this.context.router.toMyOrderDetails(cleanOrderID);
+  }
+
+  handleSubmitError(error: any): void {
+    const errorReasons = {
+      'Billing address on credit card incorrect': 'the requested billing address is incorrect.',
+      'CVV Validation Failure': 'the CVV in the request is not correct for this card.' 
+    }
+    const reason = errorReasons[error?.response?.data?.Message] || 'of an unknown error'; 
+    this.paymentError = `The authorization for your payment was declined by the processor because 
+        ${reason} Please reenter your information or use a different card`
+    this.isLoading = false;
+    this.currentPanel = 'payment';
+  }
+
+  getCCPaymentData(): OrderCloudIntegrationsCreditCardPayment {
+    return {
+      OrderID: this.order.ID,
+      PaymentID: this.payments.Items[0].ID, // There's always only one at this point
+      CreditCardID: this.selectedCard?.SavedCard?.ID,
+      CreditCardDetails: this.selectedCard.NewCard,
+      Currency: this.order.xp.Currency,
+      CVV: this.selectedCard.CVV
+    }
   }
 
   getValidation(id: string): any {
