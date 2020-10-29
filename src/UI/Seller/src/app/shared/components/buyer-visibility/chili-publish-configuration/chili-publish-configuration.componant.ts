@@ -147,13 +147,13 @@ export class ChiliPublishConfiguration implements OnInit {
                 ListOrder: index,
                 Name: spec.name,
                 DefaultValue: spec.displayValue,
-                Required: (spec.required.toLowerCase() == 'true') ? true : false,
+                Required: (spec.required.toLowerCase() === 'true') ? true : false,
                 AllowOpenText: false,
                 DefaultOptionID: '',
                 xp: csxp
             };
 
-            if (controlType !== 'Not Found') {
+            if (controlType !== 'Not Found' && spec.visible.toLowerCase() === 'true') {
                 return this.productService.saveChiliSpec(tempSpec);
             }
         });
