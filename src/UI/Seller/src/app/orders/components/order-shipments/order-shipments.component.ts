@@ -103,14 +103,14 @@ export class OrderShipmentsComponent implements OnChanges {
       Shipper: new FormControl(''),
       Service: new FormControl(''),
       Comment: new FormControl(''),
-      Quantities: new FormGroup({}),
-      LineItemComments: new FormGroup({})
+      LineItemData: new FormGroup({}),
     });
-    const QuantityGroup = this.shipmentForm.get('Quantities') as FormGroup;
-    const LineItemComments = this.shipmentForm.get('LineItemComments') as FormGroup;
+    const LineItemGroup = this.shipmentForm.get('LineItemData') as FormGroup;
     this.lineItems.forEach(item => {
-      QuantityGroup.addControl(item.ID, new FormControl(0));
-      LineItemComments.addControl(item.ID, new FormControl(0));
+      LineItemGroup.addControl(item.ID, new FormGroup({
+        Quantity: new FormControl(0),
+        Comment: new FormControl('')
+      }));
     });
   }
 
@@ -178,9 +178,9 @@ export class OrderShipmentsComponent implements OnChanges {
 
   async patchLineItems(): Promise<void> {
     const lineItemsToPatch = [];
-    const quantities = this.shipmentForm.value.Quantities;
+    const lineItemData = this.shipmentForm.value.LineItemData;
     this.lineItems.forEach(async li => {
-      if (quantities[li.ID] > 0 && quantities[li.ID] === li.Quantity) {
+      if (lineItemData[li.ID]?.Quantity > 0 && lineItemData[li.ID]?.Quantity === li.Quantity) {
         lineItemsToPatch.push(
           this.ocLineItemService
             .Patch(this.orderDirection, this._order?.ID, li.ID, { xp: { LineItemStatus: LineItemStatus.Complete } })
@@ -255,8 +255,10 @@ export class OrderShipmentsComponent implements OnChanges {
     if (this.shipAllItems) {
       this.lineItems.forEach(item => {
         this.shipmentForm.patchValue({
-          Quantities: {
-            [item.ID]: item.Quantity - item.QuantityShipped,
+          LineItemData: {
+            [item.ID]: {
+              Quantity: item.Quantity - item.QuantityShipped,
+            }
           },
         });
       });
@@ -288,10 +290,16 @@ export class OrderShipmentsComponent implements OnChanges {
       },
       ShipmentItems: this.lineItems
         .map(li => {
-          return { LineItemID: li.ID, OrderID: this._order?.ID, QuantityShipped: shipment.Quantities[li.ID], Comments: shipment.LineItemComments[li.ID] };
+          return { LineItemID: li.ID, OrderID: this._order?.ID, QuantityShipped: shipment.LineItemData[li.ID].Quantity, 
+            xp: {
+              Comments: shipment.LineItemData[li.ID].Comment 
+            }
+          };
         })
         .filter(li => li !== undefined),
     };
+    console.log(superShipment);
+    debugger;
     this.patchLineItems();
     const postedShipment: any = await this.httpClient
       .post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions)
@@ -305,8 +313,8 @@ export class OrderShipmentsComponent implements OnChanges {
     if (shipment.value.TrackingNumber === '') return true;
     if (shipment.value.ShipDate === '') return true;
     if (shipment.value.Shipper === '') return true;
-    const quantities = this.shipmentForm.value.Quantities;
-    const validQuantity = Object.values(quantities).find(qty => qty > 0);
+    const lineItemData = this.shipmentForm.value.LineItemData;
+    const validQuantity = Object.values(lineItemData).find((item: any) => item.Quantity > 0);
     if (!validQuantity) return true;
     if (this.isSaving) return true;
   }

@@ -189,10 +189,10 @@
           <label class="custom-control-label"
                  for="shipAllItems">Ship All Items</label>
         </div>
-        <div *ngFor="let li of lineItems; let i = index"
-             formGroupName="Quantities">
+        <div formGroupName="LineItemData">
+          <div *ngFor="let li of lineItems; let i = index" formGroupName="{{li.ID}}"> 
           <div *ngIf="li.Quantity !== li.QuantityShipped"
-               class="mt-5 row align-items-center">
+                class="mt-5 row align-items-center">
             <div class="col-sm-12">
               <div class="row align-top">
                 <div class="col-sm-9">
@@ -202,10 +202,10 @@
                       <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
                     </h6>
                     <img [id]="i"
-                         [src]="getImageUrl(li)"
-                         width="auto"
-                         height="100px"
-                         class="d-print-none">
+                          [src]="getImageUrl(li)"
+                          width="auto"
+                          height="100px"
+                          class="d-print-none">
                   </div>
                 </div>
                 <div class="col-sm-3">
@@ -214,7 +214,7 @@
                     <select type="dropdown"
                             [attr.disabled]="shipAllItems ? true : null"
                             class="form-control"
-                            formControlName="{{li.ID}}"
+                            formControlName="Quantity"
                             id="{{li.ID}}">
                       <option [value]="0">Do Not Ship</option>
                       <option *ngFor="let j of getQuantityDropdown(li)"
@@ -225,20 +225,23 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="form-group row">
-          <div class="col-sm-12">
-            <label for="LineItemComment"
+         <div class="col-sm-12">
+           <label for="LineItemComment"
                    class="control-label font-weight-bold mt-1">Comment</label>
-            <textarea type="text"
-                      class="form-control"
-                      formControlName="LineItemComment"
-                      placeholder="Enter comment"
-                      rows="3"
-                      maxLength="300"></textarea>
-          </div>
+           <textarea type="text"
+                     id="LineItemComment"
+                     class="form-control"
+                     formControlName="Comment"
+                     placeholder="Enter comment"
+                     rows="3"
+                     maxLength="300"></textarea>
+         </div>
+       </div>
+     </div>
+
         </div>
+
+
         <button type="submit"
                 id="submitBtn"
                 [disabled]="shouldDisableSave(shipmentForm)"
