@@ -8,10 +8,11 @@ import { debounceTime, takeWhile, filter } from 'rxjs/operators';
   styleUrls: ['./search.component.scss'],
 })
 export class OCMSearch implements OnInit, OnChanges, OnDestroy {
-  alive = true;
   @Input() placeholderText?: string;
   @Input() searchTermInput?: string;
   @Output() searched = new EventEmitter<string>();
+
+  alive = true;
   faSearch = faSearch;
   faTimes = faTimes;
   form: FormGroup;

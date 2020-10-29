@@ -1,7 +1,7 @@
 <div *ngIf="orderSummaryMeta">
   <div class="row">
-    <div class="col-sm-7">
-      <div class="input-group">
+    <div class="col-sm-6">
+      <div class="input-group input-group-sm">
         <input type="text"
                class="form-control"
                placeholder="Promo Code"
@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-5"
+    <div class="col-sm-6"
          *ngIf="_orderPromos?.length">
       <p translate>CHECKOUT.CHECKOUT_PAYMENT.DISCOUNTS_APPLIED</p>
       <div class="card p-2"
@@ -29,7 +29,7 @@
         <button translate
                 type="button"
                 (click)="removePromo(promo.Code)"
-                class="btn btn-sm btn-remove wobble pr-2 pb-1">
+                class="btn btn-remove wobble pr-2 pb-1">
           CHECKOUT.CHECKOUT_PAYMENT.REMOVE</button>
       </div>
     </div>

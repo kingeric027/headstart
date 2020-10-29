@@ -151,7 +151,7 @@ export class OCMKitProductDetails implements OnInit, OnDestroy {
         const details = this.productDictionary[kitDefinition.Product.ID];
         return {
           ProductID: kitDefinition.Product.ID,
-          Quantity: details.quantity,
+          Quantity: kitDefinition.MinQty === kitDefinition.MaxQty ? kitDefinition.MinQty : details.quantity,
           Specs: kitDefinition.Static ?
             this.buildStaticKitSpecs(kitDefinition) :
             this.specFormService.getLineItemSpecs(details.specs, details.specForm),

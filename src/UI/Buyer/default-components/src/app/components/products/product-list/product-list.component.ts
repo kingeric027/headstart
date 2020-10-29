@@ -16,7 +16,6 @@ export class OCMProductList implements OnInit, OnDestroy {
   alive = true;
   facets: ListFacet[];
   categoryCrumbs: Category[];
-  _kitProucts: ListPage<MarketplaceKitProduct>;
   favoriteProducts: string[] = [];
   hasFilters = false;
   showingFavoritesOnly = false;

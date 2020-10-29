@@ -16,6 +16,7 @@ using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using static Marketplace.Common.Models.SendGridModels;
 
 namespace Marketplace.Common.Services
 {
@@ -39,11 +40,7 @@ namespace Marketplace.Common.Services
         Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName);
     }
 
-    public class EmailTemplate
-    {
-        public object Data { get; set; }
-        public EmailDisplayText Message { get; set; }
-    }
+
     public class SendgridService : ISendgridService
     {
         private readonly AppSettings _settings; 
@@ -168,8 +165,6 @@ namespace Marketplace.Common.Services
                 date = yesterday
             };
             await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
-            //string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName
-
         }
 
         public async Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText)
@@ -300,12 +295,7 @@ namespace Marketplace.Common.Services
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
-                Address supplierAddress = null; ;
-                if(orderWorksheet.Order.xp.SupplierIDs != null && orderWorksheet.Order.xp.ShipFromAddressIDs != null)
-                {
-                    supplierAddress = await _oc.SupplierAddresses.GetAsync(orderWorksheet.Order.xp.SupplierIDs.FirstOrDefault(), orderWorksheet.Order.xp.ShipFromAddressIDs.FirstOrDefault());
-                }
-                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems, supplierAddress);
+                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems);
 
                 EmailTemplate buyerTemplateData = new EmailTemplate()
                 {
@@ -499,59 +489,60 @@ namespace Marketplace.Common.Services
             return supplierList;
         }
 
-        private object GetOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
+        private OrderTemplateData GetOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
         {
             var productsList = lineItems.Select(lineItem =>
             {
-                return new
+                return new ProductInfo()
                 {
                     ProductName = lineItem.Product.Name,
                     ImageURL = lineItem.xp.ImageUrl,
-                    lineItem.ProductID,
-                    lineItem.Quantity,
-                    lineItem.LineTotal,
+                    ProductID = lineItem.ProductID,
+                    Quantity = lineItem.Quantity,
+                    LineTotal = lineItem.LineTotal,
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
-            return new
+            var currencyString = order.xp.Currency.ToString();
+            return new OrderTemplateData()
             {
-                order.FromUser.FirstName,
-                order.FromUser.LastName,
+                FirstName = order.FromUser.FirstName,
+                LastName = order.FromUser.LastName,
                 OrderID = order.ID,
                 DateSubmitted = order.DateSubmitted.ToString(),
-                order.ShippingAddressID,
+                ShippingAddressID = order.ShippingAddressID,
                 ShippingAddress = shippingAddress,
-                order.BillingAddressID,
-                BillingAddress = new
+                BillingAddressID = order.BillingAddressID,
+                BillingAddress = new Address()
                 {
-                    order.BillingAddress?.Street1,
-                    order.BillingAddress?.Street2,
-                    order.BillingAddress?.City,
-                    order.BillingAddress?.State,
-                    order.BillingAddress?.Zip
+                    Street1 =order.BillingAddress?.Street1,
+                    Street2 = order.BillingAddress?.Street2,
+                    City = order.BillingAddress?.City,
+                    State = order.BillingAddress?.State,
+                    Zip = order.BillingAddress?.Zip
                 },
                 Products = productsList,
-                order.Subtotal,
-                order.TaxCost,
-                order.ShippingCost,
+                Subtotal =order.Subtotal,
+                TaxCost = order.TaxCost,
+                ShippingCost = order.ShippingCost,
                 PromotionalDiscount = order.PromotionDiscount,
-                order.Total,
-                order.xp.Currency
+                Total = order.Total,
+                Currency = currencyString
             };
         }
 
-        private object GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems, Address supplierAddress)
+        private QuoteOrderTemplateData GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
         {
-            return new
+            return new QuoteOrderTemplateData()
             {
                 FirstName = order.FromUser.FirstName,
                 LastName = order.FromUser.LastName,
                 Phone = order.xp.QuoteOrderInfo.Phone,
                 Email = order.FromUser.Email,
-                Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
+                Location = order.xp.QuoteOrderInfo.BuyerLocation,
                 ProductID = lineItems.FirstOrDefault().Product.ID,
                 ProductName = lineItems.FirstOrDefault().Product.Name,
-                order = order,
+                Order = order,
             };
         }
 
@@ -577,44 +568,46 @@ namespace Marketplace.Common.Services
             return products;
         }
 
-        private object MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
-        new
+        private ProductInfo MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
+        new ProductInfo()
         {
             ProductName = lineItem.Product.Name,
             ImageURL = lineItem.xp.ImageUrl,
-            lineItem.ProductID,
-            lineItem.Quantity,
-            lineItem.LineTotal,
+            ProductID = lineItem.ProductID,
+            Quantity = lineItem.Quantity,
+            LineTotal = lineItem.LineTotal,
         };
 
-        private object MapCanceledLineItemToProduct(MarketplaceLineItem lineItem) =>
-        new
+        private ProductInfo MapCanceledLineItemToProduct(MarketplaceLineItem lineItem) =>
+        new ProductInfo()
         {
             ProductName = lineItem.Product.Name,
             ImageURL = lineItem.xp.ImageUrl,
-            lineItem.ProductID,
-            lineItem.Quantity,
-            lineItem.LineTotal,
+            ProductID = lineItem.ProductID,
+            Quantity = lineItem.Quantity,
+            LineTotal = lineItem.LineTotal,
         };
 
-        private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
-          new
+        private ProductInfo MapLineItemToProduct(MarketplaceLineItem lineItem) =>
+          new ProductInfo()
           {
               ProductName = lineItem.Product.Name,
               ImageURL = lineItem.xp.ImageUrl,
-              lineItem.ProductID,
-              lineItem.Quantity,
-              lineItem.LineTotal,
+              ProductID = lineItem.ProductID,
+              Quantity = lineItem.Quantity,
+              LineTotal = lineItem.LineTotal,
           };
 
-        private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
-          new
-          {
-              lineItems[0].ShippingAddress.Street1,
-              lineItems[0].ShippingAddress.Street2,
-              lineItems[0].ShippingAddress.City,
-              lineItems[0].ShippingAddress.State,
-              lineItems[0].ShippingAddress.Zip
-          };
+        private Address GetShippingAddress(IList<MarketplaceLineItem> lineItems)
+        {
+            return new Address()
+            {
+                Street1 = lineItems[0].ShippingAddress.Street1,
+                Street2 = lineItems[0].ShippingAddress.Street2,
+                City = lineItems[0].ShippingAddress.City,
+                State = lineItems[0].ShippingAddress.State,
+                Zip = lineItems[0].ShippingAddress.Zip
+            };
+        }
     }
 }
