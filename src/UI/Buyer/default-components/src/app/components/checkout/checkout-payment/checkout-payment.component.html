@@ -72,6 +72,7 @@
   <ocm-payment-credit-card *ngIf="orderSummaryMeta.StandardLineItemCount"
                            [cards]="cards"
                            [termsAccepted]="POTermsAccepted"
+                           [paymentError]="paymentError"
                            (cardSelected)="onCardSelected($event.detail)">
   </ocm-payment-credit-card>
   <button type="submit"

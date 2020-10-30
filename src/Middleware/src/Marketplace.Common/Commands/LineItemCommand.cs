@@ -10,6 +10,8 @@ using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Constants;
 using SendGrid.Helpers.Mail;
+using Marketplace.Common.Extensions;
+using System.Net;
 
 namespace Marketplace.Common.Commands
 {
@@ -388,7 +390,11 @@ namespace Marketplace.Common.Commands
             var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
             {
                 var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
-                var relatedSpecMarkup = relatedProductSpec.Options.First(option => option.ID == spec.OptionID).PriceMarkup;
+                decimal? relatedSpecMarkup = 0;
+                if (relatedProductSpec.Options.HasItem())
+                {
+                    relatedSpecMarkup = relatedProductSpec.Options?.First(option => option.ID == spec.OptionID)?.PriceMarkup;
+                }
                 return accumulator + (relatedSpecMarkup ?? 0M);
             });
             return totalSpecMarkup + markedUpBasePrice;

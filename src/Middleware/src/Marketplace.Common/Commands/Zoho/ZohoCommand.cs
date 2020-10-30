@@ -71,6 +71,7 @@ namespace Marketplace.Common.Commands.Zoho
                 foreach (var item in order.ShipEstimateResponse.ShipEstimates)
                 {
                     var shipping_method = item.ShipMethods.FirstOrDefault(s => s.ID == item.SelectedShipMethodID);
+                    if (shipping_method.xp.CarrierAccountID != "ca_8bdb711131894ab4b42abcd1645d988c") continue;
                     var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = "SMG Shipping" });
                     var oc_lineitems = new ListPage<MarketplaceLineItem>()
                     {
@@ -240,6 +241,7 @@ namespace Marketplace.Common.Commands.Zoho
             });
             return items.ToList();
         }
+        
         private async Task<List<ZohoLineItem>> CreateOrUpdateSalesLineItems(IList<MarketplaceLineItem> lineitems)
         {
             // TODO: accomodate possibility of more than 100 line items

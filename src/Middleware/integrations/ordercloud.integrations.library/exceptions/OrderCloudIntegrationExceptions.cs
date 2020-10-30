@@ -5,6 +5,7 @@ using OrderCloud.SDK;
 
 namespace ordercloud.integrations.library
 {
+    
     public class OrderCloudIntegrationException : Exception
     {
         public ApiError ApiError { get; }
