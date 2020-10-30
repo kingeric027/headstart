@@ -17,7 +17,7 @@ namespace Marketplace.Common.Models
             this.ShippingProfiles.Add(new EasyPostShippingProfile()
             {
                 ID = "Provision",
-                SupplierID = "093",
+                SupplierID = settings.OrderCloudSettings.ProvisionSupplierID,
                 CarrierAccountID = _settings.EasyPostSettings.ProvisionFedexAccountId,
                 Customs_Signer = "Christa Zaspel",
                 Restriction_Type = "none",
@@ -39,7 +39,7 @@ namespace Marketplace.Common.Models
             this.ShippingProfiles.Add(new EasyPostShippingProfile()
             {
                 ID = "SEB",
-                SupplierID = "027",
+                SupplierID = _settings.OrderCloudSettings.SEBDistributionSupplierID,
                 CarrierAccountID = _settings.EasyPostSettings.SEBDistributionFedexAccountId,
                 Customs_Signer = "Christa Zaspel",
                 Restriction_Type = "none",
