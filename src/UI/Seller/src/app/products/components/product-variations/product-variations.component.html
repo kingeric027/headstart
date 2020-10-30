@@ -1,8 +1,8 @@
 <div class="container-fluid">
-  <!-- Product Variations -->
+  <!-- Product Customizations -->
   <div class="row">
     <div class="col-md-7">
-      <div class="card py-2 px-3 mt-3 bg-white">
+      <div class="card p-4 mt-3 bg-white">
         <div class="d-flex justify-content-between align-items-center">
           <h6 class="font-weight-medium"
               translate>Customization</h6>
@@ -20,14 +20,18 @@
             </label>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-12">
-            <small class="font-italic d-block my-3"
-                   translate>{{readonly ? 'Open Text Specifications as defined by the supplier.' : 'Do you need to collect customized input from the buyer to fulfill this product?  Shirt text? Sign verbiage? Configure the options here.'}}</small>
-          </div>
-        </div>
+        <p class="font-italic small mt-3 mb-0"
+           translate>{{readonly ? 'Open Text Specifications as defined by the supplier.' : 'Do you need to collect customized input from the buyer to fulfill this product?  Shirt text? Sign verbiage? Configure the options here.'}}</p>
         <table *ngIf="addVariableTextSpecs"
-               class="table table-borderless mt-2">
+               class="table table-borderless">
+          <colgroup>
+            <col span="1"
+                 style="width: 60%;">
+            <col span="1"
+                 style="width: 20%;">
+            <col span="1"
+                 style="width: 25%;">
+          </colgroup>
           <thead>
             <tr>
               <th translate>Customization Name</th>
@@ -36,7 +40,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="py-2 px-3"
+            <tr class=""
                 *ngFor="let spec of variableTextSpecs; let i = index;">
               <td class="vertical-align-middle">{{spec.Name}} <span *ngIf="!spec?.Required">(optional)</span></td>
               <td class="vertical-align-middle">{{spec?.xp?.CharacterLimit || 'No Limit'}}</td>
@@ -46,28 +50,31 @@
                         translate>Delete</button>
               </td>
             </tr>
-            <tr class="py-2 px-3 bg-light">
-              <td style="width: 60%">
+            <tr class="bg-light">
+              <td class="p-3">
                 <input type="text"
                        class="form-control form-control-sm"
                        id="AddVariableTextSpec"
                        placeholder="{{'Back of shirt, Sign, Line 1 etc' | translate}}">
-                <label class="check-container d-flex align-items-center"
-                       translate><small>This customization is optional</small>
+
+                <div class="custom-control custom-checkbox mt-3">
                   <input type="checkbox"
                          [checked]="!customizationRequired"
                          (change)="customizationRequired = !customizationRequired"
-                         id="DefinesVariant">
-                  <span class="checkmark"></span>
-                </label>
+                         class="custom-control-input"
+                         id="optionalCustomizationCheckbox">
+                  <label class="custom-control-label small"
+                         style="line-height:1.5rem;"
+                         for="optionalCustomizationCheckbox">This customization is optional</label>
+                </div>
               </td>
-              <td style="width: 20%">
+              <td class="p-3">
                 <input type="number"
                        min="0"
                        class="form-control form-control-sm"
                        id="CharacterLimit">
               </td>
-              <td style="width: 20%">
+              <td class="p-3">
                 <button class="btn btn-sm btn-block btn-outline-dark"
                         (click)="addVariableTextSpec()"
                         translate>ADMIN.PRODUCT_EDIT.ADD</button>
@@ -126,7 +133,9 @@
           </div>
         </div> -->
       </div>
-      <div class="card py-2 px-3 mt-3 bg-white">
+
+      <!-- Product Variations -->
+      <div class="card p-4 mt-3 bg-white">
         <div class="d-flex justify-content-between align-items-center">
           <h6 class="font-weight-medium"
               translate>ADMIN.PRODUCT_EDIT.PRODUCT_VARIATIONS</h6>
@@ -144,7 +153,7 @@
             </label>
           </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
           <div class="col-md-12">
             <small class="font-italic d-block mb-0"
                    translate>{{readonly ? 'ADMIN.PRODUCT_EDIT.PRODUCT_VARIETIES_DEFINED' : 'ADMIN.PRODUCT_EDIT.DOES_YOUR_PRODUCT'}}</small>
@@ -159,7 +168,7 @@
             </p>
           </div>
         </div>
-        <div class="row pt-3">
+        <div class="row mt-3">
           <div class="col-md-12">
             <div class="form-group"
                  *ngIf="editSpecs">
@@ -169,90 +178,94 @@
                      class="form-control add-variation"
                      id="AddVariation"
                      placeholder="{{'ADMIN.PRODUCT_EDIT.NAME_THE_VARIATION' | translate}}">
-              <label class="check-container"
-                     translate>ADMIN.PRODUCT_EDIT.SKUS_VARY
+
+              <div class="custom-control custom-checkbox mt-3">
                 <input type="checkbox"
                        [checked]="shouldDefinesVariantBeChecked()"
                        (change)="definesVariant = !definesVariant"
                        [disabled]="!variantsValid || variants?.getValue()?.length === 100"
-                       id="DefinesVariant">
-                <span class="checkmark"></span>
-              </label>
-              <button class="btn btn-outline-dark"
+                       class="custom-control-input"
+                       id="skuVariationCheckbox">
+                <label class="custom-control-label small"
+                       style="line-height:1.5rem;"
+                       for="skuVariationCheckbox"
+                       translate>ADMIN.PRODUCT_EDIT.SKUS_VARY</label>
+              </div>
+              <button class="btn btn-outline-dark mt-3"
                       (click)="addSpec()"
-                      translate>ADMIN.PRODUCT_EDIT.ADD</button>
+                      translate>ADMIN.PRODUCT_EDIT.ADD_VARIATION</button>
             </div>
           </div>
         </div>
-        <div class="row pt-3 border-top"
-             *ngIf="nonVariableTextSpecs && editSpecs">
-          <div class="col-md-12">
-            <div *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
-              <table class="table table-sm table-hover">
-                <thead>
-                  <tr>
-                    <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
-                    <th translate>ADMIN.PRODUCT_EDIT.DEFAULT</th>
-                    <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input class="form-control"
-                             id="{{spec.ID}}"
-                             type="text"
-                             maxlength="30"
-                             placeholder="{{'ADMIN.PRODUCT_EDIT.NAME' | translate}}">
-                    </td>
-                    <td>
-                      <input class="form-control"
-                             id="{{spec.ID}}Markup"
-                             type="number"
-                             placeholder="{{'ADMIN.PRODUCT_EDIT.MARKUP' | translate}}">
-                    </td>
-                    <td>
-                      <button class="btn btn-outline-dark"
-                              [disabled]="shouldDisableAddSpecOptBtn(spec)"
-                              (click)="addSpecOption(spec)"
-                              translate>ADMIN.PRODUCT_EDIT.ADD</button>
-                    </td>
-                  </tr>
-                  <tr *ngFor="let opt of spec.Options; let optionIndex = index">
-                    <td>{{opt.Value}}</td>
-                    <td>
-                      <label class="check-container mt-0">
-                        <input type="checkbox"
-                               [checked]="isDefaultSpecOption(spec.ID, opt.ID)"
-                               (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID) : setDefaultSpecOption(spec.ID, opt.ID)"
-                               [disabled]="disableSpecOption(spec.ID, opt)"
-                               id="DefaultSpecOption">
-                        <span class="checkmark"
-                              [matTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
-                        </span>
-                      </label>
-                    </td>
-                    <td>{{getPriceMarkup(opt) | currency: myCurrency?.Currency}}</td>
-                    <td>
-                      <div class="icon-button ripple hover-btn"
-                           (click)="removeSpecOption(spec, optionIndex)">
-                        <div class="icon-wrapper">
-                          <fa-icon class="text-danger"
-                                   [icon]="faTrash">
-                          </fa-icon>
+        <ng-container *ngIf="nonVariableTextSpecs && editSpecs">
+          <div class="row pt-3 border-top">
+            <div class="col-md-12">
+              <div *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
+                <table class="table table-sm table-hover">
+                  <thead>
+                    <tr>
+                      <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
+                      <th translate>ADMIN.PRODUCT_EDIT.DEFAULT</th>
+                      <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <input class="form-control"
+                               id="{{spec.ID}}"
+                               type="text"
+                               maxlength="30"
+                               placeholder="{{'ADMIN.PRODUCT_EDIT.NAME' | translate}}">
+                      </td>
+                      <td>
+                        <input class="form-control"
+                               id="{{spec.ID}}Markup"
+                               type="number"
+                               placeholder="{{'ADMIN.PRODUCT_EDIT.MARKUP' | translate}}">
+                      </td>
+                      <td>
+                        <button class="btn btn-outline-dark"
+                                [disabled]="shouldDisableAddSpecOptBtn(spec)"
+                                (click)="addSpecOption(spec)"
+                                translate>ADMIN.PRODUCT_EDIT.ADD</button>
+                      </td>
+                    </tr>
+                    <tr *ngFor="let opt of spec.Options; let optionIndex = index">
+                      <td>{{opt.Value}}</td>
+                      <td>
+                        <label class="check-container mt-0">
+                          <input type="checkbox"
+                                 [checked]="isDefaultSpecOption(spec.ID, opt.ID)"
+                                 (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID) : setDefaultSpecOption(spec.ID, opt.ID)"
+                                 [disabled]="disableSpecOption(spec.ID, opt)"
+                                 id="DefaultSpecOption">
+                          <span class="checkmark"
+                                [matTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
+                          </span>
+                        </label>
+                      </td>
+                      <td>{{getPriceMarkup(opt) | currency: myCurrency?.Currency}}</td>
+                      <td>
+                        <div class="icon-button ripple hover-btn"
+                             (click)="removeSpecOption(spec, optionIndex)">
+                          <div class="icon-wrapper">
+                            <fa-icon class="text-danger"
+                                     [icon]="faTrash">
+                            </fa-icon>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-            <!-- TODO -->
-            <!-- TODO DELETE ONCE THE UI IS REWORKED AND YOU DON'T NEED REFERENCE -->
-            <!-- TODO -->
-            <!-- <div class="card-deck">
+              <!-- TODO -->
+              <!-- TODO DELETE ONCE THE UI IS REWORKED AND YOU DON'T NEED REFERENCE -->
+              <!-- TODO -->
+              <!-- <div class="card-deck">
               <div class="product-spec card p-2"
                    *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -333,7 +346,7 @@
                 </table>
               </div>
             </div> -->
-            <!-- <div class="d-flex justify-content-end align-items-center mt-3">
+              <!-- <div class="d-flex justify-content-end align-items-center mt-3">
               <button *ngIf="editSpecs && areSpecChanges"
                       (click)="handleDiscardSpecChanges()"
                       class="btn btn-link text-dark"
@@ -349,8 +362,9 @@
                       (click)="toggleEditSpecs()"
                       translate>ADMIN.PRODUCT_EDIT.DONE</button>
             </div> -->
+            </div>
           </div>
-        </div>
+        </ng-container>
       </div>
     </div>
     <div class="col-md-5">
