@@ -13,6 +13,7 @@ using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
 using ordercloud.integrations.cms;
+using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
@@ -85,7 +86,8 @@ namespace Marketplace.Common.Commands
                             Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
                         },
-                        ProductType = obj.ProductType
+                        ProductType = obj.ProductType,
+                        Currency = obj.Currency
                     }
                 }, _user.AccessToken);
                 Asset image = new Asset()
@@ -197,7 +199,8 @@ namespace Marketplace.Common.Commands
                             Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
                         },
-                        ProductType = obj.ProductType
+                        ProductType = obj.ProductType,
+                        Currency = obj.Currency
                     }
                 }, _user.AccessToken);
                 Asset image = null;
@@ -302,7 +305,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID ??= wi.RecordId;
-                var priceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(obj.ID, new MarketplacePriceSchedule()
+                var priceSchedule = await _oc.PriceSchedules.PatchAsync<MarketplacePriceSchedule>(obj.ID, new PartialPriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -315,7 +318,7 @@ namespace Marketplace.Common.Commands
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
                 }, _user.AccessToken);
-                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(obj.ID, new MarketplaceProduct()
+                var product = await _oc.Products.PatchAsync<MarketplaceProduct>(obj.ID, new PartialProduct()
                 {
                     Active = true,
                     AutoForward = false,
@@ -345,7 +348,8 @@ namespace Marketplace.Common.Commands
                             Qty = obj.UnitOfMeasureQuantity,
                             Unit = obj.UnitOfMeasure
                         },
-                        ProductType = obj.ProductType
+                        ProductType = obj.ProductType,
+                        Currency = obj.Currency
                     }
                 }, _user.AccessToken);
                 Asset image = null;
@@ -406,47 +410,7 @@ namespace Marketplace.Common.Commands
                 throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
             }
         }
-        //public async Task<JObject> PatchAsync(WorkItem wi)
-        //{
-        //    _user ??= await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
-        //    var objProduct = wi.Diff.ToObject<PartialTemplateProductFlat>(OrchestrationSerializer.Serializer);
-
-        //    var objPrice = wi.Diff.ToObject<PartialPriceSchedule>(OrchestrationSerializer.Serializer);
-        //    // don't see evidence Assets support partials. had to choose to either ignore or always update
-        //    var obj = wi.Current.ToObject<TemplateProductFlat>(OrchestrationSerializer.Serializer);
-
-        //    try
-        //    {
-        //        var product = await _oc.Products.PatchAsync<MarketplaceProduct>(wi.RecordId, new PartialMarketplaceProduct(), wi.Token);
-        //        var priceSchedule = await _oc.PriceSchedules.PatchAsync<MarketplacePriceSchedule>(wi.RecordId, objPrice, wi.Token);
-        //        Asset image = null;
-        //        if (obj.Url != null)
-        //        {
-        //            image = await _assets.Save(obj.ID, new Asset()
-        //            {
-        //                ID = obj.ID,
-        //                Active = true,
-        //                FileName = obj.FileName,
-        //                Type = AssetType.Image,
-        //                Url = obj.Url,
-        //                Title = obj.ImageTitle,
-        //                Tags = obj.Tags?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
-        //            }, _user);
-        //        }
-        //        return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
-        //    }
-        //    catch (OrderCloudException ex)
-        //    {
-        //        await _log.Save(new OrchestrationLog(wi)
-        //        {
-        //            ErrorType = OrchestrationErrorType.PatchGeneralError,
-        //            Message = ex.Message,
-        //            Level = LogLevel.Error
-        //        });
-        //        throw new Exception(OrchestrationErrorType.PatchGeneralError.ToString(), ex);
-        //    }
-        //}
-
+      
         public Task<JObject> DeleteAsync(WorkItem wi)
         {
             throw new NotImplementedException();
