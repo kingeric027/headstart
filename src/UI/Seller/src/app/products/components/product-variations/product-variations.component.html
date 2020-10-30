@@ -448,10 +448,9 @@
             <tbody>
               <ng-container *ngFor="let variant of variants | async; let i = index">
                 <tr [ngClass]="{'selected-variant': variant === variantInSelection}">
-                  <td class="vertical-align-middle">
+                  <td class="d-flex">
                     <div class="icon-button ripple"
                          (click)="variantInSelection?.ID === variant?.ID ? closeVariantDetails() : openVariantDetails(variant)">
-                      <small class="d-inline-flex">View Details</small>
                       <div class="icon-wrapper">
                         <fa-icon [icon]="variantInSelection?.ID === variant?.ID ? faCaretDown : faCaretRight">
                         </fa-icon>
@@ -510,7 +509,7 @@
                                [icon]="faPlusCircle"
                                class="mr-2"
                                size="lg">
-                      </fa-icon> Assign Image
+                      </fa-icon>
                     </div>
                     <img *ngFor="let img of getVariantImages(variantInSelection)"
                          style="max-width: 50px"
