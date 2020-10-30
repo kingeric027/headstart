@@ -22,6 +22,11 @@ namespace Marketplace.Common.Commands
     }
     public class DocumentImportSummary
     {
+        public int Row { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+    public class DocumentImportSummary
+    {
         public int TotalCount { get; set; }
         public int ValidCount { get; set; }
         public int InvalidCount { get; set; }
@@ -45,14 +50,14 @@ namespace Marketplace.Common.Commands
     {
         public BatchProcessSummary Meta { get; set; }
         public List<Misc.Shipment> SuccessfulList = new List<Misc.Shipment>();
-        public List<DocumentRowError> FailureList = new List<DocumentRowError>();
+        public List<Misc.Shipment> FailureList = new List<Misc.Shipment>();
 
     }
 
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
-        Task<DocumentImportResult> UploadShipments(IFormFile file);
+        Task<DocumentImportResult> UploadShipments(IFormFile file, string supplierToken);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -80,25 +85,8 @@ namespace Marketplace.Common.Commands
             string buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
 
-            var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
-
-            //  platform bug. Cant save new xp values onto shipment line item. Update order line item to have this value
-            var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null);
-            await Throttler.RunAsync(shipmentItemsWithComment, 100, 5, (shipmentItem) => {
-                dynamic comments = new ExpandoObject();
-                var commentsByShipment = comments as IDictionary<string, object>;
-                commentsByShipment[ocShipment.ID] = shipmentItem.xp?.Comment;
-
-                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, shipmentItem.LineItemID,
-                    new PartialLineItem()
-                    {
-                        xp = new
-                        {
-                            Comments = commentsByShipment
-                        }
-                    });
-            });
-            var shipmentItemResponses = await Throttler.RunAsync(
+            MarketplaceShipment ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
+            IList<ShipmentItem> shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems,
                 100,
                 5,
@@ -138,16 +126,17 @@ namespace Marketplace.Common.Commands
             return relatedBuyerOrder.FromCompanyID;
         }
 
-        public async Task<DocumentImportResult> UploadShipments(IFormFile file)
+        public async Task<DocumentImportResult> UploadShipments(IFormFile file, string accessToken)
         {
             DocumentImportResult documentImportResult;
 
-            documentImportResult = await GetShipmentListFromFile(file);
+
+            documentImportResult = await GetShipmentListFromFile(file, accessToken);
 
             return documentImportResult;
         }
 
-        private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file)
+        private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file, string accessToken)
         {
             BatchProcessResult processResults;
             using Stream stream = file.OpenReadStream();
@@ -155,17 +144,68 @@ namespace Marketplace.Common.Commands
 
             DocumentImportResult result = Validate(shipments.Where(p => p.Value?.LineItemID != null).Select(p => p).ToList());
 
-            processResults = ProcessShipments(result);
+            processResults = ProcessShipments(result, accessToken);
 
-            return await Task.FromResult(result);
+            var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
+
+            //  platform bug. Cant save new xp values onto shipment line item. Update order line item to have this value
+            var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null);
+            await Throttler.RunAsync(shipmentItemsWithComment, 100, 5, (shipmentItem) => {
+                dynamic comments = new ExpandoObject();
+                var commentsByShipment = comments as IDictionary<string, object>;
+                commentsByShipment[ocShipment.ID] = shipmentItem.xp?.Comment;
+
+                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, shipmentItem.LineItemID,
+                    new PartialLineItem()
+                    {
+                        xp = new
+                        {
+                            Comments = commentsByShipment
+                        }
+                    });
+            });
+            var shipmentItemResponses = await Throttler.RunAsync(
+                superShipment.ShipmentItems,
+                100,
+                5,
+                (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
+            MarketplaceShipment ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
+            return new SuperShipment()
+            {
+                Shipment = ocShipmentWithDateShipped,
+                ShipmentItems = shipmentItemResponses.ToList()
+            };
         }
 
-        private BatchProcessResult ProcessShipments(DocumentImportResult importResult)
+        private BatchProcessResult ProcessShipments(DocumentImportResult importResult, string accessToken)
         {
             BatchProcessResult processResult = new BatchProcessResult();
 
             if (importResult == null) { return null; }
-            if (importResult.Valid.HasItem())
+            if (importResult.Valid?.Count < 0) { return null; }
+
+            foreach (Misc.Shipment shipment in importResult.Valid)
+            {
+                bool isSuccessful = ProcessShipment(shipment, accessToken);
+                if (isSuccessful) { processResult.SuccessfulList.Add(shipment); }
+                else { processResult.FailureList.Add(shipment); }
+            }
+
+            processResult.Meta = new BatchProcessSummary()
+            {
+                FailureListCount = processResult.FailureList.Count(),
+                SuccessfulCount = processResult.SuccessfulList.Count(),
+                TotalCount = importResult.Meta.TotalCount
+            };
+
+            return processResult;
+
+        }
+
+        private bool ProcessShipment(Misc.Shipment shipment, string accessToken)
+        {
+            var order = _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
+            return false;
         }
 
         public static DocumentImportResult Validate(List<RowInfo<Misc.Shipment>> rows)

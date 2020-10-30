@@ -40,7 +40,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost]
         public async Task<DocumentImportResult> UploadShipments([FromForm] AssetUpload fileRequest)
         {
-            return  await _command.UploadShipments(fileRequest?.File);
+            return  await _command.UploadShipments(fileRequest?.File, VerifiedUserContext.AccessToken);
         }
     }
 }
