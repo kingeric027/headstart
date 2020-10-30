@@ -197,42 +197,54 @@
             </div>
           </div>
         </div>
+
+        <!-- Variation Options -->
         <ng-container *ngIf="nonVariableTextSpecs && editSpecs">
           <div class="row pt-3 border-top">
             <div class="col-md-12">
-              <div *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
-                <table class="table table-sm table-hover">
+              <h6>{{variants.getValue()[0]?.xp?.SpecValues[i]?.SpecName}}</h6>
+              <div class="table-responsive"
+                   *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
+                <table class="table table-borderless table-hover">
+                  <colgroup>
+                    <col span="1"
+                         style="width: 50%;">
+                    <col span="1"
+                         style="width: 30%;">
+                    <col span="1"
+                         style="width: 20%;">
+                  </colgroup>
                   <thead>
                     <tr>
                       <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
-                      <th translate>ADMIN.PRODUCT_EDIT.DEFAULT</th>
                       <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>
-                        <input class="form-control"
+                    <tr class="bg-light">
+                      <td class="p-3">
+                        <input class="form-control form-control-sm"
                                id="{{spec.ID}}"
                                type="text"
                                maxlength="30"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.NAME' | translate}}">
                       </td>
-                      <td>
-                        <input class="form-control"
+                      <td class="p-3">
+                        <input class="form-control form-control-sm"
                                id="{{spec.ID}}Markup"
                                type="number"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.MARKUP' | translate}}">
                       </td>
-                      <td>
-                        <button class="btn btn-outline-dark"
+                      <td class="p-3">
+                        <button class="btn btn-sm btn-block btn-outline-dark"
                                 [disabled]="shouldDisableAddSpecOptBtn(spec)"
                                 (click)="addSpecOption(spec)"
                                 translate>ADMIN.PRODUCT_EDIT.ADD</button>
                       </td>
                     </tr>
-                    <tr *ngFor="let opt of spec.Options; let optionIndex = index">
+                    <tr id="optionResults"
+                        *ngFor="let opt of spec.Options; let optionIndex = index">
                       <td>{{opt.Value}}</td>
                       <td>
                         <label class="check-container mt-0">
