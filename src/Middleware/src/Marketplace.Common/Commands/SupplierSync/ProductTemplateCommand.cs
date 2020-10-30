@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using Npoi.Mapper;
 using ordercloud.integrations.cms;
+using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using IPartial = ordercloud.integrations.library.IPartial;
@@ -199,6 +200,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public bool RestrictedQuantity { get; set; }
         [OrderCloud.SDK.Required]
         public decimal? Price { get; set; }
+        public CurrencySymbol Currency { get; set; }
         public string ImageTitle { get; set; }
         public string Url { get; set; }
         public AssetType Type { get; set; }
@@ -224,6 +226,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string UnitOfMeasureQty { get; set; }
         public string UnitOfMeasure { get; set; }
         public bool IsResale { get; set; }
+        public CurrencySymbol Currency { get; set; }
     }
 
     public class TemplatePriceSchedule

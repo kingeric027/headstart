@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 export class OCMLineitemTable implements OnInit {
   @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
     this._lineItems = lineItems;
+    this.initLineItems(); // if line items change we need to regroup them
   }
   @Input() set groupByKits(bool: boolean) {
     this._groupByKits = bool;

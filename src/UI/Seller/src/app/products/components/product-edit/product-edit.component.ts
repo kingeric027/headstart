@@ -20,7 +20,7 @@ import { faTrash,
   faTimes, faCircle, faHeart, faAsterisk, faCheckCircle, faTimesCircle, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductService } from '@app-seller/products/product.service';
-import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties, Asset, MarketplaceSupplier } from '@ordercloud/headstart-sdk';
+import { SuperMarketplaceProduct, ListPage, HeadStartSDK, SpecOption, ProductXp, TaxProperties, Asset } from '@ordercloud/headstart-sdk';
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper';
@@ -32,7 +32,7 @@ import { getProductMediumImageUrl } from '@app-seller/products/product-image.hel
 import { takeWhile } from 'rxjs/operators';
 import { SizerTiersDescriptionMap } from './size-tier.constants';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MonitoredProductFieldModifiedNotification, MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+import { MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 
 @Component({
   selector: 'app-product-edit',
@@ -98,13 +98,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   newPriceBreakPrice = 0;
   newPriceBreakQty = 2;
   newProductPriceBreaks = [];
-  availableProductTypes: any = [];
+  availableProductTypes = [];
   availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
   isSpecsEditing = false;
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[];
-  supplier: MarketplaceSupplier;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -337,8 +336,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async getAvailableProductTypes(): Promise<void> {
-    this.supplier = await this.currentUserService.getMySupplier();
-    this.availableProductTypes = this.supplier?.xp?.ProductTypes || ['Standard', 'Quote', 'PurchaseOrder', 'Kit'];
+    const supplier = await this.currentUserService.getMySupplier();
+    this.availableProductTypes = supplier?.xp?.ProductTypes || ['Standard', 'Quote', 'PurchaseOrder', 'Kit'];
   }
 
   async handleSave(): Promise<void> {

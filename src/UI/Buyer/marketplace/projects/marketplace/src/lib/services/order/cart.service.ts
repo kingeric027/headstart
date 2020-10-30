@@ -15,8 +15,10 @@ export class CartService {
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
-  constructor(private state: OrderStateService,
-    private tempSdk: TempSdk) { }
+  constructor(
+    private state: OrderStateService,
+    private tempSdk: TempSdk
+  ) { }
 
   get(): ListPage<MarketplaceLineItem> {
     return this.lineItems;
@@ -108,6 +110,12 @@ export class CartService {
   }
 
   private hasSameSpecs(line1: MarketplaceLineItem, line2: MarketplaceLineItem): boolean {
+    if(!line1?.Specs?.length && !line2?.Specs?.length) {
+      return true;
+    }
+    if((!line1?.Specs?.length && line2?.Specs?.length) || (line1?.Specs?.length && !line2?.Specs?.length)) {
+      return false;
+    }
     const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
     const sortedSpecs2 = line2.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
     return JSON.stringify(sortedSpecs1) === JSON.stringify(sortedSpecs2);

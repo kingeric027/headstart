@@ -44,6 +44,18 @@
       <!--Add To Cart-->
       <div *ngIf="ShowAddToCart">
         <div>
+          <div class="pb-3 mb-3 border-bottom border-light">
+            <a class="d-block my-2" href="javascript:;"
+              (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">
+              {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}
+            </a>
+            <h1 class="h3 my-0">
+              {{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
+            </h1>
+            <ocm-toggle-favorite title="Favorite" (click)="$event.stopPropagation()" [favorite]="isFavorite()"
+              (favoriteChanged)="setIsFavorite($event.detail)">
+            </ocm-toggle-favorite>
+          </div>
           <div *ngIf="supplierNote" class="alert alert-info my-3">
             <b>
             </b><span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
