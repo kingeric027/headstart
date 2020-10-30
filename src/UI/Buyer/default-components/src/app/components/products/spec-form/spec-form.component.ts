@@ -93,7 +93,7 @@ export class OCMSpecForm implements OnChanges {
     return new FormControl({ disabled, value }, validation);
   }
 
-  handleChange(): void { 
+  handleChange(): void {
     this.validateChangeAvailability(this.form, this.disabledVariants);
     this.specFormChange.emit({
       form: this.form,
@@ -103,8 +103,8 @@ export class OCMSpecForm implements OnChanges {
   validateChangeAvailability(form: FormGroup, disabledVariants: MarketplaceVariant[]): void {
     let controlInactive = false;
     if (!disabledVariants) { return; }
-    if (disabledVariants?.length < 1){ return; }
-    for(const disabledVariant of disabledVariants){
+    if (disabledVariants?.length < 1) { return; }
+    for (const disabledVariant of disabledVariants) {
       if (this.isControlInactive(form.value.ctrls, disabledVariant)) {
         controlInactive = true;
         this.isSelectionInactive.emit(controlInactive);
@@ -119,17 +119,17 @@ export class OCMSpecForm implements OnChanges {
 
   isControlInactive(ctrls: string[], disabledVariant: MarketplaceVariant): boolean {
     let controlCount = 0;
-   for (const variant of disabledVariant.Specs) {
-     ctrlLoop:
-     for (const controlValue of ctrls){
-       if (variant.Value === controlValue) {
-        controlCount = controlCount + 1;
-        if (controlCount ===  ctrls.length){ return true; }
-        break ctrlLoop;
-       }
-     }
-   }
-   return false;
+    for (const variant of disabledVariant.Specs) {
+      ctrlLoop:
+      for (const controlValue of ctrls) {
+        if (variant.Value === controlValue) {
+          controlCount = controlCount + 1;
+          if (controlCount === ctrls.length) { return true; }
+          break ctrlLoop;
+        }
+      }
+    }
+    return false;
   }
 
   private createCheckboxField(spec: Spec): FieldConfig {

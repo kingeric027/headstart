@@ -140,7 +140,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   calculatePrice(): void {
-    this.price = this.productDetailService.getProductPrice(this.priceBreaks, this.specs, this.specForm, this.quantity);
+    this.price = this.productDetailService.getProductPrice(this.priceBreaks, this.specs, this.quantity, this.specForm);
     if (this.priceBreaks?.length) {
       const basePrice = this.quantity * this.priceBreaks[0].Price;
       this.percentSavings = this.productDetailService.getPercentSavings(this.price, basePrice)

@@ -69,7 +69,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
-    this.disabled = this.isQtyChanging;
+    this.disabled = this.isQtyChanging || (priceSchedule.MinQuantity === priceSchedule.MaxQuantity);
     this.isQtyRestricted = priceSchedule.RestrictedQuantity;
     this.inventory = this.getInventory(product);
     this.min = this.minQty(priceSchedule);
@@ -101,8 +101,8 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   getMaxQty(): number {
     if (this.variantInventory && !this.product?.Inventory?.OrderCanExceed) {
       return this.variantInventory;
-    } else if(this.product?.Inventory?.Enabled 
-      && !this.product?.Inventory?.OrderCanExceed 
+    } else if (this.product?.Inventory?.Enabled
+      && !this.product?.Inventory?.OrderCanExceed
       && !this.product?.Inventory?.VariantLevelTracking) {
       return this.product?.Inventory?.QuantityAvailable;
     }
@@ -114,8 +114,8 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     const endUrl = splitUrl[splitUrl.length - 1];
     if (!endUrl.includes('cart')) {
       const productInCart = this.context.order.cart.get()?.Items
-      ?.filter(i => i.ProductID === this.product?.ID)
-      ?.find(p => p.Variant?.ID === this.selectedVariant?.ID);
+        ?.filter(i => i.ProductID === this.product?.ID)
+        ?.find(p => p.Variant?.ID === this.selectedVariant?.ID);
       if (productInCart) {
         qty = qty + productInCart.Quantity;
       }

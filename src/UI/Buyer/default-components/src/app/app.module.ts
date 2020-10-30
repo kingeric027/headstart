@@ -146,6 +146,11 @@ import { SafeHTMLPipe } from './pipes/safe-html.pipe';
 import { OCMStaticPage } from './components/layout/static-page/static-page.component';
 import { OCMProductChiliConfig } from './components/products/product-chili-configuration/product-chili-configuration.component';
 import { OCMKitProductDetails } from './components/products/kit-product-details/kit-product-details.component';
+import { KitProductNameWithSpecsPipe } from './pipes/kitproduct-name-with-specs.pipe';
+import { OCMProductAttachments } from './components/products/product-attachments/product-attachments.component';
+import { OCMKitStaticCard } from './components/products/kit-static-card/kit-static-card.component';
+import { OCMKitVariableCard } from './components/products/kit-variable-card/kit-variable-card.component';
+import { OCMKitVariantSelector } from './components/products/kit-variant-selector/kit-variant-selector.component';
 
 export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): TranslateHttpLoader {
   return new TranslateHttpLoader(http, appConfig.translateBlobUrl);
@@ -153,6 +158,9 @@ export function HttpLoaderFactory(http: HttpClient, appConfig: AppConfig): Trans
 }
 
 const components = [
+  OCMKitStaticCard,
+  OCMKitVariableCard,
+  OCMKitVariantSelector,
   OCMCategoryDropdown,
   OCMQuoteRequestForm,
   OCMContactSupplierForm,
@@ -236,7 +244,8 @@ const components = [
   OCMLocationListItem,
   OCMLocationManagement,
   OCMCertificateForm,
-  OCMProductChiliConfig
+  OCMProductChiliConfig,
+  OCMProductAttachments
 ];
 
 // @dynamic
@@ -248,6 +257,7 @@ const components = [
     CreditCardInputDirective,
     SpecFieldDirective,
     ProductNameWithSpecsPipe,
+    KitProductNameWithSpecsPipe,
     OrderStatusDisplayPipe,
     PhoneFormatPipe,
     ChildCategoryPipe,
@@ -327,6 +337,10 @@ export class AppModule {
 
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details');
     this.buildWebComponent(OCMProductChiliConfig, 'ocm-product-chili-configuration');
+    this.buildWebComponent(OCMProductAttachments, 'ocm-product-attachments');
+    this.buildWebComponent(OCMKitVariableCard, 'ocm-kit-variable-card');
+    this.buildWebComponent(OCMKitStaticCard, 'ocm-kit-static-card');
+    this.buildWebComponent(OCMKitVariantSelector, 'ocm-kit-variant-selector');
     this.buildWebComponent(OCMKitProductDetails, 'ocm-kit-product-details');
     this.buildWebComponent(OCMCart, 'ocm-cart');
     this.buildWebComponent(OCMHomePage, 'ocm-home-page');
