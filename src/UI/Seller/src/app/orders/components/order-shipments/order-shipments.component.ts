@@ -292,14 +292,12 @@ export class OrderShipmentsComponent implements OnChanges {
         .map(li => {
           return { LineItemID: li.ID, OrderID: this._order?.ID, QuantityShipped: shipment.LineItemData[li.ID].Quantity, 
             xp: {
-              Comments: shipment.LineItemData[li.ID].Comment 
+              Comment: shipment.LineItemData[li.ID].Comment 
             }
           };
         })
         .filter(li => li !== undefined),
     };
-    console.log(superShipment);
-    debugger;
     this.patchLineItems();
     const postedShipment: any = await this.httpClient
       .post(this.appConfig.middlewareUrl + '/shipment', superShipment, httpOptions)
