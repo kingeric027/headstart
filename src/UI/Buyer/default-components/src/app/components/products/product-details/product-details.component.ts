@@ -3,7 +3,7 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons';
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk';
 import { MarketplaceMeProduct, ShopperContextService, CurrentUser, ContactSupplierBody } from 'marketplace';
 import { PriceSchedule } from 'ordercloud-javascript-sdk';
-import { MarketplaceLineItem, Asset, QuoteOrderInfo, ProductInKit, ChiliConfig, MarketplaceVariant } from '@ordercloud/headstart-sdk';
+import { MarketplaceLineItem, Asset, QuoteOrderInfo, ProductInKit, ChiliConfig, MarketplaceVariant, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { Observable } from 'rxjs';
 import { ModalState } from 'src/app/models/modal-state.class';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -88,7 +88,7 @@ export class OCMProductDetails implements OnInit {
     if (!this._product?.xp?.ArtworkRequired) {
       return;
     }
-    const chiliConfigs = await this.context.chiliConfig.listChiliConfigs();
+    const chiliConfigs = await HeadStartSDK.ChiliConfigs.List({ filters: { SupplierProductID: this._product.ID }, pageSize: 100 })
     this._chiliConfigs = chiliConfigs.Items.filter(item => (item.SupplierProductID === this._product.ID && item.BuyerID === this.currentUser.Buyer.ID));
   }
 

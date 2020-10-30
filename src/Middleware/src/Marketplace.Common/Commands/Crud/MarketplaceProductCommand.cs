@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Extensions;
 using Marketplace.Models;
-using Newtonsoft.Json;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
@@ -292,6 +292,7 @@ namespace Marketplace.Common.Commands.Crud
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Make assignments for the new specs
 			await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = s.ID }, accessToken: user.AccessToken));
+			HandleSpecOptionChanges(requestSpecs, existingSpecs, user);
 			// Check if Variants differ
 			var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
 			var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
@@ -356,7 +357,51 @@ namespace Marketplace.Common.Commands.Crud
 			return false;
 		}
 
-		public async Task Delete(string id, VerifiedUserContext user)
+		private async void HandleSpecOptionChanges(IList<Spec> requestSpecs, IList<Spec> existingSpecs, VerifiedUserContext user)
+        {
+			var requestSpecOptions = new Dictionary<string, List<SpecOption>>();
+			var existingSpecOptions = new List<SpecOption>();
+			foreach (Spec requestSpec in requestSpecs)
+			{
+				List<SpecOption> specOpts = new List<SpecOption>();
+				foreach (SpecOption requestSpecOption in requestSpec.Options)
+				{
+					specOpts.Add(requestSpecOption);
+				}
+				requestSpecOptions.Add(requestSpec.ID, specOpts);
+			}
+			foreach (Spec existingSpec in existingSpecs)
+            {
+				foreach (SpecOption existingSpecOption in existingSpec.Options)
+                {
+					existingSpecOptions.Add(existingSpecOption);
+				}
+            }
+			foreach (var spec in requestSpecOptions)
+			{
+				IList<SpecOption> changedSpecOptions = ChangedSpecOptions(spec.Value, existingSpecOptions);
+				await Throttler.RunAsync(changedSpecOptions, 100, 5, option => _oc.Specs.SaveOptionAsync(spec.Key, option.ID, option, user.AccessToken));
+			}
+		}
+
+        private IList<SpecOption> ChangedSpecOptions(List<SpecOption> requestOptions, List<SpecOption> existingOptions)
+        {
+            return requestOptions.FindAll(requestOption => OptionHasChanges(requestOption, existingOptions));
+        }
+
+        private bool OptionHasChanges(SpecOption requestOption, List<SpecOption> currentOptions)
+        {
+			var matchingOption = currentOptions.Find(currentOption => currentOption.ID == requestOption.ID);
+			if (matchingOption == null) { return false; };
+			if (matchingOption.PriceMarkup != requestOption.PriceMarkup) { return true; };
+			if (matchingOption.IsOpenText != requestOption.IsOpenText) { return true; };
+			if (matchingOption.ListOrder != requestOption.ListOrder) { return true; };
+			if (matchingOption.PriceMarkupType != requestOption.PriceMarkupType) { return true; };
+
+			return false;
+        }
+
+        public async Task Delete(string id, VerifiedUserContext user)
 		{
 			var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
 			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
@@ -375,15 +420,16 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
 		{
 			//Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-			//All suppliers have integration clients with a default user of dev_{supplierID}.
-			var supplierClient = await _oc.ApiClients.ListAsync(filters: $"DefaultContextUserName=dev_{supplierID}");
-			var selectedSupplierClient = supplierClient.Items[0];
+			var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
+			if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
+			ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+			if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
 			var configToUse = new OrderCloudClientConfig
 			{
 				ApiUrl = user.ApiUrl,
 				AuthUrl = user.AuthUrl,
-				ClientId = selectedSupplierClient.ID,
-				ClientSecret = selectedSupplierClient.ClientSecret,
+				ClientId = supplierClient.ID,
+				ClientSecret = supplierClient.ClientSecret,
 				GrantType = GrantType.ClientCredentials,
 				Roles = new[]
 						   {
