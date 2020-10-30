@@ -87,8 +87,7 @@ export class ProductPricingComponent {
 
   getBuyerPercentMarkupPrice(supplierPrice: number): number {
     const markupMultiplier = (this.selectedSuperMarketplaceBuyer?.Markup?.Percent || 0) / 100 + 1;
-    const conversionRate = this.supplierToSellerCurrencyRate * markupMultiplier;
-    return supplierPrice * conversionRate;
+    return supplierPrice * markupMultiplier * (1/this.supplierToSellerCurrencyRate);
 
   }
 
