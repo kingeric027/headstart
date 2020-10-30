@@ -32,7 +32,7 @@ import { getProductMediumImageUrl } from '@app-seller/products/product-image.hel
 import { takeWhile } from 'rxjs/operators';
 import { SizerTiersDescriptionMap } from './size-tier.constants';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MonitoredProductFieldModifiedNotification, MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+import { MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 
 @Component({
   selector: 'app-product-edit',
@@ -102,7 +102,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
-  isSpecsEditing = false;
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[];
   supplier: MarketplaceSupplier;
 
@@ -196,11 +195,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
-  }
-
-
-  specsBeingEdited(event): void {
-    this.isSpecsEditing = event;
   }
 
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
