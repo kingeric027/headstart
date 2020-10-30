@@ -3,21 +3,22 @@
        *ngFor="let liGroup of liGroupedByShipFrom; index as i">
     <div class="card-header p-3">
       <div class="row"
-           *ngIf="suppliers?.length > 0 && suppliers[i]?.shipFrom && suppliers[i]?.supplier">
+           *ngIf="suppliers?.length > 0 && suppliers[i]?.supplier">
         <div class="col-md">
           <h2 class="card-title h6 mb-0">
             <span class="text-medium font-weight-light">Ship From: </span>{{ suppliers[i].supplier.Name }}
           </h2>
         </div>
         <div class="col-md d-flex flex-column justify-content-end text-md-right">
-          <address class="small text-muted mb-0">{{ suppliers[i].shipFrom.Street1 }} {{ suppliers[i].shipFrom.Street2 }} | {{ suppliers[i].shipFrom.City }},
-            {{ suppliers[i].shipFrom.State }},
-            {{ suppliers[i].shipFrom.Zip }}
+          <address *ngIf="suppliers[i]?.shipFrom"
+                   class="small text-muted mb-0">{{ suppliers[i].shipFrom?.Street1 }} {{ suppliers[i].shipFrom?.Street2 }} | {{ suppliers[i].shipFrom?.City }},
+            {{ suppliers[i].shipFrom?.State }},
+            {{ suppliers[i].shipFrom?.Zip }}
           </address>
           <address class="small text-muted mb-0"
                    *ngIf="suppliers[i].supplier?.xp?.Contacts">
-            {{ suppliers[i].supplier.xp.Contacts[0].Phone | phoneFormat }} |
-            {{ suppliers[i].supplier.xp.Contacts[0].Email }}
+            {{ suppliers[i].supplier.xp.Contacts[0]?.Phone | phoneFormat }} |
+            {{ suppliers[i].supplier.xp.Contacts[0]?.Email }}
           </address>
         </div>
       </div>
