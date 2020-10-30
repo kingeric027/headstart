@@ -41,6 +41,11 @@ export class SpecFormService {
             OptionID: option.ID,
             Value: option.Value,
           });
+        } else {
+          specs.push({
+            SpecID: spec.ID,
+            Value: formValues[value]
+          })
         }
       }
     }
