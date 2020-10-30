@@ -71,8 +71,6 @@ namespace Marketplace.Common
         public string ClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
         public string DevcenterApiUrl { get; set; }
-        public string SEBDistributionSupplierID { get; set; }
-        public string ProvisionSupplierID { get; set; }
     }
 
 	public class AvalaraSettings
@@ -94,8 +92,8 @@ namespace Marketplace.Common
         public string SMGFedexAccountId { get; set; }
         public string ProvisionFedexAccountId { get; set; } 
         public string SEBDistributionFedexAccountId { get; set; }
-
     }
+
     public class SendgridSettings
     {
         public string ApiKey { get; set; }

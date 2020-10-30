@@ -59,11 +59,23 @@ namespace ordercloud.integrations.cardconnect
 			var ccAmount = GetAmountToCharge(orderWorksheet);
 
 			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, payment.PaymentID);
-			var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
-			ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
-			var transaction = await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
-				CardConnectMapper.Map(order, ocPayment, call));
-			return transaction;
+            try
+            {
+                var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
+                ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment {Accepted = true, Amount = ccAmount});
+                return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, call));
+            }
+            catch (CreditCardIntegrationException ex)
+            {
+                ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
+                await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
+                throw new OrderCloudIntegrationException(new ApiError()
+                {
+                    Data = ex.Response,
+                    Message = ex.ApiError.Message,
+                    ErrorCode = ex.ApiError.ErrorCode
+                });
+			}
 		}
 
 		private decimal GetAmountToCharge(OrderWorksheet orderWorksheet)

@@ -1,6 +1,5 @@
 ﻿namespace ordercloud.integrations.cardconnect
 {
-
     public class CardConnectAuthorizationRequest
     {
         public string merchid { get; set; }
@@ -22,7 +21,6 @@
         //public string capture { get; set; }
         //public string bin { get; set; }
     }
-
 
     public class CardConnectAuthorizationResponse
     {

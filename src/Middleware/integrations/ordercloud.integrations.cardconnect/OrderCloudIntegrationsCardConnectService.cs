@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Flurl.Http;
-using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cardconnect
@@ -59,72 +58,55 @@ namespace ordercloud.integrations.cardconnect
 
             // Each payment processor has a unique set of response codes. Generally, a processor response code(respcode) beginning with "00" or "000" is a successful authorization request; any other code is a decline.  
             // https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
-            if(attempt.respcode == "101")
+            if (attempt.IsExpired())
             {
-                throw new OrderCloudIntegrationException(new ApiError()
+                throw new CreditCardIntegrationException(new ApiError()
                 {
                     Data = attempt,
                     Message = $"Card has expired",
                     ErrorCode = attempt.respcode
-                });
+                }, attempt);
             }
-            else if(attempt.respcode == "500")
+            else if(attempt.IsDeclined())
             {
-                throw new OrderCloudIntegrationException(new ApiError()
+                throw new CreditCardIntegrationException(new ApiError()
                 {
                     Data = attempt,
                     Message = $"Card was declined",
                     ErrorCode = attempt.respcode
-                });
+                }, attempt);
             }
-            else if (!PassedAVSCheck(attempt))
+            else if (!attempt.PassedAVSCheck())
             {
-                throw new OrderCloudIntegrationException(new ApiError()
+                throw new CreditCardIntegrationException(new ApiError()
                 {
                     Data = attempt,
                     Message = $"Billing address on credit card incorrect",
                     ErrorCode = attempt.respcode
-                });
+                }, attempt);
             }
-            else if (!PassedCvvCheck(attempt, request))
+            else if (!attempt.PassedCvvCheck(request))
             {
-                throw new OrderCloudIntegrationException(new ApiError()
+                throw new CreditCardIntegrationException(new ApiError()
                 {
                     Data = attempt,
                     Message = $"CVV Validation Failure",
                     ErrorCode = attempt.respcode
-                });
+                }, attempt);
             }
-            else if (!WasSuccessful(attempt))
+            else if (!attempt.WasSuccessful())
             {
-                throw new OrderCloudIntegrationException(new ApiError()
+                throw new CreditCardIntegrationException(new ApiError()
                 {
                     Data = attempt,
                     Message = $"{attempt.respstat.ToResponseStatus()} : {attempt.resptext}",
                     ErrorCode = attempt.respcode
-                });
+                }, attempt);
             }
             return attempt;
 
         }
 
-        private static bool WasSuccessful(CardConnectAuthorizationResponse attempt)
-        {
-            return attempt.respstat == "A" && (attempt.respcode == "0" || attempt.respcode == "00" || attempt.respcode == "000");
-        }
-
-        private static bool PassedCvvCheck(CardConnectAuthorizationResponse attempt, CardConnectAuthorizationRequest request)
-        {
-            if (request.cvv2 == null && (attempt.cvvresp == "P" || attempt.cvvresp == null)) 
-                return true;
-            return (attempt.cvvresp != null &&
-                    attempt.cvvresp != "N" && attempt.cvvresp != "P" && attempt.cvvresp != "U");
-        }
-
-        private static bool PassedAVSCheck(CardConnectAuthorizationResponse attempt)
-        {
-            return (attempt.avsresp != null &&
-                    (attempt.avsresp != "N" && attempt.avsresp != "A" && attempt.avsresp != "Z"));
-        }
+        
     }
 }
