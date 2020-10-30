@@ -193,7 +193,20 @@ namespace Marketplace.Common.Commands.Crud
                     var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
                     await Task.WhenAll(specListRequest, variantListRequest);
 
-                    p.Product = await productRequest;
+                    var product = await productRequest;
+                    if(product?.PriceSchedule != null)
+                    {
+                        // set min/max from kit only if its within the bounds of what the product can set
+                        // this should be enforced at the admin creation level but may change after initially set
+                        if (product.PriceSchedule.MinQuantity == null || p.MinQty > product.PriceSchedule.MinQuantity)
+                            product.PriceSchedule.MinQuantity = p.MinQty;
+                        if ( 
+                            product.PriceSchedule.MaxQuantity > product.PriceSchedule.MinQuantity && // this check is necessary because kit min qty may have changed it
+                            (product.PriceSchedule.MaxQuantity == null || p.MaxQty < product.PriceSchedule.MaxQuantity))
+                            product.PriceSchedule.MaxQuantity = p.MaxQty;
+                    }
+
+                    p.Product = product;
                     p.Specs = await specListRequest;
                     p.Variants = await variantListRequest;
                     p.Images = await GetProductImages(p.ID, user);

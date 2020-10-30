@@ -43,7 +43,6 @@ export class OCMKitVariantSelector {
     this.productKitDetails = this._event.productKitDetails;
     this.selection = this._event.selection;
     this.disabledVariants = this.productKitDetails.Variants.filter(v => !v.Active)
-    this.setKitMinAndMax();
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
@@ -60,9 +59,9 @@ export class OCMKitVariantSelector {
     } else {
       const maxQty = this.productKitDetails.Product.PriceSchedule.MaxQuantity;
       const minQty = this.productKitDetails.Product.PriceSchedule.MinQuantity;
-      if (qty > maxQty) {
+      if (maxQty && qty > maxQty) {
         this.errorMessage = `Quantity must not exceed ${maxQty}`
-      } else if (qty < minQty) {
+      } else if (minQty && qty < minQty) {
         this.errorMessage = `Quantity must not be less than ${minQty}`
       }
     }
@@ -114,15 +113,6 @@ export class OCMKitVariantSelector {
           ? this.kitProduct.Images[0].Url
           : 'http://placehold.it/60x60'
       }
-    }
-  }
-
-  setKitMinAndMax(): void {
-    // use min/max defined on the kit which can be more restrictive than what's set at the product level
-    const isOrderable = this.productKitDetails.Product.PriceSchedule;
-    if (isOrderable) {
-      this.productKitDetails.Product.PriceSchedule.MinQuantity = this.productKitDetails.MinQty;
-      this.productKitDetails.Product.PriceSchedule.MaxQuantity = this.productKitDetails.MaxQty;
     }
   }
 }

@@ -42,7 +42,6 @@ export class OCMKitStaticCard {
       `${appSettings.middlewareUrl}/assets/${appSettings.sellerID}/products/${this._productKitDetails.Product.ID}/thumbnail?size=S` :
       'http://placehold.it/60x60';
     this.specForm = this.buildStaticSpecForm();
-    this.setKitMinAndMax();
   }
 
   qtyChange({ valid, qty }: QtyChangeEvent): void {
@@ -62,9 +61,9 @@ export class OCMKitStaticCard {
       this.removeLineItem.emit(this.buildLineItem());
       const maxQty = this._productKitDetails.Product.PriceSchedule.MaxQuantity;
       const minQty = this._productKitDetails.Product.PriceSchedule.MinQuantity;
-      if (qty > maxQty) {
+      if (maxQty && qty > maxQty) {
         this.errorMessage = `Quantity must not exceed ${maxQty}`
-      } else if (qty < minQty) {
+      } else if (minQty && qty < minQty) {
         this.errorMessage = `Quantity must not be less than ${minQty}`
       }
     }
@@ -129,14 +128,4 @@ export class OCMKitStaticCard {
     })
     return form as FormGroup;
   }
-
-  setKitMinAndMax(): void {
-    // use min/max defined on the kit which can be more restrictive than what's set at the product level
-    const isOrderable = this._productKitDetails.Product.PriceSchedule;
-    if (isOrderable) {
-      this._productKitDetails.Product.PriceSchedule.MinQuantity = this._productKitDetails.MinQty;
-      this._productKitDetails.Product.PriceSchedule.MaxQuantity = this._productKitDetails.MaxQty;
-    }
-  }
-
 }
