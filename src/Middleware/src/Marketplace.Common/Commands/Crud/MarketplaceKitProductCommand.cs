@@ -168,6 +168,8 @@ namespace Marketplace.Common.Commands.Crud
                     p.Specs = await specListRequest;
                     p.Variants = await variantListRequest;
                     p.Images = await GetProductImages(p.ID, user);
+                    p.Attachments = await GetProductAttachments(p.ID, user);
+
                 } catch(Exception)
                 {
                     p.Product = null;
@@ -195,6 +197,7 @@ namespace Marketplace.Common.Commands.Crud
                     p.Specs = await specListRequest;
                     p.Variants = await variantListRequest;
                     p.Images = await GetProductImages(p.ID, user);
+                    p.Attachments = await GetProductAttachments(p.ID, user);
                 }
                 catch (Exception)
                 {
