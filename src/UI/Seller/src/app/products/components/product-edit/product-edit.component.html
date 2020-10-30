@@ -168,7 +168,7 @@
                            translate>ADMIN.PRODUCT_EDIT.ACTIVE</label>
                     <label class="d-block switch mb-0">
                       <input class="form-check-input"
-                            [attr.disabled]="readonly ? true : null"
+                             [attr.disabled]="readonly ? true : null"
                              type="checkbox"
                              (click)="handleUpdateProduct($event, 'Product.Active')"
                              [checked]="_superMarketplaceProductEditable?.Product.Active">
@@ -662,8 +662,7 @@
                                         [copyProductResource]="copyProductResource"
                                         [myCurrency]="supplierCurrency"
                                         (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                        (variantsValidated)="validateVariants($event)"
-                                        (isSpecsEditing)="specsBeingEdited($event)">
+                                        (variantsValidated)="validateVariants($event)">
           </product-variations-component>
         </ng-template>
       </li>
@@ -873,14 +872,14 @@
          class="text-danger"
          translate>ADMIN.PRODUCT_EDIT.VARIATION_ISSUES</p>
       <div>
-        <button *ngIf="areChanges && !isSpecsEditing"
+        <button *ngIf="areChanges"
                 class="btn btn-primary"
                 type="submit"
                 [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
-                *ngIf="areChanges && !isCreatingNew && !isSpecsEditing"
+                *ngIf="areChanges && !isCreatingNew"
                 translate>COMMON.DISCARD_CHANGES</button>
       </div>
     </div>
