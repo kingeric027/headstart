@@ -50,7 +50,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.userContext.Me.Supplier ? this.getSupplierOrg() : (this.organizationName = this.appConfig.sellerName);
     this.refresh(this.userContext.Me);
     this.setProfileImgSrc();
-    this.retrieveNotifications();
+    if (this.userContext?.UserType === 'SELLER') this.retrieveNotifications();
 }
 
   setUpSubs(): void {
