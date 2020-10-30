@@ -51,7 +51,7 @@
               </td>
             </tr>
             <tr class="bg-light">
-              <td class="p-3">
+              <td class="py-3 px-2">
                 <input type="text"
                        class="form-control form-control-sm"
                        id="AddVariableTextSpec"
@@ -68,13 +68,13 @@
                          for="optionalCustomizationCheckbox">This customization is optional</label>
                 </div>
               </td>
-              <td class="p-3">
+              <td class="py-3 px-2">
                 <input type="number"
                        min="0"
                        class="form-control form-control-sm"
                        id="CharacterLimit">
               </td>
-              <td class="p-3">
+              <td class="py-3 px-2">
                 <button class="btn btn-sm btn-block btn-outline-dark"
                         (click)="addVariableTextSpec()"
                         translate>ADMIN.PRODUCT_EDIT.ADD</button>
@@ -191,7 +191,7 @@
                        for="skuVariationCheckbox"
                        translate>ADMIN.PRODUCT_EDIT.SKUS_VARY</label>
               </div>
-              <button class="btn btn-outline-dark mt-3"
+              <button class="btn btn-outline-secondary mt-3"
                       (click)="addSpec()"
                       translate>ADMIN.PRODUCT_EDIT.ADD_VARIATION</button>
             </div>
@@ -200,43 +200,49 @@
 
         <!-- Variation Options -->
         <ng-container *ngIf="nonVariableTextSpecs && editSpecs">
-          <div class="row pt-3 border-top">
+          <div class="row pt-3 border-top"
+               *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
             <div class="col-md-12">
-              <h6>{{variants.getValue()[0]?.xp?.SpecValues[i]?.SpecName}}</h6>
-              <div class="table-responsive"
-                   *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
-                <table class="table table-borderless table-hover">
+              <h6>{{spec.Name}}</h6>
+              <div class="table-responsive">
+                <table class="table table-borderless">
                   <colgroup>
                     <col span="1"
-                         style="width: 50%;">
+                         style="width: 40%;">
                     <col span="1"
-                         style="width: 30%;">
+                         style="width: 20%;">
+                    <col span="1"
+                         style="width: 20%;">
                     <col span="1"
                          style="width: 20%;">
                   </colgroup>
                   <thead>
                     <tr>
                       <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
+                      <th translate>ADMIN.PRODUCT_EDIT.DEFAULT</th>
                       <th translate>ADMIN.PRODUCT_EDIT.PRICE_MARKUP</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr class="bg-light">
-                      <td class="p-3">
+                      <td class="py-3 px-2">
                         <input class="form-control form-control-sm"
                                id="{{spec.ID}}"
                                type="text"
                                maxlength="30"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.NAME' | translate}}">
                       </td>
-                      <td class="p-3">
+                      <td class="py-3 px-2">
+                        <!-- intentionally left blank -->
+                      </td>
+                      <td class="py-3 px-2">
                         <input class="form-control form-control-sm"
                                id="{{spec.ID}}Markup"
                                type="number"
                                placeholder="{{'ADMIN.PRODUCT_EDIT.MARKUP' | translate}}">
                       </td>
-                      <td class="p-3">
+                      <td class="py-3 px-2">
                         <button class="btn btn-sm btn-block btn-outline-dark"
                                 [disabled]="shouldDisableAddSpecOptBtn(spec)"
                                 (click)="addSpecOption(spec)"
@@ -245,29 +251,27 @@
                     </tr>
                     <tr id="optionResults"
                         *ngFor="let opt of spec.Options; let optionIndex = index">
-                      <td>{{opt.Value}}</td>
-                      <td>
-                        <label class="check-container mt-0">
+                      <td class="vertical-align-middle">{{opt.Value}}</td>
+                      <td class="vertical-align-middle">
+                        <div class="custom-control custom-checkbox">
                           <input type="checkbox"
+                                 class="custom-control-input position-static"
                                  [checked]="isDefaultSpecOption(spec.ID, opt.ID)"
                                  (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID) : setDefaultSpecOption(spec.ID, opt.ID)"
                                  [disabled]="disableSpecOption(spec.ID, opt)"
-                                 id="DefaultSpecOption">
-                          <span class="checkmark"
-                                [matTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
-                          </span>
-                        </label>
-                      </td>
-                      <td>{{getPriceMarkup(opt) | currency: myCurrency?.Currency}}</td>
-                      <td>
-                        <div class="icon-button ripple hover-btn"
-                             (click)="removeSpecOption(spec, optionIndex)">
-                          <div class="icon-wrapper">
-                            <fa-icon class="text-danger"
-                                     [icon]="faTrash">
-                            </fa-icon>
-                          </div>
+                                 id="DefaultSpecOption"
+                                 [matTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
+                          <label class="custom-control-label sr-only"
+                                 for="DefaultSpecOption">
+                            Default Spec Option
+                          </label>
                         </div>
+                      </td>
+                      <td class="vertical-align-middle">{{getPriceMarkup(opt) | currency: myCurrency?.Currency}}</td>
+                      <td class="vertical-align-middle">
+                        <button class="btn btn-sm btn-block btn-link text-muted"
+                                (click)="removeSpecOption(spec, optionIndex)"
+                                translate>ADMIN.PRODUCT_EDIT.REMOVE_OPTION</button>
                       </td>
                     </tr>
                   </tbody>
@@ -393,7 +397,7 @@
   </div>
 
   <!-- Variant Matrix -->
-  <div class="row pt-3 position-relative product-variations">
+  <div class="row my-4 product-variations">
     <!-- <div class="variant-overlay"
          *ngIf="editSpecs">
       <span *ngIf="specsWithoutVariations?.length || specsWithVariations?.length"
@@ -418,12 +422,13 @@
       </div>
     </div>
     <div class="col-md-12">
-      <div *ngIf="variants?.getValue()?.length > 0">
-        <h6 translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_HAVE</h6>
+      <ng-container *ngIf="variants?.getValue()?.length > 0">
+        <h6 class="my-2"
+            translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_HAVE</h6>
         <perfect-scrollbar class="product-table ps-show-always"
                            style="width: 100%; max-height: 600px;">
-          <table class="table mb-0">
-            <thead class="bg-light">
+          <table class="table table-borderless mb-0">
+            <thead class="bg-white">
               <tr>
                 <th scope="col"
                     translate>ADMIN.PRODUCT_EDIT.DETAILS</th>
@@ -443,20 +448,22 @@
             <tbody>
               <ng-container *ngFor="let variant of variants | async; let i = index">
                 <tr [ngClass]="{'selected-variant': variant === variantInSelection}">
-                  <td class="d-flex">
+                  <td class="vertical-align-middle">
                     <div class="icon-button ripple"
                          (click)="variantInSelection?.ID === variant?.ID ? closeVariantDetails() : openVariantDetails(variant)">
+                      <small class="d-inline-flex">View Details</small>
                       <div class="icon-wrapper">
                         <fa-icon [icon]="variantInSelection?.ID === variant?.ID ? faCaretDown : faCaretRight">
                         </fa-icon>
                       </div>
                     </div>
                   </td>
-                  <td *ngFor="let specValue of variant.xp?.SpecValues">
+                  <td class="vertical-align-middle"
+                      *ngFor="let specValue of variant.xp?.SpecValues">
                     {{specValue.SpecOptionValue}} <span class="font-weight-bold"
                           *ngIf="specValue.PriceMarkup">(+{{specValue.PriceMarkup | currency: myCurrency?.Currency}})</span>
                   </td>
-                  <td>
+                  <td class="vertical-align-middle">
                     <div *ngIf="readonly"
                          class="chip supplier-facet-chip readonly active">{{getVariantStatusDisplay(variant)}}
                       <fa-icon [icon]="faCheckCircle"></fa-icon>
@@ -472,7 +479,7 @@
                                [icon]="faCheckCircle"></fa-icon>
                     </div>
                   </td>
-                  <td>
+                  <td class="vertical-align-middle">
                     <div class="input-group-sm">
                       <input class="form-control input-sm"
                              type="text"
@@ -481,7 +488,8 @@
                              [value]="variant?.xp?.NewID || variant?.ID">
                     </div>
                   </td>
-                  <td *ngIf="superProductEditable?.Product?.Inventory?.VariantLevelTracking">
+                  <td class="vertical-align-middle"
+                      *ngIf="superProductEditable?.Product?.Inventory?.VariantLevelTracking">
                     <div class="input-group-sm">
                       <input class="form-control input-sm"
                              type="number"
@@ -494,7 +502,8 @@
                   <td>{{getTotalMarkup(variant.xp?.SpecValues) | currency: myCurrency?.Currency}}</td>
                 </tr>
                 <tr *ngIf="!isCreatingNew && variantInSelection?.ID === variant.ID">
-                  <td [attr.colspan]="getVariantDetailColSpan()">
+                  <td class="vertical-align-middle"
+                      [attr.colspan]="getVariantDetailColSpan()">
                     <div class="my-2">
                       <fa-icon *ngIf="superProductEditable?.Images?.length && !readonly"
                                (click)="assignVariantImages = true"
@@ -506,7 +515,7 @@
                     <img *ngFor="let img of getVariantImages(variantInSelection)"
                          style="max-width: 50px"
                          [src]="img.Url"
-                         alt="" />
+                         alt="Variant Image" />
                     <div class="form-row">
                       <div class="form-group col-3">
                         <label for="shipWidth"
@@ -555,14 +564,14 @@
             </tbody>
           </table>
         </perfect-scrollbar>
-      </div>
-      <div class="mt-2"
-           *ngIf="specsWithoutVariations?.length">
-        <h6 translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_DONT</h6>
+      </ng-container>
+      <ng-container *ngIf="specsWithoutVariations?.length">
+        <h6 class="my-2"
+            translate>ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_DONT</h6>
         <perfect-scrollbar class="product-table ps-show-always"
                            style="width: 100%; max-height: 600px;">
-          <table class="table mb-0">
-            <thead class="bg-light">
+          <table class="table table-borderless mb-0">
+            <thead class="bg-white">
               <tr>
                 <th translate>ADMIN.PRODUCT_EDIT.VARIATION</th>
                 <th translate>ADMIN.PRODUCT_EDIT.OPTION</th>
@@ -578,7 +587,7 @@
             </tbody>
           </table>
         </perfect-scrollbar>
-      </div>
+      </ng-container>
     </div>
   </div>
   <!-- /Variant Matrix -->
