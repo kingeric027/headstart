@@ -150,7 +150,7 @@
             <div *ngIf="li.Quantity !== li.QuantityShipped" class="mt-5 row align-items-center">
               <div class="col-sm-12">
                 <div class="row align-top">
-                  <div class="col-sm-9">
+                  <div class="col-sm-5">
                     <div class="ml-3">
                       <h6>
                         <span>{{ li.Product.Name }} <span
@@ -159,6 +159,11 @@
                       </h6>
                       <img [id]="i" [src]="getImageUrl(li)" width="auto" height="100px" class="d-print-none">
                     </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <h6>Comment</h6>
+                    <textarea type="text" id="LineItemComment" class="form-control" formControlName="Comment"
+                      placeholder="Enter comment" rows="4" maxLength="300"></textarea>
                   </div>
                   <div class="col-sm-3">
                     <div class="float-right mr-2">
@@ -173,11 +178,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-12">
-                <label for="LineItemComment" class="control-label font-weight-bold mt-1">Comment</label>
-                <textarea type="text" id="LineItemComment" class="form-control" formControlName="Comment"
-                  placeholder="Enter comment" rows="3" maxLength="300"></textarea>
-              </div>
+
             </div>
           </div>
         </div>
