@@ -34,6 +34,21 @@ namespace Marketplace.Common.Commands
         public List<DocumentRowError> Invalid = new List<DocumentRowError>();
     }
 
+    public class BatchProcessSummary
+    {
+        public int TotalCount { get; set; }
+        public int SuccessfulCount { get; set; }
+        public int FailureListCount { get; set; }
+    }
+
+    public class BatchProcessResult
+    {
+        public BatchProcessSummary Meta { get; set; }
+        public List<Misc.Shipment> SuccessfulList = new List<Misc.Shipment>();
+        public List<DocumentRowError> FailureList = new List<DocumentRowError>();
+
+    }
+
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
@@ -51,18 +66,18 @@ namespace Marketplace.Common.Commands
         }
         public async Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken)
         {
-            var firstShipmentItem = superShipment.ShipmentItems.First();
-            var supplierOrderID = firstShipmentItem.OrderID;
-            var buyerOrderID = supplierOrderID.Split("-").First();
+            ShipmentItem firstShipmentItem = superShipment.ShipmentItems.First();
+            string supplierOrderID = firstShipmentItem.OrderID;
+            string buyerOrderID = supplierOrderID.Split("-").First();
 
             // in the platform, in order to make sure the order has the proper Order.Status, you must 
             // create a shipment without a DateShipped and then patch the DateShipped after
-            var dateShipped = superShipment.Shipment.DateShipped;
+            DateTimeOffset? dateShipped = superShipment.Shipment.DateShipped;
             superShipment.Shipment.DateShipped = null;
 
 
             await PatchLineItemStatuses(supplierOrderID, superShipment);
-            var buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
+            string buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
 
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
@@ -88,7 +103,7 @@ namespace Marketplace.Common.Commands
                 100,
                 5,
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
-            var ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
+            MarketplaceShipment ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
             return new SuperShipment()
             {
                 Shipment = ocShipmentWithDateShipped,
@@ -98,7 +113,7 @@ namespace Marketplace.Common.Commands
 
         private async Task PatchLineItemStatuses(string supplierOrderID, SuperShipment superShipment)
         {
-            var lineItemStatusChanges = superShipment.ShipmentItems.Select(shipmentItem =>
+            List<LineItemStatusChange> lineItemStatusChanges = superShipment.ShipmentItems.Select(shipmentItem =>
             {
                 return new LineItemStatusChange()
                 {
@@ -107,7 +122,7 @@ namespace Marketplace.Common.Commands
                 };
             }).ToList();
 
-            var lineItemStatusChange = new LineItemStatusChanges()
+            LineItemStatusChanges lineItemStatusChange = new LineItemStatusChanges()
             {
                 Changes = lineItemStatusChanges,
                 Status = LineItemStatus.Complete
@@ -118,8 +133,8 @@ namespace Marketplace.Common.Commands
 
         private async Task<string> GetBuyerIDForSupplierOrder(string supplierOrderID)
         {
-            var buyerOrderID = supplierOrderID.Split("-").First();
-            var relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
+            string buyerOrderID = supplierOrderID.Split("-").First();
+            Order relatedBuyerOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, buyerOrderID);
             return relatedBuyerOrder.FromCompanyID;
         }
 
@@ -134,21 +149,34 @@ namespace Marketplace.Common.Commands
 
         private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file)
         {
-            using var stream = file.OpenReadStream();
-            var shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
-            var result = Validate(shipments.Where(p => p.Value?.LineItemID != null).Select(p => p).ToList());
+            BatchProcessResult processResults;
+            using Stream stream = file.OpenReadStream();
+            List<RowInfo<Misc.Shipment>> shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
+
+            DocumentImportResult result = Validate(shipments.Where(p => p.Value?.LineItemID != null).Select(p => p).ToList());
+
+            processResults = ProcessShipments(result);
+
             return await Task.FromResult(result);
+        }
+
+        private BatchProcessResult ProcessShipments(DocumentImportResult importResult)
+        {
+            BatchProcessResult processResult = new BatchProcessResult();
+
+            if (importResult == null) { return null; }
+            if (importResult.Valid.HasItem())
         }
 
         public static DocumentImportResult Validate(List<RowInfo<Misc.Shipment>> rows)
         {
-            var result = new DocumentImportResult()
+            DocumentImportResult result = new DocumentImportResult()
             {
                 Invalid = new List<DocumentRowError>(),
                 Valid = new List<Misc.Shipment>()
             };
 
-            foreach (var row in rows)
+            foreach (RowInfo<Misc.Shipment> row in rows)
             {
                 if (row.ErrorColumnIndex > -1)
                     result.Invalid.Add(new DocumentRowError()
@@ -158,7 +186,7 @@ namespace Marketplace.Common.Commands
                     });
                 else
                 {
-                    var results = new List<ValidationResult>();
+                    List<ValidationResult> results = new List<ValidationResult>();
                     if (Validator.TryValidateObject(row.Value, new ValidationContext(row.Value), results, true) == false)
                     {
                         result.Invalid.Add(new DocumentRowError()

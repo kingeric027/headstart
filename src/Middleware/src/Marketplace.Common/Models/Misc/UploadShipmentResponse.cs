@@ -11,20 +11,20 @@ namespace Marketplace.Common.Models.Misc
 
     public class Shipment
     {
-        public int OrderID { get; set; }
-        public int LineItemID { get; set; }
-        public int QuantityShipped { get; set; }
-        public int? ShipmentID { get; set; }
-        public int BuyerID { get; set; }
-        public int? Shipper { get; set; }
+        public string OrderID { get; set; }
+        public string LineItemID { get; set; }
+        public string QuantityShipped { get; set; }
+        public string ShipmentID { get; set; }
+        public string BuyerID { get; set; }
+        public string Shipper { get; set; }
         public DateTime DateShipped { get; set; }
         public DateTime? DateDelivered { get; set; }
-        public int TrackingNumber { get; set; }
-        public int? Cost { get; set; }
-        public int? FromAddressID { get; set; }
-        public int? ToAddressID { get; set; }
+        public string TrackingNumber { get; set; }
+        public string Cost { get; set; }
+        public string FromAddressID { get; set; }
+        public string ToAddressID { get; set; }
         public string Account { get; set; }
-        public int? Service { get; set; }
+        public string Service { get; set; }
         public string Comments { get; set; }
 
     }
