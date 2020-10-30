@@ -11,7 +11,6 @@ using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
-using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using SendGrid;
@@ -26,14 +25,13 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
-
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
-        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
+        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
-        Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
-        Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
+        Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
+        Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText);
         Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText);
         Task SendContactSupplierAboutProductEmail(ContactSupplierBody template);
@@ -46,6 +44,7 @@ namespace Marketplace.Common.Services
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
         private const string ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string ORDER_APPROVAL_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
@@ -199,22 +198,18 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = new
-                {
-                    messageNotification.Recipient.FirstName,
-                    messageNotification.Recipient.LastName,
-                    OrderID = messageNotification.EventBody.Order.ID
-                },
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -244,26 +239,26 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
+        public async Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderApprovedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
+        public async Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)

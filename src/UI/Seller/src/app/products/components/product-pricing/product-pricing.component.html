@@ -65,10 +65,12 @@
              translate>ADMIN.PRODUCT_EDIT.HOW_PRICES_DISPLAY</p>
           <p class="font-italic">
             <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_1</span>
-            {{sellerCurrency?.Currency}}
+            {{supplierCurrency?.Currency}}.
             <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_2</span>
             {{supplierToSellerCurrencyRate}}
-            <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_3</span></p>
+            <span translate>ADMIN.PRODUCT_EDIT.PRICES_BELOW_3</span>
+          {{sellerCurrency?.Currency}} 
+          </p>
           <p class="font-italic">
             <span translate>ADMIN.PRODUCT_EDIT.DEFAULT_MARKUP_INFO_1</span>
             {{selectedSuperMarketplaceBuyer?.Buyer?.Name}}

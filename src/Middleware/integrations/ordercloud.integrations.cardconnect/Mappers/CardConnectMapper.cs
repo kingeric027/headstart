@@ -87,7 +87,7 @@ namespace ordercloud.integrations.cardconnect
                 DateExecuted = DateTime.Now,
                 ResultCode = response.authcode,
                 ResultMessage = payment.Description,
-                Succeeded = payment.Accepted == true,
+                Succeeded = response.WasSuccessful(),
                 Type = payment.Type.ToString()
             };
             return t;

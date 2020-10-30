@@ -31,6 +31,27 @@ namespace ordercloud.integrations.easypost
         public List<EasyPostCarrierAccount> carrier_accounts { get; set; }
         public string batch_id { get; set; }
         public string order_id { get; set; }
+        public EasyPostCustomsInfo customs_info { get; set; }
+    }
+
+    public class EasyPostCustomsInfo
+    {
+        public bool customs_certify { get; set; }
+        public string customs_signer { get; set; }
+        public string contents_type { get; set; } = "merchandise";
+        public string restriction_type { get; set; } = "none";
+        public string eel_pfc { get; set; } = "NOEEI30.37(a)";
+        public List<EasyPostCustomsItem> customs_items { get; set; } = new List<EasyPostCustomsItem>();
+    }
+
+    public class EasyPostCustomsItem
+    {
+        public string description { get; set; }
+        public int quantity { get; set; }
+        public double weight { get; set; }
+        public double value { get; set; }
+        public string hs_tariff_number { get; set; }
+        public string origin_country { get; set; }
     }
 
     public class EasyPostMessage
