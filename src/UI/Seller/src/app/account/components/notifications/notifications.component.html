@@ -35,7 +35,7 @@
               <div class="mb-0" style="margin-top: 35px;">
                 <h1 class="resource-name mb-0" style="padding-bottom: 20px;" translate> Notification Center</h1>
 
-                <ng-container *ngIf="userContext?.UserType === 'SELLER' && notificationsToReview?.length > 0">
+                <ng-container *ngIf="userContext?.UserType === 'SELLER' || notificationsToReview?.length > 0">
                   <div *ngFor="let notification of notificationsToReview">
                       <monitored-product-notification
                                     [notification]="notification"
