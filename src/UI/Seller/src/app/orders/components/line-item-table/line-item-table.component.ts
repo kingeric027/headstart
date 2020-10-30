@@ -8,6 +8,7 @@ import { LineItemStatus } from '@app-seller/shared/models/order-status.interface
 import { FormArray, Validators, FormControl } from '@angular/forms';
 import { getPrimaryLineItemImage } from '@app-seller/products/product-image.helper';
 import { MeUser, OcOrderService } from '@ordercloud/angular-sdk';
+import { LineItem, LineItemSpec } from 'ordercloud-javascript-sdk';
 
 @Component({
   selector: 'app-line-item-table',
@@ -102,6 +103,8 @@ export class LineItemTableComponent {
   canChangeTo(lineItemStatus: LineItemStatus): boolean {
     return CanChangeLineItemsOnOrderTo(lineItemStatus, this._lineItems);
   }
+
+  getVariableTextSpecs = (li: LineItem): LineItemSpec[] =>  li?.Specs?.filter(s => s.OptionID === null);
 
   getLineItemStatusDisplay(lineItem: MarketplaceLineItem): string {
     return Object.entries(lineItem.xp.StatusByQuantity)
