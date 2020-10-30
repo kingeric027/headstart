@@ -11,12 +11,6 @@
                       [address]="lineItems[0].ShippingAddress"
                       addressTitle="Shipping Address">
     </ocm-address-card>
-    <br />
-    <span translate>ORDERS.HISTORICAL.BILLING_ADDRESS</span>
-    <ocm-address-card [address]="order.BillingAddress"
-                      addressTitle="Billing Address"
-                      *ngIf="order?.BillingAddress">
-    </ocm-address-card>
   </div>
   <div class="col-6"
        *ngIf="!isQuoteOrder(order)">
