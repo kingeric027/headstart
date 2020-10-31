@@ -64,7 +64,7 @@ namespace Marketplace.Common.Commands
             for (var i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.GetByIDOrDefault(supplierID).CarrierAccountID);
+                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.FirstOrDefault(supplierID).CarrierAccountID);
                 shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(methods).Select(s =>
                 {
                     // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112

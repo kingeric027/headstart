@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Internal;
 using ordercloud.integrations.easypost;
 
 namespace Marketplace.Common.Models
@@ -46,6 +47,11 @@ namespace Marketplace.Common.Models
                 Markup = 1.1M,
                 Default = false
             });
+        }
+
+        public override EasyPostShippingProfile FirstOrDefault(string id)
+        {
+            return ShippingProfiles.FirstOrDefault(p => p.SupplierID == id) ?? ShippingProfiles.First(p => p.ID == "SMG");
         }
     }
 }

@@ -14,7 +14,7 @@ namespace ordercloud.integrations.easypost
            
         }
 
-        public EasyPostShippingProfile GetByIDOrDefault(string id)
+        public virtual EasyPostShippingProfile FirstOrDefault(string id)
         {
             if (ShippingProfiles.All(p => !p.Default)) throw new InvalidOperationException("No default carrier account specified");
             return ShippingProfiles.FirstOrDefault(p => p.SupplierID == id) ?? ShippingProfiles.First(p => p.Default);

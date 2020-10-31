@@ -93,7 +93,7 @@ namespace ordercloud.integrations.easypost
             {
                 var line_item = groupedLineItems.First(g => g.SupplierID != null);
 
-				var profile = profiles.GetByIDOrDefault(line_item.SupplierID);
+				var profile = profiles.FirstOrDefault(line_item.SupplierID);
                 shipment.customs_info = new EasyPostCustomsInfo()
                 {
 					contents_type = "merchandise",
