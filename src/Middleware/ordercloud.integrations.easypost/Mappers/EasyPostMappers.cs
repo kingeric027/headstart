@@ -64,7 +64,7 @@ namespace ordercloud.integrations.easypost
 				ID = rate.id,
 				Name = rate.service,
 				Cost = decimal.Parse(rate.rate),
-				EstimatedTransitDays = (int)rate.delivery_days,
+				EstimatedTransitDays = rate.delivery_days ?? rate.est_delivery_days ?? 10,
 				xp =
 				{
 					Carrier = rate.carrier,
@@ -78,20 +78,22 @@ namespace ordercloud.integrations.easypost
 
 		public static IList<ShipMethod> MapRates(IEnumerable<EasyPostRate> rates) => rates.Select(MapRate).ToList();
 
-		public static EasyPostShipment MapShipment(IGrouping<AddressPair, LineItem> groupedLineItems, List<EasyPostShippingProfile> profiles)
+		public static EasyPostShipment MapShipment(IGrouping<AddressPair, LineItem> groupedLineItems, EasyPostShippingProfiles profiles)
 		{
 			var shipment =  new EasyPostShipment()
 			{
 				from_address = MapAddress(groupedLineItems.Key.ShipFrom),
 				to_address = MapAddress(groupedLineItems.Key.ShipTo),
 				parcel = MapParcel(groupedLineItems.Select(g => g).ToList()), // All line items with the same shipFrom and shipTo are grouped into 1 "parcel"
-				carrier_accounts = profiles.Select(id => new EasyPostCarrierAccount() { id = id.CarrierAccountID }).ToList()
+				carrier_accounts = profiles.ShippingProfiles.Select(id => new EasyPostCarrierAccount() { id = id.CarrierAccountID }).ToList()
 			};
 
 			// add customs info for international shipments
             if (groupedLineItems.Key.ShipTo.Country != "US")
             {
-                var profile = profiles.First(p => p.SupplierID == groupedLineItems.First(g => g.SupplierID != null).SupplierID);
+                var line_item = groupedLineItems.First(g => g.SupplierID != null);
+
+				var profile = profiles.FirstOrDefault(line_item.SupplierID);
                 shipment.customs_info = new EasyPostCustomsInfo()
                 {
 					contents_type = "merchandise",

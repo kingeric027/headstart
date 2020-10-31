@@ -32,7 +32,7 @@ namespace ordercloud.integrations.easypost
 
 	public interface IEasyPostShippingService
 	{
-		Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, List<EasyPostShippingProfile> profiles);
+		Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles);
 	}
 
 
@@ -46,7 +46,7 @@ namespace ordercloud.integrations.easypost
 			_config = config;
 		}
 
-		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, List<EasyPostShippingProfile> profiles)
+		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles)
 		{
 			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, profiles));
 			var easyPostResponse = await Task.WhenAll(easyPostShipments.Select(PostShipment));
