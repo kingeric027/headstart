@@ -102,7 +102,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
-  isSpecsEditing = false;
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[];
 
   constructor(
@@ -195,11 +194,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
-  }
-
-
-  specsBeingEdited(event): void {
-    this.isSpecsEditing = event;
   }
 
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {

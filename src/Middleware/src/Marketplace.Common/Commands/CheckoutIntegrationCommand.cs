@@ -58,13 +58,13 @@ namespace Marketplace.Common.Commands
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
 
             var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
-            var shipResponse = await _shippingService.GetRates(groupedLineItems, _profiles.ShippingProfiles.ToList()); // include all accounts at this stage so we can save on order worksheet and analyze 
+            var shipResponse = await _shippingService.GetRates(groupedLineItems, _profiles); // include all accounts at this stage so we can save on order worksheet and analyze 
 
             // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  
             for (var i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.GetBySupplierId(supplierID).CarrierAccountID);
+                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.FirstOrDefault(supplierID).CarrierAccountID);
                 shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(methods).Select(s =>
                 {
                     // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112
