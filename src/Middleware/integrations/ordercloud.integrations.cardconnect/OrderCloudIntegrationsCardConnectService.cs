@@ -57,7 +57,7 @@ namespace ordercloud.integrations.cardconnect
 
         public async Task<CardConnectAuthorizationResponse> AuthWithCapture(CardConnectAuthorizationRequest request)
         {
-            request.capture = true;
+            request.capture = "Y";
             return await PostAuthorizationAsync(request);
         }
 

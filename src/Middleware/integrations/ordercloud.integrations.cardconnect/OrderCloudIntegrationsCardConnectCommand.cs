@@ -110,5 +110,7 @@ namespace ordercloud.integrations.cardconnect
 			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
 			return CreditCardMapper.Map(card, auth);
 		}
-	}
+
+        
+    }
 }
