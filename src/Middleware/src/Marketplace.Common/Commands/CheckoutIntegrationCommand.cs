@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Dynamitey;
+using Marketplace.Common.Models;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
@@ -19,6 +19,7 @@ namespace Marketplace.Common.Commands
         Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
         Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
         Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
+        Task<ShipEstimateResponse> GetRatesAsync(string orderID);
     }
 
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
@@ -27,7 +28,9 @@ namespace Marketplace.Common.Commands
         private readonly IEasyPostShippingService _shippingService;
         private readonly IExchangeRatesCommand _exchangeRates;
         private readonly IOrderCloudClient _oc;
+        private readonly SelfEsteemBrandsShippingProfiles _profiles;
         private readonly AppSettings _settings;
+  
         public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud, IEasyPostShippingService shippingService, AppSettings settings)
         {
 			_avalara = avalara;
@@ -35,71 +38,52 @@ namespace Marketplace.Common.Commands
             _oc = orderCloud;
             _shippingService = shippingService;
             _settings = settings;
+            _profiles = new SelfEsteemBrandsShippingProfiles(_settings);
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload)
         {
-            var worksheet = orderCalculatePayload.OrderWorksheet;
-            var excludePOProducts = orderCalculatePayload.ConfigData.ExcludePOProductsFromShipping;
-            if (excludePOProducts)
-			{
-                worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
-            }
+            return await this.GetRatesAsync(orderCalculatePayload.OrderWorksheet, orderCalculatePayload.ConfigData);
+        }
 
-            var groupedLineItems = orderCalculatePayload.OrderWorksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
-            var accounts = new [] { _settings.EasyPostSettings.ProvisionFedexAccountId, _settings.EasyPostSettings.SEBDistributionFedexAccountId, _settings.EasyPostSettings.SMGFedexAccountId };
-            var shipResponse = await _shippingService.GetRates(groupedLineItems, accounts); // include all accounts at this stage so we can save on order worksheet and analyze 
+        public async Task<ShipEstimateResponse> GetRatesAsync(string orderID)
+        {
+            var order = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            return await this.GetRatesAsync(order);
+        }
+
+        private async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderWorksheet worksheet, CheckoutIntegrationConfiguration config = null)
+        {
+            if (config != null && config.ExcludePOProductsFromShipping)
+                worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
+
+            var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
+            var shipResponse = await _shippingService.GetRates(groupedLineItems, _profiles); // include all accounts at this stage so we can save on order worksheet and analyze 
 
             // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  
-            for (int i = 0; i < groupedLineItems.Count; i++)
+            for (var i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == GetShippingAccountForSupplier(supplierID));
+                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.FirstOrDefault(supplierID).CarrierAccountID);
                 shipResponse.ShipEstimates[i].ShipMethods = WhereRateIsCheapestOfItsKind(methods).Select(s =>
                 {
                     // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112
                     if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
-                    {
                         s.Cost = 0;
-                    }
 
-                    if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SEBDistributionFedexAccountId)
-                    {
-                        s.Cost = s.Cost * (decimal)1.1; //  Apply markup for the SEBDistributionFedexAccount
-                    }
-                    else if (s.xp.CarrierAccountID == _settings.EasyPostSettings.SMGFedexAccountId)
-                    {
-                        s.Cost = s.Cost * (decimal)1.4;
-                    }
+                    s.Cost *= _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup;
                     return s;
                 }).ToList();
             }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
 
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
-            {
                 shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
-            }
 
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
 
             return shipResponse;
         }
-
-        private string GetShippingAccountForSupplier(string supplierID)
-		{
-            if (supplierID == _settings.OrderCloudSettings.ProvisionSupplierID)
-			{
-                return _settings.EasyPostSettings.ProvisionFedexAccountId;
-
-            } else if (supplierID == _settings.OrderCloudSettings.SEBDistributionSupplierID) 
-            {
-                return _settings.EasyPostSettings.SEBDistributionFedexAccountId;
-            } else
-			{
-                return _settings.EasyPostSettings.SMGFedexAccountId;
-            }
-		}
 
         public static IEnumerable<ShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<ShipMethod> methods)
 		{
@@ -116,15 +100,14 @@ namespace Marketplace.Common.Commands
             {
                 estimate.ShipMethods = estimate.ShipMethods.Select(method =>
                 {
-                    var convertedCost = method.Cost / (decimal)conversionRate;
                     method.xp = new
                     {
-                        OriginalShipCost = method.Cost,
+                        OriginalShipCost = method.xp?.OriginalCost,
                         OriginalCurrency = shipperCurrency.ToString(),
                         ExchangeRate = conversionRate,
                         OrderCurrency = buyerCurrency.ToString()
                     };
-                    method.Cost = convertedCost;
+                    if (conversionRate != null) method.Cost /= (decimal) conversionRate;
                     return method;
                 }).ToList();
                 return estimate;

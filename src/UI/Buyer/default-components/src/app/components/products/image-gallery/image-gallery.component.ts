@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { fromEvent } from 'rxjs';
-import { Asset } from '@ordercloud/headstart-sdk';
+import { Asset, Spec } from '@ordercloud/headstart-sdk';
 
 @Component({
   templateUrl: './image-gallery.component.html',
@@ -50,8 +50,8 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   isImageMatchingSpecs(image: Asset): boolean {
-    // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    return this.specs.every(spec => image.Tags.find(tag => tag?.split('-').includes(spec.replace(/\s/g, ''))));
+    // Examine all non-variable text specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+    return this.specs.filter(s => s !== null).every(spec => image.Tags.find(tag => tag?.split('-').includes(spec.replace(/\s/g, ''))));
   }
 
   onSpecsChange(): void {

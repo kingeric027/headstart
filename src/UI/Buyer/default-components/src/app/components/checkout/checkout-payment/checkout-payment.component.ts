@@ -25,6 +25,7 @@ export class OCMCheckoutPayment implements OnInit, OnChanges {
   @Input() cards: ListPage<BuyerCreditCard>;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
+  @Input() paymentError: string; 
   @Input() orderSummaryMeta: OrderSummaryMeta;
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   @Output() continue = new EventEmitter<void>();

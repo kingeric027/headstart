@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.EntityFrameworkCore.Internal;
+using ordercloud.integrations.easypost;
+
+namespace Marketplace.Common.Models
+{
+    public class SelfEsteemBrandsShippingProfiles : EasyPostShippingProfiles
+    {
+        public SelfEsteemBrandsShippingProfiles(AppSettings settings)
+        {
+            this.ShippingProfiles.Add(new EasyPostShippingProfile()
+            {
+                ID = "Provision",
+                SupplierID = settings.OrderCloudSettings.ProvisionSupplierID,
+                CarrierAccountID = settings.EasyPostSettings.ProvisionFedexAccountId,
+                Customs_Signer = "Christa Zaspel",
+                Restriction_Type = "none",
+                EEL_PFC = "NOEEI30.37(a)",
+                Customs_Certify = true,
+                Markup = 1M,
+                Default = false
+            });
+            this.ShippingProfiles.Add(new EasyPostShippingProfile()
+            {
+                ID = "SMG",
+                SupplierID = null,
+                CarrierAccountID = settings.EasyPostSettings.SMGFedexAccountId,
+                Customs_Signer = "Bob Bernier",
+                Restriction_Type = "none",
+                EEL_PFC = "NOEEI30.37(a)",
+                Customs_Certify = true,
+                Markup = 1.4M,
+                Default = true
+            });
+            this.ShippingProfiles.Add(new EasyPostShippingProfile()
+            {
+                ID = "SEB",
+                SupplierID = settings.OrderCloudSettings.SEBDistributionSupplierID,
+                CarrierAccountID = settings.EasyPostSettings.SEBDistributionFedexAccountId,
+                Customs_Signer = "Christa Zaspel",
+                Restriction_Type = "none",
+                EEL_PFC = "NOEEI30.37(a)",
+                Customs_Certify = true,
+                Markup = 1.1M,
+                Default = false
+            });
+        }
+
+        public override EasyPostShippingProfile FirstOrDefault(string id)
+        {
+            return ShippingProfiles.FirstOrDefault(p => p.SupplierID == id) ?? ShippingProfiles.First(p => p.ID == "SMG");
+        }
+    }
+}

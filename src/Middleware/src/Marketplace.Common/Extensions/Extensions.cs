@@ -11,6 +11,13 @@ namespace Marketplace.Common.Extensions
 
             return true;
         }
+        public static bool HasItem<t>(this IReadOnlyList<t> itemList)
+        {
+            if (itemList == null || itemList.Count == 0)
+            { return false; }
+
+            return true;
+        }
         public static bool HasItem<t>(this List<t> itemList)
         {
             if (itemList == null || itemList.Count == 0)
