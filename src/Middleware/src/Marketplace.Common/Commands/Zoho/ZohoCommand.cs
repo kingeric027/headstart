@@ -138,7 +138,7 @@ namespace Marketplace.Common.Commands.Zoho
                 var contact = await CreateOrUpdateVendor(order);
 
                 // Step 2: Create or update Items from LineItems/Products on Order
-                var items = await CreateOrUpdatePurchaseLineItem(lineitems.Items);
+                var items = await CreateOrUpdatePurchaseLineItem(lineitems.Items, supplier);
 
                 // Step 3: Create purchase order
                 var po = await CreatePurchaseOrder(z_order, order, items, lineitems, delivery_address, contact);
@@ -213,7 +213,7 @@ namespace Marketplace.Common.Commands.Zoho
             return items.ToList();
         }
 
-        private async Task<List<ZohoLineItem>> CreateOrUpdatePurchaseLineItem(IList<MarketplaceLineItem> lineitems)
+        private async Task<List<ZohoLineItem>> CreateOrUpdatePurchaseLineItem(IList<MarketplaceLineItem> lineitems, Supplier supplier)
         {
             // TODO: accomodate possibility of more than 100 line items
             // Overview: variants will be saved in Zoho as the Item. If the variant is null save the Product as the Item
@@ -236,8 +236,8 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
                 if (z_item.Key != null)
-                    return await _zoho.Items.SaveAsync(ZohoPurchaseLineItemMapper.Map(z_item.Value, lineItem));
-                return await _zoho.Items.CreateAsync(ZohoPurchaseLineItemMapper.Map(lineItem));
+                    return await _zoho.Items.SaveAsync(ZohoPurchaseLineItemMapper.Map(z_item.Value, lineItem, supplier));
+                return await _zoho.Items.CreateAsync(ZohoPurchaseLineItemMapper.Map(lineItem, supplier));
             });
             return items.ToList();
         }
