@@ -66,9 +66,14 @@ namespace Marketplace.API
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
                 Container = _settings.ExchangeRatesSettings.Container
             };
+            var middlewareErrorsConfig = new BlobServiceConfig()
+            {
+                ConnectionString = _settings.BlobSettings.ConnectionString,
+                Container = "unhandled-errors-log"
+            };
 
             services
-                .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
+                .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
                 .InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
