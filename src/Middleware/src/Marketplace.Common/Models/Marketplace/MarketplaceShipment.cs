@@ -1,4 +1,4 @@
-﻿using Marketplace.Models;
+using Marketplace.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;

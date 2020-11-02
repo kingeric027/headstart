@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CurrentUserService } from '../services/current-user/current-user.service';
 import { SuperMarketplaceProduct, KitProduct } from '@ordercloud/headstart-sdk';
-import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 
 @Component({
   template: `
@@ -13,7 +12,7 @@ import { TempSdk } from '../services/temp-sdk/temp-sdk.service';
 export class ProductDetailWrapperComponent implements OnInit {
   isKit: boolean;
   product: SuperMarketplaceProduct | KitProduct;
-  constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService, private tempSdk: TempSdk) { }
+  constructor(private activatedRoute: ActivatedRoute, protected currentUser: CurrentUserService) { }
 
   ngOnInit(): void {
     const product = this.activatedRoute.snapshot.data.product;

@@ -41,6 +41,11 @@ export class SpecFormService {
             OptionID: option.ID,
             Value: option.Value,
           });
+        } else {
+          specs.push({
+            SpecID: spec.ID,
+            Value: formValues[value]
+          })
         }
       }
     }
@@ -73,6 +78,7 @@ export class SpecFormService {
       return firstImage?.Url;
     }
     const image = images?.find(img => this.isImageMatchingSpecs(img, specs, specForm));
+    if (!image) return images[0]?.Url;
     return image?.Url;
   }
 

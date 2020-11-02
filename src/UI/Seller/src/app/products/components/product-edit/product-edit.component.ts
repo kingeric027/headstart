@@ -32,7 +32,7 @@ import { getProductMediumImageUrl } from '@app-seller/products/product-image.hel
 import { takeWhile } from 'rxjs/operators';
 import { SizerTiersDescriptionMap } from './size-tier.constants';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MonitoredProductFieldModifiedNotification, MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
+import { MonitoredProductFieldModifiedNotificationDocument, NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface';
 
 @Component({
   selector: 'app-product-edit',
@@ -102,7 +102,6 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   availableSizeTiers = SizerTiersDescriptionMap;
   active: number;
   alive = true;
-  isSpecsEditing = false;
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[];
 
   constructor(
@@ -191,15 +190,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.createProductForm(this._superMarketplaceProductEditable);
     if (this.userContext?.UserType === 'SELLER') {
       this.addresses = await this.ocSupplierAddressService.List(this._superMarketplaceProductEditable?.Product?.DefaultSupplierID).toPromise();
-      this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
+      if (superProduct.Product?.ShipFromAddressID) this.shippingAddress = await this.ocSupplierAddressService.Get(this._superMarketplaceProductEditable.Product.OwnerID, this._superMarketplaceProductEditable.Product.ShipFromAddressID).toPromise();
     }
     this.isCreatingNew = this.productService.checkIfCreatingNew();
     this.checkForChanges();
-  }
-
-
-  specsBeingEdited(event): void {
-    this.isSpecsEditing = event;
   }
 
   createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
@@ -667,6 +661,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   ): Promise<SuperMarketplaceProduct> {
     const supplier = await this.currentUserService.getMySupplier();
     superMarketplaceProduct.Product.xp.ProductType = this.productType;
+    (superMarketplaceProduct.Product.xp as any).PromotionEligible = this.productType === 'PurchaseOrder' ? false : true;
     superMarketplaceProduct.Product.xp.Status = 'Draft';
     superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency;
     superMarketplaceProduct.PriceSchedule.ID = superMarketplaceProduct.Product.ID;

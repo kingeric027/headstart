@@ -32,7 +32,7 @@ namespace ordercloud.integrations.easypost
 
 	public interface IEasyPostShippingService
 	{
-		Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, IEnumerable<string> carrierAccountIDs);
+		Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles);
 	}
 
 
@@ -46,21 +46,26 @@ namespace ordercloud.integrations.easypost
 			_config = config;
 		}
 
-		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, IEnumerable<string> carrierAccountIDs)
+		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles)
 		{
-			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, carrierAccountIDs));
+			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, profiles));
 			var easyPostResponse = await Task.WhenAll(easyPostShipments.Select(PostShipment));
 			var shipEstimateResponse = new ShipEstimateResponse
 			{
 				ShipEstimates = groupedLineItems.Select((lineItems, index) =>
 				{
+					var firstLi = lineItems.First();
 					var shipMethods = EasyPostMappers.MapRates(easyPostResponse[index].rates);
 					return new ShipEstimate()
 					{
 						ID = easyPostResponse[index]?.id,
 						ShipMethods = shipMethods, // This will get filtered down based on carrierAccounts
 						ShipEstimateItems = lineItems.Select(li => new ShipEstimateItem() { LineItemID = li.ID, Quantity = li.Quantity }).ToList(),
-						xp = { AllShipMethods = shipMethods } // This is being saved so we have all data to compare rates across carrierAccounts
+						xp = { 
+							AllShipMethods = shipMethods, // This is being saved so we have all data to compare rates across carrierAccounts
+							SupplierID = firstLi.SupplierID, // This will help with forwarding the supplier order
+							ShipFromAddressID = firstLi.ShipFromAddressID  // This will help with forwarding the supplier order
+						}
 					};
 				}).ToList(),
 			};

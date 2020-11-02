@@ -1,5 +1,4 @@
-﻿using Marketplace.Common.Services.ShippingIntegration;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;
@@ -23,11 +22,17 @@ namespace Marketplace.Common.Controllers
 		[OrderCloudWebhookAuth]
 		public async Task<ShipEstimateResponse> GetShippingRates([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)
 		{
-			var shipmentEstimates = await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
-			return shipmentEstimates;
+			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
 
-		[Route("ordercalculate")]
+        // good debug method for testing rates with orders
+        [Route("shippingrates/{orderID}"), HttpGet]
+        public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
+        {
+            return await _checkoutIntegrationCommand.GetRatesAsync(orderID);
+        }
+
+        [Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)
@@ -35,6 +40,14 @@ namespace Marketplace.Common.Controllers
 			var orderCalculationResponse = await _checkoutIntegrationCommand.CalculateOrder(orderCalculatePayload);
 			return orderCalculationResponse;
 		}
+
+        [Route("taxcalculate/{orderID}")]
+        [HttpPost, OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        public async Task<OrderCalculateResponse> CalculateOrder(string orderID)
+        {
+            var orderCalculationResponse = await _checkoutIntegrationCommand.CalculateOrder(orderID, this.VerifiedUserContext);
+            return orderCalculationResponse;
+        }
 
 		[HttpPost, Route("ordersubmit")]
 		[OrderCloudWebhookAuth]
@@ -44,13 +57,14 @@ namespace Marketplace.Common.Controllers
 			return response;
 		}
 
-        //[HttpPost, Route("ordersubmit/retry/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
-        //public async Task RetryOrderSubmit([FromBody] string orderID)
-        //{
+        [HttpPost, Route("ordersubmit/retry/zoho/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
+        {
+            var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
+            return retry;
+        }
 
-        //}
-
-		[HttpPost, Route("orderapproved")]
+        [HttpPost, Route("orderapproved")]
 		[OrderCloudWebhookAuth]
 		public async Task<OrderSubmitResponse> HandleOrderApproved([FromBody] MarketplaceOrderCalculatePayload payload)
 		{

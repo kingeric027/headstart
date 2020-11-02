@@ -31,7 +31,7 @@ namespace Marketplace.Orchestration
 
         [FunctionName("UploadProductTemplate")]
         public async Task<IActionResult> UploadProductTemplate(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "{supplierId}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "templateupload/{supplierId}")]
             HttpRequest req, string supplierId, ILogger log)
         {
             var user = await _token.Authorize(req, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });

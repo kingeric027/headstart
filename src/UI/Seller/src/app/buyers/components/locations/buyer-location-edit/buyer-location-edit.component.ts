@@ -9,8 +9,10 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper';
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation';
-import { HeadStartSDK } from '@ordercloud/headstart-sdk';
+import { HeadStartSDK, MarketplaceCatalog, MarketplaceCatalogAssignmentRequest } from '@ordercloud/headstart-sdk';
 import { SupportedCountries, GeographyConfig } from '@app-seller/shared/models/supported-countries.interface';
+import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',
@@ -37,6 +39,7 @@ export class BuyerLocationEditComponent implements OnInit {
   updateResource = new EventEmitter<ResourceUpdate>();
   @Output()
   isCreatingNew: boolean;
+  catalogAssignments: MarketplaceCatalogAssignmentRequest = { CatalogIDs: [] };
   buyerID: string;
   selectAddress = new EventEmitter<any>();
   buyerLocationEditable: MarketplaceBuyerLocation;
@@ -44,27 +47,33 @@ export class BuyerLocationEditComponent implements OnInit {
   areChanges = false;
   dataIsSaving = false;
   countryOptions: SupportedCountries[];
+  catalogs: MarketplaceCatalog[] = [];
 
   constructor(
     private buyerLocationService: BuyerLocationService,
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
+    private marketplaceCatalogService: CatalogsTempService
   ) {this.countryOptions = GeographyConfig.getCountries();}
 
-  async refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation) {
+  refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation): void {
     this.buyerLocationEditable = buyerLocation;
     this.buyerLocationStatic = buyerLocation;
+    this.catalogAssignments.CatalogIDs = this.buyerLocationEditable.UserGroup.xp.CatalogAssignments;
     this.createBuyerLocationForm(buyerLocation);
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.buyerID !== REDIRECT_TO_FIRST_PARENT) {
+      await this.getCatalogs();
+    }
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew();
   }
 
-  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation) {
+  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation): void {
     this.resourceForm = new FormGroup({
       ID: new FormControl(buyerLocation.Address.ID),
       LocationName: new FormControl(buyerLocation.UserGroup.Name, Validators.required),
@@ -83,6 +92,11 @@ export class BuyerLocationEditComponent implements OnInit {
       // TODO: remove this workaround when headstart sdk has been updated to include correct type
       BillingNumber: new FormControl((buyerLocation.Address.xp as any).BillingNumber)
     });
+  }
+
+  async getCatalogs(): Promise<void> {
+    const catalogsResponse = await this.marketplaceCatalogService.list(this.buyerID);
+    this.catalogs = catalogsResponse.Items;
   }
 
   handleSelectedAddress(event: Address): void {
@@ -115,6 +129,7 @@ export class BuyerLocationEditComponent implements OnInit {
       this.buyerLocationEditable.UserGroup.ID = this.buyerLocationEditable.Address.ID;
       (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
       const newBuyerLocation = await HeadStartSDK.BuyerLocations.Create(this.buyerID, this.buyerLocationEditable);
+      if (this.isCreatingNew) await HeadStartSDK.Catalogs.SetAssignments(this.buyerID, newBuyerLocation.UserGroup.ID, this.catalogAssignments);
       this.refreshBuyerLocationData(newBuyerLocation);
       this.router.navigateByUrl(`/buyers/${this.buyerID}/locations/${newBuyerLocation.Address.ID}`);
       this.dataIsSaving = false;
@@ -128,6 +143,7 @@ export class BuyerLocationEditComponent implements OnInit {
     try {
       this.dataIsSaving = true;
       (this.buyerLocationEditable.UserGroup.xp as any).Country = this.buyerLocationEditable.Address.Country;
+      this.buyerLocationEditable.UserGroup.xp.CatalogAssignments = this.catalogAssignments?.CatalogIDs;
       const updatedBuyerLocation = await HeadStartSDK.BuyerLocations.Save(
         this.buyerID,
         this.buyerLocationEditable.Address.ID,
@@ -149,7 +165,7 @@ export class BuyerLocationEditComponent implements OnInit {
     this.router.navigateByUrl(`/buyers/${this.buyerID}/locations`);
   }
 
-  updateBuyerLocationResource(buyerLocationUpdate: any) {
+  updateBuyerLocationResource(buyerLocationUpdate: any): void {
     const resourceToEdit = this.buyerLocationEditable || this.buyerLocationService.emptyResource;
     this.buyerLocationEditable = this.buyerLocationService.getUpdatedEditableResource(
       buyerLocationUpdate,
@@ -158,7 +174,7 @@ export class BuyerLocationEditComponent implements OnInit {
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
   }
 
-  handleUpdateBuyerLocation(event: any, field: string) {
+  handleUpdateBuyerLocation(event: any, field: string): void {
     const buyerLocationUpdate = {
       field,
       value: field === 'Active' ? event.target.checked : event.target.value,
@@ -179,6 +195,10 @@ export class BuyerLocationEditComponent implements OnInit {
     this.buyerLocationEditable = this.buyerLocationStatic;
     this.suggestedAddresses = null;
     this.areChanges = this.buyerLocationService.checkForChanges(this.buyerLocationEditable, this.buyerLocationStatic);
+  }
+
+  addCatalogAssignments(event): void {
+    this.catalogAssignments = event;
   }
 
   private async handleSelectedAddressChange(address: Address): Promise<void> {

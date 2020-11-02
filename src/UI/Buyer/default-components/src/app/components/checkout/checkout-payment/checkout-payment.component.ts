@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input, OnChanges } from '@angular/core';
 import { BuyerCreditCard, ListPage, OrderPromotion } from 'ordercloud-javascript-sdk';
 import { MarketplaceBuyerCreditCard, ShopperContextService } from 'marketplace';
 import { OrderCloudIntegrationsCreditCardToken, MarketplaceOrder } from '@ordercloud/headstart-sdk';
@@ -21,10 +21,11 @@ interface IOrderPromotionDisplay {
   templateUrl: './checkout-payment.component.html',
   styleUrls: ['./checkout-payment.component.scss'],
 })
-export class OCMCheckoutPayment implements OnInit {
+export class OCMCheckoutPayment implements OnInit, OnChanges {
   @Input() cards: ListPage<BuyerCreditCard>;
   @Input() isAnon: boolean;
   @Input() order: MarketplaceOrder;
+  @Input() paymentError: string; 
   @Input() orderSummaryMeta: OrderSummaryMeta;
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   @Output() continue = new EventEmitter<void>();
@@ -35,16 +36,21 @@ export class OCMCheckoutPayment implements OnInit {
   _uniqueOrderPromos: OrderPromotion[];
   _groupedOrderPromos: IGroupedOrderPromo;
   promoForm: FormGroup;
-  promoCode: string = '';
+  promoCode = '';
   faCheckCircle = faCheckCircle;
+  POTermsAccepted: boolean;
 
   constructor(private context: ShopperContextService, private toastrService: ToastrService) {}
 
   ngOnInit(): void {
     this._orderCurrency = this.context.currentUser.get().Currency;
-    this._orderPromos = this.context.order.promos.get().Items;
-    this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
+    this.setOrderPromos();
+    
     this.createPromoForm(this.promoCode);
+  }
+
+  ngOnChanges(): void {
+    if (this.orderSummaryMeta) this.POTermsAccepted = this.orderSummaryMeta?.POLineItemCount ? false : true;
   }
 
   createPromoForm(promoCode: string): void {
@@ -60,8 +66,7 @@ export class OCMCheckoutPayment implements OnInit {
   async applyPromo(): Promise<void> {
     try {
       await this.context.order.promos.applyPromo(this.promoCode);
-      this._orderPromos = this.context.order.promos.get().Items;
-      this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
+      this.setOrderPromos()
       await this.checkout.calculateOrder();
       this.promoCode = '';
     } catch (ex) {
@@ -74,7 +79,7 @@ export class OCMCheckoutPayment implements OnInit {
   async removePromo(promoCode: string): Promise<void> {
     try {
       await this.context.order.promos.removePromo(promoCode);
-      this._orderPromos = this.context.order.promos.get().Items;
+      this.setOrderPromos();
       await this.checkout.calculateOrder();
     } finally {
       this.promosChanged.emit(this._orderPromos);
@@ -89,6 +94,15 @@ export class OCMCheckoutPayment implements OnInit {
 
   onCardSelected(card: SelectedCreditCard): void {
     this.cardSelected.emit(card);
+  }
+
+  setOrderPromos(): void {
+    this._orderPromos = this.context.order.promos.get().Items;
+    this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
+  }
+
+  acceptPOTerms(): void {
+    this.POTermsAccepted = true;
   }
 
   // used when no selection of card is required

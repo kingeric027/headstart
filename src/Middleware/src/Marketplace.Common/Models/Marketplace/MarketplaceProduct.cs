@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Marketplace.Common.Models.Marketplace;
@@ -82,6 +82,7 @@ namespace Marketplace.Models
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
         public bool? ArtworkRequired { get; set; } = false;
+        public bool PromotionEligible { get; set; }
     }
 
 	[JsonConverter(typeof(StringEnumConverter))]

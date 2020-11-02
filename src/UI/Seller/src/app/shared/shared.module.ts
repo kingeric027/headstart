@@ -12,6 +12,7 @@ import {
   NgbDatepickerModule,
   NgbTooltipModule,
   NgbProgressbarModule,
+  NgbCollapseModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -78,6 +79,7 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     NgbDatepickerModule,
     NgbTooltipModule,
     NgbProgressbarModule,
+    NgbCollapseModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -97,6 +99,7 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     NgbTabsetModule,
     NgbDropdownModule,
     NgbProgressbarModule,
+    NgbCollapseModule,
 
     // OrderCloud CMS Components
     CmsAdminModule,

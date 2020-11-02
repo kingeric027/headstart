@@ -12,9 +12,11 @@ namespace Marketplace.Common.Controllers.CardConnect
     public class MePaymentController : BaseController
     {
         private readonly IOrderCloudIntegrationsCardConnectCommand _card;
+        private readonly AppSettings _settings;
         public MePaymentController(AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card) : base(settings)
         {
             _card = card;
+            _settings = settings;
         }
 
         [HttpPost, Route("me/payments/{testcase}/{amount}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
@@ -27,7 +29,15 @@ namespace Marketplace.Common.Controllers.CardConnect
         [HttpPost, Route("me/payments"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<Payment> Post([FromBody] OrderCloudIntegrationsCreditCardPayment payment)
         {
-            return await _card.AuthorizePayment(payment, VerifiedUserContext);
+            string merchantID;
+            if (payment.Currency == "USD")
+                merchantID = _settings.CardConnectSettings.UsdMerchantID;
+            else if (payment.Currency == "CAD")
+                merchantID = _settings.CardConnectSettings.CadMerchantID;
+            else
+                merchantID = _settings.CardConnectSettings.EurMerchantID;
+                
+            return await _card.AuthorizePayment(payment, VerifiedUserContext, merchantID);
         }
     }
 

@@ -3,11 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcAdminUserService, OcSupplierUserService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastrService } from 'ngx-toastr';
 import { AppAuthService } from '@app-seller/auth';
 import {get as _get} from 'lodash';
+import { JDocument} from '@ordercloud/headstart-sdk';
+
 
 @Component({
   selector: 'account-notifications',
@@ -43,6 +44,16 @@ export class NotificationsComponent extends AccountContent {
 
   toggleProductEmails(value: boolean): void {
     this.updateUserFromEvent({ target: { value: value } }, 'xp.ProductEmails')
+  }
+
+  notificationActionTaken(event: string, notification: JDocument) {
+    if (event === "ACCEPTED"){
+      this.notificationsToReview.splice(this.notificationsToReview.indexOf(notification), 1);
+    }
+  }
+
+  goToProductPage(product: string) {
+    this.navigateToPage(`/products/${product}`)
   }
 
   addAddtlRcpt() {

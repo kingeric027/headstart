@@ -4,14 +4,20 @@ using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using System.Linq;
 using Marketplace.Common.Constants;
+using ordercloud.integrations.library.helpers;
+using Marketplace.Models;
+using System;
+using System.Dynamic;
+using System.Collections.Generic;
+using Marketplace.Common.Extensions;
 
 namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceSupplierCommand
     {
-        Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token);
-        Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token);
-        Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token);
+        Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false);
+        Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user);
+        Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -23,20 +29,62 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = oc;
         }
-        public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user, string token)
+        public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user)
         {
             Require.That(supplierID == user.SupplierID,
                 new ErrorCode("Unauthorized", 401, $"You are only authorized to view {user.SupplierID}."));
-            return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID, token);
+            return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
         }
 
-        public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user, string token)
+        public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user)
         {
             Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
-            return await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
+            var currentSupplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
+            var updatedSupplier = await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
+            // Update supplier products only on a name change
+            if (currentSupplier.Name != supplier.Name)
+            {
+                var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<MarketplaceProduct>(
+                supplierID: supplierID,
+                page: page,
+                pageSize: 100,
+                accessToken: user.AccessToken
+                ));
+                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
+                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
+                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+                if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
+                var configToUse = new OrderCloudClientConfig
+                {
+                    ApiUrl = user.ApiUrl,
+                    AuthUrl = user.AuthUrl,
+                    ClientId = supplierClient.ID,
+                    ClientSecret = supplierClient.ClientSecret,
+                    GrantType = GrantType.ClientCredentials,
+                    Roles = new[]
+                               {
+                                 ApiRole.SupplierAdmin,
+                                 ApiRole.ProductAdmin
+                            },
+
+                };
+                var ocClient = new OrderCloudClient(configToUse);
+                await ocClient.AuthenticateAsync();
+                var token = ocClient.TokenResponse.AccessToken;
+                foreach (var product in productsToUpdate)
+                {
+                    product.xp.Facets["supplier"] = new List<string>() { supplier.Name };
+                }
+                await Throttler.RunAsync(productsToUpdate, 100, 5, product => ocClient.Products.SaveAsync(product.ID, product, accessToken: token));
+            }
+
+            return updatedSupplier;
+
         }
-        public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, string token)
+        public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
+            var token = isSeedingEnvironment ? user.AccessToken : null;
+
             // Create Supplier
             supplier.ID = "{supplierIncrementor}";
             var ocSupplier = await _oc.Suppliers.CreateAsync(supplier, token);
@@ -80,7 +128,7 @@ namespace Marketplace.Common.Commands
                 {
                     ApiClientID = apiClient.ID
                 }
-            });
+            }, token);
 
             // Assign Supplier API Client to new supplier
             await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
@@ -89,7 +137,7 @@ namespace Marketplace.Common.Commands
                 SupplierID = ocSupplierID
             }, token);
             // list message senders
-            var msList = await _oc.MessageSenders.ListAsync();
+            var msList = await _oc.MessageSenders.ListAsync(accessToken: token);
             // create message sender assignment
             var assignmentList = msList.Items.Select(ms =>
             {
@@ -99,7 +147,7 @@ namespace Marketplace.Common.Commands
                     SupplierID = ocSupplierID
                 };
             });
-            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a, token));
             return supplier;
         }
     
@@ -110,7 +158,7 @@ namespace Marketplace.Common.Commands
             {
                 SupplierID = supplierID,
                 SecurityProfileID = "MPMeAdmin"
-            });
+            }, token);
 
             foreach(var userType in SEBUserTypes.Supplier())
             {

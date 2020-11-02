@@ -17,7 +17,8 @@ namespace Marketplace.Common
 		public AppEnvironment Env { get; set; }
         public UI UI { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
-		public AvalaraSettings AvalaraSettings { get; set; }
+		public ApplicationInsightsSettings ApplicationInsightsSettings { get; set; } = new ApplicationInsightsSettings();
+        public AvalaraSettings AvalaraSettings { get; set; }
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
@@ -26,9 +27,9 @@ namespace Marketplace.Common
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
-        public string SendgridApiKey { get; set; }
         public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
         public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
+        public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
     }
 
     public class UI
@@ -37,10 +38,15 @@ namespace Marketplace.Common
         public string BaseAdminUrl { get; set; }
     }
 
-	public class EnvironmentSettings
-	{
-		public string BaseUrl { get; set; }
+    public class EnvironmentSettings
+    {
+        public string BaseUrl { get; set; }
 	}
+
+    public class ApplicationInsightsSettings
+    {
+        public string InstrumentationKey { get; set; }
+    }
 
 	public class SmartyStreetSettings
 	{
@@ -64,8 +70,9 @@ namespace Marketplace.Common
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
-        public string SEBDistributionSupplierID { get; set; }
+        public string DevcenterApiUrl { get; set; }
         public string ProvisionSupplierID { get; set; }
+        public string SEBDistributionSupplierID { get; set; }
     }
 
 	public class AvalaraSettings
@@ -87,6 +94,11 @@ namespace Marketplace.Common
         public string SMGFedexAccountId { get; set; }
         public string ProvisionFedexAccountId { get; set; } 
         public string SEBDistributionFedexAccountId { get; set; }
+    }
 
+    public class SendgridSettings
+    {
+        public string ApiKey { get; set; }
+        public string FromEmail { get; set; }
     }
 }

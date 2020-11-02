@@ -7,7 +7,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { PasswordReset, TokenPasswordReset } from 'ordercloud-javascript-sdk';
 import { ValidateStrongPassword, ValidateFieldMatches } from '../../../validators/validators';
 import { ToastrService } from 'ngx-toastr';
-import { ShopperContextService } from 'marketplace';
+import { AppConfig, ShopperContextService } from 'marketplace';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -23,7 +23,8 @@ export class OCMResetPassword implements OnInit {
   constructor(
     private toasterService: ToastrService,
     private context: ShopperContextService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    public appConfig: AppConfig
   ) {}
 
   ngOnInit(): void {

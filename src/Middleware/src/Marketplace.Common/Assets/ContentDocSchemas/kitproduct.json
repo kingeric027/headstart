@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "properties": {
+    "ProductsInKit": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string"
+          },
+          "MinQty": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "MaxQty": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "Static": {
+            "type": "boolean"
+          },
+          "Variants": {
+            "type": "array"
+          },
+          "SpecCombo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ID",
+          "Static"
+        ]
+      }
+    },
+    "additionalProperties": false
+  },
+  "$schema": "https://marketplace-middleware-test.azurewebsites.net/schema-specs/metaschema",
+  "$id": "https://marketplace-middleware-test.azurewebsites.net/schema-specs/8033042a-3e42-4e70-aa97-e7922fa576dd"
+}

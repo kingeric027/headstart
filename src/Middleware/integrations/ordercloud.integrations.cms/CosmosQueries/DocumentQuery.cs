@@ -90,7 +90,7 @@ namespace ordercloud.integrations.cms
 			var matchingID = await GetWithoutExceptions(schema.id, dataObject.InteropID, user);
 			if (matchingID != null) throw new DuplicateIDException();
 			dataObject = Init(dataObject, schema, user);
-			dataObject = SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
+			dataObject = await SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
 			var newDocument = await _store.AddAsync(dataObject);
 			return DocumentMapper.MapTo<T>(newDocument);
 		}
@@ -108,7 +108,7 @@ namespace ordercloud.integrations.cms
 			existingDocument.InteropID = document.ID;
 			existingDocument.Doc = JObject.FromObject(document.Doc);
 			existingDocument.History = HistoryBuilder.OnUpdate(existingDocument.History, user);
-			existingDocument = SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
+			existingDocument = await SchemaHelper.ValidateDocumentAgainstSchema(schema, existingDocument);
 			var updatedDocument = await _store.UpsertAsync(existingDocument);
 			return DocumentMapper.MapTo<T>(updatedDocument);
 		}

@@ -1,5 +1,5 @@
-/* MODAL STYLES
--------------------------------*/
+/*------------------------------- MODAL STYLES-------------------------------*/
+
 ocm-modal {
   /* modals are hidden by default */
   display: none;
@@ -11,55 +11,29 @@ ocm-modal {
     right: 0;
     bottom: 0;
     left: 0;
-
-    /* z-index must be higher than .jw-modal-background */
-    z-index: 1000000;
-
-    /* enables scrolling for tall modals */
+    margin: 0 auto;
+    z-index: $zindex-modal;
     overflow: auto;
-
-    .shared-modal__body {
-      @include media-breakpoint-down(sm) {
-        // Mobile Modal Styles
-        max-width: 100%;
-        position: fixed;
-        margin: auto;
-        bottom: 0;
-        width: 100vw;
-        border-radius: none;
-        padding: 10px 10px 20px 10px;
-        border-radius: 15px 15px 0px 0px;
-      }
-      // Desktop Modal Styles
-      background: #fff;
-      border-radius: $border-radius;
-      max-width: 20rem;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 20px;
-
-      /* margin exposes part of the modal background */
-      margin-top: 40px;
-      margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .shared-modal-body {
+      background-color: $white;
+      padding: 3rem;
+      box-shadow: 0 1rem 3rem rgba(23, 17, 24, 0.75); // .shadow-lg with *significantly* more opacity
     }
   }
-
   .shared-modal__background {
-    /* modal background fixed across whole screen */
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-
-    /* semi-transparent black  */
-    background-color: #000;
-    opacity: 0.60;
-
-    /* z-index must be below .jw-modal and above everything else  */
-    z-index: 90000;
+    background-color: rgba(0, 0, 0, .75);
+    z-index: $zindex-modal-backdrop;
   }
 }
+
 
 body.shared-modal--open {
   /* body overflow is hidden to hide main scrollbar when modal window is open */

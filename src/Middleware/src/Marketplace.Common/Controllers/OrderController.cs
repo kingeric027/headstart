@@ -35,7 +35,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
+        public async Task<ListPage<MarketplaceOrder>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
         {
             return await _command.ListOrdersForLocation(locationID, listArgs, VerifiedUserContext);
         }

@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
 import { OrderListColumn } from '../../../models/order-list-column';
 import { ShopperContextService, OrderViewContext } from 'marketplace';
@@ -10,11 +10,12 @@ import { MarketplaceOrder } from '@ordercloud/headstart-sdk';
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.scss'],
 })
-export class OCMOrderList {
+export class OCMOrderList implements OnInit {
   @Input() orders: ListPage<MarketplaceOrder>;
   @Input() columns: OrderListColumn[];
   faCaretDown = faCaretDown;
   faCaretUp = faCaretUp;
+  _userCurrency: string;
   isQuoteOrder = isQuoteOrder;
   // todo - should this be in some kinda service?
   @Input() sortBy: string;
@@ -22,6 +23,10 @@ export class OCMOrderList {
   @Output() changedPage = new EventEmitter<number>();
 
   constructor(private context: ShopperContextService) {}
+
+  ngOnInit(): void {
+    this._userCurrency = this.context.currentUser.get().Currency;
+  }
 
   updateSort(selectedSortBy: string): void {
     let sortBy;
@@ -44,9 +49,9 @@ export class OCMOrderList {
   }
 
   getOrderStatus(order: Order): string {
-    //AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
-    if (order?.Status === "AwaitingApproval") {
-      return "AwaitingApproval"
+    // AwaitingApproval is the one status order xp doesn't account for. If order.status is AwaitingApproval, take that.
+    if (order?.Status === 'AwaitingApproval') {
+      return 'AwaitingApproval'
     } else {
       return order?.xp?.SubmittedOrderStatus;
     }

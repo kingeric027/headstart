@@ -9,10 +9,12 @@ import { SelectedCreditCard } from '../../checkout/checkout-payment/checkout-pay
   styleUrls: ['./payment-credit-card.component.scss'],
 })
 export class OCMPaymentCreditCard implements OnInit {
+  @Input() cards: ListPage<BuyerCreditCard>;
+  @Input() termsAccepted: boolean;
+  @Input() paymentError: string;
+  @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   showNewCCForm = false;
 
-  @Input() cards: ListPage<BuyerCreditCard>;
-  @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
   form = new FormGroup({
     cardID: new FormControl(null, Validators.required),
     cvv: new FormControl('', Validators.required),

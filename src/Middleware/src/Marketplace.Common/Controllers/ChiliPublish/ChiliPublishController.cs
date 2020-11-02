@@ -205,7 +205,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("Get Tecra Documents By Folder")]
-        [HttpGet, Route("byfolder")]
+        [HttpGet, Route("byfolder/{folder}")]
         public async Task<IEnumerable<TecraDocument>> GetByFolder(string folder)
         {
             var result = await _tecra.TecraDocumentsByFolder(folder);
