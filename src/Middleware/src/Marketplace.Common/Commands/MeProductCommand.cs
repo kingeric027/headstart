@@ -125,7 +125,7 @@ namespace Marketplace.Common.Commands
 					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
 					{
 						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
-						var currency = product?.xp?.Currency;
+						var currency = product?.xp?.Currency ?? CurrencySymbol.USD;
 						var convertedPrice = ConvertPrice(markedupPrice, currency, exchangeRates);
 						priceBreak.Price = convertedPrice;
 						return priceBreak;
