@@ -7,7 +7,6 @@ namespace ordercloud.integrations.cardconnect
 {
 	public interface IOrderCloudIntegrationsCardConnectCommand
 	{
-		//Task<CreditCardAuthorization> Authorize(CreditCardAuthorization auth);
 		Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user, string merchantID);
@@ -61,7 +60,7 @@ namespace ordercloud.integrations.cardconnect
 			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, payment.PaymentID);
             try
             {
-                var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
+                var call = await _cardConnect.AuthWithCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
                 ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment {Accepted = true, Amount = ccAmount});
                 return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, call));
             }
