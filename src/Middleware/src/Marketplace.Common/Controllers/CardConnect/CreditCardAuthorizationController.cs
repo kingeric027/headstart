@@ -19,11 +19,11 @@ namespace Marketplace.Common.Controllers.CardConnect
             _settings = settings;
         }
 
-        [HttpPost, Route("me/payments/{testcase}/{amount}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<CardConnectAuthorizationResponse> PostTest([FromBody] OrderCloudIntegrationsCreditCardPayment payment, string testcase, decimal amount)
-        {
-            return await _card.AuthorizeValidationPayment(payment, amount, testcase, VerifiedUserContext);
-        }
+        //[HttpPost, Route("me/payments/{testcase}/{amount}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        //public async Task<CardConnectAuthorizationResponse> PostTest([FromBody] OrderCloudIntegrationsCreditCardPayment payment, string testcase, decimal amount)
+        //{
+        //    return await _card.AuthorizeValidationPayment(payment, amount, testcase, VerifiedUserContext);
+        //}
 
         [DocName("POST Payment")]
         [HttpPost, Route("me/payments"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
