@@ -498,7 +498,7 @@ namespace Marketplace.Common.Services
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
-            var currencyString = order.xp.Currency.ToString();
+            var currencyString = order.xp?.Currency?.ToString();
             return new OrderTemplateData()
             {
                 FirstName = order.FromUser.FirstName,
