@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho.Models;
@@ -216,7 +217,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             {
                 item_type = "sales_and_purchases",
                 name = item.Variant?.Name ?? item.Product.Name,
-                rate = decimal.ToDouble(item.UnitPrice.Value),
+                rate = Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2),
                 purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", 
                 description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
                 sku = item.Variant?.ID ?? item.Product.ID,
@@ -234,7 +235,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 item_id = zItem.item_id,
                 item_type = "sales_and_purchases",
                 name = item.Variant?.Name ?? item.Product.Name,
-                rate = decimal.ToDouble(item.UnitPrice.Value),
+                rate = Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2),
                 purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", // debug removal
                 description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
                 sku = item.Variant?.ID ?? item.Product.ID,

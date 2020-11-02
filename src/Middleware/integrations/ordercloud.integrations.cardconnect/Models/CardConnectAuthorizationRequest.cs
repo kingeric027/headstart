@@ -17,6 +17,7 @@
         ////public string profile { get; set; }
         public string ecomind { get; set; } = "E";
         public string cvv2 { get; set; }
+        public bool capture { get; set; }
         ////public object track { get; set; }
         //public string capture { get; set; }
         //public string bin { get; set; }
