@@ -50,6 +50,7 @@ namespace Marketplace.Common.Models.Marketplace
         public int? MinQty { get; set; }
         public int? MaxQty { get; set; }
         public bool Static { get; set; }
+        public bool Optional { get; set; }
         public string SpecCombo { get; set; }
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
@@ -65,6 +66,7 @@ namespace Marketplace.Common.Models.Marketplace
         public int? MinQty { get; set; }
         public int? MaxQty { get; set; }
         public bool Static { get; set; }
+        public bool Optional { get; set; }
         public string SpecCombo { get; set; }
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }

@@ -115,7 +115,14 @@ export class KitsEditComponent implements OnInit {
         product.ProductAssignments.ProductsInKit.forEach(async p => {
             const ocProduct = await HeadStartSDK.Products.Get(p.ID, accessToken);
             productAssignments.push({
-                ID: p.ID, Name: ocProduct.Product.Name, Variants: p.Variants, MinQty: p.MinQty, MaxQty: p.MaxQty, Static: p.Static, SpecCombo: p.SpecCombo
+                ID: p.ID,
+                Name: ocProduct.Product.Name,
+                Variants: p.Variants,
+                MinQty: p.MinQty,
+                MaxQty: p.MaxQty,
+                Static: p.Static,
+                SpecCombo: p.SpecCombo,
+                Optional: p.Optional
             });
         });
         this.productsIncluded = productAssignments;
@@ -222,7 +229,12 @@ export class KitsEditComponent implements OnInit {
                 Variants: ocProduct.Variants, SpecCombo: '',
                 MinQty: null, MaxQty: null, Static: false
             };
-            const productInKit = { ID: productID, MinQty: null, MaxQty: null, Static: false, Variants: ocProduct.Variants, SpecCombo: '' };
+            const productInKit = {
+                ID: productID, MinQty: null,
+                MaxQty: null, Static: false,
+                Variants: ocProduct.Variants,
+                SpecCombo: ocProduct?.Variants?.length ? ocProduct.Variants[0].xp.SpecCombo : ''
+            };
             if (!this.productsIncluded.includes(newProduct)) this.productsIncluded.push(newProduct);
             if (!updatedAssignments.includes(productInKit)) updatedAssignments.push(productInKit);
         });

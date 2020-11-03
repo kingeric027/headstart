@@ -242,11 +242,12 @@
                   <th translate>ADMIN.PRODUCT_EDIT.NAME</th>
                   <th translate>ADMIN.KITS.MIN_QTY</th>
                   <th translate>ADMIN.KITS.MAX_QTY</th>
+                  <th translate>ADMIN.KITS.OPTIONAL</th>
                   <th translate>ADMIN.KITS.STATIC</th>
                   <th></th>
                 </tr>
               </thead>
-              <tbody *ngFor="let product of productsIncluded;">
+              <tbody *ngFor="let product of productsIncluded; let i = index;">
                 <tr *ngIf="product">
                   <td>{{product?.ID}}</td>
                   <td>{{product?.Name}}</td>
@@ -259,7 +260,14 @@
                       class="form-control" (change)="handleUpdateProduct($event, 'MaxQty', 'number', product)"
                       aria-label="Minimum Quantity" />
                   </td>
-                  td
+                  <td>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" [checked]="product.Optional" class="custom-control-input"
+                        (click)="handleUpdateProduct($event, 'Optional', 'boolean', product)"
+                        id="{{'KitProductOptional' + product.ID}}">
+                      <label class="custom-control-label" for="{{'KitProductOptional' + product.ID}}">Optional</label>
+                    </div>
+                  </td>
                   <td class="d-flex flex-row">
                     <label class="d-block switch mb-0">
                       <input type="checkbox"
