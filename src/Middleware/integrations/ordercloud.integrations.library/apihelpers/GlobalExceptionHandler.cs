@@ -61,7 +61,8 @@ namespace ordercloud.integrations.library
                 ErrorCode = code.ToString(),
                 Message = "Unknown error has occured.",
                 StackTrace = ex.StackTrace,
-                InnerException = ex.InnerException
+                InnerException = ex.InnerException,
+                TimeStamp = DateTime.Now
             };
             LogError(log);
 
@@ -88,6 +89,7 @@ namespace ordercloud.integrations.library
         {
             public string StackTrace { get; set; }
             public Exception InnerException { get; set; }
+            public DateTime TimeStamp { get; set; }
         }
     }
 }

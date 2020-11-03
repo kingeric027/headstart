@@ -150,7 +150,7 @@ namespace ordercloud.integrations.cms
 		public async Task<AssetDO> GetByInternalID(string assetID)
 		{
 			var asset = await _assetStore.Query().FirstOrDefaultAsync(a => a.id == assetID);
-			if (asset == null) throw new NotImplementedException(); // Why not implemented instead of not found?
+			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetID);
 			return asset;
 		}
 
