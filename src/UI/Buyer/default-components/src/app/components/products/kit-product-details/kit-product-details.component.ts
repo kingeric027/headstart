@@ -82,11 +82,11 @@ export class OCMKitProductDetails {
   canAddToCart(): boolean {
     // the cart is valid if all kit products have at least one associated line item
     // variable kit products may have more than one
-    if (!this._product || !this._product.ProductAssignments.ProductsInKit.length) {
+    if (!this._product || !this._product.ProductAssignments.ProductsInKit.length || !this.lineItemsToAdd?.length) {
       return false;
     }
     const productsAddedToCart = this.lineItemsToAdd.map(li => li.ProductID);
-    return this._product.ProductAssignments.ProductsInKit.every(details => productsAddedToCart.includes(details.Product.ID))
+    return this._product.ProductAssignments.ProductsInKit.every(details => details.Optional || productsAddedToCart.includes(details.Product.ID))
   }
 
 }

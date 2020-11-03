@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-md-5">
-      <ocm-image-gallery *ngIf="_product" [images]="_product.Images"></ocm-image-gallery>
+      <ocm-image-gallery *ngIf="_product && !openVariantSelectionEvent" [images]="_product.Images"></ocm-image-gallery>
       <ocm-kit-variant-selector
         *ngIf="openVariantSelectionEvent"
         [kitProduct]="_product"
