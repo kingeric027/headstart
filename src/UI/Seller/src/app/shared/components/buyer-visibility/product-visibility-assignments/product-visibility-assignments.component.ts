@@ -7,9 +7,7 @@ import {
   OcCatalogService,
 } from '@ordercloud/angular-sdk';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceProduct, MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
-import { MiddlewareKitService } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'product-visibility-assignments-component',
@@ -31,8 +29,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
 
   constructor(
     private ocBuyerService: OcBuyerService,
-    private ocCatalogService: OcCatalogService,
-    private productService: ProductService
+    private ocCatalogService: OcCatalogService
   ) { }
 
   ngOnInit(): void {
