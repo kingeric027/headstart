@@ -16,6 +16,29 @@ export async function deleteProduct(productID: string, clientAuth: string) {
 	}
 }
 
+export async function deleteAutomationProducts(
+	products: OrderCloudSDK.Product[],
+	clientAuth: string
+) {
+	for await (const product of products) {
+		if (product.Name.includes('AutomationProduct_')) {
+			await deleteProduct(product.ID, clientAuth)
+		}
+	}
+}
+
+export async function getAutomationProducts(clientAuth: string) {
+	const searchResponse = await OrderCloudSDK.Products.List(
+		{
+			search: 'AutomationProduct_',
+			searchOn: ['Name'],
+		},
+		{ accessToken: clientAuth }
+	)
+
+	return searchResponse.Items
+}
+
 export async function getProductID(productName: string, clientAuth: string) {
 	let searchResponse
 	for (let i = 0; i < 5; i++) {

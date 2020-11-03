@@ -12,6 +12,8 @@ class CheckoutPage {
 	submitOrderButton: Selector
 	shippingAddressDropdown: Selector
 	shippingAddressOptions: Selector
+	addNewAddressButton: Selector
+	acceptButton: Selector
 	//address form
 	firstNameField: Selector
 	lastNameField: Selector
@@ -38,6 +40,10 @@ class CheckoutPage {
 		)
 		this.shippingAddressDropdown = Selector('#selectAddress')
 		this.shippingAddressOptions = this.shippingAddressDropdown.find('option')
+		this.addNewAddressButton = Selector('button').withText(
+			createRegExp('add new address')
+		)
+		this.acceptButton = Selector('button').withText(createRegExp('accept'))
 		//address form
 		this.firstNameField = Selector('#FirstName')
 		this.lastNameField = Selector('#LastName')
@@ -55,6 +61,10 @@ class CheckoutPage {
 
 	async clickContinueButton() {
 		await t.click(this.continueButton)
+	}
+
+	async clickAcceptButton() {
+		await t.click(this.acceptButton)
 	}
 
 	async selectShippingOption(product: string, shippingOption: string) {
@@ -86,11 +96,8 @@ class CheckoutPage {
 		await t.click(this.submitOrderButton)
 	}
 
-	async selectAddNewAddress() {
-		await t.click(this.shippingAddressDropdown)
-		await t.click(
-			this.shippingAddressOptions.withText(createRegExp('add a new address'))
-		)
+	async clickAddNewAddressButton() {
+		await t.click(this.addNewAddressButton)
 	}
 
 	async enterDefaultAddress(firstName: string, lastName: string) {

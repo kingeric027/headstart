@@ -99,7 +99,8 @@
                                      [orderPromos]="orderPromotions"
                                      [shipEstimates]="shipEstimates"
                                      (selectShipRate)="selectShipMethod($event.detail)"
-                                     (continue)="doneWithShippingRates()">
+                                     (continue)="doneWithShippingRates()"
+                                     (backToAddress)="navigateBackToAddress()">
               </ocm-checkout-shipping>
             </ng-template>
           </ngb-panel>
@@ -126,6 +127,7 @@
                                     [orderPromos]="orderPromotions"
                                     [cards]="cards"
                                     [orderSummaryMeta]="orderSummaryMeta"
+                                    [paymentError]="paymentError"
                                     (promosChanged)="updateOrderMeta($event)"
                                     (cardSelected)="onCardSelected($event.detail)"
                                     (continue)="onAcknowledgePurchaseOrder()">
@@ -135,7 +137,7 @@
           <ngb-panel id="confirm">
             <ng-template ngbPanelTitle>
               <h2 class="h5 mb-0 py-2 text-secondary"
-                  translate>CHECKOUT.CHECKOUT.CONFIRM </h2>
+                  translate>CHECKOUT.CHECKOUT.CONFIRM</h2>
               <ngx-spinner *ngIf="isLoading && currentPanel === 'submitLoading'"
                            bdColor="null"
                            color="var(--primary)"

@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using ordercloud.integrations.freightpop;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration

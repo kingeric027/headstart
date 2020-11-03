@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avalara.AvaTax.RestClient;
 using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +8,6 @@ using Marketplace.Common;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Controllers;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
@@ -16,17 +15,19 @@ using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
-using Marketplace.Models.Extended;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
-using ordercloud.integrations.freightpop;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
+using ordercloud.integrations.tecra;
+using System.Runtime.InteropServices;
+using LazyCache;
 
 namespace Marketplace.API
 {
@@ -66,21 +67,21 @@ namespace Marketplace.API
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
                 Container = _settings.ExchangeRatesSettings.Container
             };
-            var freightPopConfig = new FreightPopConfig()
+            var middlewareErrorsConfig = new BlobServiceConfig()
             {
-                BaseUrl = _settings.FreightPopSettings.BaseUrl,
-                Password = _settings.FreightPopSettings.Password,
-                Username = _settings.FreightPopSettings.Username
+                ConnectionString = _settings.BlobSettings.ConnectionString,
+                Container = "unhandled-errors-log"
             };
 
             services
-                .OrderCloudIntegrationsConfigureWebApiServices(_settings, "marketplacecors")
+                .AddLazyCache()
+                .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
-				.InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
-				.InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
-				.InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
-				.InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
+                .InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
+                .InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
+                .InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
+                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
@@ -93,23 +94,24 @@ namespace Marketplace.API
                 .Inject<ISmartyStreetsCommand>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<IOrchestrationLogCommand>()
-                .Inject<IOCShippingIntegration>()
+                .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
                 .Inject<IEnvironmentSeedCommand>()
-                .Inject<IOrderCloudSandboxService>()
                 .Inject<IMarketplaceProductCommand>()
                 .Inject<ILineItemCommand>()
                 .Inject<IMeProductCommand>()
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
-				.Inject<IDocumentQuery>()
-				.Inject<IBlobStorage>()
-				.Inject<ISchemaQuery>()
+                .Inject<IDocumentQuery>()
+                .Inject<IBlobStorage>()
+                .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
+                .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliTemplateCommand>()
                 .Inject<IChiliConfigCommand>()
+                .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -117,7 +119,7 @@ namespace Marketplace.API
                     AccessToken = _settings.ZohoSettings.AccessToken,
                     ClientId = _settings.ZohoSettings.ClientId,
                     ClientSecret = _settings.ZohoSettings.ClientSecret,
-                    OrganizationID = _settings.ZohoSettings.OrgID }, 
+                    OrganizationID = _settings.ZohoSettings.OrgID },
                     new OrderCloudClientConfig {
                         ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                         AuthUrl = _settings.OrderCloudSettings.ApiUrl,
@@ -129,12 +131,13 @@ namespace Marketplace.API
                             }
                     }
                 ))
-				.AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<IFreightPopService>(x => new FreightPopService(freightPopConfig))
+                .AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
-				.AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
+                .AddSingleton<IOrderCloudIntegrationsTecraService>(x => new OrderCloudIntegrationsTecraService(_settings.TecraSettings))
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations")
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
@@ -155,6 +158,7 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
+            services.AddApplicationInsightsTelemetry(_settings.ApplicationInsightsSettings.InstrumentationKey);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

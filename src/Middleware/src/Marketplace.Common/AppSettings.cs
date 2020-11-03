@@ -5,6 +5,7 @@ using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
+using ordercloud.integrations.tecra;
 
 namespace Marketplace.Common
 {
@@ -16,21 +17,19 @@ namespace Marketplace.Common
 		public AppEnvironment Env { get; set; }
         public UI UI { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
-		public AvalaraSettings AvalaraSettings { get; set; }
+		public ApplicationInsightsSettings ApplicationInsightsSettings { get; set; } = new ApplicationInsightsSettings();
+        public AvalaraSettings AvalaraSettings { get; set; }
         public BlobSettings BlobSettings { get; set; }
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
-        public FreightPopSettings FreightPopSettings { get; set; }
-
-        // additional field for production settings because we can only test third
-        // party shipping on FreigthPOP prd
-        public FreightPopSettings FreightPopSettingsProd { get; set; }
         public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
+        public OrderCloudTecraConfig TecraSettings { get; set; } = new OrderCloudTecraConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
-        public string SendgridApiKey { get; set; }
         public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
+        public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
+        public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
     }
 
     public class UI
@@ -39,10 +38,15 @@ namespace Marketplace.Common
         public string BaseAdminUrl { get; set; }
     }
 
-	public class EnvironmentSettings
-	{
-		public string BaseUrl { get; set; }
+    public class EnvironmentSettings
+    {
+        public string BaseUrl { get; set; }
 	}
+
+    public class ApplicationInsightsSettings
+    {
+        public string InstrumentationKey { get; set; }
+    }
 
 	public class SmartyStreetSettings
 	{
@@ -60,19 +64,15 @@ namespace Marketplace.Common
         public string OrgID { get; set; }
     }
 
-    public class FreightPopSettings
-    {
-        public string BaseUrl { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
 	public class OrderCloudSettings
 	{
 		public string ApiUrl { get; set; }
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
+        public string DevcenterApiUrl { get; set; }
+        public string ProvisionSupplierID { get; set; }
+        public string SEBDistributionSupplierID { get; set; }
     }
 
 	public class AvalaraSettings
@@ -86,5 +86,19 @@ namespace Marketplace.Common
     {
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
+    }
+
+    public class EasyPostSettings
+	{
+        public string APIKey { get; set; }
+        public string SMGFedexAccountId { get; set; }
+        public string ProvisionFedexAccountId { get; set; } 
+        public string SEBDistributionFedexAccountId { get; set; }
+    }
+
+    public class SendgridSettings
+    {
+        public string ApiKey { get; set; }
+        public string FromEmail { get; set; }
     }
 }

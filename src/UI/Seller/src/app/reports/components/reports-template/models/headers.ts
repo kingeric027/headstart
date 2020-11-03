@@ -8,7 +8,11 @@ export const buyerLocation = [
     { value: 'Country', path: 'Country' },
     { value: 'Company Name', path: 'CompanyName'},
     { value: 'Email', path: 'xp.Email' },
-    { value: 'Phone', path: 'Phone' }
+    { value: 'Phone', path: 'Phone' },
+    { value: 'Opening Date', path: 'xp.OpeningDate' },
+    { value: 'Billing Number', path: 'xp.BillingNumber' },
+    { value: 'Status', path: 'xp.Status' },
+    { value: 'Legal Entity', path: 'xp.LegalEntity' }
 ]
 
 export const salesOrderDetail = [

@@ -69,12 +69,7 @@ module.exports = {
     "id-match": "error",
     "import/order": "off",
     "max-classes-per-file": "off",
-    "max-len": [
-      "error",
-      {
-        "code": 140
-      }
-    ],
+    "max-len": "off",
     "new-parens": "error",
     "no-bitwise": "off",
     "no-caller": "error",
@@ -127,7 +122,7 @@ module.exports = {
     "no-undef-init": "error",
     "no-underscore-dangle": "off",
     "no-unsafe-finally": "error",
-    "no-unused-expressions": "error",
+    "no-unused-expressions": "off",
     "no-unused-labels": "error",
     "no-var": "error",
     "object-shorthand": "error",

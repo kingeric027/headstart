@@ -155,6 +155,17 @@ export async function getSupplierUser(
 	return getUser
 }
 
+export async function getSupplierUsers(supplierID: string, clientAuth: string) {
+	const users = await OrderCloudSDK.SupplierUsers.List(
+		supplierID,
+		{},
+		{ accessToken: clientAuth }
+	)
+
+	//filter out integration user
+	return users.Items.filter(user => !user.Username.includes('dev_'))
+}
+
 //delete supplier integration user that is created when creating a new supplier (AKA vendor)
 export async function deleteSupplierIntegrationUser(
 	supplierID: string,

@@ -23,12 +23,12 @@ namespace ordercloud.integrations.cms
 
 	public class SchemaNotValidException : OrderCloudIntegrationException
 	{
-		public SchemaNotValidException(IList<string> errors) : base("Schema Invalid", "Errors with Json Schema", errors) { }
+		public SchemaNotValidException(List<string> errors) : base("Schema Invalid", "Errors with Json Schema", errors) { }
 	}
 
 	public class DocumentNotValidException : OrderCloudIntegrationException
 	{
-		public DocumentNotValidException(string schemaInteropID, IList<string> errors) : base("Document Invalid", $"This Document does not conform to schema \"{schemaInteropID}\"", errors) { }
+		public DocumentNotValidException(string schemaInteropID, List<string> errors) : base("Document Invalid", $"This Document does not conform to schema \"{schemaInteropID}\"", errors) { }
 	}
 
 	public class InvalidAssignmentException : OrderCloudIntegrationException
@@ -50,5 +50,15 @@ namespace ordercloud.integrations.cms
 	public class ReorderImagesOnlyException : OrderCloudIntegrationException
 	{
 		public ReorderImagesOnlyException() : base("Reorder Error", "Only Image-type assets have an ordering.", null) { }
+	}
+
+	public class NotConfiguredForAssetsException : OrderCloudIntegrationException
+	{
+		public NotConfiguredForAssetsException(string sellerID) : base("Configuration Error", $"Your OC organization with SellerID {sellerID} is not configured to use the Assets feature. Please contact oheywood@four51.com for access.", null) { }
+	}
+
+	public class MissingConfigationException : OrderCloudIntegrationException
+	{
+		public MissingConfigationException() : base("Configuration Error", $"Missing Configuration Record.", null) { }
 	}
 }

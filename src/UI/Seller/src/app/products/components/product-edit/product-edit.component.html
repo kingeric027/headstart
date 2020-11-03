@@ -1,5 +1,45 @@
 <div *ngIf="productForm"
      class="container-fluid resource-edit">
+  <div *ngIf="productInReviewNotifications?.length > 0 && userContext?.UserType === 'SUPPLIER'"
+       class="alert alert-warning d-flex justify-content-start align-items-center"
+       style="top: 0;">
+    <fa-icon [icon]="faExclamationCircle"
+             class="mr-3"></fa-icon>
+    <p class="mb-0">A monitored field on this product has been edited and is pending seller review. Until a seller approves the changes, the product is inactive, and unorderable. Once this notice is gone, your product has been re-activated and is orderable once again.</p>
+  </div>
+  <ng-container *ngIf="userContext?.UserType === 'SELLER'">
+    <div *ngFor="let notification of productInReviewNotifications"
+         class="alert alert-warning"
+         style="top: 0;">
+      <div class="pb-3 border-bottom d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-start align-items-center">
+          <fa-icon [icon]="faExclamationCircle"
+                   class="mr-3"></fa-icon>
+          <p class="mb-0">{{notification?.Doc?.Product?.FieldModified}} has been edited.</p>
+        </div>
+        <div>
+          <button (click)="reviewMonitoredFieldChange('ACCEPTED', notification)"
+                  class="btn btn-primary">Accept</button>
+          <!-- TODO: Reinstate the rejected button once functionality can handle the repercussions. -->
+          <!-- <button (click)="reviewMonitoredFieldChange('REJECTED')"
+                  class="btn btn-outline-danger ml-2">Reject</button> -->
+        </div>
+      </div>
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="d-flex flex-column">
+          <small class="mb-0 text-uppercase text-muted font-weight-bolder">Previous Value</small>
+          <pre><code>{{notification?.Doc?.Product?.PreviousValue | json}}</code></pre>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex flex-column">
+            <small class="mb-0 text-uppercase text-muted font-weight-bolder">New Value</small>
+            <pre>{{notification?.Doc?.Product?.CurrentValue | json}}</pre>
+          </div>
+        </div>
+      </div>
+      <small class="mb-0 font-italic">Edited by {{notification?.Doc?.History?.ModifiedBy?.Name}} of {{notification?.Doc?.Supplier?.Name}} on {{notification?.Doc?.History?.DateModified | date}}</small>
+    </div>
+  </ng-container>
   <form [formGroup]="productForm">
     <ul ngbNav
         #nav="ngbNav"
@@ -122,11 +162,13 @@
                            value="{{_superMarketplaceProductStatic.Product.ID}}"
                            disabled>
                   </div>
-                  <div class="form-group">
+                  <div *ngIf="productInReviewNotifications?.length <= 0"
+                       class="form-group">
                     <label for="Active"
                            translate>ADMIN.PRODUCT_EDIT.ACTIVE</label>
                     <label class="d-block switch mb-0">
                       <input class="form-check-input"
+                             [attr.disabled]="readonly ? true : null"
                              type="checkbox"
                              (click)="handleUpdateProduct($event, 'Product.Active')"
                              [checked]="_superMarketplaceProductEditable?.Product.Active">
@@ -458,7 +500,7 @@
                       <div class="card-body d-flex flex-column justify-content-between bg-light">
                         <h5 class="card-title"
                             title="_superMarketplaceProductEditable?.Product?.Name">{{_superMarketplaceProductEditable?.Product?.Name}}</h5><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.ID}}</small>
-                        <p class="card-text">{{_superMarketplaceProductEditable?.Product?.xp?.Facets?.supplier && _superMarketplaceProductEditable?.Product?.xp?.Facets?.supplier[0]}}</p>
+                            <p class="card-text">{{_superMarketplaceProductEditable?.Product?.xp?.Facets?.supplier && _superMarketplaceProductEditable?.Product?.xp?.Facets?.supplier[0]}}</p>
                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                           <p class="card-text mb-0"> {{_superMarketplaceProductEditable?.PriceSchedule?.PriceBreaks[0]?.Price | currency: supplierCurrency?.Currency }} </p><small class="card-text text-muted">{{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Qty}} / {{_superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure?.Unit}}</small><label class="sr-only"
                                  for="quantity"
@@ -620,8 +662,7 @@
                                         [copyProductResource]="copyProductResource"
                                         [myCurrency]="supplierCurrency"
                                         (productVariationsChanged)="updateEditableProductWithVariationChanges($event)"
-                                        (variantsValidated)="validateVariants($event)"
-                                        (isSpecsEditing)="specsBeingEdited($event)">
+                                        (variantsValidated)="validateVariants($event)">
           </product-variations-component>
         </ng-template>
       </li>
@@ -675,12 +716,13 @@
                                        description="Deleting this image cannot be reversed.<br /><small class='font-italic'>If your product has no images, a fallback image will display on the buyer site.</small>">
                           <button type="button"
                                   class="btn btn-link text-dark"
-                                  (click)="modal.dismiss()">ADMIN.PRODUCT_EDIT.CANCEL</button>
+                                  (click)="modal.dismiss()"
+                                  translate>ADMIN.PRODUCT_EDIT.CANCEL</button>
                           <button type="button"
                                   class="btn brand-button--danger"
                                   (click)="removeFile(image)"
                                   (click)="modal.dismiss()"
-                                  translate>ADMIN.PRODUCT_EDIT.YES_DELETE</button>
+                                  translate>COMMON.YES_DELETE</button>
                         </confirm-modal>
                       </ng-template>
                     </div>
@@ -830,14 +872,14 @@
          class="text-danger"
          translate>ADMIN.PRODUCT_EDIT.VARIATION_ISSUES</p>
       <div>
-        <button *ngIf="areChanges && !isSpecsEditing"
+        <button *ngIf="areChanges"
                 class="btn btn-primary"
                 type="submit"
                 [disabled]="productForm?.status === 'INVALID' || !variantsValid || dataIsSaving"
                 (click)="handleSave()">{{getSaveBtnText()}}</button>
         <button class="btn brand-button ml-3"
                 (click)="handleDiscardChanges()"
-                *ngIf="areChanges && !isCreatingNew && !isSpecsEditing"
+                *ngIf="areChanges && !isCreatingNew"
                 translate>COMMON.DISCARD_CHANGES</button>
       </div>
     </div>

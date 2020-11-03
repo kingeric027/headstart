@@ -20,35 +20,28 @@ namespace Marketplace.Common.Controllers
         public SupplierController(IMarketplaceSupplierCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
         {
             _command = command;
-            _oc = oc;
+			_oc = oc;
         }
 
 		[DocName("GET MarketplaceSupplier")]
 		[HttpGet, Route("me/{supplierID}"), OrderCloudIntegrationsAuth]
 		public async Task<MarketplaceSupplier> GetMySupplier(string supplierID)
 		{
-			//ocAuth is the token for the organization that is specified in the AppSettings
-		   var ocAuth = await _oc.AuthenticateAsync();
-			return await _command.GetMySupplier(supplierID, VerifiedUserContext, ocAuth.AccessToken);
+			return await _command.GetMySupplier(supplierID, VerifiedUserContext);
 		}
 
 		[DocName("POST Marketplace Supplier")]
 		[HttpPost, OrderCloudIntegrationsAuth(ApiRole.SupplierAdmin)]
 		public async Task<MarketplaceSupplier> Create([FromBody] MarketplaceSupplier supplier)
 		{
-			///ocAuth is the token for the organization that is specified in the AppSettings
-
-		   var ocAuth = await _oc.AuthenticateAsync();
-			return await _command.Create(supplier, VerifiedUserContext, ocAuth.AccessToken);
+			return await _command.Create(supplier, VerifiedUserContext);
 		}
 
 		[DocName("GET If Location Deletable")]
 		[HttpGet, Route("candelete/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.SupplierAddressAdmin)]
 		public async Task<bool> CanDeleteLocation(string locationID)
 		{
-			///ocAuth is the token for the organization that is specified in the AppSettings
-			var ocAuth = await _oc.AuthenticateAsync();
-			var productList = await _oc.Products.ListAsync(filters: $"ShipFromAddressID={locationID}", accessToken: ocAuth.AccessToken);
+			var productList = await _oc.Products.ListAsync(filters: $"ShipFromAddressID={locationID}");
 			return productList.Items.Count == 0;
 		}
 
@@ -57,9 +50,7 @@ namespace Marketplace.Common.Controllers
 		[HttpPatch, Route("{supplierID}"), OrderCloudIntegrationsAuth]
 		public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, [FromBody] PartialSupplier supplier)
 		{
-			///ocAuth is the token for the organization that is specified in the AppSettings
-			var ocAuth = await _oc.AuthenticateAsync();
-			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext, ocAuth.AccessToken);
+			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext);
 		}
 
 	}

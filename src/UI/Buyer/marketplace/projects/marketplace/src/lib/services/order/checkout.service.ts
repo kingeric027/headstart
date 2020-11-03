@@ -114,7 +114,7 @@ export class CheckoutService {
   }
 
   async createSavedCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Promise<Payment> {
-    return await this.createCCPayment(card.PartialAccountNumber, card.CardType, card.ID, amount);
+    return await this.createCCPayment(card?.PartialAccountNumber, card.CardType, card.ID, amount);
   }
 
   async createOneTimeCCPayment(card: OrderCloudIntegrationsCreditCardToken, amount: number): Promise<Payment> {
@@ -186,6 +186,7 @@ export class CheckoutService {
     const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
     await this.state.reset();
     return submittedOrder.ID;
+
   }
 
   private async createCCPayment(

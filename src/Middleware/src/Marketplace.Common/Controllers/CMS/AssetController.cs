@@ -115,7 +115,7 @@ namespace Marketplace.CMS.Controllers
 			Response.Redirect(url);
 		}
 
-		[DocName("Get a Resource's primary image")]
+		[DocName("Get a Resource Child's primary image")]
 		[HttpGet, Route("{sellerID}/{parentType}/{parentID}/{type}/{ID}/thumbnail")] // No auth
 		public async Task GetThumbnailOnChild(string sellerID, ParentResourceType parentType, string parentID, ResourceType type, string ID, [FromQuery] ThumbSize size = ThumbSize.M)
 		{

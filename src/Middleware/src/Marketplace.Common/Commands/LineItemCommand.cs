@@ -10,6 +10,8 @@ using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Constants;
 using SendGrid.Helpers.Mail;
+using Marketplace.Common.Extensions;
+using System.Net;
 
 namespace Marketplace.Common.Commands
 {
@@ -239,7 +241,7 @@ namespace Marketplace.Common.Commands
             // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
             var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
 
-            foreach (KeyValuePair<VerifiedUserType, LineItemEmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status]) {
+            foreach (KeyValuePair<VerifiedUserType, EmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status]) {
                 var userType = entry.Key;
                 var emailText = entry.Value;
 
@@ -388,7 +390,11 @@ namespace Marketplace.Common.Commands
             var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
             {
                 var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
-                var relatedSpecMarkup = relatedProductSpec.Options.First(option => option.ID == spec.OptionID).PriceMarkup;
+                decimal? relatedSpecMarkup = 0;
+                if (relatedProductSpec.Options.HasItem())
+                {
+                    relatedSpecMarkup = relatedProductSpec.Options?.First(option => option.ID == spec.OptionID)?.PriceMarkup;
+                }
                 return accumulator + (relatedSpecMarkup ?? 0M);
             });
             return totalSpecMarkup + markedUpBasePrice;
@@ -397,6 +403,10 @@ namespace Marketplace.Common.Commands
         private bool LineItemsMatch(LineItem li1, LineItem li2)
         {
             if (li1.ProductID != li2.ProductID) return false;
+            if (!String.IsNullOrEmpty(li2.xp.PrintArtworkURL)) 
+            {
+                if (li2.xp.PrintArtworkURL != li1.xp.PrintArtworkURL) return false;
+            }
             foreach (var spec1 in li1.Specs) {
                 var spec2 = (li2.Specs as List<LineItemSpec>)?.Find(s => s.SpecID == spec1.SpecID);
                 if (spec1?.Value != spec2?.Value) return false;

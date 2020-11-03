@@ -53,7 +53,7 @@ namespace Marketplace.Common.Queries
 
         public async Task Delete(string id, string partitionKey)
         {
-            await _store.RemoveByIdAsync(id);
+            await _store.RemoveByIdAsync(id, partitionKey);
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Flurl.Http.Testing;
 using NUnit.Framework;
 using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.library;
 
 namespace CardConnect.Tests
 {
@@ -71,7 +70,7 @@ namespace CardConnect.Tests
         public void auth_failure_attempt_tests(string body)
         {
             _http.RespondWith(body);
-            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
+            var ex = Assert.ThrowsAsync<CreditCardIntegrationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
         }
 
         [Test]
@@ -88,7 +87,7 @@ namespace CardConnect.Tests
         }
     }
 
-    public class ResponseCodeFactory
+    public static class ResponseCodeFactory
     {
         public static IEnumerable FailCases
         {
@@ -102,6 +101,8 @@ namespace CardConnect.Tests
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'N'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'A'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'Z'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'P', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '500', 'cvvresp': 'P', 'avsresp': 'Y'}");
             }
         }
     }

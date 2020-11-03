@@ -1,5 +1,6 @@
 <form class="form-group"
       [formGroup]="form">
+  <div *ngIf="paymentError" class="text-danger">{{paymentError}}</div>
   <select formControlName="cardID"
           (change)="toggleShowCCForm($event)"
           class="custom-select my-2"
@@ -18,6 +19,7 @@
   <ocm-credit-card-form [submitText]="'Save and Continue'"
                         [showCVV]="true"
                         [showCardDetails]="showNewCCForm"
+                        [termsAccepted]="termsAccepted"
                         (formSubmitted)="submit($event.detail)"
                         class="w-100">
   </ocm-credit-card-form>

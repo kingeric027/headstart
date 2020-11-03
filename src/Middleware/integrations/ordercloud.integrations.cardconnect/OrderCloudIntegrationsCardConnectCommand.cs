@@ -7,10 +7,9 @@ namespace ordercloud.integrations.cardconnect
 {
 	public interface IOrderCloudIntegrationsCardConnectCommand
 	{
-		//Task<CreditCardAuthorization> Authorize(CreditCardAuthorization auth);
 		Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
-		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user);
+		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user, string merchantID);
     }
 
 	public class OrderCloudIntegrationsCardConnectCommand : IOrderCloudIntegrationsCardConnectCommand
@@ -36,8 +35,11 @@ namespace ordercloud.integrations.cardconnect
 			return buyerCreditCard;
 		}
 
-		public async Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment,
-            VerifiedUserContext user)
+		public async Task<Payment> AuthorizePayment(
+			OrderCloudIntegrationsCreditCardPayment payment,
+            VerifiedUserContext user,
+			string merchantID
+		)
 		{
 			Require.That((payment.CreditCardID != null) || (payment.CreditCardDetails != null),
 				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID"));
@@ -56,11 +58,23 @@ namespace ordercloud.integrations.cardconnect
 			var ccAmount = GetAmountToCharge(orderWorksheet);
 
 			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, payment.PaymentID);
-			var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, ccAmount));
-			ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
-			var transaction = await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID,
-				CardConnectMapper.Map(order, ocPayment, call));
-			return transaction;
+            try
+            {
+                var call = await _cardConnect.AuthWithCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
+                ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment {Accepted = true, Amount = ccAmount});
+                return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, call));
+            }
+            catch (CreditCardIntegrationException ex)
+            {
+                ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
+                await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
+                throw new OrderCloudIntegrationException(new ApiError()
+                {
+                    Data = ex.Response,
+                    Message = ex.ApiError.Message,
+                    ErrorCode = ex.ApiError.ErrorCode
+                });
+			}
 		}
 
 		private decimal GetAmountToCharge(OrderWorksheet orderWorksheet)
@@ -71,23 +85,9 @@ namespace ordercloud.integrations.cardconnect
 				.Select(li => li.Quantity * li.UnitPrice)
 				.Sum();
 
-			var puchaseOrderLineItemIDs = purchaseOrderLineItems.Select(li => li.ID);
-			var purchaseOrderShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(shipEstimate =>
-			{
-				return shipEstimate.ShipEstimateItems.Any(item => puchaseOrderLineItemIDs.Contains(item.LineItemID));
-			});
-
-			var poShippingCosts = purchaseOrderShipEstimates.Select(shipEstimate =>
-			{
-				var selectedShipMethod = shipEstimate.ShipMethods.First(ShipMethod => ShipMethod.ID == shipEstimate.SelectedShipMethodID);
-				return selectedShipMethod.Cost;
-			});
-
-			var poShippingCost = poShippingCosts.Sum();
-
-			var purchaseOrderTotal = (purchaseOrderSubtotal ?? 0) + poShippingCost;
-
-			return orderWorksheet.Order.Total - purchaseOrderTotal;
+			// PurchaseOrder products (aka keyfob products) are excluded when calculating
+			// shipping so we only need to account for the subtotal here
+			return orderWorksheet.Order.Total - (purchaseOrderSubtotal ?? 0);
 		}
 		
 		private async Task<BuyerCreditCard> GetMeCardDetails(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
@@ -110,5 +110,7 @@ namespace ordercloud.integrations.cardconnect
 			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
 			return CreditCardMapper.Map(card, auth);
 		}
-	}
+
+        
+    }
 }

@@ -12,6 +12,7 @@ import {
   NgbDatepickerModule,
   NgbTooltipModule,
   NgbProgressbarModule,
+  NgbCollapseModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
 // 3rd party UI
@@ -54,6 +55,8 @@ import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/
 import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
 import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
 import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { VariablePrintConfiguration } from './components/buyer-visibility/variable-print-configuration/variable-print-configuration.component';
+import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-publish-configuration/chili-publish-configuration.componant';
 import { ResourceListMeta } from './components/resource-list-meta/resource-list-meta.component';
 
 @NgModule({
@@ -76,6 +79,7 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     NgbDatepickerModule,
     NgbTooltipModule,
     NgbProgressbarModule,
+    NgbCollapseModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -95,6 +99,7 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     NgbTabsetModule,
     NgbDropdownModule,
     NgbProgressbarModule,
+    NgbCollapseModule,
 
     // OrderCloud CMS Components
     CmsAdminModule,
@@ -133,6 +138,8 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
+    VariablePrintConfiguration,
+    ChiliPublishConfiguration,
     ResourceListMeta,
   ],
   declarations: [
@@ -164,6 +171,8 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
+    VariablePrintConfiguration,
+    ChiliPublishConfiguration,
     ResourceListMeta,
     // Pipes
     PhoneFormatPipe,

@@ -1,4 +1,4 @@
-﻿using OrderCloud.SDK;
+using OrderCloud.SDK;
 using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IShipmentCommand
     {
-        Task<ShipmentCreateResponse> CreateShipment(SuperShipment superShipment, string supplierToken);
+        Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -25,7 +25,7 @@ namespace Marketplace.Common.Commands
             _oc = oc;
             _lineItemCommand = lineItemCommand;
         }
-        public async Task<ShipmentCreateResponse> CreateShipment(SuperShipment superShipment, string supplierToken)
+        public async Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken)
         {
             var firstShipmentItem = superShipment.ShipmentItems.First();
             var supplierOrderID = firstShipmentItem.OrderID;
@@ -42,13 +42,25 @@ namespace Marketplace.Common.Commands
             superShipment.Shipment.BuyerID = buyerID;
 
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
+
+            //  platform bug. Cant save new xp values onto shipment line item. Update order line item to have this value
+            var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null);
+            await Throttler.RunAsync(shipmentItemsWithComment, 100, 5, (shipmentItem) =>
+                _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, shipmentItem.LineItemID,
+                    new PartialLineItem()
+                    {
+                        xp = new
+                        {
+                            Comment = shipmentItem.xp?.Comment
+                        }
+                    }));
             var shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems, 
                 100, 
                 5, 
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
             var ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
-            return new ShipmentCreateResponse()
+            return new SuperShipment()
             {
                 Shipment = ocShipmentWithDateShipped,
                 ShipmentItems = shipmentItemResponses.ToList()

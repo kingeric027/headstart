@@ -56,5 +56,30 @@ namespace Marketplace.Common.Services.Zoho.Models
         public string product_type { get; set; }
         public string purchase_description { get; set; }
         public double? discount { get; set; }
+        public string avatax_tax_code { get; set; }
+        // adding additional fields
+        public string brand { get; set; }
+        public string manufacturer { get; set; }
+        public double sales_rate { get; set; }
+        public string purchase_account_name { get; set; }
+        public string created_time { get; set; }
+        public string last_modified_time { get; set; }
+        public string tax_exemption_code { get; set; }
+        public string avatax_use_code_id { get; set; }
+        public string avatax_use_code_desc { get; set; }
+        public string avatax_tax_code_id { get; set; }
+        public string avatax_tax_code_desc { get; set; }
+        public string minimum_order_quantity { get; set; }
+        public string maximum_order_quantity { get; set; }
+        public string initial_stock { get; set; }
+        public string initial_stock_rate { get; set; }
+        public string vendor_id { get; set; }
+        public string vendor_name { get; set; }
+        public string upc { get; set; }
+        public string isbn { get; set; }
+        public string part_number { get; set; }
+        public bool is_combo_product { get; set; }
+        public object[] sales_channels { get; set; }
+        public object[] preferred_vendors { get; set; }
     }
 }
