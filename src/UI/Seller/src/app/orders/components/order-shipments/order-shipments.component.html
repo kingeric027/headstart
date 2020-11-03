@@ -211,7 +211,8 @@
                     <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span>
                   </span>
                     <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
-                    <small class="d-block" *ngIf="li.xp?.Comment">{{'Comments: '+li.xp.Comment}}</small>
+                    <small class="d-block" *ngIf="li.xp?.Comments && li.xp?.Comments[superShipment?.Shipment?.ID]">
+                      {{'Comments: '+li.xp.Comments[superShipment.Shipment.ID]}}</small> 
                   <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
                     class="badge badge-pill badge-primary">Purchase Order</span>
                 </h6>
