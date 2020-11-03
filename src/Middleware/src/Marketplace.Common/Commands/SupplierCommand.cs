@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
             var currentSupplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
             var updatedSupplier = await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
             // Update supplier products only on a name change
-            if (currentSupplier.Name != supplier.Name)
+            if (currentSupplier.Name != supplier.Name || currentSupplier.xp.Currency.ToString() != supplier.xp.Currency.Value)
             {
                 var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<MarketplaceProduct>(
                 supplierID: supplierID,
@@ -74,6 +74,7 @@ namespace Marketplace.Common.Commands
                 foreach (var product in productsToUpdate)
                 {
                     product.xp.Facets["supplier"] = new List<string>() { supplier.Name };
+                    product.xp.Currency = supplier.xp.Currency;
                 }
                 await Throttler.RunAsync(productsToUpdate, 100, 5, product => ocClient.Products.SaveAsync(product.ID, product, accessToken: token));
             }
