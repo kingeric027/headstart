@@ -180,7 +180,7 @@ namespace Marketplace.Common.Commands
                 }
                 if (updatedPriceSchedule?.PriceBreaks != oldPriceSchedule?.PriceBreaks)
                 {
-                    var updatedBreaks = updatedPriceSchedule.PriceBreaks.Select(p => JsonConvert.SerializeObject(p)).ToList();
+                    var updatedBreaks = updatedPriceSchedule.PriceBreaks?.Select(p => JsonConvert.SerializeObject(p))?.ToList();
                     var oldBreaks = oldPriceSchedule?.PriceBreaks?.Select(p => JsonConvert.SerializeObject(p))?.ToList();
                     updateData.NewPriceBreak = updatedBreaks == null ? null : String.Join(",", updatedBreaks);
                     updateData.OldPriceBreak = oldBreaks == null ? null : String.Join(",", oldBreaks);
