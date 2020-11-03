@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
+using LazyCache;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -24,12 +25,14 @@ namespace ordercloud.integrations.cms
 		private readonly ICosmosStore<AssetedResourceDO> _store;
 		private readonly IAssetQuery _assets;
 		private readonly CMSConfig _config;
+		private readonly IAppCache _cache;
 
-		public AssetedResourceQuery(ICosmosStore<AssetedResourceDO> store, IAssetQuery assets, CMSConfig config)
+		public AssetedResourceQuery(ICosmosStore<AssetedResourceDO> store, IAssetQuery assets, CMSConfig config, IAppCache cache)
 		{
 			_store = store;
 			_assets = assets;
 			_config = config;
+			_cache = cache;
 		}
 
 		public async Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user)
@@ -58,14 +61,25 @@ namespace ordercloud.integrations.cms
 
 		public async Task<string> GetThumbnail(Resource resource, ThumbSize size, string sellerID)
 		{
-			resource.Validate();
-			var assetedResource = await GetExisting(resource, sellerID);
-			if (assetedResource?.ImageAssetIDs == null || assetedResource.ImageAssetIDs.Count == 0)
+			var cacheKey = GetThumbnailCacheKey(resource, sellerID, size);
+			var expireAfter = TimeSpan.FromMinutes(20);
+			return await _cache.GetOrAddAsync(cacheKey, async () =>
 			{
-				return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
-			}
-			var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
-			return asset.Url ?? $"{_config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}-{size.ToString().ToLower()}";
+				resource.Validate();
+				var assetedResource = await GetExisting(resource, sellerID);
+				if (assetedResource?.ImageAssetIDs == null || assetedResource.ImageAssetIDs.Count == 0)
+				{
+					return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
+				}
+				try
+                {
+					var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
+					return asset.Url ?? $"{_config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}-{size.ToString().ToLower()}";
+				} catch(OrderCloudIntegrationException.NotFoundException)
+                {
+					return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
+				}
+			}, expireAfter);
 		}
 
 		public async Task SaveAssignment(AssetAssignment assignment, VerifiedUserContext user)
@@ -76,6 +90,7 @@ namespace ordercloud.integrations.cms
 			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
 			GetAssetIDs(assetedResource, asset.Type).UniqueAdd(asset.id); 
 			await _store.UpsertAsync(assetedResource);
+			InvalidateThumbnailCache(assignment, user.SellerID);
 		}
 
 		public async Task DeleteAssignment(AssetAssignment assignment, VerifiedUserContext user)
@@ -86,6 +101,7 @@ namespace ordercloud.integrations.cms
 			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
 			GetAssetIDs(assetedResource, asset.Type).Remove(asset.id);
 			await _store.UpdateAsync(assetedResource);
+			InvalidateThumbnailCache(assignment, user.SellerID);
 		}
 
 		public async Task MoveImageAssignment(AssetAssignment assignment, int newPosition, VerifiedUserContext user)
@@ -97,6 +113,7 @@ namespace ordercloud.integrations.cms
 			var assetedResource = await GetExistingOrDefault(assignment, user.SellerID);
 			assetedResource.ImageAssetIDs.MoveTo(asset.id, newPosition);
 			await _store.UpdateAsync(assetedResource);
+			InvalidateThumbnailCache(assignment, user.SellerID);
 		}
 
 		private async Task<AssetedResourceDO> GetExistingOrDefault(Resource resource, string sellerID)
@@ -136,5 +153,24 @@ namespace ordercloud.integrations.cms
 					return $"{url}/generic";
 			}
 		}
+
+		private string GetThumbnailCacheKey(Resource resource, string sellerID, ThumbSize size)
+        {
+			return $"thumbnail_url_{sellerID}{resource.ParentResourceType}{resource.ParentResourceID}{resource.ResourceType}{resource.ResourceID}{size}";
+		}
+		private string GetThumbnailCacheKey(AssetAssignment assignment, string sellerID, ThumbSize size)
+		{
+			return $"thumbnail_url_{sellerID}{assignment.ParentResourceType}{assignment.ParentResourceID}{assignment.ResourceType}{assignment.ResourceID}{size}";
+		}
+
+		private void InvalidateThumbnailCache(AssetAssignment assignment, string sellerID)
+        {
+			var sizes = Enum.GetValues(typeof(ThumbSize)).Cast<ThumbSize>();
+			foreach(var size in sizes)
+            {
+				var cacheKey = GetThumbnailCacheKey(assignment, sellerID, size);
+				_cache.Remove(cacheKey);
+			}
+        }
 	}
 }
