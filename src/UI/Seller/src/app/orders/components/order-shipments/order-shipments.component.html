@@ -194,27 +194,12 @@
     <div *ngFor="let superShipment of superShipments; let i = index" class="pb-3"
       [ngClass]="{'border-top': i !== 0, 'mt-3': i !== 0, 'pt-3': i !== 0}">
       <div class="row">
-
         <div class="col-md-5">
           <small class="font-weight-bolder text-uppercase text-muted mb-0">
             Shipped via {{superShipment?.Shipment?.Shipper}} {{superShipment?.Shipment?.xp?.Service}} on
             {{superShipment?.Shipment.DateShipped | date:'shortDate':'UTC' }}
           </small>
           <h6>Tracking #{{superShipment?.Shipment?.TrackingNumber}}</h6>
-        </div>
-
-        <div class="col-md-5">
-          <p *ngIf="superShipment?.Shipment.xp?.Comment">Comments: {{superShipment?.Shipment?.xp?.Comment}}</p>
-        </div>
-
-        <div class="col-md-2 text-right">
-          <small class="font-weight-bolder text-uppercase text-muted mb-0">Shipping Cost</small>
-          <p *ngIf="superShipment?.Shipment.Cost">{{superShipment?.Shipment.Cost | currency: _order?.xp?.Currency}}</p>
-        </div>
-      </div>
-      <div class="row">
-
-        <div class="col-md-5">
           <div class="my-1" *ngFor="let li of superShipment?.ShipmentItems; let i = index">
             <div class="d-flex justify-content-start align-items-center">
               <h6 class="mb-0 mr-3">{{ li.QuantityShipped }}x</h6>
@@ -226,24 +211,24 @@
                     <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span>
                   </span>
                   <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>
-                  
+                  <span *ngIf="li.Product.xp?.ProductType === 'PurchaseOrder'"
+                    class="badge badge-pill badge-primary">Purchase Order</span>
                 </h6>
               </div>
             </div>
           </div>
         </div>
-
         <div class="col-md-5">
-          <div *ngFor="let li of superShipment?.ShipmentItems; let i = index">
-            <span>{{ li.xp.Comment }}</span>
-          </div>
+          <p *ngIf="superShipment?.Shipment.xp?.Comment">Comments: {{superShipment?.Shipment?.xp?.Comment}}</p>
         </div>
-
-      </div>
+        <div class="col-md-2 text-right">
+          <small class="font-weight-bolder text-uppercase text-muted mb-0">Shipping Cost</small>
+          <p *ngIf="superShipment?.Shipment.Cost">{{superShipment?.Shipment.Cost | currency: _order?.xp?.Currency}}</p>
+        </div>
         <!-- TO-DO: Work on formatting for this once we can update Ship From/Ship To address in the Portal -->
         <!-- <span class="d-block" *ngIf="shipment.FromAddress">Ship From: {{shipment.FromAddress}}</span>
             <span class="d-block" *ngIf="shipment.ToAddress">Ship To: {{shipment.ToAddress}}</span> -->
-      
+      </div>
     </div>
   </div>
 </div>
