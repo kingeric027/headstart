@@ -27,6 +27,7 @@ using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
 using ordercloud.integrations.tecra;
 using System.Runtime.InteropServices;
+using LazyCache;
 
 namespace Marketplace.API
 {
@@ -73,6 +74,7 @@ namespace Marketplace.API
             };
 
             services
+                .AddLazyCache()
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
