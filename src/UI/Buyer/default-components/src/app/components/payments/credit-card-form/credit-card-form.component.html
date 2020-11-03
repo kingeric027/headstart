@@ -4,6 +4,15 @@
       name="CardForm"
       class="add-card-form">
   <div *ngIf="_showCardDetails">
+    <div class="p-2 mb-3 bg-light">
+      <small class="d-block font-weight-bold text-uppercase text-muted">Payments Accpeted</small>
+      <fa-icon class="payment-icon text-dark"
+               [icon]="faCcVisa"
+               ngbTooltip="Visa"></fa-icon>
+      <fa-icon class="payment-icon text-dark ml-2"
+               [icon]="faCcMastercard"
+               ngbTooltip="Mastercard"></fa-icon>
+    </div>
     <div class="row align-items-center">
       <label class="small text-muted col-12"
              for="accepted-cards"
