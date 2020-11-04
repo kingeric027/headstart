@@ -21,39 +21,39 @@ namespace Marketplace.Common.Controllers
             _command = command;
         }
 
-        [DocName("GET Kit Product")]
+        [DocName("Get Kit Product")]
         [HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceKitProduct> Get(string id)
         {
             return await _command.Get(id, VerifiedUserContext);
         }
         
-        [DocName("POST Kit Product")]
+        [DocName("Create Kit Product")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceKitProduct> Post([FromBody] MarketplaceKitProduct kitProduct)
+        public async Task<MarketplaceKitProduct> Create([FromBody] MarketplaceKitProduct kitProduct)
         {
             return await _command.Post(kitProduct, VerifiedUserContext);
         }
-        [DocName("LIST Kit Products")]
+        [DocName("List Kit Products")]
         [HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }
-        [DocName("LIST Me Kit Products")]
+        [DocName("List Me Kit Products")]
         [HttpGet, Route("me"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<MarketplaceKitProduct>> ListMeKits(ListArgs<Document<KitProduct>> args)
         {
             return await _command.List(args, VerifiedUserContext);
         }
-        [DocName("PUT Kit Product")]
+        [DocName("Save Kit Product")]
         [HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceKitProduct> Put([FromBody] MarketplaceKitProduct kitProduct, string id)
+        public async Task<MarketplaceKitProduct> Save([FromBody] MarketplaceKitProduct kitProduct, string id)
         {
             return await _command.Put(id, kitProduct, VerifiedUserContext);
         }
 
-        [DocName("DELETE Kit Product")]
+        [DocName("Delete Kit Product")]
         [HttpDelete, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task Delete(string id)
         {

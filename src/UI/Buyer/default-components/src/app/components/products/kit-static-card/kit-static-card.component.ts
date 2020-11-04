@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MarketplaceMeKitProduct, MeProductInKit, Spec, VariantSpec } from '@ordercloud/headstart-sdk';
 import { ShopperContextService } from 'marketplace';
-import { LineItemToAdd } from '../kit-product-details/kit-product-details.component';
+import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
+import { ProductSelectionEvent } from 'src/app/models/product-selection-event.interface';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { SpecFormService } from '../spec-form/spec-form.service';
@@ -20,6 +21,7 @@ export class OCMKitStaticCard {
   @Input() kitProduct: MarketplaceMeKitProduct;
   @Output() addLineItem = new EventEmitter<LineItemToAdd>();
   @Output() removeLineItem = new EventEmitter<LineItemToAdd>();
+  @Output() selectProduct = new EventEmitter<ProductSelectionEvent>();
 
   _productKitDetails: MeProductInKit;
   imageUrl: string;
@@ -127,5 +129,9 @@ export class OCMKitStaticCard {
       form.value[spec.Name] = spec.Options[0].Value;
     })
     return form as FormGroup;
+  }
+
+  onSelectProduct(): void {
+    this.selectProduct.emit({ productKitDetails: this._productKitDetails })
   }
 }

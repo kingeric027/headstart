@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 import {
   OcCatalogService,
@@ -11,9 +11,8 @@ import {
   CategoryProductAssignment,
 } from '@ordercloud/angular-sdk';
 import { ProductService } from '@app-seller/products/product.service';
-import { MarketplaceBuyer, MarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service';
-import { MiddlewareKitService } from '@app-seller/shared/services/middleware-api/middleware-kit.service';
+import { HeadStartSDK, MarketplaceBuyer, MarketplaceProduct } from '@ordercloud/headstart-sdk';
 
 @Component({
   selector: 'buyer-visibility-configuration-component',
@@ -31,7 +30,7 @@ export class BuyerVisibilityConfiguration {
 
   @Input()
   set product(value: MarketplaceProduct) {
-      this._product = value;
+    this._product = value;
     this.fetchData();
   }
 
@@ -67,7 +66,6 @@ export class BuyerVisibilityConfiguration {
     private ocCatalogService: OcCatalogService,
     private ocUserGroupService: OcUserGroupService,
     private ocProductService: OcProductService,
-    private kitService: MiddlewareKitService,
     private productService: ProductService,
     public catalogsTempService: CatalogsTempService
   ) { }
@@ -87,7 +85,7 @@ export class BuyerVisibilityConfiguration {
 
   resetCatalogAssignments(catalogAssignments: ProductAssignment[]): void {
     this.catalogAssignmentsEditable = catalogAssignments;
-      this.catalogAssignmentsStatic = catalogAssignments;
+    this.catalogAssignmentsStatic = catalogAssignments;
   }
 
   resetCategoryAssignments(categoryAssignments: Category[][]): void {
@@ -100,10 +98,10 @@ export class BuyerVisibilityConfiguration {
   }
 
   async getKitProductCatalogAssignments(product: MarketplaceProduct) {
-    let productCatalogAssignments = [];
-    const kitProduct = await this.kitService.Get(product.ID);
+    const productCatalogAssignments = [];
+    const kitProduct = await HeadStartSDK.KitProducts.Get(product.ID);
     kitProduct.ProductAssignments.ProductsInKit.forEach(async prod => {
-      let catalogs = await this.ocCatalogService
+      const catalogs = await this.ocCatalogService
         .ListProductAssignments({ productID: prod && prod.ID })
         .toPromise();
       productCatalogAssignments.push(catalogs.Items);
@@ -181,7 +179,7 @@ export class BuyerVisibilityConfiguration {
     this.catalogs = catalogsResponse.Items;
   }
 
-    async getCatalogAssignments(): Promise<void> {
+  async getCatalogAssignments(): Promise<void> {
     const catalogAssignmentRequests = this.catalogs.map(c =>
       this.ocProductService.ListAssignments({ userGroupID: c.ID, productID: this._product.ID }).toPromise()
     );

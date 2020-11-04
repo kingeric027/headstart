@@ -16,7 +16,7 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 import { set as _set } from 'lodash';
 import { CurrentUserService } from '../current-user/current-user.service';
-import { BuyerAddress, ListPage, Address } from 'ordercloud-javascript-sdk';
+import { BuyerAddress, ListPage } from 'ordercloud-javascript-sdk';
 import { singular } from 'pluralize';
 
 export abstract class ResourceCrudService<ResourceType> {
@@ -383,7 +383,7 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // TODO - move to some other file. Not related to resource crud
   getSuggestedAddresses = (ex): ListPage<BuyerAddress<any>> => {
-    if (ex?.Message === "Address not valid") {
+    if (ex?.Message === 'Address not valid') {
       return ex?.Data?.SuggestedAddresses;
     }
     for (const err of ex?.error?.Errors) {
