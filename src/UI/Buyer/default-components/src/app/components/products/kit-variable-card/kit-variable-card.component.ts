@@ -3,7 +3,8 @@ import { FormGroup } from '@angular/forms';
 import { faCaretDown, faCaretRight, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { MarketplaceMeKitProduct, MeProductInKit } from '@ordercloud/headstart-sdk';
 import { ShopperContextService } from 'marketplace';
-import { LineItemToAdd, ProductSelectionEvent } from '../kit-product-details/kit-product-details.component';
+import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
+import { ProductSelectionEvent } from 'src/app/models/product-selection-event.interface';
 
 @Component({
   // ocm-kit-variable-card
