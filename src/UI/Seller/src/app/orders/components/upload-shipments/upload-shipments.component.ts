@@ -44,6 +44,13 @@ export class UploadShipmentsComponent {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     var asset: AssetUpload = {};
 
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      }),
+    };
+
     if (fileType === 'staticContent') {
       const mappedFiles: FileHandle[] = Array.from(event.target.files).map((file: File) => {
         asset = {
@@ -55,9 +62,7 @@ export class UploadShipmentsComponent {
         return { File: file, URL, Filename: 'shipments_to_process' };
       });
 
-      const headers = new HttpHeaders({
-        Authorization: `Bearer ${accessToken}`,
-      });
+      const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
 
       const formData = new FormData();
 
@@ -68,9 +73,7 @@ export class UploadShipmentsComponent {
       }
 
       this.http
-        .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, {
-          headers,
-        })
+        .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, { headers })
         .subscribe(result => {
           console.log(result);
         });

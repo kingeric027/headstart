@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Cosmonaut;
 using Cosmonaut.Extensions.Microsoft.DependencyInjection;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.DependencyInjection;
