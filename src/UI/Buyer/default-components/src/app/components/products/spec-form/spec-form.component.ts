@@ -78,7 +78,10 @@ export class OCMSpecForm implements OnChanges {
       } else if (spec?.xp?.control === 'range') {
         c.push(this.createRangeField(spec));
       } else if (spec?.Options.length === 1) {
-        c.unshift(this.createLabelField(spec));
+        c.push(this.createSelectField(spec));
+        // c.unshift(this.createLabelField(spec)); 
+        // TODO: Possibly reinstate if needed, but for single option specs,
+        // it does not have a value selected, so for required specs, this does not work.
       } else if (spec?.Options.length > 1) {
         c.push(this.createSelectField(spec));
       } else if (spec.AllowOpenText) {
