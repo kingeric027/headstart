@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { faCaretDown, faCaretRight, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { MarketplaceMeKitProduct, MeProductInKit } from '@ordercloud/headstart-sdk';
 import { ShopperContextService } from 'marketplace';
-import { LineItemToAdd, OpenVariantSelectionEvent } from '../kit-product-details/kit-product-details.component';
+import { LineItemToAdd, ProductSelectionEvent } from '../kit-product-details/kit-product-details.component';
 
 @Component({
   // ocm-kit-variable-card
@@ -23,7 +23,7 @@ export class OCMKitVariableCard {
     this._kitProduct = value;
     this.getLineItemTotals();
   }
-  @Output() openVariantSelection = new EventEmitter<OpenVariantSelectionEvent>();
+  @Output() selectProduct = new EventEmitter<ProductSelectionEvent>();
   @Output() removeLineItem = new EventEmitter<LineItemToAdd>();
   _allLineItems: LineItemToAdd[];
   _kitProduct: MarketplaceMeKitProduct;
@@ -65,14 +65,14 @@ export class OCMKitVariableCard {
   }
 
   selectVariant(): void {
-    this.openVariantSelection.emit({
+    this.selectProduct.emit({
       productKitDetails: this._productKitDetails,
-      selection: {
+      variantSelection: {
         productID: this._productKitDetails.Product.ID,
         quantity: 0,
         specForm: {} as FormGroup
       }
-    });
+    })
   }
 
   removeVariantLineItem(lineItem: LineItemToAdd): void {
