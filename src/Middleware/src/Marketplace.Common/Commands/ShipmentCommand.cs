@@ -49,8 +49,8 @@ namespace Marketplace.Common.Commands
     public class BatchProcessResult
     {
         public BatchProcessSummary Meta { get; set; }
-        public List<Misc.Shipment> SuccessfulList = new List<Misc.Shipment>();
-        public List<Misc.Shipment> FailureList = new List<Misc.Shipment>();
+        public List<Shipment> SuccessfulList = new List<Shipment>();
+        public List<BatchProcessFailure> FailureList = new List<BatchProcessFailure>();
 
     }
 
@@ -130,7 +130,6 @@ namespace Marketplace.Common.Commands
         {
             DocumentImportResult documentImportResult;
 
-
             documentImportResult = await GetShipmentListFromFile(file, accessToken);
 
             return documentImportResult;
@@ -139,12 +138,14 @@ namespace Marketplace.Common.Commands
         private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file, string accessToken)
         {
             BatchProcessResult processResults;
+
+            if (file == null) { return new DocumentImportResult(); }
             using Stream stream = file.OpenReadStream();
             List<RowInfo<Misc.Shipment>> shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
 
             DocumentImportResult result = Validate(shipments.Where(p => p.Value?.LineItemID != null).Select(p => p).ToList());
 
-            processResults = ProcessShipments(result, accessToken);
+            processResults = await ProcessShipments(result, accessToken);
 
             var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
 
@@ -177,7 +178,7 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        private BatchProcessResult ProcessShipments(DocumentImportResult importResult, string accessToken)
+        private async Task<BatchProcessResult> ProcessShipments(DocumentImportResult importResult, string accessToken)
         {
             BatchProcessResult processResult = new BatchProcessResult();
 
@@ -186,9 +187,18 @@ namespace Marketplace.Common.Commands
 
             foreach (Misc.Shipment shipment in importResult.Valid)
             {
-                bool isSuccessful = ProcessShipment(shipment, accessToken);
-                if (isSuccessful) { processResult.SuccessfulList.Add(shipment); }
-                else { processResult.FailureList.Add(shipment); }
+                try
+                {
+                    bool isSuccessful = await ProcessShipment(shipment, processResult, accessToken);
+                }
+                catch (Exception ex)
+                {
+                    BatchProcessFailure failureDto = new BatchProcessFailure();
+                    failureDto.Error = ex.Message;
+                    failureDto.Shipment = shipment;
+                    processResult.FailureList.Add(failureDto);
+                }
+
             }
 
             processResult.Meta = new BatchProcessSummary()
@@ -202,10 +212,102 @@ namespace Marketplace.Common.Commands
 
         }
 
-        private bool ProcessShipment(Misc.Shipment shipment, string accessToken)
+        private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, string errorMessage)
         {
-            var order = _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
-            return false;
+            BatchProcessFailure failure = new BatchProcessFailure();
+
+            if (errorMessage == null) { failure.Error = "Something went wrong"; }
+            else { failure.Error = errorMessage; }
+
+            failure.Shipment = shipment;
+
+            return failure;
+        }
+
+        private async Task<bool> ProcessShipment(Misc.Shipment shipment, BatchProcessResult result, string accessToken)
+        {
+            PartialShipment newShipment;
+            Shipment ocShipment = null;
+            try
+            {
+                Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, shipment.OrderID);
+                LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Incoming, shipment.OrderID, shipment.LineItemID);
+                ShipmentItem newShipmentItem = new ShipmentItem()
+                {
+                    OrderID = shipment.OrderID,
+                    LineItemID = lineItem.ID,
+                    QuantityShipped = Convert.ToInt32(shipment.QuantityShipped),
+                    UnitPrice = Convert.ToDecimal(shipment.Cost)
+                };
+
+                if (shipment.ShipmentID != null)
+                {
+                    ocShipment = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
+                }
+                if (ocShipment != null)
+                {
+                    newShipment = PatchShipment(ocShipment, shipment);
+                }
+                else
+                {
+                    newShipment = PatchShipment(null, shipment);
+                }
+
+                if (newShipment != null)
+                {
+                    Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, accessToken);
+
+                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem, accessToken);
+
+                    result.SuccessfulList.Add(processedShipment);
+                }
+                if (lineItem.ID != null)
+                {
+                    //Create new lineItem
+                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem, accessToken);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                result.FailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.InnerException}"));
+                return false;
+            }
+        }
+
+        private PartialShipment PatchShipment(Shipment ocShipment, Misc.Shipment shipment)
+        {
+            PartialShipment newShipment = new PartialShipment();
+            bool isCreatingNew = false;
+
+            if (ocShipment == null)
+            {
+                isCreatingNew = true;
+            } 
+            else
+            {
+                newShipment.ID = ocShipment?.ID;
+                newShipment.xp = ocShipment?.xp;
+                newShipment.FromAddress = ocShipment?.FromAddress;
+                newShipment.ToAddress = ocShipment?.ToAddress;
+            }
+            if (newShipment.xp == null)
+            {
+                newShipment.xp = new ShipmentXp();
+            }
+            newShipment.BuyerID = shipment.BuyerID;
+            newShipment.Shipper = shipment.Shipper;
+            newShipment.DateShipped = isCreatingNew? shipment.DateShipped : null; //Must patch to null on new creation due to OC bug
+            newShipment.DateDelivered = shipment.DateDelivered;
+            newShipment.TrackingNumber = shipment.TrackingNumber;
+            newShipment.Cost = Convert.ToDecimal(shipment.Cost);
+            newShipment.Account = shipment.Account;        
+            newShipment.FromAddressID = shipment.FromAddressID;
+            newShipment.ToAddressID = shipment.ToAddressID;
+            newShipment.xp.Service = Convert.ToString(shipment.Service);
+            newShipment.xp.Comment = Convert.ToString(shipment.Comment);
+
+            return newShipment;
         }
 
         public static DocumentImportResult Validate(List<RowInfo<Misc.Shipment>> rows)
