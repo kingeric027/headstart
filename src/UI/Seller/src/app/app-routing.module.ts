@@ -13,7 +13,6 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
-      { path: 'orders/uploadshipments', component: UploadShipmentsComponent },
       {
         path: 'products',
         loadChildren: () => import('./products/products.module').then(m => m.ProductsModule),

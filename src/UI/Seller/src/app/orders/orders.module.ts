@@ -5,9 +5,11 @@ import { OrderTableComponent } from './components/order-table/order-table.compon
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
 import { OrderShipmentsComponent } from './components/order-shipments/order-shipments.component';
 import { LineItemTableComponent } from './components/line-item-table/line-item-table.component';
+import { UploadShipmentsComponent } from './components/upload-shipments/upload-shipments.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 @NgModule({
-  imports: [SharedModule, OrdersRoutingModule],
-  declarations: [OrderTableComponent, OrderDetailsComponent, OrderShipmentsComponent, LineItemTableComponent],
+  imports: [SharedModule, OrdersRoutingModule, PerfectScrollbarModule],
+  declarations: [OrderTableComponent, OrderDetailsComponent, OrderShipmentsComponent, LineItemTableComponent, UploadShipmentsComponent],
 })
 export class OrdersModule {}
