@@ -169,7 +169,7 @@ export class KitsEditComponent implements OnInit {
     async createNewKitProduct(): Promise<void> {
         try {
             this.dataIsSaving = true;
-            const superProduct = await HeadStartSDK.Products.Post(this.kitProductEditable);
+            const superProduct = await HeadStartSDK.KitProducts.Create(this.kitProductEditable);
             this.refreshProductData(superProduct);
             if (this.imageFiles.length > 0) await this.addImages(this.imageFiles, superProduct.Product.ID);
             if (this.staticContentFiles.length > 0) await this.addDocuments(this.staticContentFiles, superProduct.Product.ID);
