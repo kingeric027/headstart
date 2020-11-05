@@ -1,56 +1,61 @@
-<div class="container-fluid">
+<div class="container-fluid bg-light py-3"
+     [ngStyle]="{'min-height.px': contentHeight}">
   <div class="row">
-    <div class="col-md-12 bg-light">
-      <div class="container-fluid py-3">
-        <div class="row">
-          <div class="col-md-7">
-            <div class="d-flex justify-content-between align-items-center">
-              <h1 class="resource-name mb-0"
-                  translate>Upload Shipments</h1>
-            </div>
-          </div>
-          <div class="col-sm-10 d-flex"
-               style="flex-direction: column; flex-flow: column; align-items: center;">
-            <ul id="progress-container"
-                class="vertical visible-xs">
-              <li class="active">
-                <div class="process-step"
-                     style="display: flex; justify-content: center; flex-direction: column;">
-                  <div style="display: flex; justify-content: center;">No template? No problem! Click here to download it.</div>
-                  <button class="btn btn-primary"
-                          (click)="downloadTemplate()">Download Template</button>
-                </div>
-              </li>
-              <li>
-                <div class="process-step">
-                  Step 2: Add all necessary information to the spreadsheet for the orders
-                </div>
-              </li>
-              <li>
-                <div class="process-step">
-                  Step 3: Upload filled out spreadsheet here:
-                </div>
-              </li>
-            </ul>
-
-            <label class="rmpm dropzone"
-                   for="shipmentUpload"
-                   appDrag
-                   (files)="stageDocument($event)">
-            </label>
-            <input class="d-none"
-                   id="shipmentUpload"
-                   type="file"
-                   (change)="manualFileUpload($event, 'staticContent')">
-          </div>
-          <div class="card col-sm-2 flex">
-            <h3 class="info">What is this tool?</h3>
-            <div style="display: flex; justify-content: center;">
-              Use this tool to import tracking numbers for items on orders you have received. You will need to use the Order Reports to identify OrderIDs as well as Line Item IDs before shipping. Once you have this information, you can add the tracking number, carrier, and ship date for the shipment</div>
-          </div>
+    <div class="col-md-12 d-flex flex-column align-items-center">
+      <div class="card p-4 shadow-sm"
+           style="width: 40rem;">
+        <h5>Upload Shipments</h5>
+        <p class="text-muted mb-0">
+          Use this tool to import tracking numbers for items on orders you have received. You will need to use the Order Reports to identify OrderIDs as well as Line Item IDs before shipping. Once you have this information, you can add the tracking number, carrier, and ship date for the shipment
+        </p>
+      </div>
+      <div class="card mt-3 p-4 shadow-sm"
+           style="width: 40rem;">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Open or download template</h5>
+          <small class="d-block text-uppercase text-muted font-weight-bold mb-2">Step 1 of 4</small>
+        </div>
+        <p class="text-muted">No template? No problem! Click here to download it.</p>
+        <button class="btn btn-primary"
+                (click)="downloadTemplate()">
+          Download Template
+        </button>
+      </div>
+      <div class="card mt-3 p-4 shadow-sm"
+           style="width: 40rem;">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Fill out spreadsheet</h5>
+          <small class="d-block text-uppercase text-muted font-weight-bold mb-2">Step 2 of 4</small>
+        </div>
+        <p class="mb-0">Add all necessary information to the spreadsheet for the orders</p>
+      </div>
+      <div class="card mt-3 p-4 shadow-sm"
+           style="width: 40rem;">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Upload filled out spreadsheet below</h5>
+          <small class="d-block text-uppercase text-muted font-weight-bold mb-2">Step 3 of 4</small>
+        </div>
+        <div class="d-flex justify-content-center pt-4">
+          <label class="rmpm dropzone"
+                 for="shipmentUpload"
+                 appDrag
+                 (files)="stageDocument($event)">
+          </label>
+          <input class="d-none"
+                 id="shipmentUpload"
+                 type="file"
+                 (change)="manualFileUpload($event, 'staticContent')">
         </div>
       </div>
+      <div class="card mt-3 p-4 shadow-sm"
+           style="width: 40rem;">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Upload complete!</h5>
+          <small class="d-block text-uppercase text-muted font-weight-bold mb-2">Step 4 of 4</small>
+        </div>
+        <p>There were 'successCount' number of shipments uploaded</p>
+        <p>There were 'errorCount' number of errors</p>
+      </div>
     </div>
-
   </div>
 </div>

@@ -6,7 +6,7 @@ import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AppAuthService } from '@app-seller/auth';
 import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk';
-import paramsSerializer from './ParamsSerializer';
+import { getPsHeight } from '@app-seller/shared/services/dom.helper';
 
 @Component({
   selector: 'upload-shipments',
@@ -19,11 +19,14 @@ export class UploadShipmentsComponent {
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private sanitizer: DomSanitizer,
     private appAuthService: AppAuthService
-  ) {}
+  ) {
+    this.contentHeight = getPsHeight('base-layout-item');
+  }
 
   files: FileHandle[] = [];
+  contentHeight = 0;
 
-  async downloadTemplate() {
+  downloadTemplate(): void {
     const file = 'Shipment_Import_Template.xlsx';
     this.getSharedAccessSignature(file).subscribe(sharedAccessSignature => {
       const uri = `${this.appConfig.blobStorageUrl}/downloads/Shipment_Import_Template.xlsx${sharedAccessSignature}`;
@@ -40,16 +43,9 @@ export class UploadShipmentsComponent {
     return this.http.get<string>(`${this.appConfig.middlewareUrl}/reports/download-shared-access/${fileName}`);
   }
 
-  async manualFileUpload(event, fileType: string) {
+  async manualFileUpload(event, fileType: string): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise();
-    var asset: AssetUpload = {};
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + accessToken,
-      }),
-    };
+    let asset: AssetUpload = {};
 
     if (fileType === 'staticContent') {
       const mappedFiles: FileHandle[] = Array.from(event.target.files).map((file: File) => {
