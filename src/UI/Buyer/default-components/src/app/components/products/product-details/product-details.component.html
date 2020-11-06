@@ -126,7 +126,7 @@
             translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</h3>:
         <div class="border-bottom border-medium mb-3 pb-3">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
-          <div class="d-flex flex-row">
+          <div class="d-flex flex-row flex-wrap">
             <span *ngFor="let priceBreak of priceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">
               {{ getPriceBreakRange(i) }}:
@@ -173,7 +173,7 @@
       <p [innerHTML]="_product.Description || 'This product has no description.' | safeHTML">
       </p>
       <ng-container *ngIf="_chiliConfigs && _chiliConfigs.length">
-        <strong>Available Configurations:</strong>
+        <strong translate>PRODUCTS.CUSTOMIZE_TEMPLATE</strong>:
         <table class='table table-bordered table-condensed table-striped table-hover'>
           <tr class="table-row"
               *ngFor="let config of _chiliConfigs">

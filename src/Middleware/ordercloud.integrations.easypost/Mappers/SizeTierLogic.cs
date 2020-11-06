@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using ordercloud.integrations.library.extensions;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -97,10 +98,11 @@ namespace ordercloud.integrations.easypost
 			{
 				return new EasyPostParcel()
 				{
+					// length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
 					weight = (double) li.Product.ShipWeight,
-					length = (double) (li.Product.ShipLength ?? Package.FULL_PACKAGE_DIMENSION),
-					width = (double) (li.Product.ShipWidth ?? Package.FULL_PACKAGE_DIMENSION),
-					height = (double) (li.Product.ShipHeight ?? Package.FULL_PACKAGE_DIMENSION),
+					length = (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
+					width = (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
+					height = (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
 				};
 			});
 
