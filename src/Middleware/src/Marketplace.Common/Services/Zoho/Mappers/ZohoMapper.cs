@@ -232,7 +232,6 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             zItem.item_id = zItem.item_id;
             zItem.name = item.Variant?.Name ?? item.Product.Name;
             zItem.sku = item.Variant?.ID ?? item.Product.ID;
-            zItem.manufacturer = item.SupplierID; //TODO: figure out getting the Supplier name in here
             zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
             zItem.description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}";
             zItem.rate = Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2);

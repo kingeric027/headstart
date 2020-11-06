@@ -1,4 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using OrderCloud.SDK;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace ordercloud.integrations.easypost
@@ -34,145 +38,73 @@ namespace ordercloud.integrations.easypost
 		F
 	}
 
-	//public static class SmartPackageMapper
-	//{
-	//    public static RateRequestBody Map(List<LineItem> obj)
-	//    {
-	//        var firstLineItem = obj[0];
-	//        var shipToAddress = firstLineItem.ShippingAddress;
-	//        var shipFromAddress = firstLineItem.ShipFromAddress;
+	public class Package
+	{
+		public static readonly decimal FULL_PACKAGE_DIMENSION = 22; // inches
+		public decimal PercentFilled { get; set; } = 0;
+		public decimal Weight { get; set; } = 0; // lbs 
+	}
 
+	public static class SmartPackageMapper
+	{
+		private static Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>() 
+		{
+			{ SizeTier.A, .385M }, // 38.5% of a full package
+			{ SizeTier.B, .10M },
+			{ SizeTier.C, .031M },
+			{ SizeTier.D, .0134M },
+			{ SizeTier.E, .0018M },
+			{ SizeTier.F, .00067M }
+		};
 
-	//        return new RateRequestBody
-	//        {
-	//            ConsigneeAddress = RateAddressMapper.Map(shipToAddress),
-	//            ShipperAddress = RateAddressMapper.Map(shipFromAddress),
-	//            Items = MapLineItemsIntoPackages(obj),
-	//            Accessorials = AccessorialMapper.Map(obj, shipToAddress, shipFromAddress)
-	//        };
-	//    }
+		public static List<EasyPostParcel> MapLineItemsIntoPackages(List<LineItem> lineItems)
+		{
+			var lineItemsThatCanShipTogether = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
+			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
 
-	//    private static Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>()
-	//    {
-	//        { SizeTier.A, .385M },
-	//        { SizeTier.B, .10M },
-	//        { SizeTier.C, .031M },
-	//        { SizeTier.D, .0134M },
-	//        { SizeTier.E, .0018M },
-	//        { SizeTier.F, .00067M }
-	//    };
+			var parcels = lineItemsThatCanShipTogether
+				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
+				.Aggregate(new List<Package>(), (packages, item) =>
+				{
+					if (packages.Count == 0) packages.Add(new Package());
+					var percentFillToAdd = SIZE_FACTOR_MAP[item.Product.xp.SizeTier];
+					var currentPackage = packages.Last();
+					if (currentPackage.PercentFilled + percentFillToAdd > 100)
+					{
+						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
+						packages.Add(newPackage);
+					} else
+					{
+						currentPackage.PercentFilled += percentFillToAdd;
+						currentPackage.Weight += item.Product.ShipWeight ?? 0;
+					}
+					return packages;
+				});
 
-	//    private static Dictionary<decimal, int> PERCENT_FILL_TO_SIDE_LENGTH_MAP = new Dictionary<decimal, int>()
-	//    {
-	//        { 0.0117392937640872M, 5 },
-	//        { 0.0202854996243426M, 6 },
-	//        { 0.0322126220886552M, 7 },
-	//        { 0.048084147257701M, 8 },
-	//        { 0.0684635612321563M, 9 },
-	//        { 0.0939143501126972M, 10 },
-	//        { 0.125M, 11 },
-	//        { 0.162283996994741M, 12 },
-	//        { 0.206329827197596M, 13 },
-	//        { 0.257700976709241M, 14 },
-	//        { 0.316960931630353M, 15 },
-	//        { 0.384673178061608M, 16 },
-	//        { 0.461401202103681M, 17 },
-	//        { 0.54770848985725M, 18 },
-	//        { 0.64415852742299M, 19 },
-	//        { 0.751314800901578M, 20 },
-	//        { 0.869740796393689M, 21 },
-	//        { 1M, 22 }
-	//    };
+			var combinationPackages = parcels.Select((package, index) =>
+			{
+				var demension = (int)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
+				return new EasyPostParcel()
+				{
+					weight = (double)package.Weight,
+					length = demension,
+					width = demension,
+					height = demension,
+				};
+			}).ToList();
 
-	//    private static decimal MAX_PERCENT_FILL = .80M;
+			var individualPackages = lineItemsThatShipAlone.Select(li =>
+			{
+				return new EasyPostParcel()
+				{
+					weight = (double) li.Product.ShipWeight,
+					length = (double) (li.Product.ShipLength ?? Package.FULL_PACKAGE_DIMENSION),
+					width = (double) (li.Product.ShipWidth ?? Package.FULL_PACKAGE_DIMENSION),
+					height = (double) (li.Product.ShipHeight ?? Package.FULL_PACKAGE_DIMENSION),
+				};
+			});
 
-	//    private static List<Item> MapLineItemsIntoPackages(List<MarketplaceLineItem> lineItems)
-	//    {
-	//        var lineItemsCanCombineBySizeDescending = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
-
-	//        // tuple item1 = percent filled, item 2 = weight
-	//        var packageContents = new List<Tuple<decimal, decimal>>();
-	//        var currentPercentFilled = 0M;
-	//        var currentWeight = 0M;
-
-	//        foreach (var lineItem in lineItemsCanCombineBySizeDescending)
-	//        {
-	//            var i = 0;
-	//            var percentByQuantity = SIZE_FACTOR_MAP[lineItem.Product.xp.SizeTier];
-	//            while (i < lineItem.Quantity)
-	//            {
-	//                if (currentPercentFilled + percentByQuantity < MAX_PERCENT_FILL)
-	//                {
-	//                    currentPercentFilled += percentByQuantity;
-	//                    currentWeight += lineItem.Product.ShipWeight ?? 0M;
-	//                }
-	//                else
-	//                {
-	//                    packageContents.Add(new Tuple<decimal, decimal>(currentPercentFilled, currentWeight));
-	//                    currentWeight = 0;
-	//                    currentPercentFilled = 0;
-	//                }
-	//                i++;
-	//            }
-	//        }
-
-	//        if (currentPercentFilled > 0 && currentWeight > 0)
-	//        {
-	//            packageContents.Add(new Tuple<decimal, decimal>(currentPercentFilled, currentWeight));
-	//        }
-
-	//        var packages = packageContents.Select(packageContents => GetSideLengthAndWeight(packageContents));
-
-	//        var combinationPackages = packages.Select((package, index) =>
-	//        {
-	//            return new Item()
-	//            {
-	//                Weight = package.Item2,
-	//                Length = package.Item1,
-	//                Width = package.Item1,
-	//                Height = package.Item1,
-	//                Quantity = 1,
-	//                PackageId = index.ToString(),
-	//                PackageType = PackageType.Box,
-	//                FreightClass = 1,
-	//                Unit = Unit.lbs_inch
-	//            };
-	//        }).ToList();
-
-	//        var individualLineItems = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
-	//        var individualPackages = individualLineItems.Select(li =>
-	//        {
-	//            return new Item()
-	//            {
-	//                Weight = li.Product.ShipWeight ?? 0,
-	//                Length = li.Product.ShipLength ?? 0,
-	//                Width = li.Product.ShipWidth ?? 0,
-	//                Height = li.Product.ShipHeight ?? 0,
-	//                Quantity = li.Quantity,
-	//                PackageId = li.ID,
-	//                PackageType = PackageType.Box,
-	//                FreightClass = 1,
-	//                Unit = Unit.lbs_inch
-	//            };
-	//        });
-
-	//        return combinationPackages.Union(individualPackages).ToList();
-	//    }
-
-	//    private static Tuple<int, decimal> GetSideLengthAndWeight(Tuple<decimal, decimal> packageContents)
-	//    {
-	//        var (percentFilled, weight) = packageContents;
-	//        var bigEnoughBox = PERCENT_FILL_TO_SIDE_LENGTH_MAP.First(entry =>
-	//        {
-	//            var boxPercentSide = entry.Key;
-	//            var sideLength = entry.Value;
-	//            var paddedPercentBoxSize = boxPercentSide * MAX_PERCENT_FILL;
-
-	//            return percentFilled < paddedPercentBoxSize;
-	//        });
-
-	//        return new Tuple<int, decimal>(bigEnoughBox.Value, weight);
-
-	//    }
-	//}
+			return combinationPackages.Union(individualPackages).ToList();
+		}
+	}
 }
