@@ -132,6 +132,7 @@ export class ChiliPublishConfiguration implements OnInit {
         const requests = this.tecraSpecs.map((spec, index) => {
             const types = {
                 string: 'Text',
+                longtext: 'Text',
                 list: 'DropDown',
                 checkbox: 'Checkbox'
             };
