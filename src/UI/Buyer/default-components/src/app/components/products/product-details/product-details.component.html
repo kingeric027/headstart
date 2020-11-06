@@ -126,7 +126,7 @@
             translate>PRODUCTS.DETAILS.TIERED_PRICE_HEAD</h3>:
         <div class="border-bottom border-medium mb-3 pb-3">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
-          <div class="d-flex flex-row">
+          <div class="d-flex flex-row flex-wrap">
             <span *ngFor="let priceBreak of priceBreaks; let i = index"
                   class="font-weight-bold d-flex mt-2">
               {{ getPriceBreakRange(i) }}:
