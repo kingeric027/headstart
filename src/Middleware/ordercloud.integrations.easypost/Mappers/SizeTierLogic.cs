@@ -98,9 +98,9 @@ namespace ordercloud.integrations.easypost
 				return new EasyPostParcel()
 				{
 					weight = (double) li.Product.ShipWeight,
-					length = (double) li.Product.ShipLength,
-					width = (double) li.Product.ShipWidth,
-					height = (double) li.Product.ShipHeight,
+					length = (double) (li.Product.ShipLength ?? Package.FULL_PACKAGE_DIMENSION),
+					width = (double) (li.Product.ShipWidth ?? Package.FULL_PACKAGE_DIMENSION),
+					height = (double) (li.Product.ShipHeight ?? Package.FULL_PACKAGE_DIMENSION),
 				};
 			});
 
