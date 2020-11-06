@@ -3,6 +3,9 @@
     [ngClass]="{ 'hide-tabpanel': !variantLineItems.length }">
     <ngb-panel [id]="_productKitDetails.Product.ID">
       <ng-template ngbPanelHeader>
+        <div class="d-flex justify-content-end" *ngIf="_productKitDetails.Optional">
+          <span class="float-right">(Optional)</span>
+        </div>
         <div class="row align-items-center" (click)="selectVariant()">
           <div class="d-block col-md">
             <img style="height: 60px" class="img-thumbnail" [src]="imageUrl"
