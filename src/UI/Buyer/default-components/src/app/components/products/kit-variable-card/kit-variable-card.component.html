@@ -15,11 +15,11 @@
             {{ _productKitDetails.Product.Name }}
           </h6>
           <div class="col-md">
-            <span *ngIf="!variantLineItems.length">
-              <small class="text-danger" translate>
+            <button class="btn btn-xs btn-secondary" *ngIf="!variantLineItems.length">
+              <span translate>
                 PRODUCTS.KITS.CLICK_TO_SELECT_VARIANT
-              </small>
-            </span>
+              </span>
+            </button>
             <span *ngIf="variantLineItems.length"> ({{ variantLineItemsTotalQuantity }}) </span>
           </div>
           <div class="col-md">
