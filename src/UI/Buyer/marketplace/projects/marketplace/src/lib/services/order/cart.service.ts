@@ -6,6 +6,7 @@ import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
 import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
 import { TempSdk } from '../../services/temp-sdk/temp-sdk.service';
+import { CheckoutService } from './checkout.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,8 @@ export class CartService {
 
   constructor(
     private state: OrderStateService,
-    private tempSdk: TempSdk
+    private tempSdk: TempSdk,
+    private checkout: CheckoutService
   ) { }
 
   get(): ListPage<MarketplaceLineItem> {
@@ -134,6 +136,10 @@ export class CartService {
     try {
       return await HeadStartSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
+      if(this.state.orderPromos?.Items?.length) {
+        // if there are pre-existing promos need to recalculate order
+        await this.checkout.calculateOrder();
+      }
       await this.state.reset();
     }
   }
