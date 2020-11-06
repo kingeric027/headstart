@@ -62,15 +62,14 @@ namespace ordercloud.integrations.easypost
 			var lineItemsThatCanShipTogether = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
 			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
 
-			var init = new List<Package>() { new Package() { } };
-
 			var parcels = lineItemsThatCanShipTogether
 				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
-				.Aggregate(init, (packages, item) =>
+				.Aggregate(new List<Package>(), (packages, item) =>
 				{
+					if (packages.Count == 0) packages.Add(new Package());
 					var percentFillToAdd = SIZE_FACTOR_MAP[item.Product.xp.SizeTier];
 					var currentPackage = packages.Last();
-					if (currentPackage.PercentFilled + percentFillToAdd > 0)
+					if (currentPackage.PercentFilled + percentFillToAdd > 100)
 					{
 						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
 						packages.Add(newPackage);
