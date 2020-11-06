@@ -389,11 +389,11 @@ namespace Marketplace.Common.Commands
             var markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
             var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
             {
-                var relatedProductSpec = product.Specs.First(productSpec => productSpec.ID == spec.SpecID);
+                var relatedProductSpec = product.Specs.FirstOrDefault(productSpec => productSpec.ID == spec.SpecID);
                 decimal? relatedSpecMarkup = 0;
-                if (relatedProductSpec.Options.HasItem())
+                if (relatedProductSpec != null && relatedProductSpec.Options.HasItem())
                 {
-                    relatedSpecMarkup = relatedProductSpec.Options?.First(option => option.ID == spec.OptionID)?.PriceMarkup;
+                    relatedSpecMarkup = relatedProductSpec.Options?.FirstOrDefault(option => option.ID == spec.OptionID)?.PriceMarkup;
                 }
                 return accumulator + (relatedSpecMarkup ?? 0M);
             });

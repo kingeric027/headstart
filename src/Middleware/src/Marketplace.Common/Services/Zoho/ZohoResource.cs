@@ -34,6 +34,9 @@ namespace Marketplace.Common.Services.Zoho
         protected internal IFlurlRequest Delete(params object[] segments)=> 
             _client.Request(this.AppendSegments(segments));
 
+        protected internal IFlurlRequest Post(params object[] segments) =>
+            _client.Request(this.AppendSegments(segments));
+
         protected internal async Task<T> Post<T>(object obj) => 
             await Parse<T>(await _client.Post(obj, _segments).PostAsync(null));
 
