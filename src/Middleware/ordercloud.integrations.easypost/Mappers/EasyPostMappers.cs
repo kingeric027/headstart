@@ -44,18 +44,17 @@ namespace ordercloud.integrations.easypost
 		//}
 
 		private static List<EasyPostCustomsItem> MapCustomsItem(IGrouping<AddressPair, LineItem> lineitems, EasyPostShippingProfile profile)
-		{
-			return lineitems.Select(lineItem => new EasyPostCustomsItem()
-			{
-				description = lineItem.Product.Name,
-                hs_tariff_number = lineItem.Product.xp.HS_Tariff_number ?? profile.HS_Tariff_Number,
-				origin_country = lineItem.ShipFromAddress.Country,
-				value = decimal.ToDouble(lineItem.LineSubtotal),
-				quantity = lineItem.Quantity,
-				weight = (double)Convert.ChangeType(lineItem.Product.ShipWeight, typeof(double))
-			})
-				.ToList();
-		}
+        {
+            return lineitems.Select(lineItem => new EasyPostCustomsItem()
+            {
+                description = lineItem.Product.Name,
+                hs_tariff_number = !string.IsNullOrEmpty(lineItem.Product.xp.HS_Tariff_number) ? lineItem.Product.xp.HS_Tariff_number : profile.HS_Tariff_Number,
+                origin_country = lineItem.ShipFromAddress.Country,
+                value = decimal.ToDouble(lineItem.LineSubtotal),
+                quantity = lineItem.Quantity,
+                weight = (double)Convert.ChangeType(lineItem.Product.ShipWeight, typeof(double))
+            }).ToList();
+        }
 
 
 		public static IList<ShipMethod> MapRates(EasyPostShipment[] shipments)

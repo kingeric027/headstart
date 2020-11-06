@@ -46,7 +46,8 @@ namespace Marketplace.Common.Models
                 EEL_PFC = "NOEEI30.37(a)",
                 Customs_Certify = true,
                 Markup = 1.1M,
-                Default = false
+                Default = false,
+                HS_Tariff_Number = "8523.59.0000"
             });
         }
 
