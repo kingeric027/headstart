@@ -1,20 +1,12 @@
 <div *ngIf="_productKitDetails">
-  <ngb-accordion
-    #accordion
-    [closeOthers]="false"
-    [activeIds]="panelActiveIDs"
-    [ngClass]="{ 'hide-tabpanel': !variantLineItems.length }"
-  >
+  <ngb-accordion #accordion [closeOthers]="false" [activeIds]="panelActiveIDs"
+    [ngClass]="{ 'hide-tabpanel': !variantLineItems.length }">
     <ngb-panel [id]="_productKitDetails.Product.ID">
       <ng-template ngbPanelHeader>
         <div class="row align-items-center" (click)="selectVariant()">
           <div class="d-block col-md">
-            <img
-              style="height: 60px"
-              class="img-thumbnail"
-              [src]="imageUrl"
-              alt="{{ 'Image for ' + _productKitDetails.Product.Name }}"
-            />
+            <img style="height: 60px" class="img-thumbnail" [src]="imageUrl"
+              alt="{{ 'Image for ' + _productKitDetails.Product.Name }}" />
           </div>
           <h6 class="mb-0 col-md">
             {{ _productKitDetails.Product.Name }}
@@ -33,13 +25,10 @@
           <!-- accordion toggle -->
           <div class="col-md flex-grow-0">
             <button ngbPanelToggle type="button" class="btn icon-button" *ngIf="variantLineItems?.length">
-              <fa-icon
-                class="icon-wrapper"
-                [icon]="accordion.isExpanded(_productKitDetails.Product.ID) ? faCaretDown : faCaretRight"
-              >
-                <span class="sr-only"
-                  ><span translate>PRODUCTS.KITS.EXPAND_AND_COLLAPSE</span> {{ _productKitDetails.Product.Name }}</span
-                >
+              <fa-icon class="icon-wrapper"
+                [icon]="accordion.isExpanded(_productKitDetails.Product.ID) ? faCaretDown : faCaretRight">
+                <span class="sr-only"><span translate>PRODUCTS.KITS.EXPAND_AND_COLLAPSE</span>
+                  {{ _productKitDetails.Product.Name }}</span>
               </fa-icon>
             </button>
           </div>
@@ -49,12 +38,8 @@
         <div class="card-body" *ngFor="let li of variantLineItems">
           <div class="row align-items-center">
             <div class="d-block col-md">
-              <img
-                style="height: 60px"
-                class="img-thumbnail"
-                [src]="li.xp.ImageUrl"
-                alt="{{ 'Image for ' + _productKitDetails.Product.Name }}"
-              />
+              <img style="height: 60px" class="img-thumbnail" [src]="li.xp.ImageUrl"
+                alt="{{ 'Image for ' + _productKitDetails.Product.Name }}" />
             </div>
             <h6 class="mb-0 col-md">
               {{ li | productNameWithSpecs }}
