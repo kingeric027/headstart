@@ -144,7 +144,7 @@ namespace Marketplace.Common.Commands
             using Stream stream = file.OpenReadStream();
             List<RowInfo<Misc.Shipment>> shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
 
-            DocumentImportResult result = Validate(shipments.Where(p => p.Value?.LineItemID != null).Select(p => p).ToList());
+            DocumentImportResult result = Validate(shipments);
 
             processResults = await ProcessShipments(result, accessToken);
 
@@ -277,9 +277,9 @@ namespace Marketplace.Common.Commands
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch (OrderCloudException ex)
             {
-                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.InnerException}"));
+                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.Data.Keys}"));
                 return false;
             }
         }
@@ -333,8 +333,9 @@ namespace Marketplace.Common.Commands
                     result.Invalid.Add(new DocumentRowError()
                     {
                         ErrorMessage = row.ErrorMessage,
-                        Row = row.RowNumber++
-                    });
+                        Row = row.RowNumber++,
+                        Column = row.ErrorColumnIndex
+                    }); 
                 else
                 {
                     List<ValidationResult> results = new List<ValidationResult>();
