@@ -44,7 +44,9 @@ namespace Marketplace.Common.Commands
     {
         public int TotalCount { get; set; }
         public int SuccessfulCount { get; set; }
-        public int FailureListCount { get; set; }
+        public int ProcessFailureListCount { get; set; }
+        public int DocumentFailureListCount { get; set; }
+
     }
 
     public class BatchProcessFailure
@@ -57,7 +59,9 @@ namespace Marketplace.Common.Commands
     {
         public BatchProcessSummary Meta { get; set; }
         public List<Shipment> SuccessfulList = new List<Shipment>();
-        public List<BatchProcessFailure> FailureList = new List<BatchProcessFailure>();
+        public List<BatchProcessFailure> ProcessFailureList = new List<BatchProcessFailure>();
+        public List<DocumentRowError> InvalidRowFailureList = new List<DocumentRowError>();
+
 
     }
 
@@ -175,16 +179,18 @@ namespace Marketplace.Common.Commands
                     BatchProcessFailure failureDto = new BatchProcessFailure();
                     failureDto.Error = ex.Message;
                     failureDto.Shipment = shipment;
-                    processResult.FailureList.Add(failureDto);
+                    processResult.ProcessFailureList.Add(failureDto);
                 }
 
             }
-
+            processResult.InvalidRowFailureList.AddRange(importResult.Invalid);
             processResult.Meta = new BatchProcessSummary()
             {
-                FailureListCount = processResult.FailureList.Count(),
+                ProcessFailureListCount = processResult.ProcessFailureList.Count(),
+                DocumentFailureListCount = processResult.InvalidRowFailureList.Count(),
                 SuccessfulCount = processResult.SuccessfulList.Count(),
                 TotalCount = importResult.Meta.TotalCount
+                
             };
 
             return processResult;
@@ -219,6 +225,7 @@ namespace Marketplace.Common.Commands
                     UnitPrice = Convert.ToDecimal(shipment.Cost)
                 };
 
+                //If a user included a ShipmentID in the spreadsheet, find that shipment and patch it with the information on that row
                 if (shipment.ShipmentID != null)
                 {
                     ocShipment = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
@@ -235,21 +242,26 @@ namespace Marketplace.Common.Commands
                 if (newShipment != null)
                 {
                     Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, accessToken);
+                    //POST a shipment item, passing it a Shipment ID parameter, and a request body of Order ID, Line Item ID, and Quantity Shipped
+                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
 
-                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem, accessToken);
+                    //Re-patch the shipment adding the date shipped now due to oc bug
+                    var repatchedShipment = PatchShipment(ocShipment, shipment);
+                    await _oc.Shipments.PatchAsync(newShipment.ID, repatchedShipment);
+
 
                     result.SuccessfulList.Add(processedShipment);
                 }
-                if (lineItem.ID != null)
+                if (lineItem.ID == null)
                 {
                     //Create new lineItem
-                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem, accessToken);
+                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
                 }
                 return true;
             }
             catch (Exception ex)
             {
-                result.FailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.InnerException}"));
+                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.InnerException}"));
                 return false;
             }
         }
@@ -276,7 +288,7 @@ namespace Marketplace.Common.Commands
             }
             newShipment.BuyerID = shipment.BuyerID;
             newShipment.Shipper = shipment.Shipper;
-            newShipment.DateShipped = isCreatingNew? shipment.DateShipped : null; //Must patch to null on new creation due to OC bug
+            newShipment.DateShipped = isCreatingNew? null : shipment.DateShipped; //Must patch to null on new creation due to OC bug
             newShipment.DateDelivered = shipment.DateDelivered;
             newShipment.TrackingNumber = shipment.TrackingNumber;
             newShipment.Cost = Convert.ToDecimal(shipment.Cost);
