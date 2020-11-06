@@ -47,7 +47,7 @@ namespace ordercloud.integrations.easypost
 
 	public static class SmartPackageMapper
 	{
-		private static Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>()
+		private static Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>() 
 		{
 			{ SizeTier.A, .385M }, // 38.5% of a full package
 			{ SizeTier.B, .10M },
@@ -73,13 +73,13 @@ namespace ordercloud.integrations.easypost
 					{
 						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
 						packages.Add(newPackage);
-					}
-					else
+					} else
 					{
 						currentPackage.PercentFilled += percentFillToAdd;
 						currentPackage.Weight += item.Product.ShipWeight ?? 0;
 					}
 					return packages;
+				});
 				});
 
 			var combinationPackages = parcels.Select((package, index) =>
@@ -96,14 +96,14 @@ namespace ordercloud.integrations.easypost
 
 			var individualPackages = lineItemsThatShipAlone.Select(li =>
 			{
-                try
-                {
-                    return new EasyPostParcel()
-                    {
-                        weight = (double)li.Product.ShipWeight,
-                        length = (double)(li.Product.ShipLength ?? Package.FULL_PACKAGE_DIMENSION),
-						width = (double)(li.Product.ShipWidth ?? Package.FULL_PACKAGE_DIMENSION),
-						height = (double)(li.Product.ShipHeight ?? Package.FULL_PACKAGE_DIMENSION)
+				return new EasyPostParcel()
+				{
+					weight = (double) li.Product.ShipWeight,
+					length = (double) (li.Product.ShipLength ?? Package.FULL_PACKAGE_DIMENSION),
+					width = (double) (li.Product.ShipWidth ?? Package.FULL_PACKAGE_DIMENSION),
+					height = (double) (li.Product.ShipHeight ?? Package.FULL_PACKAGE_DIMENSION),
+				};
+			});
 					};
                 }
                 catch (Exception ex)

@@ -55,7 +55,7 @@ namespace ordercloud.integrations.easypost
 			{
 				easyPostResponses.Add(await Task.WhenAll(shipments.Select(PostShipment)));
 			}
-
+			
 			var shipEstimateResponse = new ShipEstimateResponse
 			{
 				ShipEstimates = groupedLineItems.Select((lineItems, index) =>
