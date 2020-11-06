@@ -9,6 +9,7 @@ namespace ordercloud.integrations.cardconnect
     {
         Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request);
         Task<CardConnectAuthorizationResponse> AuthWithoutCapture(CardConnectAuthorizationRequest request);
+        Task<CardConnectAuthorizationResponse> AuthWithCapture(CardConnectAuthorizationRequest request);
     }
 
     public class OrderCloudIntegrationsCardConnectConfig 
@@ -51,6 +52,17 @@ namespace ordercloud.integrations.cardconnect
 
         public async Task<CardConnectAuthorizationResponse> AuthWithoutCapture(CardConnectAuthorizationRequest request)
         {
+            return await PostAuthorizationAsync(request);
+        }
+
+        public async Task<CardConnectAuthorizationResponse> AuthWithCapture(CardConnectAuthorizationRequest request)
+        {
+            request.capture = "Y";
+            return await PostAuthorizationAsync(request);
+        }
+
+        private async Task<CardConnectAuthorizationResponse> PostAuthorizationAsync(CardConnectAuthorizationRequest request)
+        {
             var attempt = await this
                 .Request("cardconnect/rest/auth")
                 .PutJsonAsync(request)
@@ -67,7 +79,7 @@ namespace ordercloud.integrations.cardconnect
                     ErrorCode = attempt.respcode
                 }, attempt);
             }
-            else if(attempt.IsDeclined())
+            else if (attempt.IsDeclined())
             {
                 throw new CreditCardIntegrationException(new ApiError()
                 {
@@ -106,7 +118,5 @@ namespace ordercloud.integrations.cardconnect
             return attempt;
 
         }
-
-        
     }
 }

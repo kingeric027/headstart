@@ -3,8 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { SpecFormService } from '../spec-form/spec-form.service';
-import { KitVariantSelection, LineItemToAdd } from '../kit-product-details/kit-product-details.component';
-
+import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
 
 @Injectable({
     providedIn: 'root',

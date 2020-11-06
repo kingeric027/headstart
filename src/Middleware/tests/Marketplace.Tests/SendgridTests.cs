@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services;
 using ordercloud.integrations.avalara;
@@ -85,7 +85,7 @@ namespace Marketplace.Tests
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmailMultipleRcpts(default, default, default, default)).DoNotCallBase();
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmail(default, default, default, default)).DoNotCallBase();
 
-
+            //act
             await _commandSub.SendOrderSubmitEmail(orderWorksheet);
 
             //assert
@@ -194,7 +194,8 @@ namespace Marketplace.Tests
                         {
                             TestConstants.supplier1ID,
                             TestConstants.supplier2ID
-                        }
+                        },
+                        Currency = ordercloud.integrations.exchangerates.CurrencySymbol.USD
                     },
                     DateSubmitted = new DateTimeOffset()
                 },

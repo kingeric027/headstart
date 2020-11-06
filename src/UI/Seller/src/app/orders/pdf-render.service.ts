@@ -15,9 +15,7 @@ export class PDFService {
     There are different functions for whether or not the user is on Safari.
     */
 
-    const orderDetailObject = document
-      .getElementsByClassName('order-detail-pdf-range')[0]
-      .cloneNode(true);
+    const orderDetailObject = document.getElementsByClassName('order-detail-pdf-range')[0].cloneNode(true);
 
     // removes all of the elements that are marked with d-print-none
     this.removeNodesOfClass(orderDetailObject, 'd-print-none');
@@ -28,31 +26,40 @@ export class PDFService {
     // const imgElement = <HTMLElement>pdfArea.querySelector('img');
     // imgElement.style.margin = "1em 40px";
     const links = pdfArea.getElementsByClassName('link-text');
-    Array.from(links).forEach((link) => {
+    Array.from(links).forEach(link => {
       link.classList.add('pdf-links');
     });
     document.body.appendChild(pdfArea);
-    const printObj = document.getElementsByClassName(
-      'order-detail-pdf-range'
-    )[1];
+    const printObj = document.getElementsByClassName('order-detail-pdf-range')[1];
     this.generateImagePDF(orderDetailObject, printObj, orderID);
   }
 
   private generateImagePDF(orderDetailObject, printObj, orderID) {
     domtoimage
       .toPng(printObj)
-      .then((dataUrl) => {
+      .then(dataUrl => {
         const img = new Image();
         img.src = dataUrl;
         img.onload = () => {
           const width = img.width;
           const height = img.height;
           const aspectRatio = width / height;
+          const pdfHeight = 170 / aspectRatio;
           const pdf = new jsPDF();
           pdf.addImage(dataUrl, 'PNG', 20, 20, 170, 170 / aspectRatio);
+          const pages = Math.ceil(pdfHeight / 300);
+          if (pages > 1) {
+            let prevPageHeight = 0;
+            for (let i = 1; i < pages; i++) {
+              const newY = i == 1 ? 20 - pdf.internal.pageSize.height : prevPageHeight - pdf.internal.pageSize.height;
+              pdf.addPage();
+              pdf.addImage(dataUrl, 'PNG', 20, newY, 170, pdfHeight);
+              prevPageHeight = newY;
+            }
+          }
           pdf.save(orderID + '.pdf');
 
-        /* this removes from the dom the hidden print area
+          /* this removes from the dom the hidden print area
            this prevents the next pdf download from creating a
            pdf with the old information in the dom */
           this.removeNodesOfClass(document, 'hidden-print-area');
@@ -60,7 +67,7 @@ export class PDFService {
       })
       .catch(
         //if promise does not resolve, generate the pdf with html2canvas and don't use an image
-        (e) => {
+        e => {
           console.log(e);
           this.generateNoImagePDF(orderDetailObject, printObj, orderID);
         }
@@ -82,11 +89,8 @@ export class PDFService {
 
   private removeNodesOfClass(parentObject: any, classToRemove: string): void {
     if (parentObject && parentObject.childNodes) {
-      parentObject.childNodes.forEach((childNode) => {
-        if (
-          childNode['classList'] &&
-          Array.from(childNode['classList']).includes(classToRemove)
-        ) {
+      parentObject.childNodes.forEach(childNode => {
+        if (childNode['classList'] && Array.from(childNode['classList']).includes(classToRemove)) {
           parentObject.removeChild(childNode);
         } else {
           this.removeNodesOfClass(childNode, classToRemove);

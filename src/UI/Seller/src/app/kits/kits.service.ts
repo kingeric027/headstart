@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { MiddlewareKitService } from '../shared/services/middleware-api/middleware-kit.service';
-import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk';
+import { MarketplaceKitProduct, HeadStartSDK } from '@ordercloud/headstart-sdk';
 @Injectable({
     providedIn: 'root',
 })
@@ -44,7 +43,7 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
                     Unit: null,
                     Qty: 0,
                 },
-                ProductType: "Kit",
+                ProductType: 'Kit',
                 StaticContent: null,
             },
         },
@@ -67,9 +66,8 @@ export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
     constructor(
         router: Router,
         activatedRoute: ActivatedRoute,
-        middlewareKitService: MiddlewareKitService,
         currentUserService: CurrentUserService
     ) {
-        super(router, activatedRoute, middlewareKitService, currentUserService, '/kitproducts', 'kitproducts');
+        super(router, activatedRoute, HeadStartSDK.KitProducts, currentUserService, '/kitproducts', 'kitproducts');
     }
 }

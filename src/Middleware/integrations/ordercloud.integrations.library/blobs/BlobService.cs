@@ -17,7 +17,8 @@ namespace ordercloud.integrations.library
 {
     public interface IOrderCloudIntegrationsBlobService
     {
-		Task<T> Get<T>(string id);
+        CloudBlobContainer Container { get; }
+        Task<T> Get<T>(string id);
         Task<string> Get(string id);
         Task Save(string reference, string blob, string fileType = null);
 #if NETCOREAPP3_1

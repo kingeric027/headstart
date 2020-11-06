@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho.Models;
@@ -172,7 +173,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoPurchaseLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item)
+        public static ZohoLineItem Map(MarketplaceLineItem item, Supplier supplier)
         {
             return new ZohoLineItem()
             {
@@ -185,27 +186,26 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
                 quantity = item.Quantity,
                 product_type = "goods",
-                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000"
+                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000",
+                manufacturer = supplier.Name
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
+        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, Supplier supplier)
         {
-            // TODO: handle the purchase information. ie, the supplier product setup pricing/cost
-            return new ZohoLineItem()
-            {
-                item_id = zItem.item_id,
-                item_type = "sales_and_purchases",
-                name = item.Variant?.Name ?? item.Product.Name,
-                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", // debug removal
-                description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
-                sku = item.Variant?.ID ?? item.Product.ID,
-                unit = item.Product.xp?.UnitOfMeasure?.Unit,
-                purchase_rate = decimal.ToDouble(item.UnitPrice.Value),
-                quantity = item.Quantity,
-                product_type = "goods",
-                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000"
-            };
+            zItem.item_id = zItem.item_id;
+            zItem.item_type = "sales_and_purchases";
+            zItem.name = item.Variant?.Name ?? item.Product.Name;
+            zItem.purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}";
+            zItem.description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}";
+            zItem.sku = item.Variant?.ID ?? item.Product.ID;
+            zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
+            zItem.purchase_rate = decimal.ToDouble(item.UnitPrice.Value);
+            zItem.quantity = item.Quantity;
+            zItem.product_type = "goods";
+            zItem.avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000";
+            zItem.manufacturer = supplier.Name;
+            return zItem;
         }
     }
     public static class ZohoSalesLineItemMapper
@@ -216,7 +216,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             {
                 item_type = "sales_and_purchases",
                 name = item.Variant?.Name ?? item.Product.Name,
-                rate = decimal.ToDouble(item.UnitPrice.Value),
+                rate = Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2),
                 purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", 
                 description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
                 sku = item.Variant?.ID ?? item.Product.ID,
@@ -229,20 +229,19 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
         {
-            return new ZohoLineItem()
-            {
-                item_id = zItem.item_id,
-                item_type = "sales_and_purchases",
-                name = item.Variant?.Name ?? item.Product.Name,
-                rate = decimal.ToDouble(item.UnitPrice.Value),
-                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}", // debug removal
-                description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}",
-                sku = item.Variant?.ID ?? item.Product.ID,
-                unit = item.Product.xp?.UnitOfMeasure?.Unit, 
-                product_type = "goods",
-                avatax_tax_code = item.Product.xp?.Tax.Code,
-                quantity = item.Quantity
-            };
+            zItem.item_id = zItem.item_id;
+            zItem.name = item.Variant?.Name ?? item.Product.Name;
+            zItem.sku = item.Variant?.ID ?? item.Product.ID;
+            zItem.manufacturer = item.SupplierID; //TODO: figure out getting the Supplier name in here
+            zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
+            zItem.description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}";
+            zItem.rate = Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2);
+            zItem.purchase_description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}";
+            zItem.item_type = "sales_and_purchases";
+            zItem.product_type = "goods";
+            zItem.avatax_tax_code = item.Product.xp?.Tax.Code;
+            zItem.quantity = item.Quantity;
+            return zItem;
         }
     }
 

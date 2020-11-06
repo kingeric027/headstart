@@ -43,12 +43,12 @@ namespace ordercloud.integrations.easypost
 			};
 		}
 
-        private static List<EasyPostCustomsItem> MapCustomsItem(IGrouping<AddressPair, LineItem> lineitems)
+        private static List<EasyPostCustomsItem> MapCustomsItem(IGrouping<AddressPair, LineItem> lineitems, EasyPostShippingProfile profile)
         {
             return lineitems.Select(lineItem => new EasyPostCustomsItem()
                 {
                     description = lineItem.Product.Name,
-                    hs_tariff_number = null,
+                    hs_tariff_number = profile.HS_Tariff_Number,
                     origin_country = lineItem.ShipFromAddress.Country,
                     value = decimal.ToDouble(lineItem.LineSubtotal),
                     quantity = lineItem.Quantity,
@@ -101,8 +101,8 @@ namespace ordercloud.integrations.easypost
 					eel_pfc = profile.EEL_PFC,
 					customs_certify = profile.Customs_Certify,
 					customs_signer = profile.Customs_Signer,
-					customs_items = MapCustomsItem(groupedLineItems)
-				};
+					customs_items = MapCustomsItem(groupedLineItems, profile)
+                };
             }
             return shipment;
         }
