@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MarketplaceMeKitProduct, MeProductInKit, Variant } from '@ordercloud/headstart-sdk';
+import { ShopperContextService } from 'marketplace';
 import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
 import { KitVariantSelection, ProductSelectionEvent } from 'src/app/models/product-selection-event.interface';
 import { ProductDetailService } from '../product-details/product-detail.service';
@@ -34,16 +35,20 @@ export class OCMKitVariantSelector {
   quantityValid: boolean;
   errorMessage: string;
   resetFormToggle = true;
+  userCurrency: string;
 
   constructor(
     private productDetailService: ProductDetailService,
-    private specFormService: SpecFormService
+    private specFormService: SpecFormService,
+    private context: ShopperContextService,
   ) { }
 
   onInit(): void {
     this.productKitDetails = this._event.productKitDetails;
     this.selection = this._event.variantSelection;
     this.disabledVariants = this.productKitDetails.Variants.filter(v => !v.Active)
+    const currentUser = this.context.currentUser.get();
+    this.userCurrency = currentUser.Currency;
   }
 
   onSpecFormChange(event: SpecFormEvent): void {

@@ -18,6 +18,7 @@ namespace Marketplace.Common.Commands
 		Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
 		Task RequestProductInfo(ContactSupplierBody template);
+		Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user);
 	}
 
 	public class MeProductCommand : IMeProductCommand
@@ -69,6 +70,26 @@ namespace Marketplace.Common.Commands
 			superMarketplaceProduct.Product = markedupProduct;
 			superMarketplaceProduct.Specs = markedupSpecs;
 			return superMarketplaceProduct;
+		}
+
+		public async Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user)
+		{
+			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+			var exchangeRatesRequest = GetExchangeRates(user);
+
+			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+			var exchangeRates = await exchangeRatesRequest;
+
+			foreach(var kit in kitProduct.ProductAssignments.ProductsInKit)
+            {
+				var markedupProduct = ApplyBuyerProductPricing(kit.Product, defaultMarkupMultiplier, exchangeRates);
+				var productCurrency = (Nullable<CurrencySymbol>)kit.Product.xp.Currency;
+				var markedupSpecs = ApplySpecMarkups(kit.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
+				kit.Product = markedupProduct;
+				kit.Specs = markedupSpecs;
+			}
+
+			return kitProduct;
 		}
 
 		private List<Spec> ApplySpecMarkups(List<Spec> specs, decimal defaultMarkupMultiplier, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
