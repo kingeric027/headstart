@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Marketplace.Common.Services.Zoho.Models;
@@ -17,6 +18,7 @@ namespace Marketplace.Common.Services.Zoho.Resources
         Task<ZohoLineItem> CreateAsync(ZohoLineItem item);
         Task<TZohoItem> CreateAsync<TZohoItem>(TZohoItem item) where TZohoItem : ZohoLineItem;
         Task DeleteAsync(string id);
+        Task MarkActiveAsync(string id);
     }
 
     public class ZohoItemResource : ZohoResource, IZohoItemResource
@@ -46,5 +48,10 @@ namespace Marketplace.Common.Services.Zoho.Resources
             await Post<TZohoItem>(item);
 
         public Task DeleteAsync(string id) => Delete(id).DeleteAsync();
+
+        public async Task MarkActiveAsync(string id)
+        {
+            await Post(id, "active").SendAsync(HttpMethod.Post);
+        }
     }
 }
