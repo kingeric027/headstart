@@ -20,7 +20,6 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
         Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
         Task<ShipEstimateResponse> GetRatesAsync(string orderID);
-        List<IGrouping<AddressPair, MarketplaceLineItem>> GroupByShipping(IList<MarketplaceLineItem> lineItems);
     }
 
     public class CheckoutIntegrationCommand : ICheckoutIntegrationCommand
@@ -53,23 +52,12 @@ namespace Marketplace.Common.Commands
             return await this.GetRatesAsync(order);
         }
 
-        public List<IGrouping<AddressPair, MarketplaceLineItem>> GroupByShipping(IList<MarketplaceLineItem> lineItems)
-        {
-            var group = lineItems.GroupBy(li => new AddressPair
-            {
-                ShipFrom = li.ShipFromAddress,
-                ShipTo = li.ShippingAddress
-            }).ToList();
-            return group;
-        }
-
         private async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderWorksheet worksheet, CheckoutIntegrationConfiguration config = null)
         {
             if (config != null && config.ExcludePOProductsFromShipping)
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
 
-            var groupedLineItems = this.GroupByShipping(worksheet.LineItems);
-
+            var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
             var shipResponse = await _shippingService.GetRates(groupedLineItems, _profiles); // include all accounts at this stage so we can save on order worksheet and analyze 
 
             // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  

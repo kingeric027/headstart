@@ -2,102 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Marketplace.Common;
-using Marketplace.Common.Commands;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
 using NSubstitute;
 using NUnit.Framework;
-using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
-using ordercloud.integrations.exchangerates;
 using OrderCloud.SDK;
 
 namespace Marketplace.Tests
 {
     public class ShippingTests
     {
-        private ICheckoutIntegrationCommand _checkout;
-        private IAvalaraCommand _avalara;
-        private IExchangeRatesCommand _exchange;
-        private IOrderCloudClient _oc;
-        private IEasyPostShippingService _shipping;
-        private AppSettings _settings;
-
         [SetUp]
         public void Setup()
         {
-            _avalara = Substitute.For<IAvalaraCommand>();
-            _exchange = Substitute.For<IExchangeRatesCommand>();
-            _oc = Substitute.For<IOrderCloudClient>();
-            _shipping = Substitute.For<IEasyPostShippingService>();
-            _settings = Substitute.For<AppSettings>();
-            _checkout = new CheckoutIntegrationCommand(_avalara, _exchange, _oc, _shipping, _settings);
-        }
 
-        [Test, TestCaseSource(typeof(LineItemFactory), nameof(LineItemFactory.LineItemCases))]
-        public int TestShipmentGrouping(List<MarketplaceLineItem> line_items)
-        {
-            var grouped = _checkout.GroupByShipping(line_items);
-            return grouped.Count;
-        }
-
-        public class LineItemFactory
-        {
-            public static IEnumerable LineItemCases
-            {
-                get
-                {
-                    yield return new TestCaseData(new List<MarketplaceLineItem>()
-                    {
-                        new MarketplaceLineItem() { 
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Edina", State = "MN", Zip = "55425" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        }
-                    }).Returns(1);
-                    yield return new TestCaseData(new List<MarketplaceLineItem>()
-                    {
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Edina", State = "MN", Zip = "55425" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        },
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Edina", State = "MN", Zip = "55425" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        }
-                    }).Returns(1);
-                    yield return new TestCaseData(new List<MarketplaceLineItem>()
-                    {
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Edina", State = "MN", Zip = "55425" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        },
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Wilmington", State = "DE", Zip = "26598" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        }
-                    }).Returns(2);
-                    yield return new TestCaseData(new List<MarketplaceLineItem>()
-                    {
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Edina", State = "MN", Zip = "55425" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        },
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Edina", State = "MN", Zip = "55425" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        },
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Wilmington", State = "DE", Zip = "26598" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Jackson", State = "MS", Zip = "23548" }
-                        },
-                        new MarketplaceLineItem() {
-                            ShipFromAddress = new MarketplaceAddressSupplier() { City = "Wilmington", State = "DE", Zip = "26598" },
-                            ShippingAddress = new MarketplaceAddressBuyer() { City = "Austin", State = "TX", Zip = "54677" }
-                        }
-                    }).Returns(3);
-                }
-            }
         }
 
         [Test]
