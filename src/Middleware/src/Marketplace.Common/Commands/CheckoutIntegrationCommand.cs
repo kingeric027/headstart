@@ -82,6 +82,30 @@ namespace Marketplace.Common.Commands
 
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
 
+            if(shipResponse.ShipEstimates != null)
+            {
+                foreach(var shipEstimate in shipResponse.ShipEstimates)
+                {
+                    if(!shipEstimate.ShipMethods.Any())
+                    {
+                        // there are legitimate reasons for no rates to be returned
+                        // but we still need to provide the user an option so they can check out
+                        shipEstimate.ShipMethods = new List<ShipMethod>()
+                        {
+                            new ShipMethod
+                            {
+                                ID = "NO_SHIPPING_RATES",
+                                Name = "No shipping rates returned",
+                                Cost = 0,
+                                xp = new
+                                {
+                                    OriginalCost = 0
+                                }
+                            }
+                        };
+                    }
+                }
+            }
             return shipResponse;
         }
 
