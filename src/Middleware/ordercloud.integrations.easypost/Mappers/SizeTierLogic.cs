@@ -42,13 +42,14 @@ namespace ordercloud.integrations.easypost
 	public class Package
 	{
 		public static readonly decimal FULL_PACKAGE_DIMENSION = 22; // inches
+        public static readonly decimal DEFAULT_WEIGHT = 5;
 		public decimal PercentFilled { get; set; } = 0;
 		public decimal Weight { get; set; } = 0; // lbs 
 	}
 
 	public static class SmartPackageMapper
 	{
-		private static Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>() 
+		private static readonly Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>() 
 		{
 			{ SizeTier.A, .385M }, // 38.5% of a full package
 			{ SizeTier.B, .10M },
@@ -84,27 +85,24 @@ namespace ordercloud.integrations.easypost
 
 			var combinationPackages = parcels.Select((package, index) =>
 			{
-				var demension = (int)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
+				var dimension = (int)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
 				return new EasyPostParcel()
 				{
 					weight = (double)package.Weight,
-					length = demension,
-					width = demension,
-					height = demension,
+					length = dimension,
+					width = dimension,
+					height = dimension,
 				};
 			}).ToList();
 
-			var individualPackages = lineItemsThatShipAlone.Select(li =>
-			{
-				return new EasyPostParcel()
-				{
-					// length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
-					weight = (double) li.Product.ShipWeight,
-					length = (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
-					width = (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
-					height = (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
-				};
-			});
+			var individualPackages = lineItemsThatShipAlone.Select(li => new EasyPostParcel()
+            {
+                // length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
+                weight = (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
+                length = (double) (li.Product.ShipLength?? Package.FULL_PACKAGE_DIMENSION),
+                width = (double) (li.Product.ShipWidth ?? Package.FULL_PACKAGE_DIMENSION),
+                height = (double) (li.Product.ShipHeight ?? Package.FULL_PACKAGE_DIMENSION),
+            });
 
 			return combinationPackages.Union(individualPackages).ToList();
 		}
