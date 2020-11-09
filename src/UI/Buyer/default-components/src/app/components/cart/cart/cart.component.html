@@ -22,10 +22,12 @@
     <div class="row flex-lg-row-reverse"
          *ngIf="_order?.LineItemCount">
       <div class="col-lg-4">
-        <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
-        <button class="btn btn-lg btn-primary btn-block my-4 font-weight-bold"
-                (click)="toCheckout()"
-                translate>CART.CART.CHECKOUT</button>
+        <div class="sticky-top order-summary">
+          <ocm-order-summary [orderSummaryMeta]="orderSummaryMeta"></ocm-order-summary>
+          <button class="btn btn-lg btn-primary btn-block my-4 font-weight-bold"
+                  (click)="toCheckout()"
+                  translate>CART.CART.CHECKOUT</button>
+        </div>
       </div>
       <div class="col-lg-8"
            *ngIf="_lineItems?.Items">

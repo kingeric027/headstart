@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
 import { SpecFormService } from '../spec-form/spec-form.service';
-
+import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +14,7 @@ export class ProductDetailService {
         private specFormService: SpecFormService
     ) { }
 
-    getProductPrice(priceBreaks: PriceBreak[], specs: Spec[], specForm: FormGroup, quantity: number): number {
+    getProductPrice(priceBreaks: PriceBreak[], specs: Spec[], quantity: number, specForm: FormGroup): number {
         // In OC, the price per item can depend on the quantity ordered. This info is stored on the PriceSchedule as a list of PriceBreaks.
         // Find the PriceBreak with the highest Quantity less than the quantity ordered. The price on that price break
         // is the cost per item.
@@ -40,5 +40,27 @@ export class ProductDetailService {
         return parseInt(
             (((basePrice - actualPrice) / basePrice) * 100).toFixed(0), 10
         );
+    }
+
+    isSameLine(line: LineItemToAdd, other: LineItemToAdd): boolean {
+        return line.ProductID === other.ProductID && this.isObjectEqual(line.Specs, other.Specs)
+    }
+
+    isSameLineAsOthers(line: LineItemToAdd, others: LineItemToAdd[]): boolean {
+        return others.some(other => {
+            return line.ProductID === other.ProductID && this.isObjectEqual(line.Specs, other.Specs);
+        })
+    }
+
+    isObjectEqual(obj1: any, obj2: any): boolean {
+        const sorted1 = this.sortObjectByKeys(obj1);
+        const sorted2 = this.sortObjectByKeys(obj2);
+        if (JSON.stringify(sorted1) === JSON.stringify(sorted2)) {
+            return true;
+        }
+    }
+
+    private sortObjectByKeys(obj: any): any[] {
+        return Object.entries(obj).sort(([a], [b]) => a < b ? -1 : 1)
     }
 }

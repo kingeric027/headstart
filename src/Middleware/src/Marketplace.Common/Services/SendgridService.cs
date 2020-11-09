@@ -11,11 +11,11 @@ using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
-using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using static Marketplace.Common.Models.SendGridModels;
 
 namespace Marketplace.Common.Services
 {
@@ -25,30 +25,26 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
-
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
-        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
+        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
-        Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
-        Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
+        Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
+        Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText);
         Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText);
         Task SendContactSupplierAboutProductEmail(ContactSupplierBody template);
         Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName);
     }
 
-    public class EmailTemplate
-    {
-        public object Data { get; set; }
-        public EmailDisplayText Message { get; set; }
-    }
+
     public class SendgridService : ISendgridService
     {
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
         private const string ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string ORDER_APPROVAL_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
@@ -70,7 +66,7 @@ namespace Marketplace.Common.Services
             await client.SendEmailAsync(msg);
         }
 
-        public async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
+        public virtual async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
@@ -79,7 +75,7 @@ namespace Marketplace.Common.Services
             await client.SendEmailAsync(msg);
         }
 
-        public async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
+        public virtual async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
             var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
@@ -168,8 +164,6 @@ namespace Marketplace.Common.Services
                 date = yesterday
             };
             await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
-            //string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName
-
         }
 
         public async Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText)
@@ -204,22 +198,18 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = new
-                {
-                    messageNotification.Recipient.FirstName,
-                    messageNotification.Recipient.LastName,
-                    OrderID = messageNotification.EventBody.Order.ID
-                },
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -249,26 +239,26 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
+        public async Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderApprovedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
+        public async Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -300,12 +290,7 @@ namespace Marketplace.Common.Services
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
-                Address supplierAddress = null; ;
-                if(orderWorksheet.Order.xp.SupplierIDs != null && orderWorksheet.Order.xp.ShipFromAddressIDs != null)
-                {
-                    supplierAddress = await _oc.SupplierAddresses.GetAsync(orderWorksheet.Order.xp.SupplierIDs.FirstOrDefault(), orderWorksheet.Order.xp.ShipFromAddressIDs.FirstOrDefault());
-                }
-                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems, supplierAddress);
+                var orderData = GetQuoteOrderTemplateData(orderWorksheet.Order, orderWorksheet.LineItems);
 
                 EmailTemplate buyerTemplateData = new EmailTemplate()
                 {
@@ -367,21 +352,22 @@ namespace Marketplace.Common.Services
                 var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
                 supplierShippingSelections.Add(selection);
             }
-            supplierOrderWorksheet.Order.ShippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+            var shippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+            supplierOrderWorksheet.Order.ShippingCost = Math.Round(shippingCost, 2);
 
             //  now get correct tax for line items on supplier order
             var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
-            var supplierShippintRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
-            var supplierTax = 0.0;
+            var supplierShippingRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
+            var supplierTax = (decimal)0.0;
             foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
             {
-                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippintRateIDs.Contains(line?.lineNumber) && line.tax != null)
+                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippingRateIDs.Contains(line?.lineNumber) && line.tax != null)
                 {
                     //  Add tax from line items and shipping rates associated with this supplier
-                    supplierTax += line?.tax;
+                    supplierTax += (decimal)line?.tax;
                 }
             }
-            supplierOrderWorksheet.Order.TaxCost = (decimal)supplierTax;
+            supplierOrderWorksheet.Order.TaxCost = supplierTax;
             supplierOrderWorksheet.Order.Total = supplierOrderWorksheet.Order.Total + supplierOrderWorksheet.Order.TaxCost + supplierOrderWorksheet.Order.ShippingCost;
             return supplierOrderWorksheet;
         }
@@ -499,58 +485,60 @@ namespace Marketplace.Common.Services
             return supplierList;
         }
 
-        private object GetOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
+        private OrderTemplateData GetOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
         {
             var productsList = lineItems.Select(lineItem =>
             {
-                return new
+                return new ProductInfo()
                 {
                     ProductName = lineItem.Product.Name,
                     ImageURL = lineItem.xp.ImageUrl,
-                    lineItem.ProductID,
-                    lineItem.Quantity,
-                    lineItem.LineTotal,
+                    ProductID = lineItem.ProductID,
+                    Quantity = lineItem.Quantity,
+                    LineTotal = lineItem.LineTotal,
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
-            return new
+            var currencyString = order.xp?.Currency?.ToString();
+            return new OrderTemplateData()
             {
-                order.FromUser.FirstName,
-                order.FromUser.LastName,
+                FirstName = order.FromUser.FirstName,
+                LastName = order.FromUser.LastName,
                 OrderID = order.ID,
                 DateSubmitted = order.DateSubmitted.ToString(),
-                order.ShippingAddressID,
+                ShippingAddressID = order.ShippingAddressID,
                 ShippingAddress = shippingAddress,
-                order.BillingAddressID,
-                BillingAddress = new
+                BillingAddressID = order.BillingAddressID,
+                BillingAddress = new Address()
                 {
-                    order.BillingAddress?.Street1,
-                    order.BillingAddress?.Street2,
-                    order.BillingAddress?.City,
-                    order.BillingAddress?.State,
-                    order.BillingAddress?.Zip
+                    Street1 =order.BillingAddress?.Street1,
+                    Street2 = order.BillingAddress?.Street2,
+                    City = order.BillingAddress?.City,
+                    State = order.BillingAddress?.State,
+                    Zip = order.BillingAddress?.Zip
                 },
                 Products = productsList,
-                order.Subtotal,
-                order.TaxCost,
-                order.ShippingCost,
+                Subtotal =order.Subtotal,
+                TaxCost = order.TaxCost,
+                ShippingCost = order.ShippingCost,
                 PromotionalDiscount = order.PromotionDiscount,
-                order.Total,
+                Total = order.Total,
+                Currency = currencyString
             };
         }
 
-        private object GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems, Address supplierAddress)
+        private QuoteOrderTemplateData GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
         {
-            return new
+            return new QuoteOrderTemplateData()
             {
                 FirstName = order.FromUser.FirstName,
                 LastName = order.FromUser.LastName,
                 Phone = order.xp.QuoteOrderInfo.Phone,
                 Email = order.FromUser.Email,
-                Location = supplierAddress == null ? null : $"{supplierAddress?.Street1}, {supplierAddress?.City}, {supplierAddress?.State} {supplierAddress?.Zip}",
+                Location = order.xp.QuoteOrderInfo.BuyerLocation,
                 ProductID = lineItems.FirstOrDefault().Product.ID,
                 ProductName = lineItems.FirstOrDefault().Product.Name,
-                order = order,
+                Order = order,
             };
         }
 
@@ -576,44 +564,46 @@ namespace Marketplace.Common.Services
             return products;
         }
 
-        private object MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
-        new
+        private ProductInfo MapReturnedLineItemToProduct(MarketplaceLineItem lineItem) =>
+        new ProductInfo()
         {
             ProductName = lineItem.Product.Name,
             ImageURL = lineItem.xp.ImageUrl,
-            lineItem.ProductID,
-            lineItem.Quantity,
-            lineItem.LineTotal,
+            ProductID = lineItem.ProductID,
+            Quantity = lineItem.Quantity,
+            LineTotal = lineItem.LineTotal,
         };
 
-        private object MapCanceledLineItemToProduct(MarketplaceLineItem lineItem) =>
-        new
+        private ProductInfo MapCanceledLineItemToProduct(MarketplaceLineItem lineItem) =>
+        new ProductInfo()
         {
             ProductName = lineItem.Product.Name,
             ImageURL = lineItem.xp.ImageUrl,
-            lineItem.ProductID,
-            lineItem.Quantity,
-            lineItem.LineTotal,
+            ProductID = lineItem.ProductID,
+            Quantity = lineItem.Quantity,
+            LineTotal = lineItem.LineTotal,
         };
 
-        private object MapLineItemToProduct(MarketplaceLineItem lineItem) =>
-          new
+        private ProductInfo MapLineItemToProduct(MarketplaceLineItem lineItem) =>
+          new ProductInfo()
           {
               ProductName = lineItem.Product.Name,
               ImageURL = lineItem.xp.ImageUrl,
-              lineItem.ProductID,
-              lineItem.Quantity,
-              lineItem.LineTotal,
+              ProductID = lineItem.ProductID,
+              Quantity = lineItem.Quantity,
+              LineTotal = lineItem.LineTotal,
           };
 
-        private object GetShippingAddress(IList<MarketplaceLineItem> lineItems) =>
-          new
-          {
-              lineItems[0].ShippingAddress.Street1,
-              lineItems[0].ShippingAddress.Street2,
-              lineItems[0].ShippingAddress.City,
-              lineItems[0].ShippingAddress.State,
-              lineItems[0].ShippingAddress.Zip
-          };
+        private Address GetShippingAddress(IList<MarketplaceLineItem> lineItems)
+        {
+            return new Address()
+            {
+                Street1 = lineItems[0].ShippingAddress.Street1,
+                Street2 = lineItems[0].ShippingAddress.Street2,
+                City = lineItems[0].ShippingAddress.City,
+                State = lineItems[0].ShippingAddress.State,
+                Zip = lineItems[0].ShippingAddress.Zip
+            };
+        }
     }
 }

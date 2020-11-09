@@ -6,6 +6,7 @@ import { isUndefined as _isUndefined } from 'lodash';
 import { listAll } from '../../functions/listAll';
 import { MarketplaceLineItem, MarketplaceOrder, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk';
 import { TempSdk } from '../../services/temp-sdk/temp-sdk.service';
+import { CheckoutService } from './checkout.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +16,11 @@ export class CartService {
   public onChange = this.state.onLineItemsChange.bind(this.state);
   private initializingOrder = false;
 
-  constructor(private state: OrderStateService,
-    private tempSdk: TempSdk) { }
+  constructor(
+    private state: OrderStateService,
+    private tempSdk: TempSdk,
+    private checkout: CheckoutService
+  ) { }
 
   get(): ListPage<MarketplaceLineItem> {
     return this.lineItems;
@@ -108,6 +112,12 @@ export class CartService {
   }
 
   private hasSameSpecs(line1: MarketplaceLineItem, line2: MarketplaceLineItem): boolean {
+    if(!line1?.Specs?.length && !line2?.Specs?.length) {
+      return true;
+    }
+    if((!line1?.Specs?.length && line2?.Specs?.length) || (line1?.Specs?.length && !line2?.Specs?.length)) {
+      return false;
+    }
     const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
     const sortedSpecs2 = line2.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
     return JSON.stringify(sortedSpecs1) === JSON.stringify(sortedSpecs2);
@@ -126,6 +136,10 @@ export class CartService {
     try {
       return await HeadStartSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
+      if(this.state.orderPromos?.Items?.length) {
+        // if there are pre-existing promos need to recalculate order
+        await this.checkout.calculateOrder();
+      }
       await this.state.reset();
     }
   }

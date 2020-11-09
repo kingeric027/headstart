@@ -41,6 +41,11 @@ export class SpecFormService {
             OptionID: option.ID,
             Value: option.Value,
           });
+        } else {
+          specs.push({
+            SpecID: spec.ID,
+            Value: formValues[value]
+          })
         }
       }
     }
@@ -83,7 +88,7 @@ export class SpecFormService {
     return liSpecs.
       every(spec => image.Tags
         .find(tag => tag?.split('-')
-          .includes(spec.Value.replace(/\s/g, ''))));
+          .includes(spec.Value.split(' ').join('').replace(/[^a-zA-Z0-9 ]/g, ''))));
   }
 
   private singleSpecMarkup(unitPrice: number, quantity: number, option: SpecOption): number {

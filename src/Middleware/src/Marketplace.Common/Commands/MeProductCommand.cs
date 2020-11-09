@@ -18,6 +18,7 @@ namespace Marketplace.Common.Commands
 		Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
 		Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
 		Task RequestProductInfo(ContactSupplierBody template);
+		Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user);
 	}
 
 	public class MeProductCommand : IMeProductCommand
@@ -71,6 +72,26 @@ namespace Marketplace.Common.Commands
 			return superMarketplaceProduct;
 		}
 
+		public async Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user)
+		{
+			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+			var exchangeRatesRequest = GetExchangeRates(user);
+
+			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+			var exchangeRates = await exchangeRatesRequest;
+
+			foreach(var kit in kitProduct.ProductAssignments.ProductsInKit)
+            {
+				var markedupProduct = ApplyBuyerProductPricing(kit.Product, defaultMarkupMultiplier, exchangeRates);
+				var productCurrency = (Nullable<CurrencySymbol>)kit.Product.xp.Currency;
+				var markedupSpecs = ApplySpecMarkups(kit.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
+				kit.Product = markedupProduct;
+				kit.Specs = markedupSpecs;
+			}
+
+			return kitProduct;
+		}
+
 		private List<Spec> ApplySpecMarkups(List<Spec> specs, decimal defaultMarkupMultiplier, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
 			return specs.Select(spec =>
@@ -91,8 +112,8 @@ namespace Marketplace.Common.Commands
 		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
 				var searchText = args.Search ?? "";
-
-				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, accessToken: user.AccessToken);
+				var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
+				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, accessToken: user.AccessToken);
 				var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 				var exchangeRatesRequest = GetExchangeRates(user);
 
@@ -125,7 +146,7 @@ namespace Marketplace.Common.Commands
 					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
 					{
 						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
-						var currency = (Nullable<CurrencySymbol>)CurrencySymbol.USD;
+						var currency = product?.xp?.Currency ?? CurrencySymbol.USD;
 						var convertedPrice = ConvertPrice(markedupPrice, currency, exchangeRates);
 						priceBreak.Price = convertedPrice;
 						return priceBreak;

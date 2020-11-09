@@ -7,7 +7,8 @@ import { NumberCanChangeTo, CanChangeTo, CanChangeLineItemsOnOrderTo } from '@ap
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface';
 import { FormArray, Validators, FormControl } from '@angular/forms';
 import { getPrimaryLineItemImage } from '@app-seller/products/product-image.helper';
-import { MeUser } from '@ordercloud/angular-sdk';
+import { MeUser, OcOrderService } from '@ordercloud/angular-sdk';
+import { LineItem, LineItemSpec } from 'ordercloud-javascript-sdk';
 
 @Component({
   selector: 'app-line-item-table',
@@ -16,11 +17,17 @@ import { MeUser } from '@ordercloud/angular-sdk';
 })
 export class LineItemTableComponent {
   _lineItems: MarketplaceLineItem[] = [];
+  _order: MarketplaceOrder;
   _liGroupedByShipFrom: MarketplaceLineItem[][];
+  _supplierOrders: MarketplaceOrder[] = [];
   _statusChangeForm = new FormArray([]);
   _tableStatus = LineItemTableStatus.Default;
   _user: MeUser;
-  @Input() order: MarketplaceOrder;
+  @Input() 
+  set order(value: MarketplaceOrder) {
+    this._order = value;
+    this.setSupplierOrders(value);
+  }
   @Input() orderDirection: 'Incoming' | 'Outgoing';
   @Output() orderChange = new EventEmitter();
   isSaving = false;
@@ -34,6 +41,7 @@ export class LineItemTableComponent {
   }
 
   constructor(
+    private ocOrderService: OcOrderService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -47,12 +55,14 @@ export class LineItemTableComponent {
   }
 
   getShipMethodString(lineItem: MarketplaceLineItem): string {
+    const salesOrderID = this._order.ID.split('-')[0];
+    const supplierOrder = this._supplierOrders?.find(order => order.ID === `${salesOrderID}-${lineItem.SupplierID}`)
     const shipFromID = lineItem.ShipFromAddressID;
-    const shipMethod = (this.order?.xp?.SelectedShipMethodsSupplierView || [])
+    const shipMethod = (supplierOrder?.xp?.SelectedShipMethodsSupplierView || [])
                         .find(sm => sm.ShipFromAddressID === shipFromID);
     if (shipMethod == null) return 'No Data';
     const name = shipMethod.Name.replace(/_/g, ' ');     
-    const delivery = new Date(this.order.DateSubmitted);
+    const delivery = new Date(this._order.DateSubmitted);
     delivery.setDate(delivery.getDate() + shipMethod.EstimatedTransitDays);  
     return `${name}, ${delivery.toLocaleDateString('en-US')} Delivery`;             
   }
@@ -78,9 +88,23 @@ export class LineItemTableComponent {
     this._liGroupedByShipFrom = Object.values(liGroups);
   }
 
+  async setSupplierOrders(order: MarketplaceOrder): Promise<void> {
+    const salesOrderID = order?.ID?.split('-')[0];
+    if(order.ID === salesOrderID) {
+      const supplierOrderFilterString = order?.xp?.SupplierIDs?.map(id => `${order.ID}-${id}`).join('|');
+      const supplierOrders = await this.ocOrderService.List(this.orderDirection === 'Incoming' ? 'Outgoing' : 'Incoming', 
+      { filters: {ID: supplierOrderFilterString } }).toPromise(); 
+      this._supplierOrders = supplierOrders.Items;
+    } else {
+      this._supplierOrders = [order];
+    }
+  }
+
   canChangeTo(lineItemStatus: LineItemStatus): boolean {
     return CanChangeLineItemsOnOrderTo(lineItemStatus, this._lineItems);
   }
+
+  getVariableTextSpecs = (li: LineItem): LineItemSpec[] =>  li?.Specs?.filter(s => s.OptionID === null);
 
   getLineItemStatusDisplay(lineItem: MarketplaceLineItem): string {
     return Object.entries(lineItem.xp.StatusByQuantity)
@@ -105,7 +129,7 @@ export class LineItemTableComponent {
     this.isSaving = true;
     try {
       const lineItemChanges = this.buildLineItemChanges();
-      await HeadStartSDK.Orders.SellerSupplierUpdateLineItemStatusesWithNotification(this.order.ID, this.orderDirection, lineItemChanges);
+      await HeadStartSDK.Orders.SellerSupplierUpdateLineItemStatusesWithNotification(this._order.ID, this.orderDirection, lineItemChanges);
       this.orderChange.emit();
       this.changeTableStatus('Default')
       this.isSaving = false;

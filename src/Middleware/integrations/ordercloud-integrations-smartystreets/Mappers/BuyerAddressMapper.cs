@@ -26,15 +26,16 @@ namespace ordercloud.integrations.smartystreets
 			return lookup;
 		}
 
-		public static List<BuyerAddress> Map(AutoCompleteResponse repsonse, BuyerAddress raw)
+		public static List<BuyerAddress> Map(AutoCompleteResponse response, BuyerAddress raw)
 		{
-			var addresses = repsonse.suggestions.Select(suggestion => {
+			var addresses = response.suggestions.Select(suggestion => {
 				var rawCopy = JsonSerializer.Deserialize<BuyerAddress>(JsonSerializer.Serialize(raw));
 				rawCopy.Street1 = suggestion.street_line;
 				rawCopy.Street2 = suggestion.secondary;
 				rawCopy.City = suggestion.city;
 				rawCopy.State = suggestion.state;
 				rawCopy.Zip = suggestion.zipcode;
+				rawCopy.xp = null;
 				return rawCopy;
 			}).ToList();
 			return addresses;

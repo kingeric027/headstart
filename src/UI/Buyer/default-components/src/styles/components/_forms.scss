@@ -108,3 +108,9 @@ ocm-quantity-input {
   right: 0;
   margin-top: .25rem;
 }
+
+.error-message {
+  color: $danger;
+  font-size: .8rem;
+  text-transform: uppercase;
+}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using NSubstitute;
 using NUnit.Framework;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
+using AutoFixture;
 
 namespace exchangerates.tests
 {
@@ -45,6 +46,26 @@ namespace exchangerates.tests
             //_http.RespondWith(@"{'rates':{'MYR':4.6982},'base':'EUR','date':'2020-05-15'}");
             _blob = Substitute.For<IOrderCloudIntegrationsBlobService>();
             _command = new ExchangeRatesCommand(_blob);
+        }
+
+        private OrderCloudIntegrationsExchangeRate GetExchangeRate(CurrencySymbol baseCurrency, CurrencySymbol toCurrency, double returnedRate)
+        {
+            Fixture fixture = new Fixture();
+            return new OrderCloudIntegrationsExchangeRate()
+            {
+                BaseSymbol = baseCurrency,
+                Rates = new List<OrderCloudIntegrationsConversionRate>()
+                {
+                    new OrderCloudIntegrationsConversionRate()
+                    {
+                        Currency = toCurrency,
+                        Rate = returnedRate
+                    },
+                    fixture.Create<OrderCloudIntegrationsConversionRate>(),
+                    fixture.Create<OrderCloudIntegrationsConversionRate>()
+                }
+            };
+
         }
 
         [Test]
@@ -96,8 +117,17 @@ namespace exchangerates.tests
         [Test]
         public async Task conversion_rate_by_currency()
         {
-            var rate = await _command.ConvertCurrency(CurrencySymbol.EUR, CurrencySymbol.MYR, 1.33);
-            Assert.IsTrue(rate == 1.33);
+            //Arrange
+            var baseCurrency = CurrencySymbol.EUR;
+            var toCurrency = CurrencySymbol.MYR;
+            double returnedRate = 4.6982;
+            _blob.Get<OrderCloudIntegrationsExchangeRate>(Arg.Any<string>()).ReturnsForAnyArgs(GetExchangeRate(baseCurrency, toCurrency, returnedRate));
+
+            //Act
+            var rate = await _command.ConvertCurrency(baseCurrency, toCurrency, 1.33);
+
+            //Assert
+            Assert.IsTrue(rate == (1.33*returnedRate));
         }
     }
 }

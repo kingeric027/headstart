@@ -25,7 +25,14 @@ namespace Marketplace.Common.Controllers
 			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
 
-		[Route("ordercalculate")]
+        // good debug method for testing rates with orders
+        [Route("shippingrates/{orderID}"), HttpGet]
+        public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
+        {
+            return await _checkoutIntegrationCommand.GetRatesAsync(orderID);
+        }
+
+        [Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)

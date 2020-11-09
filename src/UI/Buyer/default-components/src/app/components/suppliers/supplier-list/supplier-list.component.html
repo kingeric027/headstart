@@ -44,7 +44,7 @@
               </div>
             </div>
           </ng-template>
-          <div class="icon-button ripple"
+          <div class="btn btn-light mr-2"
                placement="bottom"
                [ngbPopover]="filters"
                autoClose="outside"
@@ -52,21 +52,20 @@
                #popover="ngbPopover"
                (click)="openPopover()"
                popoverTitle="Filter">
-            <div class="icon-wrapper">
-              <fa-layers class="fa-layers fa-fw">
-                <fa-icon [icon]="faFilter">
-                </fa-icon>
-                <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
-                                   class="badge__counter--large"
-                                   style="background: gray"
-                                   [content]="activeFilterCount">
-                </fa-layers-counter>
-              </fa-layers>
-            </div>
+            Filter <span translate>ALIAS.SUPPLIERS</span>
+            <fa-layers class="fa-layers fa-fw">
+              <fa-icon [icon]="faFilter">
+              </fa-icon>
+              <fa-layers-counter *ngIf="activeFilterCount && activeFilterCount > 0"
+                                 class="badge__counter--large"
+                                 style="background: gray"
+                                 [content]="activeFilterCount">
+              </fa-layers-counter>
+            </fa-layers>
           </div>
           <ocm-supplier-sort (closePopoverEvent)="closePopover($event.detail)"></ocm-supplier-sort>
           <div *ngIf="activeFilterCount > 0"
-               class="icon-button ripple">
+               class="btn-icon ripple">
             <div class="icon-wrapper">
               <fa-icon [icon]="faTimes"
                        (click)="clearFilters()"></fa-icon>
@@ -88,8 +87,7 @@
              translate>
             SUPPLIERS.LIST.NO_SUPPLIERS
             <br>
-            <a class="link"
-               (click)="clearFilters()"
+            <a (click)="clearFilters()"
                translate>SUPPLIERS.LIST.CLEAR_FILTERS</a>
           </p>
         </div>

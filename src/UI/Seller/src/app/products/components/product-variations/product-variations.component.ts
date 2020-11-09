@@ -1,26 +1,28 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { Variant, SpecOption, Spec, OcSpecService, OcProductService } from '@ordercloud/angular-sdk';
 import { faExclamationCircle, faCog, faTrash, faTimesCircle, faCheckDouble, faPlusCircle, faCaretRight, faCaretDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { ProductService } from '@app-seller/products/product.service';
 import { ToastrService } from 'ngx-toastr';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HeadStartSDK, SuperMarketplaceProduct, Asset } from '@ordercloud/headstart-sdk';
-import { environment } from 'src/environments/environment';
+import { HeadStartSDK, SuperMarketplaceProduct, Asset, MarketplaceVariant } from '@ordercloud/headstart-sdk';
 import { AppAuthService } from '@app-seller/auth';
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface';
+import { BehaviorSubject } from 'rxjs';
+import { Products } from 'ordercloud-javascript-sdk';
 
 @Component({
   selector: 'product-variations-component',
   templateUrl: './product-variations.component.html',
   styleUrls: ['./product-variations.component.scss'],
 })
-export class ProductVariations {
+export class ProductVariations implements OnChanges {
   @Input()
   set superMarketplaceProductEditable(superProductEditable: SuperMarketplaceProduct) {
     this.superProductEditable = superProductEditable;
-    this.variants = superProductEditable?.Variants;
+    this.variants.next(superProductEditable?.Variants);
     this.variantInSelection = {};
     this.canConfigureVariations = !!superProductEditable?.Product?.ID;
+    this.addVariableTextSpecs = superProductEditable?.Specs?.some(s => s.AllowOpenText);
+    this.editSpecs = superProductEditable?.Specs?.some(s => !s.AllowOpenText)
   };
   @Input()
   set superMarketplaceProductStatic(superProductStatic: SuperMarketplaceProduct) {
@@ -32,20 +34,26 @@ export class ProductVariations {
   @Input() checkForChanges;
   @Input() copyProductResource;
   @Input() isCreatingNew = false;
-  get specsWithVariations() {
-    return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant) as Spec[];
+  get specsWithVariations(): Spec[] {
+    return this.superProductEditable?.Specs?.filter(s => s.DefinesVariant && !s.AllowOpenText) as Spec[];
   };
-  get specsWithoutVariations() {
-    return this.superProductEditable?.Specs?.filter(s => !s.DefinesVariant);
+  get specsWithoutVariations(): Spec[] {
+    return this.superProductEditable?.Specs?.filter(s => !s.DefinesVariant && !s.AllowOpenText);
   };
+  get nonVariableTextSpecs(): Spec[] {
+    return this.superProductEditable?.Specs?.filter(s => !s.AllowOpenText);
+  }
+
+  get variableTextSpecs(): Spec[] {
+    return this.superProductEditable?.Specs?.filter(s => s.AllowOpenText);
+  }
   @Output()
   productVariationsChanged = new EventEmitter<SuperMarketplaceProduct>();
   @Output() skuUpdated = new EventEmitter<SuperMarketplaceProduct>();
   @Output() variantsValidated = new EventEmitter<boolean>();
-  @Output() isSpecsEditing = new EventEmitter<boolean>();
   superProductEditable: SuperMarketplaceProduct;
   superProductStatic: SuperMarketplaceProduct;
-  variants: Variant[] = [];
+  variants: BehaviorSubject<MarketplaceVariant[]>;
   specOptAdded = new EventEmitter<SpecOption>();
   canConfigureVariations = false;
   areSpecChanges = false;
@@ -65,8 +73,25 @@ export class ProductVariations {
   viewVariantDetails = false;
   variantInSelection: Variant;
   imageInSelection: Asset;
+  addVariableTextSpecs = false;
+  customizationRequired = true;
 
-  constructor(private productService: ProductService, private toasterService: ToastrService, private ocSpecService: OcSpecService, private changeDetectorRef: ChangeDetectorRef, private ocProductService: OcProductService, private appAuthService: AppAuthService,) { }
+  constructor(
+    private productService: ProductService, 
+    private toasterService: ToastrService, 
+    private ocSpecService: OcSpecService, 
+    private changeDetectorRef: ChangeDetectorRef, 
+    private ocProductService: OcProductService, 
+    private appAuthService: AppAuthService) {
+      this.variants = new BehaviorSubject<MarketplaceVariant[]>([]);
+    }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+     if (changes?.superMarketplaceProductEditable) {
+       this.variants.next(changes?.superMarketplaceProductEditable?.currentValue?.Variants);
+     }
+  }
+
   getTotalMarkup = (specOptions: SpecOption[]): number => {
     let totalMarkup = 0;
     if (specOptions) {
@@ -77,13 +102,11 @@ export class ProductVariations {
 
   toggleEditSpecs(): void {
     this.editSpecs = !this.editSpecs;
-    this.isSpecsEditing.emit(this.editSpecs);
   }
 
   handleDiscardSpecChanges(): void {
     this.editSpecs = !this.editSpecs;
     this.superProductEditable.Specs = this.superProductEditable?.Specs;
-    this.isSpecsEditing.emit(this.editSpecs);
     this.checkForSpecChanges();
   }
 
@@ -93,16 +116,18 @@ export class ProductVariations {
 
   shouldDefinesVariantBeChecked(): boolean {
     if (this.definesVariant) return true;
-    if (this.variants?.length >= 100) return false;
+    if (this.variants?.getValue()?.length >= 100) return false;
   }
 
   shouldDisableAddSpecOptBtn(spec: Spec): boolean {
-    if (this.variants?.length === 100 && spec.DefinesVariant) return true;
-    if (this.variants?.length === 100 && !spec.DefinesVariant) return false;
-    if (!this.variantsValid) return true;
+    if (!this.variantsValid) {
+      return true;
+    } else {
+      return this.variants?.getValue().length === 100 && spec.DefinesVariant;
+    }
   }
 
-  toggleActive(variant: Variant) {
+  toggleActive(variant: Variant): void {
     variant.Active = !variant.Active;
 
     const updateProductResourceCopy = this.productService.copyResource(
@@ -142,6 +167,51 @@ export class ProductVariations {
     this.productVariationsChanged.emit(this.superProductEditable);
   }
 
+  toggleAddVariableTextSpecs(event: any): void {
+    this.addVariableTextSpecs = event?.target?.checked;
+  }
+
+  getSpecIndex(specID: string): number {
+    return this.superProductEditable?.Specs?.findIndex(s => s.ID === specID);
+  }
+
+  addVariableTextSpec(): void {
+    const updateProductResourceCopy = this.productService.copyResource(
+      this.superProductEditable || this.productService.emptyResource
+    );
+    const input = (document.getElementById('AddVariableTextSpec') as any)
+    const charLimitInput = (document.getElementById('CharacterLimit') as any)
+    if (input.value === '') {
+      this.toasterService.warning('Please provide a description of what the buyer will be customizing.', 'Warning');
+      return;
+    }
+    if ((Number(charLimitInput?.value)) < 0) {
+      this.toasterService.warning('Character limit must be a positive number.', 'Warning');
+      return;
+    }
+    const newSpec: Spec[] | any = [{
+      ID: `${updateProductResourceCopy.Product.ID}${input.value.split(' ').join('-').replace(/[^a-zA-Z0-9 ]/g, '')}`,
+      Name: input.value,
+      // If AllowOpenText is trye - DefinesVariant _MUST_ be false (platform requirement)
+      AllowOpenText: true,
+      Required: this.customizationRequired,
+      DefinesVariant: false,
+      ListOrder: (updateProductResourceCopy.Specs?.length || 0) + 1,
+      Options: [],
+      xp: {
+        CharacterLimit: Number(charLimitInput?.value) === 0 ? null : Number(charLimitInput?.value)
+      }
+    }]
+    input.value = '';
+    charLimitInput.value = '';
+    updateProductResourceCopy.Specs = updateProductResourceCopy.Specs.concat(newSpec);
+    this.superProductEditable = updateProductResourceCopy;
+    this.customizationRequired = true;
+    this.checkForSpecChanges();
+    console.log(this.superProductEditable)
+    this.productVariationsChanged.emit(this.superProductEditable);
+  }
+
   addSpec(): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
@@ -168,10 +238,12 @@ export class ProductVariations {
     this.checkForSpecChanges();
     this.productVariationsChanged.emit(this.superProductEditable);
   }
-  addSpecOption(spec: Spec, specIndex: number): void {
+  addSpecOption(spec: Spec): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
+    // TODO: Browser compatability for .findIndex?
+    const specIndex = this.getSpecIndex(spec.ID);
     const input = (document.getElementById(`${spec.ID}`) as any)
     const markup = (document.getElementById(`${spec.ID}Markup`) as any).value;
     if (input.value === '') {
@@ -196,10 +268,11 @@ export class ProductVariations {
     this.checkForSpecChanges();
   };
 
-  removeSpecOption(specIndex: number, optionIndex: number): void {
+  removeSpecOption(spec: Spec, optionIndex: number): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
+    const specIndex = this.getSpecIndex(spec.ID);
     if (updateProductResourceCopy.Specs[specIndex].DefaultOptionID === updateProductResourceCopy.Specs[specIndex].Options[optionIndex].ID) updateProductResourceCopy.Specs[specIndex].DefaultOptionID = null;
     updateProductResourceCopy.Specs[specIndex].Options.splice(optionIndex, 1);
     this.superProductEditable = updateProductResourceCopy;
@@ -207,7 +280,7 @@ export class ProductVariations {
     this.mockVariants();
     this.checkForSpecChanges();
   };
-
+  
   removeSpec(spec: Spec): void {
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
@@ -290,10 +363,17 @@ export class ProductVariations {
 
   getPriceMarkup = (specOption: SpecOption): number => !specOption.PriceMarkup ? 0 : specOption.PriceMarkup
 
-  isDefaultSpecOption = (specID: string, optionID: string, specIndex: number): boolean => this.superProductEditable?.Specs[specIndex]?.DefaultOptionID === optionID;
-  disableSpecOption = (specIndex: string, option: SpecOption): boolean => this.isCreatingNew ? false : !JSON.stringify(this.superProductStatic?.Specs[specIndex]?.Options)?.includes(JSON.stringify(option));
+  isDefaultSpecOption = (specID: string, optionID: string): boolean => {
+    const specIndex = this.getSpecIndex(specID);
+    return this.superProductEditable?.Specs[specIndex]?.DefaultOptionID === optionID
+  };
+  disableSpecOption = (specID: string, option: SpecOption): boolean => {
+    const specIndex = this.getSpecIndex(specID);
+    return this.isCreatingNew ? false : !JSON.stringify(this.superProductStatic?.Specs[specIndex]?.Options)?.includes(JSON.stringify(option));
+  };
 
-  stageDefaultSpecOption(specID: string, optionID: string, specIndex: number): void {
+  stageDefaultSpecOption(specID: string, optionID: string): void {
+    const specIndex = this.getSpecIndex(specID);
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
@@ -301,7 +381,8 @@ export class ProductVariations {
     this.superProductEditable = updateProductResourceCopy;
   }
 
-  async setDefaultSpecOption(specID: string, optionID: string, specIndex: number): Promise<void> {
+  async setDefaultSpecOption(specID: string, optionID: string): Promise<void> {
+    const specIndex = this.getSpecIndex(specID);
     const updateProductResourceCopy = this.productService.copyResource(
       this.superProductEditable || this.productService.emptyResource
     );
@@ -316,8 +397,12 @@ export class ProductVariations {
   }
 
   openVariantDetails(variant: Variant): void {
+    const variantBehaviorSubjectValue = this.variants?.getValue();
     this.viewVariantDetails = true;
     this.variantInSelection = variant;
+    if (variantBehaviorSubjectValue !== null) {
+      this.variantInSelection = variantBehaviorSubjectValue[variantBehaviorSubjectValue?.indexOf(variant)];
+    }
   }
 
   closeVariantDetails(): void {
@@ -354,7 +439,7 @@ export class ProductVariations {
     return colSpan;
   }
 
-  async variantShippingDimensionUpdate(event: any, field: string): Promise<void> {
+  async variantShippingDimensionUpdate(event: any, field: string, index: number): Promise<void> {
     let partialVariant: Variant = {};
     // If there's no value, or the value didn't change, don't send request.
     if (event.target.value === '') return;
@@ -375,7 +460,13 @@ export class ProductVariations {
         break;
     }
     try {
-      await this.ocProductService.PatchVariant(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant).toPromise();
+      const patchedVariant = await Products.PatchVariant<MarketplaceVariant>(this.superProductEditable.Product?.ID, this.variantInSelection.ID, partialVariant);
+      const variants = this.variants?.getValue();
+      if (variants !== null) {
+        variants[index] = JSON.parse(JSON.stringify(patchedVariant));
+        this.variants.next(variants)
+        this.variantInSelection = this.variants?.getValue()[index];
+      }
       this.toasterService.success('Shipping dimensions updated', 'OK');
     } catch (err) {
       console.log(err)

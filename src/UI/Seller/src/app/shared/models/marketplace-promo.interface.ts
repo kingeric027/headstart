@@ -2,6 +2,7 @@ export interface PromotionXp {
   Type?: MarketplacePromoType;
   Value?: number;
   AppliesTo?: MarketplacePromoEligibility;
+  SKUs?: string[];
   Supplier?: string;
   Automatic?: boolean;
   MinReq?: MarketplacePromoMinRequirement;
@@ -22,6 +23,7 @@ export enum MarketplacePromoType {
 export enum MarketplacePromoEligibility {
   EntireOrder = 'EntireOrder',
   SpecificSupplier = 'SpecificSupplier',
+  SpecificSKUs = 'SpecificSKUs'
 }
 
 export enum MinRequirementType {

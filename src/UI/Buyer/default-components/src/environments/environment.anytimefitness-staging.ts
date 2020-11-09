@@ -9,7 +9,7 @@ export const environment: Environment = {
   hostedApp: true,
   appname: 'Anytime Fitness',
   clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
-  marketplaceID: 'SEB',
+  marketplaceID: 'SEB_TEST',
   baseUrl: 'https://anytimefitness-staging.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
@@ -19,7 +19,7 @@ export const environment: Environment = {
     'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=7f9257b2-8a27-4527-9efa-225f4cb172da&redirect_uri=https://seb-four51-integration-stage.azurewebsites.net/api/anytime/authorize',
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: afTheme,
-  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+  instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
 };
 /*
 

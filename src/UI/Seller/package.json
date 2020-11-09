@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --configuration=dev --open",
+    "start": "ng serve --open",
     "build": "ng build --configuration=production",
     "test": "ng test --code-coverage",
     "lint": "eslint src/**/*.ts",
@@ -38,7 +38,7 @@
     "@ngx-translate/http-loader": "^5.0.0",
     "@ordercloud/angular-cms-components": "^1.0.0-beta.38",
     "@ordercloud/angular-sdk": "1.0.0-12",
-    "@ordercloud/headstart-sdk": "1.12.4",
+    "@ordercloud/headstart-sdk": "1.14.5",
     "@tinymce/tinymce-angular": "^4.1.0",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",

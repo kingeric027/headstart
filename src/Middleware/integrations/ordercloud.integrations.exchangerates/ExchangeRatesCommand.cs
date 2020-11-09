@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Newtonsoft.Json;
 
 namespace ordercloud.integrations.exchangerates
 {
@@ -19,6 +20,7 @@ namespace ordercloud.integrations.exchangerates
             OrderCloudIntegrationsExchangeRate rates);
 
         Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value);
+        Task Update();
     }
 
     public class ExchangeRatesCommand : IExchangeRatesCommand
@@ -147,5 +149,16 @@ namespace ordercloud.integrations.exchangerates
                 return 1;
             return t.Value == 0 ? 1 : t.Value;
         }
+
+        public async Task Update()
+        {
+            var list = await GetRateList();
+            await Throttler.RunAsync(list.Items, 100, 10, async rate =>
+            {
+                var rates = await Get(rate.Currency);
+                await _blob.Save($"{rate.Currency}.json", JsonConvert.SerializeObject(rates));
+            });
+        }
+
     }
 }

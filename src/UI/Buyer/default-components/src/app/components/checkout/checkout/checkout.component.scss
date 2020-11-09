@@ -11,7 +11,11 @@
     width: 100%;
     &:hover,
     &:focus {
-      text-decoration-color: var(--purple);
+      text-decoration-color: var(--primary);
     }
   }
+}
+
+.order-summary {
+  top: 140px; // TODO: Design, Magic number for proper height from top.
 }

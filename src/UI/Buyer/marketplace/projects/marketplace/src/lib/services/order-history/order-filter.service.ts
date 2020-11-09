@@ -182,7 +182,7 @@ export class OrderFilterService {
   private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {
     if (status === OrderStatus.ChangesRequested) {
       listOptions.filters.DateDeclined = '*';
-    } else if (status === OrderStatus.AwaitingApproval) {
+    } else if (status === OrderStatus.AwaitingApproval || status === OrderStatus.AllSubmitted) {
       listOptions.filters.Status = status;
     } else {
       listOptions.filters.xp.SubmittedOrderStatus = status;

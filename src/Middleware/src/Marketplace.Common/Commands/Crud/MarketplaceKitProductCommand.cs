@@ -32,13 +32,22 @@ namespace Marketplace.Common.Commands.Crud
         private readonly IOrderCloudClient _oc;
         private readonly IAssetedResourceQuery _assetedResources;
         private readonly IAssetQuery _assets;
+        private readonly IMeProductCommand _meProductCommand;
 
-        public MarketplaceKitProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc, IDocumentQuery query)
+        public MarketplaceKitProductCommand(
+            AppSettings settings,
+            IAssetedResourceQuery assetedResources,
+            IAssetQuery assets,
+            IOrderCloudClient elevatedOc,
+            IDocumentQuery query,
+            IMeProductCommand meProductCommand
+        )
         {
             _assetedResources = assetedResources;
             _assets = assets;
             _oc = elevatedOc;
             _query = query;
+            _meProductCommand = meProductCommand;
         }
 
         public async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
@@ -76,7 +85,7 @@ namespace Marketplace.Common.Commands.Crud
             var _images = GetProductImages(id, user);
             var _attachments = GetProductAttachments(id, user);
             var _productAssignments = await _query.Get<MeKitProduct>("KitProduct", _product.ID, user);
-            return new MarketplaceMeKitProduct
+            var meKitProduct = new MarketplaceMeKitProduct
             {
                 ID = _product.ID,
                 Name = _product.Name,
@@ -85,6 +94,7 @@ namespace Marketplace.Common.Commands.Crud
                 Attachments = await _attachments,
                 ProductAssignments = await _getMeKitDetails(_productAssignments.Doc, user)
             };
+            return await _meProductCommand.ApplyBuyerPricing(meKitProduct, user);
         }
 
         public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, VerifiedUserContext user)
@@ -168,6 +178,8 @@ namespace Marketplace.Common.Commands.Crud
                     p.Specs = await specListRequest;
                     p.Variants = await variantListRequest;
                     p.Images = await GetProductImages(p.ID, user);
+                    p.Attachments = await GetProductAttachments(p.ID, user);
+
                 } catch(Exception)
                 {
                     p.Product = null;
@@ -191,10 +203,24 @@ namespace Marketplace.Common.Commands.Crud
                     var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
                     await Task.WhenAll(specListRequest, variantListRequest);
 
-                    p.Product = await productRequest;
+                    var product = await productRequest;
+                    if(product?.PriceSchedule != null)
+                    {
+                        // set min/max from kit only if its within the bounds of what the product can set
+                        // this should be enforced at the admin creation level but may change after initially set
+                        if (product.PriceSchedule.MinQuantity == null || p.MinQty > product.PriceSchedule.MinQuantity)
+                            product.PriceSchedule.MinQuantity = p.MinQty;
+                        if ( 
+                            product.PriceSchedule.MaxQuantity > product.PriceSchedule.MinQuantity && // this check is necessary because kit min qty may have changed it
+                            (product.PriceSchedule.MaxQuantity == null || p.MaxQty < product.PriceSchedule.MaxQuantity))
+                            product.PriceSchedule.MaxQuantity = p.MaxQty;
+                    }
+
+                    p.Product = product;
                     p.Specs = await specListRequest;
                     p.Variants = await variantListRequest;
                     p.Images = await GetProductImages(p.ID, user);
+                    p.Attachments = await GetProductAttachments(p.ID, user);
                 }
                 catch (Exception)
                 {

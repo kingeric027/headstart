@@ -4,6 +4,7 @@ import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe';
 import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators';
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { GeographyConfig } from 'src/app/config/geography.class';
+import { faCcMastercard, faCcVisa } from '@fortawesome/free-brands-svg-icons';
 
 export interface CreditCardFormOutput {
   card: OrderCloudIntegrationsCreditCardToken;
@@ -47,6 +48,8 @@ export class OCMCreditCardForm implements OnInit {
   yearOptions = this.buildYearOptions();
   stateOptions: string[] = [];
   countryOptions: { label: string; abbreviation: string }[];
+  faCcVisa = faCcVisa;
+  faCcMastercard = faCcMastercard;
   private readonly defaultCountry = 'US';
 
   constructor(private creditCardFormatPipe: CreditCardFormatPipe) {

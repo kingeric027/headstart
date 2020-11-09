@@ -3,10 +3,11 @@
 ::ng-deep .ngxImageZoomContainer {
   height: unset !important;
   width: unset !important;
-  max-height: 75vh;
+  max-height: 65vh;
   img {
     height: auto;
     max-width: 100%;
+    margin: 0 auto;
     display: block;
     object-fit: contain;
   }

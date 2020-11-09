@@ -9,7 +9,7 @@ export const environment: Environment = {
   hostedApp: true,
   appname: 'The Bar Method',
   clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
-  marketplaceID: 'SEB',
+  marketplaceID: 'SEB_TEST',
   baseUrl: 'https://thebarmethod-staging.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
@@ -18,7 +18,7 @@ export const environment: Environment = {
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: bmTheme,
-  instrumentationKey: '3a0b0eb7-9a02-4f97-b75d-c4811aec975e',
+  instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
 };
 /*
 

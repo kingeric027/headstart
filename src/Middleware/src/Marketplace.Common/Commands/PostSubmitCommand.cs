@@ -15,6 +15,7 @@ using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
+using Npoi.Mapper;
 
 namespace Marketplace.Common.Commands
 {
@@ -44,8 +45,8 @@ namespace Marketplace.Common.Commands
         public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user)
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
-            var supplierOrders = await Throttler.RunAsync(worksheet.LineItems, 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
-                $"{worksheet.Order.ID}-{item.SupplierID}", user.AccessToken));
+            var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
+                $"{worksheet.Order.ID}-{item}", user.AccessToken));
 
             return await CreateOrderSubmitResponse(
                 new List<ProcessResult>() { await this.PerformZohoTasks(worksheet, supplierOrders) }, 

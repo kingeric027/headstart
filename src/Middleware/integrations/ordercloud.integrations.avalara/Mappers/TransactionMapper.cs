@@ -1,4 +1,4 @@
-﻿using Avalara.AvaTax.RestClient;
+using Avalara.AvaTax.RestClient;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -13,8 +13,8 @@ namespace ordercloud.integrations.avalara
 		{
 			var buyerLocationID = order.Order.BillingAddress.ID;
 
-			var standardLineItems = order.LineItems.Where(li => li.Product.xp.ProductType == "Standard").ToList();
-			var poLineItemIDs = order.LineItems.Where(li => li.Product.xp.ProductType == "PurchaseOrder").Select(li => li.ID).ToList();
+			var standardLineItems = order.LineItems.Where(li => li.Product.xp.ProductType == "Standard")?.ToList();
+			var poLineItemIDs = order.LineItems.Where(li => li.Product.xp.ProductType == "PurchaseOrder")?.Select(li => li?.ID)?.ToList();
 			var standardShipEstimates = order.ShipEstimateResponse.ShipEstimates.Where(estimate =>
 			{
 				return !estimate.ShipEstimateItems.Any(item => poLineItemIDs.Contains(item.LineItemID));

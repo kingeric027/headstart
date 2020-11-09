@@ -50,11 +50,13 @@ namespace Marketplace.Common.Models.Marketplace
         public int? MinQty { get; set; }
         public int? MaxQty { get; set; }
         public bool Static { get; set; }
+        public bool Optional { get; set; }
         public string SpecCombo { get; set; }
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
         public MarketplaceProduct Product { get; set; }
         public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
     [SwaggerModel]
@@ -64,11 +66,13 @@ namespace Marketplace.Common.Models.Marketplace
         public int? MinQty { get; set; }
         public int? MaxQty { get; set; }
         public bool Static { get; set; }
+        public bool Optional { get; set; }
         public string SpecCombo { get; set; }
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
         public MarketplaceMeProduct Product { get; set; }
         public IList<Asset> Images { get; set; }
+        public IList<Asset> Attachments { get; set; }
     }
 
 }
