@@ -3,6 +3,7 @@
       [formGroup]="addressForm"
       name="RegisterForm">
   <div [hidden]="suggestedAddresses && suggestedAddresses.length">
+       <div *ngIf="addressError" class="text-danger">{{addressError}}</div>
     <div class="row">
       <div [hidden]="true"
            class="col-md-6 form-group">
