@@ -69,7 +69,7 @@ namespace Marketplace.Common.Commands
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
-        Task<DocumentImportResult> UploadShipments(IFormFile file, string supplierToken);
+        Task<BatchProcessResult> UploadShipments(IFormFile file, string supplierToken);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -139,20 +139,20 @@ namespace Marketplace.Common.Commands
             return relatedBuyerOrder.FromCompanyID;
         }
 
-        public async Task<DocumentImportResult> UploadShipments(IFormFile file, string accessToken)
+        public async Task<BatchProcessResult> UploadShipments(IFormFile file, string accessToken)
         {
-            DocumentImportResult documentImportResult;
+            BatchProcessResult documentImportResult;
 
             documentImportResult = await GetShipmentListFromFile(file, accessToken);
 
             return documentImportResult;
         }
 
-        private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file, string accessToken)
+        private async Task<BatchProcessResult> GetShipmentListFromFile(IFormFile file, string accessToken)
         {
             BatchProcessResult processResults;
 
-            if (file == null) { return new DocumentImportResult(); }
+            if (file == null) { return new BatchProcessResult(); }
             using Stream stream = file.OpenReadStream();
             List<RowInfo<Misc.Shipment>> shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
 
@@ -160,7 +160,7 @@ namespace Marketplace.Common.Commands
 
             processResults = await ProcessShipments(result, accessToken);
 
-            return await Task.FromResult(result);
+            return await Task.FromResult(processResults);
         }
 
         private async Task<BatchProcessResult> ProcessShipments(DocumentImportResult importResult, string accessToken)

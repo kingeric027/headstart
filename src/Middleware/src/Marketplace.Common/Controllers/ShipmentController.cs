@@ -38,7 +38,7 @@ namespace Marketplace.Common.Controllers
         [DocName("POST Batch Shipment Update")]
         [Route("batch/uploadshipment")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ShipmentAdmin)]
-        public async Task<DocumentImportResult> UploadShipments([FromForm] AssetUpload fileRequest)
+        public async Task<BatchProcessResult> UploadShipments([FromForm] AssetUpload fileRequest)
         {
             return  await _command.UploadShipments(fileRequest?.File, VerifiedUserContext.AccessToken);
         }
