@@ -84,7 +84,7 @@ export const lineItemDetail: Filter[] = [
   },
   {
     name: 'Country',
-    path: 'xp.ShippingAddress.Country',
+    path: 'Country',
     dataKey: 'abbreviation',
     sourceType: 'model',
     source: 'GeographyConfig',

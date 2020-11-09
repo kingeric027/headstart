@@ -275,7 +275,7 @@ namespace Marketplace.Common.Commands
                 }
                 var filterValues = filterProps.Value;
                 var dataValue = GetDataValue(filterKey, data);
-                if (!filterValues.Contains(dataValue.ToString()))
+                if (dataValue == null || !filterValues.Contains(dataValue.ToString()))
                 {
                     return false;
                 }
@@ -285,6 +285,10 @@ namespace Marketplace.Common.Commands
 
         private object GetDataValue(string filterKey, object data)
         {
+            if (data == null)
+            {
+                return null;
+            }
             var filterKeys = filterKey.Split('.');
             for (var i = 0; i < filterKeys.Length; i++)
             {
@@ -299,7 +303,7 @@ namespace Marketplace.Common.Commands
                         {
                             string[] remainingLevels = new string[filterKeys.Length - i - 1];
                             Array.Copy(filterKeys, i + 1, remainingLevels, 0, filterKeys.Length - i - 1);
-                            string remainingKeys = string.Join("", remainingLevels);
+                            string remainingKeys = string.Join(".", remainingLevels);
                             return GetDataValue(remainingKeys, data);
                         }
                        return data;
