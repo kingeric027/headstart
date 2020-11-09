@@ -32,6 +32,7 @@
           <ocm-address-form [existingAddress]="currentAddress"
                             [homeCountry]="homeCountry"
                             [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"
+                            [addressError]="_addressError"
                             (formSubmitted)="addressFormSubmitted($event.detail.address)"
                             (formChanged)="addressFormChanged($event.detail)"
                             (formDismissed)="dismissEditAddressForm()">
@@ -77,6 +78,7 @@
                             [suggestedAddresses]="suggestedAddresses"
                             [homeCountry]="homeCountry"
                             [btnText]="currentAddress ? 'Save Changes' : 'Create Address'"
+                            [addressError]="_addressError"
                             (formSubmitted)="addressFormSubmitted($event.detail.address)"
                             (formChanged)="addressFormChanged($event.detail)"
                             (formDismissed)="dismissEditAddressForm()">
