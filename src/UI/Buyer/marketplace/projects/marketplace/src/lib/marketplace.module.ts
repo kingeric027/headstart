@@ -108,10 +108,13 @@ export class MarketplaceModule {
 
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
     const apiUrl = this.getApiUrl(config.ordercloudEnv);
+    const appname = config.appname.replace(/ /g, '');
     return {
-      baseApiUrl: `${apiUrl}`,
+      baseApiUrl: apiUrl,
       clientID: config.clientID,
-      cookieOptions: { prefix: config.appname.replace(/ /g, '_').toLowerCase() },
+      cookieOptions: {
+        prefix: `${appname}buyer-${config.ordercloudEnv}`.toLowerCase()
+      },
     };
   }
 

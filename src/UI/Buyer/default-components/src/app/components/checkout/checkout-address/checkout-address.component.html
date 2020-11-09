@@ -43,7 +43,7 @@
           </span>
         </option>
       </select>
-      <button (click)="showNewAddressForm = true"
+      <button (click)="showNewAddress()"
               class="btn btn-outline-primary btn-sm mr-2 mt-3"
               translate>Add New Address</button>
       <button type="submit"
@@ -54,13 +54,13 @@
               translate>CHECKOUT.CHECKOUT_ADDRESS.SAVE_CONTINUE</button>
     </div>
     <ocm-address-form *ngIf="showNewAddressForm"
+                      [existingAddress]="selectedShippingAddress"
                       [suggestedAddresses]="suggestedAddresses"
                       [showOptionToSave]="true"
                       [homeCountry]="homeCountry"
-                      [selectedBuyerLocation]="selectedBuyerLocation"
-                      [selectedShippingAddress]="selectedShippingAddress"
                       [btnText]="'Save and Continue'"
                       (formDismissed)="showNewAddressForm = false"
+                      (formChanged)="addressFormChanged($event.detail)"
                       (formSubmitted)="saveAddressesAndContinue($event.detail.address)">
     </ocm-address-form>
   </ng-container>
