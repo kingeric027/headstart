@@ -55,6 +55,9 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   async saveAddressesAndContinue(newShippingAddress: Address = null): Promise<void> {
+    if (!this.selectedBuyerLocation) {
+      throw new Error('Please select a location for this order');
+    }
     try {
       this.spinner.show();
       this.order = await this.context.order.checkout.setBuyerLocationByID(this.selectedBuyerLocation?.ID);
