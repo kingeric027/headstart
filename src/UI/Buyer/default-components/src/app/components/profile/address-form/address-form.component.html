@@ -2,7 +2,7 @@
       novalidate
       [formGroup]="addressForm"
       name="RegisterForm">
-  <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0">
+  <div [hidden]="suggestedAddresses && suggestedAddresses.length">
     <div class="row">
       <div [hidden]="true"
            class="col-md-6 form-group">

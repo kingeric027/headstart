@@ -14,6 +14,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class OCMCheckoutAddress implements OnInit {
+  @Input() order: MarketplaceOrder;
+  @Input() lineItems: ListPage<LineItem>;
+  @Output() continue = new EventEmitter();
+
   readonly NEW_ADDRESS_CODE = 'new';
   existingBuyerLocations: ListPage<BuyerAddress>;
   selectedBuyerLocation: BuyerAddress;
@@ -22,10 +26,6 @@ export class OCMCheckoutAddress implements OnInit {
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
-
-  @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListPage<LineItem>;
-  @Output() continue = new EventEmitter();
 
   constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { }
 
@@ -60,14 +60,28 @@ export class OCMCheckoutAddress implements OnInit {
       if (newShippingAddress != null) {
         this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
       }
-      await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
-      
-      this.spinner.hide();
-      this.continue.emit();
-    } catch(e) {
+
+      if (this.selectedShippingAddress) {
+        await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
+        this.continue.emit();
+      } else {
+        // not able to create address - display suggestions to user
+        this.spinner.hide();
+      }
+    } catch (e) {
       this.spinner.hide();
       throw e;
     }
+  }
+
+  addressFormChanged(address: BuyerAddress): void {
+    this.selectedShippingAddress = address;
+  }
+
+  showNewAddress(): void {
+    this.showNewAddressForm = true;
+    this.selectedShippingAddress = null;
+    this.suggestedAddresses = [];
   }
 
   private async listSavedBuyerLocations(): Promise<void> {
@@ -90,6 +104,7 @@ export class OCMCheckoutAddress implements OnInit {
       return savedAddress;
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
+      return null; // set this.selectedShippingAddress
     }
   }
 
