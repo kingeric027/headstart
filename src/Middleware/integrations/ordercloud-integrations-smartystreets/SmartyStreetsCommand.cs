@@ -80,11 +80,17 @@ namespace ordercloud.integrations.smartystreets
 			{
 				// no valid address found
 				var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
+				if (NoAddressSuggestions(suggestions)) throw new InvalidBuyerAddressException(response);
 				response.SuggestedAddresses = BuyerAddressMapper.Map(suggestions, address);
 			}
 			if (!response.ValidAddressFound) throw new InvalidBuyerAddressException(response);
 			return response;
 		}
+
+		private bool NoAddressSuggestions(AutoCompleteResponse suggestions)
+        {
+			return (suggestions == null || suggestions.suggestions == null || suggestions.suggestions.Count == 0);
+        }
 
 		#region Ordercloud Routes
 		// ME endpoints

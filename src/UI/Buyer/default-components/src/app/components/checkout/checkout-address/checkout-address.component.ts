@@ -17,6 +17,7 @@ export class OCMCheckoutAddress implements OnInit {
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListPage<LineItem>;
   @Output() continue = new EventEmitter();
+  _addressError: string;
 
   readonly NEW_ADDRESS_CODE = 'new';
   existingBuyerLocations: ListPage<BuyerAddress>;
@@ -69,8 +70,12 @@ export class OCMCheckoutAddress implements OnInit {
         this.spinner.hide();
       }
     } catch (e) {
+      if(e?.response?.data?.Message) {
+        this._addressError = e?.response?.data?.Message
+      } else {
+        throw e;
+      }
       this.spinner.hide();
-      throw e;
     }
   }
 
@@ -104,6 +109,7 @@ export class OCMCheckoutAddress implements OnInit {
       return savedAddress;
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
+      if(!(this.suggestedAddresses?.length>=1)) throw(ex)
       return null; // set this.selectedShippingAddress
     }
   }
