@@ -243,7 +243,7 @@ test
 			await baseTestCleanup(
 				t.ctx.testUser.ID,
 				'0005',
-				t.fixtureCtx.adminClientAuth
+				t.fixtureCtx.clientAuth
 			)
 		}
 	})('Can product be Created and checked out with? | 20036', async t => {
