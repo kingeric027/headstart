@@ -47,6 +47,14 @@ export const salesOrderDetail: Filter[] = [
     sourceType: 'model',
     source: 'OrderType',
     filterValues: [],
+  },
+  {
+    name: 'Country',
+    path: 'Country',
+    dataKey: 'abbreviation',
+    sourceType: 'model',
+    source: 'GeographyConfig',
+    filterValues: [],
   }
 ];
 
