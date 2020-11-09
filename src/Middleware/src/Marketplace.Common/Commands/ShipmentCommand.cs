@@ -75,6 +75,7 @@ namespace Marketplace.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly ILineItemCommand _lineItemCommand;
+        private Dictionary<string, Shipment> _shipmentByTrackingNumber = new Dictionary<string, Shipment>();
 
         public ShipmentCommand(AppSettings settings, IOrderCloudClient oc, ILineItemCommand lineItemCommand)
         {
@@ -212,8 +213,8 @@ namespace Marketplace.Common.Commands
 
         private async Task<bool> ProcessShipment(Misc.Shipment shipment, BatchProcessResult result, string accessToken)
         {
-            PartialShipment newShipment;
-            Shipment ocShipment = null;
+            PartialShipment newShipment = null;
+            Shipment ocShipment;
             try
             {
                 Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, shipment.OrderID);
@@ -226,18 +227,12 @@ namespace Marketplace.Common.Commands
                     UnitPrice = Convert.ToDecimal(shipment.Cost)
                 };
 
+                ocShipment = await GetShipmentByTrackingNumber(shipment, accessToken);
                 //If a user included a ShipmentID in the spreadsheet, find that shipment and patch it with the information on that row
-                if (shipment.ShipmentID != null)
-                {
-                    ocShipment = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
-                }
+                
                 if (ocShipment != null)
                 {
                     newShipment = PatchShipment(ocShipment, shipment);
-                }
-                else
-                {
-                    newShipment = PatchShipment(null, shipment);
                 }
 
                 if (newShipment != null)
@@ -266,6 +261,40 @@ namespace Marketplace.Common.Commands
                 return false;
             }
         }
+
+        private async Task<Shipment> GetShipmentByTrackingNumber(Misc.Shipment shipment, string accessToken)
+        {
+            Shipment shipmentResponse;
+
+            //if dictionary already contains shipment, return that shipment
+            if (shipment != null && _shipmentByTrackingNumber.ContainsKey(shipment.TrackingNumber)) 
+            { 
+                return _shipmentByTrackingNumber[shipment.TrackingNumber]; 
+            }
+
+            if (shipment?.ShipmentID != null)
+            {
+                //get shipment if shipmentId is provided
+                shipmentResponse = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
+                if (shipmentResponse != null)
+                {
+                    //add shipment to dictionary if it's found
+                    _shipmentByTrackingNumber.Add(shipmentResponse.TrackingNumber, shipmentResponse);
+                }
+            } 
+            else if (shipment?.ShipmentID == null)
+            {
+                PartialShipment newShipment = PatchShipment(null, shipment);
+                //Create shipment for tracking number provided if shipmentId wasn't included
+                Shipment createdShipment = await _oc.Shipments.CreateAsync(newShipment, accessToken);
+                if (createdShipment != null)
+                {
+                    _shipmentByTrackingNumber.Add(createdShipment.TrackingNumber, createdShipment);
+                }
+            }
+            return null;
+        }
+        
 
         private PartialShipment PatchShipment(Shipment ocShipment, Misc.Shipment shipment)
         {

@@ -25,6 +25,8 @@ export class UploadShipmentsComponent {
 
   files: FileHandle[] = [];
   contentHeight = 0;
+  showUploadSummary = false;
+  uploadSummary: object;
 
   downloadTemplate(): void {
     const file = 'Shipment_Import_Template.xlsx';
@@ -71,7 +73,9 @@ export class UploadShipmentsComponent {
       this.http
         .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, { headers })
         .subscribe(result => {
-          console.log(result);
+          if (result !== null) {
+            this.showUploadSummary = true;
+          }
         });
       console.log(mappedFiles);
     }
