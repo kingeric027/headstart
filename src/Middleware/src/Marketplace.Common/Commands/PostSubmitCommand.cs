@@ -44,9 +44,9 @@ namespace Marketplace.Common.Commands
 
         public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
-                $"{worksheet.Order.ID}-{item}", user.AccessToken));
+                $"{worksheet.Order.ID}-{item}"));
 
             return await CreateOrderSubmitResponse(
                 new List<ProcessResult>() { await this.PerformZohoTasks(worksheet, supplierOrders) }, 
