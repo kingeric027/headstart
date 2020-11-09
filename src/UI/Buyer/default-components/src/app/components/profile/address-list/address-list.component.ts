@@ -25,17 +25,17 @@ export class OCMAddressList implements OnInit {
       [key: string]: string | string[];
     };
   } = {
-    page: undefined,
-    search: undefined,
-    filters: { ['Editable']: 'true' },
-  };
+      page: undefined,
+      search: undefined,
+      filters: { ['Editable']: 'true' },
+    };
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
   isLoading = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
-  constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     this.reloadAddresses();
@@ -73,11 +73,15 @@ export class OCMAddressList implements OnInit {
 
   addressFormSubmitted(address: BuyerAddress): void {
     window.scrollTo(0, null);
-    if (this.currentAddress) {
+    if (this.currentAddress?.ID) {
       this.updateAddress(address);
     } else {
       this.addAddress(address);
     }
+  }
+
+  addressFormChanged(address: BuyerAddress): void {
+    this.currentAddress = address;
   }
 
   async deleteAddress(address: BuyerAddress): Promise<void> {
@@ -106,6 +110,7 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
+      this.currentAddress = null;
       this.suggestedAddresses = getSuggestedAddresses(ex);
     }
   }
@@ -120,6 +125,7 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
+      this.currentAddress = null;
       this.suggestedAddresses = getSuggestedAddresses(ex);
     }
   }
