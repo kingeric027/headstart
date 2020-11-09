@@ -7,6 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { AppAuthService } from '@app-seller/auth';
 import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { getPsHeight } from '@app-seller/shared/services/dom.helper';
+import { BatchProcessResult } from './shipment-upload.interface';
 
 @Component({
   selector: 'upload-shipments',
@@ -26,7 +27,7 @@ export class UploadShipmentsComponent {
   files: FileHandle[] = [];
   contentHeight = 0;
   showUploadSummary = false;
-  uploadSummary: object;
+  batchProcessResult: BatchProcessResult;
 
   downloadTemplate(): void {
     const file = 'Shipment_Import_Template.xlsx';
@@ -50,7 +51,7 @@ export class UploadShipmentsComponent {
     let asset: AssetUpload = {};
 
     if (fileType === 'staticContent') {
-      const mappedFiles: FileHandle[] = Array.from(event.target.files).map((file: File) => {
+      const mappedFiles: FileHandle[] = Array.from(event).map((file: File) => {
         asset = {
           Active: true,
           Title: 'document',
@@ -72,9 +73,10 @@ export class UploadShipmentsComponent {
 
       this.http
         .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, { headers })
-        .subscribe(result => {
+        .subscribe((result: BatchProcessResult) => {
           if (result !== null) {
             this.showUploadSummary = true;
+            this.batchProcessResult = result;
           }
         });
       console.log(mappedFiles);
@@ -97,7 +99,33 @@ export class UploadShipmentsComponent {
     return await HeadStartSDK.Products.Get(productID, accessToken);
   }
 
+  getColumnHeader(columnNumber: number): string {
+    //Ensure number is within the amount of columns on the Excel sheet.
+    if (columnNumber >= 1 && columnNumber <= 16) {
+      return ShipmentImportColumnHeader[columnNumber];
+    }
+  }
+
   stageDocument(event): void {
     console.log(event);
   }
+}
+
+export enum ShipmentImportColumnHeader {
+  OrderID = 1,
+  LineItemID = 2,
+  QuantityShipped = 3,
+  ShipmentID = 4,
+  BuyerID = 5,
+  Shipper = 6,
+  DateShipped = 7,
+  DateDelivered = 8,
+  TrackingNumber = 9,
+  Cost = 10,
+  FromAddressID = 11,
+  ToAddressID = 12,
+  Account = 13,
+  XpService = 14,
+  ShipmentComment = 15,
+  ShipmentLineItemComment = 16,
 }

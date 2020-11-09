@@ -129,18 +129,18 @@ namespace Marketplace.Common.Commands
 
         public async Task<DocumentImportResult> UploadShipments(IFormFile file, string accessToken)
         {
-            DocumentImportResult documentImportResult;
+            BatchProcessResult documentImportResult;
 
             documentImportResult = await GetShipmentListFromFile(file, accessToken);
 
             return documentImportResult;
         }
 
-        private async Task<DocumentImportResult> GetShipmentListFromFile(IFormFile file, string accessToken)
+        private async Task<BatchProcessResult> GetShipmentListFromFile(IFormFile file, string accessToken)
         {
             BatchProcessResult processResults;
 
-            if (file == null) { return new DocumentImportResult(); }
+            if (file == null) { return new BatchProcessResult(); }
             using Stream stream = file.OpenReadStream();
             List<RowInfo<Misc.Shipment>> shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
 
