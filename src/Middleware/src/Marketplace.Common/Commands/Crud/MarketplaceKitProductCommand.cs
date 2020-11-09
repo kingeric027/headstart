@@ -208,12 +208,22 @@ namespace Marketplace.Common.Commands.Crud
                     {
                         // set min/max from kit only if its within the bounds of what the product can set
                         // this should be enforced at the admin creation level but may change after initially set
-                        if (product.PriceSchedule.MinQuantity == null || p.MinQty > product.PriceSchedule.MinQuantity)
-                            product.PriceSchedule.MinQuantity = p.MinQty;
-                        if ( 
-                            product.PriceSchedule.MaxQuantity > product.PriceSchedule.MinQuantity && // this check is necessary because kit min qty may have changed it
-                            (product.PriceSchedule.MaxQuantity == null || p.MaxQty < product.PriceSchedule.MaxQuantity))
-                            product.PriceSchedule.MaxQuantity = p.MaxQty;
+                        var productMax = product.PriceSchedule.MaxQuantity;
+                        var productMin = product.PriceSchedule.MinQuantity;
+                        var kitMax = p.MaxQty;
+                        var kitMin = p.MinQty;
+
+                        // set product min
+                        if(kitMin != null && (productMin == null || productMin < kitMin ))
+                        {
+                            product.PriceSchedule.MinQuantity = kitMin;
+                        }
+
+                        // set product max
+                        if(kitMax != null && (productMax == null || productMax > kitMax) && kitMax > product.PriceSchedule.MinQuantity) // extra check needed because minqty might have changed
+                        {
+                            product.PriceSchedule.MaxQuantity = kitMax;
+                        }
                     }
 
                     p.Product = product;

@@ -35,6 +35,7 @@ export class OCMAddressList implements OnInit {
   isLoading = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
+  _addressError: string;
   constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
@@ -71,12 +72,21 @@ export class OCMAddressList implements OnInit {
     this.suggestedAddresses = null;
   }
 
-  addressFormSubmitted(address: BuyerAddress): void {
+  async addressFormSubmitted(address: BuyerAddress): Promise<void> {
     window.scrollTo(0, null);
-    if (this.currentAddress?.ID) {
-      this.updateAddress(address);
-    } else {
-      this.addAddress(address);
+    try {
+      if (this.currentAddress?.ID) {
+        await this.updateAddress(address);
+      } else {
+        await this.addAddress(address);
+      }
+    }
+    catch(e) {
+      if(e?.response?.data?.Message) {
+        this._addressError = e?.response?.data?.Message
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -110,8 +120,12 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
-      this.currentAddress = null;
       this.suggestedAddresses = getSuggestedAddresses(ex);
+      if(!(this.suggestedAddresses?.length>=1)){
+        throw(ex)  
+      } else {
+        this.currentAddress = null;
+      }
     }
   }
 

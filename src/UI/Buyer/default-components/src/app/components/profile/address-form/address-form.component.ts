@@ -16,6 +16,7 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
   @Input() suggestedAddresses: BuyerAddress[];
   @Input() showOptionToSave = false;
   @Input() homeCountry: string;
+  @Input() addressError: string;
   @Output() formDismissed = new EventEmitter();
   @Output()
   formSubmitted = new EventEmitter<{ address: Address; shouldSaveAddress: boolean }>();
