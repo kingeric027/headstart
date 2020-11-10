@@ -364,7 +364,7 @@ namespace Marketplace.Common.Commands
             return updatedSupplierOrders;
         }
 
-        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<ShipEstimate> shipEstimates)
+        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<MarketplaceShipEstimate> shipEstimates)
 		{
             var selectedShipMethods = shipEstimates.Select(se =>
             {

@@ -138,7 +138,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoShippingLineItemMapper
     {
-        public static ZohoLineItem Map(ZohoLineItem item, ShipMethod method)
+        public static ZohoLineItem Map(ZohoLineItem item, MarketplaceShipMethod method)
         {
             item.item_id = item.item_id;
             item.item_type = "sales_and_purchases";
@@ -153,7 +153,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return item;
         }
 
-        public static ZohoLineItem Map(ShipMethod method)
+        public static ZohoLineItem Map(MarketplaceShipMethod method)
         {
             var item = new ZohoLineItem()
             {
