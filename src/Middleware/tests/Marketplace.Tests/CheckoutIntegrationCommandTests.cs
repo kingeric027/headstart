@@ -31,17 +31,17 @@ namespace Marketplace.Tests
         public void dont_filter_valid_rates()
         {
             // preserve order, rates are already correct
-            var method1 = new ShipMethod
+            var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 25
             };
-            var method2 = new ShipMethod
+            var method2 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 15
             };
-            var method3 = new ShipMethod
+            var method3 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 5
@@ -60,17 +60,17 @@ namespace Marketplace.Tests
         public void remove_invalid_method()
         {
             // remove one offending ship method
-            var method1 = new ShipMethod
+            var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 10
             };
-            var method2 = new ShipMethod
+            var method2 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 5
             };
-            var method3 = new ShipMethod
+            var method3 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 20
@@ -88,17 +88,17 @@ namespace Marketplace.Tests
         public void remove_two_invalid_methods()
         {
             // remove two offending ship methods
-            var method1 = new ShipMethod
+            var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 5
             };
-            var method2 = new ShipMethod
+            var method2 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 10
             };
-            var method3 = new ShipMethod
+            var method3 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 15
@@ -115,17 +115,17 @@ namespace Marketplace.Tests
         public void handle_mixed_order_by_transit_days()
         {
             // remove two offending ship methods, transit days ordered backwards
-            var method1 = new ShipMethod
+            var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 15
             };
-            var method2 = new ShipMethod
+            var method2 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 10
             };
-            var method3 = new ShipMethod
+            var method3 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 5
@@ -142,17 +142,17 @@ namespace Marketplace.Tests
         public void handle_free_shipping()
         {
             // handle free shipping
-            var method1 = new ShipMethod
+            var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 15
             };
-            var method2 = new ShipMethod
+            var method2 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 0
             };
-            var method3 = new ShipMethod
+            var method3 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 5
@@ -170,17 +170,17 @@ namespace Marketplace.Tests
         public void handle_methods_with_same_rates()
         {
             // handle two estimates with same rates
-            var method1 = new ShipMethod
+            var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 15
             };
-            var method2 = new ShipMethod
+            var method2 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 15
             };
-            var method3 = new ShipMethod
+            var method3 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 5
@@ -196,11 +196,11 @@ namespace Marketplace.Tests
             Assert.AreEqual(3, methods[1].EstimatedTransitDays);
         }
 
-        private List<ShipEstimate> BuildEstimates(params ShipMethod[] shipMethods)
+        private List<MarketplaceShipEstimate> BuildEstimates(params MarketplaceShipMethod[] shipMethods)
         {
-            return new List<ShipEstimate>
+            return new List<MarketplaceShipEstimate>
             {
-                new ShipEstimate
+                new MarketplaceShipEstimate
                 {
                     ShipMethods = shipMethods.ToList()
                 }

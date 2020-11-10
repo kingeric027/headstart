@@ -6,6 +6,7 @@ using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.EntityFrameworkCore.Design;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
@@ -58,7 +59,7 @@ namespace Marketplace.Common.Commands
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
 
             var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
-            var shipResponse = await _shippingService.GetRates(groupedLineItems, _profiles); // include all accounts at this stage so we can save on order worksheet and analyze 
+            var shipResponse = (MarketplaceShipEstimateResponse) await _shippingService.GetRates(groupedLineItems, _profiles); // include all accounts at this stage so we can save on order worksheet and analyze 
 
             // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  
             for (var i = 0; i < groupedLineItems.Count; i++)
@@ -88,14 +89,14 @@ namespace Marketplace.Common.Commands
             return shipResponse;
         }
 
-        public static IEnumerable<ShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<ShipMethod> methods)
+        public static IEnumerable<MarketplaceShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<MarketplaceShipMethod> methods)
 		{
             return methods
                 .GroupBy(method => method.EstimatedTransitDays)
                 .Select(kind => kind.OrderBy(method => method.Cost).First());
         }
 
-        private async Task<List<ShipEstimate>> ConvertShippingRatesCurrency(IList<ShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
+        private async Task<List<MarketplaceShipEstimate>> ConvertShippingRatesCurrency(IList<MarketplaceShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
 		{
             var rates = (await _exchangeRates.Get(buyerCurrency)).Rates;
             var conversionRate = rates.Find(r => r.Currency == shipperCurrency).Rate;
@@ -103,13 +104,9 @@ namespace Marketplace.Common.Commands
             {
                 estimate.ShipMethods = estimate.ShipMethods.Select(method =>
                 {
-                    method.xp = new
-                    {
-                        OriginalShipCost = method.xp?.OriginalCost,
-                        OriginalCurrency = shipperCurrency.ToString(),
-                        ExchangeRate = conversionRate,
-                        OrderCurrency = buyerCurrency.ToString()
-                    };
+                    method.xp.OriginalCurrency = shipperCurrency;
+                    method.xp.OrderCurrency = buyerCurrency;
+                    method.xp.ExchangeRate = conversionRate;
                     if (conversionRate != null) method.Cost /= (decimal) conversionRate;
                     return method;
                 }).ToList();
@@ -117,11 +114,11 @@ namespace Marketplace.Common.Commands
             }).ToList();
         }
 
-        private async Task<List<ShipEstimate>> ApplyFreeShipping(MarketplaceOrderWorksheet orderWorksheet, IList<ShipEstimate> shipEstimates)
+        private async Task<List<MarketplaceShipEstimate>> ApplyFreeShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> shipEstimates)
         {
             var supplierIDs = orderWorksheet.LineItems.Select(li => li.SupplierID);
             var suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
-            var updatedEstimates = new List<ShipEstimate>();
+            var updatedEstimates = new List<MarketplaceShipEstimate>();
 
             foreach(var estimate in shipEstimates)
             {
@@ -137,13 +134,10 @@ namespace Marketplace.Common.Commands
                         // free shipping on ground shipping or orders where we weren't able to calculate a shipping rate
                         if (method.Name.Contains("GROUND") || method.ID == "NO_SHIPPING_RATES")
                         {
-                            method.xp = new
-                            {
-                                FreeShippingApplied = true,
-                                FreeShippingThreshold = supplier.xp.FreeShippingThreshold,
-                                CostBeforeDiscount = method.Cost,
-                                Cost = 0
-                            };
+                            method.xp.FreeShippingApplied = true;
+                            method.xp.FreeShippingThreshold = supplier.xp.FreeShippingThreshold;
+                            method.xp.CostBeforeDiscount = method.Cost; // do we need this? xp.OriginalCost already exists
+                            method.Cost = 0;
                         }
                     }
                 }
@@ -153,7 +147,7 @@ namespace Marketplace.Common.Commands
             return updatedEstimates;
         }
 
-        public static IList<ShipEstimate> FilterSlowerRatesWithHighCost(IList<ShipEstimate> estimates)
+        public static IList<MarketplaceShipEstimate> FilterSlowerRatesWithHighCost(IList<MarketplaceShipEstimate> estimates)
         {
             // filter out rate estimates with slower transit days and higher costs than faster transit days
             // ex: 3 days for $20 vs 1 day for $10. Filter out the 3 days option
@@ -161,7 +155,7 @@ namespace Marketplace.Common.Commands
             var result = estimates.Select(estimate =>
             {
                 var methodsList = estimate.ShipMethods.OrderBy(m => m.EstimatedTransitDays).ToList();
-                var filtered = new List<ShipMethod>();
+                var filtered = new List<MarketplaceShipMethod>();
                 for (var i = methodsList.Count - 1; i >= 0; i--)
                 {
                     var method = methodsList[i];
@@ -180,7 +174,7 @@ namespace Marketplace.Common.Commands
             return result;
         }
 
-        public static IList<ShipEstimate> CheckForEmptyRates(IList<ShipEstimate> estimates, decimal noRatesCost, int noRatesTransitDays)
+        public static IList<MarketplaceShipEstimate> CheckForEmptyRates(IList<MarketplaceShipEstimate> estimates, decimal noRatesCost, int noRatesTransitDays)
         {
             // if there are no rates for a set of line items then return a mocked response so user can check out
             // this order will additionally get marked as needing attention
@@ -189,15 +183,15 @@ namespace Marketplace.Common.Commands
             {
                 if (!shipEstimate.ShipMethods.Any())
                 {
-                    shipEstimate.ShipMethods = new List<ShipMethod>()
+                    shipEstimate.ShipMethods = new List<MarketplaceShipMethod>()
                     {
-                        new ShipMethod
+                        new MarketplaceShipMethod
                         {
                             ID = "NO_SHIPPING_RATES",
                             Name = "No shipping rates",
                             Cost = noRatesCost,
                             EstimatedTransitDays = noRatesTransitDays,
-                            xp = new
+                            xp = new ShipMethodXP
                             {
                                 OriginalCost = noRatesCost
                             }
