@@ -80,10 +80,10 @@ namespace Marketplace.Common.Commands
 
 
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
-                shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency); 
+                shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency);
+            shipResponse.ShipEstimates = CheckForEmptyRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.NoRatesFallbackCost, _settings.EasyPostSettings.NoRatesFallbackTransitDays);
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
-            shipResponse.ShipEstimates = CheckForEmptyRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.NoRatesFallbackCost, _settings.EasyPostSettings.NoRatesFallbackTransitDays);
             
             return shipResponse;
         }
@@ -134,12 +134,16 @@ namespace Marketplace.Common.Commands
                 {
                     foreach (var method in estimate.ShipMethods)
                     {
-                        if (method.Name.Contains("GROUND")) //  free shipping on ground shipping
+                        // free shipping on ground shipping or orders where we weren't able to calculate a shipping rate
+                        if (method.Name.Contains("GROUND") || method.ID == "NO_SHIPPING_RATES")
                         {
-                            method.xp.FreeShippingApplied = true;
-                            method.xp.FreeShippingThreshold = supplier.xp.FreeShippingThreshold;
-                            method.xp.CostBeforeDiscount = method.Cost;
-                            method.Cost = 0;
+                            method.xp = new
+                            {
+                                FreeShippingApplied = true,
+                                FreeShippingThreshold = supplier.xp.FreeShippingThreshold,
+                                CostBeforeDiscount = method.Cost,
+                                Cost = 0
+                            };
                         }
                     }
                 }
