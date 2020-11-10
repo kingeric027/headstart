@@ -23,8 +23,8 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
 const appName: AppName = SELF_ESTEEM_BRANDS;
-const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
-const localMiddlewareURL = 'https://localhost:44340';
+const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
+const localMiddlewareURL = 'https://localhost:44381';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -33,7 +33,7 @@ const devEnvironments: Record<string, Environment> = {
     hostedApp: false,
     sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
     clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
-    middlewareUrl: 'https://localhost:44340',
+    middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
     appname: 'Marketplace Admin Local',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
