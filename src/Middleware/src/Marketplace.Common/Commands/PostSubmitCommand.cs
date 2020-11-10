@@ -130,6 +130,18 @@ namespace Marketplace.Common.Commands
 
             // STEP 3: Zoho orders
             results.Add(await this.PerformZohoTasks(orderWorksheet, supplierOrders));
+
+            // STEP 4: Validate shipping
+            var shipping = await ProcessActivityCall(
+                ProcessType.Shipping,
+                "Validate Shipping",
+                ValidateShipping(orderWorksheet));
+            results.Add(new ProcessResult()
+            {
+                Type = ProcessType.Shipping,
+                Activity = new List<ProcessResultAction>() { shipping }
+            });
+
             return results;
         }
         
@@ -137,7 +149,8 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                if (processResults.All(i => i.Activity.All(a => !a.Success)))
+                if (processResults.All(i => i.Activity.All(a => a.Success)))
+                {
                     return new OrderSubmitResponse()
                     {
                         HttpStatusCode = 200,
@@ -146,6 +159,8 @@ namespace Marketplace.Common.Commands
                             ProcessResults = processResults
                         }
                     };
+                }
+                    
                 await MarkOrdersAsNeedingAttention(ordersRelatingToProcess); 
                 return new OrderSubmitResponse()
                 {
@@ -192,6 +207,26 @@ namespace Marketplace.Common.Commands
                         Success = true
                 };
             }
+            catch (OrderCloudIntegrationException integrationEx)
+            {
+                return new ProcessResultAction()
+                {
+                    Description = description,
+                    ProcessType = type,
+                    Success = false,
+                    Exception = new ProcessResultException(integrationEx)
+                };
+            }
+            catch (FlurlHttpException flurlEx)
+            {
+                return new ProcessResultAction()
+                {
+                    Description = description,
+                    ProcessType = type,
+                    Success = false,
+                    Exception = new ProcessResultException(flurlEx)
+                };
+            }
             catch (Exception ex)
             {
                 return new ProcessResultAction() {
@@ -217,6 +252,16 @@ namespace Marketplace.Common.Commands
                     },
                     await func
                 );
+            }
+            catch (OrderCloudIntegrationException integrationEx)
+            {
+                return new Tuple<ProcessResultAction, T>(new ProcessResultAction()
+                {
+                    Description = description,
+                    ProcessType = type,
+                    Success = false,
+                    Exception = new ProcessResultException(integrationEx)
+                }, new T());
             }
             catch (FlurlHttpException flurlEx)
             {
@@ -319,7 +364,7 @@ namespace Marketplace.Common.Commands
             return updatedSupplierOrders;
         }
 
-        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<ShipEstimate> shipEstimates)
+        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<MarketplaceShipEstimate> shipEstimates)
 		{
             var selectedShipMethods = shipEstimates.Select(se =>
             {
@@ -342,6 +387,18 @@ namespace Marketplace.Common.Commands
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
                 xp = new { AvalaraTaxTransactionCode = transaction.code }
             });
+        }
+
+        private async Task ValidateShipping(OrderWorksheet orderWorksheet)
+        {
+            if(orderWorksheet.ShipEstimateResponse.HttpStatusCode != 200)
+            {
+                throw new Exception(orderWorksheet.ShipEstimateResponse.UnhandledErrorBody);
+            }
+            if(orderWorksheet.ShipEstimateResponse.ShipEstimates.Any(s => s.SelectedShipMethodID == "NO_SHIPPING_RATES"))
+            {
+                throw new Exception("No shipping rates could be determined - fallback shipping rate of $20 3-day was used");
+            }
         }
     };
 }

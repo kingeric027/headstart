@@ -346,7 +346,7 @@ namespace Marketplace.Common.Services
 
             //  Get the shipping total from selected shipping methods for that supplier
             var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
-            var supplierShippingSelections = new List<ShipMethod>();
+            var supplierShippingSelections = new List<MarketplaceShipMethod>();
             foreach (var estimate in supplierShipEstimates)
             {
                 var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
