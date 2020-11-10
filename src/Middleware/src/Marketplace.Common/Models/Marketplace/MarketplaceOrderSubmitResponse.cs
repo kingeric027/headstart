@@ -38,7 +38,8 @@ namespace Marketplace.Common.Models.Marketplace
         Forwarding,
         Notification,
         Accounting,
-        Tax
+        Tax,
+        Shipping
     }
 
 }
