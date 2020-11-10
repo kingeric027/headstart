@@ -1,16 +1,23 @@
-using OrderCloud.SDK;
-using System.Threading.Tasks;
-using Marketplace.Models.Misc;
-using System.Linq;
+﻿using Dynamitey;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Models.Extended;
+using Marketplace.Models.Models.Marketplace;
+using Microsoft.AspNetCore.Http;
+using Npoi.Mapper;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using SmartyStreets.USAutocompleteApi;
 using System;
 using System.Collections.Generic;
-using Marketplace.Models.Models.Marketplace;
-using System.Dynamic;
-
-using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Misc = Marketplace.Common.Models.Misc;
 
 namespace Marketplace.Common.Commands
@@ -19,11 +26,7 @@ namespace Marketplace.Common.Commands
     {
         public int Row { get; set; }
         public string ErrorMessage { get; set; }
-    }
-    public class DocumentImportSummary
-    {
-        public int Row { get; set; }
-        public string ErrorMessage { get; set; }
+        public int Column { get; set; }
     }
     public class DocumentImportSummary
     {
@@ -43,7 +46,15 @@ namespace Marketplace.Common.Commands
     {
         public int TotalCount { get; set; }
         public int SuccessfulCount { get; set; }
-        public int FailureListCount { get; set; }
+        public int ProcessFailureListCount { get; set; }
+        public int DocumentFailureListCount { get; set; }
+
+    }
+
+    public class BatchProcessFailure
+    {
+        public Misc.Shipment Shipment { get; set; }
+        public string Error { get; set; }
     }
 
     public class BatchProcessResult
@@ -53,17 +64,19 @@ namespace Marketplace.Common.Commands
         public List<BatchProcessFailure> ProcessFailureList = new List<BatchProcessFailure>();
         public List<DocumentRowError> InvalidRowFailureList = new List<DocumentRowError>();
 
+
     }
 
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
-        Task<DocumentImportResult> UploadShipments(IFormFile file, string supplierToken);
+        Task<BatchProcessResult> UploadShipments(IFormFile file, string supplierToken);
     }
     public class ShipmentCommand : IShipmentCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly ILineItemCommand _lineItemCommand;
+        private Dictionary<string, Shipment> _shipmentByTrackingNumber = new Dictionary<string, Shipment>();
 
         public ShipmentCommand(AppSettings settings, IOrderCloudClient oc, ILineItemCommand lineItemCommand)
         {
@@ -127,7 +140,7 @@ namespace Marketplace.Common.Commands
             return relatedBuyerOrder.FromCompanyID;
         }
 
-        public async Task<DocumentImportResult> UploadShipments(IFormFile file, string accessToken)
+        public async Task<BatchProcessResult> UploadShipments(IFormFile file, string accessToken)
         {
             BatchProcessResult documentImportResult;
 
@@ -148,35 +161,7 @@ namespace Marketplace.Common.Commands
 
             processResults = await ProcessShipments(result, accessToken);
 
-            var ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
-
-            //  platform bug. Cant save new xp values onto shipment line item. Update order line item to have this value
-            var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null);
-            await Throttler.RunAsync(shipmentItemsWithComment, 100, 5, (shipmentItem) => {
-                dynamic comments = new ExpandoObject();
-                var commentsByShipment = comments as IDictionary<string, object>;
-                commentsByShipment[ocShipment.ID] = shipmentItem.xp?.Comment;
-
-                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, shipmentItem.LineItemID,
-                    new PartialLineItem()
-                    {
-                        xp = new
-                        {
-                            Comments = commentsByShipment
-                        }
-                    });
-            });
-            var shipmentItemResponses = await Throttler.RunAsync(
-                superShipment.ShipmentItems,
-                100,
-                5,
-                (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
-            MarketplaceShipment ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
-            return new SuperShipment()
-            {
-                Shipment = ocShipmentWithDateShipped,
-                ShipmentItems = shipmentItemResponses.ToList()
-            };
+            return await Task.FromResult(processResults);
         }
 
         private async Task<BatchProcessResult> ProcessShipments(DocumentImportResult importResult, string accessToken)
