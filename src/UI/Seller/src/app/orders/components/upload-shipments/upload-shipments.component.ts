@@ -8,6 +8,7 @@ import { AppAuthService } from '@app-seller/auth';
 import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk';
 import { getPsHeight } from '@app-seller/shared/services/dom.helper';
 import { BatchProcessResult } from './shipment-upload.interface';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'upload-shipments',
@@ -19,7 +20,8 @@ export class UploadShipmentsComponent {
     private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private sanitizer: DomSanitizer,
-    private appAuthService: AppAuthService
+    private appAuthService: AppAuthService,
+   private spinner: NgxSpinnerService
   ) {
     this.contentHeight = getPsHeight('base-layout-item');
   }
@@ -28,6 +30,7 @@ export class UploadShipmentsComponent {
   contentHeight = 0;
   showUploadSummary = false;
   batchProcessResult: BatchProcessResult;
+  showResults = false;
 
   downloadTemplate(): void {
     const file = 'Shipment_Import_Template.xlsx';
@@ -47,11 +50,18 @@ export class UploadShipmentsComponent {
   }
 
   async manualFileUpload(event, fileType: string): Promise<void> {
+    this.showUploadSummary = true;
+    this.showResults = false;
+    this.spinner.show();
     const accessToken = await this.appAuthService.fetchToken().toPromise();
     let asset: AssetUpload = {};
 
     if (fileType === 'staticContent') {
-      const mappedFiles: FileHandle[] = Array.from(event).map((file: File) => {
+      if (event?.File !== null && event?.File !== undefined && !Array.isArray(event)){
+              asset = { Active: true, Title: 'document', File: event.File, FileName: 'shipments_to_process' } as AssetUpload;
+
+      } else {
+        const mappedFiles: FileHandle[] = Array.from(event).map((file: File) => {
         asset = {
           Active: true,
           Title: 'document',
@@ -60,7 +70,8 @@ export class UploadShipmentsComponent {
         } as AssetUpload;
         return { File: file, URL, Filename: 'shipments_to_process' };
       });
-
+      }
+  
       const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
 
       const formData = new FormData();
@@ -75,11 +86,11 @@ export class UploadShipmentsComponent {
         .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, { headers })
         .subscribe((result: BatchProcessResult) => {
           if (result !== null) {
-            this.showUploadSummary = true;
             this.batchProcessResult = result;
+            this.spinner.hide();
+            this.showResults = true;
           }
         });
-      console.log(mappedFiles);
     }
   }
 

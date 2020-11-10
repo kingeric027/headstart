@@ -39,7 +39,7 @@
           <label class=" dropzone"
                  for="shipmentUpload"
                  appDrag
-                 (files)="manualFileUpload($event, 'staticContent')">
+                 (files)="manualFileUpload($event[0], 'staticContent')">
           </label>
           <input class="d-none"
                  id="shipmentUpload"
@@ -51,10 +51,20 @@
            class="card mt-3 p-4 shadow-sm"
            style="width: 50rem;">
         <div class="d-flex justify-content-between align-items-center">
-          <h5>Upload complete!</h5>
+          <ng-container *ngIf="!showResults && showUploadSummary">
+                <ngx-spinner bdColor="rgba(255, 255, 255, 0.9)"
+                 color="var(--primary)"
+                 size="small"
+                 type="ball-spin-clockwise-fade"
+                 [fullScreen]="false">
+      <small>Processing Uploaded File...</small>
+    </ngx-spinner>
+          </ng-container>
+
+          <h5 *ngIf="showResults">Upload complete!</h5>
           <small class="d-block text-uppercase text-muted font-weight-bold mb-2">Step 4 of 4</small>
         </div>
-        <div>
+        <div *ngIf="showResults">
           <strong>Successful uploads: {{batchProcessResult?.Meta?.SuccessfulCount}}</strong>
 
           <table *ngIf="batchProcessResult?.SuccessfulList.length > 0" class="table">
@@ -71,7 +81,7 @@
           </table>
 
         </div>
-        <div>
+        <div *ngIf="showResults">
           <strong>Failed uploads: {{batchProcessResult?.Meta?.ProcessFailureListCount + batchProcessResult?.Meta?.DocumentFailureListCount}}</strong>
           <table *ngIf="batchProcessResult?.InvalidRowFailureList?.length > 0" class="table">
             <tr>
