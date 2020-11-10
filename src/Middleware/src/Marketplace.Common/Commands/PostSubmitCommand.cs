@@ -345,6 +345,7 @@ namespace Marketplace.Common.Commands
                     }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
+                await SaveShipMethodByLineItem(lineItems, supplierOrderPatch.xp.SelectedShipMethodsSupplierView, buyerOrder.Order.ID);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
@@ -398,6 +399,24 @@ namespace Marketplace.Common.Commands
             if(orderWorksheet.ShipEstimateResponse.ShipEstimates.Any(s => s.SelectedShipMethodID == "NO_SHIPPING_RATES"))
             {
                 throw new Exception("No shipping rates could be determined - fallback shipping rate of $20 3-day was used");
+            }
+        }
+
+        private async Task SaveShipMethodByLineItem(ListPage<LineItem> lineItems, List<ShipMethodSupplierView> shipMethods, string buyerOrderID)
+        {
+            if (shipMethods != null)
+            {
+                foreach (LineItem lineItem in lineItems.Items)
+                {
+                    string shipFromID = lineItem.ShipFromAddressID;
+                    if (shipFromID != null)
+                    {
+                        ShipMethodSupplierView shipMethod = shipMethods.Find(shipMethod => shipMethod.ShipFromAddressID == shipFromID);
+                        string readableShipMethod = shipMethod.Name.Replace("_", " ");
+                        PartialLineItem lineItemToPatch = new PartialLineItem { xp = new { ShipMethod = readableShipMethod } };
+                        LineItem patchedLineItem = await _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, lineItem.ID, lineItemToPatch);
+                    }
+                }
             }
         }
     };
