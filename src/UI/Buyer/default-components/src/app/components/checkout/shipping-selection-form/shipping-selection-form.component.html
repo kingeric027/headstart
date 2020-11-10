@@ -7,18 +7,9 @@
   <select class="custom-select" formControlName="ShipMethodID" (change)="onFormChanges()">
     <option [ngValue]="null" disabled translate>CHECKOUT.SHIPPING_SELECTION_FORM.HOW_FAST</option>
     <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods" [ngValue]="shipMethod.ID">
-      <div *ngIf="shipMethod.ID !== 'NO_SHIPPING_RATES'">
-        {{ shipMethod.EstimatedTransitDays }} <span
-          translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{detectPlural(shipMethod.EstimatedTransitDays) }} -
-        {{ shipMethod.xp.FreeShippingApplied ? 'FREE' : (shipMethod.Cost | currency: _orderCurrency) }}
-      </div>
-      <!-- 
-        there are legitimate reasons for no rates to be returned
-        the middleware returns this special rate when that happens so that the user can still check out
-       -->
-      <div *ngIf="shipMethod.ID === 'NO_SHIPPING_RATES'">
-        <span translate>CHECKOUT.SHIPPING_SELECTION_FORM.NO_RATES_RETURNED_MESSAGE</span>
-      </div>
+      {{ shipMethod.EstimatedTransitDays }} <span
+        translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{detectPlural(shipMethod.EstimatedTransitDays) }} -
+      {{ shipMethod.xp.FreeShippingApplied ? 'FREE' : (shipMethod.Cost | currency: _orderCurrency) }}
     </option>
   </select>
 </form>

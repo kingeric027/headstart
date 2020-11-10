@@ -106,8 +106,20 @@ namespace ordercloud.integrations.avalara
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
 			var createTransactionModel = orderWorksheet.ToAvalaraTransationModel(_companyCode, docType);
-			var transaction = await _avaTax.CreateTransactionAsync("", createTransactionModel);
-			return transaction;
+			try
+            {
+				var transaction = await _avaTax.CreateTransactionAsync("", createTransactionModel);
+				return transaction;
+
+			} catch(AvaTaxError e)
+            {
+				throw new OrderCloudIntegrationException(new ApiError
+				{
+					ErrorCode = "AvalaraTaxError",
+					Message = e.error.error.message,
+					Data = e.error.error
+				});
+			}
 		}
 	}
 }
