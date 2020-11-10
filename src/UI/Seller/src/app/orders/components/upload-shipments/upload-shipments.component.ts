@@ -1,3 +1,4 @@
+import { OcTokenService } from '@ordercloud/angular-sdk';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
@@ -21,10 +22,12 @@ export class UploadShipmentsComponent {
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private sanitizer: DomSanitizer,
     private appAuthService: AppAuthService,
-   private spinner: NgxSpinnerService
+   private spinner: NgxSpinnerService,
+   private ocTokenService: OcTokenService
   ) {
     this.contentHeight = getPsHeight('base-layout-item');
   }
+
 
   files: FileHandle[] = [];
   contentHeight = 0;
@@ -45,10 +48,15 @@ export class UploadShipmentsComponent {
     });
   }
 
-  private getSharedAccessSignature(fileName: string): Observable<string> {
-    return this.http.get<string>(`${this.appConfig.middlewareUrl}/reports/download-shared-access/${fileName}`);
+ private getSharedAccessSignature(fileName: string): Observable<string> {
+    return this.http.get<string>(`${this.appConfig.middlewareUrl}/reports/download-shared-access/${fileName}`, { headers: this.buildHeaders() });
   }
-
+  private buildHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+    });
+  }
   async manualFileUpload(event, fileType: string): Promise<void> {
     this.showUploadSummary = true;
     this.showResults = false;
