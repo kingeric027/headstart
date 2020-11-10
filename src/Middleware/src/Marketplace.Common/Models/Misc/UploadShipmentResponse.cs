@@ -25,7 +25,8 @@ namespace Marketplace.Common.Models.Misc
         public string ToAddressID { get; set; }
         public string Account { get; set; }
         public string Service { get; set; }
-        public string Comment { get; set; }
+        public string ShipmentComment { get; set; }
+        public string ShipmentLineItemComment { get; set; }
 
     }
 }

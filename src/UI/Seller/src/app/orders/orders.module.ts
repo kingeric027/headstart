@@ -7,9 +7,16 @@ import { OrderShipmentsComponent } from './components/order-shipments/order-ship
 import { LineItemTableComponent } from './components/line-item-table/line-item-table.component';
 import { UploadShipmentsComponent } from './components/upload-shipments/upload-shipments.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
-  imports: [SharedModule, OrdersRoutingModule, PerfectScrollbarModule],
-  declarations: [OrderTableComponent, OrderDetailsComponent, OrderShipmentsComponent, LineItemTableComponent, UploadShipmentsComponent],
+  imports: [SharedModule, OrdersRoutingModule, PerfectScrollbarModule, NgxSpinnerModule],
+  declarations: [
+    OrderTableComponent,
+    OrderDetailsComponent,
+    OrderShipmentsComponent,
+    LineItemTableComponent,
+    UploadShipmentsComponent,
+  ],
 })
 export class OrdersModule {}

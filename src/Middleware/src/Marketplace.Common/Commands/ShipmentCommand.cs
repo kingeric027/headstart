@@ -244,8 +244,8 @@ namespace Marketplace.Common.Commands
                 };
 
                 ocShipment = await GetShipmentByTrackingNumber(shipment, accessToken);
+
                 //If a user included a ShipmentID in the spreadsheet, find that shipment and patch it with the information on that row
-                
                 if (ocShipment != null)
                 {
                     newShipment = PatchShipment(ocShipment, shipment);
@@ -254,6 +254,10 @@ namespace Marketplace.Common.Commands
                 if (newShipment != null)
                 {
                     Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, accessToken);
+
+                    //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
+                    PatchPartialLineItemComment(lineItem, shipment);
+
                     //POST a shipment item, passing it a Shipment ID parameter, and a request body of Order ID, Line Item ID, and Quantity Shipped
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
 
@@ -264,8 +268,11 @@ namespace Marketplace.Common.Commands
 
                     result.SuccessfulList.Add(processedShipment);
                 }
-                if (lineItem.ID == null)
+                if (lineItem?.ID == null)
                 {
+                    //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
+                    PatchPartialLineItemComment(lineItem, shipment);
+
                     //Create new lineItem
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
                 }
@@ -276,6 +283,25 @@ namespace Marketplace.Common.Commands
                 result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.Data.Keys}"));
                 return false;
             }
+        }
+
+        private async void PatchPartialLineItemComment(LineItem lineItem, Misc.Shipment shipment)
+        {
+            PartialLineItem partialLineItem;
+            Dictionary<string, object> commentDictonary = new Dictionary<string, object>();
+
+            //Add new comment
+            commentDictonary.Add(shipment.ShipmentID, shipment.ShipmentLineItemComment);
+
+            partialLineItem = new PartialLineItem()
+            {
+                xp = new
+                {
+                    Comments = commentDictonary
+                }
+            };
+
+            await _oc.LineItems.PatchAsync(OrderDirection.Incoming, shipment.OrderID, shipment.LineItemID, partialLineItem);
         }
 
         private async Task<Shipment> GetShipmentByTrackingNumber(Misc.Shipment shipment, string accessToken)
@@ -342,7 +368,7 @@ namespace Marketplace.Common.Commands
             newShipment.FromAddressID = shipment.FromAddressID;
             newShipment.ToAddressID = shipment.ToAddressID;
             newShipment.xp.Service = Convert.ToString(shipment.Service);
-            newShipment.xp.Comment = Convert.ToString(shipment.Comment);
+            newShipment.xp.Comment = Convert.ToString(shipment.ShipmentComment);
 
             return newShipment;
         }
