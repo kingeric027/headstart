@@ -160,7 +160,7 @@ namespace Marketplace.Common.Commands
                 {
                     var method = methodsList[i];
                     var fasterMethods = methodsList.GetRange(0, i);
-                    var existsFasterCheaperRate = fasterMethods.Any(m => m.Cost <= method.Cost);
+                    var existsFasterCheaperRate = fasterMethods.Any(m => m.Cost < method.Cost);
                     if (!existsFasterCheaperRate)
                     {
                         filtered.Add(method);
