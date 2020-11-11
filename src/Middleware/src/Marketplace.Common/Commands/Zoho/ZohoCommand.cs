@@ -145,7 +145,7 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact, Supplier supplier)
         {
-            var items = lineitems.Items.Skip(5).Take(5).Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
+            var items = lineitems.Items.Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
             var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = order.ID });
             if (po.Items.Any())
                 return await _zoho.PurchaseOrders.SaveAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact, po.Items.FirstOrDefault()));
@@ -177,7 +177,7 @@ namespace Marketplace.Common.Commands.Zoho
             var zOrder = await _zoho.SalesOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = orderWorksheet.Order.ID });
 
             // map lineitems
-            var items = orderWorksheet.LineItems.Skip(5).Take(5).Select(ZohoSalesLineItemMapper.Map).ToList();
+            var items = orderWorksheet.LineItems.Select(ZohoSalesLineItemMapper.Map).ToList();
             // apply shipping as lineitems
             items.AddRange(orderWorksheet.ShipEstimateResponse.ShipEstimates.Select(shipment =>
             {
