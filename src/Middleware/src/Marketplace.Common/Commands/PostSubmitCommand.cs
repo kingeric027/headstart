@@ -16,6 +16,7 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
 using Npoi.Mapper;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -23,6 +24,7 @@ namespace Marketplace.Common.Commands
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
         Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user);
+        Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user);
     }
 
     public class PostSubmitCommand : IPostSubmitCommand
@@ -42,11 +44,26 @@ namespace Marketplace.Common.Commands
             _lineItemCommand = lineItemCommand;
         }
 
+        public async Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            return await CreateOrderSubmitResponse(
+                new List<ProcessResult>() { new ProcessResult()
+                {
+                    Type = ProcessType.Accounting,
+                    Activity = new List<ProcessResultAction>() { await ProcessActivityCall(
+                        ProcessType.Shipping,
+                        "Validate Shipping",
+                        ValidateShipping(worksheet)) }
+                }},
+                new List<MarketplaceOrder> { worksheet.Order });
+        }
+
         public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
-                $"{worksheet.Order.ID}-{item}", user.AccessToken));
+                $"{worksheet.Order.ID}-{item}"));
 
             return await CreateOrderSubmitResponse(
                 new List<ProcessResult>() { await this.PerformZohoTasks(worksheet, supplierOrders) }, 
@@ -320,8 +337,8 @@ namespace Marketplace.Common.Commands
         {
             var updatedSupplierOrders = new List<MarketplaceOrder>();
             var supplierIDs = new List<string>();
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.Order.ID);
-            var shipFromAddressIDs = lineItems.Items.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
+            var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.Order.ID, page: page, pageSize: 100));
+            var shipFromAddressIDs = lineItems.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
 
             foreach (var supplierOrder in supplierOrders)
             {
@@ -381,24 +398,34 @@ namespace Marketplace.Common.Commands
 
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
-            var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
-            await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
+            var standardLineItems = orderWorksheet.LineItems.Where(li => li.Product.xp.ProductType == "Standard")?.ToList();
+            if(standardLineItems.Any())
             {
-                TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
-                xp = new { AvalaraTaxTransactionCode = transaction.code }
-            });
+                var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
+                await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
+                {
+                    TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
+                    xp = new { AvalaraTaxTransactionCode = transaction.code }
+                });
+            } else
+            {
+                await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
+                {
+                    TaxCost = 0,  // Set this again just to make sure we have the most up to date info
+                    xp = new { AvalaraTaxTransactionCode = "No_TAXABLE_LINES" }
+                });
+            }
         }
 
-        private async Task ValidateShipping(OrderWorksheet orderWorksheet)
+        private static async Task ValidateShipping(MarketplaceOrderWorksheet orderWorksheet)
         {
             if(orderWorksheet.ShipEstimateResponse.HttpStatusCode != 200)
-            {
                 throw new Exception(orderWorksheet.ShipEstimateResponse.UnhandledErrorBody);
-            }
+
             if(orderWorksheet.ShipEstimateResponse.ShipEstimates.Any(s => s.SelectedShipMethodID == "NO_SHIPPING_RATES"))
-            {
                 throw new Exception("No shipping rates could be determined - fallback shipping rate of $20 3-day was used");
-            }
+
+            await Task.CompletedTask;
         }
     };
 }
