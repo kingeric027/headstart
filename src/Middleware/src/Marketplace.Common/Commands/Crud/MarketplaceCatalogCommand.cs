@@ -133,7 +133,7 @@ namespace Marketplace.Common.Commands.Crud
 				var addedAssignments = oldAssignments == null ? newAssignments : newAssignments.Where(newAssignment => !oldAssignments.Contains(newAssignment)).ToList();
 				var deletedAssignments = oldAssignments == null ? new List<string>() : oldAssignments.Where(oldAssignment => !newAssignments.Contains(oldAssignment)).ToList();
 
-				var users = await ListAllAsync.List((page) => _oc.Users.ListAsync<MarketplaceUser>(buyerID, userGroupID: locationID, pageSize: 100));
+				var users = await ListAllAsync.List((page) => _oc.Users.ListAsync<MarketplaceUser>(buyerID, userGroupID: locationID, page: page, pageSize: 100));
 				if (addedAssignments.Count() > 0)
 				{
 					var userCatalogAssignments = await Throttler.RunAsync(users, 100, 4, user =>
@@ -145,7 +145,11 @@ namespace Marketplace.Common.Commands.Crud
 
 				if(deletedAssignments.Count() > 0)
 				{
-					var locations = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(buyerID, opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100)));
+					var locations = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(buyerID, opts => {
+							opts.Page(page);
+							opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100);
+						}
+					));
 					var locationUserAssignments = await Throttler.RunAsync(locations, 100, 5, location =>
 					{
 						return _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: location.ID, pageSize: 100);
