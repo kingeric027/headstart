@@ -355,7 +355,7 @@ namespace Marketplace.Common.Commands
         {
             // get me product with markedup prices correct currency and the existing line items in parellel
             var productRequest = _meProductCommand.Get(liReq.ProductID, user);
-            var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, null, user.AccessToken, page: page, pageSize: 100));
+            var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: user.AccessToken));
 
             var existingLineItems = await existingLineItemsRequest;
             var li = new MarketplaceLineItem();
