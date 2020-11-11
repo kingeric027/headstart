@@ -53,6 +53,13 @@ namespace Marketplace.Common.Controllers
             var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
             return retry;
         }
+
+        [HttpPost, Route("shipping/validate/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        public async Task<OrderSubmitResponse> RetryShippingValidate(string orderID)
+        {
+            var retry = await _postSubmitCommand.HandleShippingValidate(orderID, this.VerifiedUserContext);
+            return retry;
+        }
     }
 
     public class ShipmentTestModel
