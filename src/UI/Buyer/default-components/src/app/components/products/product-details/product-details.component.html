@@ -9,7 +9,6 @@
     <div [ngClass]="specs?.length > 3 ? 'col-md-5' : 'col-md-7'">
       <div class="pb-3 mb-3 border-bottom border-light">
         <a class="d-block my-2"
-           href="javascript:;"
            (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">
           {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}
         </a>

@@ -185,7 +185,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   setActiveSupplier(supplierId: string): void {
-    this.context.router.toProductList({ activeFacets: { Supplier: supplierId.toLowerCase() } });
+    this.context.router.toProductList({ activeFacets: { supplier: supplierId.toLowerCase() } });
   }
 
   openQuoteForm(): void {
