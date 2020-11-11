@@ -23,7 +23,7 @@ export class LineItemTableComponent {
   _statusChangeForm = new FormArray([]);
   _tableStatus = LineItemTableStatus.Default;
   _user: MeUser;
-  @Input() 
+  @Input()
   set order(value: MarketplaceOrder) {
     this._order = value;
     this.setSupplierOrders(value);
@@ -35,7 +35,7 @@ export class LineItemTableComponent {
   @Input()
   set lineItems(value: MarketplaceLineItem[]) {
     this._lineItems = value;
-    if(value?.length) {
+    if (value?.length) {
       this.setLineItemGroups(value);
     }
   }
@@ -43,11 +43,11 @@ export class LineItemTableComponent {
   constructor(
     private ocOrderService: OcOrderService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
-  ) {}
+  ) { }
 
   changeTableStatus(newStatus: string): void {
     this._tableStatus = newStatus;
-    if(this._tableStatus !== 'Default') {
+    if (this._tableStatus !== 'Default') {
       this.setupForm();
     } else {
       this.setLineItemGroups(this._lineItems);
@@ -59,12 +59,12 @@ export class LineItemTableComponent {
     const supplierOrder = this._supplierOrders?.find(order => order.ID === `${salesOrderID}-${lineItem.SupplierID}`)
     const shipFromID = lineItem.ShipFromAddressID;
     const shipMethod = (supplierOrder?.xp?.SelectedShipMethodsSupplierView || [])
-                        .find(sm => sm.ShipFromAddressID === shipFromID);
+      .find(sm => sm.ShipFromAddressID === shipFromID);
     if (shipMethod == null) return 'No Data';
-    const name = shipMethod.Name.replace(/_/g, ' ');     
+    const name = shipMethod.Name.replace(/_/g, ' ');
     const delivery = new Date(this._order.DateSubmitted);
-    delivery.setDate(delivery.getDate() + shipMethod.EstimatedTransitDays);  
-    return `${name}, ${delivery.toLocaleDateString('en-US')} Delivery`;             
+    delivery.setDate(delivery.getDate() + shipMethod.EstimatedTransitDays);
+    return `${name}, ${delivery.toLocaleDateString('en-US')} Delivery`;
   }
 
   setupForm(): void {
@@ -90,10 +90,10 @@ export class LineItemTableComponent {
 
   async setSupplierOrders(order: MarketplaceOrder): Promise<void> {
     const salesOrderID = order?.ID?.split('-')[0];
-    if(order.ID === salesOrderID) {
+    if (order.ID === salesOrderID) {
       const supplierOrderFilterString = order?.xp?.SupplierIDs?.map(id => `${order.ID}-${id}`).join('|');
-      const supplierOrders = await this.ocOrderService.List(this.orderDirection === 'Incoming' ? 'Outgoing' : 'Incoming', 
-      { filters: {ID: supplierOrderFilterString } }).toPromise(); 
+      const supplierOrders = await this.ocOrderService.List(this.orderDirection === 'Incoming' ? 'Outgoing' : 'Incoming',
+        { filters: { ID: supplierOrderFilterString } }).toPromise();
       this._supplierOrders = supplierOrders.Items;
     } else {
       this._supplierOrders = [order];
@@ -104,9 +104,10 @@ export class LineItemTableComponent {
     return CanChangeLineItemsOnOrderTo(lineItemStatus, this._lineItems);
   }
 
-  getVariableTextSpecs = (li: LineItem): LineItemSpec[] =>  li?.Specs?.filter(s => s.OptionID === null);
+  getVariableTextSpecs = (li: LineItem): LineItemSpec[] => li?.Specs?.filter(s => s.OptionID === null);
 
   getLineItemStatusDisplay(lineItem: MarketplaceLineItem): string {
+    debugger;
     return Object.entries(lineItem.xp.StatusByQuantity)
       .filter(([status, quantity]) => quantity)
       .map(([status, quantity]) => {
@@ -119,8 +120,8 @@ export class LineItemTableComponent {
     return NumberCanChangeTo(this._tableStatus as LineItemStatus, lineItem);
   }
 
-  areChanges(): boolean { 
-    return this._statusChangeForm.controls.some(control =>  {
+  areChanges(): boolean {
+    return this._statusChangeForm.controls.some(control => {
       return (control as any).controls.some(subControl => subControl.value > 0);
     })
   }
@@ -150,7 +151,7 @@ export class LineItemTableComponent {
 
     this._statusChangeForm.controls.forEach((control, shipFromIndex) => {
       (control as any).controls.forEach((subControl, lineItemIndex) => {
-        if(control.value) {
+        if (control.value) {
           const lineItem = this._liGroupedByShipFrom[shipFromIndex][lineItemIndex];
           lineItemChanges.Changes.push({
             ID: lineItem.ID,

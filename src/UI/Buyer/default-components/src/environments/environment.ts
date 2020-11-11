@@ -40,9 +40,9 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const appName: AppName = WAXING_THE_CITY;
-const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
-const localMiddlewareURL = 'https://localhost:44381';
+const appName: AppName = ANYTIME_FITNESS;
+const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
+const localMiddlewareURL = 'https://localhost:5001';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -50,32 +50,32 @@ const devEnvironments: Record<string, Environment> = {
   ANYTIME_FITNESS: {
     hostedApp: false,
     appname: 'Anytime Fitness',
-    clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+    clientID: '61807034-4085-45E7-AA35-04969FC27B35',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
-    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+    creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+    sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
     ssoLink: null,
-    ordercloudEnv: OrdercloudEnv.Staging,
+    ordercloudEnv: OrdercloudEnv.Production,
     theme: afTheme,
-    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
+    instrumentationKey: '22575a56-7540-47c7-9a91-3cf5316531a3',
   },
   WAXING_THE_CITY: {
     hostedApp: false,
     appname: 'Waxing The City',
-    clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
+    clientID: '61807034-4085-45E7-AA35-04969FC27B35',
     marketplaceID: 'SEB',
     baseUrl: 'https://localhost:4200',
     middlewareUrl: middlewareLocationSelection === 'LOCAL' as any ? localMiddlewareURL : 'https://marketplace-middleware-test.azurewebsites.net',
-    creditCardIframeUrl: 'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+    creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
-    sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+    sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
     ssoLink: null,
-    ordercloudEnv: OrdercloudEnv.Staging,
+    ordercloudEnv: OrdercloudEnv.Production,
     theme: wtcTheme,
-    instrumentationKey: '5c21e742-2524-42fd-aa9a-fa45397cea35',
+    instrumentationKey: '22575a56-7540-47c7-9a91-3cf5316531a3',
   },
   BASECAMP_FITNESS: {
     hostedApp: false,

@@ -246,15 +246,15 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoPurchaseOrderMapper
     {
-        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor, ZohoPurchaseOrder po)
+        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor, ZohoPurchaseOrder po)
         {
             po.line_items = items.Select(p => new ZohoLineItem()
             {
                 account_id = p.purchase_account_id,
                 item_id = p.item_id,
                 description = p.description,
-                rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                quantity = lineitems.Items.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == p.sku : li.ProductID == p.sku)?.Quantity
+                rate = decimal.ToDouble(lineitems.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
+                quantity = lineitems.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == p.sku : li.ProductID == p.sku)?.Quantity
             }).ToList();
             po.salesorder_id = salesorder.salesorder_id;
             po.purchaseorder_number = order.ID;
@@ -266,7 +266,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             po.delivery_customer_id = salesorder.customer_id;
             return po;
         }
-        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor) {
+        public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items, List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor) {
             var po = new ZohoPurchaseOrder()
             {
                 //var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
@@ -276,8 +276,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     account_id = p.purchase_account_id,
                     item_id = p.item_id,
                     description = p.description,
-                    rate = decimal.ToDouble(lineitems.Items.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                    quantity = lineitems.Items.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku)?.Quantity
+                    rate = decimal.ToDouble(lineitems.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
+                    quantity = lineitems.FirstOrDefault(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku)?.Quantity
                 }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
                 purchaseorder_number = order.ID,
