@@ -60,6 +60,13 @@
                      formControlName="{{filter}}"
                      (change)="updateReportAdHocFilters($event.target.value, filter)">
             </div>
+            <div *ngIf="getFilterType(filter) === 'time'">
+              <input class="form-control" 
+                     type="time" 
+                     id="{{filter}}"
+                     formControlName="{{filter}}"
+                     (change)="updateReportAdHocFilters($event.target.value, filter)">
+            </div>
           </form>
         </div>
         </ng-container>

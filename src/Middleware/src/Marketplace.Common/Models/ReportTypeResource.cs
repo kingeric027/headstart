@@ -29,7 +29,7 @@ namespace Marketplace.Common.Models
                 ReportCategory = "Order",
                 AvailableToSuppliers = false,
                 Value = "SalesOrderDetail",
-                AdHocFilters = new string[] {"Date Submitted (Low)", "Date Submitted (High)"}
+                AdHocFilters = new string[] {"Date Submitted (Low)", "Date Submitted (High)", "Time Submitted (Low)", "Time Submitted (High)"}
             },
             new ReportTypeResource
             {
