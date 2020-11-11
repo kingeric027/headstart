@@ -107,7 +107,6 @@ export class LineItemTableComponent {
   getVariableTextSpecs = (li: LineItem): LineItemSpec[] => li?.Specs?.filter(s => s.OptionID === null);
 
   getLineItemStatusDisplay(lineItem: MarketplaceLineItem): string {
-    debugger;
     return Object.entries(lineItem.xp.StatusByQuantity)
       .filter(([status, quantity]) => quantity)
       .map(([status, quantity]) => {
