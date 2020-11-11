@@ -103,6 +103,10 @@ export const getOrderSummaryMeta = (
 /* eslint-enable */
 
 const getPOShippingCost = (shipEstimates: ShipEstimate[], POlineItems: MarketplaceLineItem[]): number => {
+  if (!shipEstimates) {
+    // the error is in orderworksheet.ShipEstimateResponse.UnhandledErrorBody
+    throw new Error('There was an error while retrieving shipping estimates');
+  }
   const POShipEstimates = shipEstimates.filter(shipEstimate => {
     return shipEstimate.ShipEstimateItems.some(item => POlineItems.some(li => li.ID === item.LineItemID))
   })

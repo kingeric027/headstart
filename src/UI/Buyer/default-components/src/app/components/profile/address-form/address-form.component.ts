@@ -1,30 +1,38 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
 import { BuyerAddress, Address } from 'ordercloud-javascript-sdk';
 import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   templateUrl: './address-form.component.html',
   styleUrls: ['./address-form.component.scss'],
 })
-export class OCMAddressForm implements OnInit, OnChanges {
+export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
   @Input() btnText: string;
   @Input() suggestedAddresses: BuyerAddress[];
   @Input() showOptionToSave = false;
   @Input() homeCountry: string;
-  @Input() selectedBuyerLocation: BuyerAddress;
-  @Input() selectedShippingAddress: BuyerAddress;
+  @Input() addressError: string;
   @Output() formDismissed = new EventEmitter();
   @Output()
   formSubmitted = new EventEmitter<{ address: Address; shouldSaveAddress: boolean }>();
+  @Output() formChanged = new EventEmitter<BuyerAddress>();
+  @Input() set existingAddress(address: BuyerAddress) {
+    this.ExistingAddress = address || {};
+    this.setForms();
+    this.listenToFormChanges();
+    this.addressForm.markAsPristine();
+  }
   stateOptions: string[] = [];
   countryOptions: { label: string; abbreviation: string }[];
   addressForm: FormGroup;
   shouldSaveAddressForm: FormGroup;
   selectedAddress: BuyerAddress;
+  alive = true;
   private ExistingAddress: BuyerAddress = {};
 
   constructor() {
@@ -33,19 +41,14 @@ export class OCMAddressForm implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.setForms();
+    this.listenToFormChanges();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes.homeCountry) {
       this.addressForm.controls.Country.setValue(this.homeCountry);
       this.onCountryChange();
     }
-  }
-
-  @Input() set existingAddress(address: BuyerAddress) {
-    this.ExistingAddress = address || {};
-    this.setForms();
-    this.addressForm.markAsPristine();
   }
 
   setForms(): void {
@@ -66,6 +69,19 @@ export class OCMAddressForm implements OnInit, OnChanges {
     });
   }
 
+  listenToFormChanges(): void {
+    this.addressForm.valueChanges.pipe(
+      takeWhile(() => this.alive)
+    )
+      .subscribe((address) => {
+        if (!address.ID) {
+          // default option for "Shipping Address" select dropdown expects a null value if its missing
+          address.ID = null;
+        }
+        this.formChanged.emit(address);
+      });
+  }
+
   onCountryChange(event?: any): void {
     const country = this.homeCountry;
     this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
@@ -76,12 +92,16 @@ export class OCMAddressForm implements OnInit, OnChanges {
   }
 
   getCountryName(countryCode: string): string {
-    const country = this.countryOptions.find(country => country.abbreviation === countryCode);
+    const country = this.countryOptions.find(c => c.abbreviation === countryCode);
     return country ? country.label : '';
   }
 
   useSuggestedAddress(address: BuyerAddress): void {
-    this.selectedAddress = address;
+    if (!address.ID) {
+      // default option for "Shipping Address" select dropdown expects a null value if its missing
+      (address as any).ID = null;
+    }
+    this.formChanged.emit(address);
   }
 
   onSubmit(): void {
@@ -94,5 +114,9 @@ export class OCMAddressForm implements OnInit, OnChanges {
 
   dismissForm(): void {
     this.formDismissed.emit();
+  }
+
+  ngOnDestroy(): void {
+    this.alive = false;
   }
 }

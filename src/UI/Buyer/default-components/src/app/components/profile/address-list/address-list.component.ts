@@ -25,17 +25,18 @@ export class OCMAddressList implements OnInit {
       [key: string]: string | string[];
     };
   } = {
-    page: undefined,
-    search: undefined,
-    filters: { ['Editable']: 'true' },
-  };
+      page: undefined,
+      search: undefined,
+      filters: { ['Editable']: 'true' },
+    };
   resultsPerPage = 8;
   areYouSureModal = ModalState.Closed;
   showCreateAddressForm = false;
   isLoading = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
-  constructor(private context: ShopperContextService, private toasterService: ToastrService) {}
+  _addressError: string;
+  constructor(private context: ShopperContextService, private toasterService: ToastrService) { }
 
   ngOnInit(): void {
     this.reloadAddresses();
@@ -71,13 +72,26 @@ export class OCMAddressList implements OnInit {
     this.suggestedAddresses = null;
   }
 
-  addressFormSubmitted(address: BuyerAddress): void {
+  async addressFormSubmitted(address: BuyerAddress): Promise<void> {
     window.scrollTo(0, null);
-    if (this.currentAddress) {
-      this.updateAddress(address);
-    } else {
-      this.addAddress(address);
+    try {
+      if (this.currentAddress?.ID) {
+        await this.updateAddress(address);
+      } else {
+        await this.addAddress(address);
+      }
     }
+    catch(e) {
+      if(e?.response?.data?.Message) {
+        this._addressError = e?.response?.data?.Message
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  addressFormChanged(address: BuyerAddress): void {
+    this.currentAddress = address;
   }
 
   async deleteAddress(address: BuyerAddress): Promise<void> {
@@ -107,6 +121,11 @@ export class OCMAddressList implements OnInit {
       this.refresh();
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
+      if(!(this.suggestedAddresses?.length>=1)){
+        throw(ex)  
+      } else {
+        this.currentAddress = null;
+      }
     }
   }
 
@@ -120,6 +139,7 @@ export class OCMAddressList implements OnInit {
       this.suggestedAddresses = null;
       this.refresh();
     } catch (ex) {
+      this.currentAddress = null;
       this.suggestedAddresses = getSuggestedAddresses(ex);
     }
   }

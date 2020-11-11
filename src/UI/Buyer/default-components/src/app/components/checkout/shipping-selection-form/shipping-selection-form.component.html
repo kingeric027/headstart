@@ -1,19 +1,15 @@
-<form [formGroup]="form"
-      class="py-3">
+<form [formGroup]="form" class="py-3">
   <p translate>CHECKOUT.SHIPPING_SELECTION_FORM.DELIVERY_OPTIONS <fa-icon [icon]="faQuestionCircle"
-             ngbTooltip="Shipping estimates are based on delivery speed after items have been shipped by the carrier."
-             placement="right-bottom auto">
+      ngbTooltip="Shipping estimates are based on delivery speed after items have been shipped by the carrier."
+      placement="right-bottom auto">
     </fa-icon>
   </p>
-  <select class="custom-select"
-          formControlName="ShipMethodID"
-          (change)="onFormChanges()">
-    <option [ngValue]="null"
-            disabled
-            translate>CHECKOUT.SHIPPING_SELECTION_FORM.HOW_FAST</option>
-    <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods"
-            [ngValue]="shipMethod.ID">
-      {{ shipMethod.EstimatedTransitDays }} <span translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{detectPlural(shipMethod.EstimatedTransitDays) }} - {{ shipMethod.xp.FreeShippingApplied ? 'FREE' : (shipMethod.Cost | currency: _orderCurrency) }}
+  <select class="custom-select" formControlName="ShipMethodID" (change)="onFormChanges()">
+    <option [ngValue]="null" disabled translate>CHECKOUT.SHIPPING_SELECTION_FORM.HOW_FAST</option>
+    <option *ngFor="let shipMethod of _shipEstimate?.ShipMethods" [ngValue]="shipMethod.ID">
+      {{ shipMethod.EstimatedTransitDays }} <span
+        translate>CHECKOUT.SHIPPING_SELECTION_FORM.DAY</span>{{detectPlural(shipMethod.EstimatedTransitDays) }} -
+      {{ shipMethod.xp.FreeShippingApplied ? 'FREE' : (shipMethod.Cost | currency: _orderCurrency) }}
     </option>
   </select>
 </form>

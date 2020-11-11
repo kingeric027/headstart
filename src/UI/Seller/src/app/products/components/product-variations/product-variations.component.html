@@ -224,11 +224,11 @@
                                  [checked]="isDefaultSpecOption(spec.ID, opt.ID)"
                                  (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID) : setDefaultSpecOption(spec.ID, opt.ID)"
                                  [disabled]="disableSpecOption(spec.ID, opt)"
-                                 id="DefaultSpecOption"
-                                 [matTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
+                                 id="DefaultSpecOption_{{opt.ID}}"
+                                 [ngbTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
                           <label class="custom-control-label small"
                                  style="line-height: 1.5rem"
-                                 for="DefaultSpecOption">Default
+                                 for="DefaultSpecOption_{{opt.ID}}">Default
                           </label>
                         </div>
                       </td>

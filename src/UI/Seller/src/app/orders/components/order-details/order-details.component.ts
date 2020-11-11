@@ -20,6 +20,7 @@ import { AppConfig, applicationConfiguration } from '@app-seller/config/app.conf
 import { AppAuthService } from '@app-seller/auth';
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface';
 import { MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import { flatten as _flatten } from 'lodash';
 
 export const LineItemTableStatus = {
   Default: 'Default',
@@ -151,10 +152,32 @@ export class OrderDetailsComponent {
     this.setOrderProgress(order);
     this._order = order;
     this.getIncomingOrOutgoing();
-    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID).toPromise();
-    this._lineItems = lineItemsResponse.Items as MarketplaceLineItem[];
+    this._lineItems = await this.getAllLineItems(order);
     const paymentsResponse = await this.ocPaymentService.List(this.orderDirection, order.ID).toPromise();
     this._payments = paymentsResponse.Items;
+  }
+  
+  private async getAllLineItems(order) {
+    let lineItems = [];
+    const listOptions = {
+      page: 1,
+      pageSize: 100
+    }
+    const lineItemsResponse = await this.ocLineItemService.List(this.orderDirection, order.ID, listOptions).toPromise();
+    lineItems = [...lineItems, ...lineItemsResponse.Items as MarketplaceLineItem[]];
+    if (lineItemsResponse.Meta.TotalPages <= 1) {
+      return lineItems;
+    } else {
+      let lineItemRequests = [];
+      for (let page = 2; page <= lineItemsResponse.Meta.TotalPages; page++) {
+        listOptions.page = page;
+        lineItemRequests = [...lineItemRequests, this.ocLineItemService.List(this.orderDirection, order.ID, listOptions).toPromise()]
+      }
+      return await Promise.all(lineItemRequests).then(response => {
+        lineItems = [...lineItems, ..._flatten(response.map(r => r.Items))];
+        return lineItems;
+      });
+    }
   }
 
   async refreshOrder(): Promise<void> {
