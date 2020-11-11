@@ -2,16 +2,13 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ShopperContextService } from 'marketplace';
 import { ShipEstimate, ShipMethodSelection } from 'ordercloud-javascript-sdk';
 import { FormGroup, FormControl } from '@angular/forms';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   templateUrl: './shipping-selection-form.component.html',
   styleUrls: ['./shipping-selection-form.component.scss'],
 })
 export class OCMShippingSelectionForm implements OnInit {
-  faQuestionCircle = faQuestionCircle;
-  _shipEstimate: ShipEstimate;
-  _orderCurrency: string;
   @Input() set shipEstimate(value: ShipEstimate) {
     this._shipEstimate = value;
     this.setSelectedRate(value.SelectedShipMethodID);
@@ -19,7 +16,11 @@ export class OCMShippingSelectionForm implements OnInit {
   @Input() shipFromAddressID: string;
   @Input() supplierID: string;
   @Output() selectionChanged = new EventEmitter<ShipMethodSelection>();
-
+  
+  faQuestionCircle = faQuestionCircle;
+  faExclamationTriangle = faExclamationTriangle;
+  _shipEstimate: ShipEstimate;
+  _orderCurrency: string;
   form: FormGroup;
 
   constructor(private context: ShopperContextService) {}
