@@ -16,7 +16,9 @@ namespace ordercloud.integrations.easypost
 
 		public bool Equals(AddressPair other)
 		{
-			return (ShipFrom.Street1 == other.ShipFrom.Street1) &&
+			return (ShipFrom.ID == other.ShipFrom.ID) &&
+					// we still want to compare the rest of these properties to handle one time addresses
+					(ShipFrom.Street1 == other.ShipFrom.Street1) &&
 					(ShipFrom.Zip == other.ShipFrom.Zip) &&
 					(ShipFrom.City == other.ShipFrom.City) &&
 					(ShipTo.Street1 == other.ShipTo.Street1) &&
