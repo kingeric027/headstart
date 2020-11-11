@@ -1,8 +1,8 @@
-<form (ngSubmit)="onSubmit()"
-      novalidate
+<form  novalidate
       [formGroup]="addressForm"
       name="RegisterForm">
-  <div *ngIf="!suggestedAddresses || suggestedAddresses?.length === 0">
+  <div [hidden]="suggestedAddresses && suggestedAddresses.length">
+       <div *ngIf="addressError" class="text-danger">{{addressError}}</div>
     <div class="row">
       <div [hidden]="true"
            class="col-md-6 form-group">
@@ -169,8 +169,9 @@
                         (selectedAddress)="useSuggestedAddress($event.detail)"></address-suggestion>
   </div>
   <div class="d-flex justify-content-start align-items-center">
-    <button type="submit"
-            [disabled]="!selectedShippingAddress || !selectedBuyerLocation"
+    <button type="button"
+              (click)="onSubmit()"
+            [disabled]= "!addressForm.valid" 
             class="btn btn-secondary btn-sm mr-2">{{ btnText }}</button>
     <button type="button"
             class="btn btn-sm btn-outline-danger"

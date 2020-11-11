@@ -1,60 +1,38 @@
 import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { LineItemSpec } from 'ordercloud-javascript-sdk';
-import { MarketplaceMeKitProduct, MeProductInKit } from '@ordercloud/headstart-sdk';
+import { Asset, MarketplaceMeKitProduct, MeProductInKit } from '@ordercloud/headstart-sdk';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { ShopperContextService } from 'marketplace';
+import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
+import { KitVariantSelection, ProductSelectionEvent } from 'src/app/models/product-selection-event.interface';
 
-export interface KitVariantSelection {
-  productID: string;
-  specForm: FormGroup;
-  quantity: number;
-}
-
-export interface OpenVariantSelectionEvent {
-  productKitDetails: MeProductInKit;
-  selection: KitVariantSelection;
-}
-
-export interface LineItemToAdd {
-  ProductID: string;
-  Quantity: number;
-  Specs: LineItemSpec[];
-  Product: {
-    // adding purely so i can use productNameWithSpecs pipe without modification
-    Name: string;
-  };
-  Price: number; // adding for display purposes
-  xp: {
-    ImageUrl: string;
-    KitProductName: string;
-    KitProductImageUrl: string;
-    KitProductID: string;
-  };
-}
 @Component({
   templateUrl: './kit-product-details.component.html',
   styleUrls: ['./kit-product-details.component.scss']
 })
 export class OCMKitProductDetails {
+  @Input() set product(product: MarketplaceMeKitProduct) {
+    this._product = product
+    this.images = product.Images;
+  }
+
   isAddingToCart = false;
   _product: MarketplaceMeKitProduct;
   variantSelection: KitVariantSelection;
-  openVariantSelectionEvent: OpenVariantSelectionEvent;
+  productSelectionEvent: ProductSelectionEvent;
   lineItemsToAdd: LineItemToAdd[] = [];
-
-  @Input() set product(product: MarketplaceMeKitProduct) {
-    this._product = product
-  }
+  selectedProduct: MeProductInKit;
+  images: Asset[];
 
   constructor(
     private productDetailService: ProductDetailService,
     private context: ShopperContextService
   ) { }
 
-  openVariantSelection(event: OpenVariantSelectionEvent): void {
-    this.openVariantSelectionEvent = event;
+  selectProduct(event: ProductSelectionEvent): void {
+    this.productSelectionEvent = event;
+    this.images = event.productKitDetails.Images;
   }
+
   async addToCart(): Promise<void> {
     this.isAddingToCart = true;
     try {
@@ -82,11 +60,13 @@ export class OCMKitProductDetails {
   canAddToCart(): boolean {
     // the cart is valid if all kit products have at least one associated line item
     // variable kit products may have more than one
-    if (!this._product || !this._product.ProductAssignments.ProductsInKit.length) {
+    if (!this._product || !this._product.ProductAssignments.ProductsInKit.length || !this.lineItemsToAdd?.length) {
       return false;
     }
     const productsAddedToCart = this.lineItemsToAdd.map(li => li.ProductID);
-    return this._product.ProductAssignments.ProductsInKit.every(details => productsAddedToCart.includes(details.Product.ID))
+    return this._product.ProductAssignments.ProductsInKit.every(
+      details => details.Optional || productsAddedToCart.includes(details.Product.ID)
+    )
   }
 
 }

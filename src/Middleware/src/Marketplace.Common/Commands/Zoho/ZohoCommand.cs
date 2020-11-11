@@ -261,6 +261,9 @@ namespace Marketplace.Common.Commands.Zoho
             foreach (var list in zItems)
                 list.Items.ForEach(item => z_items.Add(item.sku, item));
 
+            await Throttler.RunAsync(z_items.Where(z => z.Value.status == "inactive").Select(z => z.Value), 100, 5,
+                b => _zoho.Items.MarkActiveAsync(b.item_id));
+
             var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
             {
                 var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
@@ -280,6 +283,11 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var method = shipment.ShipMethods.FirstOrDefault(s => s.ID == shipment.SelectedShipMethodID);
                 var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() {Key = "sku", Value = $"{method?.Name} Shipping (41000)" });
+
+                var inactives = z_shipping.Items.Where(z => z.status == "inactive").Select(z => z);
+
+                await Throttler.RunAsync(inactives, 100, 5,
+                    b => _zoho.Items.MarkActiveAsync(b.item_id));
                 if (z_shipping.Items.Any())
                     list.Add(await _zoho.Items.SaveAsync(ZohoShippingLineItemMapper.Map(z_shipping.Items.FirstOrDefault(), method)));
                 else

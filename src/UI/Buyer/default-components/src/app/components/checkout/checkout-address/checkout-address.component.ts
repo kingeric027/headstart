@@ -14,6 +14,11 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class OCMCheckoutAddress implements OnInit {
+  @Input() order: MarketplaceOrder;
+  @Input() lineItems: ListPage<LineItem>;
+  @Output() continue = new EventEmitter();
+  _addressError: string;
+
   readonly NEW_ADDRESS_CODE = 'new';
   existingBuyerLocations: ListPage<BuyerAddress>;
   selectedBuyerLocation: BuyerAddress;
@@ -22,10 +27,6 @@ export class OCMCheckoutAddress implements OnInit {
   showNewAddressForm = false;
   suggestedAddresses: BuyerAddress[];
   homeCountry: string;
-
-  @Input() order: MarketplaceOrder;
-  @Input() lineItems: ListPage<LineItem>;
-  @Output() continue = new EventEmitter();
 
   constructor(private context: ShopperContextService, private spinner: NgxSpinnerService) { }
 
@@ -54,20 +55,41 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   async saveAddressesAndContinue(newShippingAddress: Address = null): Promise<void> {
+    if (!this.selectedBuyerLocation) {
+      throw new Error('Please select a location for this order');
+    }
     try {
       this.spinner.show();
       this.order = await this.context.order.checkout.setBuyerLocationByID(this.selectedBuyerLocation?.ID);
       if (newShippingAddress != null) {
         this.selectedShippingAddress = await this.saveNewShippingAddress(newShippingAddress);
       }
-      await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
-      
+
+      if (this.selectedShippingAddress) {
+        await this.context.order.checkout.setShippingAddressByID(this.selectedShippingAddress);
+        this.continue.emit();
+      } else {
+        // not able to create address - display suggestions to user
+        this.spinner.hide();
+      }
+    } catch (e) {
+      if(e?.response?.data?.Message) {
+        this._addressError = e?.response?.data?.Message
+      } else {
+        throw e;
+      }
       this.spinner.hide();
-      this.continue.emit();
-    } catch(e) {
-      this.spinner.hide();
-      throw e;
     }
+  }
+
+  addressFormChanged(address: BuyerAddress): void {
+    this.selectedShippingAddress = address;
+  }
+
+  showNewAddress(): void {
+    this.showNewAddressForm = true;
+    this.selectedShippingAddress = null;
+    this.suggestedAddresses = [];
   }
 
   private async listSavedBuyerLocations(): Promise<void> {
@@ -90,6 +112,8 @@ export class OCMCheckoutAddress implements OnInit {
       return savedAddress;
     } catch (ex) {
       this.suggestedAddresses = getSuggestedAddresses(ex);
+      if(!(this.suggestedAddresses?.length>=1)) throw(ex)
+      return null; // set this.selectedShippingAddress
     }
   }
 

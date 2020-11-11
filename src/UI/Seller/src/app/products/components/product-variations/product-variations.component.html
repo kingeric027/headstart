@@ -163,7 +163,12 @@
           <div class="row pt-3 border-top"
                *ngFor="let spec of nonVariableTextSpecs; let specIndex = index;">
             <div class="col-md-12">
-              <h6>{{spec.Name}}</h6>
+              <div class="d-flex justify-content-between align-items-center">
+                <h6>{{spec.Name}}</h6>
+                <button class="btn btn-sm btn-link text-muted"
+                        (click)="removeSpec(spec)"
+                        translate>Remove variation</button>
+              </div>
               <div class="table-responsive">
                 <table class="table table-borderless">
                   <colgroup>
@@ -219,11 +224,11 @@
                                  [checked]="isDefaultSpecOption(spec.ID, opt.ID)"
                                  (change)="isCreatingNew ? stageDefaultSpecOption(spec.ID, opt.ID) : setDefaultSpecOption(spec.ID, opt.ID)"
                                  [disabled]="disableSpecOption(spec.ID, opt)"
-                                 id="DefaultSpecOption"
-                                 [matTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
+                                 id="DefaultSpecOption_{{opt.ID}}"
+                                 [ngbTooltip]="disableSpecOption(spec.ID, opt) ? 'Product must be saved before setting this new option as default' : ''">
                           <label class="custom-control-label small"
                                  style="line-height: 1.5rem"
-                                 for="DefaultSpecOption">Default
+                                 for="DefaultSpecOption_{{opt.ID}}">Default
                           </label>
                         </div>
                       </td>

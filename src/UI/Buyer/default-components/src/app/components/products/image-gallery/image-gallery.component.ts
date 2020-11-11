@@ -50,8 +50,12 @@ export class OCMImageGallery implements OnInit, OnChanges {
   }
 
   isImageMatchingSpecs(image: Asset): boolean {
-    // Examine all non-variable text specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    return this.specs.filter(s => s !== null).every(spec => image.Tags.find(tag => tag?.split('-').includes(spec.replace(/\s/g, ''))));
+    // Examine all non-variable text specs, and find the image tag that matches all specs,
+    // removing spaces where needed on the spec to find that match.
+    return this.specs.filter(s => s !== null)
+      .every(spec => image.Tags
+        .find(tag => tag?.split('-')
+          .includes(spec.split(' ').join('').replace(/[^a-zA-Z0-9 ]/g, ''))));
   }
 
   onSpecsChange(): void {

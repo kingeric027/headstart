@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MarketplaceMeKitProduct, MeProductInKit, Variant } from '@ordercloud/headstart-sdk';
-import { KitVariantSelection, LineItemToAdd, OpenVariantSelectionEvent } from '../kit-product-details/kit-product-details.component';
+import { ShopperContextService } from 'marketplace';
+import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
+import { KitVariantSelection, ProductSelectionEvent } from 'src/app/models/product-selection-event.interface';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface';
@@ -13,7 +15,7 @@ import { SpecFormService } from '../spec-form/spec-form.service';
   styleUrls: ['./kit-variant-selector.component.scss']
 })
 export class OCMKitVariantSelector {
-  @Input() set event(value: OpenVariantSelectionEvent) {
+  @Input() set event(value: ProductSelectionEvent) {
     this._event = value;
     this.onInit();
   }
@@ -23,7 +25,7 @@ export class OCMKitVariantSelector {
   @Input() kitProduct: MarketplaceMeKitProduct;
   @Output() addLineItem = new EventEmitter<LineItemToAdd>();
   _allLineItems: LineItemToAdd[];
-  _event: OpenVariantSelectionEvent;
+  _event: ProductSelectionEvent;
   productKitDetails: MeProductInKit;
   selection: KitVariantSelection;
   disabledVariants: Variant[]
@@ -33,16 +35,20 @@ export class OCMKitVariantSelector {
   quantityValid: boolean;
   errorMessage: string;
   resetFormToggle = true;
+  userCurrency: string;
 
   constructor(
     private productDetailService: ProductDetailService,
-    private specFormService: SpecFormService
+    private specFormService: SpecFormService,
+    private context: ShopperContextService,
   ) { }
 
   onInit(): void {
     this.productKitDetails = this._event.productKitDetails;
-    this.selection = this._event.selection;
+    this.selection = this._event.variantSelection;
     this.disabledVariants = this.productKitDetails.Variants.filter(v => !v.Active)
+    const currentUser = this.context.currentUser.get();
+    this.userCurrency = currentUser.Currency;
   }
 
   onSpecFormChange(event: SpecFormEvent): void {

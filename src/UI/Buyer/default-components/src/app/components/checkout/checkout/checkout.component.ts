@@ -194,6 +194,7 @@ export class OCMCheckout implements OnInit {
   }
 
   toSection(id: string): void {
+    this.orderPromotions = this.context.order.promos.get()?.Items;
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, id)
     const prevIdx = Math.max(this.sections.findIndex(x => x.id === id) - 1, 0);
 

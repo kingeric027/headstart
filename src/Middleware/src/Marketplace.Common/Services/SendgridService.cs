@@ -346,13 +346,14 @@ namespace Marketplace.Common.Services
 
             //  Get the shipping total from selected shipping methods for that supplier
             var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
-            var supplierShippingSelections = new List<ShipMethod>();
+            var supplierShippingSelections = new List<MarketplaceShipMethod>();
             foreach (var estimate in supplierShipEstimates)
             {
                 var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
                 supplierShippingSelections.Add(selection);
             }
-            supplierOrderWorksheet.Order.ShippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+            var shippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+            supplierOrderWorksheet.Order.ShippingCost = Math.Round(shippingCost, 2);
 
             //  now get correct tax for line items on supplier order
             var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();

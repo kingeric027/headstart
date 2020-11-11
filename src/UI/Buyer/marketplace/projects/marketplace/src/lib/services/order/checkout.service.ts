@@ -32,7 +32,7 @@ export class CheckoutService {
     private paymentHelper: PaymentHelperService,
     private state: OrderStateService,
     private appConfig: AppConfig
-  ) {}
+  ) { }
 
   async submitWithCreditCard(payment: OrderCloudIntegrationsCreditCardPayment): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
@@ -79,14 +79,15 @@ export class CheckoutService {
     return this.order;
   }
 
-  async setShippingAddressByID(address: MarketplaceAddressBuyer, ): Promise<MarketplaceOrder> {
+  async setShippingAddressByID(address: MarketplaceAddressBuyer,): Promise<MarketplaceOrder> {
     try {
       await Orders.Patch('Outgoing', this.order.ID, { xp: { ShippingAddress: address } })
       return await this.patch({ ShippingAddressID: address.ID });
     } catch (ex) {
-      if (ex.error.Errors[0].ErrorCode === 'NotFound') {
+      if (ex?.error?.Errors?.[0]?.ErrorCode === 'NotFound') {
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
       }
+      throw ex;
     }
   }
 

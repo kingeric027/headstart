@@ -138,7 +138,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoShippingLineItemMapper
     {
-        public static ZohoLineItem Map(ZohoLineItem item, ShipMethod method)
+        public static ZohoLineItem Map(ZohoLineItem item, MarketplaceShipMethod method)
         {
             item.item_id = item.item_id;
             item.item_type = "sales_and_purchases";
@@ -153,7 +153,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return item;
         }
 
-        public static ZohoLineItem Map(ShipMethod method)
+        public static ZohoLineItem Map(MarketplaceShipMethod method)
         {
             var item = new ZohoLineItem()
             {
@@ -232,7 +232,6 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             zItem.item_id = zItem.item_id;
             zItem.name = item.Variant?.Name ?? item.Product.Name;
             zItem.sku = item.Variant?.ID ?? item.Product.ID;
-            zItem.manufacturer = item.SupplierID; //TODO: figure out getting the Supplier name in here
             zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
             zItem.description = $"{item.Variant?.Name ?? item.Product.Name} from {item.SupplierID}";
             zItem.rate = Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2);

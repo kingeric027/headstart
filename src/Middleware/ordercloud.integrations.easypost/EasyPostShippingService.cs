@@ -49,16 +49,22 @@ namespace ordercloud.integrations.easypost
 		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles)
 		{
 			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, profiles));
-			var easyPostResponse = await Task.WhenAll(easyPostShipments.Select(PostShipment));
+			List<EasyPostShipment[]> easyPostResponses = new List<EasyPostShipment[]>();
+
+			foreach (var shipments in easyPostShipments)
+			{
+				easyPostResponses.Add(await Task.WhenAll(shipments.Select(PostShipment)));
+			}
+			
 			var shipEstimateResponse = new ShipEstimateResponse
 			{
 				ShipEstimates = groupedLineItems.Select((lineItems, index) =>
 				{
 					var firstLi = lineItems.First();
-					var shipMethods = EasyPostMappers.MapRates(easyPostResponse[index].rates);
+					var shipMethods = EasyPostMappers.MapRates(easyPostResponses[index]);
 					return new ShipEstimate()
 					{
-						ID = easyPostResponse[index]?.id,
+						ID = easyPostResponses[index][0].id,
 						ShipMethods = shipMethods, // This will get filtered down based on carrierAccounts
 						ShipEstimateItems = lineItems.Select(li => new ShipEstimateItem() { LineItemID = li.ID, Quantity = li.Quantity }).ToList(),
 						xp = { 
