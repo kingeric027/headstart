@@ -162,7 +162,8 @@ export class OCMCheckout implements OnInit {
 
   handleSubmitError(error: any): void {
     const errorReason = error?.response?.data?.Message || 'Unknown error'
-    this.paymentError = `The authorization for your payment was declined by the processor due to ${errorReason}. Please reenter your information or use a different card.`
+    const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
+    this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
     this.isLoading = false;
     this.currentPanel = 'payment';
   }
