@@ -143,7 +143,7 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact, Supplier supplier)
         {
-            var items = lineitems.Items.Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
+            var items = lineitems.Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
             var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = order.ID });
             if (po.Items.Any())
                 return await _zoho.PurchaseOrders.SaveAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact, po.Items.FirstOrDefault()));
