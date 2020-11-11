@@ -398,23 +398,12 @@ namespace Marketplace.Common.Commands
 
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
-            var standardLineItems = orderWorksheet.LineItems.Where(li => li.Product.xp.ProductType == "Standard")?.ToList();
-            if(standardLineItems.Any())
+            var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
+            await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
             {
-                var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
-                await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
-                {
-                    TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
-                    xp = new { AvalaraTaxTransactionCode = transaction.code }
-                });
-            } else
-            {
-                await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
-                {
-                    TaxCost = 0,  // Set this again just to make sure we have the most up to date info
-                    xp = new { AvalaraTaxTransactionCode = "No_TAXABLE_LINES" }
-                });
-            }
+                TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
+                xp = new { AvalaraTaxTransactionCode = transaction.code }
+            });
         }
 
         private static async Task ValidateShipping(MarketplaceOrderWorksheet orderWorksheet)
