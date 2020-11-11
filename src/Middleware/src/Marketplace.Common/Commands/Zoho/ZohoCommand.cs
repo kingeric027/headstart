@@ -131,7 +131,7 @@ namespace Marketplace.Common.Commands.Zoho
                 var contact = await CreateOrUpdateVendor(order);
 
                 // Step 2: Create or update Items from LineItems/Products on Order
-                //var items = await CreateOrUpdatePurchaseLineItem(lineitems.Items, supplier);
+                var items = await CreateOrUpdatePurchaseLineItem(lineitems, supplier);
 
                 // Step 3: Create purchase order
                 var po = await CreatePurchaseOrder(z_order, order, lineitems, delivery_address, contact, supplier);
