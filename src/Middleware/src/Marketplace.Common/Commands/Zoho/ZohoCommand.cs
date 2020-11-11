@@ -10,6 +10,7 @@ using Marketplace.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Zoho
@@ -71,34 +72,31 @@ namespace Marketplace.Common.Commands.Zoho
                 // this is where we filter out SMG's account for these orders only
                 if (shipping_method?.xp.CarrierAccountID != "ca_8bdb711131894ab4b42abcd1645d988c") continue;
                 var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = "SMG Shipping" });
-                var oc_lineitems = new ListPage<MarketplaceLineItem>()
+                var oc_lineitems = new List<MarketplaceLineItem>()
                 {
-                    Items = new List<MarketplaceLineItem>()
-                    {
-                        new MarketplaceLineItem() {
-                            ID = $"{z_order.reference_number} - 41000",
-                            UnitPrice = shipping_method?.Cost,
-                            ProductID = $"{shipping_method?.Name} Shipping (41000)",
-                            SupplierID = "SMG Shipping",
-                            Product = new MarketplaceLineItemProduct()
+                    new MarketplaceLineItem() {
+                        ID = $"{z_order.reference_number} - 41000",
+                        UnitPrice = shipping_method?.Cost,
+                        ProductID = $"{shipping_method?.Name} Shipping (41000)",
+                        SupplierID = "SMG Shipping",
+                        Product = new MarketplaceLineItemProduct()
+                        {
+                            Description = $"{shipping_method?.xp?.Carrier} Shipping Charge",
+                            Name = $"{shipping_method.Name} Shipping (41000)",
+                            ID = $"{shipping_method.Name} Shipping (41000)",
+                            QuantityMultiplier = 1,
+                            xp = new ProductXp()
                             {
-                                Description = $"{shipping_method?.xp?.Carrier} Shipping Charge",
-                                Name = $"{shipping_method.Name} Shipping (41000)",
-                                ID = $"{shipping_method.Name} Shipping (41000)",
-                                QuantityMultiplier = 1,
-                                xp = new ProductXp()
+                                Tax = new TaxProperties()
                                 {
-                                    Tax = new TaxProperties()
-                                    {
-                                        Code = "FR",
-                                        Description = "Shipping Charge"
-                                    }
+                                    Code = "FR",
+                                    Description = "Shipping Charge"
                                 }
                             }
                         }
                     }
                 };
-                var shipping_items = oc_lineitems.Items.Select(ZohoSalesLineItemMapper.Map).ToList();
+                var shipping_items = oc_lineitems.Select(ZohoSalesLineItemMapper.Map).ToList();
                 var oc_order = new Order()
                 {
                     ID = $"{order.Order.ID}-{order.LineItems.FirstOrDefault()?.SupplierID} - 41000",
@@ -127,7 +125,7 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var delivery_address = z_order.shipping_address;
                 var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
-                var lineitems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, pageSize: 100);
+                var lineitems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, page: page, pageSize: 100));
 
                 // Step 1: Create contact (customer) in Zoho
                 var contact = await CreateOrUpdateVendor(order);
@@ -143,9 +141,9 @@ namespace Marketplace.Common.Commands.Zoho
             return results;
         }
 
-        private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, ListPage<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact, Supplier supplier)
+        private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact, Supplier supplier)
         {
-            var items = lineitems.Items.Skip(5).Take(5).Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
+            var items = lineitems.Skip(5).Take(5).Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
             var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = order.ID });
             if (po.Items.Any())
                 return await _zoho.PurchaseOrders.SaveAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact, po.Items.FirstOrDefault()));
