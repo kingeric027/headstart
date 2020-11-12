@@ -77,8 +77,10 @@ export async function authBuyerBrowser(user: Partial<OrderCloudSDK.User>) {
 		buyerUserRoles
 	)
 
-	await setBrowserAuthCookie(userToken, 'marketplace_test.access-token')
-	//Below cookie is set on the browser when logging in, but does not seem to be needed
+	await setBrowserAuthCookie(
+		userToken,
+		'marketplacetestbuyer-staging.access-token'
+	)
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
 	t.ctx.userAuth = userToken

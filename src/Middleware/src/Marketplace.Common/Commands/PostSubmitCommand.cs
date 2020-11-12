@@ -23,7 +23,7 @@ namespace Marketplace.Common.Commands
     public interface IPostSubmitCommand
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
-        Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user);
+        Task<OrderSubmitResponse> HandleZohoRetry(string orderID);
         Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user);
     }
 
@@ -59,7 +59,7 @@ namespace Marketplace.Common.Commands
                 new List<MarketplaceOrder> { worksheet.Order });
         }
 
-        public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user)
+        public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID)
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
@@ -168,6 +168,7 @@ namespace Marketplace.Common.Commands
             {
                 if (processResults.All(i => i.Activity.All(a => a.Success)))
                 {
+                    await UpdateOrderNeedingAttention(ordersRelatingToProcess, false);
                     return new OrderSubmitResponse()
                     {
                         HttpStatusCode = 200,
@@ -178,7 +179,7 @@ namespace Marketplace.Common.Commands
                     };
                 }
                     
-                await MarkOrdersAsNeedingAttention(ordersRelatingToProcess); 
+                await UpdateOrderNeedingAttention(ordersRelatingToProcess, true); 
                 return new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
@@ -198,9 +199,9 @@ namespace Marketplace.Common.Commands
             }
         }
         
-        private async Task MarkOrdersAsNeedingAttention(List<MarketplaceOrder> orders)
+        private async Task UpdateOrderNeedingAttention(IList<MarketplaceOrder> orders, bool isError)
         {
-            var partialOrder = new PartialOrder() { xp = new { NeedsAttention = true } };
+            var partialOrder = new PartialOrder() { xp = new { NeedsAttention = isError } };
 
             var orderInfos = new List<Tuple<OrderDirection, string>> { };
 
