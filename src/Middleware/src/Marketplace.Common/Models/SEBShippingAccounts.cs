@@ -33,7 +33,7 @@ namespace Marketplace.Common.Models
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",
                 Customs_Certify = true,
-                Markup = 1.4M,
+                Markup = 1.5M,
                 Default = true
             });
             this.ShippingProfiles.Add(new EasyPostShippingProfile()
