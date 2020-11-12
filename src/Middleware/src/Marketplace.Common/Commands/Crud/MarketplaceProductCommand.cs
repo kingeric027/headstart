@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
@@ -40,12 +41,14 @@ namespace Marketplace.Common.Commands.Crud
 		private readonly IAssetedResourceQuery _assetedResources;
 		private readonly IAssetQuery _assets;
 		private readonly AppSettings _settings;
+		private readonly ISupplierApiClientHelper _apiClientHelper;
 		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
 		{
 			_assetedResources = assetedResources;
 			_assets = assets;
 			_oc = elevatedOc;
 			_settings = settings;
+			_apiClientHelper = new SupplierApiClientHelper(settings, elevatedOc);
 		}
 
 		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
@@ -419,12 +422,8 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
 		{
-			// Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-			// All suppliers have integration clients containing their name, get the supplier and use the name to get the clientID
-			var supplier = await _oc.Suppliers.GetAsync(supplierID);
-			// List API Clients and find one with supplier name 
-			var apiClients = await _oc.ApiClients.ListAsync(supplier.Name);
-			var supplierClient = apiClients?.Items?[0];
+			
+			ApiClient supplierClient = await _apiClientHelper.GetOrCreateSupplierApiClientByXpValue(supplierID, user);
 			if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
 			var configToUse = new OrderCloudClientConfig
 			{

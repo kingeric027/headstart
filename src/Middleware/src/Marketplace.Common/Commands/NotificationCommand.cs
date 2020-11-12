@@ -11,6 +11,7 @@ using Marketplace.Common.Commands.Crud;
 using ordercloud.integrations.library.Cosmos;
 using System.Collections.Generic;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -26,6 +27,7 @@ namespace Marketplace.Common.Commands
         private readonly IDocumentQuery _query;
         private readonly IDocumentAssignmentQuery _assignmentQuery;
         private readonly IMarketplaceProductCommand _productCommand;
+        private readonly ISupplierApiClientHelper _apiClientHelper;
 
         public NotificationCommand(IOrderCloudClient oc, AppSettings settings, IDocumentQuery query, IDocumentAssignmentQuery assignmentQuery, IMarketplaceProductCommand productCommand)
         {
@@ -34,6 +36,7 @@ namespace Marketplace.Common.Commands
             _query = query;
             _assignmentQuery = assignmentQuery;
             _productCommand = productCommand;
+            _apiClientHelper = new SupplierApiClientHelper(settings, oc);
         }
         public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
         {
@@ -53,13 +56,7 @@ namespace Marketplace.Common.Commands
             var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                // Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-                // All suppliers have integration clients containing their name, get the supplier and use the name to get the clientID
-                var supplier = await _oc.Suppliers.GetAsync(supplierID);
-                // List API Clients and find one with supplier name 
-                var apiClients = await _oc.ApiClients.ListAsync(supplier.Name);
-                var supplierClient = apiClients?.Items?[0];
-
+                var supplierClient = await _apiClientHelper.GetOrCreateSupplierApiClientByXpValue(supplierID, user);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
 
                 var configToUse = new OrderCloudClientConfig

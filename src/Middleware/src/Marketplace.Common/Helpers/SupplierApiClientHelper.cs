@@ -8,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace Marketplace.Common.Helpers
 {
-    public class SupplierApiClientHelper
+    public interface ISupplierApiClientHelper
+    {
+        Task<ApiClient> GetOrCreateSupplierApiClientByXpValue(string supplierID, VerifiedUserContext user);
+    }
+    public class SupplierApiClientHelper : ISupplierApiClientHelper
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
@@ -17,17 +21,18 @@ namespace Marketplace.Common.Helpers
             _settings = settings;
             _oc = oc;
         }
-        public async Task<ApiClient> GetOrCreateSupplierApiClientByName(string supplierID, VerifiedUserContext user)
+        public async Task<ApiClient> GetOrCreateSupplierApiClientByXpValue(string supplierID, VerifiedUserContext user)
         {
             ApiClient supplierClient;
             var supplierDetails = await _oc.Suppliers.GetAsync(supplierID);
-            // List API Clients and find one with supplier name 
-            var apiClients = await _oc.ApiClients.ListAsync(supplierDetails.Name);
-            if (apiClients.Items.HasItem())
+            // GET ApiClient using the xp value on supplier
+            try
             {
+                ApiClient apiClient = await _oc.ApiClients.GetAsync(supplierDetails?.xp?.ApiClientID);
                 // If ApiClient exists, return it
-                supplierClient = apiClients?.Items?[0];
-            } else
+                supplierClient = apiClient;
+            } 
+            catch
             {
                 // else create and return the new api client
                 supplierClient = await _oc.ApiClients.CreateAsync(new ApiClient()
@@ -43,6 +48,14 @@ namespace Marketplace.Common.Helpers
                     AllowSeller = false,
                     IsAnonBuyer = false,
                 }, user.AccessToken);
+                // Assign Supplier API Client to new supplier
+                await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
+                {
+                    ApiClientID = supplierClient.ID,
+                    SupplierID = supplierID
+                }, user.AccessToken);
+                // Update supplierXp to contain the new api client value
+                await _oc.Suppliers.PatchAsync(supplierID, new PartialSupplier { xp = new { ApiClientID = supplierClient.ID} });
             }
             return supplierClient;
         }
