@@ -61,7 +61,7 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
       State: new FormControl(this.ExistingAddress.State || null, Validators.required),
       Zip: new FormControl(this.ExistingAddress.Zip || ''),
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
-      Country: new FormControl(this.homeCountry || '', Validators.required),
+      Country: new FormControl({value: this.homeCountry || '', disabled: true}, Validators.required),
       ID: new FormControl(this.ExistingAddress.ID || ''),
     });
     this.shouldSaveAddressForm = new FormGroup({
@@ -90,6 +90,7 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
     } else {
       this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
     }
+    this.addressForm.get('Zip').updateValueAndValidity();
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }
