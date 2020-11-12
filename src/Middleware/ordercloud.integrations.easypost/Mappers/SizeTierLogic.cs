@@ -42,7 +42,8 @@ namespace ordercloud.integrations.easypost
 
 	public class Package
 	{
-		// This is intended to be a max parcel dimension, but is not being honored because of a percentage bug. see line 77
+		// This is intended to be a max parcel dimension, but is not being honored because of a bug in the math. see line 83 about percentage 1 vs 100
+		// fixing that bug 
 		public static readonly decimal FULL_PACKAGE_DIMENSION = 11; // inches. 
         public static readonly decimal DEFAULT_WEIGHT = 5;
 		public decimal PercentFilled { get; set; } = 0;
@@ -51,8 +52,12 @@ namespace ordercloud.integrations.easypost
 
 	public static class SmartPackageMapper
 	{
-		// Any parcel sent to easy post for a fedex account with a dimension over 33 returns no rates.
-		private static readonly int FEDEX_MAX_PARCEL_DIMENSION = 33; // inches. 
+		// Any parcel sent to easy post with a dimension over 33 returns no rates.
+		// Dimensions around 33 return high rates in the $200's for the slowest shipping tiers 
+		private static readonly int EASYPOST_MAX_PARCEL_DIMENSION = 33; // inches. 
+
+		// 22 inches seems to produce rates around $20 for the slowest tiers, which feels reasonable
+		private static readonly int TARGET_REASONABLE_PARCEL_DIMENSION = 22; // inches
 
 		private static readonly Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>() 
 		{
@@ -68,6 +73,7 @@ namespace ordercloud.integrations.easypost
 		{
 			var lineItemsThatCanShipTogether = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
 			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
+
 
 			var packages = lineItemsThatCanShipTogether
 				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
@@ -98,7 +104,7 @@ namespace ordercloud.integrations.easypost
 					width = dimension,
 					height = dimension,
 				};
-			}).ToList();
+			}).Select(p => CapParcelDimensions(p, TARGET_REASONABLE_PARCEL_DIMENSION));
 
 			var individualPackages = lineItemsThatShipAlone.Select(li => new EasyPostParcel()
             {
@@ -107,21 +113,17 @@ namespace ordercloud.integrations.easypost
                 length = (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
                 width = (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
                 height = (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
-            });
+            }).Select(p => CapParcelDimensions(p, EASYPOST_MAX_PARCEL_DIMENSION));
 
-			var parcels = combinationPackages
-				.Union(individualPackages)
-				.Select(CapParcelDimensions)
-				.ToList();
-
-			return parcels;
-
+			return combinationPackages.Union(individualPackages).ToList();
 		}
-		private static EasyPostParcel CapParcelDimensions(EasyPostParcel parcel)
+
+
+		private static EasyPostParcel CapParcelDimensions(EasyPostParcel parcel, double maximumDimension)
 		{
-			parcel.height = Math.Min(parcel.height, FEDEX_MAX_PARCEL_DIMENSION);
-			parcel.width = Math.Min(parcel.width, FEDEX_MAX_PARCEL_DIMENSION);
-			parcel.length = Math.Min(parcel.length, FEDEX_MAX_PARCEL_DIMENSION);
+			parcel.height = Math.Min(parcel.height, maximumDimension);
+			parcel.width = Math.Min(parcel.width, maximumDimension);
+			parcel.length = Math.Min(parcel.length, maximumDimension);
 			return parcel;
 		}
 	}
