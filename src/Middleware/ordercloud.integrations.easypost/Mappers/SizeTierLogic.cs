@@ -4,6 +4,7 @@ using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text.Json.Serialization;
 
 namespace ordercloud.integrations.easypost
@@ -41,7 +42,8 @@ namespace ordercloud.integrations.easypost
 
 	public class Package
 	{
-		public static readonly decimal FULL_PACKAGE_DIMENSION = 11; // inches
+		// This is intended to be a max parcel dimension, but is not being honored because of a percentage bug. see line 77
+		public static readonly decimal FULL_PACKAGE_DIMENSION = 11; // inches. 
         public static readonly decimal DEFAULT_WEIGHT = 5;
 		public decimal PercentFilled { get; set; } = 0;
 		public decimal Weight { get; set; } = 0; // lbs 
@@ -49,6 +51,9 @@ namespace ordercloud.integrations.easypost
 
 	public static class SmartPackageMapper
 	{
+		// Any parcel sent to easy post for a fedex account with a dimension over 33 returns no rates.
+		private static readonly int FEDEX_MAX_PARCEL_DIMENSION = 33; // inches. 
+
 		private static readonly Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>() 
 		{
 			{ SizeTier.A, .385M }, // 38.5% of a full package
@@ -64,26 +69,26 @@ namespace ordercloud.integrations.easypost
 			var lineItemsThatCanShipTogether = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
 			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
 
-			var parcels = lineItemsThatCanShipTogether
+			var packages = lineItemsThatCanShipTogether
 				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
-				.Aggregate(new List<Package>(), (packages, item) =>
+				.Aggregate(new List<Package>(), (packagesInProgress, item) =>
 				{
-					if (packages.Count == 0) packages.Add(new Package());
+					if (packagesInProgress.Count == 0) packagesInProgress.Add(new Package());
 					var percentFillToAdd = SIZE_FACTOR_MAP[item.Product.xp.SizeTier];
-					var currentPackage = packages.Last();
-					if (currentPackage.PercentFilled + percentFillToAdd > 100)
+					var currentPackage = packagesInProgress.Last();
+					if (currentPackage.PercentFilled + percentFillToAdd > 100) // this should be a 1, not a 100. However, this mathematically correct packaging produces very high rates.
 					{
 						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
-						packages.Add(newPackage);
+						packagesInProgress.Add(newPackage);
 					} else
 					{
 						currentPackage.PercentFilled += percentFillToAdd;
 						currentPackage.Weight += item.Product.ShipWeight ?? 0;
 					}
-					return packages;
+					return packagesInProgress;
 				});
 
-			var combinationPackages = parcels.Select((package, index) =>
+			var combinationPackages = packages.Select((package, index) =>
 			{
 				var dimension = (int)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
 				return new EasyPostParcel()
@@ -104,7 +109,20 @@ namespace ordercloud.integrations.easypost
                 height = (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
             });
 
-			return combinationPackages.Union(individualPackages).ToList();
+			var parcels = combinationPackages
+				.Union(individualPackages)
+				.Select(CapParcelDimensions)
+				.ToList();
+
+			return parcels;
+
+		}
+		private static EasyPostParcel CapParcelDimensions(EasyPostParcel parcel)
+		{
+			parcel.height = Math.Min(parcel.height, FEDEX_MAX_PARCEL_DIMENSION);
+			parcel.width = Math.Min(parcel.width, FEDEX_MAX_PARCEL_DIMENSION);
+			parcel.length = Math.Min(parcel.length, FEDEX_MAX_PARCEL_DIMENSION);
+			return parcel;
 		}
 	}
 }
