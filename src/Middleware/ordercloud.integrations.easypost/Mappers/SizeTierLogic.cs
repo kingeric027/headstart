@@ -75,26 +75,26 @@ namespace ordercloud.integrations.easypost
 			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
 
 
-			var packages = lineItemsThatCanShipTogether
+			var parcels = lineItemsThatCanShipTogether
 				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
-				.Aggregate(new List<Package>(), (packagesInProgress, item) =>
+				.Aggregate(new List<Package>(), (packages, item) =>
 				{
-					if (packagesInProgress.Count == 0) packagesInProgress.Add(new Package());
+					if (packages.Count == 0) packages.Add(new Package());
 					var percentFillToAdd = SIZE_FACTOR_MAP[item.Product.xp.SizeTier];
-					var currentPackage = packagesInProgress.Last();
+					var currentPackage = packages.Last();
 					if (currentPackage.PercentFilled + percentFillToAdd > 100) // this should be a 1, not a 100. However, this mathematically correct packaging produces very high rates.
 					{
 						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
-						packagesInProgress.Add(newPackage);
+						packages.Add(newPackage);
 					} else
 					{
 						currentPackage.PercentFilled += percentFillToAdd;
 						currentPackage.Weight += item.Product.ShipWeight ?? 0;
 					}
-					return packagesInProgress;
+					return packages;
 				});
 
-			var combinationPackages = packages.Select((package, index) =>
+			var combinationPackages = parcels.Select((package, index) =>
 			{
 				var dimension = (int)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
 				return new EasyPostParcel()
