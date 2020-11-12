@@ -3,7 +3,7 @@ import { FormGroup, Validators, FormControl } from '@angular/forms';
 
 // 3rd party
 import { BuyerAddress, Address } from 'ordercloud-javascript-sdk';
-import { ValidateName, ValidateUSZip, ValidatePhone } from '../../../validators/validators';
+import { ValidateName, ValidateUSZip, ValidatePhone, ValidateCAZip } from '../../../validators/validators';
 import { GeographyConfig } from '../../../config/geography.class';
 import { takeWhile } from 'rxjs/operators';
 
@@ -59,7 +59,7 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
       Street2: new FormControl(this.ExistingAddress.Street2 || ''),
       City: new FormControl(this.ExistingAddress.City || ''),
       State: new FormControl(this.ExistingAddress.State || null, Validators.required),
-      Zip: new FormControl(this.ExistingAddress.Zip || '', [Validators.required, ValidateUSZip]),
+      Zip: new FormControl(this.ExistingAddress.Zip || ''),
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
       Country: new FormControl(this.homeCountry || '', Validators.required),
       ID: new FormControl(this.ExistingAddress.ID || ''),
@@ -85,7 +85,11 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
   onCountryChange(event?: any): void {
     const country = this.homeCountry;
     this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
-    this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
+    if (country === 'CA') {
+      this.addressForm.get('Zip').setValidators([Validators.required, ValidateCAZip]);
+    } else {
+      this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
+    }
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }
