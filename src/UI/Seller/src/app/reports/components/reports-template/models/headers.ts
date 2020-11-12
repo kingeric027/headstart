@@ -91,6 +91,7 @@ export const lineItemDetail = [
   { value: 'Line Item ID', path: 'MarketplaceLineItem.ID' },
   { value: 'Product ID', path: 'MarketplaceLineItem.ProductID' },
   { value: 'Product Name', path: 'MarketplaceLineItem.Product.Name' },
+  { value: 'Variant ID', path: 'MarketplaceLineItem.Variant.ID'},
   { value: 'Product Price', path: 'MarketplaceLineItem.UnitPrice' },
   { value: 'Quantity Ordered', path: 'MarketplaceLineItem.Quantity' },
   { value: 'Tax Code', path: 'MarketplaceLineItem.Product.xp.Tax.Code' },

@@ -19,8 +19,8 @@ namespace Marketplace.Common.Commands
         ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser);
         Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
+        Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
         Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> GetReportTemplate(string id, VerifiedUserContext verifiedUser);
@@ -153,13 +153,17 @@ namespace Marketplace.Common.Commands
             return filteredOrders;
         }
 
-        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
+        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
         {
             var template = await _template.Get(templateID, verifiedUser);
+            string dateLow = GetAdHocFilterValue(args, "DateLow");
+            string timeLow = GetAdHocFilterValue(args, "TimeLow");
+            string dateHigh = GetAdHocFilterValue(args, "DateHigh");
+            string timeHigh = GetAdHocFilterValue(args, "TimeHigh");
             var orderDirection = verifiedUser.UsrType == "admin" ? OrderDirection.Outgoing : OrderDirection.Incoming;
             var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
                 orderDirection,
-                filters: $"from={lowDateRange}&to={highDateRange}",
+                filters: $"from={dateLow}&to={dateHigh}",
                 page: page,
                 pageSize: 100,
                 accessToken: verifiedUser.AccessToken
@@ -178,7 +182,7 @@ namespace Marketplace.Common.Commands
             foreach (var order in orders)
             {
 
-                if (PassesFilters(order, filtersToEvaluateMap))
+                if (PassesFilters(order, filtersToEvaluateMap) && PassesOrderTimeFilter(order, dateLow, timeLow, dateHigh, timeHigh))
                 {
                     filteredOrders.Add(order);
                 }
@@ -186,12 +190,16 @@ namespace Marketplace.Common.Commands
             return filteredOrders;
         }
 
-        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, string lowDateRange, string highDateRange, VerifiedUserContext verifiedUser)
+        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
         {
             var template = await _template.Get(templateID, verifiedUser);
+            string dateLow = GetAdHocFilterValue(args, "DateLow");
+            string timeLow = GetAdHocFilterValue(args, "TimeLow");
+            string dateHigh = GetAdHocFilterValue(args, "DateHigh");
+            string timeHigh = GetAdHocFilterValue(args, "TimeHigh");
             var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
                 OrderDirection.Incoming,
-                filters: $"from={lowDateRange}&to={highDateRange}",
+                filters: $"from={dateLow}&to={dateHigh}",
                 page: page,
                 pageSize: 100,
                 accessToken: verifiedUser.AccessToken
@@ -210,7 +218,7 @@ namespace Marketplace.Common.Commands
             foreach (var order in orders)
             {
 
-                if (PassesFilters(order, filtersToEvaluateMap))
+                if (PassesFilters(order, filtersToEvaluateMap) && PassesOrderTimeFilter(order, dateLow, timeLow, dateHigh, timeHigh))
                 {
                     filteredOrders.Add(order);
                 }

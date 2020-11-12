@@ -59,6 +59,6 @@ export class ReportsSelectionComponent {
   }
 
   getFilterNameDisplay(filter: string): string {
-    return filter.match(/[A-Z][a-z]+|[0-9]+/g).join(' ');
+    return filter.match(/[A-Z][a-z]+|[0-9]+/g).join(' ') + (filter.includes('Time') ? ' (Optional)' : '');
   }
 }
