@@ -10,7 +10,7 @@ namespace Marketplace.Common.Helpers
 {
     public interface ISupplierApiClientHelper
     {
-        Task<ApiClient> GetOrCreateSupplierApiClientByXpValue(string supplierID, VerifiedUserContext user);
+        Task<ApiClient> GetSupplierApiClient(string supplierID, VerifiedUserContext user);
     }
     public class SupplierApiClientHelper : ISupplierApiClientHelper
     {
@@ -21,7 +21,7 @@ namespace Marketplace.Common.Helpers
             _settings = settings;
             _oc = oc;
         }
-        public async Task<ApiClient> GetOrCreateSupplierApiClientByXpValue(string supplierID, VerifiedUserContext user)
+        public async Task<ApiClient> GetSupplierApiClient(string supplierID, VerifiedUserContext user)
         {
             ApiClient supplierClient;
             var supplierDetails = await _oc.Suppliers.GetAsync(supplierID);

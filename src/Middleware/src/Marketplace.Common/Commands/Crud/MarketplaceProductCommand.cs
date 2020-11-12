@@ -42,13 +42,13 @@ namespace Marketplace.Common.Commands.Crud
 		private readonly IAssetQuery _assets;
 		private readonly AppSettings _settings;
 		private readonly ISupplierApiClientHelper _apiClientHelper;
-		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
+		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc, ISupplierApiClientHelper apiClientHelper)
 		{
 			_assetedResources = assetedResources;
 			_assets = assets;
 			_oc = elevatedOc;
 			_settings = settings;
-			_apiClientHelper = new SupplierApiClientHelper(settings, elevatedOc);
+			_apiClientHelper = apiClientHelper;
 		}
 
 		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
@@ -423,7 +423,7 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
 		{
 			
-			ApiClient supplierClient = await _apiClientHelper.GetOrCreateSupplierApiClientByXpValue(supplierID, user);
+			ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
 			if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
 			var configToUse = new OrderCloudClientConfig
 			{

@@ -29,14 +29,14 @@ namespace Marketplace.Common.Commands
         private readonly IMarketplaceProductCommand _productCommand;
         private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, IDocumentQuery query, IDocumentAssignmentQuery assignmentQuery, IMarketplaceProductCommand productCommand)
+        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, IDocumentQuery query, IDocumentAssignmentQuery assignmentQuery, IMarketplaceProductCommand productCommand, ISupplierApiClientHelper apiClientHelper)
         {
             _oc = oc;
             _settings = settings;
             _query = query;
             _assignmentQuery = assignmentQuery;
             _productCommand = productCommand;
-            _apiClientHelper = new SupplierApiClientHelper(settings, oc);
+            _apiClientHelper = apiClientHelper;
         }
         public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
         {
@@ -56,7 +56,7 @@ namespace Marketplace.Common.Commands
             var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                var supplierClient = await _apiClientHelper.GetOrCreateSupplierApiClientByXpValue(supplierID, user);
+                var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
 
                 var configToUse = new OrderCloudClientConfig

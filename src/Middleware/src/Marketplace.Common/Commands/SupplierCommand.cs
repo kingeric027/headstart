@@ -26,11 +26,11 @@ namespace Marketplace.Common.Commands
         private readonly AppSettings _settings;
         private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc)
+        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc, ISupplierApiClientHelper apiClientHelper)
         {
             _settings = settings;
             _oc = oc;
-            _apiClientHelper = new SupplierApiClientHelper(settings, oc);
+            _apiClientHelper = apiClientHelper;
         }
         public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user)
         {
@@ -53,7 +53,7 @@ namespace Marketplace.Common.Commands
                 pageSize: 100,
                 accessToken: user.AccessToken
                 ));
-                ApiClient supplierClient = await _apiClientHelper.GetOrCreateSupplierApiClientByXpValue(supplierID, user);
+                ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
                 var configToUse = new OrderCloudClientConfig
                 {
