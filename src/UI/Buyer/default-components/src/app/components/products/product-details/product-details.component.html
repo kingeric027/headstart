@@ -38,7 +38,7 @@
         <fa-icon [icon]="faTh">
         </fa-icon>
       </button>
-    </div> -->
+    </div>
       </div>
       <div *ngIf="supplierNote"
            class="alert alert-info my-3">
@@ -119,8 +119,7 @@
                             [specs]="specs"
                             [specForm]="specForm"
                             [superProduct]="_superProduct"
-                            [product]="_product"
-                            [priceSchedule]="priceSchedule">
+                            [product]="_product">
         </ocm-grid-spec-form>
       </ng-container>
       <ng-container *ngIf="priceBreaks && priceBreaks.length > 1">
