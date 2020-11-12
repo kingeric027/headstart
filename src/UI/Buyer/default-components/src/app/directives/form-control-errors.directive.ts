@@ -28,6 +28,8 @@ export class FormControlErrorDirective implements OnInit {
     let controlErrors = Object.keys(control.errors);
     if (control.value) controlErrors = controlErrors.filter(x => x !== 'required');
     if (controlErrors.length === 0) return '';
-    return ErrorDictionary[controlErrors[0]];
+    let error = ErrorDictionary[controlErrors[0]];
+    if (error === undefined) { error = 'Error' };
+    return error;
   }
 }

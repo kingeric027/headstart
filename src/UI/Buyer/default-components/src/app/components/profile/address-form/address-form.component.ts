@@ -59,7 +59,7 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
       Street2: new FormControl(this.ExistingAddress.Street2 || ''),
       City: new FormControl(this.ExistingAddress.City || ''),
       State: new FormControl(this.ExistingAddress.State || null, Validators.required),
-      Zip: new FormControl(this.ExistingAddress.Zip || ''),
+      Zip: new FormControl(this.ExistingAddress.Zip || '', [Validators.pattern(this.getZip(this.homeCountry)), Validators.required]),
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
       Country: new FormControl({value: this.homeCountry || '', disabled: true}, Validators.required),
       ID: new FormControl(this.ExistingAddress.ID || ''),
@@ -67,6 +67,15 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
     this.shouldSaveAddressForm = new FormGroup({
       shouldSaveAddress: new FormControl(false),
     });
+  }
+
+  getZip(countryCode: string = 'US'): string {
+    switch (countryCode) {
+      case 'CA':
+        return '^[A-Za-z]\\d[A-Za-z][ -]?\\d[A-Za-z]\\d$'; // CA zip
+      case 'US':
+        return '^[0-9]{5}(?:-[0-9]{4})?$'; // US zip - five numbers
+    }
   }
 
   listenToFormChanges(): void {
@@ -85,12 +94,6 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
   onCountryChange(event?: any): void {
     const country = this.homeCountry;
     this.stateOptions = GeographyConfig.getStates(country).map(s => s.abbreviation);
-    if (country === 'CA') {
-      this.addressForm.get('Zip').setValidators([Validators.required, ValidateCAZip]);
-    } else {
-      this.addressForm.get('Zip').setValidators([Validators.required, ValidateUSZip]);
-    }
-    this.addressForm.get('Zip').updateValueAndValidity();
     if (event) {
       this.addressForm.patchValue({ State: null, Zip: '' });
     }
