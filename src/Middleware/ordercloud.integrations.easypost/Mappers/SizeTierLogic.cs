@@ -41,7 +41,7 @@ namespace ordercloud.integrations.easypost
 
 	public class Package
 	{
-		public static readonly decimal FULL_PACKAGE_DIMENSION = 22; // inches
+		public static readonly decimal FULL_PACKAGE_DIMENSION = 11; // inches
         public static readonly decimal DEFAULT_WEIGHT = 5;
 		public decimal PercentFilled { get; set; } = 0;
 		public decimal Weight { get; set; } = 0; // lbs 

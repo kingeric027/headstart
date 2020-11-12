@@ -60,6 +60,13 @@ namespace Marketplace.Common.Controllers
             var retry = await _postSubmitCommand.HandleShippingValidate(orderID, this.VerifiedUserContext);
             return retry;
         }
+
+        // good debug method for testing rates with orders
+        [Route("shippingrates/{orderID}"), HttpGet]
+        public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
+        {
+            return await _checkoutIntegrationCommand.GetRatesAsync(orderID);
+        }
     }
 
     public class ShipmentTestModel
