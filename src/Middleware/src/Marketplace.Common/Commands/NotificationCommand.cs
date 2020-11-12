@@ -53,13 +53,12 @@ namespace Marketplace.Common.Commands
             var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                //Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-                //All suppliers have integration clients with a default user of dev_{supplierID}.
-                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
-
-                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}, ProductID: {productID}"); }
-
-                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+                // Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
+                // All suppliers have integration clients containing their name, get the supplier and use the name to get the clientID
+                var supplier = await _oc.Suppliers.GetAsync(supplierID);
+                // List API Clients and find one with supplier name 
+                var apiClients = await _oc.ApiClients.ListAsync(supplier.Name);
+                var supplierClient = apiClients?.Items?[0];
 
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
 

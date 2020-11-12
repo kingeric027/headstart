@@ -10,6 +10,7 @@ using System;
 using System.Dynamic;
 using System.Collections.Generic;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -50,9 +51,12 @@ namespace Marketplace.Common.Commands
                 pageSize: 100,
                 accessToken: user.AccessToken
                 ));
-                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
-                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
-                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+                // Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
+                // All suppliers have integration clients containing their name, get the supplier and use the name to get the clientID
+                var supplierDetails = await _oc.Suppliers.GetAsync(supplierID);
+                // List API Clients and find one with supplier name 
+                var apiClients = await _oc.ApiClients.ListAsync(supplier.Name);
+                ApiClient supplierClient = await GetOrCreateSupplierApiClientByName(supplierID, user);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
                 var configToUse = new OrderCloudClientConfig
                 {
