@@ -122,9 +122,10 @@ namespace Marketplace.Common.Commands
             var startOfYesterday = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 0, 0, 0);
             var yesterdaysProductUpdates = await _productQuery.ListByDate(startOfYesterday);
             var yesterdaysPriceScheduleUpdates = await _priceScheduleQuery.ListByDate(startOfYesterday);
+            var auth = await _oc.AuthenticateAsync();
 
             var filterString = String.Join("|", yesterdaysPriceScheduleUpdates.Select(p => p.ResourceID));
-            var defaultPriceScheduleProducts = await _oc.Products.ListAsync(filters: $"DefaultPriceScheduleID={filterString}");
+            var defaultPriceScheduleProducts = await _oc.Products.ListAsync(filters: $"DefaultPriceScheduleID={filterString}", accessToken: auth.AccessToken);
 
             var updatedProducts = yesterdaysProductUpdates.Select(p => p.Resource).Concat(defaultPriceScheduleProducts.Items.Where(p => !yesterdaysProductUpdates.Select(p => p.ResourceID).Contains(p.ID)));
             var dataToSend = new List<ProductUpdateData>();
