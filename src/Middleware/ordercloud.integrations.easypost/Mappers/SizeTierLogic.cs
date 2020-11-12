@@ -43,7 +43,7 @@ namespace ordercloud.integrations.easypost
 	public class Package
 	{
 		// This is intended to be a max parcel dimension, but is not being honored because of a bug in the math. see line 83 about percentage 1 vs 100
-		// fixing that bug 
+		// however, fixing that math produces some crazy rates (~$1000).
 		public static readonly decimal FULL_PACKAGE_DIMENSION = 11; // inches. 
         public static readonly decimal DEFAULT_WEIGHT = 5;
 		public decimal PercentFilled { get; set; } = 0;
