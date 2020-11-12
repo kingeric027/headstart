@@ -3,6 +3,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
+using Namotion.Reflection;
 using Npoi.Mapper;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -16,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Misc = Marketplace.Common.Models.Misc;
@@ -157,6 +159,9 @@ namespace Marketplace.Common.Commands
             using Stream stream = file.OpenReadStream();
             List<RowInfo<Misc.Shipment>> shipments = new Mapper(stream).Take<Misc.Shipment>(0, 1000).ToList();
 
+            if (shipments == null) { throw new Exception("No shipments found in sheet"); }
+
+            shipments.RemoveRange(0, 2);
             DocumentImportResult result = Validate(shipments);
 
             processResults = await ProcessShipments(result, accessToken);
@@ -193,7 +198,6 @@ namespace Marketplace.Common.Commands
                 DocumentFailureListCount = processResult.InvalidRowFailureList.Count(),
                 SuccessfulCount = processResult.SuccessfulList.Count(),
                 TotalCount = importResult.Meta.TotalCount
-                
             };
 
             return processResult;
@@ -241,10 +245,10 @@ namespace Marketplace.Common.Commands
                     Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, accessToken);
 
                     //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
-                    PatchPartialLineItemComment(lineItem, shipment);
+                    PatchPartialLineItemComment(lineItem, shipment, newShipment.ID);
 
                     //POST a shipment item, passing it a Shipment ID parameter, and a request body of Order ID, Line Item ID, and Quantity Shipped
-                    await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
+                    await _oc.Shipments.SaveItemAsync(newShipment.ID, newShipmentItem);
 
                     //Re-patch the shipment adding the date shipped now due to oc bug
                     var repatchedShipment = PatchShipment(ocShipment, shipment);
@@ -256,7 +260,7 @@ namespace Marketplace.Common.Commands
                 if (lineItem?.ID == null)
                 {
                     //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
-                    PatchPartialLineItemComment(lineItem, shipment);
+                    PatchPartialLineItemComment(lineItem, shipment, newShipment.ID);
 
                     //Create new lineItem
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
@@ -270,13 +274,13 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async void PatchPartialLineItemComment(LineItem lineItem, Misc.Shipment shipment)
+        private async void PatchPartialLineItemComment(LineItem lineItem, Misc.Shipment shipment, string newShipmentId)
         {
             PartialLineItem partialLineItem;
             Dictionary<string, object> commentDictonary = new Dictionary<string, object>();
 
             //Add new comment
-            commentDictonary.Add(shipment.ShipmentID, shipment.ShipmentLineItemComment);
+            commentDictonary.Add(newShipmentId, shipment.ShipmentLineItemComment);
 
             partialLineItem = new PartialLineItem()
             {
@@ -302,7 +306,14 @@ namespace Marketplace.Common.Commands
             if (shipment?.ShipmentID != null)
             {
                 //get shipment if shipmentId is provided
-                shipmentResponse = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
+                try
+                {
+                    shipmentResponse = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception($"ShipmentID: {shipment.ShipmentID} could not be found. Error Detail: {ex.Message}");
+                }
                 if (shipmentResponse != null)
                 {
                     //add shipment to dictionary if it's found
@@ -317,6 +328,7 @@ namespace Marketplace.Common.Commands
                 if (createdShipment != null)
                 {
                     _shipmentByTrackingNumber.Add(createdShipment.TrackingNumber, createdShipment);
+                    return createdShipment;
                 }
             }
             return null;
@@ -378,6 +390,9 @@ namespace Marketplace.Common.Commands
                 else
                 {
                     List<ValidationResult> results = new List<ValidationResult>();
+
+                    if (ShouldIgnoreRow(row.Value)) { continue; }
+
                     if (Validator.TryValidateObject(row.Value, new ValidationContext(row.Value), results, true) == false)
                     {
                         result.Invalid.Add(new DocumentRowError()
@@ -400,6 +415,22 @@ namespace Marketplace.Common.Commands
                 TotalCount = rows.Count
             };
             return result;
+        }
+
+        private static bool ShouldIgnoreRow(Misc.Shipment value)
+        {
+            string exampleSignifier = "//EXAMPLE//";
+            //Ignore if the row is empty, or if it's the example row.
+            if (value == null) { return false; }
+            if (value.OrderID.ToUpper() == exampleSignifier) { return true; }
+
+            PropertyInfo[] props = typeof(Misc.Shipment).GetProperties();
+
+            foreach (PropertyInfo prop in props)
+            {
+                if (prop.GetValue(value) != null) { return false; }
+            }
+            return true;
         }
     }
 }
