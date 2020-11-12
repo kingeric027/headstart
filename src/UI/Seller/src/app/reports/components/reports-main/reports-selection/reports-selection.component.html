@@ -51,7 +51,7 @@
         <div *ngFor="let filter of adHocFilters"
               class="form-group col-md-6">
           <form [formGroup]="reportSelectionForm">
-            <label for="{{filter}}">{{filter}}</label>
+            <label for="{{filter}}">{{getFilterNameDisplay(filter)}}</label>
             <div *ngIf="getFilterType(filter) === 'date'">
               <input class="form-control" 
                      type="date" 

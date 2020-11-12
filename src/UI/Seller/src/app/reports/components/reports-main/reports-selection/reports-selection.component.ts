@@ -57,4 +57,8 @@ export class ReportsSelectionComponent {
     if (filter.includes('Date')) return 'date';
     if (filter.includes('Time')) return 'time';
   }
+
+  getFilterNameDisplay(filter: string): string {
+    return filter.match(/[A-Z][a-z]+|[0-9]+/g).join(' ');
+  }
 }

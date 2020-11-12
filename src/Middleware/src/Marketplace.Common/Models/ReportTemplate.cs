@@ -48,4 +48,13 @@ namespace Marketplace.Common.Models
             { "Country", "xp.ShippingAddress.Country" }
         };
     }
+
+    [SwaggerModel]
+    public class ReportAdHocFilters
+    {
+        public string LowDate { get; set; }
+        public string HighDate { get; set; }
+        public string LowTime { get; set; }
+        public string HighTime { get; set; }
+    }
 }
