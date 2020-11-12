@@ -47,10 +47,10 @@ namespace Marketplace.Common.Controllers
             return orderCalculationResponse;
         }
 
-        [HttpPost, Route("zoho/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        [HttpPost, Route("zoho/{orderID}")]
         public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
         {
-            var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
+            var retry = await _postSubmitCommand.HandleZohoRetry(orderID);
             return retry;
         }
 
