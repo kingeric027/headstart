@@ -261,11 +261,10 @@ namespace Orchestration.Tests
         }
 
         [TestCase("TemplateSheets.xlsx")]
-        [TestCase("TemplateExcel.xlsx")]
         public async Task Test(string fileName)
         {
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Orchestration.Tests.TemplateTests.{fileName}");
-            var file = Substitute.For<IFormFile>();
+            using var stream = File.Open($"TemplateTests/{fileName}", FileMode.Open);
+            IFormFile file = Substitute.For<IFormFile>();
             file.OpenReadStream().Returns(stream);
             var command = new ProductTemplateCommand(Substitute.For<AppSettings>());
             var parsed = await command.ParseProductTemplate(file, new VerifiedUserContext(new ClaimsPrincipal()));
