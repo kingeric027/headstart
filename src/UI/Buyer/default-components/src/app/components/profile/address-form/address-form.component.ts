@@ -62,7 +62,7 @@ export class OCMAddressForm implements OnInit, OnChanges, OnDestroy {
       State: new FormControl(this.ExistingAddress.State || null, Validators.required),
       Zip: new FormControl(this.ExistingAddress.Zip || '', [Validators.pattern(getZip(this.homeCountry)), Validators.required]),
       Phone: new FormControl(this.ExistingAddress.Phone || '', ValidatePhone),
-      Country: new FormControl({value: this.homeCountry || '', disabled: true}, Validators.required),
+      Country: new FormControl(this.homeCountry || '', Validators.required),
       ID: new FormControl(this.ExistingAddress.ID || ''),
     });
     this.shouldSaveAddressForm = new FormGroup({
