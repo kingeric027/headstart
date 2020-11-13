@@ -23,40 +23,49 @@ namespace Marketplace.Common.Helpers
         }
         public async Task<ApiClient> GetSupplierApiClient(string supplierID, VerifiedUserContext user)
         {
-            ApiClient supplierClient;
-            var supplierDetails = await _oc.Suppliers.GetAsync(supplierID);
+            Supplier supplierDetails = await _oc.Suppliers.GetAsync(supplierID);
             // GET ApiClient using the xp value on supplier
             try
             {
                 ApiClient apiClient = await _oc.ApiClients.GetAsync(supplierDetails?.xp?.ApiClientID);
                 // If ApiClient exists, return it
-                supplierClient = apiClient;
-            } 
+                if (apiClient.ID == null)
+                {
+                    // in some cases, a null xp value was returning a 'blank' api client in the get request
+                    return await HandleError(supplierDetails, user);
+                }
+                return apiClient;
+            }
             catch
             {
                 // else create and return the new api client
-                supplierClient = await _oc.ApiClients.CreateAsync(new ApiClient()
-                {
-                    AppName = $"Integration Client {supplierDetails.Name}",
-                    Active = true,
-                    DefaultContextUserName = $"dev_{supplierID}",
-                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-                    AccessTokenDuration = 600,
-                    RefreshTokenDuration = 43200,
-                    AllowAnyBuyer = false,
-                    AllowAnySupplier = false,
-                    AllowSeller = false,
-                    IsAnonBuyer = false,
-                }, user.AccessToken);
-                // Assign Supplier API Client to new supplier
-                await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
-                {
-                    ApiClientID = supplierClient.ID,
-                    SupplierID = supplierID
-                }, user.AccessToken);
-                // Update supplierXp to contain the new api client value
-                await _oc.Suppliers.PatchAsync(supplierID, new PartialSupplier { xp = new { ApiClientID = supplierClient.ID} });
+                return await HandleError(supplierDetails, user);
             }
+
+        }
+        public async Task<ApiClient> HandleError(Supplier supplierDetails, VerifiedUserContext user)
+        {
+            var supplierClient = await _oc.ApiClients.CreateAsync(new ApiClient()
+            {
+                AppName = $"Integration Client {supplierDetails.Name}",
+                Active = true,
+                DefaultContextUserName = $"dev_{supplierDetails.ID}",
+                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                AccessTokenDuration = 600,
+                RefreshTokenDuration = 43200,
+                AllowAnyBuyer = false,
+                AllowAnySupplier = false,
+                AllowSeller = false,
+                IsAnonBuyer = false,
+            }, user.AccessToken);
+            // Assign Supplier API Client to new supplier
+            await _oc.ApiClients.SaveAssignmentAsync(new ApiClientAssignment()
+            {
+                ApiClientID = supplierClient.ID,
+                SupplierID = supplierDetails.ID
+            }, user.AccessToken);
+            // Update supplierXp to contain the new api client value
+            await _oc.Suppliers.PatchAsync(supplierDetails.ID, new PartialSupplier { xp = new { ApiClientID = supplierClient.ID } });
             return supplierClient;
         }
     }
