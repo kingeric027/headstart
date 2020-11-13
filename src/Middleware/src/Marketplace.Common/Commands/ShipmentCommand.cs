@@ -314,7 +314,7 @@ namespace Marketplace.Common.Commands
                 }
                 catch(Exception ex)
                 {
-                    throw new Exception($"ShipmentID: {shipment.ShipmentID} could not be found. Error Detail: {ex.Message}");
+                    throw new Exception($"ShipmentID: {shipment.ShipmentID} could not be found. If you are not patching an existing shipment, this field must be blank so that the system can generate a Shipment ID for you. Error Detail: {ex.Message}");
                 }
                 if (shipmentResponse != null)
                 {
