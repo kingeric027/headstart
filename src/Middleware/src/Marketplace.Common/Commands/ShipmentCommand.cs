@@ -224,8 +224,8 @@ namespace Marketplace.Common.Commands
             {
                 if (shipment.OrderID == null) { throw new Exception("OrderID was not provided"); }
 
-                Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, shipment.OrderID);
-                LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Incoming, shipment.OrderID, shipment.LineItemID);
+                Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Outgoing, shipment.OrderID);
+                LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID);
                 ShipmentItem newShipmentItem = new ShipmentItem()
                 {
                     OrderID = shipment.OrderID,
@@ -250,7 +250,7 @@ namespace Marketplace.Common.Commands
                     PatchPartialLineItemComment(lineItem, shipment, newShipment.ID);
 
                     //POST a shipment item, passing it a Shipment ID parameter, and a request body of Order ID, Line Item ID, and Quantity Shipped
-                    await _oc.Shipments.SaveItemAsync(newShipment.ID, newShipmentItem);
+                    await _oc.Shipments.SaveItemAsync(newShipment.ID, newShipmentItem, accessToken: accessToken);
 
                     //Re-patch the shipment adding the date shipped now due to oc bug
                     var repatchedShipment = PatchShipment(ocShipment, shipment);
@@ -292,7 +292,7 @@ namespace Marketplace.Common.Commands
                 }
             };
 
-            await _oc.LineItems.PatchAsync(OrderDirection.Incoming, shipment.OrderID, shipment.LineItemID, partialLineItem);
+            await _oc.LineItems.PatchAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, partialLineItem);
         }
 
         private async Task<Shipment> GetShipmentByTrackingNumber(Misc.Shipment shipment, string accessToken)
