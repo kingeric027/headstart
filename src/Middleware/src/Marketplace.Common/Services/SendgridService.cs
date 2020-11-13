@@ -347,24 +347,30 @@ namespace Marketplace.Common.Services
             //  Get the shipping total from selected shipping methods for that supplier
             var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
             var supplierShippingSelections = new List<MarketplaceShipMethod>();
-            foreach (var estimate in supplierShipEstimates)
+            if(supplierShipEstimates?.Count() >0 )
             {
-                var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
-                supplierShippingSelections.Add(selection);
+                foreach (var estimate in supplierShipEstimates)
+                {
+                    var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
+                    supplierShippingSelections.Add(selection);
+                }
             }
-            var shippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
+            var shippingCost = supplierShippingSelections?.Select(s => s.Cost)?.Sum() ?? 0;
             supplierOrderWorksheet.Order.ShippingCost = Math.Round(shippingCost, 2);
 
             //  now get correct tax for line items on supplier order
             var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
-            var supplierShippingRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
+            var supplierShippingRateIDs = supplierShippingSelections?.Select(s => s.ID)?.ToList();
             var supplierTax = (decimal)0.0;
-            foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
+            if(orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines != null)
             {
-                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippingRateIDs.Contains(line?.lineNumber) && line.tax != null)
+                foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
                 {
-                    //  Add tax from line items and shipping rates associated with this supplier
-                    supplierTax += (decimal)line?.tax;
+                    if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippingRateIDs.Contains(line?.lineNumber) && line.tax != null)
+                    {
+                        //  Add tax from line items and shipping rates associated with this supplier
+                        supplierTax += (decimal)line?.tax;
+                    }
                 }
             }
             supplierOrderWorksheet.Order.TaxCost = supplierTax;

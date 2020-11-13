@@ -167,7 +167,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             return new ZohoLineItem()
             {
-                name = $"{item.Product.Name}",
+                name = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
                 purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
                 description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
                 sku = item.Variant?.ID ?? item.Product.ID,
@@ -182,7 +182,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, Supplier supplier)
         {
             zItem.item_id = zItem.item_id;
-            zItem.name = $"{item.Product.Name}";
+            zItem.name = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.purchase_description =
                 $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
@@ -203,7 +203,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return new ZohoLineItem()
             {
                 item_type = "sales_and_purchases",
-                name = $"{item.Product.Name}",
+                name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
                 rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0,
                 quantity = item.Quantity,
                 purchase_description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
@@ -217,14 +217,11 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
         {
             zItem.item_type = "sales_and_purchases";
-            zItem.item_id = zItem.item_id;
-            zItem.name = $"{item.Product.Name}".Trim();
-            zItem.sku = item.Variant?.ID ?? item.Product.ID;
+            zItem.name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.purchase_description =
                 $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0;
-            zItem.quantity = item.Quantity;
             zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
             zItem.avatax_tax_code = item.Product.xp?.Tax.Code;
             return zItem;
@@ -236,7 +233,14 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items,
             List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor, ZohoPurchaseOrder po)
         {
-            po.line_items = items;
+            po.line_items = items.Select(p => new ZohoLineItem()
+            {
+                //account_id = p.purchase_account_id,
+                item_id = p.item_id,
+                description = p.description,
+                rate = decimal.ToDouble(lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
+                quantity = lineitems.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == p.sku : li.ProductID == p.sku)?.Quantity
+            }).ToList(); ;
             po.salesorder_id = salesorder.salesorder_id;
             po.purchaseorder_number = order.ID;
             po.reference_number = salesorder.reference_number;
@@ -253,7 +257,14 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             var po = new ZohoPurchaseOrder()
             {
-                line_items = items,
+                line_items = items.Select(p => new ZohoLineItem()
+                {
+                    //account_id = p.purchase_account_id,
+                    item_id = p.item_id,
+                    description = p.description,
+                    rate = decimal.ToDouble(lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
+                    quantity = lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku)?.Quantity
+                }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
                 purchaseorder_number = order.ID,
                 reference_number = salesorder.reference_number,
@@ -278,7 +289,26 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             zOrder.is_discount_before_tax = true;
             zOrder.discount = decimal.ToDouble(promotions.Sum(p => p.Amount));
             zOrder.discount_type = "entity_level";
-            zOrder.line_items = items;
+            zOrder.line_items = items.Select(item =>
+            {
+                if (item.sku.Contains("Shipping (41000)"))
+                {
+                    return new ZohoLineItem()
+                    {
+                        item_id = item.item_id,
+                        quantity = 1,
+                        rate = item.rate
+                    };
+                }
+
+                var line_item = lineitems.First(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
+                return new ZohoLineItem()
+                {
+                    item_id = item.item_id,
+                    quantity = line_item.Quantity,
+                    rate = decimal.ToDouble(line_item.UnitPrice.Value),
+                };
+            }).ToList();
             zOrder.tax_total = decimal.ToDouble(order.TaxCost);
             zOrder.customer_name = contact.contact_name;
             zOrder.sub_total = decimal.ToDouble(order.Subtotal);
@@ -303,7 +333,28 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 is_discount_before_tax = true,
                 discount = decimal.ToDouble(promotions.Sum(p => p.Amount)),
                 discount_type = "entity_level",
-                line_items = items,
+                line_items = items.Select(item =>
+                {
+                    if (item.sku.Contains("Shipping (41000)"))
+                    {
+                        return new ZohoLineItem()
+                        {
+                            item_id = item.item_id,
+                            quantity = 1,
+                            rate = item.rate
+                        };
+                    }
+
+                    var line_item = lineitems.First(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
+                    return new ZohoLineItem()
+                    {
+                        item_id = item.item_id,
+                        quantity = line_item.Quantity,
+                        rate = decimal.ToDouble(line_item.UnitPrice.Value),
+                        //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
+
+                    };
+                }).ToList(),
                 tax_total = decimal.ToDouble(order.TaxCost),
                 customer_name = contact.contact_name,
                 sub_total = decimal.ToDouble(order.Subtotal),
