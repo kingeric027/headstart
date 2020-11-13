@@ -422,7 +422,7 @@ namespace Marketplace.Common.Commands
             string exampleSignifier = "//EXAMPLE//";
             //Ignore if the row is empty, or if it's the example row.
             if (value == null) { return false; }
-            if (value.OrderID.ToUpper() == exampleSignifier) { return true; }
+            if (value.OrderID?.ToUpper() == exampleSignifier) { return true; }
 
             PropertyInfo[] props = typeof(Misc.Shipment).GetProperties();
 
