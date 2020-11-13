@@ -17,6 +17,7 @@ export const ErrorDictionary = {
   creditCardLength: 'Card length is invalid',
   min: 'Please enter a higher value',
   max: 'Please enter a lower value',
+  pattern: 'Zip Code is invalid' /* Maybe change if another regex is utilized elsewhere? */
 };
 
 // only alphanumic and space . '

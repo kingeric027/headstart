@@ -5,6 +5,7 @@ import { ValidateCreditCard, ValidateUSZip } from 'src/app/validators/validators
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk';
 import { GeographyConfig } from 'src/app/config/geography.class';
 import { faCcMastercard, faCcVisa } from '@fortawesome/free-brands-svg-icons';
+import { getZip } from 'src/app/services/zip-validator.helper';
 
 export interface CreditCardFormOutput {
   card: OrderCloudIntegrationsCreditCardToken;
@@ -89,10 +90,11 @@ export class OCMCreditCardForm implements OnInit {
   }
 
   onCountryChange(event?: any): void {
+    console.log({event})
     this.stateOptions = this.getStateOptions(this.cardForm.value.country);
-    this.cardForm.get('zip').setValidators([Validators.required, ValidateUSZip]);
+    this.cardForm.get('zip').setValidators([Validators.pattern(getZip(this.cardForm.value.country)), Validators.required]);
     if (event) {
-      this.cardForm.patchValue({ State: null, Zip: '' });
+      this.cardForm.patchValue({ state: null, zip: '' });
     }
   }
 
@@ -124,7 +126,7 @@ export class OCMCreditCardForm implements OnInit {
     this.cardForm.addControl('street', new FormControl(form.street, Validators.required));
     this.cardForm.addControl('city', new FormControl(form.city, Validators.required));
     this.cardForm.addControl('state', new FormControl(form.state, Validators.required));
-    this.cardForm.addControl('zip', new FormControl(form.zip, [Validators.required, ValidateUSZip]));
+    this.cardForm.addControl('zip', new FormControl(form.zip, [Validators.pattern(getZip(form.country)), Validators.required]));
     this.cardForm.addControl('country', new FormControl(form.country, Validators.required));
   }
 
