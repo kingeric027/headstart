@@ -90,7 +90,6 @@ export class OCMCreditCardForm implements OnInit {
   }
 
   onCountryChange(event?: any): void {
-    console.log({event})
     this.stateOptions = this.getStateOptions(this.cardForm.value.country);
     this.cardForm.get('zip').setValidators([Validators.pattern(getZip(this.cardForm.value.country)), Validators.required]);
     if (event) {
