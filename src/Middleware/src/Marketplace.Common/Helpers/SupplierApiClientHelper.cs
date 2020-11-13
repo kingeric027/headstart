@@ -29,7 +29,7 @@ namespace Marketplace.Common.Helpers
             {
                 ApiClient apiClient = await _oc.ApiClients.GetAsync(supplierDetails?.xp?.ApiClientID);
                 // If ApiClient exists, return it
-                if (apiClient.ID == null)
+                if (apiClient?.ID == null)
                 {
                     // in some cases, a null xp value was returning a 'blank' api client in the get request
                     return await HandleError(supplierDetails, user);
