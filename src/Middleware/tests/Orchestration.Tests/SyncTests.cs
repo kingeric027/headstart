@@ -36,7 +36,7 @@ namespace Orchestration.Tests
             };
             _command = new SyncCommand(_settings, 
                 new OrderCloudClient(), 
-                Substitute.For<AssetQuery>(Substitute.For<ICosmosStore<Asset>>(null)), 
+                Substitute.For<AssetQuery>(Substitute.For<ICosmosStore<Asset>>()), 
                 Substitute.For<AssetedResourceQuery>(Substitute.For<ICosmosStore<AssetedResourceDO>>()), 
                 Substitute.For<LogQuery>(Substitute.For<ICosmosStore<OrchestrationLog>>()));
         }

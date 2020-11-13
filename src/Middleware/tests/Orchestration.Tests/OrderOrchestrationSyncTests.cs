@@ -43,7 +43,7 @@ namespace Orchestration.Tests
                 AvailableRoles = new List<string>()
                 {
                     "FullAccess"
-                },
+                }
             });
             
             var functionToken = new OrderCloudIntegrationsFunctionToken(Substitute.For<AppSettings>());
