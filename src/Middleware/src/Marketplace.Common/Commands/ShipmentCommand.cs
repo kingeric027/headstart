@@ -222,6 +222,8 @@ namespace Marketplace.Common.Commands
             Shipment ocShipment;
             try
             {
+                if (shipment.OrderID == null) { throw new Exception("OrderID was not provided"); }
+
                 Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Incoming, shipment.OrderID);
                 LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Incoming, shipment.OrderID, shipment.LineItemID);
                 ShipmentItem newShipmentItem = new ShipmentItem()
@@ -269,7 +271,7 @@ namespace Marketplace.Common.Commands
             }
             catch (OrderCloudException ex)
             {
-                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {ex.Data.Keys}"));
+                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {((dynamic)ex?.Errors[0]?.Data).ToList()?[0]}"));
                 return false;
             }
         }
