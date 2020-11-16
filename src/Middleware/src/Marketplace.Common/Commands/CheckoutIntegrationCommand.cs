@@ -73,7 +73,7 @@ namespace Marketplace.Common.Commands
                     if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
                         s.Cost = 0;
 
-                    s.Cost *= _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup;
+                    s.Cost = s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup;
                     return s;
                 }).ToList();
             }
