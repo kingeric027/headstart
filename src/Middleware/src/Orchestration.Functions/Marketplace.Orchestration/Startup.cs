@@ -67,6 +67,7 @@ namespace Marketplace.Orchestration
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
+                .Inject<IProductTemplateCommand>()
                 .Inject<ISendgridService>();
         }
     }
