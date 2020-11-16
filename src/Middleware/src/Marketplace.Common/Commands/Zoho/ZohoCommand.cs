@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DurableTask.Core.History;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Common.Services.Zoho;
 using Marketplace.Common.Services.Zoho.Mappers;
@@ -226,22 +227,26 @@ namespace Marketplace.Common.Commands.Zoho
             // Overview: variants will be saved in Zoho as the Item. If the variant is null save the Product as the Item
 
             // gather IDs either at the product or variant level to search Zoho for existing Items 
-            var itemIds = lineitems.Select(item => $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-"));
+            var uniqueLineItems = lineitems.DistinctBy(item => item.SKU()).ToList();
 
-            var zItems = await Throttler.RunAsync(itemIds, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
+            var zItems = await Throttler.RunAsync(uniqueLineItems, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
             {
                 Key = "sku",
-                Value = id
+                Value = id.SKU()
             }));
             // the search api returns a list always. if no item was found the list will be empty
             // so we want to get found items into a pared down list
             var z_items = new Dictionary<string, ZohoLineItem>();
             foreach (var list in zItems)
-                list.Items.ForEach(item => z_items.Add(item.sku, item));
+                list.Items.ForEach(item =>
+                {
+                    if (z_items.Any(z => z.Key == item.sku)) return;
+                    z_items.Add(item.sku, item);
+                });
 
-            var items = await Throttler.RunAsync(lineitems.ToList(), delay, concurrent, async lineItem =>
+            var items = await Throttler.RunAsync(uniqueLineItems, delay, concurrent, async lineItem =>
             {
-                var z_item = z_items.First(z => z.Key == $"{lineItem.Product.ID}-{lineItem.Variant?.ID}".TrimEnd("-"));
+                var z_item = z_items.First(z => z.Key == lineItem.SKU());
                 if (z_item.Key != null)
                     return await _zoho.Items.SaveAsync(ZohoPurchaseLineItemMapper.Map(z_item.Value, lineItem, supplier));
                 return await _zoho.Items.CreateAsync(ZohoPurchaseLineItemMapper.Map(lineItem, supplier));
@@ -251,30 +256,30 @@ namespace Marketplace.Common.Commands.Zoho
 
         private async Task<List<ZohoLineItem>> CreateOrUpdateSalesLineItems(IList<MarketplaceLineItem> lineitems)
         {
-            // TODO: accomodate possibility of more than 100 line items
-            // Overview: variants will be saved in Zoho as the Item. If the variant is null save the Product as the Item
-
             // gather IDs either at the product or variant level to search Zoho for existing Items 
-            var itemIds = lineitems.Select(item => $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-"));
+            var uniqueLineItems = lineitems.DistinctBy(item => item.SKU()).ToList();
 
-            var zItems = await Throttler.RunAsync(itemIds, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
+            var zItems = await Throttler.RunAsync(uniqueLineItems, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
             {
                 Key = "sku",
-                Value = id
+                Value = id.SKU()
             }));
             // the search api returns a list always. if no item was found the list will be empty
             // so we want to get found items into a pared down list
             var z_items = new Dictionary<string, ZohoLineItem>();
             foreach (var list in zItems)
-                list.Items.ForEach(item => z_items.Add(item.sku, item));
+                list.Items.ForEach(item =>
+                {
+                    if (z_items.Any(z => z.Key == item.sku)) return;
+                    z_items.Add(item.sku, item);
+                });
 
-            var items = await Throttler.RunAsync(lineitems.ToList(), delay, concurrent, async lineItem =>
+            var items = await Throttler.RunAsync(uniqueLineItems, delay, concurrent, async lineItem =>
             {
-                var z_item = z_items.FirstOrDefault(z => z.Key == $"{lineItem.Product.ID}-{lineItem.Variant?.ID}".TrimEnd("-"));
+                var z_item = z_items.FirstOrDefault(z => z.Key == lineItem.SKU());
                 if (z_item.Key != null)
                     return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item.Value, lineItem));
                 return await _zoho.Items.CreateAsync(ZohoSalesLineItemMapper.Map(lineItem));
-
             });
             return items.ToList();
         }
