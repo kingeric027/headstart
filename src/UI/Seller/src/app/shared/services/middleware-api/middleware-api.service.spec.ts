@@ -6,7 +6,7 @@ describe('MiddlewareAPIServiceService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: MiddlewareAPIService = TestBed.get(MiddlewareAPIServiceService);
+    const service: MiddlewareAPIService = TestBed.inject(MiddlewareAPIService);
     expect(service).toBeTruthy();
   });
 });

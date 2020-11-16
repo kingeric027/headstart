@@ -1,20 +1,17 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PromotionListComponent } from './promotion-list.component';
+import { PromotionTableComponent } from './promotion-table.component';
 
 describe('PromotionListComponent', () => {
-  let component: PromotionListComponent;
-  let fixture: ComponentFixture<PromotionListComponent>;
+  let component: PromotionTableComponent;
+  let fixture: ComponentFixture<PromotionTableComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PromotionListComponent ]
-    })
-    .compileComponents();
+    TestBed.configureTestingModule({ declarations: [PromotionTableComponent] }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PromotionListComponent);
+    fixture = TestBed.createComponent(PromotionTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

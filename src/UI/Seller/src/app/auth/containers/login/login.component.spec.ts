@@ -6,10 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { of, BehaviorSubject } from 'rxjs';
 
 import { LoginComponent } from '@app-seller/auth/containers/login/login.component';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 
 import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
@@ -60,10 +57,7 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-  describe('ngOnInit', () => {
+  fdescribe('ngOnInit', () => {
     beforeEach(() => {
       component.ngOnInit();
     });
@@ -78,19 +72,14 @@ describe('LoginComponent', () => {
   describe('onSubmit', () => {
     beforeEach(() => {
       component['appConfig'].clientID = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
-      component['appConfig'].scope = ['testScope'];
+      component['appConfig'].scope = ['ApiClientAdmin'];
     });
     it('should call the OcAuthService Login method, OcTokenService SetAccess method, and route to home', () => {
       component.onSubmit();
-      expect(ocAuthService.Login).toHaveBeenCalledWith(
-        '',
-        '',
-        'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-        ['testScope']
-      );
-      expect(ocTokenService.SetAccess).toHaveBeenCalledWith(
-        response.access_token
-      );
+      expect(ocAuthService.Login).toHaveBeenCalledWith('', '', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', [
+        'ApiClientAdmin',
+      ]);
+      expect(ocTokenService.SetAccess).toHaveBeenCalledWith(response.access_token);
       expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
     });
 

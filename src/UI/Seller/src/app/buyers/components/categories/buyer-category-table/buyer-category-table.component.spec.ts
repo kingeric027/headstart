@@ -1,19 +1,16 @@
+import { BuyerCategoryTableComponent } from './buyer-category-table.component';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SupplierTableComponent } from './supplier-table.component';
-
-describe('SupplierTableComponent', () => {
-  let component: SupplierTableComponent;
-  let fixture: ComponentFixture<SupplierTableComponent>;
+describe('BuyerCategoryTableComponent', () => {
+  let component: BuyerCategoryTableComponent;
+  let fixture: ComponentFixture<BuyerCategoryTableComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [SupplierTableComponent],
-    }).compileComponents();
+    TestBed.configureTestingModule({ declarations: [BuyerCategoryTableComponent] }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SupplierTableComponent);
+    fixture = TestBed.createComponent(BuyerCategoryTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

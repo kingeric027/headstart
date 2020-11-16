@@ -1,19 +1,16 @@
+import { ProductEditComponent } from './product-edit.component';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SupplierTableComponent } from './supplier-edit.component';
-
-describe('SupplierTableComponent', () => {
-  let component: SupplierTableComponent;
-  let fixture: ComponentFixture<SupplierTableComponent>;
+describe('ProductEditComponent', () => {
+  let component: ProductEditComponent;
+  let fixture: ComponentFixture<ProductEditComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [SupplierTableComponent],
-    }).compileComponents();
+    TestBed.configureTestingModule({ declarations: [ProductEditComponent] }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SupplierTableComponent);
+    fixture = TestBed.createComponent(ProductEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
