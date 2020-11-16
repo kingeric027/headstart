@@ -22,6 +22,11 @@
       <fa-icon [icon]="faDownload"></fa-icon> Download Order Invoice PDF
     </button>
   </div>
+  <div class="d-block text-right mb-2">
+    <span class="font-weight-bold">
+      Order Placed: {{_order?.DateSubmitted | date:'medium' }}
+    </span>
+  </div>
   <div class="card card--order-details py-2 px-3 bg-white mb-2">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div class="d-flex justify-content-start align-items-center">
