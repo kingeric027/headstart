@@ -39,8 +39,6 @@ namespace Marketplace.Orchestration
                 BlobStorageConnectionString = settings.BlobSettings.ConnectionString
             };
             var blobAccount = settings.Env.ToString() == "Prod" ? "prod" : (settings.Env.ToString() == "Staging" ? "staging" : "test");
-            //  var blobConnection = $"DefaultEndpointsProtocol=https;AccountName=marketplace{blobAccount};AccountKey={settings.BlobSettings.ConnectionString};EndpointSuffix=core.windows.net";
-            var blobConnection = "DefaultEndpointsProtocol=https;AccountName=marktplacetest;AccountKey=/8d8CQfBMWItssdkVfmc4pIBr4NSYbYPmiOnAn6F1+tGU3+ddOa6yvJagTDdb4V3TKcMPmh1SkKiUx4WBdyxHQ==;EndpointSuffix=core.windows.net";
             builder.Services
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
