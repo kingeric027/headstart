@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { SupplierTableComponent } from './supplier-edit.component';
+import { SupplierTableComponent } from '../supplier-table/supplier-table.component';
 
 describe('SupplierTableComponent', () => {
   let component: SupplierTableComponent;
