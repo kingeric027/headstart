@@ -25,7 +25,10 @@ namespace ordercloud.integrations.library
                 if (value.Type == JTokenType.Object)
                 {
                     var obj = ((JObject)value).Diff(cache); // recursion
-                    if (obj != null) diff.Add(key, obj);
+                    if (obj != null)
+                    {
+                        diff.Add(key, obj);
+                    }
                 }
                 else
                 {
