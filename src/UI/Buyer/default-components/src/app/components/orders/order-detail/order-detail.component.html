@@ -1,4 +1,5 @@
 <div class="container">
+ <div id="order-detail-pdf-range">
   <div *ngIf="order">
     <nav class="breadcrumb"
          aria-label="breadcrumb">
@@ -74,6 +75,8 @@
                 translate>
           ORDERS.DETAIL.UPDATE
         </button>
+        <button class="btn btn-secondary float-right mr-2 d-print-none"
+                (click)="createAndSavePDF()">Download Order Invoice PDF</button>
         <!-- TODO: refactor the reorder process to not be in a modal -->
         <ng-template #reorderModal
                      let-modal
@@ -151,11 +154,16 @@
       </button>
     </li>
   </ul>
+   <div>
   <ocm-order-historical class="col-md-6"
                         *ngIf="orderDetails && showDetails() && (!showRequestReturn && !showRequestCancel)"
                         [isOrderToApprove]="isOrderToApprove"
-                        [orderDetails]="orderDetails"></ocm-order-historical>
-  <ocm-order-shipments *ngIf="showShipments() && !showRequestReturn"></ocm-order-shipments>
+                        [orderDetails]="orderDetails">
+  </ocm-order-historical>
+   </div>
+  </div>
+  <ocm-order-shipments *ngIf="showShipments() && !showRequestReturn">
+  </ocm-order-shipments>
   <ocm-order-return class="col-md-6"
                     *ngIf="showRequestReturn || showRequestCancel"
                     (viewReturnFormEvent)="toggleShowRequestForm($event.detail)"
