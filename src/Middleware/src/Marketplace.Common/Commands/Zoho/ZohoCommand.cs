@@ -27,7 +27,7 @@ namespace Marketplace.Common.Commands.Zoho
     {
         private readonly IZohoClient _zoho;
         private readonly IOrderCloudClient _oc;
-        private const int delay = 5000;
+        private const int delay = 250;
         private const int concurrent = 1;
 
         public ZohoCommand(ZohoClientConfig zoho_config, OrderCloudClientConfig oc_config)
