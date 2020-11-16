@@ -44,11 +44,14 @@ export class ReportsComponent implements OnInit {
   async handleReportTypeSelection(event: string): Promise<void> {
     this.resetForm();
     this.selectedReportType = event;
-    this.reportSelectionForm.controls['ReportType'].setValue(this.selectedReportType);
+    this.reportSelectionForm.controls.ReportType.setValue(this.selectedReportType);
     this.adHocFilters = this.setAdHocFilters(this.selectedReportType);
     if (this.adHocFilters?.length) {
       this.adHocFilters.forEach(filter => {
-        this.reportSelectionForm.addControl(filter, new FormControl(null, Validators.required));
+        this.reportSelectionForm.addControl(filter, new FormControl(null));
+        if (filter.includes('Date')) {
+          this.reportSelectionForm.controls[filter].setValidators(Validators.required);
+        }
       })
     }
     this.reportTemplates = await this.reportsTemplateService.listReportTemplatesByReportType(this.selectedReportType);
@@ -69,7 +72,7 @@ export class ReportsComponent implements OnInit {
     this.selectedTemplate = this.reportTemplates.find(template => template.TemplateID === event);
     const headers = this.selectedTemplate.Headers;
     this.displayHeaders = headers.map(header => this.fetchDisplayHeader(header));
-    this.reportSelectionForm.controls['ReportTemplate'].setValue(event);
+    this.reportSelectionForm.controls.ReportTemplate.setValue(event);
   }
 
   handleReportAdHocFiltersSelection(event: any): void {
