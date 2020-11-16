@@ -27,6 +27,8 @@ namespace Marketplace.Common.Commands.Zoho
     {
         private readonly IZohoClient _zoho;
         private readonly IOrderCloudClient _oc;
+        private const int delay = 5000;
+        private const int concurrent = 1;
 
         public ZohoCommand(ZohoClientConfig zoho_config, OrderCloudClientConfig oc_config)
         {
@@ -65,57 +67,68 @@ namespace Marketplace.Common.Commands.Zoho
         public async Task<List<ZohoPurchaseOrder>> CreateShippingPurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrderWorksheet order)
         {
             // special request by SMG for creating PO of shipments
-            var list = new List<ZohoPurchaseOrder>();
-            foreach (var item in order.ShipEstimateResponse.ShipEstimates)
+            // we definitely don't want this stopping orders from flowing into Zoho so I'm going to handle exceptions and allow to proceed
+            try
             {
-                var shipping_method = item.ShipMethods.FirstOrDefault(s => s.ID == item.SelectedShipMethodID);
-                // this is where we filter out SMG's account for these orders only
-                if (shipping_method?.xp.CarrierAccountID != "ca_8bdb711131894ab4b42abcd1645d988c") continue;
-                var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = "SMG Shipping" });
-                var oc_lineitems = new List<MarketplaceLineItem>()
+                var list = new List<ZohoPurchaseOrder>();
+                foreach (var item in order.ShipEstimateResponse.ShipEstimates)
                 {
-                    new MarketplaceLineItem() {
-                        ID = $"{z_order.reference_number} - 41000",
-                        UnitPrice = shipping_method?.Cost,
-                        ProductID = $"{shipping_method?.Name} Shipping (41000)",
-                        SupplierID = "SMG Shipping",
-                        Product = new MarketplaceLineItemProduct()
+                    var shipping_method = item.ShipMethods.FirstOrDefault(s => s.ID == item.SelectedShipMethodID);
+                    if (shipping_method.xp.CarrierAccountID != "ca_8bdb711131894ab4b42abcd1645d988c") continue;
+                    var vendor = await _zoho.Contacts.ListAsync(new ZohoFilter() { Key = "contact_name", Value = "SMG Shipping" });
+                    var oc_lineitems = new ListPage<MarketplaceLineItem>()
+                    {
+                        Items = new List<MarketplaceLineItem>()
                         {
-                            Description = $"{shipping_method?.xp?.Carrier} Shipping Charge",
-                            Name = $"{shipping_method.Name} Shipping (41000)",
-                            ID = $"{shipping_method.Name} Shipping (41000)",
-                            QuantityMultiplier = 1,
-                            xp = new ProductXp()
-                            {
-                                Tax = new TaxProperties()
+                            new MarketplaceLineItem() {
+                                ID = $"{z_order.reference_number} - 41000",
+                                UnitPrice = shipping_method?.Cost,
+                                ProductID = $"{shipping_method?.Name} Shipping (41000)",
+                                SupplierID = "SMG Shipping",
+                                Product = new MarketplaceLineItemProduct()
                                 {
-                                    Code = "FR",
-                                    Description = "Shipping Charge"
+                                    Description = $"{shipping_method?.xp?.Carrier} Shipping Charge",
+                                    Name = $"{shipping_method.Name} Shipping (41000)",
+                                    ID = $"{shipping_method.Name} Shipping (41000)",
+                                    QuantityMultiplier = 1,
+                                    xp = new ProductXp()
+                                    {
+                                        Tax = new TaxProperties()
+                                        {
+                                            Code = "FR",
+                                            Description = "Shipping Charge"
+                                        }
+                                    }
                                 }
                             }
                         }
+                    };
+                    var z_item = await CreateOrUpdateShippingLineItem(oc_lineitems.Items);
+                    var oc_order = new Order()
+                    {
+                        ID = $"{order.Order.ID}-{order.LineItems.FirstOrDefault()?.SupplierID} - 41000",
+                        Subtotal = shipping_method.Cost,
+                        Total = shipping_method.Cost,
+                        TaxCost = 0M
+                    };
+                    var oc_lineitem = new ListPage<MarketplaceLineItem>() { Items = new List<MarketplaceLineItem>() { new MarketplaceLineItem() { Quantity = 1 } } };
+                    var z_po = ZohoPurchaseOrderMapper.Map(z_order, oc_order, z_item, oc_lineitem.Items.ToList(), null, vendor.Items.FirstOrDefault());
+                    var shipping_po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = $"{order.Order.ID}-{order.LineItems.FirstOrDefault()?.SupplierID} - 41000" });
+                    if (shipping_po.Items.Any())
+                    {
+                        z_po.purchaseorder_id = shipping_po.Items.FirstOrDefault()?.purchaseorder_id;
+                        list.Add(await _zoho.PurchaseOrders.SaveAsync(z_po));
                     }
-                };
-                var shipping_items = oc_lineitems.Select(ZohoSalesLineItemMapper.Map).ToList();
-                var oc_order = new Order()
-                {
-                    ID = $"{order.Order.ID}-{order.LineItems.FirstOrDefault()?.SupplierID} - 41000",
-                    Subtotal = shipping_method.Cost,
-                    Total = shipping_method.Cost,
-                    TaxCost = 0M
-                };
-                var oc_lineitem = new ListPage<MarketplaceLineItem>() { Items = new List<MarketplaceLineItem>() { new MarketplaceLineItem() { Quantity = 1 } } };
-                var z_po = ZohoPurchaseOrderMapper.Map(z_order, oc_order, shipping_items, oc_lineitems, null, vendor.Items.FirstOrDefault());
-                var shipping_po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = $"{order.Order.ID} - {item.ID} - {shipping_method.Name} - 41000" });
-                if (shipping_po.Items.Any())
-                {
-                    z_po.purchaseorder_id = shipping_po.Items.FirstOrDefault()?.purchaseorder_id;
-                    list.Add(await _zoho.PurchaseOrders.SaveAsync(z_po));
+                    else
+                        list.Add(await _zoho.PurchaseOrders.CreateAsync(z_po));
                 }
-                else
-                    list.Add(await _zoho.PurchaseOrders.CreateAsync(z_po));
+
+                return list;
             }
-            return list;
+            catch (Exception ex)
+            {
+                return new List<ZohoPurchaseOrder>();
+            }
         }
 
         public async Task<List<ZohoPurchaseOrder>> CreateOrUpdatePurchaseOrder(ZohoSalesOrder z_order, List<MarketplaceOrder> orders)
@@ -123,8 +136,9 @@ namespace Marketplace.Common.Commands.Zoho
             var results = new List<ZohoPurchaseOrder>();
             foreach (var order in orders)
             {
-                var delivery_address = z_order.shipping_address;
+                var delivery_address = z_order.shipping_address; //TODO: this is not good enough. Might even need to go back to SaleOrder and split out by delivery address
                 var supplier = await _oc.Suppliers.GetAsync(order.ToCompanyID);
+                // TODO: accomodate possibility of more than 100 line items
                 var lineitems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, order.ID, page: page, pageSize: 100));
 
                 // Step 1: Create contact (customer) in Zoho
@@ -134,16 +148,15 @@ namespace Marketplace.Common.Commands.Zoho
                 var items = await CreateOrUpdatePurchaseLineItem(lineitems, supplier);
 
                 // Step 3: Create purchase order
-                var po = await CreatePurchaseOrder(z_order, order, lineitems, delivery_address, contact, supplier);
+                var po = await CreatePurchaseOrder(z_order, order, items, lineitems, delivery_address, contact);
                 results.Add(po);
             }
 
             return results;
         }
 
-        private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact, Supplier supplier)
+        private async Task<ZohoPurchaseOrder> CreatePurchaseOrder(ZohoSalesOrder z_order, MarketplaceOrder order, List<ZohoLineItem> items, List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact contact)
         {
-            var items = lineitems.Select(lineItem => ZohoPurchaseLineItemMapper.Map(lineItem, supplier)).ToList();
             var po = await _zoho.PurchaseOrders.ListAsync(new ZohoFilter() { Key = "purchaseorder_number", Value = order.ID });
             if (po.Items.Any())
                 return await _zoho.PurchaseOrders.SaveAsync(ZohoPurchaseOrderMapper.Map(z_order, order, items, lineitems, delivery_address, contact, po.Items.FirstOrDefault()));
@@ -163,29 +176,19 @@ namespace Marketplace.Common.Commands.Zoho
             items.AddRange(await ApplyShipping(orderWorksheet));
 
             // Step 4: create sales order with all objects from above
-            var salesOrder = await CreateSalesOrder(orderWorksheet, contact);
+            var salesOrder = await CreateSalesOrder(orderWorksheet, items, contact);
 
             return salesOrder;
         }
 
-        private async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet, ZohoContact contact)
+        private async Task<ZohoSalesOrder> CreateSalesOrder(MarketplaceOrderWorksheet orderWorksheet, IEnumerable<ZohoLineItem> items, ZohoContact contact)
         {
             // promotions aren't part of the order worksheet, so we have to get them from OC
             var promotions = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderWorksheet.Order.ID);
             var zOrder = await _zoho.SalesOrders.ListAsync(new ZohoFilter() { Key = "reference_number", Value = orderWorksheet.Order.ID });
-
-            // map lineitems
-            var items = orderWorksheet.LineItems.Select(ZohoSalesLineItemMapper.Map).ToList();
-            // apply shipping as lineitems
-            items.AddRange(orderWorksheet.ShipEstimateResponse.ShipEstimates.Select(shipment =>
-            {
-                var method = shipment.ShipMethods.FirstOrDefault(s => s.ID == shipment.SelectedShipMethodID);
-                return ZohoShippingLineItemMapper.Map(method);
-            }));
-
             if (zOrder.Items.Any())
-                return await _zoho.SalesOrders.SaveAsync(ZohoSalesOrderMapper.Map(zOrder.Items.FirstOrDefault(), orderWorksheet.Order, items, contact, orderWorksheet.LineItems, promotions.Items));
-            return await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderWorksheet.Order, items, contact, orderWorksheet.LineItems, promotions.Items));
+                return await _zoho.SalesOrders.SaveAsync(ZohoSalesOrderMapper.Map(zOrder.Items.FirstOrDefault(), orderWorksheet.Order, items.ToList(), contact, orderWorksheet.LineItems, promotions.Items));
+            return await _zoho.SalesOrders.CreateAsync(ZohoSalesOrderMapper.Map(orderWorksheet.Order, items.ToList(), contact, orderWorksheet.LineItems, promotions.Items));
         }
 
         private async Task<List<ZohoLineItem>> CreateOrUpdateShippingLineItem(IList<MarketplaceLineItem> lineitems)
@@ -196,7 +199,7 @@ namespace Marketplace.Common.Commands.Zoho
             // gather IDs either at the product or variant level to search Zoho for existing Items 
             var itemIds = lineitems.Select(item => item.Variant == null ? item.Product.ID : item.Variant.ID);
 
-            var zItems = await Throttler.RunAsync(itemIds, 100, 5, id => _zoho.Items.ListAsync(new ZohoFilter()
+            var zItems = await Throttler.RunAsync(itemIds, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
             {
                 Key = "sku",
                 Value = id
@@ -207,7 +210,7 @@ namespace Marketplace.Common.Commands.Zoho
             foreach (var list in zItems)
                 list.Items.ForEach(item => z_items.Add(item.sku, item));
 
-            var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
+            var items = await Throttler.RunAsync(lineitems.ToList(), delay, concurrent, async lineItem =>
             {
                 var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
                 if (z_item.Key != null)
@@ -223,9 +226,9 @@ namespace Marketplace.Common.Commands.Zoho
             // Overview: variants will be saved in Zoho as the Item. If the variant is null save the Product as the Item
 
             // gather IDs either at the product or variant level to search Zoho for existing Items 
-            var itemIds = lineitems.Select(item => item.Variant == null ? item.Product.ID : item.Variant.ID);
+            var itemIds = lineitems.Select(item => $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-"));
 
-            var zItems = await Throttler.RunAsync(itemIds, 100, 5, id => _zoho.Items.ListAsync(new ZohoFilter()
+            var zItems = await Throttler.RunAsync(itemIds, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
             {
                 Key = "sku",
                 Value = id
@@ -236,9 +239,9 @@ namespace Marketplace.Common.Commands.Zoho
             foreach (var list in zItems)
                 list.Items.ForEach(item => z_items.Add(item.sku, item));
 
-            var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
+            var items = await Throttler.RunAsync(lineitems.ToList(), delay, concurrent, async lineItem =>
             {
-                var z_item = z_items.FirstOrDefault(z => lineItem.Variant != null ? z.Key == lineItem.Variant.ID : z.Key == lineItem.Product.ID);
+                var z_item = z_items.First(z => z.Key == $"{lineItem.Product.ID}-{lineItem.Variant?.ID}".TrimEnd("-"));
                 if (z_item.Key != null)
                     return await _zoho.Items.SaveAsync(ZohoPurchaseLineItemMapper.Map(z_item.Value, lineItem, supplier));
                 return await _zoho.Items.CreateAsync(ZohoPurchaseLineItemMapper.Map(lineItem, supplier));
@@ -252,14 +255,24 @@ namespace Marketplace.Common.Commands.Zoho
             // Overview: variants will be saved in Zoho as the Item. If the variant is null save the Product as the Item
 
             // gather IDs either at the product or variant level to search Zoho for existing Items 
-            var itemIds = lineitems.Select(item => item.Variant == null ? item.Product.ID : item.Variant.ID);
-            var zItems = await _zoho.Items.ListAsync();
-            
-            var items = await Throttler.RunAsync(lineitems.ToList(), 100, 5, async lineItem =>
+            var itemIds = lineitems.Select(item => $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-"));
+
+            var zItems = await Throttler.RunAsync(itemIds, delay, concurrent, id => _zoho.Items.ListAsync(new ZohoFilter()
             {
-                var z_item = zItems.Items.FirstOrDefault(z => lineItem.Variant != null ? z.sku == lineItem.Variant.ID : z.sku == lineItem.Product.ID);
-                if (z_item != null)
-                    return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item, lineItem));
+                Key = "sku",
+                Value = id
+            }));
+            // the search api returns a list always. if no item was found the list will be empty
+            // so we want to get found items into a pared down list
+            var z_items = new Dictionary<string, ZohoLineItem>();
+            foreach (var list in zItems)
+                list.Items.ForEach(item => z_items.Add(item.sku, item));
+
+            var items = await Throttler.RunAsync(lineitems.ToList(), delay, concurrent, async lineItem =>
+            {
+                var z_item = z_items.FirstOrDefault(z => z.Key == $"{lineItem.Product.ID}-{lineItem.Variant?.ID}".TrimEnd("-"));
+                if (z_item.Key != null)
+                    return await _zoho.Items.SaveAsync(ZohoSalesLineItemMapper.Map(z_item.Value, lineItem));
                 return await _zoho.Items.CreateAsync(ZohoSalesLineItemMapper.Map(lineItem));
 
             });
@@ -274,11 +287,6 @@ namespace Marketplace.Common.Commands.Zoho
             {
                 var method = shipment.ShipMethods.FirstOrDefault(s => s.ID == shipment.SelectedShipMethodID);
                 var z_shipping = await _zoho.Items.ListAsync(new ZohoFilter() { Key = "sku", Value = $"{method?.Name} Shipping (41000)" });
-
-                var inactives = z_shipping.Items.Where(z => z.status == "inactive").Select(z => z);
-
-                await Throttler.RunAsync(inactives, 100, 5,
-                    b => _zoho.Items.MarkActiveAsync(b.item_id));
                 if (z_shipping.Items.Any())
                     list.Add(await _zoho.Items.SaveAsync(ZohoShippingLineItemMapper.Map(z_shipping.Items.FirstOrDefault(), method)));
                 else

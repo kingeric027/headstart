@@ -31,7 +31,8 @@ namespace Marketplace.Common.Commands.SupplierSync
 
         public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
-            var supplierWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, ID);
+            //TODO: BaseUrl cannot be found here
+            var supplierWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, ID, user.AccessToken);
             
             var buyerWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, ID.Split('-')[0]);
             var buyerLineItems = buyerWorksheet.LineItems.Where(li => li.SupplierID == supplierWorksheet.Order.ToCompanyID).Select(li => li);
