@@ -43,6 +43,7 @@ export class OCMProductList implements OnInit, OnDestroy {
 
   changePage(page: number): void {
     this.context.productFilters.toPage(page);
+    window.location.hash = '#top';
   }
 
   toggleFilterByFavorites(): void {
