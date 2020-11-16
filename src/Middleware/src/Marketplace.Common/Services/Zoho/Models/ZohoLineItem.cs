@@ -30,10 +30,10 @@ namespace Marketplace.Common.Services.Zoho.Models
         // reevaluation fields when handling promotions
         //public double? discount_amount { get; set; }
         //public string discount { get; set; }
-        public string tax_id { get; set; }
-        public string tax_name { get; set; }
-        public string tax_type { get; set; }
-        public double? tax_percentage { get; set; }
+        //public string tax_id { get; set; }
+        //public string tax_name { get; set; }
+        //public string tax_type { get; set; }
+        //public double? tax_percentage { get; set; }
         public double? item_total { get; set; }
         //public string account_id { get; set; }
         public string account_name { get; set; }

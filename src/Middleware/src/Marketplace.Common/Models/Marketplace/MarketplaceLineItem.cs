@@ -21,6 +21,9 @@ namespace Marketplace.Models.Models.Marketplace
         public string KitProductImageUrl { get; set; }
         public string KitProductID { get; set; }
         public string KitProductName { get; set; }
+
+        // needed for Line Item Detail Report
+        public string ShipMethod { get; set; }
     }
 
     [SwaggerModel]

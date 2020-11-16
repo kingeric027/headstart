@@ -320,7 +320,7 @@
                       <div class="input-group-append"><span class="input-group-text rounded-right">units</span></div>
                     </div>
                   </div>
-                  <ng-container *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.VariantLevelTracking">
+                  <ng-container *ngIf="_superMarketplaceProductEditable?.Product?.Inventory?.Enabled && _superMarketplaceProductEditable?.Product?.Inventory?.VariantLevelTracking">
                     <p class="mb-0"
                        translate>ADMIN.PRODUCT_EDIT.QUANTITY_AVAILABLE</p>
                     <a [fragment]="variants"

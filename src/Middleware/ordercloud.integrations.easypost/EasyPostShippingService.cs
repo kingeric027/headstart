@@ -1,9 +1,7 @@
 using Flurl.Http;
-using Microsoft.Extensions.Azure;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
@@ -19,12 +17,12 @@ namespace ordercloud.integrations.easypost
 		{
 			return (ShipFrom.ID == other.ShipFrom.ID) &&
 					// we still want to compare the rest of these properties to handle one time addresses
-					(ShipFrom.Street1 == other.ShipFrom.Street1) &&
-					(ShipFrom.Zip == other.ShipFrom.Zip) &&
-					(ShipFrom.City == other.ShipFrom.City) &&
-					(ShipTo.Street1 == other.ShipTo.Street1) &&
-					(ShipTo.Zip == other.ShipTo.Zip) &&
-					(ShipTo.City == other.ShipTo.City);
+					(ShipFrom.Street1 == other?.ShipFrom.Street1) &&
+					(ShipFrom.Zip == other?.ShipFrom.Zip) &&
+					(ShipFrom.City == other?.ShipFrom.City) &&
+					(ShipTo.Street1 == other?.ShipTo.Street1) &&
+					(ShipTo.Zip == other?.ShipTo.Zip) &&
+					(ShipTo.City == other?.ShipTo.City);
 		}
 
 		public override int GetHashCode()

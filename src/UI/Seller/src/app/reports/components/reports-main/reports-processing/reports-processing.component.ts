@@ -35,15 +35,15 @@ export class ReportsProcessingComponent {
   }
 
   retrieveReportRequestBody(selectedTemplateID: string): any {
-    let adHocFilterValues: any[] = [];
+    const filterDictionary = new Object();
     if (this.adHocFilters?.length) {
       this.adHocFilters.forEach(filter => {
-        adHocFilterValues.push(this.reportSelectionForm.controls[filter].value);
+        filterDictionary[filter] = this.reportSelectionForm.controls[filter].value;
       });
     }
     const reportRequestBody = {
-      selectedTemplateID: selectedTemplateID,
-      adHocFilterValues: adHocFilterValues,
+      selectedTemplateID,
+      filterDictionary
     };
     return reportRequestBody;
   }

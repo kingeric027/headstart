@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
@@ -12,6 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
+using OrderCloud.AzureStorage;
+using Marketplace.Common.Services;
+using NPOI.OpenXmlFormats.Wordprocessing;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -41,20 +44,31 @@ namespace Marketplace.Orchestration
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
                 .Inject<IFlurlClient>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
-                    ApiUrl = settings.OrderCloudSettings.ApiUrl
+                    ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = settings.OrderCloudSettings.ApiUrl,
+                    ClientId = settings.OrderCloudSettings.ClientID,
+                    ClientSecret = settings.OrderCloudSettings.ClientSecret,
+                    Roles = new[]
+                    {
+                        ApiRole.FullAccess
+                    }
                 })
                 .AddSingleton<CMSConfig>(x => cmsConfig)
+                .AddSingleton<BlobService>((s) => new BlobService(settings.BlobSettings.EnvironmentString))
                 .Inject<IAssetQuery>()
                 .Inject<IAssetedResourceQuery>()
                 .Inject<IBlobStorage>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
-                .Inject<IProductTemplateCommand>();
+                .Inject<IProductTemplateCommand>()
+                .Inject<ISendgridService>();
         }
     }
 }
