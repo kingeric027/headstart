@@ -63,7 +63,7 @@ namespace Marketplace.Orchestration
                     }
                 })
                 .AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<BlobService>((s) => new BlobService(blobConnection))
+                .AddSingleton<BlobService>((s) => new BlobService(settings.BlobSettings.EnvironmentString))
                 .Inject<IAssetQuery>()
                 .Inject<IAssetedResourceQuery>()
                 .Inject<IBlobStorage>()
