@@ -38,7 +38,6 @@ namespace Marketplace.Orchestration
                 BlobStorageHostUrl = settings.BlobSettings.HostUrl,
                 BlobStorageConnectionString = settings.BlobSettings.ConnectionString
             };
-            var blobAccount = settings.Env.ToString() == "Prod" ? "prod" : (settings.Env.ToString() == "Staging" ? "staging" : "test");
             builder.Services
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
                 .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
