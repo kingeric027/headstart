@@ -419,11 +419,11 @@ namespace Marketplace.Common.Commands
             await Task.CompletedTask;
         }
 
-        private async Task SaveShipMethodByLineItem(ListPage<LineItem> lineItems, List<ShipMethodSupplierView> shipMethods, string buyerOrderID)
+        private async Task SaveShipMethodByLineItem(List<LineItem> lineItems, List<ShipMethodSupplierView> shipMethods, string buyerOrderID)
         {
             if (shipMethods != null)
             {
-                foreach (LineItem lineItem in lineItems.Items)
+                foreach (LineItem lineItem in lineItems)
                 {
                     string shipFromID = lineItem.ShipFromAddressID;
                     if (shipFromID != null)
