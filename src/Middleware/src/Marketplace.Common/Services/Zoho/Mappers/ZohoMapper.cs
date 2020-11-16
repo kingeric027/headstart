@@ -167,32 +167,26 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             return new ZohoLineItem()
             {
-                name = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
                 purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                sku = item.Variant?.ID ?? item.Product.ID,
-                unit = item.Product.xp?.UnitOfMeasure?.Unit,
                 purchase_rate = item.UnitPrice.HasValue ? decimal.ToDouble(item.UnitPrice.Value) : 0,
-                quantity = item.Quantity,
-                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000",
-               manufacturer = supplier.Name,
+                manufacturer = supplier.Name,
             };
         }
 
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, Supplier supplier)
         {
-            zItem.item_id = zItem.item_id;
-            zItem.name = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.purchase_description =
-                $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.sku = item.Variant?.ID ?? item.Product.ID;
-            zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
+            zItem.purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.purchase_rate = item.UnitPrice.HasValue ? decimal.ToDouble(item.UnitPrice.Value) : 0;
-            zItem.quantity = item.Quantity;
-            zItem.avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000";
             zItem.manufacturer = supplier.Name;
             return zItem;
+        }
+    }
+
+    public static class ZohoExtensions
+    {
+        public static string SKU(this MarketplaceLineItem item)
+        {
+            return item.Product == null ? "" : $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-");
         }
     }
 
@@ -205,10 +199,9 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 item_type = "sales_and_purchases",
                 name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
                 rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0,
-                quantity = item.Quantity,
-                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
+                quantity = 1,
                 description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                sku = item.Variant?.ID ?? item.Product.ID,
+                sku = item.SKU(),
                 unit = item.Product.xp?.UnitOfMeasure?.Unit,
                 avatax_tax_code = item.Product.xp?.Tax.Code
             };
@@ -219,8 +212,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             zItem.item_type = "sales_and_purchases";
             zItem.name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.purchase_description =
-                $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
+            zItem.purchase_description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
             zItem.rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0;
             zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
             zItem.avatax_tax_code = item.Product.xp?.Tax.Code;
@@ -238,8 +230,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //account_id = p.purchase_account_id,
                 item_id = p.item_id,
                 description = p.description,
-                rate = decimal.ToDouble(lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                quantity = lineitems.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == p.sku : li.ProductID == p.sku)?.Quantity
+                rate = decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value),
+                quantity = lineitems.FirstOrDefault(li => li.SKU() == p.sku)?.Quantity
             }).ToList(); ;
             po.salesorder_id = salesorder.salesorder_id;
             po.purchaseorder_number = order.ID;
@@ -262,8 +254,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     //account_id = p.purchase_account_id,
                     item_id = p.item_id,
                     description = p.description,
-                    rate = decimal.ToDouble(lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                    quantity = lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku)?.Quantity
+                    rate = decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value),
+                    quantity = lineitems.First(l => l.SKU() == p.sku)?.Quantity
                 }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
                 purchaseorder_number = order.ID,
@@ -301,7 +293,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     };
                 }
 
-                var line_item = lineitems.First(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
+                var line_item = lineitems.First(li => li.SKU() == item.sku);
                 return new ZohoLineItem()
                 {
                     item_id = item.item_id,
@@ -345,7 +337,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                         };
                     }
 
-                    var line_item = lineitems.First(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
+                    var line_item = lineitems.First(li => li.SKU() == item.sku);
                     return new ZohoLineItem()
                     {
                         item_id = item.item_id,
