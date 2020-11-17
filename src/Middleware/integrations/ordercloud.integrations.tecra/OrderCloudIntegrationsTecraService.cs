@@ -10,6 +10,8 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.tecra.Models;
 using ordercloud.integrations.tecra.Storage;
 using OrderCloud.SDK;
+using Polly.Retry;
+using Polly;
 
 namespace ordercloud.integrations.tecra
 {
@@ -100,7 +102,19 @@ namespace ordercloud.integrations.tecra
 
             return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }
-        public async Task<string> GetTecraProofByStoreID(string token, string id)
+
+        private AsyncRetryPolicy Retry()
+        {
+            // retries three times, waits five seconds in-between failures
+            return Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(new[] {
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(5),
+                });
+        }
+        private async Task<string> DownloadProof(string token, string id) 
         {
             TecraProofParams tparams = new TecraProofParams();
             string azureFilePath = "";
@@ -115,19 +129,21 @@ namespace ordercloud.integrations.tecra
             {
                 client.DownloadFile(proofURL, fileName);
             }
-            
+
             //Save it in Azure Storage
             using (var image = Image.FromFile(fileName))
             {
                 azureFilePath = await _blob.UploadAsset(fileName, image);
             }
-            
+
             //Delete downloaded file
             File.Delete(fileName);
 
             return azureFilePath;
+
         }
-        public async Task<string> GetTecraPDFByStoreID(string token, string id)
+        
+        private async Task<string> DownloadPDF(string token, string id) 
         {
             //TODO - Make wsid and folder dynamic
             TecraPDFParams tparams = new TecraPDFParams();
@@ -151,6 +167,24 @@ namespace ordercloud.integrations.tecra
             File.Delete(fileName);
 
             return azureFilePath;
+
+        }
+
+        public async Task<string> GetTecraProofByStoreID(string token, string id)
+        {
+            return await Retry()
+                    .ExecuteAsync(() => {
+                        return DownloadProof(token, id);
+                    });
+            
+        }
+        public async Task<string> GetTecraPDFByStoreID(string token, string id)
+        {
+            return await Retry()
+                    .ExecuteAsync(() => {
+                        return DownloadPDF(token, id);
+                    });
+
         }
     }
 }
