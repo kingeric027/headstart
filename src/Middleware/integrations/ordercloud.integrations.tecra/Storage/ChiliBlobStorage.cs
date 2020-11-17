@@ -6,13 +6,13 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.cms;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 
 namespace ordercloud.integrations.tecra.Storage
 {
 	public interface IChiliBlobStorage
 	{
-		Task<string> UploadAsset(string blobName, byte[] bytes);
-		Task<string> UploadAsset(string blobName, Image image);
+		Task<string> UploadAsset(string blobName, Stream image, string fileType);
 	}
 
 	public class ChiliBlobStorage : IChiliBlobStorage
@@ -32,25 +32,11 @@ namespace ordercloud.integrations.tecra.Storage
 			});
 		}
 
-
-		public async Task<string> UploadAsset(string blobName, byte[] bytes)
+		public async Task<string> UploadAsset(string blobName, Stream image, string fileType)
 		{
 			try
 			{
-				await _blob.Save(blobName, bytes, "application/pdf");
-				return _config.BlobStorageHostUrl + "/" + chiliContainer + "/" + blobName;
-			}
-			catch (Exception ex)
-			{
-				throw new StorageConnectionException(chiliContainer, ex);
-			}
-		}
-		public async Task<string> UploadAsset(string blobName, Image image)
-		{
-			try
-			{
-				var bytes = image.ToBytes(ImageFormat.Png);
-				await _blob.Save(blobName, bytes, "image/png");
+				await _blob.Save(blobName, image, fileType);
 				return _config.BlobStorageHostUrl + "/" + chiliContainer + "/" + blobName;
 			}
 			catch (Exception ex)
