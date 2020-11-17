@@ -1,3 +1,4 @@
+import { CurrentUserService } from './../../../shared/services/current-user/current-user.service';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,10 +9,9 @@ import { of, BehaviorSubject } from 'rxjs';
 import { LoginComponent } from '@app-seller/auth/containers/login/login.component';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 
-import { OcAuthService, OcTokenService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
-import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
-import { AppStateService } from '@app-seller/shared';
+import { ToastrService } from 'ngx-toastr';
+import { TranslateModule, TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -30,18 +30,18 @@ describe('LoginComponent', () => {
   const appAuthService = {
     setRememberStatus: jasmine.createSpy('setRememberStatus'),
   };
-  const appStateService = { isLoggedIn: new BehaviorSubject(false) };
+
+  const currentUserService = { login: jasmine.createSpy('Login').and.returnValue(of(response)) };
+  const toastrService = {};
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule],
+      imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule, TranslateModule.forRoot()],
       providers: [
-        { provide: AppStateService, useValue: appStateService },
-        { provide: AppAuthService, useValue: appAuthService },
         { provide: Router, useValue: router },
-        { provide: OcTokenService, useValue: ocTokenService },
-        { provide: OcAuthService, useValue: ocAuthService },
+        { provide: CurrentUserService, useValue: currentUserService },
+        { provide: ToastrService, useValue: toastrService },
         {
           provide: applicationConfiguration,
           useValue: new InjectionToken<AppConfig>('app.config'),
@@ -57,7 +57,7 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
-  fdescribe('ngOnInit', () => {
+  describe('ngOnInit', () => {
     beforeEach(() => {
       component.ngOnInit();
     });
@@ -76,18 +76,8 @@ describe('LoginComponent', () => {
     });
     it('should call the OcAuthService Login method, OcTokenService SetAccess method, and route to home', () => {
       component.onSubmit();
-      expect(ocAuthService.Login).toHaveBeenCalledWith('', '', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', [
-        'ApiClientAdmin',
-      ]);
-      expect(ocTokenService.SetAccess).toHaveBeenCalledWith(response.access_token);
+      expect(currentUserService.login).toHaveBeenCalledWith('', '', false);
       expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
-    });
-
-    it('should call set refresh token and set rememberStatus if rememberMe is true', () => {
-      component.form.controls['rememberMe'].setValue(true);
-      component.onSubmit();
-      expect(ocTokenService.SetRefresh).toHaveBeenCalledWith('refresh123456');
-      expect(appAuthService.setRememberStatus).toHaveBeenCalledWith(true);
     });
   });
 });

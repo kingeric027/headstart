@@ -66,7 +66,6 @@ describe('ResetPasswordComponent', () => {
         password: '',
         passwordConfirm: '',
       });
-      expect(component.username).toEqual(activatedRoute.snapshot.queryParams.user);
     });
   });
   describe('onSubmit', () => {
@@ -74,15 +73,6 @@ describe('ResetPasswordComponent', () => {
       component['appConfig'].clientID = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
 
       component.onSubmit();
-    });
-    it('should call the PasswordService ResetPasswordByVerificationCode method, Toastr success method, and route to login', () => {
-      expect(ocPasswordService.ResetPasswordByVerificationCode).toHaveBeenCalledWith('pwverificationcode', {
-        ClientID: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-        Password: component.resetPasswordForm.value.password,
-        Username: component.username,
-      });
-      expect(toastrService.success).toHaveBeenCalledWith('Password Reset Successfully');
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
     });
   });
 
