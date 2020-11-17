@@ -394,7 +394,8 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         path: 'FromCompanyID',
         header: 'ADMIN.HEADERS.FROM_COMPANY_ID',
         type: BASIC_STRING,
-        sortable: true
+        sortable: true,
+        queryRestriction: 'OrderDirection=Incoming'
       },
       {
         path: 'ID',
