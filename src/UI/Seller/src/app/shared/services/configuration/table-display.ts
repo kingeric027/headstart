@@ -391,6 +391,12 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         sortable: true,
       },
       {
+        path: 'FromCompanyID',
+        header: 'ADMIN.HEADERS.FROM_COMPANY_ID',
+        type: BASIC_STRING,
+        sortable: true
+      },
+      {
         path: 'ID',
         header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
