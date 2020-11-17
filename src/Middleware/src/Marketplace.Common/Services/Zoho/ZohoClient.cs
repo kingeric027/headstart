@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using Marketplace.Common.Services.Zoho.Models;
@@ -17,7 +16,7 @@ namespace Marketplace.Common.Services.Zoho
         IZohoCurrencyResource Currencies { get; }
         IZohoItemResource Items { get; }
         IZohoSalesOrderResource SalesOrders { get; }
-        IZohoPurchaseOrderResource PurchaseOrders { get;  }
+        IZohoPurchaseOrderResource PurchaseOrders { get; }
         IZohoOrganizationResource Organizations { get; }
         Task<ZohoTokenResponse> AuthenticateAsync();
     }
@@ -25,7 +24,7 @@ namespace Marketplace.Common.Services.Zoho
     {
         private static readonly IFlurlClientFactory _clientFac = new PerBaseUrlFlurlClientFactory();
         private IFlurlClient ApiClient => _clientFac.Get(Config.ApiUrl);
-        private IFlurlClient AuthClient => _clientFac.Get("https://accounts.zoho.com/oauth/v2/");
+        private static IFlurlClient AuthClient => _clientFac.Get("https://accounts.zoho.com/oauth/v2/");
         public ZohoTokenResponse TokenResponse { get; set; }
 
         public bool IsAuthenticated => TokenResponse?.access_token != null;
@@ -62,10 +61,11 @@ namespace Marketplace.Common.Services.Zoho
                     Message = ex.Message
                 });
             }
-            
+
         }
 
-        internal IFlurlRequest Request(object[] segments, string access_token = null) {
+        internal IFlurlRequest Request(object[] segments, string access_token = null)
+        {
             return ApiClient
             .Request(segments)
             .WithHeader("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
@@ -84,14 +84,9 @@ namespace Marketplace.Common.Services.Zoho
         internal IFlurlRequest Put(object obj, object[] segments) => WriteRequest(obj, segments);
         internal IFlurlRequest Post(object obj, object[] segments) => WriteRequest(obj, segments);
 
-        private IFlurlRequest WriteRequest(object obj, object[] segments, string access_token = null) =>  ApiClient
+        private IFlurlRequest WriteRequest(object obj, object[] segments, string access_token = null) => ApiClient
             .Request(segments)
             .WithHeader("Authorization", $"Zoho-oauthtoken {access_token ?? this.TokenResponse.access_token}")
-            .SetQueryParam("JSONString", JsonConvert.SerializeObject(obj, new JsonSerializerSettings()
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.None
-            }))
             .ConfigureRequest(settings =>
             {
                 settings.JsonSerializer = new NewtonsoftJsonSerializer(new JsonSerializerSettings
@@ -117,7 +112,6 @@ namespace Marketplace.Common.Services.Zoho
         }
 
         public IZohoOrganizationResource Organizations { get; private set; }
-
         public IZohoContactResource Contacts { get; private set; }
         public IZohoCurrencyResource Currencies { get; private set; }
         public IZohoItemResource Items { get; private set; }
