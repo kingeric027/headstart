@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using System.IO;
 #if NETCOREAPP2_2
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -28,6 +29,7 @@ namespace ordercloud.integrations.library
         Task Save(string reference, JObject blob, string fileType = null);
 #endif
         Task Save(string reference, IFormFile blob, string fileType = null);
+        Task Save(string reference, Stream file, string fileType = null);
         Task Save(string reference, byte[] bytes, string fileType = null);
         Task Save(BlobBase64Image base64Image);
         Task Delete(string id);
@@ -150,6 +152,13 @@ namespace ordercloud.integrations.library
             using var stream = blob.OpenReadStream();
             await block.UploadFromStreamAsync(stream);
 #endif
+        }
+        public async Task Save(string reference, Stream file, string fileType = null)
+        {
+			await this.Init();
+            var block = Container.GetBlockBlobReference(reference);
+            block.Properties.ContentType = fileType;
+            await block.UploadFromStreamAsync(file);
         }
 
         public async Task Save(BlobBase64Image base64Image)

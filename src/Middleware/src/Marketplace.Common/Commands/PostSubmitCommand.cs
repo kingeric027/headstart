@@ -363,7 +363,8 @@ namespace Marketplace.Common.Commands
                     }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
-                await SaveShipMethodByLineItem(lineItems, supplierOrderPatch.xp.SelectedShipMethodsSupplierView, buyerOrder.Order.ID);
+                var supplierLineItems = lineItems.Where(li => li.SupplierID == supplier.ID).ToList();
+                await SaveShipMethodByLineItem(supplierLineItems, supplierOrderPatch.xp.SelectedShipMethodsSupplierView, buyerOrder.Order.ID);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 

@@ -125,19 +125,13 @@ namespace ordercloud.integrations.tecra
             //Download the png
             string proofURL = await this.Request("api/v1/chili/getproofimagebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
             string fileName = id + ".png";
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(proofURL, fileName);
-            }
 
             //Save it in Azure Storage
-            using (var image = Image.FromFile(fileName))
+            WebClient wc = new WebClient();
+            using (MemoryStream stream = new MemoryStream(wc.DownloadData(proofURL)))
             {
-                azureFilePath = await _blob.UploadAsset(fileName, image);
+                azureFilePath = await _blob.UploadAsset(fileName, stream, "image/png");
             }
-
-            //Delete downloaded file
-            File.Delete(fileName);
 
             return azureFilePath;
 
@@ -155,16 +149,13 @@ namespace ordercloud.integrations.tecra
             //Download the png
             string pdfURL = await this.Request("api/v1/chili/generatepdfbystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
             string fileName = id + ".pdf";
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(pdfURL, fileName);
-            }
-            byte[] pdfBytes = System.IO.File.ReadAllBytes(fileName);
-            //Save it in Azure Storage
-            azureFilePath = await _blob.UploadAsset(fileName, pdfBytes);
 
-            //Delete downloaded file
-            File.Delete(fileName);
+            //Save it in Azure Storage
+            WebClient wc = new WebClient();
+            using (MemoryStream stream = new MemoryStream(wc.DownloadData(pdfURL)))
+            {
+                azureFilePath = await _blob.UploadAsset(fileName, stream, "application/pdf");
+            }
 
             return azureFilePath;
 
