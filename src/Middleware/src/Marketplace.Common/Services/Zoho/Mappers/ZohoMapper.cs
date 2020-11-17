@@ -133,7 +133,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             item.item_id = item.item_id;
             item.item_type = "sales_and_purchases";
             item.name = $"Shipping: {method.Name}";
-            item.rate = decimal.ToDouble(method.Cost);
+            item.rate = Math.Round(decimal.ToDouble(method.Cost), 2);
             item.description = $"{method.Name} - {method.EstimatedTransitDays} days transit";
             item.sku = item.sku;
             item.quantity = 1;
@@ -149,7 +149,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             {
                 item_type = "sales_and_purchases",
                 sku = method.ShippingSku(),
-                rate = decimal.ToDouble(method.Cost),
+                rate = Math.Round(decimal.ToDouble(method.Cost), 2),
                 description = $"{method.Name} - {method.EstimatedTransitDays} days transit",
                 name = $"Shipping: {method.Name}",
                 quantity = 1,
@@ -168,7 +168,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return new ZohoLineItem()
             {
                 purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim(),
-                purchase_rate = item.UnitPrice.HasValue ? decimal.ToDouble(item.UnitPrice.Value) : 0,
+                purchase_rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0,
                 manufacturer = supplier.Name,
             };
         }
@@ -176,7 +176,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, Supplier supplier)
         {
             zItem.purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
-            zItem.purchase_rate = item.UnitPrice.HasValue ? decimal.ToDouble(item.UnitPrice.Value) : 0;
+            zItem.purchase_rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0;
             zItem.manufacturer = supplier.Name;
             return zItem;
         }
@@ -236,7 +236,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //account_id = p.purchase_account_id,
                 item_id = p.item_id,
                 description = p.description,
-                rate = decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value),
+                rate = Math.Round(decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value), 2),
                 quantity = lineitems.FirstOrDefault(li => li.SKU() == p.sku)?.Quantity
             }).ToList(); ;
             po.salesorder_id = salesorder.salesorder_id;
@@ -260,7 +260,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     //account_id = p.purchase_account_id,
                     item_id = p.item_id,
                     description = p.description,
-                    rate = decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value),
+                    rate = Math.Round(decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value), 2),
                     quantity = lineitems.First(l => l.SKU() == p.sku)?.Quantity
                 }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
@@ -291,7 +291,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             {
                 item_id = items.First(i => i.sku == item.SKU()).item_id,
                 quantity = item.Quantity,
-                rate = (double)(item.UnitPrice ?? 0),
+                rate = Math.Round((double)(item.UnitPrice ?? 0), 2),
                 avatax_tax_code = item.Product.xp.Tax.Code
                 //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
             }).ToList();
@@ -313,7 +313,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 {
                     item_id = items.First(i => i.sku == method?.ShippingSku()).item_id,
                     quantity = 1,
-                    rate = (double)(method?.Cost ?? 0),
+                    rate = Math.Round((double)(method?.Cost ?? 0), 2),
                     avatax_tax_code = "FR"
                 });
             }
@@ -334,7 +334,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 {
                     item_id = items.First(i => i.sku == item.SKU()).item_id,
                     quantity = item.Quantity,
-                    rate = (double)(item.UnitPrice ?? 0),
+                    rate = Math.Round((double)(item.UnitPrice ?? 0), 2),
                     avatax_tax_code = item.Product.xp.Tax.Code
                     //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
                 }).ToList(),
@@ -358,7 +358,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 {
                     item_id = items.First(i => i.sku == method?.ShippingSku()).item_id,
                     quantity = 1,
-                    rate = (double)(method?.Cost ?? 0),
+                    rate = Math.Round((double)(method?.Cost ?? 0), 2),
                     avatax_tax_code = "FR"
                 });
             }
