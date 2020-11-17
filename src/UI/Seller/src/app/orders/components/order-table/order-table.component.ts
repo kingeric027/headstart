@@ -52,11 +52,12 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         Display: 'ADMIN.FILTERS.STATUS',
         Path: 'Status',
         Items: [
-          {Text: 'ADMIN.FILTER_OPTIONS.OPEN', Value: 'Open'},
-          {Text: 'ADMIN.FILTER_OPTIONS.AWAITING_APPROVAL', Value: 'AwaitingApproval'},
-          {Text: 'ADMIN.FILTER_OPTIONS.COMPLETED', Value: 'Completed'},
-          {Text: 'ADMIN.FILTER_OPTIONS.DECLINED', Value: 'Declined'},
-          {Text: 'ADMIN.FILTER_OPTIONS.CANCELED', Value: 'Canceled'}],
+          { Text: 'ADMIN.FILTER_OPTIONS.OPEN', Value: 'Open' },
+          { Text: 'ADMIN.FILTER_OPTIONS.AWAITING_APPROVAL', Value: 'AwaitingApproval' },
+          { Text: 'ADMIN.FILTER_OPTIONS.COMPLETED', Value: 'Completed' },
+          { Text: 'ADMIN.FILTER_OPTIONS.DECLINED', Value: 'Declined' },
+          { Text: 'ADMIN.FILTER_OPTIONS.CANCELED', Value: 'Canceled' },
+        ],
         Type: 'Dropdown',
       },
       {
@@ -72,11 +73,9 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
       {
         Display: 'ADMIN.FILTERS.HAS_CLAIMS',
         Path: 'xp.OrderReturnInfo.HasReturn',
-        Items: [
-          {Value: true},
-          {Value: false }],
+        Items: [{ Value: true }, { Value: false }],
         Type: 'Dropdown',
-        QueryRestriction: 'OrderDirection=Incoming'
+        QueryRestriction: 'OrderDirection=Incoming',
       },
     ],
   };
