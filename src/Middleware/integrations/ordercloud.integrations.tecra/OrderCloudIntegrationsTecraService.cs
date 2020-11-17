@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Net;
+using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Flurl.Http;
 using ordercloud.integrations.library;
 using ordercloud.integrations.tecra.Models;
+using ordercloud.integrations.tecra.Storage;
 using OrderCloud.SDK;
+using Polly.Retry;
+using Polly;
 
 namespace ordercloud.integrations.tecra
 {
@@ -39,18 +45,17 @@ namespace ordercloud.integrations.tecra
     public class OrderCloudIntegrationsTecraService : IOrderCloudIntegrationsTecraService
     {
         private readonly IFlurlClient _flurl;
+        private readonly IChiliBlobStorage _blob;
         public OrderCloudTecraConfig Config { get; }
 
-        public OrderCloudIntegrationsTecraService() : this(new OrderCloudTecraConfig())
-        {
-        }
-        public OrderCloudIntegrationsTecraService(OrderCloudTecraConfig config)
+        public OrderCloudIntegrationsTecraService(OrderCloudTecraConfig config, IChiliBlobStorage blob)
         {
             Config = config;
             _flurl = new FlurlClient
             {
                 BaseUrl = $"{Config.BaseUrl}/"
             };
+            _blob = blob;
         }
         private IFlurlRequest Token(string resource)
         {
@@ -97,24 +102,89 @@ namespace ordercloud.integrations.tecra
 
             return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
         }
-        public async Task<string> GetTecraProofByStoreID(string token, string id)
+
+        private AsyncRetryPolicy Retry()
+        {
+            // retries three times, waits five seconds in-between failures
+            return Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(new[] {
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(5),
+                });
+        }
+        private async Task<string> DownloadProof(string token, string id) 
         {
             TecraProofParams tparams = new TecraProofParams();
+            string azureFilePath = "";
             tparams.docid = id;
             tparams.storeid = Config.StoreID;
             tparams.page = 1;
 
-            return await this.Request("api/v1/chili/getproofimagebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+            //Download the png
+            string proofURL = await this.Request("api/v1/chili/getproofimagebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+            string fileName = id + ".png";
+            using (var client = new WebClient())
+            {
+                client.DownloadFile(proofURL, fileName);
+            }
+
+            //Save it in Azure Storage
+            using (var image = Image.FromFile(fileName))
+            {
+                azureFilePath = await _blob.UploadAsset(fileName, image);
+            }
+
+            //Delete downloaded file
+            File.Delete(fileName);
+
+            return azureFilePath;
+
         }
-        public async Task<string> GetTecraPDFByStoreID(string token, string id)
+        
+        private async Task<string> DownloadPDF(string token, string id) 
         {
             //TODO - Make wsid and folder dynamic
             TecraPDFParams tparams = new TecraPDFParams();
+            string azureFilePath = "";
             tparams.docid = id;
             tparams.storeid = Config.StoreID;
             tparams.settingsid = Config.SettingsID;
 
-            return await this.Request("api/v1/chili/generatepdfbystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+            //Download the png
+            string pdfURL = await this.Request("api/v1/chili/generatepdfbystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+            string fileName = id + ".pdf";
+            using (var client = new WebClient())
+            {
+                client.DownloadFile(pdfURL, fileName);
+            }
+            byte[] pdfBytes = System.IO.File.ReadAllBytes(fileName);
+            //Save it in Azure Storage
+            azureFilePath = await _blob.UploadAsset(fileName, pdfBytes);
+
+            //Delete downloaded file
+            File.Delete(fileName);
+
+            return azureFilePath;
+
+        }
+
+        public async Task<string> GetTecraProofByStoreID(string token, string id)
+        {
+            return await Retry()
+                    .ExecuteAsync(() => {
+                        return DownloadProof(token, id);
+                    });
+            
+        }
+        public async Task<string> GetTecraPDFByStoreID(string token, string id)
+        {
+            return await Retry()
+                    .ExecuteAsync(() => {
+                        return DownloadPDF(token, id);
+                    });
+
         }
     }
 }
