@@ -8,7 +8,7 @@ export interface Filter {
   filterValues: any[];
 }
 
-export let buyerLocation: Filter[] = [
+export const buyerLocation: Filter[] = [
   { name: 'Buyer', 
     path: 'BuyerID', 
     dataKey: 'ID', 
@@ -33,7 +33,32 @@ export let buyerLocation: Filter[] = [
   },
 ];
 
-export let salesOrderDetail: Filter[] = [
+export const salesOrderDetail: Filter[] = [
+  {
+    name: 'Order Status',
+    path: 'Status',
+    sourceType: 'model',
+    source: 'OrderStatus',
+    filterValues: [],
+  },
+  {
+    name: 'Order Type',
+    path: 'OrderType',
+    sourceType: 'model',
+    source: 'OrderType',
+    filterValues: [],
+  },
+  {
+    name: 'Country',
+    path: 'Country',
+    dataKey: 'abbreviation',
+    sourceType: 'model',
+    source: 'GeographyConfig',
+    filterValues: [],
+  }
+];
+
+export const purchaseOrderDetail: Filter[] = [
   {
     name: 'Order Status',
     path: 'Status',
@@ -50,7 +75,7 @@ export let salesOrderDetail: Filter[] = [
   }
 ];
 
-export let purchaseOrderDetail: Filter[] = [
+export const lineItemDetail: Filter[] = [
   {
     name: 'Order Status',
     path: 'Status',
@@ -64,22 +89,13 @@ export let purchaseOrderDetail: Filter[] = [
     sourceType: 'model',
     source: 'OrderType',
     filterValues: [],
-  }
-];
-
-export let lineItemDetail: Filter[] = [
-  {
-    name: 'Order Status',
-    path: 'Status',
-    sourceType: 'model',
-    source: 'OrderStatus',
-    filterValues: [],
   },
   {
-    name: 'Order Type',
-    path: 'OrderType',
+    name: 'Country',
+    path: 'Country',
+    dataKey: 'abbreviation',
     sourceType: 'model',
-    source: 'OrderType',
+    source: 'GeographyConfig',
     filterValues: [],
   }
 ];

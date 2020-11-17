@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -71,9 +72,12 @@ namespace Marketplace.Common.Commands
                 {
                     // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112
                     if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
+                    {
                         s.Cost = 0;
-
-                    s.Cost *= _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup;
+                    } else
+                    {
+                        s.Cost = Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
+                    }
                     return s;
                 }).ToList();
             }

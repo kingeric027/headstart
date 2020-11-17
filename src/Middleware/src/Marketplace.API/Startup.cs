@@ -114,6 +114,7 @@ namespace Marketplace.API
                 .Inject<IChiliConfigCommand>()
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
+                .Inject<ISupplierApiClientHelper>()
                 .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {

@@ -148,7 +148,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             var item = new ZohoLineItem()
             {
                 item_type = "sales_and_purchases",
-                sku = $"{method.Name} Shipping (41000)",
+                sku = method.ShippingSku(),
                 rate = decimal.ToDouble(method.Cost),
                 description = $"{method.Name} - {method.EstimatedTransitDays} days transit",
                 name = $"Shipping: {method.Name}",
@@ -167,32 +167,32 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         {
             return new ZohoLineItem()
             {
-                name = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                sku = item.Variant?.ID ?? item.Product.ID,
-                unit = item.Product.xp?.UnitOfMeasure?.Unit,
+                purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim(),
                 purchase_rate = item.UnitPrice.HasValue ? decimal.ToDouble(item.UnitPrice.Value) : 0,
-                quantity = item.Quantity,
-                avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000",
-               manufacturer = supplier.Name,
+                manufacturer = supplier.Name,
             };
         }
 
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, Supplier supplier)
         {
-            zItem.item_id = zItem.item_id;
-            zItem.name = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.purchase_description =
-                $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.sku = item.Variant?.ID ?? item.Product.ID;
-            zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
+            zItem.purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
             zItem.purchase_rate = item.UnitPrice.HasValue ? decimal.ToDouble(item.UnitPrice.Value) : 0;
-            zItem.quantity = item.Quantity;
-            zItem.avatax_tax_code = item.Product.xp?.Tax.Code ?? "P000000";
             zItem.manufacturer = supplier.Name;
             return zItem;
+        }
+    }
+
+    public static class ZohoExtensions
+    {
+        public static string ShippingSuffix = "Shipping (41000)";
+        public static string SKU(this MarketplaceLineItem item)
+        {
+            return item.Product == null ? "" : $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-");
+        }
+
+        public static string ShippingSku(this MarketplaceShipMethod method)
+        {
+            return $"{method?.Name} {ShippingSuffix}";
         }
     }
 
@@ -203,12 +203,11 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return new ZohoLineItem()
             {
                 item_type = "sales_and_purchases",
-                name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
+                name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim(),
                 rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0,
-                quantity = item.Quantity,
-                purchase_description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim(),
-                sku = item.Variant?.ID ?? item.Product.ID,
+                quantity = 1,
+                description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim(),
+                sku = item.SKU(),
                 unit = item.Product.xp?.UnitOfMeasure?.Unit,
                 avatax_tax_code = item.Product.xp?.Tax.Code
             };
@@ -217,10 +216,9 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
         {
             zItem.item_type = "sales_and_purchases";
-            zItem.name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
-            zItem.purchase_description =
-                $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp.SpecCombo}".Trim();
+            zItem.name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
+            zItem.description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
+            zItem.purchase_description = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
             zItem.rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0;
             zItem.unit = item.Product.xp?.UnitOfMeasure?.Unit;
             zItem.avatax_tax_code = item.Product.xp?.Tax.Code;
@@ -238,8 +236,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 //account_id = p.purchase_account_id,
                 item_id = p.item_id,
                 description = p.description,
-                rate = decimal.ToDouble(lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                quantity = lineitems.FirstOrDefault(li => li.Variant != null ? li.Variant?.ID == p.sku : li.ProductID == p.sku)?.Quantity
+                rate = decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value),
+                quantity = lineitems.FirstOrDefault(li => li.SKU() == p.sku)?.Quantity
             }).ToList(); ;
             po.salesorder_id = salesorder.salesorder_id;
             po.purchaseorder_number = order.ID;
@@ -262,8 +260,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     //account_id = p.purchase_account_id,
                     item_id = p.item_id,
                     description = p.description,
-                    rate = decimal.ToDouble(lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku).UnitPrice.Value),
-                    quantity = lineitems.First(l => l.Variant != null ? l.Variant.ID == p.sku : l.ProductID == p.sku)?.Quantity
+                    rate = decimal.ToDouble(lineitems.First(l => l.SKU() == p.sku).UnitPrice.Value),
+                    quantity = lineitems.First(l => l.SKU() == p.sku)?.Quantity
                 }).ToList(),
                 salesorder_id = salesorder.salesorder_id,
                 purchaseorder_number = order.ID,
@@ -274,91 +272,76 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                 vendor_id = vendor.contact_id,
                 delivery_customer_id = salesorder.customer_id
             };
+
             return po;
         }
     }
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(ZohoSalesOrder zOrder, MarketplaceOrder order, List<ZohoLineItem> items,
-            ZohoContact contact, IList<MarketplaceLineItem> lineitems, IList<OrderPromotion> promotions)
+        public static ZohoSalesOrder Map(ZohoSalesOrder zOrder, MarketplaceOrderWorksheet worksheet, List<ZohoLineItem> items, ZohoContact contact, IList<OrderPromotion> promotions)
         {
-            zOrder.reference_number = order.ID;
-            zOrder.salesorder_number = order.ID;
-            zOrder.date = order.DateSubmitted?.ToString("yyyy-MM-dd");
+            zOrder.reference_number = worksheet.Order.ID;
+            zOrder.salesorder_number = worksheet.Order.ID;
+            zOrder.date = worksheet.Order.DateSubmitted?.ToString("yyyy-MM-dd");
             zOrder.is_discount_before_tax = true;
             zOrder.discount = decimal.ToDouble(promotions.Sum(p => p.Amount));
             zOrder.discount_type = "entity_level";
-            zOrder.line_items = items.Select(item =>
+            zOrder.line_items = worksheet.LineItems.Select(item => new ZohoLineItem
             {
-                if (item.sku.Contains("Shipping (41000)"))
-                {
-                    return new ZohoLineItem()
-                    {
-                        item_id = item.item_id,
-                        quantity = 1,
-                        rate = item.rate
-                    };
-                }
-
-                var line_item = lineitems.First(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
-                return new ZohoLineItem()
-                {
-                    item_id = item.item_id,
-                    quantity = line_item.Quantity,
-                    rate = decimal.ToDouble(line_item.UnitPrice.Value),
-                };
+                item_id = items.First(i => i.sku == item.SKU()).item_id,
+                quantity = item.Quantity,
+                rate = (double)(item.UnitPrice ?? 0),
+                avatax_tax_code = item.Product.xp.Tax.Code
+                //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
             }).ToList();
-            zOrder.tax_total = decimal.ToDouble(order.TaxCost);
+            zOrder.tax_total = decimal.ToDouble(worksheet.Order.TaxCost);
             zOrder.customer_name = contact.contact_name;
-            zOrder.sub_total = decimal.ToDouble(order.Subtotal);
-            zOrder.total = decimal.ToDouble(order.Total);
+            zOrder.sub_total = decimal.ToDouble(worksheet.Order.Subtotal);
+            zOrder.total = decimal.ToDouble(worksheet.Order.Total);
             zOrder.customer_id = contact.contact_id;
             zOrder.currency_code = contact.currency_code;
             zOrder.currency_symbol = contact.currency_symbol;
             zOrder.notes = promotions.Any()
                 ? $"Promotions applied: {promotions.DistinctBy(p => p.Code).Select(p => p.Code).JoinString(" - ", p => p)}"
                 : null;
+            // adding shipping as a line item
+            foreach (var shipment in worksheet.ShipEstimateResponse.ShipEstimates)
+            {
+                var method = shipment.ShipMethods.FirstOrDefault(s => s.ID == shipment.SelectedShipMethodID);
+                zOrder.line_items.Add(new ZohoLineItem
+                {
+                    item_id = items.First(i => i.sku == method?.ShippingSku()).item_id,
+                    quantity = 1,
+                    rate = (double)(method?.Cost ?? 0),
+                    avatax_tax_code = "FR"
+                });
+            }
             return zOrder;
         }
 
-        public static ZohoSalesOrder Map(MarketplaceOrder order, List<ZohoLineItem> items, ZohoContact contact,
-            IList<MarketplaceLineItem> lineitems, IList<OrderPromotion> promotions)
+        public static ZohoSalesOrder Map(MarketplaceOrderWorksheet worksheet, List<ZohoLineItem> items, ZohoContact contact, IList<OrderPromotion> promotions)
         {
             var o = new ZohoSalesOrder()
             {
-                reference_number = order.ID,
-                salesorder_number = order.ID,
-                date = order.DateSubmitted?.ToString("yyyy-MM-dd"),
+                reference_number = worksheet.Order.ID,
+                salesorder_number = worksheet.Order.ID,
+                date = worksheet.Order.DateSubmitted?.ToString("yyyy-MM-dd"),
                 is_discount_before_tax = true,
                 discount = decimal.ToDouble(promotions.Sum(p => p.Amount)),
                 discount_type = "entity_level",
-                line_items = items.Select(item =>
+                line_items = worksheet.LineItems.Select(item => new ZohoLineItem
                 {
-                    if (item.sku.Contains("Shipping (41000)"))
-                    {
-                        return new ZohoLineItem()
-                        {
-                            item_id = item.item_id,
-                            quantity = 1,
-                            rate = item.rate
-                        };
-                    }
-
-                    var line_item = lineitems.First(li => li.Variant != null ? li.Variant?.ID == item.sku : li.ProductID == item.sku);
-                    return new ZohoLineItem()
-                    {
-                        item_id = item.item_id,
-                        quantity = line_item.Quantity,
-                        rate = decimal.ToDouble(line_item.UnitPrice.Value),
-                        //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
-
-                    };
+                    item_id = items.First(i => i.sku == item.SKU()).item_id,
+                    quantity = item.Quantity,
+                    rate = (double)(item.UnitPrice ?? 0),
+                    avatax_tax_code = item.Product.xp.Tax.Code
+                    //discount = decimal.ToDouble(promotions.Where(p => p.LineItemLevel == true && p.LineItemID == line_item.ID).Sum(p => p.Amount)),
                 }).ToList(),
-                tax_total = decimal.ToDouble(order.TaxCost),
+                tax_total = decimal.ToDouble(worksheet.Order.TaxCost),
                 customer_name = contact.contact_name,
-                sub_total = decimal.ToDouble(order.Subtotal),
-                total = decimal.ToDouble(order.Total),
+                sub_total = decimal.ToDouble(worksheet.Order.Subtotal),
+                total = decimal.ToDouble(worksheet.Order.Total),
                 customer_id = contact.contact_id,
                 currency_code = contact.currency_code,
                 currency_symbol = contact.currency_symbol,
@@ -367,6 +350,18 @@ namespace Marketplace.Common.Services.Zoho.Mappers
                     : null
                 //shipping_charge = decimal.ToDouble(order.ShippingCost), //TODO: Please mention any Shipping/miscellaneous charges as additional line items.
             };
+            // adding shipping as a line item
+            foreach (var shipment in worksheet.ShipEstimateResponse.ShipEstimates)
+            {
+                var method = shipment.ShipMethods.FirstOrDefault(s => s.ID == shipment.SelectedShipMethodID);
+                o.line_items.Add(new ZohoLineItem
+                {
+                    item_id = items.First(i => i.sku == method?.ShippingSku()).item_id,
+                    quantity = 1,
+                    rate = (double)(method?.Cost ?? 0),
+                    avatax_tax_code = "FR"
+                });
+            }
             return o;
         }
     }

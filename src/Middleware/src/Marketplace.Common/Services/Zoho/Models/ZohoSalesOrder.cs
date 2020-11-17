@@ -29,7 +29,7 @@ namespace Marketplace.Common.Services.Zoho.Models
         public bool is_emailed { get; set; }
         public List<string> contact_persons { get; set; }
         public string currency_symbol { get; set; }
-        public double exchange_rate { get; set; }
+        //public double exchange_rate { get; set; }
 
         // discount fields resulting in errror "Discount after tax cannot be applied when discount is given at the item level"
         // reevaluation fields when handling promotions

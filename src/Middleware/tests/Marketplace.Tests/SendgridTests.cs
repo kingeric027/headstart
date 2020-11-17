@@ -145,8 +145,8 @@ namespace Marketplace.Tests
         {
             Fixture fixture = new Fixture();
 
-            dynamic shipEstimatexp1 = new ExpandoObject();
-            dynamic shipEstimatexp2 = new ExpandoObject();
+            dynamic shipEstimatexp1 = new ShipEstimateXP();
+            dynamic shipEstimatexp2 = new ShipEstimateXP();
             shipEstimatexp1.SupplierID = TestConstants.supplier1ID;
             shipEstimatexp2.SupplierID = TestConstants.supplier2ID;
 
