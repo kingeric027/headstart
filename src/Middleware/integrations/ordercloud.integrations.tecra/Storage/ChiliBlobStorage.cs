@@ -11,54 +11,52 @@ namespace ordercloud.integrations.tecra.Storage
 {
 	public interface IChiliBlobStorage
 	{
-		Task<string> UploadAsset(string container, string blobName, byte[] bytes);
-		Task<string> UploadAsset(string container, string blobName, Image image);
+		Task<string> UploadAsset(string blobName, byte[] bytes);
+		Task<string> UploadAsset(string blobName, Image image);
 	}
 
 	public class ChiliBlobStorage : IChiliBlobStorage
 	{
 		private readonly CMSConfig _config;
+		private readonly IOrderCloudIntegrationsBlobService _blob;
+		string chiliContainer = "chili-assets";
 
 		public ChiliBlobStorage(CMSConfig config)
 		{
 			_config = config;
+			_blob = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
+			{
+				ConnectionString = _config.BlobStorageConnectionString,
+				Container = chiliContainer,
+				AccessType = BlobContainerPublicAccessType.Container
+			});
 		}
 
 
-		public async Task<string> UploadAsset(string container, string blobName, byte[] bytes)
+		public async Task<string> UploadAsset(string blobName, byte[] bytes)
 		{
 			try
 			{
-				await BuildBlobService(container).Save(blobName, bytes, "application/pdf");
-				return _config.BlobStorageHostUrl + "/" + container + "/" + blobName;
+				await _blob.Save(blobName, bytes, "application/pdf");
+				return _config.BlobStorageHostUrl + "/" + chiliContainer + "/" + blobName;
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container, ex);
+				throw new StorageConnectionException(chiliContainer, ex);
 			}
 		}
-		public async Task<string> UploadAsset(string container, string blobName, Image image)
+		public async Task<string> UploadAsset(string blobName, Image image)
 		{
 			try
 			{
 				var bytes = image.ToBytes(ImageFormat.Png);
-				await BuildBlobService(container).Save(blobName, bytes, "image/png");
-				return _config.BlobStorageHostUrl + "/" + container + "/" + blobName;
+				await _blob.Save(blobName, bytes, "image/png");
+				return _config.BlobStorageHostUrl + "/" + chiliContainer + "/" + blobName;
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(container, ex);
+				throw new StorageConnectionException(chiliContainer, ex);
 			}
-		}
-
-		private OrderCloudIntegrationsBlobService BuildBlobService(string container)
-		{
-			return new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
-			{
-				ConnectionString = _config.BlobStorageConnectionString,
-				Container = container,
-				AccessType = BlobContainerPublicAccessType.Container
-			});
 		}
 	}
 }

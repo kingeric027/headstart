@@ -119,7 +119,7 @@ namespace ordercloud.integrations.tecra
             //Save it in Azure Storage
             using (var image = Image.FromFile(fileName))
             {
-                azureFilePath = await _blob.UploadAsset("chili-assets", fileName, image);
+                azureFilePath = await _blob.UploadAsset(fileName, image);
             }
             
             //Delete downloaded file
@@ -145,7 +145,7 @@ namespace ordercloud.integrations.tecra
             }
             byte[] pdfBytes = System.IO.File.ReadAllBytes(fileName);
             //Save it in Azure Storage
-            azureFilePath = await _blob.UploadAsset("chili-assets", fileName, pdfBytes);
+            azureFilePath = await _blob.UploadAsset(fileName, pdfBytes);
 
             //Delete downloaded file
             File.Delete(fileName);
