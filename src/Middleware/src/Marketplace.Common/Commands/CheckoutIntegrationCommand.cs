@@ -73,7 +73,7 @@ namespace Marketplace.Common.Commands
                     // apply a 75% markup to keyfob shipments https://four51.atlassian.net/browse/SEB-1260
                     if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
                     {
-                        s.Cost = s.Cost * (decimal)1.75;
+                        s.Cost = Math.Round(s.Cost * (decimal)1.75, 2);
                     } else
                     {
                         s.Cost = Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
