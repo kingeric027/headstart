@@ -12,23 +12,13 @@ export class PDFService {
   constructor() {}
   
   createAndSavePDF(orderID: string): void {
-    const orderDetailObjectByID = document.getElementById('order-detail-pdf-range');
-    this.removeNodesOfClass(orderDetailObjectByID, 'd-print-none');
-    const pdfArea = document.createElement('div');
-    pdfArea.classList.add('hidden-print-area');
-    pdfArea.appendChild(orderDetailObjectByID);
-    const links = pdfArea.getElementsByClassName('link-text');
-    Array.from(links).forEach(link => {
-      link.classList.add('pdf-links');
-    });
-    document.body.appendChild(pdfArea);
-    const printObj = document.getElementById('order-detail-pdf-range');
-    this.generateImagePDF(orderDetailObjectByID, printObj, orderID);
+    const printObj = document.getElementsByClassName('order-detail-pdf-range')[0];
+    this.generateImagePDF(printObj, orderID);
   }
 
-  private generateImagePDF(orderDetailObject: any, printObj: any, orderID: string): void {
+  private generateImagePDF(printObj: any, orderID: string): void {
     domtoimage
-      .toPng(printObj).then(dataUrl => {
+      .toPng(printObj, {filter: (node: Node) => (node instanceof Element && !node.classList.contains('d-print-none')) || !(node instanceof Element)}).then(dataUrl => {
         const img = new Image();
         img.src = dataUrl;
         img.onload = (): void => {
@@ -37,7 +27,7 @@ export class PDFService {
           const aspectRatio = width / height;
           const pdfHeight = 170 / aspectRatio;
           const pdf = new jspdf();
-          pdf.addImage(dataUrl, 'PNG', 20, 20, 170, 170 / aspectRatio);
+          pdf.addImage(dataUrl, 'PNG', 20, 20, 170, pdfHeight);
           const pages = Math.ceil(pdfHeight / 300);
           if (pages > 1) {
             let prevPageHeight = 0;
@@ -52,12 +42,12 @@ export class PDFService {
           this.removeNodesOfClass(document, 'hidden-print-area');
         };
       })
-      .catch(e => {this.generateNoImagePDF(orderDetailObject, printObj, orderID);}
+      .catch(e => {this.generateNoImagePDF(printObj, orderID);}
       );
   }
 
-  private async generateNoImagePDF(orderDetailObject: any, printObj: any, orderID: string): Promise<void> {
-    this.removeNodesOfClass(orderDetailObject, 'img-thumbnail');
+  private async generateNoImagePDF(printObj: any, orderID: string): Promise<void> {
+    this.removeNodesOfClass(printObj, 'img-thumbnail');
     const canvas = await html2canvas(printObj, { allowTaint: true });
     const pdf = new jspdf();
     const width = canvas.width;

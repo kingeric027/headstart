@@ -1,5 +1,5 @@
 <div class="container">
- <div id="order-detail-pdf-range">
+ <div class="container order-detail-pdf-range">
   <div *ngIf="order">
     <nav class="breadcrumb"
          aria-label="breadcrumb">
@@ -16,6 +16,14 @@
               class="badge badge-pill badge-primary ml-2">{{
             order.xp.OrderType
           }}</span>
+        <div *ngIf="subView === 'details'"
+              class="float-right">
+          <button class="btn btn-outline-secondary d-print-none"
+                  (click)="createAndSavePDF()"
+                  translate>
+                  ORDERS.DETAIL.DOWNLOAD_AS_PDF
+          </button>
+        </div>
       </h2>
     </div>
     <div class="row">
@@ -31,7 +39,7 @@
                             [orderID]="order.ID"></ocm-order-approval>
 
         <button *ngIf="!approvalVersion"
-                class="btn btn-outline-secondary float-right"
+                class="btn btn-outline-secondary float-right d-print-none"
                 (click)="toggleFavorite(order)"
                 translate>
           ORDERS.DETAIL.FAVORITE
@@ -39,44 +47,42 @@
                                [favorite]="isFavorite(order.ID)"> </ocm-toggle-favorite>
         </button>
         <button *ngIf="!approvalVersion && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
-                class="btn btn-secondary float-right mr-2"
+                class="btn btn-secondary float-right mr-2 d-print-none"
                 (click)="open(reorderModal)"
                 translate>
           ORDERS.DETAIL.REORDER
         </button>
         <button *ngIf="!showRequestReturn && !showRequestCancel && canRequestReturn() && !approvalVersion && !isQuoteOrder(order)"
-                class="btn btn-secondary float-right mr-2"
+                class="btn btn-secondary float-right mr-2 d-print-none"
                 (click)="toggleRequestReturn()"
                 translate>
           ORDERS.DETAIL.REQUEST_A_RETURN
         </button>
         <button *ngIf="showRequestCancel && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
-                class="btn btn-secondary float-right mr-2"
+                class="btn btn-secondary float-right mr-2 d-print-none"
                 (click)="toggleRequestCancel()"
                 translate>
           ORDERS.DETAIL.DISCARD_CANCEL_REQUEST
         </button>
         <button *ngIf="!showRequestCancel && !showRequestReturn && canRequestCancel() && !approvalVersion && !isQuoteOrder(order)"
-                class="btn btn-secondary float-right mr-2"
+                class="btn btn-secondary float-right mr-2 d-print-none"
                 (click)="toggleRequestCancel()"
                 translate>
           ORDERS.DETAIL.REQUEST_A_CANCEL
         </button>
         <button *ngIf="showRequestReturn && !isQuoteOrder(order) && order.Status !== 'Unsubmitted'"
-                class="btn btn-secondary float-right mr-2"
+                class="btn btn-secondary float-right mr-2 d-print-none"
                 (click)="toggleRequestReturn()"
                 translate>
           ORDERS.DETAIL.DISCARD_RETURN_REQUEST
         </button>
 
         <button *ngIf="!approvalVersion && !isQuoteOrder(order) && order.Status === 'Unsubmitted'"
-                class="btn btn-secondary float-right mr-2"
+                class="btn btn-secondary float-right mr-2 d-print-none"
                 (click)="open(updateOrderModal)"
                 translate>
           ORDERS.DETAIL.UPDATE
         </button>
-        <button class="btn btn-secondary float-right mr-2 d-print-none"
-                (click)="createAndSavePDF()">Download Order Invoice PDF</button>
         <!-- TODO: refactor the reorder process to not be in a modal -->
         <ng-template #reorderModal
                      let-modal
@@ -136,7 +142,7 @@
     </div>
   </div>
   <ul *ngIf="!approvalVersion"
-      class="nav nav-tabs mb-3">
+      class="nav nav-tabs mb-3 d-print-none">
     <li class="nav-item">
       <button class="btn btn-link nav-link"
               (click)="toDetails()"
