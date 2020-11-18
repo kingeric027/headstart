@@ -283,7 +283,7 @@ test
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(createdProductName, '1 day')
+	await checkoutPage.selectShippingOption(createdProductName, 'day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(buyerUser.FirstName)
 	await checkoutPage.enterCVV('900')

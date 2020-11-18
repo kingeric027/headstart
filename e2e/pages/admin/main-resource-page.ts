@@ -60,6 +60,11 @@ class MainResourcePage {
 		await t.click(this.resourceList.withText(resourceName))
 		await loadingHelper.waitForLoadingBar()
 	}
+
+	async selectResourceByIndex(index: number) {
+		await t.click(this.resourceList.nth(index))
+		await loadingHelper.waitForLoadingBar()
+	}
 }
 
 export default new MainResourcePage()
