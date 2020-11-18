@@ -88,7 +88,7 @@ namespace ordercloud.integrations.library
 
         public string AccessToken
         {
-            get { return Principal.Claims.First(c => c.Type == "accesstoken").Value; }
+            get { return Principal.Claims.First(c => c.Type == "accesstoken")?.Value; }
             set => AccessToken = value;
         }
 
