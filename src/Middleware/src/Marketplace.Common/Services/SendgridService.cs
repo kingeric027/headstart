@@ -50,7 +50,7 @@ namespace Marketplace.Common.Services
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
         private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
-        private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-8d60fcbc191b4fd1ae526e28713e6abe";
+        private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-d0e5fda7ce8c4ffe9da1fe82ab14beb6";
         public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
         {
             _oc = ocClient;
@@ -159,9 +159,17 @@ namespace Marketplace.Common.Services
         public async Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName)
         {
             var yesterday = DateTime.Now.AddDays(-1).ToString();
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                date = yesterday
+                Data = new
+                {
+                    date = yesterday
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = $"Product Updates from {yesterday}",
+                    DynamicText = $"Please see the attached file of newly created and updated products from {yesterday}"
+                }
             };
             await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
         }
@@ -343,32 +351,6 @@ namespace Marketplace.Common.Services
             var supplierOrderWorksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{orderWorksheet.Order.ID}-{supplierID}");
             supplierOrderWorksheet.Order.BillingAddress = orderWorksheet.Order.BillingAddress;
             supplierOrderWorksheet.Order.FromUser = orderWorksheet.Order.FromUser;
-
-            //  Get the shipping total from selected shipping methods for that supplier
-            var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
-            var supplierShippingSelections = new List<ShipMethod>();
-            foreach (var estimate in supplierShipEstimates)
-            {
-                var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
-                supplierShippingSelections.Add(selection);
-            }
-            var shippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
-            supplierOrderWorksheet.Order.ShippingCost = Math.Round(shippingCost, 2);
-
-            //  now get correct tax for line items on supplier order
-            var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
-            var supplierShippingRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
-            var supplierTax = (decimal)0.0;
-            foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
-            {
-                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippingRateIDs.Contains(line?.lineNumber) && line.tax != null)
-                {
-                    //  Add tax from line items and shipping rates associated with this supplier
-                    supplierTax += (decimal)line?.tax;
-                }
-            }
-            supplierOrderWorksheet.Order.TaxCost = supplierTax;
-            supplierOrderWorksheet.Order.Total = supplierOrderWorksheet.Order.Total + supplierOrderWorksheet.Order.TaxCost + supplierOrderWorksheet.Order.ShippingCost;
             return supplierOrderWorksheet;
         }
 

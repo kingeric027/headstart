@@ -8,8 +8,6 @@ namespace ordercloud.integrations.easypost
 {
 	public static class EasyPostMappers
 	{
-		public static int MINIMUM_SHIP_DIMENSION = 22; // inches 
-
 		public static EasyPostAddress MapAddress(Address address)
 		{
 			return new EasyPostAddress()

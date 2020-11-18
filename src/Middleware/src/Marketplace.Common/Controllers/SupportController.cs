@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
@@ -18,10 +19,13 @@ namespace Marketplace.Common.Controllers
     {
         private static ICheckoutIntegrationCommand _checkoutIntegrationCommand;
         private static IPostSubmitCommand _postSubmitCommand;
-        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand) : base(settings)
+        private static IZohoCommand _zoho;
+
+        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho) : base(settings)
         {
             _checkoutIntegrationCommand = checkoutIntegrationCommand;
             _postSubmitCommand = postSubmitCommand;
+            _zoho = zoho;
         }
 
         [HttpGet, Route("shipping")]
@@ -40,18 +44,32 @@ namespace Marketplace.Common.Controllers
         }
 
         [Route("tax/{orderID}")]
-        [HttpPost, OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        [HttpGet, OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
         public async Task<OrderCalculateResponse> CalculateOrder(string orderID)
         {
             var orderCalculationResponse = await _checkoutIntegrationCommand.CalculateOrder(orderID, this.VerifiedUserContext);
             return orderCalculationResponse;
         }
 
-        [HttpPost, Route("zoho/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        [HttpGet, Route("zoho/{orderID}")]
         public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
         {
-            var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
+            var retry = await _postSubmitCommand.HandleZohoRetry(orderID);
             return retry;
+        }
+
+        [HttpGet, Route("shipping/validate/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
+        public async Task<OrderSubmitResponse> RetryShippingValidate(string orderID)
+        {
+            var retry = await _postSubmitCommand.HandleShippingValidate(orderID, this.VerifiedUserContext);
+            return retry;
+        }
+
+        // good debug method for testing rates with orders
+        [HttpGet, Route("shippingrates/{orderID}")]
+        public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
+        {
+            return await _checkoutIntegrationCommand.GetRatesAsync(orderID);
         }
     }
 

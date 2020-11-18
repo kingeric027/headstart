@@ -9,18 +9,20 @@
     <div [ngClass]="specs?.length > 3 ? 'col-md-5' : 'col-md-7'">
       <div class="pb-3 mb-3 border-bottom border-light">
         <a class="d-block my-2"
-           href="javascript:;"
            (click)="setActiveSupplier(_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0])">
           {{_product?.xp.Facets?.supplier && _product?.xp.Facets?.supplier[0]}}
         </a>
-        <h1 class="h3 my-0">
-          {{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
-        </h1>
-        <ocm-toggle-favorite title="Favorite"
-                             (click)="$event.stopPropagation()"
-                             [favorite]="isFavorite()"
-                             (favoriteChanged)="setIsFavorite($event.detail)">
-        </ocm-toggle-favorite>
+        <div class="d-flex justify-content-between align-items-center">
+          <h1 class="h3 my-0">
+            {{ _product.xp?.Facets?.manufacturer && _product.xp?.Facets?.manufacturer[0]}} {{ _product.Name }}
+          </h1>
+          <ocm-toggle-favorite title="Favorite"
+                               (click)="$event.stopPropagation()"
+                               [favorite]="isFavorite()"
+                               (favoriteChanged)="setIsFavorite($event.detail)">
+          </ocm-toggle-favorite>
+        </div>
+        <small class="d-block">SKU: {{_product?.ID}}</small>
         <!-- TODO: Uncomment to have grid spec form option and fix related bugs
       <div class="btn-group float-right"
          *ngIf="specs?.length > 0">

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
+using System.Linq;
 
 namespace ordercloud.integrations.avalara
 {
@@ -105,9 +106,34 @@ namespace ordercloud.integrations.avalara
 
 		private async Task<TransactionModel> CreateTransactionAsync(DocumentType docType, OrderWorksheet orderWorksheet)
 		{
-			var createTransactionModel = orderWorksheet.ToAvalaraTransationModel(_companyCode, docType);
-			var transaction = await _avaTax.CreateTransactionAsync("", createTransactionModel);
-			return transaction;
+			var standardLineItems = orderWorksheet.LineItems.Where(li => li.Product.xp.ProductType == "Standard")?.ToList();
+            if (standardLineItems.Any())
+            {
+				try
+				{
+					var createTransactionModel = orderWorksheet.ToAvalaraTransationModel(_companyCode, docType);
+					var transaction = await _avaTax.CreateTransactionAsync("", createTransactionModel);
+					return transaction;
+
+				}
+				catch (AvaTaxError e)
+				{
+					throw new OrderCloudIntegrationException(new ApiError
+					{
+						ErrorCode = "AvalaraTaxError",
+						Message = e.error.error.message,
+						Data = e.error.error
+					});
+				}
+			} else
+            {
+				return new TransactionModel
+				{
+					code = "NotTaxable",
+					totalTax = 0
+				};
+            }
+			
 		}
 	}
 }

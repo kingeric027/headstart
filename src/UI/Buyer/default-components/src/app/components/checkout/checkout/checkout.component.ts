@@ -161,15 +161,9 @@ export class OCMCheckout implements OnInit {
   }
 
   handleSubmitError(error: any): void {
-    const errorReasons = {
-      'Billing address on credit card incorrect': 'the requested billing address is incorrect.',
-      'CVV Validation Failure': 'the CVV in the request is not correct for this card.',
-      'Card has expired': 'the selected credit card has expired.',
-      'Card was declined': 'the selected credit card was declined.'
-    }
-    const reason = errorReasons[error?.response?.data?.Message] || 'of an unknown error'; 
-    this.paymentError = `The authorization for your payment was declined by the processor because 
-        ${reason} Please reenter your information or use a different card.`
+    const errorReason = error?.response?.data?.Message || 'Unknown error'
+    const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
+    this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
     this.isLoading = false;
     this.currentPanel = 'payment';
   }

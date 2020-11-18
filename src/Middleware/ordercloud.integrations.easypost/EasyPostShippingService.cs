@@ -1,11 +1,10 @@
 using Flurl.Http;
-using Microsoft.Extensions.Azure;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.easypost
 {
@@ -16,12 +15,14 @@ namespace ordercloud.integrations.easypost
 
 		public bool Equals(AddressPair other)
 		{
-			return (ShipFrom.Street1 == other.ShipFrom.Street1) &&
-					(ShipFrom.Zip == other.ShipFrom.Zip) &&
-					(ShipFrom.City == other.ShipFrom.City) &&
-					(ShipTo.Street1 == other.ShipTo.Street1) &&
-					(ShipTo.Zip == other.ShipTo.Zip) &&
-					(ShipTo.City == other.ShipTo.City);
+			return (ShipFrom.ID == other.ShipFrom.ID) &&
+					// we still want to compare the rest of these properties to handle one time addresses
+					(ShipFrom.Street1 == other?.ShipFrom.Street1) &&
+					(ShipFrom.Zip == other?.ShipFrom.Zip) &&
+					(ShipFrom.City == other?.ShipFrom.City) &&
+					(ShipTo.Street1 == other?.ShipTo.Street1) &&
+					(ShipTo.Zip == other?.ShipTo.Zip) &&
+					(ShipTo.City == other?.ShipTo.City);
 		}
 
 		public override int GetHashCode()
@@ -48,14 +49,16 @@ namespace ordercloud.integrations.easypost
 
 		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles)
 		{
-			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, profiles));
-			List<EasyPostShipment[]> easyPostResponses = new List<EasyPostShipment[]>();
+			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, profiles)).ToList();
+			var easyPostResponses = new List<EasyPostShipment[]>();
 
-			foreach (var shipments in easyPostShipments)
-			{
-				easyPostResponses.Add(await Task.WhenAll(shipments.Select(PostShipment)));
-			}
-			
+            var postShipments = easyPostShipments;
+            foreach (var shipment in postShipments)
+            {
+                var response = await Throttler.RunAsync(shipment, 200, 10, PostShipment);
+				easyPostResponses.Add(response.ToArray());
+            }
+            
 			var shipEstimateResponse = new ShipEstimateResponse
 			{
 				ShipEstimates = groupedLineItems.Select((lineItems, index) =>

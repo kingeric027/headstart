@@ -74,7 +74,7 @@
               <td class="align-middle">
                 <div class="d-flex align-items-center">
                   <h6>
-                    <span>{{ li.Product.Name }}
+                    <span>{{ li | productNameWithSpecs }}
                       <span *ngIf="li.Variant?.xp?.SpecCombo">({{li.Variant.xp.SpecCombo}})</span>
                     </span>
                     <small class="text-muted d-block">{{ li.Variant?.ID || li.Product.ID }}</small>

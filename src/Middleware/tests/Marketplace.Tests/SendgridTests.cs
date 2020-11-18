@@ -145,8 +145,8 @@ namespace Marketplace.Tests
         {
             Fixture fixture = new Fixture();
 
-            dynamic shipEstimatexp1 = new ExpandoObject();
-            dynamic shipEstimatexp2 = new ExpandoObject();
+            dynamic shipEstimatexp1 = new ShipEstimateXP();
+            dynamic shipEstimatexp2 = new ShipEstimateXP();
             shipEstimatexp1.SupplierID = TestConstants.supplier1ID;
             shipEstimatexp2.SupplierID = TestConstants.supplier2ID;
 
@@ -228,36 +228,36 @@ namespace Marketplace.Tests
                         xp = fixture.Create<LineItemXp>()
                     }
                 },
-                ShipEstimateResponse = new ShipEstimateResponse()
+                ShipEstimateResponse = new MarketplaceShipEstimateResponse()
                 {
-                    ShipEstimates = new List<ShipEstimate>()
+                    ShipEstimates = new List<MarketplaceShipEstimate>()
                     {
-                        new ShipEstimate()
+                        new MarketplaceShipEstimate()
                         {
                             SelectedShipMethodID=TestConstants.selectedShipMethod1ID,
                             xp = shipEstimatexp1,
-                            ShipMethods = new List<ShipMethod>()
+                            ShipMethods = new List<MarketplaceShipMethod>()
                             {
-                                new ShipMethod()
+                                new MarketplaceShipMethod()
                                 {
                                     ID=TestConstants.selectedShipMethod1ID,
                                     Cost=TestConstants.selectedShipMethod1Cost
                                 },
-                                fixture.Create<ShipMethod>()
+                                fixture.Create<MarketplaceShipMethod>()
                             }
                         },
-                        new ShipEstimate()
+                        new MarketplaceShipEstimate()
                         {
                             SelectedShipMethodID=TestConstants.selectedShipMethod2ID,
                             xp = shipEstimatexp2,
-                            ShipMethods = new List<ShipMethod>()
+                            ShipMethods = new List<MarketplaceShipMethod>()
                             {
-                                new ShipMethod()
+                                new MarketplaceShipMethod()
                                 {
                                     ID=TestConstants.selectedShipMethod2ID,
                                     Cost=TestConstants.selectedShipMethod2Cost
                                 },
-                                fixture.Create<ShipMethod>()
+                                fixture.Create<MarketplaceShipMethod>()
                             }
                         }
                     }

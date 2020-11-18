@@ -58,7 +58,10 @@ export class OCMFacetMultiSelect implements OnDestroy {
 
   // TODO - there is this little flash when a checkbox is click. get rid of it.
   private updateCheckBoxes(activeFacetValues: string[]): void {
-    this.checkboxArray = this._facet.Values.sort().map(facet => {
+    // Sort facet objects alphabetically by Value
+    const sortedFacetValues = this._facet.Values.sort((a, b) => {
+      return (a.Value > b.Value) ? 1 : ((b.Value > a.Value) ? - 1 : 0);});
+    this.checkboxArray = sortedFacetValues.map(facet => {
       const checked = activeFacetValues.includes(facet.Value);
       return { facet, checked };
     });

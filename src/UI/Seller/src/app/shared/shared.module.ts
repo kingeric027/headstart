@@ -58,6 +58,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
 import { VariablePrintConfiguration } from './components/buyer-visibility/variable-print-configuration/variable-print-configuration.component';
 import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-publish-configuration/chili-publish-configuration.componant';
 import { ResourceListMeta } from './components/resource-list-meta/resource-list-meta.component';
+import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe';
 
 @NgModule({
   imports: [
@@ -130,6 +131,7 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     PhoneFormatPipe,
     YesNoFormatPipe,
     SafeHTMLPipe,
+    ProductNameWithSpecsPipe,
     ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
@@ -179,6 +181,7 @@ import { ResourceListMeta } from './components/resource-list-meta/resource-list-
     YesNoFormatPipe,
     ResourceBreadcrumbsComponent,
     SafeHTMLPipe,
+    ProductNameWithSpecsPipe
   ],
 })
 export class SharedModule {
