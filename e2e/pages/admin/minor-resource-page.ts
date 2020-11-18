@@ -46,6 +46,11 @@ class MinorResourcePage {
 		await t.click(this.resourceList.withText(resource))
 		await loadingHelper.waitForLoadingBar()
 	}
+
+	async selectResourceByIndex(index: number) {
+		await t.click(this.resourceList.nth(index))
+		await loadingHelper.waitForLoadingBar()
+	}
 }
 
 export default new MinorResourcePage()
