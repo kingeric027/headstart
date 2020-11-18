@@ -1,11 +1,11 @@
-export function getPsHeight(additionalClass: string = '') {
+export function getPsHeight(additionalClass = ''): number {
   /* The height of perfect scroll containers is typically dependent on certain items 
   that are always in the layout which are given the class name 'base-layout-item' in 
   addition to items that are specific to calculating the height of that specific perfect 
   scroll container.*/
-  let baseLayoutItems = Array.from(document.getElementsByClassName('base-layout-item'));
-  let additionalItems = additionalClass ? Array.from(document.getElementsByClassName(additionalClass)) : [];
-  let totalHeight: number = 0;
+  const baseLayoutItems = Array.from(document.getElementsByClassName('base-layout-item'));
+  const additionalItems = additionalClass ? Array.from(document.getElementsByClassName(additionalClass)) : [];
+  let totalHeight = 0;
   [...baseLayoutItems, ...additionalItems].forEach(div => {
     // div does contain the property 'offsetHeight, but typescript throws error
     totalHeight += (div as any).offsetHeight;
@@ -13,7 +13,7 @@ export function getPsHeight(additionalClass: string = '') {
   return window.innerHeight - totalHeight;
 }
 
-export function getScreenSizeBreakPoint() {
+export function getScreenSizeBreakPoint(): string {
   const map = {
     xs: 575,
     sm: 767,

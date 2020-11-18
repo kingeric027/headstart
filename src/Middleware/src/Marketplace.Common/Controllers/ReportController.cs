@@ -104,7 +104,7 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("download-shared-access/{fileName}"), OrderCloudIntegrationsAuth]
         public string GetSharedAccessSignature(string fileName)
         {
-            RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
+            RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin, CustomRole.MPShipmentAdmin);
             return _downloadReportCommand.GetSharedAccessSignature(fileName);
         }
 
