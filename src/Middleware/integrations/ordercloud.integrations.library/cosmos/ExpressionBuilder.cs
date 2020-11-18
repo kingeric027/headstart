@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.library.Cosmos
@@ -30,6 +31,11 @@ namespace ordercloud.integrations.library.Cosmos
             if (propertyType.GetInterface(nameof(IList)) != null) {
                 var elementType = propertyType.GetTypeInfo().GenericTypeArguments[0];
                 return filter.ORExpressions(f => GetListExpression<T>(elementType, member, f));
+            }
+
+            if (propertyType.GetInterface(nameof(JObject)) != null)
+            {
+                
             }
 
             if (propertyType.IsEnum || (propertyType.IsNullable() && Nullable.GetUnderlyingType(propertyType).IsEnum))

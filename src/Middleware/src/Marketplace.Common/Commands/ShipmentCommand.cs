@@ -225,7 +225,7 @@ namespace Marketplace.Common.Commands
                 if (shipment.OrderID == null) { throw new Exception("OrderID was not provided"); }
 
                 Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Outgoing, shipment.OrderID);
-                LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID);
+                LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, accessToken);
                 ShipmentItem newShipmentItem = new ShipmentItem()
                 {
                     OrderID = shipment.OrderID,

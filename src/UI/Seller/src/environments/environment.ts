@@ -23,7 +23,7 @@ type MiddlewareLocationSelection = LOCAL | TEST;
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
 const appName: AppName = SELF_ESTEEM_BRANDS;
-const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
+const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL;
 const localMiddlewareURL = 'https://localhost:44340';
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================

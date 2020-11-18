@@ -64,7 +64,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   }
 
   retrieveNotifications() {
-    HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification', {pageSize: 100, sortBy: ['!History.DateUpdated']}).then((results: any) => {
+    HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification', {pageSize: 100, sortBy: ['!History.DateUpdated'], filters: {Doc: {Status: "SUBMITTED"}}}).then((results: any) => {
       if (results?.Items?.length > 0) {
       this.notificationsToReview = results?.Items.filter(i => i?.Doc?.Status === NotificationStatus.SUBMITTED);
     };
