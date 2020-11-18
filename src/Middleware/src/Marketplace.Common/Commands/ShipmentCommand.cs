@@ -1,24 +1,16 @@
-﻿using Dynamitey;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+﻿using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Extended;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
-using Namotion.Reflection;
 using Npoi.Mapper;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using SmartyStreets.USAutocompleteApi;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Misc = Marketplace.Common.Models.Misc;
 
@@ -204,9 +196,18 @@ namespace Marketplace.Common.Commands
 
         }
 
-        private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, string errorMessage)
+        private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, OrderCloudException ex)
         {
             BatchProcessFailure failure = new BatchProcessFailure();
+            string errorMessage;
+            try
+            {
+                errorMessage = $"{ex.Message}: {((dynamic)ex?.Errors[0]?.Data).ToList()?[0]}";
+            }
+            catch
+            {
+                errorMessage = $"{ex.Message}";
+            }
 
             if (errorMessage == null) { failure.Error = "Something went wrong"; }
             else { failure.Error = errorMessage; }
@@ -271,7 +272,7 @@ namespace Marketplace.Common.Commands
             }
             catch (OrderCloudException ex)
             {
-                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, $"{ex.Message}: {((dynamic)ex?.Errors[0]?.Data).ToList()?[0]}"));
+                result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, ex));
                 return false;
             }
         }
@@ -357,6 +358,7 @@ namespace Marketplace.Common.Commands
             {
                 newShipment.xp = new ShipmentXp();
             }
+
             newShipment.BuyerID = shipment.BuyerID;
             newShipment.Shipper = shipment.Shipper;
             newShipment.DateShipped = isCreatingNew? null : shipment.DateShipped; //Must patch to null on new creation due to OC bug
