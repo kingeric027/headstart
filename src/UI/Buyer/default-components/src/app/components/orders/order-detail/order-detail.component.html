@@ -161,11 +161,11 @@
     </li>
   </ul>
    <div>
-  <ocm-order-historical class="col-md-6"
+    <ocm-order-historical class="col-md-6"
                         *ngIf="orderDetails && showDetails() && (!showRequestReturn && !showRequestCancel)"
                         [isOrderToApprove]="isOrderToApprove"
                         [orderDetails]="orderDetails">
-  </ocm-order-historical>
+    </ocm-order-historical>
    </div>
   </div>
   <ocm-order-shipments *ngIf="showShipments() && !showRequestReturn">
