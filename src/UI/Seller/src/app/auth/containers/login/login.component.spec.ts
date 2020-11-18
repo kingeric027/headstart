@@ -77,7 +77,6 @@ describe('LoginComponent', () => {
     it('should call the OcAuthService Login method, OcTokenService SetAccess method, and route to home', () => {
       component.onSubmit();
       expect(currentUserService.login).toHaveBeenCalledWith('', '', false);
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
     });
   });
 });
