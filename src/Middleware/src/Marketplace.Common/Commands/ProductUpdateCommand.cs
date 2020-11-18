@@ -142,9 +142,9 @@ namespace Marketplace.Common.Commands
                 {
                     Supplier = product.OwnerID,
                     ProductID = product.ID,
-                    ProductAction = Enum.GetName(typeof(ActionType), productUpdateRecord?.Action),
+                    ProductAction = productUpdateRecord != null ? Enum.GetName(typeof(ActionType), productUpdateRecord?.Action) : null,
                     DefaultPriceScheduleID = updatedPriceSchedule?.ID,
-                    DefaultPriceScheduleAction = Enum.GetName(typeof(ActionType), priceScheduleUpdateRecord?.Action),
+                    DefaultPriceScheduleAction = priceScheduleUpdateRecord !=null ? Enum.GetName(typeof(ActionType), priceScheduleUpdateRecord?.Action) : null,
 
                 };
 
