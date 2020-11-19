@@ -196,6 +196,53 @@ namespace Marketplace.Common.Commands
 
         }
 
+        private async void ValidateOrderStatus(Misc.Shipment shipment, BatchProcessResult processResult)
+        {
+            Order ocOrder = await GetOutgoingOrder(shipment);
+
+            var lineItemList = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, shipment.OrderID);
+
+            bool shippingComplete = ValidateLineItemCounts(lineItemList);
+
+            if (!shippingComplete)
+            {
+                return;
+            }
+
+            if (ocOrder.Status != OrderStatus.Open && shippingComplete)
+            {
+                throw new Exception($"All items are shipped, but the order cannot be marked as Completed since the order status is currently {ocOrder?.Status.ToString("g")}");
+            }
+            else if (ocOrder.Status == OrderStatus.Open && shippingComplete)
+            {
+                PatchOrderStatus(ocOrder, OrderStatus.Completed);
+            }
+
+        }
+
+        private async void PatchOrderStatus(Order ocOrder, OrderStatus orderStatus)
+        {
+            var partialOrder = new PartialOrder { Status = orderStatus };
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, ocOrder.ID, partialOrder);
+        }
+
+        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
+        {
+            if (lineItemList == null || lineItemList?.Items?.Count < 1)
+            {
+                return false;
+            }
+
+            foreach(LineItem lineItem in lineItemList.Items)
+            {
+                if (lineItem.Quantity > lineItem.QuantityShipped)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, OrderCloudException ex)
         {
             BatchProcessFailure failure = new BatchProcessFailure();
@@ -272,12 +319,25 @@ namespace Marketplace.Common.Commands
                     //Create new lineItem
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
                 }
+
+                //Patch OrderStatus to completed if all items are submitted.
+                ValidateOrderStatus(shipment, result);
                 return true;
             }
             catch (OrderCloudException ex)
             {
                 result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, ex));
                 return false;
+            }
+            catch (Exception ex)
+            {
+                result.ProcessFailureList.Add(new BatchProcessFailure()
+                { 
+                    Error = ex.Message,
+                    Shipment = shipment
+                });
+                return false;
+
             }
         }
 
@@ -394,7 +454,7 @@ namespace Marketplace.Common.Commands
             } 
             else
             {
-                newShipment.ID = ocShipment?.ID;
+                newShipment.ID = ocShipment?.ID.Trim();
                 newShipment.xp = ocShipment?.xp;
                 newShipment.FromAddress = ocShipment?.FromAddress;
                 newShipment.ToAddress = ocShipment?.ToAddress;
