@@ -149,14 +149,14 @@ export class OCMCheckout implements OnInit {
         cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
       } catch (e) {
-        return this.handleSubmitError(e)
+        return await this.handleSubmitError(e)
       }
     } else {
       try {
         cleanOrderID = await this.checkout.submitWithoutCreditCard();
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
       } catch (e) {
-        return this.handleSubmitError(e)
+        return await this.handleSubmitError(e)
       }
     }
     this.isLoading = false;
