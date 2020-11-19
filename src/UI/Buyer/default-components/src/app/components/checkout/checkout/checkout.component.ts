@@ -149,14 +149,14 @@ export class OCMCheckout implements OnInit {
         cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
       } catch (e) {
-        return this.handleSubmitError(e, this.getCCPaymentData().CreditCardID)
+        return this.handleSubmitError(e)
       }
     } else {
       try {
         cleanOrderID = await this.checkout.submitWithoutCreditCard();
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
       } catch (e) {
-        return this.handleSubmitError(e, this.getCCPaymentData().CreditCardID)
+        return this.handleSubmitError(e)
       }
     }
     this.isLoading = false;
@@ -164,14 +164,14 @@ export class OCMCheckout implements OnInit {
     this.context.router.toMyOrderDetails(cleanOrderID);
   }
 
-  handleSubmitError(error: any, cardId: string): void {
+  handleSubmitError(error: any): void {
     const errorReason = error?.response?.data?.Message || 'Unknown error'
     const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
     this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
     this.isLoading = false;
     this.currentPanel = 'payment';
     if (this.isNewCard) {
-      this.context.currentUser.cards.Delete(cardId);
+      this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
     }
   }
 
