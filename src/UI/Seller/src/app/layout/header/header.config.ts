@@ -115,12 +115,18 @@ const SellerOrderNavGrouping: MPRoute = {
   subRoutes: [BuyerOrders, SupplierPurchaseOrders, RequiringAttentionOrders],
 };
 
+const SupplierOrderBatchUpload: MPRoute = {
+  rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
+  title: 'ADMIN.NAV.ORDERS_BATCH',
+  route: '/orders/uploadshipments',
+};
+
 const SupplierOrderNavGrouping: MPRoute = {
   rolesWithAccess: [MPRoles.MPOrderAdmin, MPRoles.MPOrderReader, MPRoles.MPShipmentAdmin],
   title: 'ADMIN.NAV.ORDERS',
   route: '/orders',
   orderCloudUserTypesWithAccess: [SUPPLIER],
-  subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders],
+  subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders, SupplierOrderBatchUpload],
 };
 
 // Buyers

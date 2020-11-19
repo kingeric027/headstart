@@ -59,6 +59,7 @@ namespace CardConnect.Tests
         [TestCase(@"{'respstat': 'A', 'respcode': '0', 'cvvresp': 'M', 'avsresp': 'X'}", ResponseStatus.Approved)]
         [TestCase(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'X'}", ResponseStatus.Approved)]
         [TestCase(@"{'respstat': 'A', 'respcode': '000', 'cvvresp': 'M', 'avsresp': 'X'}", ResponseStatus.Approved)]
+        [TestCase(@"{'respstat': 'A', 'respcode': '0', 'cvvresp': 'N', 'avsresp': 'Z'}", ResponseStatus.Approved)]
         public async Task auth_success_attempt_test(string body, ResponseStatus result)
         {
             _http.RespondWith(body);
@@ -95,12 +96,13 @@ namespace CardConnect.Tests
             {
                 yield return new TestCaseData(@"{'respstat': 'B', 'respcode': 'NU', 'cvvresp': 'M', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '05', 'cvvresp': 'M', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'N', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'P', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'U', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'N'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'A'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'Z'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'N', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '00', 'cvvresp': 'P', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '101', 'cvvresp': 'U', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'N'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'M', 'avsresp': 'A'}");
+                yield return new TestCaseData(@"{'respstat': 'B', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'Z'}");
+                yield return new TestCaseData(@"{'respstat': 'B', 'respcode': '100', 'cvvresp': 'M', 'avsresp': 'Z'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'P', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '500', 'cvvresp': 'P', 'avsresp': 'Y'}");
             }

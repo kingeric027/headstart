@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,11 +70,14 @@ namespace Marketplace.Common.Commands
                 var cheapestMethods = WhereRateIsCheapestOfItsKind(methods);
                 shipResponse.ShipEstimates[i].ShipMethods = cheapestMethods.Select(s =>
                 {
-                    // set shipping cost on keyfob shipments to 0 https://four51.atlassian.net/browse/SEB-1112
+                    // apply a 75% markup to keyfob shipments https://four51.atlassian.net/browse/SEB-1260
                     if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
-                        s.Cost = 0;
-
-                    s.Cost *= _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup;
+                    {
+                        s.Cost = Math.Round(s.Cost * (decimal)1.75, 2);
+                    } else
+                    {
+                        s.Cost = Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
+                    }
                     return s;
                 }).ToList();
             }
@@ -160,7 +164,7 @@ namespace Marketplace.Common.Commands
                 {
                     var method = methodsList[i];
                     var fasterMethods = methodsList.GetRange(0, i);
-                    var existsFasterCheaperRate = fasterMethods.Any(m => m.Cost <= method.Cost);
+                    var existsFasterCheaperRate = fasterMethods.Any(m => m.Cost < method.Cost);
                     if (!existsFasterCheaperRate)
                     {
                         filtered.Add(method);

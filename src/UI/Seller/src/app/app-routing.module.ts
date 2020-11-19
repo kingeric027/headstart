@@ -1,3 +1,4 @@
+import { UploadShipmentsComponent } from './orders/components/upload-shipments/upload-shipments.component';
 // components
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';

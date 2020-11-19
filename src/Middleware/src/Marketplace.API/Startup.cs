@@ -26,6 +26,7 @@ using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.AzureStorage;
 using ordercloud.integrations.tecra;
+using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
 using LazyCache;
 
@@ -112,6 +113,8 @@ namespace Marketplace.API
                 .Inject<IChiliTemplateCommand>()
                 .Inject<IChiliConfigCommand>()
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
+                .Inject<IChiliBlobStorage>()
+                .Inject<ISupplierApiClientHelper>()
                 .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -137,7 +140,8 @@ namespace Marketplace.API
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
-                .AddSingleton<IOrderCloudIntegrationsTecraService>(x => new OrderCloudIntegrationsTecraService(_settings.TecraSettings))
+                .AddSingleton<OrderCloudTecraConfig>(x => _settings.TecraSettings)
+                .Inject<IOrderCloudIntegrationsTecraService>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations")
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)

@@ -40,9 +40,9 @@ namespace ordercloud.integrations.cardconnect
             };
         }
 
-        private IFlurlRequest Request(string resource)
+        private IFlurlRequest Request(string resource, string currency = null)
         {
-            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {Config.Authorization}");
+            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : "c2VidmVuZG9yNnptQDQ5YmNMIXdEVDl3I1lOUA==")}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)
@@ -64,59 +64,20 @@ namespace ordercloud.integrations.cardconnect
         private async Task<CardConnectAuthorizationResponse> PostAuthorizationAsync(CardConnectAuthorizationRequest request)
         {
             var attempt = await this
-                .Request("cardconnect/rest/auth")
+                .Request("cardconnect/rest/auth", request.currency)
                 .PutJsonAsync(request)
                 .ReceiveJson<CardConnectAuthorizationResponse>();
 
-            // Each payment processor has a unique set of response codes. Generally, a processor response code(respcode) beginning with "00" or "000" is a successful authorization request; any other code is a decline.  
-            // https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
-            if (attempt.IsExpired())
+            if (attempt.WasSuccessful())
             {
-                throw new CreditCardIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"Card has expired",
-                    ErrorCode = attempt.respcode
-                }, attempt);
+                return attempt;
             }
-            else if (attempt.IsDeclined())
+            throw new CreditCardIntegrationException(new ApiError()
             {
-                throw new CreditCardIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"Card was declined",
-                    ErrorCode = attempt.respcode
-                }, attempt);
-            }
-            else if (!attempt.PassedAVSCheck())
-            {
-                throw new CreditCardIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"Billing address on credit card incorrect",
-                    ErrorCode = attempt.respcode
-                }, attempt);
-            }
-            else if (!attempt.PassedCvvCheck(request))
-            {
-                throw new CreditCardIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"CVV Validation Failure",
-                    ErrorCode = attempt.respcode
-                }, attempt);
-            }
-            else if (!attempt.WasSuccessful())
-            {
-                throw new CreditCardIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"{attempt.respstat.ToResponseStatus()} : {attempt.resptext}",
-                    ErrorCode = attempt.respcode
-                }, attempt);
-            }
-            return attempt;
-
+                Data = attempt,
+                Message = attempt.resptext, // response codes: https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
+                ErrorCode = attempt.respcode
+            }, attempt);
         }
     }
 }

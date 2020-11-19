@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 using Marketplace.Models;
 using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
@@ -40,12 +41,14 @@ namespace Marketplace.Common.Commands.Crud
 		private readonly IAssetedResourceQuery _assetedResources;
 		private readonly IAssetQuery _assets;
 		private readonly AppSettings _settings;
-		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
+		private readonly ISupplierApiClientHelper _apiClientHelper;
+		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc, ISupplierApiClientHelper apiClientHelper)
 		{
 			_assetedResources = assetedResources;
 			_assets = assets;
 			_oc = elevatedOc;
 			_settings = settings;
+			_apiClientHelper = apiClientHelper;
 		}
 
 		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
@@ -419,10 +422,8 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
 		{
-			//Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-			var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
-			if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
-			ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+			
+			ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
 			if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
 			var configToUse = new OrderCloudClientConfig
 			{

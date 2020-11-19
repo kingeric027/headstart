@@ -41,7 +41,7 @@ export class ReportsSelectionComponent {
   }
 
   updateReportAdHocFilters(event: string, filter: string): void {
-    let filterSelection = { event: event, filter: filter };
+    const filterSelection = { event, filter };
     this.handleReportAdHocFiltersSelection.emit(filterSelection);
   }
 
@@ -55,5 +55,10 @@ export class ReportsSelectionComponent {
 
   getFilterType(filter: string): string {
     if (filter.includes('Date')) return 'date';
+    if (filter.includes('Time')) return 'time';
+  }
+
+  getFilterNameDisplay(filter: string): string {
+    return filter.match(/[A-Z][a-z]+|[0-9]+/g).join(' ') + (filter.includes('Time') ? ' (Optional)' : '');
   }
 }

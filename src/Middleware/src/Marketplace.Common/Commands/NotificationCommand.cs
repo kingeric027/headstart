@@ -11,6 +11,7 @@ using Marketplace.Common.Commands.Crud;
 using ordercloud.integrations.library.Cosmos;
 using System.Collections.Generic;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -26,14 +27,16 @@ namespace Marketplace.Common.Commands
         private readonly IDocumentQuery _query;
         private readonly IDocumentAssignmentQuery _assignmentQuery;
         private readonly IMarketplaceProductCommand _productCommand;
+        private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, IDocumentQuery query, IDocumentAssignmentQuery assignmentQuery, IMarketplaceProductCommand productCommand)
+        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, IDocumentQuery query, IDocumentAssignmentQuery assignmentQuery, IMarketplaceProductCommand productCommand, ISupplierApiClientHelper apiClientHelper)
         {
             _oc = oc;
             _settings = settings;
             _query = query;
             _assignmentQuery = assignmentQuery;
             _productCommand = productCommand;
+            _apiClientHelper = apiClientHelper;
         }
         public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
         {
@@ -53,14 +56,7 @@ namespace Marketplace.Common.Commands
             var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                //Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-                //All suppliers have integration clients with a default user of dev_{supplierID}.
-                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
-
-                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}, ProductID: {productID}"); }
-
-                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
-
+                var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
 
                 var configToUse = new OrderCloudClientConfig

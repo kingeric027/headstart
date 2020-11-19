@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
 import { OcTokenService, OcBuyerService, OcSupplierService } from '@ordercloud/angular-sdk';
@@ -8,6 +8,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CurrentUserService } from '../current-user/current-user.service';
 import { ListPage } from '@ordercloud/headstart-sdk';
 import { singular } from 'pluralize';
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
 
 export interface ReportTemplate {
   TemplateID?: string;
@@ -48,6 +49,7 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
       Country: [],
     },
   };
+  args: ListArgs;
 
   constructor(
     router: Router,
@@ -74,8 +76,8 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   async list(args: any[]): Promise<ListPage<ReportTemplate>> {
-    var list = await this.listReportTemplatesByReportType(this.router.url.split('/')[2]);
-    var listPage = {
+    const list = await this.listReportTemplatesByReportType(this.router.url.split('/')[2]);
+    const listPage = {
       Meta: {
         Page: 1,
         PageSize: 100,
@@ -115,23 +117,23 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   async previewReport(template: any, reportRequestBody: any): Promise<object[]> {
-    let url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.TemplateID}`;
-    if (reportRequestBody.adHocFilterValues.length) {
-      reportRequestBody.adHocFilterValues.forEach(value => {
-        url += `/${value}`;
-      });
-    }
-    return await this.http.get<object[]>(url, { headers: this.buildHeaders() }).toPromise();
+    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.TemplateID}`;
+    return await this.http.get<object[]>(url, { headers: this.buildHeaders(), params: this.createHttpParams(reportRequestBody.filterDictionary) }).toPromise();
+  }
+
+  private createHttpParams(args: ListArgs): HttpParams {
+    let params = new HttpParams();
+    Object.entries(args).forEach(([key, value]) => {
+      if (key !== 'filters' && value) {
+        params = params.append(key, value.toString());
+      }
+    });
+    return params;
   }
 
   async downloadReport(template: any, reportRequestBody: any): Promise<void> {
-    let url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/download/${template.TemplateID}`;
-    if (reportRequestBody.adHocFilterValues.length) {
-      reportRequestBody.adHocFilterValues.forEach(value => {
-        url += `/${value}`;
-      });
-    }
-    const file = await this.http.post<string>(url, template, { headers: this.buildHeaders() }).toPromise();
+    const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/download/${template.TemplateID}`;
+    const file = await this.http.post<string>(url, template, { headers: this.buildHeaders(), params: this.createHttpParams(reportRequestBody.filterDictionary) }).toPromise();
     this.getSharedAccessSignature(file).subscribe(sharedAccessSignature => {
       const uri = `${this.appConfig.blobStorageUrl}/downloads/${file}${sharedAccessSignature}`;
       const link = document.createElement('a');

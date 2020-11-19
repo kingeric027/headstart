@@ -54,57 +54,57 @@ namespace Marketplace.Common.Controllers
 
         }
 
-        [HttpGet, Route("SalesOrderDetail/preview/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, string lowDateRange, string highDateRange)
+        [HttpGet, Route("SalesOrderDetail/preview/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportAdmin);
-            return await _reportDataCommand.SalesOrderDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            return await _reportDataCommand.SalesOrderDetail(templateID, args, VerifiedUserContext);
         }
 
-        [HttpPost, Route("SalesOrderDetail/download/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
-        public async Task<string> DownloadSalesOrderDetail([FromBody] ReportTemplate reportTemplate, string templateID, string lowDateRange, string highDateRange)
+        [HttpPost, Route("SalesOrderDetail/download/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<string> DownloadSalesOrderDetail([FromBody] ReportTemplate reportTemplate, string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportAdmin);
-            var reportData = await _reportDataCommand.SalesOrderDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            var reportData = await _reportDataCommand.SalesOrderDetail(templateID, args, VerifiedUserContext);
             return await _downloadReportCommand.ExportToExcel(ReportTypeEnum.SalesOrderDetail, reportTemplate, reportData);
 
         }
 
-        [HttpGet, Route("PurchaseOrderDetail/preview/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, string lowDateRange, string highDateRange)
+        [HttpGet, Route("PurchaseOrderDetail/preview/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
-            return await _reportDataCommand.PurchaseOrderDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            return await _reportDataCommand.PurchaseOrderDetail(templateID, args, VerifiedUserContext);
         }
 
-        [HttpPost, Route("PurchaseOrderDetail/download/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
-        public async Task<string> DownloadPurchaseOrderDetail([FromBody] ReportTemplate reportTemplate, string templateID, string lowDateRange, string highDateRange)
+        [HttpPost, Route("PurchaseOrderDetail/download/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<string> DownloadPurchaseOrderDetail([FromBody] ReportTemplate reportTemplate, string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
-            var reportData = await _reportDataCommand.PurchaseOrderDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            var reportData = await _reportDataCommand.PurchaseOrderDetail(templateID, args, VerifiedUserContext);
             return await _downloadReportCommand.ExportToExcel(ReportTypeEnum.PurchaseOrderDetail, reportTemplate, reportData);
 
         }
 
-        [HttpGet, Route("LineItemDetail/preview/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, string lowDateRange, string highDateRange)
+        [HttpGet, Route("LineItemDetail/preview/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
-            return await _reportDataCommand.LineItemDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            return await _reportDataCommand.LineItemDetail(templateID, args, VerifiedUserContext);
         }
 
-        [HttpPost, Route("LineItemDetail/download/{templateID}/{lowDateRange}/{highDateRange}"), OrderCloudIntegrationsAuth]
-        public async Task<string> DownloadLineItemDetail([FromBody] ReportTemplate reportTemplate, string templateID, string lowDateRange, string highDateRange)
+        [HttpPost, Route("LineItemDetail/download/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<string> DownloadLineItemDetail([FromBody] ReportTemplate reportTemplate, string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
-            var reportData = await _reportDataCommand.LineItemDetail(templateID, lowDateRange, highDateRange, VerifiedUserContext);
+            var reportData = await _reportDataCommand.LineItemDetail(templateID, args, VerifiedUserContext);
             return await _downloadReportCommand.ExportToExcel(ReportTypeEnum.LineItemDetail, reportTemplate, reportData);
         }
 
         [HttpGet, Route("download-shared-access/{fileName}"), OrderCloudIntegrationsAuth]
         public string GetSharedAccessSignature(string fileName)
         {
-            RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
+            RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin, CustomRole.MPShipmentAdmin);
             return _downloadReportCommand.GetSharedAccessSignature(fileName);
         }
 

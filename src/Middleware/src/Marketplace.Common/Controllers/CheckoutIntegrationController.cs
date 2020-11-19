@@ -25,12 +25,7 @@ namespace Marketplace.Common.Controllers
 			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
 
-        // good debug method for testing rates with orders
-        [Route("shippingrates/{orderID}"), HttpGet]
-        public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
-        {
-            return await _checkoutIntegrationCommand.GetRatesAsync(orderID);
-        }
+        
 
         [Route("ordercalculate")]
 		[HttpPost]
@@ -60,7 +55,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("ordersubmit/retry/zoho/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
         public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
         {
-            var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
+            var retry = await _postSubmitCommand.HandleZohoRetry(orderID);
             return retry;
         }
 

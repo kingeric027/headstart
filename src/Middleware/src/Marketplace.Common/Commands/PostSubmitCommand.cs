@@ -16,13 +16,15 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
 using Npoi.Mapper;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
     public interface IPostSubmitCommand
     {
         Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
-        Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user);
+        Task<OrderSubmitResponse> HandleZohoRetry(string orderID);
+        Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user);
     }
 
     public class PostSubmitCommand : IPostSubmitCommand
@@ -42,11 +44,26 @@ namespace Marketplace.Common.Commands
             _lineItemCommand = lineItemCommand;
         }
 
-        public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID, VerifiedUserContext user)
+        public async Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            return await CreateOrderSubmitResponse(
+                new List<ProcessResult>() { new ProcessResult()
+                {
+                    Type = ProcessType.Accounting,
+                    Activity = new List<ProcessResultAction>() { await ProcessActivityCall(
+                        ProcessType.Shipping,
+                        "Validate Shipping",
+                        ValidateShipping(worksheet)) }
+                }},
+                new List<MarketplaceOrder> { worksheet.Order });
+        }
+
+        public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
-                $"{worksheet.Order.ID}-{item}", user.AccessToken));
+                $"{worksheet.Order.ID}-{item}"));
 
             return await CreateOrderSubmitResponse(
                 new List<ProcessResult>() { await this.PerformZohoTasks(worksheet, supplierOrders) }, 
@@ -151,6 +168,7 @@ namespace Marketplace.Common.Commands
             {
                 if (processResults.All(i => i.Activity.All(a => a.Success)))
                 {
+                    await UpdateOrderNeedingAttention(ordersRelatingToProcess, false);
                     return new OrderSubmitResponse()
                     {
                         HttpStatusCode = 200,
@@ -161,7 +179,7 @@ namespace Marketplace.Common.Commands
                     };
                 }
                     
-                await MarkOrdersAsNeedingAttention(ordersRelatingToProcess); 
+                await UpdateOrderNeedingAttention(ordersRelatingToProcess, true); 
                 return new OrderSubmitResponse()
                 {
                     HttpStatusCode = 500,
@@ -181,9 +199,9 @@ namespace Marketplace.Common.Commands
             }
         }
         
-        private async Task MarkOrdersAsNeedingAttention(List<MarketplaceOrder> orders)
+        private async Task UpdateOrderNeedingAttention(IList<MarketplaceOrder> orders, bool isError)
         {
-            var partialOrder = new PartialOrder() { xp = new { NeedsAttention = true } };
+            var partialOrder = new PartialOrder() { xp = new { NeedsAttention = isError } };
 
             var orderInfos = new List<Tuple<OrderDirection, string>> { };
 
@@ -320,8 +338,8 @@ namespace Marketplace.Common.Commands
         {
             var updatedSupplierOrders = new List<MarketplaceOrder>();
             var supplierIDs = new List<string>();
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.Order.ID);
-            var shipFromAddressIDs = lineItems.Items.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
+            var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.Order.ID, page: page, pageSize: 100));
+            var shipFromAddressIDs = lineItems.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
 
             foreach (var supplierOrder in supplierOrders)
             {
@@ -345,6 +363,8 @@ namespace Marketplace.Common.Commands
                     }
                 };
                 var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
+                var supplierLineItems = lineItems.Where(li => li.SupplierID == supplier.ID).ToList();
+                await SaveShipMethodByLineItem(supplierLineItems, supplierOrderPatch.xp.SelectedShipMethodsSupplierView, buyerOrder.Order.ID);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
             }
 
@@ -389,15 +409,32 @@ namespace Marketplace.Common.Commands
             });
         }
 
-        private async Task ValidateShipping(OrderWorksheet orderWorksheet)
+        private static async Task ValidateShipping(MarketplaceOrderWorksheet orderWorksheet)
         {
             if(orderWorksheet.ShipEstimateResponse.HttpStatusCode != 200)
-            {
                 throw new Exception(orderWorksheet.ShipEstimateResponse.UnhandledErrorBody);
-            }
+
             if(orderWorksheet.ShipEstimateResponse.ShipEstimates.Any(s => s.SelectedShipMethodID == "NO_SHIPPING_RATES"))
-            {
                 throw new Exception("No shipping rates could be determined - fallback shipping rate of $20 3-day was used");
+
+            await Task.CompletedTask;
+        }
+
+        private async Task SaveShipMethodByLineItem(List<LineItem> lineItems, List<ShipMethodSupplierView> shipMethods, string buyerOrderID)
+        {
+            if (shipMethods != null)
+            {
+                foreach (LineItem lineItem in lineItems)
+                {
+                    string shipFromID = lineItem.ShipFromAddressID;
+                    if (shipFromID != null)
+                    {
+                        ShipMethodSupplierView shipMethod = shipMethods.Find(shipMethod => shipMethod.ShipFromAddressID == shipFromID);
+                        string readableShipMethod = shipMethod.Name.Replace("_", " ");
+                        PartialLineItem lineItemToPatch = new PartialLineItem { xp = new { ShipMethod = readableShipMethod } };
+                        LineItem patchedLineItem = await _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, lineItem.ID, lineItemToPatch);
+                    }
+                }
             }
         }
     };

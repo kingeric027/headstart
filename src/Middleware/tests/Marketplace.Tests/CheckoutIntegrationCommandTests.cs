@@ -170,6 +170,7 @@ namespace Marketplace.Tests
         public void handle_methods_with_same_rates()
         {
             // handle two estimates with same rates
+            // we do not want to filter out a slower estimate with the same rate
             var method1 = new MarketplaceShipMethod
             {
                 EstimatedTransitDays = 1,
@@ -189,11 +190,11 @@ namespace Marketplace.Tests
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
-            Assert.AreEqual(2, methods.Count);
+            Assert.AreEqual(3, methods.Count);
             Assert.AreEqual(15, methods[0].Cost);
             Assert.AreEqual(1, methods[0].EstimatedTransitDays);
-            Assert.AreEqual(5, methods[1].Cost);
-            Assert.AreEqual(3, methods[1].EstimatedTransitDays);
+            Assert.AreEqual(5, methods[2].Cost);
+            Assert.AreEqual(3, methods[2].EstimatedTransitDays);
         }
 
         private List<MarketplaceShipEstimate> BuildEstimates(params MarketplaceShipMethod[] shipMethods)

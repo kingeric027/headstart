@@ -10,6 +10,7 @@ using System;
 using System.Dynamic;
 using System.Collections.Generic;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -23,11 +24,13 @@ namespace Marketplace.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
+        private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc)
+        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc, ISupplierApiClientHelper apiClientHelper)
         {
             _settings = settings;
             _oc = oc;
+            _apiClientHelper = apiClientHelper;
         }
         public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user)
         {
@@ -50,9 +53,7 @@ namespace Marketplace.Common.Commands
                 pageSize: 100,
                 accessToken: user.AccessToken
                 ));
-                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
-                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}"); }
-                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
+                ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
                 var configToUse = new OrderCloudClientConfig
                 {
