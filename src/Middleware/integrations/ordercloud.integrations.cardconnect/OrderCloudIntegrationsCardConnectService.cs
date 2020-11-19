@@ -17,7 +17,6 @@ namespace ordercloud.integrations.cardconnect
         public string Site { get; set; }
         public string BaseUrl { get; set; }
         public string Authorization { get; set; }
-        public string Authorization_CAD { get; set; }
         public string UsdMerchantID { get; set; }
         public string CadMerchantID { get; set; }
         public string EurMerchantID { get; set; }
@@ -43,7 +42,7 @@ namespace ordercloud.integrations.cardconnect
 
         private IFlurlRequest Request(string resource, string currency = null)
         {
-            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : Config.Authorization_CAD)}");
+            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : "c2VidmVuZG9yNnptQDQ5YmNMIXdEVDl3I1lOUA==")}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)
