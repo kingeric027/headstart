@@ -173,11 +173,6 @@ namespace Marketplace.Common.Commands
                 try
                 {
                     bool isSuccessful = await ProcessShipment(shipment, processResult, accessToken);
-
-                    if (isSuccessful)
-                    {
-                        ValidateOrderStatus(shipment, processResult);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -227,7 +222,7 @@ namespace Marketplace.Common.Commands
 
         private async void PatchOrderStatus(Order ocOrder, OrderStatus orderStatus)
         {
-            var partialOrder = new PartialOrder { xp = new { OrderStatus = orderStatus } };
+            var partialOrder = new PartialOrder { Status = orderStatus };
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, ocOrder.ID, partialOrder);
         }
 
@@ -324,12 +319,25 @@ namespace Marketplace.Common.Commands
                     //Create new lineItem
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
                 }
+
+                //Patch OrderStatus to completed if all items are submitted.
+                ValidateOrderStatus(shipment, result);
                 return true;
             }
             catch (OrderCloudException ex)
             {
                 result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, ex));
                 return false;
+            }
+            catch (Exception ex)
+            {
+                result.ProcessFailureList.Add(new BatchProcessFailure()
+                { 
+                    Error = ex.Message,
+                    Shipment = shipment
+                });
+                return false;
+
             }
         }
 
@@ -446,7 +454,7 @@ namespace Marketplace.Common.Commands
             } 
             else
             {
-                newShipment.ID = ocShipment?.ID;
+                newShipment.ID = ocShipment?.ID.Trim();
                 newShipment.xp = ocShipment?.xp;
                 newShipment.FromAddress = ocShipment?.FromAddress;
                 newShipment.ToAddress = ocShipment?.ToAddress;
