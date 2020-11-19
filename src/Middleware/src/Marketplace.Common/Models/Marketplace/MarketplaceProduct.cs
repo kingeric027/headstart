@@ -83,6 +83,7 @@ namespace Marketplace.Models
 		public CurrencySymbol? Currency { get; set; } = null;
         public bool? ArtworkRequired { get; set; } = false;
         public bool PromotionEligible { get; set; }
+        public bool FreeShipping { get; set; }
     }
 
 	[JsonConverter(typeof(StringEnumConverter))]
