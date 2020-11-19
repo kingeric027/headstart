@@ -41,14 +41,8 @@ export class OCMCheckoutShipping implements OnInit {
     if (!shipEstimate.ShipEstimateItems) {
       return [];
     }
-    return shipEstimate.ShipEstimateItems
-      .map(shipEstimateItem => {
-        if (!this.lineItems || !this.lineItems.Items) {
-          return undefined;
-        }
-        return this.lineItems.Items.find(li => li.ID === shipEstimateItem.LineItemID);
-      })
-      .filter(notEmpty);
+    const lineItemsByShipFromAddressID = this.lineItems.Items.filter(li => li.ShipFromAddressID === shipEstimate?.xp?.ShipFromAddressID);
+    return lineItemsByShipFromAddressID.filter(notEmpty);
   }
 
   areAllShippingSelectionsMade(shipEstimates: ShipEstimate[]): boolean {
