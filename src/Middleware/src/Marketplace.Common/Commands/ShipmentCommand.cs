@@ -223,10 +223,10 @@ namespace Marketplace.Common.Commands
             Shipment ocShipment;
             try
             {
-                if (shipment.OrderID == null) { throw new Exception("OrderID was not provided"); }
+                if (shipment == null) { throw new Exception("Shipment cannot be null"); }
 
-                Order ocOrder = await _oc.Orders.GetAsync(OrderDirection.Outgoing, shipment.OrderID);
-                LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, accessToken);
+                Order ocOrder = await GetOutgoingOrder(shipment);
+                LineItem lineItem = await GetOutgoingLineItem(shipment);
                 ShipmentItem newShipmentItem = new ShipmentItem()
                 {
                     OrderID = shipment.OrderID,
@@ -275,6 +275,35 @@ namespace Marketplace.Common.Commands
                 result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, ex));
                 return false;
             }
+        }
+
+        private async Task<LineItem> GetOutgoingLineItem(Misc.Shipment shipment)
+        {
+            if (shipment == null || shipment.LineItemID == null) { throw new Exception("No LineItemID provided for shipment"); }
+
+            try
+            {
+                return await _oc.LineItems.GetAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Unable to find LineItem for LineItemID: {shipment.LineItemID}", ex.InnerException);
+            }
+        }
+
+        private async Task<Order> GetOutgoingOrder(Misc.Shipment shipment)
+        {
+            if (shipment == null || shipment.OrderID == null) { throw new Exception("No OrderID provided for shipment"); }
+
+            try
+            {
+                return await _oc.Orders.GetAsync(OrderDirection.Outgoing, shipment.OrderID);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Unable to find Order for OrderID: {shipment.OrderID}", ex.InnerException);
+            }
+            
         }
 
         private async void PatchPartialLineItemComment(LineItem lineItem, Misc.Shipment shipment, string newShipmentId)
