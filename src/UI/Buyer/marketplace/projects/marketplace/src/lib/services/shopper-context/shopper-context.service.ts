@@ -14,6 +14,7 @@ import { OrdersToApproveStateService } from '../order-history/order-to-approve-s
 import { ExchangeRatesService } from '../exchange-rates/exchange-rates.service';
 import { TempSdk } from '../temp-sdk/temp-sdk.service';
 import { ChiliConfigService } from '../chili-config/chili-config.service';
+import { PDFService } from '../pdf-render/pdf-render.service';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,7 @@ export class ShopperContextService {
     public addresses: AddressService,
     public ordersToApprove: OrdersToApproveStateService,
     public tempSdk: TempSdk,
-    public chiliConfig: ChiliConfigService
+    public chiliConfig: ChiliConfigService,
+    public pdfService: PDFService
   ) {}
 }

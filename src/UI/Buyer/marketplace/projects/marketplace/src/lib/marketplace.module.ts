@@ -47,6 +47,7 @@ import { TempSdk } from './services/temp-sdk/temp-sdk.service';
 import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component';
 import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/product-chili-configuration-wrapper.component';
 import { ChiliTemplateResolver } from './resolves/chili-template.resolve';
+import { PDFService } from './services/pdf-render/pdf-render.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -64,6 +65,7 @@ import { ChiliTemplateResolver } from './resolves/chili-template.resolve';
     OrdersToApproveStateService,
     TempSdk,
     PaymentHelperService,
+    PDFService,
     ProductFilterService,
     ReorderHelperService,
     RouteService,

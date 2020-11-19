@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using Npoi.Mapper;
 using ordercloud.integrations.cms;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -206,7 +207,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public AssetType Type { get; set; }
         public string Tags { get; set; }
         public string FileName { get; set; }
-
+        public SizeTier SizeTier { get; set; }
     }
 
     public class TemplateProduct
@@ -227,6 +228,7 @@ namespace Marketplace.Common.Commands.SupplierSync
         public string UnitOfMeasure { get; set; }
         public bool IsResale { get; set; }
         public CurrencySymbol Currency { get; set; }
+        public SizeTier SizeTier { get; set; }
     }
 
     public class TemplatePriceSchedule
