@@ -173,6 +173,11 @@ namespace Marketplace.Common.Commands
                 try
                 {
                     bool isSuccessful = await ProcessShipment(shipment, processResult, accessToken);
+
+                    if (isSuccessful)
+                    {
+                        ValidateOrderStatus(shipment, processResult);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -194,6 +199,53 @@ namespace Marketplace.Common.Commands
 
             return processResult;
 
+        }
+
+        private async void ValidateOrderStatus(Misc.Shipment shipment, BatchProcessResult processResult)
+        {
+            Order ocOrder = await GetOutgoingOrder(shipment);
+
+            var lineItemList = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, shipment.OrderID);
+
+            bool shippingComplete = ValidateLineItemCounts(lineItemList);
+
+            if (!shippingComplete)
+            {
+                return;
+            }
+
+            if (ocOrder.Status != OrderStatus.Open && shippingComplete)
+            {
+                throw new Exception($"All items are shipped, but the order cannot be marked as Completed since the order status is currently {ocOrder?.Status.ToString("g")}");
+            }
+            else if (ocOrder.Status == OrderStatus.Open && shippingComplete)
+            {
+                PatchOrderStatus(ocOrder, OrderStatus.Completed);
+            }
+
+        }
+
+        private async void PatchOrderStatus(Order ocOrder, OrderStatus orderStatus)
+        {
+            var partialOrder = new PartialOrder { xp = new { OrderStatus = orderStatus } };
+            await _oc.Orders.PatchAsync(OrderDirection.Incoming, ocOrder.ID, partialOrder);
+        }
+
+        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
+        {
+            if (lineItemList == null || lineItemList?.Items?.Count < 1)
+            {
+                return false;
+            }
+
+            foreach(LineItem lineItem in lineItemList.Items)
+            {
+                if (lineItem.Quantity > lineItem.QuantityShipped)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, OrderCloudException ex)
