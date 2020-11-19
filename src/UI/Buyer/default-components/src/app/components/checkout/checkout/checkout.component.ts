@@ -164,14 +164,14 @@ export class OCMCheckout implements OnInit {
     this.context.router.toMyOrderDetails(cleanOrderID);
   }
 
-  handleSubmitError(error: any): void {
+  async handleSubmitError(error: any): Promise<void> {
     const errorReason = error?.response?.data?.Message || 'Unknown error'
     const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
     this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
     this.isLoading = false;
     this.currentPanel = 'payment';
     if (this.isNewCard) {
-      this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
+      await this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
     }
   }
 
