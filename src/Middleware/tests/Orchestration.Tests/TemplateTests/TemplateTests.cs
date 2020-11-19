@@ -18,6 +18,7 @@ using NPOI.XSSF.UserModel;
 using NSubstitute;
 using NUnit.Framework;
 using ordercloud.integrations.cms;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -186,7 +187,8 @@ namespace Orchestration.Tests
                 TaxCategory = Guid.NewGuid().ToString(),
                 TaxCode = Guid.NewGuid().ToString(),
                 TaxDescription = Guid.NewGuid().ToString(),
-                UnitOfMeasureQuantity = random.Next(1, 5)
+                UnitOfMeasureQuantity = random.Next(1, 5),
+                SizeTier = SizeTier.A
             };
         }
 
