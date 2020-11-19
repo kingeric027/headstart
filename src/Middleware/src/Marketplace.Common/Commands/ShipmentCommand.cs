@@ -227,6 +227,10 @@ namespace Marketplace.Common.Commands
 
                 Order ocOrder = await GetOutgoingOrder(shipment);
                 LineItem lineItem = await GetOutgoingLineItem(shipment);
+
+                //Don't continue if attempting to ship more items than what's in the order.
+                ValidateShipmentAmount(shipment, lineItem, ocOrder);
+
                 ShipmentItem newShipmentItem = new ShipmentItem()
                 {
                     OrderID = shipment.OrderID,
@@ -274,6 +278,18 @@ namespace Marketplace.Common.Commands
             {
                 result.ProcessFailureList.Add(CreateBatchProcessFailureItem(shipment, ex));
                 return false;
+            }
+        }
+
+        private void ValidateShipmentAmount(Misc.Shipment shipment, LineItem lineItem, Order ocOrder)
+        {
+            if (shipment == null || lineItem == null) { return; }
+
+            int newAmountShipped = Convert.ToInt32(shipment.QuantityShipped) + lineItem.QuantityShipped;
+
+            if (newAmountShipped > lineItem.Quantity)
+            {
+                throw new Exception($"Unable to ship {shipment.QuantityShipped} item(s). {lineItem.QuantityShipped} out of {lineItem.Quantity} items are already shipped. LineItemID: {lineItem.ID}");
             }
         }
 
