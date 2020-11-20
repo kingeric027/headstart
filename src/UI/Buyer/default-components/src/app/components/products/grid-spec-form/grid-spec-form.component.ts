@@ -5,7 +5,7 @@ import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
 import { PriceBreak, PriceSchedule, Spec } from 'ordercloud-javascript-sdk';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
-import { SpecFormService } from '../spec-form/spec-form.service';
+import { GridSpecOption, SpecFormService } from '../spec-form/spec-form.service';
 import { minBy as _minBy } from 'lodash';
 
 @Component({
@@ -97,27 +97,27 @@ export class OCMGridSpecForm {
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
         if (i === -1) this.lineItems.push(item);
         else this.lineItems[i] = item;
-        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty);
-        this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty);
+        this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs[0]);
+        this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs[0]);
         this.totalPrice = this.getTotalPrice();
     }
 
-    getUnitPrice(qty: number): number {
+    getUnitPrice(qty: number, specs: GridSpecOption): number {
         if (!this.priceBreaks?.length) return;
         const startingBreak = _minBy(this.priceBreaks, 'Quantity');
         const selectedBreak = this.priceBreaks.reduce((current, candidate) => {
             return candidate.Quantity > current.Quantity && candidate.Quantity <= qty ? candidate : current;
         }, startingBreak);
-        return selectedBreak.Price;
+        return specs.Markup ? selectedBreak.Price + specs.Markup : selectedBreak.Price;
     }
 
-    getLineTotal(qty: number): number {
+    getLineTotal(qty: number, specs: GridSpecOption): number {
         if (qty > 0) {
             if (this.priceBreaks?.length) {
                 const basePrice = qty * this.priceBreaks[0].Price;
                 this.percentSavings = this.productDetailService.getPercentSavings(this.price, basePrice)
             }
-            return this.productDetailService.getProductPrice(this.priceBreaks, this.specs, qty, this.specForm);
+            return this.productDetailService.getGridLineItemPrice(this.priceBreaks, specs, qty);
         }
         return 0;
     }
