@@ -41,7 +41,10 @@ export class OCMCheckoutShipping implements OnInit {
     if (!shipEstimate.ShipEstimateItems) {
       return [];
     }
-    const lineItemsByShipFromAddressID = this.lineItems.Items.filter(li => li.ShipFromAddressID === shipEstimate?.xp?.ShipFromAddressID);
+    if (!this.lineItems || !this.lineItems?.Items) {
+      return undefined;
+    }
+    const lineItemsByShipFromAddressID = this.lineItems?.Items?.filter(li => li.ShipFromAddressID === shipEstimate?.xp?.ShipFromAddressID);
     return lineItemsByShipFromAddressID.filter(notEmpty);
   }
 
@@ -55,7 +58,7 @@ export class OCMCheckoutShipping implements OnInit {
     return line?.SupplierID;
   }
 
-  onChangeAddressClicked() {
+  onChangeAddressClicked(): void {
     this.backToAddress.emit();
   }
 

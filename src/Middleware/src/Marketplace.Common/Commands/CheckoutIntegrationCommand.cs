@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Constants;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Models.Marketplace;
@@ -59,7 +60,9 @@ namespace Marketplace.Common.Commands
         private async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderWorksheet worksheet, CheckoutIntegrationConfiguration config = null)
         {
             if (config != null && config.ExcludePOProductsFromShipping)
+            {
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList();
+            }
             var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
             var shipResponse = (await _shippingService.GetRates(groupedLineItems, _profiles)).Reserialize<MarketplaceShipEstimateResponse>(); // include all accounts at this stage so we can save on order worksheet and analyze 
 
@@ -212,7 +215,7 @@ namespace Marketplace.Common.Commands
         {
             foreach (var shipEstimate in estimates)
             {
-                if (shipEstimate.ID == "FREE_SHIPPING")
+                if (shipEstimate.ID == ShippingConstants.FreeShipping)
                 {
                     foreach (var method in shipEstimate.ShipMethods)
                     {

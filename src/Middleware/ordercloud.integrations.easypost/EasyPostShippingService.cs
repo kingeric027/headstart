@@ -49,6 +49,7 @@ namespace ordercloud.integrations.easypost
 	{
 		private readonly EasyPostConfig _config;
 		private const string BaseUrl = "https://api.easypost.com/v2";
+		public const string FreeShipping = "FREE_SHIPPING";
 
 		public EasyPostShippingService(EasyPostConfig config)
 		{
@@ -106,10 +107,10 @@ namespace ordercloud.integrations.easypost
 			var firstLi = lineItems.First();
 			return new ShipEstimate
 			{
-				ID = "FREE_SHIPPING",
+				ID = FreeShipping,
 				ShipMethods = new List<ShipMethod> {
 					new ShipMethod {
-						ID = "FREE_SHIPPING",
+						ID = FreeShipping,
 						Cost = 0,
 						Name = "FREE",
 						EstimatedTransitDays = 1 // Can be overwritten by app settings
