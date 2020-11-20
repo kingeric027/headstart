@@ -395,7 +395,7 @@ namespace Marketplace.Common.Commands
             
             if (product.PriceSchedule.UseCumulativeQuantity)
             {
-                int totalQuantity = li == null ? 0 : li.Quantity;
+                int totalQuantity = li?.Quantity ?? 0;
                 foreach (MarketplaceLineItem lineItem in existingLineItems) {
                     if (li == null || !LineItemsMatch(li, lineItem))
                     {
