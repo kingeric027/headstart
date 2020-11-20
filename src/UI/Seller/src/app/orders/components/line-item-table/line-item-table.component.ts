@@ -110,9 +110,13 @@ export class LineItemTableComponent {
     return Object.entries(lineItem.xp.StatusByQuantity)
       .filter(([status, quantity]) => quantity)
       .map(([status, quantity]) => {
-        return `${quantity} ${status}`;
+        return `${quantity} ${status.match(/[A-Z][a-z]+|[0-9]+/g).join(' ')}`;
       })
       .join(', ');
+  }
+
+  getReturnReason(reason: string): string {
+    return `${reason.match(/[A-Z][a-z]+|[0-9]+/g).join(' ')}`;
   }
 
   quantityCanChange(lineItem: MarketplaceLineItem): number {
