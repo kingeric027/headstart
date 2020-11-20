@@ -355,12 +355,10 @@ namespace Marketplace.Common.Commands
         {
             // get me product with markedup prices correct currency and the existing line items in parellel
             var productRequest = _meProductCommand.Get(liReq.ProductID, user);
-            var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: user.AccessToken));
-
+            var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, filters: $"Product.ID={liReq.ProductID}",  accessToken: user.AccessToken));
             var existingLineItems = await existingLineItemsRequest;
-            var li = new MarketplaceLineItem();
-            
             var product = await productRequest;
+            var li = new MarketplaceLineItem();
             var markedUpPrice = GetLineItemUnitCost(orderID, product, existingLineItems, liReq);
             liReq.UnitPrice = await markedUpPrice;
 
@@ -381,20 +379,16 @@ namespace Marketplace.Common.Commands
 
         public async Task DeleteLineItem(string orderID, string lineItemID, VerifiedUserContext verifiedUser)
         {
+            LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Incoming, orderID, lineItemID);
             await _oc.LineItems.DeleteAsync(OrderDirection.Incoming, orderID, lineItemID);
-            List<MarketplaceLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: verifiedUser.AccessToken));
+            List<MarketplaceLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, filters: $"Product.ID={lineItem.ProductID}", accessToken: verifiedUser.AccessToken));
             if (existingLineItems != null && existingLineItems.Count > 0)
             {
-                var product = await _meProductCommand.Get(existingLineItems[0].ProductID, verifiedUser);
+                var product = await _meProductCommand.Get(lineItem.ProductID, verifiedUser);
                 await GetLineItemUnitCost(orderID, product, existingLineItems, null);
             }
             await _promotionCommand.AutoApplyPromotions(orderID);
         }
-
-        //private async Task UpdateLineItemUnitPricing(string orderID, VerifiedUserContext verifiedUser)
-        //{
-        //    List<MarketplaceLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: verifiedUser.AccessToken));
-        //}
 
         private async Task<decimal> GetLineItemUnitCost(string orderID, SuperMarketplaceMeProduct product, List<MarketplaceLineItem> existingLineItems, MarketplaceLineItem li)
         {
@@ -422,21 +416,60 @@ namespace Marketplace.Common.Commands
                 markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= totalQuantity).Price;
                 foreach (MarketplaceLineItem lineItem in existingLineItems)
                 {
-                   if (lineItem.UnitPrice != /*totalSpecMarkup + */markedUpBasePrice)
+                    // Determine markup for all specs for this line item
+                    decimal lineItemTotal = markedUpBasePrice + lineItem.Specs.Aggregate(0M, (accumulator, spec) =>
+                    {
+                        Spec relatedProductSpec = product.Specs.FirstOrDefault(productSpec => productSpec.ID == spec.SpecID);
+                        decimal? relatedSpecMarkup = 0;
+                        if (relatedProductSpec != null && relatedProductSpec.Options.HasItem())
+                        {
+                            relatedSpecMarkup = relatedProductSpec.Options?.FirstOrDefault(option => option.ID == spec.OptionID)?.PriceMarkup;
+                        }
+                        return accumulator + (relatedSpecMarkup ?? 0M);
+                    });
+
+                    if (lineItem.UnitPrice != lineItemTotal)
                    {
                        PartialLineItem lineItemToPatch = new PartialLineItem();
-                       lineItemToPatch.UnitPrice = /*totalSpecMarkup +*/ markedUpBasePrice;
+                       lineItemToPatch.UnitPrice = lineItemTotal;
                        await _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItem.ID, lineItemToPatch);
                    }
+                }
+
+                if (li != null)
+                {
+                    markedUpBasePrice += li.Specs.Aggregate(0M, (accumulator, spec) =>
+                    {
+                        Spec relatedProductSpec = product.Specs.FirstOrDefault(productSpec => productSpec.ID == spec.SpecID);
+                        decimal? relatedSpecMarkup = 0;
+                        if (relatedProductSpec != null && relatedProductSpec.Options.HasItem())
+                        {
+                            relatedSpecMarkup = relatedProductSpec.Options?.FirstOrDefault(option => option.ID == spec.OptionID)?.PriceMarkup;
+                        }
+                        return accumulator + (relatedSpecMarkup ?? 0M);
+                    });
                 }
             } else
             {
                 if (li != null)
                 {
+                    // Determine price including quantity discount
                     markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
+                    // Determine markup for the 1 line item
+                    markedUpBasePrice += li.Specs.Aggregate(0M, (accumulator, spec) =>
+                    {
+                        Spec relatedProductSpec = product.Specs.FirstOrDefault(productSpec => productSpec.ID == spec.SpecID);
+                        decimal? relatedSpecMarkup = 0;
+                        if (relatedProductSpec != null && relatedProductSpec.Options.HasItem())
+                        {
+                            relatedSpecMarkup = relatedProductSpec.Options?.FirstOrDefault(option => option.ID == spec.OptionID)?.PriceMarkup;
+                        }
+                        return accumulator + (relatedSpecMarkup ?? 0M);
+                    });
                 }
             }
-            return /*totalSpecMarkup + */markedUpBasePrice;
+
+            return markedUpBasePrice;
         }
 
         private bool LineItemsMatch(LineItem li1, LineItem li2)
