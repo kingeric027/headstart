@@ -79,7 +79,7 @@ namespace ordercloud.integrations.cardconnect
             return req;
         }
 
-        public static PaymentTransaction Map(Order order, Payment payment, CardConnectAuthorizationResponse response, bool overrideSuccess = false)
+        public static PaymentTransaction Map(Order order, Payment payment, CardConnectAuthorizationResponse response)
         {
             var t = new PaymentTransaction()
             {
@@ -87,7 +87,7 @@ namespace ordercloud.integrations.cardconnect
                 DateExecuted = DateTime.Now,
                 ResultCode = response.authcode,
                 ResultMessage = response.resptext,
-                Succeeded = overrideSuccess || response.WasSuccessful(),
+                Succeeded = response.WasSuccessful(),
                 Type = payment.Type.ToString()
             };
             return t;
