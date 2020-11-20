@@ -41,14 +41,11 @@ export class OCMCheckoutShipping implements OnInit {
     if (!shipEstimate.ShipEstimateItems) {
       return [];
     }
-    return shipEstimate.ShipEstimateItems
-      .map(shipEstimateItem => {
-        if (!this.lineItems || !this.lineItems.Items) {
-          return undefined;
-        }
-        return this.lineItems.Items.find(li => li.ID === shipEstimateItem.LineItemID);
-      })
-      .filter(notEmpty);
+    if (!this.lineItems || !this.lineItems?.Items) {
+      return [];
+    }
+    const lineItemsByShipFromAddressID = this.lineItems?.Items?.filter(li => li.ShipFromAddressID === shipEstimate?.xp?.ShipFromAddressID);
+    return lineItemsByShipFromAddressID.filter(notEmpty);
   }
 
   areAllShippingSelectionsMade(shipEstimates: ShipEstimate[]): boolean {
@@ -61,7 +58,7 @@ export class OCMCheckoutShipping implements OnInit {
     return line?.SupplierID;
   }
 
-  onChangeAddressClicked() {
+  onChangeAddressClicked(): void {
     this.backToAddress.emit();
   }
 

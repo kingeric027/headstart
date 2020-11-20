@@ -22,7 +22,8 @@ export class OCMOrderDetails implements OnInit {
   showRequestReturn = false;
   showRequestCancel = false;
   isQuoteOrder = isQuoteOrder;
-  constructor(private context: ShopperContextService, private modalService: NgbModal) {}
+  constructor(private context: ShopperContextService,
+              private modalService: NgbModal) {}
 
   async ngOnInit(): Promise<void> {
     this.approvalVersion = this.context.router.getOrderViewContext() === OrderViewContext.Approve;
@@ -136,5 +137,9 @@ export class OCMOrderDetails implements OnInit {
     this.ngOnInit();
     this.showRequestReturn = showRequestReturn;
     this.showRequestCancel = showRequestReturn;
+  }
+
+  protected createAndSavePDF(): void {
+    this.context.pdfService.createAndSavePDF(this.order.ID);
   }
 }

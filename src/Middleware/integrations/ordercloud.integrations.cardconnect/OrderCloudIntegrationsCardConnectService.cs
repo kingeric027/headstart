@@ -40,9 +40,9 @@ namespace ordercloud.integrations.cardconnect
             };
         }
 
-        private IFlurlRequest Request(string resource)
+        private IFlurlRequest Request(string resource, string currency = null)
         {
-            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {Config.Authorization}");
+            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : "c2VidmVuZG86cjZ6bUA0OWJjTCF3RFQ5dyNZTlA=")}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)
@@ -64,7 +64,7 @@ namespace ordercloud.integrations.cardconnect
         private async Task<CardConnectAuthorizationResponse> PostAuthorizationAsync(CardConnectAuthorizationRequest request)
         {
             var attempt = await this
-                .Request("cardconnect/rest/auth")
+                .Request("cardconnect/rest/auth", request.currency)
                 .PutJsonAsync(request)
                 .ReceiveJson<CardConnectAuthorizationResponse>();
 
