@@ -42,7 +42,7 @@ export class OCMCheckoutShipping implements OnInit {
       return [];
     }
     if (!this.lineItems || !this.lineItems?.Items) {
-      return undefined;
+      return [];
     }
     const lineItemsByShipFromAddressID = this.lineItems?.Items?.filter(li => li.ShipFromAddressID === shipEstimate?.xp?.ShipFromAddressID);
     return lineItemsByShipFromAddressID.filter(notEmpty);
