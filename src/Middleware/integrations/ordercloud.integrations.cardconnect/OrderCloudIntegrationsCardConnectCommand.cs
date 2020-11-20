@@ -70,16 +70,19 @@ namespace ordercloud.integrations.cardconnect
                 if (payment.Currency == "CAD")
                 {
                     ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
-                    await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
+                    return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response, true));
 				}
-                ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = false, Amount = ccAmount });
-                await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
-                throw new OrderCloudIntegrationException(new ApiError()
+                else
                 {
-                    Data = ex.Response,
-                    Message = ex.ApiError.Message,
-                    ErrorCode = ex.ApiError.ErrorCode
-                });
+                    ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = false, Amount = ccAmount });
+                    await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
+                    throw new OrderCloudIntegrationException(new ApiError()
+                    {
+                        Data = ex.Response,
+                        Message = ex.ApiError.Message,
+                        ErrorCode = ex.ApiError.ErrorCode
+                    });
+				}
 			}
 		}
 
