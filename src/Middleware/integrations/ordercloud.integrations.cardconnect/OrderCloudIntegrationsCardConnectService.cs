@@ -42,7 +42,7 @@ namespace ordercloud.integrations.cardconnect
 
         private IFlurlRequest Request(string resource, string currency = null)
         {
-            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : "c2VidmVuZG86cjZ6bUA0OWJjTCF3RFQ5dyNZTlA=")}");
+            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : "c2VidmVuZG9yNnptQDQ5YmNMIXdEVDl3I1lOUA==")}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)
