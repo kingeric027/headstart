@@ -8,6 +8,7 @@ using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -94,6 +95,24 @@ namespace Marketplace.Common.Commands
             superShipment.Shipment.BuyerID = buyerID;
 
             MarketplaceShipment ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
+
+            //  platform issue. Cant save new xp values onto shipment line item. Update order line item to have this value.
+            var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null); 
+            await Throttler.RunAsync(shipmentItemsWithComment, 100, 5, (shipmentItem) =>
+            {
+                dynamic comments = new ExpandoObject();
+                var commentsByShipment = comments as IDictionary<string, object>;
+                commentsByShipment[ocShipment.ID] = shipmentItem.xp?.Comment;
+                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, shipmentItem.LineItemID,
+                    new PartialLineItem()
+                    {
+                        xp = new
+                        {
+                            Comments = commentsByShipment
+                        }
+                    });
+            });
+
             IList<ShipmentItem> shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems,
                 100,
