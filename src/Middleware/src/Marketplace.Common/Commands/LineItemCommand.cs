@@ -21,7 +21,7 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
         Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
-        Task DeleteLineItem(string orderID, string lineItemID);
+        Task DeleteLineItem(string orderID, string lineItemID, VerifiedUserContext verifiedUser);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -361,8 +361,8 @@ namespace Marketplace.Common.Commands
             var li = new MarketplaceLineItem();
             
             var product = await productRequest;
-            var markedUpPrice = GetLineItemUnitCost(product, liReq);
-            liReq.UnitPrice = markedUpPrice;
+            var markedUpPrice = GetLineItemUnitCost(orderID, product, existingLineItems, liReq);
+            liReq.UnitPrice = await markedUpPrice;
 
             liReq.xp.StatusByQuantity = LineItemStatusConstants.EmptyStatuses;
             liReq.xp.StatusByQuantity[LineItemStatus.Open] = liReq.Quantity;
@@ -379,26 +379,64 @@ namespace Marketplace.Common.Commands
             return li;
         }
 
-        public async Task DeleteLineItem(string orderID, string lineItemID)
+        public async Task DeleteLineItem(string orderID, string lineItemID, VerifiedUserContext verifiedUser)
         {
             await _oc.LineItems.DeleteAsync(OrderDirection.Incoming, orderID, lineItemID);
+            List<MarketplaceLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: verifiedUser.AccessToken));
+            if (existingLineItems != null && existingLineItems.Count > 0)
+            {
+                var product = await _meProductCommand.Get(existingLineItems[0].ProductID, verifiedUser);
+                await GetLineItemUnitCost(orderID, product, existingLineItems, null);
+            }
             await _promotionCommand.AutoApplyPromotions(orderID);
         }
 
-        private decimal GetLineItemUnitCost(SuperMarketplaceMeProduct product, MarketplaceLineItem li)
+        //private async Task UpdateLineItemUnitPricing(string orderID, VerifiedUserContext verifiedUser)
+        //{
+        //    List<MarketplaceLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: verifiedUser.AccessToken));
+        //}
+
+        private async Task<decimal> GetLineItemUnitCost(string orderID, SuperMarketplaceMeProduct product, List<MarketplaceLineItem> existingLineItems, MarketplaceLineItem li)
         {
-            var markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
-            var totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
+            //decimal totalSpecMarkup = li.Specs.Aggregate(0M, (accumulator, spec) =>
+            //{
+            //    Spec relatedProductSpec = product.Specs.FirstOrDefault(productSpec => productSpec.ID == spec.SpecID);
+            //    decimal? relatedSpecMarkup = 0;
+            //    if (relatedProductSpec != null && relatedProductSpec.Options.HasItem())
+            //    {
+            //        relatedSpecMarkup = relatedProductSpec.Options?.FirstOrDefault(option => option.ID == spec.OptionID)?.PriceMarkup;
+            //    }
+            //    return accumulator + (relatedSpecMarkup ?? 0M);
+            //});
+
+            decimal markedUpBasePrice = 0;
+            if (product.PriceSchedule.UseCumulativeQuantity)
             {
-                var relatedProductSpec = product.Specs.FirstOrDefault(productSpec => productSpec.ID == spec.SpecID);
-                decimal? relatedSpecMarkup = 0;
-                if (relatedProductSpec != null && relatedProductSpec.Options.HasItem())
-                {
-                    relatedSpecMarkup = relatedProductSpec.Options?.FirstOrDefault(option => option.ID == spec.OptionID)?.PriceMarkup;
+                int totalQuantity = li == null ? 0 : li.Quantity;
+                foreach (MarketplaceLineItem lineItem in existingLineItems) {
+                    if (li == null || !LineItemsMatch(li, lineItem))
+                    {
+                        totalQuantity += lineItem.Quantity;
+                    }
                 }
-                return accumulator + (relatedSpecMarkup ?? 0M);
-            });
-            return totalSpecMarkup + markedUpBasePrice;
+                markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= totalQuantity).Price;
+                foreach (MarketplaceLineItem lineItem in existingLineItems)
+                {
+                   if (lineItem.UnitPrice != /*totalSpecMarkup + */markedUpBasePrice)
+                   {
+                       PartialLineItem lineItemToPatch = new PartialLineItem();
+                       lineItemToPatch.UnitPrice = /*totalSpecMarkup +*/ markedUpBasePrice;
+                       await _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItem.ID, lineItemToPatch);
+                   }
+                }
+            } else
+            {
+                if (li != null)
+                {
+                    markedUpBasePrice = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= li.Quantity).Price;
+                }
+            }
+            return /*totalSpecMarkup + */markedUpBasePrice;
         }
 
         private bool LineItemsMatch(LineItem li1, LineItem li2)
