@@ -25,6 +25,7 @@ export class OCMLineitemTable implements OnInit {
   @Input() readOnly: boolean;
   @Input() orderType: OrderType;
   @Input() hideStatus = false;
+  @Input() displayShippingInfo = false;
   closeIcon = faTimes;
   faTrashAlt = faTrashAlt;
   suppliers: LineItemGroupSupplier[];
