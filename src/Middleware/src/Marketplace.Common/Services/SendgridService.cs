@@ -439,7 +439,7 @@ namespace Marketplace.Common.Services
                     Note = template.BuyerRequest.Comments
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, supplierEmail, INFORMATION_REQUEST, templateData);
             var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<MarketplaceUser>(
                     filters: $"xp.RequestInfoEmails=true",
                     page: page,
