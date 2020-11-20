@@ -110,7 +110,6 @@
                 <div *ngIf="li.xp.Returns?.length">
                   <!-- Possible TO-DO: If a line item would have multiple returns on it, a UI to support a better return view may be needed. -->
                   <div class="d-flex flex-column">
-                    <small>Qty Returned: {{ li.xp.Returns[0].Quantity }}</small>
                     <small>Reason: {{ getReturnReason(li.xp.Returns[0].Reason) }}</small>
                     <small *ngIf="li.xp.Returns[0].Comment">Comment: {{li.xp.Returns[0].Comment}}</small>
                   </div>
