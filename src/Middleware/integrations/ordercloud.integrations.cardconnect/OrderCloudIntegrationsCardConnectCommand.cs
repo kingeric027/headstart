@@ -66,14 +66,23 @@ namespace ordercloud.integrations.cardconnect
             }
             catch (CreditCardIntegrationException ex)
             {
-                ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = false, Amount = ccAmount });
-                await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
-                throw new OrderCloudIntegrationException(new ApiError()
+				//TODO: this is a hack to get around SMGs inability to create a merchant account
+                if (payment.Currency == "CAD")
                 {
-                    Data = ex.Response,
-                    Message = ex.ApiError.Message,
-                    ErrorCode = ex.ApiError.ErrorCode
-                });
+                    ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
+                    return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response, true));
+				}
+                else
+                {
+                    ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = false, Amount = ccAmount });
+                    await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
+                    throw new OrderCloudIntegrationException(new ApiError()
+                    {
+                        Data = ex.Response,
+                        Message = ex.ApiError.Message,
+                        ErrorCode = ex.ApiError.ErrorCode
+                    });
+				}
 			}
 		}
 
