@@ -66,6 +66,12 @@ namespace ordercloud.integrations.cardconnect
             }
             catch (CreditCardIntegrationException ex)
             {
+				//TODO: this is a hack to get around SMGs inability to create a merchant account
+                if (payment.Currency == "CAD")
+                {
+                    ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = true, Amount = ccAmount });
+                    await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
+				}
                 ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = false, Amount = ccAmount });
                 await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));
                 throw new OrderCloudIntegrationException(new ApiError()
