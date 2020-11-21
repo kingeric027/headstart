@@ -96,6 +96,7 @@ namespace Marketplace.Common
         public string SEBDistributionFedexAccountId { get; set; }
         public decimal NoRatesFallbackCost { get; set; }
         public int NoRatesFallbackTransitDays { get; set; }
+        public int FreeShippingTransitDays { get; set; }
     }
 
     public class SendgridSettings

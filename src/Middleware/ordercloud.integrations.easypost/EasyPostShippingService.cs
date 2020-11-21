@@ -36,11 +36,20 @@ namespace ordercloud.integrations.easypost
 		Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles);
 	}
 
+	public class Grouping<TKey, TElement> : List<TElement>, IGrouping<TKey, TElement>
+	{
+		public Grouping(TKey key) : base() => Key = key;
+		public Grouping(TKey key, int capacity) : base(capacity) => Key = key;
+		public Grouping(TKey key, IEnumerable<TElement> collection)
+			: base(collection) => Key = key;
+		public TKey Key { get; private set; }
+	}
 
 	public class EasyPostShippingService : IEasyPostShippingService
 	{
 		private readonly EasyPostConfig _config;
 		private const string BaseUrl = "https://api.easypost.com/v2";
+		public const string FreeShipping = "FREE_SHIPPING";
 
 		public EasyPostShippingService(EasyPostConfig config)
 		{
@@ -49,7 +58,14 @@ namespace ordercloud.integrations.easypost
 
 		public async Task<ShipEstimateResponse> GetRates(IEnumerable<IGrouping<AddressPair, LineItem>> groupedLineItems, EasyPostShippingProfiles profiles)
 		{
-			var easyPostShipments = groupedLineItems.Select(li => EasyPostMappers.MapShipment(li, profiles)).ToList();
+			// First, filter out any line items that are set to have free shipping
+			var filteredGroupedList = new List<Grouping<AddressPair, LineItem>>();
+			foreach (IGrouping<AddressPair, LineItem> group in groupedLineItems)
+			{
+				var filteredLineItems = group.ToList().Where(li => li.Product.xp.FreeShipping == false);
+				filteredGroupedList.Add(new Grouping<AddressPair, LineItem>(group.Key, filteredLineItems));
+			}
+			var easyPostShipments = filteredGroupedList.Select(li => EasyPostMappers.MapShipment(li, profiles)).ToList();
 			var easyPostResponses = new List<EasyPostShipment[]>();
 
             var postShipments = easyPostShipments;
@@ -63,6 +79,11 @@ namespace ordercloud.integrations.easypost
 			{
 				ShipEstimates = groupedLineItems.Select((lineItems, index) =>
 				{
+					// If all line items in the list have FreeShipping, then Mock rates
+					if (lineItems.ToList().All(li => li.Product?.xp?.FreeShipping))
+                    {
+						return MockRatesForFreeShipping(lineItems.ToList());
+					}
 					var firstLi = lineItems.First();
 					var shipMethods = EasyPostMappers.MapRates(easyPostResponses[index]);
 					return new ShipEstimate()
@@ -80,6 +101,29 @@ namespace ordercloud.integrations.easypost
 			};
 			return shipEstimateResponse;
 		}
+
+		public ShipEstimate MockRatesForFreeShipping(List<LineItem> lineItems)
+        {
+			var firstLi = lineItems.First();
+			return new ShipEstimate
+			{
+				ID = FreeShipping,
+				ShipMethods = new List<ShipMethod> {
+					new ShipMethod {
+						ID = FreeShipping,
+						Cost = 0,
+						Name = "FREE",
+						EstimatedTransitDays = 1 // Can be overwritten by app settings
+					}
+				},
+				ShipEstimateItems = lineItems.Select(li => new ShipEstimateItem() { LineItemID = li.ID, Quantity = li.Quantity }).ToList(),
+				xp =
+                {
+					SupplierID = firstLi.SupplierID, // This will help with forwarding the supplier order
+					ShipFromAddressID = firstLi.ShipFromAddressID  // This will help with forwarding the supplier order
+                }
+			};
+        }
 
 		private async Task<EasyPostShipment> PostShipment(EasyPostShipment shipment)
 		{
