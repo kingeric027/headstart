@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-// These regular expressions are all used for form validation
 export class RegexService {
   constructor() {}
+
+  // Used for Form Validiation
 
   // used for all Ordercloud IDs
   get ID() {
@@ -19,7 +20,7 @@ export class RegexService {
 
   // used for FirstName, LastName, City
   get HumanName() {
-    return "^[a-zA-Z0-9-.'\\s]*$"; // only alphanumic and space . '
+    return '^[a-zA-Z0-9-.\'\\s]*$'; // only alphanumic and space . '
   }
 
   get Email() {
@@ -42,5 +43,12 @@ export class RegexService {
       case 'US':
         return '^[0-9]{5}(?:-[0-9]{4})?$'; // US zip - five numbers
     }
+  }
+
+  // Used for general display purposes
+
+  // Used for multiple statuses with concatenated words to split them by capital letter for readability (ie. "DoesNotMatchDescription" becomes "Does Not Match Description")
+  getStatusSplitByCapitalLetter(status: string): string {
+    return status ? `${status.match(/[A-Z][a-z]+|[0-9]+/g).join(' ')}` : null;
   }
 }

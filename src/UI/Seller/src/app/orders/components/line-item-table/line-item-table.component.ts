@@ -9,6 +9,7 @@ import { FormArray, Validators, FormControl } from '@angular/forms';
 import { getPrimaryLineItemImage } from '@app-seller/products/product-image.helper';
 import { MeUser, OcOrderService } from '@ordercloud/angular-sdk';
 import { LineItem, LineItemSpec } from 'ordercloud-javascript-sdk';
+import { RegexService } from '@app-seller/shared';
 
 @Component({
   selector: 'app-line-item-table',
@@ -42,6 +43,7 @@ export class LineItemTableComponent {
 
   constructor(
     private ocOrderService: OcOrderService,
+    private regexService: RegexService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) { }
 
@@ -110,9 +112,14 @@ export class LineItemTableComponent {
     return Object.entries(lineItem.xp.StatusByQuantity)
       .filter(([status, quantity]) => quantity)
       .map(([status, quantity]) => {
-        return `${quantity} ${status}`;
+        const readableStatus = this.regexService.getStatusSplitByCapitalLetter(status);
+        return `${quantity} ${readableStatus}`;
       })
       .join(', ');
+  }
+
+  getReturnReason(reason: string): string {
+    return this.regexService.getStatusSplitByCapitalLetter(reason);
   }
 
   quantityCanChange(lineItem: MarketplaceLineItem): number {
