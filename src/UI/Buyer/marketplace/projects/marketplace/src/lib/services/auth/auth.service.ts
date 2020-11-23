@@ -107,6 +107,7 @@ export class AuthService {
     const creds = await Auth.Login(userName, password, this.appConfig.clientID, this.appConfig.scope);
     this.appInsightsService.setUserID(userName);
     this.loginWithTokens(creds.access_token, creds.refresh_token, false, rememberMe);
+    this.router.navigateByUrl('/home');
     return creds;
   }
 
@@ -123,7 +124,6 @@ export class AuthService {
       Tokens.SetRefreshToken(refreshToken);
       this.setRememberMeStatus(true);
     }
-    this.router.navigateByUrl('/home');
     this.ordersToApproveStateService.alertIfOrdersToApprove();
   }
 
