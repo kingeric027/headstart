@@ -92,7 +92,7 @@ export class LineItemTableComponent {
 
   async setSupplierOrders(order: MarketplaceOrder): Promise<void> {
     const salesOrderID = order?.ID?.split('-')[0];
-    if (order.ID && salesOrderID && order.ID === salesOrderID) {
+    if (order?.ID && salesOrderID && order.ID === salesOrderID) {
       const supplierOrderFilterString = order?.xp?.SupplierIDs?.map(id => `${order.ID}-${id}`).join('|');
       const supplierOrders = await this.ocOrderService.List(this.orderDirection === 'Incoming' ? 'Outgoing' : 'Incoming',
         { filters: { ID: supplierOrderFilterString } }).toPromise();
