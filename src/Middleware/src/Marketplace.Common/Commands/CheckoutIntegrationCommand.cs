@@ -219,6 +219,8 @@ namespace Marketplace.Common.Commands
                 {
                     foreach (var method in shipEstimate.ShipMethods)
                     {
+                        method.ID = ShippingConstants.FreeShipping;
+                        method.Cost = 0;
                         method.EstimatedTransitDays = freeShippingTransitDays;
                         method.xp.FreeShippingApplied = true;
                     }
