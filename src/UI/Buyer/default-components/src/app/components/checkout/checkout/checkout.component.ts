@@ -15,6 +15,7 @@ import { SelectedCreditCard } from '../checkout-payment/checkout-payment.compone
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { ShopperContextService } from 'marketplace';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ModalState } from 'src/app/models/modal-state.class';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -35,6 +36,7 @@ export class OCMCheckout implements OnInit {
   currentPanel: string;
   paymentError: string;
   faCheck = faCheck;
+  orderSubmitted = ModalState.Closed;
   checkout: CheckoutService = this.context.order.checkout;
   sections: any = [
     {
@@ -65,6 +67,9 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
+    if(this.order.IsSubmitted) {
+      this.handleOrderSubmitted();
+    }
 
     this.lineItems = this.context.order.cart.get();
     this.orderPromotions = this.context.order.promos.get().Items;
@@ -100,6 +105,9 @@ export class OCMCheckout implements OnInit {
     this.cards = await this.context.currentUser.cards.List();
     await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
+    if(this.order.IsSubmitted) {
+      this.handleOrderSubmitted();
+    }
     this.lineItems = this.context.order.cart.get();
     this.destoryLoadingIndicator('payment');
   }
@@ -165,14 +173,24 @@ export class OCMCheckout implements OnInit {
   }
 
   async handleSubmitError(error: any): Promise<void> {
-    const errorReason = error?.response?.data?.Message || 'Unknown error'
-    const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
-    this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
-    this.isLoading = false;
-    this.currentPanel = 'payment';
-    if (this.isNewCard) {
-      await this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
+    if(error?.message === 'Order has already been submitted') {
+      this.isLoading = false
+      this.handleOrderSubmitted();
+    } else {
+      const errorReason = error?.response?.data?.Message || 'Unknown error'
+      const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
+      this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
+      this.isLoading = false;
+      this.currentPanel = 'payment';
+      if (this.isNewCard) {
+        await this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
+      }
     }
+  }
+
+  handleOrderSubmitted(): void {
+    this.context.order.delete()
+    this.orderSubmitted = ModalState.Open;
   }
 
   getCCPaymentData(): OrderCloudIntegrationsCreditCardPayment {

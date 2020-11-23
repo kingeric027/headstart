@@ -184,6 +184,12 @@ export class CheckoutService {
   // Private Methods
   private async submit(): Promise<string> {
     // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
+    const currentOrder = await Orders.Get('Outgoing', this.order.ID);
+    const test = true;
+    if(test) {
+      console.log('already submitted!');
+      throw new Error('Order has already been submitted');
+    }
     const submittedOrder = await Orders.Submit('Outgoing', this.order.ID);
     await this.state.reset();
     return submittedOrder.ID;

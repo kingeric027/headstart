@@ -7,6 +7,12 @@
 </div>
 <div class="container">
   <div *ngIf="order">
+    <ocm-modal [state]="orderSubmitted"
+               [modalTitle]="'Order Already Submitted'">
+               <button class="btn btn-link"
+                      routerLink="/home">Back To Home
+               </button>
+    </ocm-modal>
     <div class="row flex-lg-row-reverse my-3"
          *ngIf="order.LineItemCount">
       <div class="col-lg-3">
