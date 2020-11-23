@@ -36,7 +36,7 @@ export class OCMCheckout implements OnInit {
   currentPanel: string;
   paymentError: string;
   faCheck = faCheck;
-  orderSubmitted = ModalState.Closed;
+  orderErrorModal = ModalState.Closed;
   checkout: CheckoutService = this.context.order.checkout;
   sections: any = [
     {
@@ -67,8 +67,8 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
-    if(this.order.IsSubmitted) {
-      this.handleOrderSubmitted();
+    if (this.order.IsSubmitted) {
+      this.handleOrderError();
     }
 
     this.lineItems = this.context.order.cart.get();
@@ -105,8 +105,8 @@ export class OCMCheckout implements OnInit {
     this.cards = await this.context.currentUser.cards.List();
     await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
-    if(this.order.IsSubmitted) {
-      this.handleOrderSubmitted();
+    if (this.order.IsSubmitted) {
+      this.handleOrderError();
     }
     this.lineItems = this.context.order.cart.get();
     this.destoryLoadingIndicator('payment');
@@ -129,7 +129,7 @@ export class OCMCheckout implements OnInit {
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
-      this.isNewCard=true;
+      this.isNewCard = true;
       await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal);
     }
     if (this.orderSummaryMeta.POLineItemCount) {
@@ -157,14 +157,14 @@ export class OCMCheckout implements OnInit {
         cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
       } catch (e) {
-        return await this.handleSubmitError(e)
+        return this.handleSubmitError(e)
       }
     } else {
       try {
         cleanOrderID = await this.checkout.submitWithoutCreditCard();
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
       } catch (e) {
-        return await this.handleSubmitError(e)
+        return this.handleSubmitError(e)
       }
     }
     this.isLoading = false;
@@ -175,7 +175,7 @@ export class OCMCheckout implements OnInit {
   async handleSubmitError(error: any): Promise<void> {
     if(error?.message === 'Order has already been submitted') {
       this.isLoading = false
-      this.handleOrderSubmitted();
+      this.handleOrderError();
     } else {
       const errorReason = error?.response?.data?.Message || 'Unknown error'
       const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
@@ -188,9 +188,9 @@ export class OCMCheckout implements OnInit {
     }
   }
 
-  handleOrderSubmitted(): void {
-    this.context.order.delete()
-    this.orderSubmitted = ModalState.Open;
+  handleOrderError(): void {
+    this.context.order.reset();
+    this.orderErrorModal = ModalState.Open;
   }
 
   getCCPaymentData(): OrderCloudIntegrationsCreditCardPayment {

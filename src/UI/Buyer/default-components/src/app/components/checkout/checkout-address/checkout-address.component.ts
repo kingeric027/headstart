@@ -17,6 +17,7 @@ export class OCMCheckoutAddress implements OnInit {
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListPage<LineItem>;
   @Output() continue = new EventEmitter();
+  @Output() handleOrderError = new EventEmitter();
   _addressError: string;
 
   readonly NEW_ADDRESS_CODE = 'new';
@@ -73,7 +74,10 @@ export class OCMCheckoutAddress implements OnInit {
         this.spinner.hide();
       }
     } catch (e) {
-      if(e?.response?.data?.Message) {
+      if(e?.message === 'You no longer have access to this order.') {
+        this.handleOrderError.emit();
+      }
+      else if(e?.response?.data?.Message) {
         this._addressError = e?.response?.data?.Message
       } else {
         throw e;

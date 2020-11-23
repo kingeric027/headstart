@@ -84,7 +84,10 @@ export class CheckoutService {
       await Orders.Patch('Outgoing', this.order.ID, { xp: { ShippingAddress: address } })
       return await this.patch({ ShippingAddressID: address.ID });
     } catch (ex) {
-      if (ex?.error?.Errors?.[0]?.ErrorCode === 'NotFound') {
+      if (ex?.errors?.Errors?.[0]?.ErrorCode === 'NotFound') {
+        if(ex?.errors?.Errors?.[0]?.Data.ObjectType === 'Order') {
+          throw Error('You no longer have access to this order.')
+        }
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
       }
       throw ex;
@@ -99,7 +102,10 @@ export class CheckoutService {
       this.order = await this.patch(patch as MarketplaceOrder);
       return this.order;
     } catch (ex) {
-      if (ex.error.Errors[0].ErrorCode === 'NotFound') {
+      if (ex.errors.Errors[0].ErrorCode === 'NotFound') {
+        if(ex?.errors?.Errors?.[0]?.Data.ObjectType === 'Order') {
+          throw Error('You no longer have access to this order.')
+        }
         throw Error('You no longer have access to this buyer location. Please enter or select a different one.');
       }
     }
