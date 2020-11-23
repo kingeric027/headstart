@@ -119,7 +119,7 @@
                   </span>
                 </div>
                 <div *ngIf="displayShippingInfo && li?.Product?.xp?.FreeShipping"
-                     class="badge badge-pill badge-warning text-uppercase">Ships Free!</div>
+                     class="badge badge-pill badge-warning text-uppercase">{{li?.Product?.xp?.FreeShippingMessage}}</div>
               </div>
             </div>
           </div>
