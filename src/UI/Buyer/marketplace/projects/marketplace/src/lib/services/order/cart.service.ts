@@ -32,7 +32,9 @@ export class CartService {
     this.onAdd.next(lineItem);
     if (!_isUndefined(this.order.DateCreated)) {
       const lineItems = this.state.lineItems.Items;
-      const liWithSameProduct = lineItems.find(li => li.ProductID === lineItem.ProductID && li?.xp?.KitProductID === lineItem?.xp?.KitProductID);
+      const liWithSameProduct = lineItems.find(li => 
+        li.ProductID === lineItem.ProductID && li?.xp?.KitProductID === lineItem?.xp?.KitProductID
+      );
       const isPrintProduct = lineItem.xp.PrintArtworkURL;
       if (!isPrintProduct && liWithSameProduct && this.hasSameSpecs(lineItem, liWithSameProduct)) {
         // combine any line items that have the same productID/specs into one line item
