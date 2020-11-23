@@ -5,7 +5,7 @@
     "ng": "ng",
     "test": "ng test",
     "e2e": "ng e2e",
-    "start": "ng serve --configuration=anytimefitness-staging --port=4300 --open",
+    "start": "ng serve --configuration=dev --port=4300 --open",
     "preinstall": "npm run build-marketplace",
     "lint": "eslint src/**/*.ts --quiet",
     "blah": "ng serve --configuration=brandweardesigns-test",
