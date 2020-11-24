@@ -7,7 +7,7 @@
 </div>
 <div class="container">
   <div *ngIf="order">
-    <ocm-modal [state]="orderErrorModal" [modalTitle]="'This order has already been submitted'">
+    <ocm-modal [state]="orderErrorModal" [modalTitle]="orderError">
       <div class="text-center">
         <button class="btn btn-primary align-self-center" routerLink="/home">Back To Home
         </button>
@@ -61,7 +61,7 @@
               </div>
               <ocm-checkout-address [isAnon]="isAnon" [order]="order" [lineItems]="lineItems"
                 [orderPromos]="orderPromotions" (continue)="doneWithShipToAddress()"
-                (handleOrderError)="handleOrderError()"></ocm-checkout-address>
+                (handleOrderError)="handleOrderError($event.detail)"></ocm-checkout-address>
             </ng-template>
           </ngb-panel>
           <ngb-panel id="shippingSelection">

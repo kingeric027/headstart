@@ -35,6 +35,7 @@ export class OCMCheckout implements OnInit {
   shipEstimates: ShipEstimate[] = [];
   currentPanel: string;
   paymentError: string;
+  orderError: string;
   faCheck = faCheck;
   orderErrorModal = ModalState.Closed;
   checkout: CheckoutService = this.context.order.checkout;
@@ -68,7 +69,7 @@ export class OCMCheckout implements OnInit {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
     if (this.order.IsSubmitted) {
-      this.handleOrderError();
+      this.handleOrderError('This order has already been submitted');
     }
 
     this.lineItems = this.context.order.cart.get();
@@ -106,7 +107,7 @@ export class OCMCheckout implements OnInit {
     await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
     if (this.order.IsSubmitted) {
-      this.handleOrderError();
+      this.handleOrderError('This order has already been submitted');
     }
     this.lineItems = this.context.order.cart.get();
     this.destoryLoadingIndicator('payment');
@@ -175,7 +176,7 @@ export class OCMCheckout implements OnInit {
   async handleSubmitError(error: any): Promise<void> {
     if(error?.message === 'Order has already been submitted') {
       this.isLoading = false
-      this.handleOrderError();
+      this.handleOrderError(error.message);
     } else {
       const errorReason = error?.response?.data?.Message || 'Unknown error'
       const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
@@ -188,7 +189,8 @@ export class OCMCheckout implements OnInit {
     }
   }
 
-  handleOrderError(): void {
+  handleOrderError(message: string): void {
+    this.orderError = message;
     this.context.order.reset();
     this.orderErrorModal = ModalState.Open;
   }

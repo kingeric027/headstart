@@ -75,7 +75,7 @@ export class OCMCheckoutAddress implements OnInit {
       }
     } catch (e) {
       if(e?.message === 'You no longer have access to this order.') {
-        this.handleOrderError.emit();
+        this.handleOrderError.emit(e.message);
       }
       else if(e?.response?.data?.Message) {
         this._addressError = e?.response?.data?.Message

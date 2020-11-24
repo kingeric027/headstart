@@ -355,12 +355,22 @@ namespace Marketplace.Common.Commands
         {
             // get me product with markedup prices correct currency and the existing line items in parellel
             var productRequest = _meProductCommand.Get(liReq.ProductID, user);
+            var orderRequest = _oc.Orders.GetAsync(OrderDirection.Outgoing, orderID);
             var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, accessToken: user.AccessToken));
 
-            var existingLineItems = await existingLineItemsRequest;
             var li = new MarketplaceLineItem();
-            
+
+            var existingLineItems = await existingLineItemsRequest;
             var product = await productRequest;
+            var order = await orderRequest;
+            if(order.IsSubmitted)
+            {
+                throw new OrderCloudIntegrationException(new ApiError()
+                {
+                    ErrorCode = "400",
+                    Message = "Order has already been submitted"
+                });
+            }
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
             liReq.UnitPrice = markedUpPrice;
 
