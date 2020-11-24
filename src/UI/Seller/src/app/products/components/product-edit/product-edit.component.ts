@@ -226,7 +226,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         SizeTier: new FormControl(_get(superMarketplaceProduct.Product, 'xp.SizeTier')),
         UnitOfMeasureQty: new FormControl(_get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'), Validators.required),
         ArtworkRequired: new FormControl(_get(superMarketplaceProduct.Product, 'xp.ArtworkRequired')),
-        FreeShipping: new FormControl(_get(superMarketplaceProduct.Product, 'xp.FreeShipping'))
+        FreeShipping: new FormControl(_get(superMarketplaceProduct.Product, 'xp.FreeShipping')),
+        FreeShippingMessage: new FormControl(_get(superMarketplaceProduct.Product, 'xp.FreeShippingMessage') || 'Free Shipping')
       }, { validators: ValidateMinMax }
       );
       this.setInventoryValidator();

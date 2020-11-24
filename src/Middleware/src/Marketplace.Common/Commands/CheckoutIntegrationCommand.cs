@@ -222,7 +222,6 @@ namespace Marketplace.Common.Commands
                         method.ID = ShippingConstants.FreeShipping;
                         method.Cost = 0;
                         method.EstimatedTransitDays = freeShippingTransitDays;
-                        method.xp.FreeShippingApplied = true;
                     }
                 }
             }
