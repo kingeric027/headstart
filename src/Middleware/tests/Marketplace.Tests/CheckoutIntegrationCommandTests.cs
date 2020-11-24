@@ -27,6 +27,7 @@ namespace Marketplace.Tests
 {
     public class CheckoutIntegrationCommandTests
     {
+        #region FilterSlowerRatesWithHighCost
         [Test]
         public void dont_filter_valid_rates()
         {
@@ -46,7 +47,7 @@ namespace Marketplace.Tests
                 EstimatedTransitDays = 3,
                 Cost = 5
             };
-            var estimates = BuildEstimates(method1, method2, method3);
+            var estimates = BuildEstimates(new[] { method1, method2, method3 });
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
@@ -75,7 +76,7 @@ namespace Marketplace.Tests
                 EstimatedTransitDays = 3,
                 Cost = 20
             };
-            var estimates = BuildEstimates(method1, method2, method3);
+            var estimates = BuildEstimates(new[] { method1, method2, method3 });
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
@@ -103,7 +104,7 @@ namespace Marketplace.Tests
                 EstimatedTransitDays = 3,
                 Cost = 15
             };
-            var estimates = BuildEstimates(method1, method2, method3);
+            var estimates = BuildEstimates(new[] { method1, method2, method3 });
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
@@ -130,7 +131,7 @@ namespace Marketplace.Tests
                 EstimatedTransitDays = 1,
                 Cost = 5
             };
-            var estimates = BuildEstimates(method1, method2, method3);
+            var estimates = BuildEstimates(new[] { method1, method2, method3 });
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
@@ -157,7 +158,7 @@ namespace Marketplace.Tests
                 EstimatedTransitDays = 3,
                 Cost = 5
             };
-            var estimates = BuildEstimates(method1, method2, method3);
+            var estimates = BuildEstimates(new[] { method1, method2, method3 });
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
@@ -186,7 +187,7 @@ namespace Marketplace.Tests
                 EstimatedTransitDays = 3,
                 Cost = 5
             };
-            var estimates = BuildEstimates(method1, method2, method3);
+            var estimates = BuildEstimates(new[] { method1, method2, method3 });
             var result = CheckoutIntegrationCommand.FilterSlowerRatesWithHighCost(estimates);
             var methods = result[0].ShipMethods;
 
@@ -197,14 +198,322 @@ namespace Marketplace.Tests
             Assert.AreEqual(3, methods[2].EstimatedTransitDays);
         }
 
-        private List<MarketplaceShipEstimate> BuildEstimates(params MarketplaceShipMethod[] shipMethods)
+
+        #endregion
+        #region ApplyFlatRateShipping
+        [Test]
+        public void flatrateshipping_ignore_supplier_not_medline()
+        {
+            // should not transform ship methods if the supplier isn't medline
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 20,
+                SupplierID = "012"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 89
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(method1.Cost, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_ignore_nonground()
+        {
+            // don't transform methods if they aren't ground
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 20,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "PRIORITY_OVERNIGHT",
+                EstimatedTransitDays = 1,
+                Cost = 150,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(method1.Cost, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_ignore_zerocost()
+        {
+            // don't transform methods if they are zero cost
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 0,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 60,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(method1.Cost, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_handle_first_tier()
+        {
+            // set shipping cost to $29.99 if line item cost is between 0.01$ and $499.99
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 370,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 60,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(29.99, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_handle_first_tier_multiple()
+        {
+            // set shipping cost to $29.99 if line item cost is between 0.01$ and $499.99
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 200,
+                SupplierID = "027"
+            };
+            var line2 = new MarketplaceLineItem
+            {
+                ID = "Line2",
+                LineSubtotal = 250,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 60,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1, line2);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(29.99, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_handle_second_tier()
+        {
+            // set shipping cost to $0 if line item cost is greater than $499.99
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 602,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 60,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(0, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_handle_second_tier_multiple()
+        {
+            // set shipping cost to $0 if line item cost is greater than $499.99
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 250,
+                SupplierID = "027"
+            };
+            var line2 = new MarketplaceLineItem
+            {
+                ID = "Line2",
+                LineSubtotal = 250,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 60,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1, line2);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(0, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_handle_multiple_estimates()
+        {
+            // set shipping cost to $0 if line item cost is greater than $499.99
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Supplier1Line1"
+            };
+            var shipitem2 = new ShipEstimateItem
+            {
+                LineItemID = "Supplier2Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Supplier1Line1",
+                LineSubtotal = 110,
+                SupplierID = "010"
+            };
+            var line2 = new MarketplaceLineItem
+            {
+                ID = "Supplier1Line2",
+                LineSubtotal = 125,
+                SupplierID = "010"
+            };
+            var line3 = new MarketplaceLineItem
+            {
+                ID = "Supplier2Line1",
+                LineSubtotal = 130,
+                SupplierID = "027"
+            };
+            var line4 = new MarketplaceLineItem
+            {
+                ID = "Supplier2Line2",
+                LineSubtotal = 180,
+                SupplierID = "027"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 1,
+                Cost = 80,
+                xp = new ShipMethodXP { }
+            };
+            var method2 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 60,
+                xp = new ShipMethodXP { }
+            };
+            var worksheet = BuildOrderWorksheet(line1, line2, line3, line4);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            estimates.AddRange(BuildEstimates(new[] { method2 }, new[] { shipitem2 }));
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+
+            Assert.AreEqual(2, result.Count());
+            // compare first shipment item from first estimate (no changes because its not medline supplier)
+            Assert.AreEqual(1, result[0].ShipMethods.Count());
+            Assert.AreEqual(method1.Name, result[0].ShipMethods[0].Name);
+            Assert.AreEqual(method1.Cost, result[0].ShipMethods[0].Cost);
+
+            // compare first shipment item from second estimate (cost falls in first tier between $0.01 and $499.9)
+            Assert.AreEqual(1, result[0].ShipMethods.Count());
+            Assert.AreEqual(method2.Name, result[1].ShipMethods[0].Name);
+            Assert.AreEqual(29.99M, result[1].ShipMethods[0].Cost);
+        }
+        #endregion
+
+        private List<MarketplaceShipEstimate> BuildEstimates( MarketplaceShipMethod[] shipMethods, ShipEstimateItem[] shipItems = null)
         {
             return new List<MarketplaceShipEstimate>
             {
                 new MarketplaceShipEstimate
                 {
-                    ShipMethods = shipMethods.ToList()
+                    ShipMethods = shipMethods.ToList(),
+                    ShipEstimateItems = shipItems?.ToList()
                 }
+            };
+        }
+
+        private MarketplaceOrderWorksheet BuildOrderWorksheet(params MarketplaceLineItem[] lineItems)
+        {
+            return new MarketplaceOrderWorksheet
+            {
+                LineItems = lineItems.ToList()
             };
         }
     }

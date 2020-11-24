@@ -37,7 +37,6 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		public decimal OriginalCost { get; set; }
 		public bool FreeShippingApplied { get; set; }
         public int? FreeShippingThreshold { get; set; }
-        public decimal CostBeforeDiscount { get; set; } // do we need this and OriginalCost?
 		public CurrencySymbol? OriginalCurrency { get; set; }
         public CurrencySymbol? OrderCurrency { get; set; }
         public double? ExchangeRate { get; set; }
