@@ -118,8 +118,8 @@
                     </span>
                   </span>
                 </div>
-                <div *ngIf="displayShippingInfo && li?.Product?.xp?.FreeShipping"
-                     class="badge badge-pill badge-warning text-uppercase">Ships Free!</div>
+                <div *ngIf="displayShippingInfo && li?.Product?.xp?.FreeShipping && li?.Product?.xp?.FreeShippingMessage"
+                     class="badge badge-pill badge-warning text-uppercase">{{li?.Product?.xp?.FreeShippingMessage}}</div>
               </div>
             </div>
           </div>

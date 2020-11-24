@@ -54,7 +54,7 @@
       <div class="col-md-7 form-group">
         <div class="form-group">
           <label [ngClass]="{'font-weight-bold': facetOptionLimitReached()}"
-                 for="addFacetOption">{{updatedResource?.xp?.Options?.length || 0}} / 25 {{'ADMIN.FACETS.OPTIONS' | translate}}</label>
+                 for="addFacetOption">{{_facetEditable?.xp?.Options?.length || 0}} / 25 {{'ADMIN.FACETS.OPTIONS' | translate}}</label>
           <div class="input-group w-50">
             <input class="form-control"
                    type="text"
@@ -75,11 +75,29 @@
           </div>
         </div>
         <div class="chip"
-             *ngFor="let option of updatedResource?.xp?.Options">{{option}}
+             *ngFor="let option of _facetEditable?.xp?.Options">{{option}}
           <fa-icon (click)="removeFacetOption(option)"
                    [icon]="faTimesCircle"></fa-icon>
         </div>
       </div>
     </div>
   </form>
+  <div class="d-flex justify-content-between align-items-center py-2"
+       style="position: relative;">
+    <delete-confirm-modal-component *ngIf="!isCreatingNew"
+                                    buttonText="ADMIN.NAV.FACET"
+                                    (deleteConfirmed)="handleDelete($event)">
+    </delete-confirm-modal-component>
+    <div>
+      <button *ngIf="areChanges"
+              class="btn btn-primary"
+              type="submit"
+              [disabled]="resourceForm?.status === 'INVALID' || dataIsSaving"
+              (click)="saveResource()">{{getSaveBtnText()}}</button>
+      <button class="btn brand-button ml-3"
+              (click)="handleDiscardChanges()"
+              *ngIf="areChanges && !isCreatingNew"
+              translate>COMMON.DISCARD_CHANGES</button>
+    </div>
+  </div>
 </div>

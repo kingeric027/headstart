@@ -366,6 +366,7 @@
                     </div>
                     <div class="custom-control custom-checkbox mb-3">
                       <input type="checkbox"
+                             [attr.disabled]="readonly ? true : null"
                              class="custom-control-input"
                              formControlName="FreeShipping"
                              (input)="handleUpdateProduct($event, 'Product.xp.FreeShipping')"
@@ -373,6 +374,24 @@
                       <label class="custom-control-label"
                              for="FreeShipping"
                              translate>ADMIN.PRODUCT_EDIT.FREE_SHIPPING</label>
+                    </div>
+                    <div *ngIf="_superMarketplaceProductEditable?.Product?.xp?.FreeShipping"
+                         class="mb-3">
+                      <label for="FreeShippingMessage"
+                             translate>ADMIN.PRODUCT_EDIT.FREE_SHIPPING_MESSAGE
+                      </label>
+                      <input [attr.disabled]="readonly ? true : null"
+                             type="text"
+                             class="form-control"
+                             id="FreeShippingMessage"
+                             aria-describedby="Min Quantity"
+                             formControlName="FreeShippingMessage"
+                             maxlength="25"
+                             (input)="handleUpdateProduct($event, 'Product.xp.FreeShippingMessage')">
+                      <small class="d-block">
+                        <fa-icon style="color: #cccccc"
+                                 [icon]="faExclamationCircle"></fa-icon> <span translate> ADMIN.PRODUCT_EDIT.FREE_SHIPPING_MESSAGE_INFO</span>
+                      </small>
                     </div>
                     <label for="ShipFromAddressID"
                            translate>ADMIN.PRODUCT_EDIT.WHICH_LOCATION_SHIP
