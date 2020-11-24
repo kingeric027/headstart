@@ -42,11 +42,11 @@ export class ProductFilters implements OnInit{
   }
 
   async getFacets(): Promise<void> {
-    let facetsListPage = await this.ocFacetService.List({ pageSize: 100 }).toPromise();
+    const facetsListPage = await this.ocFacetService.List({ pageSize: 100 }).toPromise();
     let facets = facetsListPage.Items;
     if (facetsListPage.Meta.TotalPages > 1) {
       for (let i = 2; i <= facetsListPage.Meta.TotalPages; i++) {
-        let additionalFacets = await this.ocFacetService.List({ pageSize: 100, page: i}).toPromise();
+        const additionalFacets = await this.ocFacetService.List({ pageSize: 100, page: i}).toPromise();
         facets = facets.concat(additionalFacets.Items);
       }
     }
@@ -54,19 +54,19 @@ export class ProductFilters implements OnInit{
   }
 
   areFacetOptionsSelected(facet: ProductFacet): boolean {
-    const productXpFacetKey = facet?.XpPath.split('.')[1];
+    const productXpFacetKey = facet?.XpPath?.split('.')[1];
     return Object.keys(this.facetsOnProductEditable).includes(productXpFacetKey) && this.facetsOnProductEditable[productXpFacetKey].length;
   }
 
   isFacetOptionApplied(facet: ProductFacet, option: string): boolean {
-    const productXpFacetKey = facet?.XpPath.split('.')[1];
+    const productXpFacetKey = facet?.XpPath?.split('.')[1];
     const facetOptionsOnProduct = this.facetsOnProductEditable[productXpFacetKey];
     const isFacetOptionApplied = facetOptionsOnProduct && facetOptionsOnProduct.includes(option);
     return isFacetOptionApplied;
   }
 
   toggleFacetOption(facet: ProductFacet, option: string): void {
-    const productXpFacetKey = facet?.XpPath.split('.')[1];
+    const productXpFacetKey = facet?.XpPath?.split('.')[1];
     let facetOnXp = this.facetsOnProductEditable[productXpFacetKey];
     delete this.facetsOnProductEditable[productXpFacetKey];
     if (!facetOnXp) {
@@ -120,7 +120,7 @@ export class ProductFilters implements OnInit{
   async saveFilterOverrides(): Promise<void> {
     this.savingOverriddenFilters = true;
     (this.superProduct.xp as any).Facets = this.facetsOnProductEditable;
-        //TO-DO - replace with SDK
+        // TO-DO - replace with SDK
     const url = `${this.appConfig.middlewareUrl}/products/filteroptionoverride/${this.superProduct.ID}`;
     const product = await this.http.patch<Product>(url, this.superProduct, { headers: this.buildHeaders() }).toPromise();
     this.superProduct = product;

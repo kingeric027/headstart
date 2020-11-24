@@ -5,6 +5,7 @@ import { MarketplaceOrder, MarketplaceAddressBuyer } from '@ordercloud/headstart
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ErrorConstants } from '../../../services/error-constants';
 // TODO - Make this component "Dumb" by removing the dependence on context service 
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
 // Goal is to get all the checkout logic and state into one component. 
@@ -17,6 +18,7 @@ export class OCMCheckoutAddress implements OnInit {
   @Input() order: MarketplaceOrder;
   @Input() lineItems: ListPage<LineItem>;
   @Output() continue = new EventEmitter();
+  @Output() handleOrderError = new EventEmitter();
   _addressError: string;
 
   readonly NEW_ADDRESS_CODE = 'new';
@@ -73,7 +75,10 @@ export class OCMCheckoutAddress implements OnInit {
         this.spinner.hide();
       }
     } catch (e) {
-      if(e?.response?.data?.Message) {
+      if(e?.message === ErrorConstants.orderNotAccessibleError) {
+        this.handleOrderError.emit(e.message);
+      }
+      else if(e?.response?.data?.Message) {
         this._addressError = e?.response?.data?.Message
       } else {
         throw e;
