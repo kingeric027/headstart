@@ -36,6 +36,7 @@ export const MarketplaceRoutes: Routes = [
   {
     path: '',
     canActivate: [HasTokenGuard],
+    canActivateChild: [HasTokenGuard],
     resolve: {
       baseResolve: BaseResolve,
     },
