@@ -126,7 +126,7 @@ const SupplierOrderNavGrouping: MPRoute = {
   title: 'ADMIN.NAV.ORDERS',
   route: '/orders',
   orderCloudUserTypesWithAccess: [SUPPLIER],
-  subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders, SupplierOrderBatchUpload],
+  subRoutes: [Orders, AwaitingApprovalOrders, ShippedOrders, CancelledOrders], //TODO: Add SupplierOrderBatchUpload back in
 };
 
 // Buyers

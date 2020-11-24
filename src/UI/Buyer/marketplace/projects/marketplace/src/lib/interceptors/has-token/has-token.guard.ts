@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, CanActivateChild, Router } from '@angular/router';
 import { DOCUMENT } from '@angular/common';
 import { TokenHelperService } from '../../services/token-helper/token-helper.service';
 import { Tokens } from 'ordercloud-javascript-sdk';
@@ -9,7 +9,7 @@ import { AppConfig } from '../../shopper-context';
 @Injectable({
   providedIn: 'root',
 })
-export class HasTokenGuard implements CanActivate {
+export class HasTokenGuard implements CanActivate, CanActivateChild {
   constructor(
     private router: Router,
     private auth: AuthService,
@@ -57,6 +57,10 @@ export class HasTokenGuard implements CanActivate {
     }
     this.auth.isLoggedIn = true;
     return isAccessTokenValid;
+  }
+
+  async canActivateChild(): Promise<boolean> {
+    return this.canActivate();
   }
 
   private isImpersonating(): boolean {
