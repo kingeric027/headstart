@@ -363,14 +363,7 @@ namespace Marketplace.Common.Commands
             var existingLineItems = await existingLineItemsRequest;
             var product = await productRequest;
             var order = await orderRequest;
-            if(order.IsSubmitted)
-            {
-                throw new OrderCloudIntegrationException(new ApiError()
-                {
-                    ErrorCode = "400",
-                    Message = "Order has already been submitted"
-                });
-            }
+            Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
             var markedUpPrice = GetLineItemUnitCost(product, liReq);
             liReq.UnitPrice = markedUpPrice;
 

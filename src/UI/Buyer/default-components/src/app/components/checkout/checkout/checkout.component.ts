@@ -16,6 +16,7 @@ import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase
 import { ShopperContextService } from 'marketplace';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ModalState } from 'src/app/models/modal-state.class';
+import { ErrorConstants, getPaymentError } from '../../../services/error-constants';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -107,7 +108,7 @@ export class OCMCheckout implements OnInit {
     await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
     if (this.order.IsSubmitted) {
-      this.handleOrderError('This order has already been submitted');
+      this.handleOrderError(ErrorConstants.orderSubmittedError);
     }
     this.lineItems = this.context.order.cart.get();
     this.destoryLoadingIndicator('payment');
@@ -174,13 +175,11 @@ export class OCMCheckout implements OnInit {
   }
 
   async handleSubmitError(error: any): Promise<void> {
-    if(error?.message === 'Order has already been submitted') {
+    if(error?.message === ErrorConstants.orderSubmittedError) {
       this.isLoading = false
       this.handleOrderError(error.message);
     } else {
-      const errorReason = error?.response?.data?.Message || 'Unknown error'
-      const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
-      this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
+      this.paymentError = getPaymentError(error?.response?.data?.Message)
       this.isLoading = false;
       this.currentPanel = 'payment';
       if (this.isNewCard) {

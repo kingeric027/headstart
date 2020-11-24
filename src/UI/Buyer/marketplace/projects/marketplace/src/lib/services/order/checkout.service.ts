@@ -86,7 +86,7 @@ export class CheckoutService {
     } catch (ex) {
       if (ex?.errors?.Errors?.[0]?.ErrorCode === 'NotFound') {
         if(ex?.errors?.Errors?.[0]?.Data.ObjectType === 'Order') {
-          throw Error('You no longer have access to this order.')
+          throw Error('You no longer have access to this order')
         }
         throw Error('You no longer have access to this saved address. Please enter or select a different one.');
       }
@@ -104,7 +104,7 @@ export class CheckoutService {
     } catch (ex) {
       if (ex.errors.Errors[0].ErrorCode === 'NotFound') {
         if(ex?.errors?.Errors?.[0]?.Data.ObjectType === 'Order') {
-          throw Error('You no longer have access to this order.')
+          throw Error('You no longer have access to this order')
         }
         throw Error('You no longer have access to this buyer location. Please enter or select a different one.');
       }
