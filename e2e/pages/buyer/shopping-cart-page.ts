@@ -10,11 +10,18 @@ class ShoppingCartPage {
 		this.checkoutButton = Selector('button').withText(
 			createRegExp('checkout')
 		)
-		this.products = Selector('.card-body')
+		this.products = Selector('.position-relative')
 	}
 
 	async clickCheckoutButton() {
 		await t.click(this.checkoutButton)
+	}
+
+	async removeProduct(productName: string) {
+		const product = this.products.withText(createRegExp(productName))
+		const removeButton = product.find('button')
+		await t.expect(removeButton.exists).ok()
+		await t.click(removeButton)
 	}
 }
 
