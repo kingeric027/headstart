@@ -118,7 +118,7 @@ export class LineItemTableComponent {
       .join(', ');
   }
 
-  getReturnReason(reason: string): string {
+  getReturnOrCancelReason(reason: string): string {
     return this.regexService.getStatusSplitByCapitalLetter(reason);
   }
 
