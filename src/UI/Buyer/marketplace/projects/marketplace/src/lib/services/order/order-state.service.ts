@@ -6,7 +6,6 @@ import {
   Order,
   Orders,
   OrderPromotion,
-  OrderWorksheet,
   ShipEstimate,
   IntegrationEvents,
 } from 'ordercloud-javascript-sdk';
