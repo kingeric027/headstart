@@ -17,7 +17,7 @@ export class OCMGridSpecForm {
     _superProduct: SuperMarketplaceProduct;
     product: MarketplaceMeProduct;
     specOptions: string[];
-    lineItems: MarketplaceLineItem[] = [];
+    lineItems: any[] = [];
     lineTotals: number[] = [];
     unitPrices: number[] = [];
     totalPrice = 0;
@@ -26,6 +26,9 @@ export class OCMGridSpecForm {
     priceBreaks: PriceBreak[];
     price: number;
     percentSavings: number;
+    totalQty: number;
+    qtyValid = false;
+    errorMsg: string = '';
     constructor(
         private specFormService: SpecFormService,
         private context: ShopperContextService,
@@ -97,9 +100,22 @@ export class OCMGridSpecForm {
         const i = this.lineItems.findIndex(li => JSON.stringify(li.Specs) === JSON.stringify(item.Specs));
         if (i === -1) this.lineItems.push(item);
         else this.lineItems[i] = item;
+        let liQuantities = [];
+        this.lineItems.forEach(li => liQuantities.push(li.Quantity));
+        this.totalQty = liQuantities.reduce((acc, curr) => { return acc + curr });
+        this.qtyValid = this.validateQuantity(this.lineItems);
         this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs[0]);
         this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs[0]);
         this.totalPrice = this.getTotalPrice();
+    }
+
+    getErrorMsg(event: any) {
+        this.errorMsg = event;
+        console.log(event);
+    }
+
+    validateQuantity(lineItems: any): boolean {
+        return this.totalQty >= lineItems[0].Product.PriceSchedule.MinQty && lineItems[0].Product.PriceSchedule.MaxQuantity !== null ? this.totalQty <= lineItems[0].Product.PriceSchedule.MaxQuantity : this.totalQty !== 0;
     }
 
     getUnitPrice(qty: number, specs: GridSpecOption): number {
