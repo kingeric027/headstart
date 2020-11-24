@@ -12,6 +12,7 @@
                           (changesDiscarded)="discardChanges()"
                           (resourceDelete)="deleteResource()"
                           (resourceSelected)="selectResource($event)"
+                          [shouldShowResourceActions]="false"
                           [labelSingular]="'ADMIN.NAV.FACET'"
                           [labelPlural]="'ADMIN.NAV.FACETS'">
   <app-facet-edit class="resource-edit"
