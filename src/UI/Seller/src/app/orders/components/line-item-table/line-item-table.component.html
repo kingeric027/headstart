@@ -107,11 +107,13 @@
               </td>
               <td class="align-middle">
                 {{ getLineItemStatusDisplay(li)}}
-                <div *ngIf="li.xp.LineItemReturnInfo?.QuantityToReturn > 0">
+                <div *ngIf="li.xp.Returns?.length || li.xp.Cancelations?.length">
+                  <!-- Possible TO-DO: If a line item would have multiple returns/cancellations on it, a UI to support a better return view may be needed. -->
                   <div class="d-flex flex-column">
-                    <small>Qty Returned: {{ li.xp.LineItemReturnInfo?.QuantityToReturn }}</small>
-                    <small>Reason: {{ getReturnReason(li.xp.LineItemReturnInfo?.ReturnReason) }}</small>
-                    <small *ngIf="li.xp.LineItemReturnInfo.Comment">Comment: {{li.xp.LineItemReturnInfo.Comment}}</small>
+                    <small *ngIf="li.xp.Returns[0]?.Reason">Return Reason: {{ getReturnOrCancelReason(li.xp.Returns[0].Reason) }}</small>
+                    <small *ngIf="li.xp.Returns[0]?.Comment">Comment: {{li.xp.Returns[0].Comment}}</small>
+                    <small *ngIf="li.xp.Cancelations[0]?.Reason">Cancel Reason: {{ getReturnOrCancelReason(li.xp.Cancelations[0].Reason) }}</small>
+                    <small *ngIf="li.xp.Cancelations[0]?.Comment">Comment: {{li.xp.Cancelations[0].Comment}}</small>
                   </div>
                 </div>
                 <return-form *ngIf="li.xp.LineItemStatus === 'ReturnRequested' && isSellerUser"

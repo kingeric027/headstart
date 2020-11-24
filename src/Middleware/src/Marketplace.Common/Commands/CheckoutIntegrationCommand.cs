@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Constants;
+using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services.ShippingIntegration.Models;
@@ -57,8 +60,9 @@ namespace Marketplace.Common.Commands
         private async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderWorksheet worksheet, CheckoutIntegrationConfiguration config = null)
         {
             if (config != null && config.ExcludePOProductsFromShipping)
-                worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList(); ;
-
+            {
+                worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList();
+            }
             var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
             var shipResponse = (await _shippingService.GetRates(groupedLineItems, _profiles)).Reserialize<MarketplaceShipEstimateResponse>(); // include all accounts at this stage so we can save on order worksheet and analyze 
 
@@ -87,6 +91,7 @@ namespace Marketplace.Common.Commands
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
                 shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency);
             shipResponse.ShipEstimates = CheckForEmptyRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.NoRatesFallbackCost, _settings.EasyPostSettings.NoRatesFallbackTransitDays);
+            shipResponse.ShipEstimates = UpdateFreeShippingRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.FreeShippingTransitDays);
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
             
@@ -201,6 +206,23 @@ namespace Marketplace.Common.Commands
                             }
                         }
                     };
+                }
+            }
+            return estimates;
+        }
+
+        public static IList<MarketplaceShipEstimate> UpdateFreeShippingRates(IList<MarketplaceShipEstimate> estimates, int freeShippingTransitDays)
+        {
+            foreach (var shipEstimate in estimates)
+            {
+                if (shipEstimate.ID == ShippingConstants.FreeShipping)
+                {
+                    foreach (var method in shipEstimate.ShipMethods)
+                    {
+                        method.ID = ShippingConstants.FreeShipping;
+                        method.Cost = 0;
+                        method.EstimatedTransitDays = freeShippingTransitDays;
+                    }
                 }
             }
             return estimates;

@@ -23,6 +23,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion;
   isAnon: boolean;
+  isNewCard: boolean;
   order: MarketplaceOrder;
   orderPromotions: OrderPromotion[] = [];
   lineItems: ListPage<MarketplaceLineItem>;
@@ -72,6 +73,8 @@ export class OCMCheckout implements OnInit {
     this.reIDLineItems();
     this.orderSummaryMeta = getOrderSummaryMeta(this.order, this.orderPromotions, this.lineItems.Items, this.shipEstimates, this.currentPanel)
     this.setValidation('login', !this.isAnon);
+
+    this.isNewCard = false;
   }
 
   async reIDLineItems(): Promise<void> {
@@ -118,6 +121,7 @@ export class OCMCheckout implements OnInit {
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
+      this.isNewCard=true;
       await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal);
     }
     if (this.orderSummaryMeta.POLineItemCount) {
@@ -145,14 +149,14 @@ export class OCMCheckout implements OnInit {
         cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
       } catch (e) {
-        return this.handleSubmitError(e)
+        return await this.handleSubmitError(e)
       }
     } else {
       try {
         cleanOrderID = await this.checkout.submitWithoutCreditCard();
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
       } catch (e) {
-        return this.handleSubmitError(e)
+        return await this.handleSubmitError(e)
       }
     }
     this.isLoading = false;
@@ -160,12 +164,15 @@ export class OCMCheckout implements OnInit {
     this.context.router.toMyOrderDetails(cleanOrderID);
   }
 
-  handleSubmitError(error: any): void {
+  async handleSubmitError(error: any): Promise<void> {
     const errorReason = error?.response?.data?.Message || 'Unknown error'
     const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
     this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
     this.isLoading = false;
     this.currentPanel = 'payment';
+    if (this.isNewCard) {
+      await this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
+    }
   }
 
   getCCPaymentData(): OrderCloudIntegrationsCreditCardPayment {

@@ -32,7 +32,9 @@ export class CartService {
     this.onAdd.next(lineItem);
     if (!_isUndefined(this.order.DateCreated)) {
       const lineItems = this.state.lineItems.Items;
-      const liWithSameProduct = lineItems.find(li => li.ProductID === lineItem.ProductID);
+      const liWithSameProduct = lineItems.find(li => 
+        li.ProductID === lineItem.ProductID && li?.xp?.KitProductID === lineItem?.xp?.KitProductID
+      );
       const isPrintProduct = lineItem.xp.PrintArtworkURL;
       if (!isPrintProduct && liWithSameProduct && this.hasSameSpecs(lineItem, liWithSameProduct)) {
         // combine any line items that have the same productID/specs into one line item
@@ -112,10 +114,10 @@ export class CartService {
   }
 
   private hasSameSpecs(line1: MarketplaceLineItem, line2: MarketplaceLineItem): boolean {
-    if(!line1?.Specs?.length && !line2?.Specs?.length) {
+    if (!line1?.Specs?.length && !line2?.Specs?.length) {
       return true;
     }
-    if((!line1?.Specs?.length && line2?.Specs?.length) || (line1?.Specs?.length && !line2?.Specs?.length)) {
+    if ((!line1?.Specs?.length && line2?.Specs?.length) || (line1?.Specs?.length && !line2?.Specs?.length)) {
       return false;
     }
     const sortedSpecs1 = line1.Specs.sort(this.sortSpecs).map(s => ({ SpecID: s.SpecID, OptionID: s.OptionID }));
@@ -136,7 +138,7 @@ export class CartService {
     try {
       return await HeadStartSDK.Orders.UpsertLineItem(this.order?.ID, lineItem);
     } finally {
-      if(this.state.orderPromos?.Items?.length) {
+      if (this.state.orderPromos?.Items?.length) {
         // if there are pre-existing promos need to recalculate order
         await this.checkout.calculateOrder();
       }

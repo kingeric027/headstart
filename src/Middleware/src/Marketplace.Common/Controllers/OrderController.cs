@@ -65,7 +65,7 @@ namespace Marketplace.Common.Controllers
         [HttpDelete, Route("{orderID}/lineitems/{lineItemID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task DeleteLineItem(string orderID, string lineItemID)
         {
-            await _lineItemCommand.DeleteLineItem(orderID, lineItemID);
+            await _lineItemCommand.DeleteLineItem(orderID, lineItemID, VerifiedUserContext);
         }
 
         [DocName("Apply a promotion to an order")]
