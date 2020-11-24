@@ -54,7 +54,8 @@ export class FacetEditComponent implements OnInit {
     async saveResource(): Promise<void> {
         // dataIsSaving indicator is used in the resource table to conditionally tell the
         // submit button to disable
-        this._facetEditable.ID = this._facetEditable?.ID?.split(' ').join('-').trim().replace(/[^a-zA-Z0-9 ]/g, '')
+        this._facetEditable.ID = this._facetEditable?.ID?.split(' ').join('_').trim().replace(/[^a-zA-Z0-9-_ ]/g, '')
+        this._facetEditable.XpPath = `Facets.${this._facetEditable?.ID}`;
         try {
           this.dataIsSaving = true;
           const newResource = await ProductFacets.Save(this._facetEditable.ID, this._facetEditable);
