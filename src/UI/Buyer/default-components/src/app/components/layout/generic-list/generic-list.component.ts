@@ -1,11 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { Meta } from 'ordercloud-javascript-sdk';
 
 @Component({
   templateUrl: './generic-list.component.html',
   styleUrls: ['./generic-list.component.scss'],
 })
-export class OCMGenericList {
+export class OCMGenericList implements OnChanges {
   /**
    *  Nearly every endpoint in the OrderCloud API can be passed a common set of options.
    *  This includes things like search, filter, orderBy, & page. The idea behind this Component
@@ -25,5 +25,11 @@ export class OCMGenericList {
     search?: string;
   }>();
 
-  constructor() {}
+  _searchPlaceholder: string;
+
+  constructor() { }
+
+  ngOnChanges(): void {
+    this._searchPlaceholder = this.searchPlaceholder;
+  }
 }
