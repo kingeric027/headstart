@@ -102,6 +102,10 @@ export const ocAppConfig: AppConfig = {
     'SupplierReader',
     'SupplierAddressReader',
   ] as ApiRole[],
+  impersonatingBuyerCustomRoleScope: [
+    'MPLocationOrderApprover',
+    'MPLocationViewAllOrders'
+  ]
 };
 
 export const applicationConfiguration = new InjectionToken<AppConfig>('app.config', {
@@ -156,4 +160,5 @@ export interface AppConfig {
 
   scope: ApiRole[];
   impersonatingBuyerScope: ApiRole[];
+  impersonatingBuyerCustomRoleScope: string[];
 }
