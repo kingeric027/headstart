@@ -1,6 +1,6 @@
 <div>
   <ocm-search class="mt-1"
-              placeholderText="{{ searchPlaceholder }}"
+              placeholderText="{{ _searchPlaceholder }}"
               (searched)="requestOptionsUpdated.emit({ search: $event.detail || undefined, page: undefined })">
   </ocm-search>
   <div *ngIf="meta?.TotalPages > 1"
@@ -17,7 +17,7 @@
     </div>
     <div class="card bg-light p-3 mx-4 w-100 text-center"
          *ngIf="meta && meta.TotalCount === 0">
-      <p class="mb-0"><span translate>LAYOUT.GENERIC_LIST.NO</span> {{ searchPlaceholder }} <span translate>LAYOUT.GENERIC_LIST.FOUND</span></p>
+      <p class="mb-0"><span translate>LAYOUT.GENERIC_LIST.NO</span> {{ _searchPlaceholder }} <span translate>LAYOUT.GENERIC_LIST.FOUND</span></p>
     </div>
   </div>
   <ngb-pagination *ngIf="meta?.TotalPages > 1"

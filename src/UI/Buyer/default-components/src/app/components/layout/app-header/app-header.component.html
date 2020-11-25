@@ -36,6 +36,7 @@
         </li>
         <li class="nav-item clickable cursor-pointer">
           <a class="nav-link"
+             id="suppliers-link"
              [ngClass]="{ active: activePath === '/suppliers' }"
              (click)="isCollapsed = !isCollapsed; context.router.toSupplierList()"
              translate>ALIAS.SUPPLIERS</a>
