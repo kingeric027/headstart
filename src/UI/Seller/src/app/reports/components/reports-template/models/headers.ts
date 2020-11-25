@@ -78,7 +78,7 @@ export const purchaseOrderDetail = [
 
 export const lineItemDetail = [
   { value: 'Order ID', path: 'MarketplaceOrder.ID' },
-  { value: 'Supplier ID', path: 'MarketplaceOrder.ToCompanyID' },
+  { value: 'Supplier ID', path: 'MarketplaceLineItem.SupplierID' },
   { value: 'Order Date', path: 'MarketplaceOrder.DateSubmitted' },
   { value: 'Total', path: 'MarketplaceOrder.Total' },
   { value: 'Tax', path: 'MarketplaceOrder.TaxCost' },
