@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MarketplaceLineItem, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
+import { PriceSchedule, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk';
 import { MarketplaceMeProduct, ShopperContextService } from 'marketplace';
-import { PriceBreak, PriceSchedule, Spec } from 'ordercloud-javascript-sdk';
+import { PriceBreak, Spec } from 'ordercloud-javascript-sdk';
 import { ProductDetailService } from '../product-details/product-detail.service';
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component';
 import { GridSpecOption, SpecFormService } from '../spec-form/spec-form.service';
@@ -22,13 +22,13 @@ export class OCMGridSpecForm {
     unitPrices: number[] = [];
     totalPrice = 0;
     isAddingToCart = false;
-    priceSchedule: PriceSchedule<any>;
+    priceSchedule: PriceSchedule;
     priceBreaks: PriceBreak[];
     price: number;
     percentSavings: number;
     totalQty: number;
     qtyValid = false;
-    errorMsg: string = '';
+    errorMsg = '';
     constructor(
         private specFormService: SpecFormService,
         private context: ShopperContextService,
