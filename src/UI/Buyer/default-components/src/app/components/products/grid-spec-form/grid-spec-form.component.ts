@@ -22,7 +22,7 @@ export class OCMGridSpecForm {
     unitPrices: number[] = [];
     totalPrice = 0;
     isAddingToCart = false;
-    priceSchedule: PriceSchedule;
+    priceSchedule: PriceSchedule<any>;
     priceBreaks: PriceBreak[];
     price: number;
     percentSavings: number;
