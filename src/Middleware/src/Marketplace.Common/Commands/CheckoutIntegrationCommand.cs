@@ -198,20 +198,22 @@ namespace Marketplace.Common.Commands
                 // at some point in the future this will be handled generically for any supplier
                 return estimate;
             }
-            estimate.ShipMethods = estimate.ShipMethods.Select(method => ApplyFlatRateShippingOnShipmethod(method, orderWorksheet, supplierID)).ToList();
+            var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplierID);
+            var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
+            var qualifiesForFlatRateShipping = supplierSubTotal > .01M && estimate.ShipMethods.Any(method => method.Name.Contains("GROUND"));
+            if(qualifiesForFlatRateShipping)
+            {
+                estimate.ShipMethods = estimate.ShipMethods
+                                        .Where(method => method.Name.Contains("GROUND")) // flat rate shipping only applies to ground shipping methods
+                                        .Select(method => ApplyFlatRateShippingOnShipmethod(method, supplierSubTotal))
+                                        .ToList();
+            }
 
             return estimate;
         }
 
-        public static MarketplaceShipMethod ApplyFlatRateShippingOnShipmethod(MarketplaceShipMethod method, MarketplaceOrderWorksheet orderWorksheet, string supplierID)
+        public static MarketplaceShipMethod ApplyFlatRateShippingOnShipmethod(MarketplaceShipMethod method, decimal supplierSubTotal)
         {
-            if (!method.Name.Contains("GROUND"))
-            {
-                // flat rate shipping will only apply to ground shipping methods
-                return method;
-            }
-            var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplierID);
-            var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
             if (supplierSubTotal > .01M && supplierSubTotal <= 499.99M)
             {
                 method.Cost = 29.99M;
