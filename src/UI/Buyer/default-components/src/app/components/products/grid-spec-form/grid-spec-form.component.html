@@ -11,31 +11,24 @@
     <tr *ngFor="let spec of specOptions; let i = index">
       <td>
         <ocm-quantity-input [existingQty]="null"
-                            [gridTotalQty]="totalQty"
                             [gridDisplay]="true"
-                            [product]="product"
+                            [product]="_product"
                             [priceSchedule]="priceSchedule"
-                            (gridErrorMsg)="getErrorMsg($event.detail)"
                             (qtyChange)="changeQuantity(specOptions[i], $event.detail)"></ocm-quantity-input>
       </td>
       <td><label for="{{ spec }}">{{spec}}</label></td>
-      <td>{{unitPrices[i] | currency}}</td>
+      <td *ngFor="let priceBreak of priceSchedule?.PriceBreaks">{{priceBreak.Price | currency}}</td>
       <td>{{lineTotals[i] | currency}}</td>
     </tr>
-    <tr><small *ngIf="errorMsg !== ''"
-      class="alert alert-danger error-message c-error-message text-center">
- {{ errorMsg }}
- <br />
-</small></tr>
   </tbody>
 </table>
 <div class="d-flex justify-content-between align-items-center">
-  <h4 class="font-weight-bold">{{ totalPrice  | currency: product?.xp?.Currency}}</h4>
-  <p class="text-muted ml-3 float-right">{{ product | UofM }}</p>
+  <h4 class="font-weight-bold">{{ totalPrice  | currency: _product?.xp?.Currency}}</h4>
+  <p class="text-muted ml-3 float-right">{{ _product | UofM }}</p>
 </div>
 <button class="btn btn-block btn-primary mb-3"
         type="submit"
-        [disabled]="isAddingToCart || !qtyValid"
+        [disabled]="isAddingToCart"
         (click)="addToCart()"
         translate>
   PRODUCTS.DETAILS.ADD_TO_CART
