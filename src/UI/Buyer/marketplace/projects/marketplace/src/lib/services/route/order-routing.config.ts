@@ -1,5 +1,5 @@
-import { RouteConfig } from './route-config';
-import { OrderViewContext } from '../../shopper-context';
+import { RouteConfig } from './route-config'
+import { OrderViewContext } from '../../shopper-context'
 
 export const OrderRoutes: RouteConfig[] = [
   {
@@ -25,4 +25,4 @@ export const OrderRoutes: RouteConfig[] = [
     showInDropdown: true,
     context: OrderViewContext.Approve,
   },
-];
+]

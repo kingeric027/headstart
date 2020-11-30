@@ -1,8 +1,11 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { faExclamationCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { ToastrService } from 'ngx-toastr';
-import { MeUser } from '@ordercloud/angular-sdk';
-import { FormGroup } from '@angular/forms';
+import { Component, Output, EventEmitter, Input } from '@angular/core'
+import {
+  faExclamationCircle,
+  faTimesCircle,
+} from '@fortawesome/free-solid-svg-icons'
+import { ToastrService } from 'ngx-toastr'
+import { MeUser } from '@ordercloud/angular-sdk'
+import { FormGroup } from '@angular/forms'
 
 @Component({
   selector: 'seller-email-notifications',
@@ -11,30 +14,33 @@ import { FormGroup } from '@angular/forms';
 })
 export class SellerEmailNotifications {
   constructor(private toastrService: ToastrService) {}
-  faExclamationCircle = faExclamationCircle;
-  faTimesCircle = faTimesCircle;
+  faExclamationCircle = faExclamationCircle
+  faTimesCircle = faTimesCircle
   // Inputs
   @Input()
-  user: MeUser;
+  user: MeUser
   @Input()
-  sellerUserForm: FormGroup;
+  sellerUserForm: FormGroup
   // Event Outputs
   @Output()
-  toggleReceiveOrderEmails = new EventEmitter<boolean>();
+  toggleReceiveOrderEmails = new EventEmitter<boolean>()
   @Output()
-  toggleReceiveProductEmails = new EventEmitter<boolean>();
+  toggleReceiveProductEmails = new EventEmitter<boolean>()
   @Output()
-  toggleReceiveRequestInfoEmails = new EventEmitter<boolean>();
+  toggleReceiveRequestInfoEmails = new EventEmitter<boolean>()
   @Output()
-  addRcpt = new EventEmitter<void>();
+  addRcpt = new EventEmitter<void>()
   @Output()
-  removeRcpt = new EventEmitter<number>();
+  removeRcpt = new EventEmitter<number>()
   // Ouput Functions
-  toggleOrderEmails = (event: any): void => this.toggleReceiveOrderEmails.emit(event.target.checked);
-  toggleRequestInfoEmails = (event: any): void => this.toggleReceiveRequestInfoEmails.emit(event.target.checked);
-  
-  toggleProductEmails =(event: any): void => this.toggleReceiveProductEmails.emit(event.target.checked);
-  
-  removeAddtlRcpt = (index: number): void => this.removeRcpt.emit(index);
-  addAddtlRcpt = () => this.addRcpt.emit();
+  toggleOrderEmails = (event: any): void =>
+    this.toggleReceiveOrderEmails.emit(event.target.checked)
+  toggleRequestInfoEmails = (event: any): void =>
+    this.toggleReceiveRequestInfoEmails.emit(event.target.checked)
+
+  toggleProductEmails = (event: any): void =>
+    this.toggleReceiveProductEmails.emit(event.target.checked)
+
+  removeAddtlRcpt = (index: number): void => this.removeRcpt.emit(index)
+  addAddtlRcpt = () => this.addRcpt.emit()
 }

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { AppStateService } from '@app-seller/shared';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core'
+import { AppStateService } from '@app-seller/shared'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-root',
@@ -8,9 +8,9 @@ import { Observable } from 'rxjs';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  isLoggedIn$: Observable<boolean>;
+  isLoggedIn$: Observable<boolean>
 
   constructor(private appStateService: AppStateService) {
-    this.isLoggedIn$ = this.appStateService.isLoggedIn;
+    this.isLoggedIn$ = this.appStateService.isLoggedIn
   }
 }

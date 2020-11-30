@@ -1,12 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core'
 
 @Component({
-    templateUrl: './confirm-modal.component.html',
-    styleUrls: ['./confirm-modal.component.scss'],
+  templateUrl: './confirm-modal.component.html',
+  styleUrls: ['./confirm-modal.component.scss'],
 })
 export class ConfirmModal {
-    @Input()
-    modalTitle: string;
-    @Input()
-    description: string;
+  @Input()
+  modalTitle: string
+  @Input()
+  description: string
 }

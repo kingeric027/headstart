@@ -1,18 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { BuyerLocationWithCert } from '../shopper-context';
+import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
+import { BuyerLocationWithCert } from '../shopper-context'
 
 @Component({
-  template: `
-    <ocm-location-list [locations]="locations"></ocm-location-list>
-  `,
+  template: ` <ocm-location-list [locations]="locations"></ocm-location-list> `,
 })
 export class LocationListWrapperComponent implements OnInit {
-  locations: BuyerLocationWithCert[];
+  locations: BuyerLocationWithCert[]
 
   constructor(private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.locations = this.activatedRoute.snapshot.data.locations;
+    this.locations = this.activatedRoute.snapshot.data.locations
   }
 }

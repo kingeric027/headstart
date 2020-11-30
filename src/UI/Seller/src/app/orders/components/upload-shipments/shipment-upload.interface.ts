@@ -1,26 +1,26 @@
-import { Shipment } from '@ordercloud/angular-sdk';
+import { Shipment } from '@ordercloud/angular-sdk'
 
 export interface BatchProcessResult {
-  ProcessFailureList: BatchProcessFailure[];
-  InvalidRowFailureList: DocumentRowError[];
-  SuccessfulList: Shipment[];
-  Meta: BatchProcessSummary;
+  ProcessFailureList: BatchProcessFailure[]
+  InvalidRowFailureList: DocumentRowError[]
+  SuccessfulList: Shipment[]
+  Meta: BatchProcessSummary
 }
 
 export interface BatchProcessFailure {
-  Shipment: Shipment;
-  Error: string;
+  Shipment: Shipment
+  Error: string
 }
 
 export interface DocumentRowError {
-  Row: number;
-  ErrorMessage: String;
-  Column: number;
+  Row: number
+  ErrorMessage: string
+  Column: number
 }
 
 export interface BatchProcessSummary {
-  TotalCount: number;
-  SuccessfulCount: number;
-  ProcessFailureListCount: number;
-  DocumentFailureListCount: number;
+  TotalCount: number
+  SuccessfulCount: number
+  ProcessFailureListCount: number
+  DocumentFailureListCount: number
 }
