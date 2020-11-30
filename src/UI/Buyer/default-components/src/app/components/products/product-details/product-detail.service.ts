@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk';
 import { minBy as _minBy } from 'lodash';
-import { GridSpecOption, SpecFormService } from '../spec-form/spec-form.service';
+import { SpecFormService } from '../spec-form/spec-form.service';
 import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface';
 
 @Injectable({
@@ -29,18 +29,6 @@ export class ProductDetailService {
             ? this.specFormService.getSpecMarkup(specs, selectedBreak, quantity || startingBreak.Quantity, specForm)
             : selectedBreak.Price * (quantity || startingBreak.Quantity);
     }
-
-    getGridLineItemPrice(priceBreaks: PriceBreak[], specs: GridSpecOption, quantity: number): number {
-        if (!priceBreaks?.length) return;
-        const startingBreak = _minBy(priceBreaks, 'Quantity');
-        const selectedBreak = priceBreaks.reduce((current, candidate) => {
-            return candidate.Quantity > current.Quantity && candidate.Quantity <= quantity ? candidate : current;
-        }, startingBreak);
-
-        // Take into account markups if they are applied which can increase price
-        return specs.Markup ? (selectedBreak.Price + specs.Markup) * quantity : selectedBreak.Price * quantity;
-    }
-
 
     getPercentSavings(actualPrice: number, basePrice: number): number {
         if (actualPrice === null || actualPrice === undefined) {
