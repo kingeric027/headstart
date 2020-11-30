@@ -22,11 +22,9 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() variantID: string;
 
   @Input() existingQty: number;
-  @Input() gridTotalQty?: number;
   @Input() gridDisplay?= false;
   @Input() isQtyChanging;
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>();
-  @Output() gridErrorMsg = new EventEmitter<string>();
   // TODO - replace with real product info
   form: FormGroup;
   isQtyRestricted = false;
@@ -38,6 +36,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   disabled = false;
 
   constructor(private router: Router, private context: ShopperContextService) { }
+
 
   ngOnInit(): void {
     const routeUrl = this.router.routerState.snapshot.url;
@@ -80,7 +79,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
       this.errorMsg = 'Out of stock.';
       this.disabled = true;
     }
-    if (this.form.controls.quantity.value !== this.getDefaultQty() && !this.gridDisplay) {
+    if (this.form.controls.quantity.value !== this.getDefaultQty()) {
       this.form.setValue({ quantity: this.getDefaultQty() });
     }
     this.quantityChangeListener();
@@ -121,27 +120,24 @@ export class OCMQuantityInput implements OnInit, OnChanges {
         qty = qty + productInCart.Quantity;
       }
     }
-    if (!this.gridDisplay && isNaN(qty) || this.gridDisplay && isNaN(this.gridTotalQty)) {
+    if (isNaN(qty)) {
       this.errorMsg = 'Please Enter a Quantity';
-      if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg);
       return false;
     }
-    if ((!this.gridDisplay && qty < this.min || qty > this.max) || (this.gridDisplay && this.gridTotalQty < this.min || this.gridTotalQty > this.max)) {
+    if (qty < this.min || qty > this.max) {
       this.errorMsg = `Please order a quantity between ${this.min}-${this.max}.`;
-      if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg);
       return false;
     }
-    if (!this.gridDisplay && qty > this.inventory || this.gridDisplay && this.gridTotalQty > this.inventory) {
+    if (qty > this.inventory) {
       this.errorMsg = `Only ${this.inventory} available in inventory.`;
-      if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg);
       return false;
     }
     this.errorMsg = '';
-    if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg);
     return true;
   }
 
   getDefaultQty(): number {
+    if (this.gridDisplay) return 0;
     if (this.existingQty) return this.existingQty;
     if (this.priceSchedule.RestrictedQuantity) return this.priceSchedule.PriceBreaks[0].Quantity;
     return this.priceSchedule.MinQuantity;
