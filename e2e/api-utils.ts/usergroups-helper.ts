@@ -15,3 +15,11 @@ export async function saveUserAssignment(
 		accessToken: authToken,
 	})
 }
+
+export function getLocationID(country?: string) {
+	switch (country) {
+		case 'CA':
+			return '0005-0003' //Mississauga, ON (Canada)
+	}
+	return '0005-0002' //Denver, CO (United States)
+}

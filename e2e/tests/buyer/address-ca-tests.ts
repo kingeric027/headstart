@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { ClientFunction } from 'testcafe'
 import testConfig from '../../testConfig'
 import {
 	adminClientSetup,
@@ -7,24 +6,16 @@ import {
 	baseTestCleanup,
 } from '../../helpers/test-setup'
 import buyerHeaderPage from '../../pages/buyer/buyer-header-page'
-import productListPage from '../../pages/buyer/product-list-page'
-import productDetailPage from '../../pages/buyer/product-detail-page'
-import shoppingCartPage from '../../pages/buyer/shopping-cart-page'
-import checkoutPage from '../../pages/buyer/checkout-page'
-import loadingHelper from '../../helpers/loading-helper'
-import orderDetailPage from '../../pages/buyer/order-detail-page'
-import requestQuoteForm from '../../pages/buyer/request-quote-form'
 import addressBookPage from '../../pages/buyer/address-book-page'
-import { address } from 'faker'
 import addressBookForm from '../../pages/buyer/address-book-form'
 
-fixture`Address Tests`
+fixture`Address Tests (CA)`
 	.meta('TestRun', '1')
 	.before(async ctx => {
 		ctx.adminClientAuth = await adminClientSetup()
 	})
 	.beforeEach(async t => {
-		t.ctx.testUser = await buyerTestSetup(t.fixtureCtx.adminClientAuth)
+		t.ctx.testUser = await buyerTestSetup(t.fixtureCtx.adminClientAuth, 'CA')
 	})
 	.afterEach(async t => {
 		await baseTestCleanup(
@@ -35,12 +26,20 @@ fixture`Address Tests`
 	})
 	.page(testConfig.buyerAppUrl)
 
-test('Can I add a valid address? | 87548', async t => {
+test('Can I add a Canadian address? | 88551', async t => {
     await buyerHeaderPage.clickAccountButton()
     await buyerHeaderPage.clickMyAddressesLink()
     await addressBookPage.clickAddAddressButton()
     await addressBookForm.enterFirstName('Jane')
-	// await await t.expect(await addressBookPage.clickAddAddressButton()).ok()
+    await addressBookForm.enterLastName('Doe')
+    await addressBookForm.enterStreet1('1150 Lorne Park Rd')
+    await addressBookForm.enterCity('Mississauga')
+    await addressBookForm.enterState('ON')
+    await addressBookForm.enterZip('L5H 3A7')
+    await addressBookForm.enterPhone('2265554545')
+    await addressBookForm.clickSaveAddressButton()
+	await t.expect(await addressBookPage.addressExists('1150 Lorne Park Rd')).ok()
+	await t.expect(await addressBookPage.addressExists('Mississauga, ON L5H 3A7')).ok()
 })
 
 // test('Can I checkout with 1 item? | 2473', async t => {

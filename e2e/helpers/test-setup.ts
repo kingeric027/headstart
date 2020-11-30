@@ -108,9 +108,9 @@ export async function baseTestCleanup(
 	await deleteUser(userID, buyerID, authToken)
 }
 
-export async function buyerTestSetup(authToken: string) {
+export async function buyerTestSetup(authToken: string, country?: string) {
 	await t.maximizeWindow()
-	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
+	const user: OrderCloudSDK.User = await createUser(authToken, '0005', country)
 
 	await authBuyerBrowser(user)
 
