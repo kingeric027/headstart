@@ -1,13 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
-import { FieldConfig } from '../field-config.interface';
-import { Field } from '../field.interface';
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormArray, AbstractControl } from '@angular/forms'
+import { FieldConfig } from '../field-config.interface'
+import { Field } from '../field.interface'
 
 @Component({
   selector: 'spec-form-select',
   template: `
     <div class="container px-0">
-      <div class="form-group justify-content-center" [formGroup]="group" [class.row]="compact">
+      <div
+        class="form-group justify-content-center"
+        [formGroup]="group"
+        [class.row]="compact"
+      >
         <label
           class="text-uppercase font-weight-bolder small text-muted mb-0 d-flex align-items-center"
           [class.col-3]="compact"
@@ -22,9 +26,14 @@ import { Field } from '../field.interface';
           value="{{ config.value }}"
         >
           <option *ngIf="!config.value" value=""></option>
-          <option *ngFor="let option of config.options" value="{{ option.Value }}">
+          <option
+            *ngFor="let option of config.options"
+            value="{{ option.Value }}"
+          >
             {{ option.Value }}
-            <span *ngIf="option.PriceMarkup"> (+ {{ option.PriceMarkup | currency: config.currency }})</span>
+            <span *ngIf="option.PriceMarkup">
+              (+ {{ option.PriceMarkup | currency: config.currency }})</span
+            >
           </option>
         </select>
       </div>
@@ -33,19 +42,19 @@ import { Field } from '../field.interface';
   styleUrls: ['./spec-form-select.component.scss'],
 })
 export class SpecFormSelectComponent implements Field, OnInit {
-  config: FieldConfig;
-  group: FormGroup;
-  index: number;
-  compact?: boolean;
-  ctrls: FormArray;
+  config: FieldConfig
+  group: FormGroup
+  index: number
+  compact?: boolean
+  ctrls: FormArray
 
   constructor() {}
 
   ngOnInit(): void {
-    this.ctrls = this.group.get('ctrls') as FormArray;
+    this.ctrls = this.group.get('ctrls') as FormArray
   }
 
   byIndex(index: number): AbstractControl {
-    return this.ctrls.at(index);
+    return this.ctrls.at(index)
   }
 }

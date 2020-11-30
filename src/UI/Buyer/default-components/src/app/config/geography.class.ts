@@ -1,12 +1,12 @@
 export interface CountryDefinition {
-  label: string;
-  abbreviation: string;
+  label: string
+  abbreviation: string
 }
 
 export interface StateDefinition {
-  label: string;
-  abbreviation: string;
-  country: string;
+  label: string
+  abbreviation: string
+  country: string
 }
 
 // @dynamic
@@ -99,13 +99,16 @@ export class GeographyConfig {
     { label: 'Quebec', abbreviation: 'QC', country: 'CA' },
     { label: 'Saskatchewan', abbreviation: 'SK', country: 'CA' },
     { label: 'Yukon', abbreviation: 'YT', country: 'CA' },
-  ];
+  ]
 
   static getStates(countryCode: string): StateDefinition[] {
-    return this.states.filter(state => state.country === countryCode);
+    return this.states.filter((state) => state.country === countryCode)
   }
 
   static getCountries(): CountryDefinition[] {
-    return [{ label: 'United States of America', abbreviation: 'US' }, { label: 'Canada', abbreviation: 'CA' }];
+    return [
+      { label: 'United States of America', abbreviation: 'US' },
+      { label: 'Canada', abbreviation: 'CA' },
+    ]
   }
 }

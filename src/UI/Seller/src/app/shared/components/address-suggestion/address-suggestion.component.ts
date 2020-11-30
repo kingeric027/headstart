@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { ListPage, BuyerAddress, Address } from '@ordercloud/angular-sdk';
-import { ResourceCrudComponent } from '../resource-crud/resource-crud.component';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core'
+import { ListPage, BuyerAddress, Address } from '@ordercloud/angular-sdk'
+import { ResourceCrudComponent } from '../resource-crud/resource-crud.component'
 
 @Component({
   selector: 'address-suggestion',
@@ -9,14 +9,14 @@ import { ResourceCrudComponent } from '../resource-crud/resource-crud.component'
 })
 export class AddressSuggestionComponent {
   @Input()
-  suggestedAddresses: ListPage<BuyerAddress>;
+  suggestedAddresses: ListPage<BuyerAddress>
   @Output()
-  selectedAddress = new EventEmitter<BuyerAddress>();
-  activeAddress: BuyerAddress;
+  selectedAddress = new EventEmitter<BuyerAddress>()
+  activeAddress: BuyerAddress
   constructor() {}
 
   setActiveAddress(address) {
-    this.activeAddress = address;
-    this.selectedAddress.emit(address);
+    this.activeAddress = address
+    this.selectedAddress.emit(address)
   }
 }

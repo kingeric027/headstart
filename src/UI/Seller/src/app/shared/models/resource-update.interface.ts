@@ -1,4 +1,4 @@
 export interface ResourceUpdate {
-  field: string;
-  value: any;
+  field: string
+  value: any
 }

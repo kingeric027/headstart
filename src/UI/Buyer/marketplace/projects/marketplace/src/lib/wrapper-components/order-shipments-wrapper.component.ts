@@ -1,12 +1,10 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ShopperContextService } from '../services/shopper-context/shopper-context.service';
-import { OrderHistoryService } from '../services/order-history/order-history.service';
+import { Component } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
+import { ShopperContextService } from '../services/shopper-context/shopper-context.service'
+import { OrderHistoryService } from '../services/order-history/order-history.service'
 
 @Component({
-  template: `
-    <ocm-order-shipments></ocm-order-shipments>
-  `,
+  template: ` <ocm-order-shipments></ocm-order-shipments> `,
 })
 export class OrderShipmentsWrapperComponent {
   constructor(
@@ -14,6 +12,6 @@ export class OrderShipmentsWrapperComponent {
     private activatedRoute: ActivatedRoute,
     private orderHistory: OrderHistoryService
   ) {
-    this.orderHistory.activeOrderID = this.activatedRoute.snapshot.params.orderID;
+    this.orderHistory.activeOrderID = this.activatedRoute.snapshot.params.orderID
   }
 }

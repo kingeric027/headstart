@@ -1,14 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core'
 
 @Component({
   templateUrl: './static-page.component.html',
-  styleUrls: ['./static-page.component.scss']
+  styleUrls: ['./static-page.component.scss'],
 })
 export class OCMStaticPage implements OnInit {
-  @Input() page: any; // TODO: add PageDocument type to cms library so this is strongly typed
+  @Input() page: any // TODO: add PageDocument type to cms library so this is strongly typed
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(): void { }
-
+  ngOnInit(): void {}
 }

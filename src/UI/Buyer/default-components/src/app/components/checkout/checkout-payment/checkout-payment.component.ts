@@ -1,118 +1,138 @@
-import { Component, Output, EventEmitter, OnInit, Input, OnChanges } from '@angular/core';
-import { BuyerCreditCard, ListPage, OrderPromotion } from 'ordercloud-javascript-sdk';
-import { MarketplaceBuyerCreditCard, ShopperContextService } from 'marketplace';
-import { OrderCloudIntegrationsCreditCardToken, MarketplaceOrder } from '@ordercloud/headstart-sdk';
-import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
-import { FormGroup, FormControl } from '@angular/forms';
-import { groupBy as _groupBy } from 'lodash';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-import { ToastrService } from 'ngx-toastr';
-import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service';
-import { uniqBy as _uniqBy } from 'lodash';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  OnInit,
+  Input,
+  OnChanges,
+} from '@angular/core'
+import {
+  BuyerCreditCard,
+  ListPage,
+  OrderPromotion,
+} from 'ordercloud-javascript-sdk'
+import { MarketplaceBuyerCreditCard, ShopperContextService } from 'marketplace'
+import {
+  OrderCloudIntegrationsCreditCardToken,
+  MarketplaceOrder,
+} from '@ordercloud/headstart-sdk'
+import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper'
+import { FormGroup, FormControl } from '@angular/forms'
+import { groupBy as _groupBy } from 'lodash'
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { ToastrService } from 'ngx-toastr'
+import { CheckoutService } from 'marketplace/projects/marketplace/src/lib/services/order/checkout.service'
+import { uniqBy as _uniqBy } from 'lodash'
 
 interface IGroupedOrderPromo {
-  [id: string]: IOrderPromotionDisplay;
+  [id: string]: IOrderPromotionDisplay
 }
 interface IOrderPromotionDisplay {
-  OrderPromotions: OrderPromotion[];
-  DiscountTotal: number;
+  OrderPromotions: OrderPromotion[]
+  DiscountTotal: number
 }
 @Component({
   templateUrl: './checkout-payment.component.html',
   styleUrls: ['./checkout-payment.component.scss'],
 })
 export class OCMCheckoutPayment implements OnInit, OnChanges {
-  @Input() cards: ListPage<BuyerCreditCard>;
-  @Input() isAnon: boolean;
-  @Input() order: MarketplaceOrder;
-  @Input() paymentError: string; 
-  @Input() orderSummaryMeta: OrderSummaryMeta;
-  @Output() cardSelected = new EventEmitter<SelectedCreditCard>();
-  @Output() continue = new EventEmitter<void>();
-  @Output() promosChanged = new EventEmitter<OrderPromotion[]>();
-  checkout: CheckoutService = this.context.order.checkout;
-  _orderCurrency: string;
-  _orderPromos: OrderPromotion[];
-  _uniqueOrderPromos: OrderPromotion[];
-  _groupedOrderPromos: IGroupedOrderPromo;
-  promoForm: FormGroup;
-  promoCode = '';
-  faCheckCircle = faCheckCircle;
-  POTermsAccepted: boolean;
+  @Input() cards: ListPage<BuyerCreditCard>
+  @Input() isAnon: boolean
+  @Input() order: MarketplaceOrder
+  @Input() paymentError: string
+  @Input() orderSummaryMeta: OrderSummaryMeta
+  @Output() cardSelected = new EventEmitter<SelectedCreditCard>()
+  @Output() continue = new EventEmitter<void>()
+  @Output() promosChanged = new EventEmitter<OrderPromotion[]>()
+  checkout: CheckoutService = this.context.order.checkout
+  _orderCurrency: string
+  _orderPromos: OrderPromotion[]
+  _uniqueOrderPromos: OrderPromotion[]
+  _groupedOrderPromos: IGroupedOrderPromo
+  promoForm: FormGroup
+  promoCode = ''
+  faCheckCircle = faCheckCircle
+  POTermsAccepted: boolean
 
-  constructor(private context: ShopperContextService, private toastrService: ToastrService) {}
+  constructor(
+    private context: ShopperContextService,
+    private toastrService: ToastrService
+  ) {}
 
   ngOnInit(): void {
-    this._orderCurrency = this.context.currentUser.get().Currency;
-    this.setOrderPromos();
-    
-    this.createPromoForm(this.promoCode);
+    this._orderCurrency = this.context.currentUser.get().Currency
+    this.setOrderPromos()
+
+    this.createPromoForm(this.promoCode)
   }
 
   ngOnChanges(): void {
-    if (this.orderSummaryMeta) this.POTermsAccepted = this.orderSummaryMeta?.POLineItemCount ? false : true;
+    if (this.orderSummaryMeta)
+      this.POTermsAccepted = this.orderSummaryMeta?.POLineItemCount
+        ? false
+        : true
   }
 
   createPromoForm(promoCode: string): void {
     this.promoForm = new FormGroup({
       PromoCode: new FormControl(promoCode),
-    });
+    })
   }
 
   updatePromoCodeValue(event: any): void {
-    this.promoCode = event.target.value;
+    this.promoCode = event.target.value
   }
 
   async applyPromo(): Promise<void> {
     try {
-      await this.context.order.promos.applyPromo(this.promoCode);
+      await this.context.order.promos.applyPromo(this.promoCode)
       this.setOrderPromos()
-      await this.checkout.calculateOrder();
-      this.promoCode = '';
+      await this.checkout.calculateOrder()
+      this.promoCode = ''
     } catch (ex) {
-      this.toastrService.error('Invalid or inelligible promotion.');
+      this.toastrService.error('Invalid or inelligible promotion.')
     } finally {
-      this.promosChanged.emit(this._orderPromos);
+      this.promosChanged.emit(this._orderPromos)
     }
   }
 
   async removePromo(promoCode: string): Promise<void> {
     try {
-      await this.context.order.promos.removePromo(promoCode);
-      this.setOrderPromos();
-      await this.checkout.calculateOrder();
+      await this.context.order.promos.removePromo(promoCode)
+      this.setOrderPromos()
+      await this.checkout.calculateOrder()
     } finally {
-      this.promosChanged.emit(this._orderPromos);
+      this.promosChanged.emit(this._orderPromos)
     }
   }
 
   getPromoDiscountTotal(promoID: string): number {
     return this._orderPromos
-      .filter(promo => promo.ID === promoID)
-      .reduce((accumulator, promo) => promo.Amount + accumulator, 0);
+      .filter((promo) => promo.ID === promoID)
+      .reduce((accumulator, promo) => promo.Amount + accumulator, 0)
   }
 
   onCardSelected(card: SelectedCreditCard): void {
-    this.cardSelected.emit(card);
+    this.cardSelected.emit(card)
   }
 
   setOrderPromos(): void {
-    this._orderPromos = this.context.order.promos.get().Items;
-    this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code');
+    this._orderPromos = this.context.order.promos.get().Items
+    this._uniqueOrderPromos = _uniqBy(this._orderPromos, 'Code')
   }
 
   acceptPOTerms(): void {
-    this.POTermsAccepted = true;
+    this.POTermsAccepted = true
   }
 
   // used when no selection of card is required
   // only acknowledgement of purchase order is required
   onContinue(): void {
-    this.continue.emit();
+    this.continue.emit()
   }
 }
 export interface SelectedCreditCard {
-  SavedCard?: MarketplaceBuyerCreditCard;
-  NewCard?: OrderCloudIntegrationsCreditCardToken;
-  CVV: string;
+  SavedCard?: MarketplaceBuyerCreditCard
+  NewCard?: OrderCloudIntegrationsCreditCardToken
+  CVV: string
 }

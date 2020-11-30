@@ -1,6 +1,6 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core'
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
   selector: 'confirm-modal',
@@ -8,7 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ConfirmModal {
   @Input()
-  modalTitle: string;
+  modalTitle: string
   @Input()
-  description: string;
+  description: string
 }

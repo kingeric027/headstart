@@ -1,7 +1,13 @@
-import { Component, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { schemas } from './swagger-spec';
-import { SwaggerSpecProperty } from '@app-seller/shared/models/swagger-spec-proeprty.interface';
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
+import {
+  Component,
+  Input,
+  ChangeDetectorRef,
+  Output,
+  EventEmitter,
+} from '@angular/core'
+import { schemas } from './swagger-spec'
+import { SwaggerSpecProperty } from '@app-seller/shared/models/swagger-spec-proeprty.interface'
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
 
 @Component({
   selector: 'resource-edit-component',
@@ -9,29 +15,30 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
   styleUrls: ['./resource-edit.component.scss'],
 })
 export class ResourceEditComponent {
-  _resource: any;
-  _resourceFields: SwaggerSpecProperty[];
+  _resource: any
+  _resourceFields: SwaggerSpecProperty[]
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   @Input()
   set resource(value: any) {
-    this._resource = value;
-    this.changeDetectorRef.detectChanges();
+    this._resource = value
+    this.changeDetectorRef.detectChanges()
   }
   @Input()
   set resourceType(value: string) {
-    this._resourceFields = this.buildResourceFields(value);
+    this._resourceFields = this.buildResourceFields(value)
   }
   @Output()
-  updateResource = new EventEmitter<ResourceUpdate>();
+  updateResource = new EventEmitter<ResourceUpdate>()
 
   handleUpdateResource(event: any, fieldType: string) {
     const resourceUpdate = {
       field: event.target.id,
-      value: fieldType === 'boolean' ? event.target.checked : event.target.value,
-    };
-    this.updateResource.emit(resourceUpdate);
+      value:
+        fieldType === 'boolean' ? event.target.checked : event.target.value,
+    }
+    this.updateResource.emit(resourceUpdate)
   }
 
   buildResourceFields(resourceType: string): SwaggerSpecProperty[] {
@@ -40,8 +47,8 @@ export class ResourceEditComponent {
         return {
           field: key,
           type: value['type'],
-        };
+        }
       })
-      .filter(r => r.field !== 'xp');
+      .filter((r) => r.field !== 'xp')
   }
 }

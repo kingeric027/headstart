@@ -1,5 +1,5 @@
-import { SpecOption } from 'ordercloud-javascript-sdk';
+import { SpecOption } from 'ordercloud-javascript-sdk'
 
 export interface FullSpecOption extends SpecOption {
-  SpecID: string;
+  SpecID: string
 }
