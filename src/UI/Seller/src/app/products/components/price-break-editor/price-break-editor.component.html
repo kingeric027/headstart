@@ -99,10 +99,10 @@
                   id="UseCumulativeQuantity"
                   aria-describedby="Use Cumulative Quantity"
                   (change)="handleUpdateUseCumulativeQuantity($event)">
-            <option [selected]="priceScheduleEditable.UseCumulativeQuantity"
+            <option [selected]="priceScheduleEditable.UseCumulativeQuantity == true"
                     [value]="true"
                     translate>ADMIN.PRODUCT_EDIT.APPLY_ACROSS_VARIATIONS</option>
-            <option [selected]="priceScheduleEditable.UseCumulativeQuantity"
+            <option [selected]="priceScheduleEditable.UseCumulativeQuantity == false"
                     [value]="false"
                     translate>ADMIN.PRODUCT_EDIT.APPLY_INDIVIDUAL_VARIATIONS</option>
           </select>

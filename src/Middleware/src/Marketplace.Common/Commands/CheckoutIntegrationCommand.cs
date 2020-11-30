@@ -94,6 +94,7 @@ namespace Marketplace.Common.Commands
             shipResponse.ShipEstimates = UpdateFreeShippingRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.FreeShippingTransitDays);
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
+            shipResponse.ShipEstimates = ApplyFlatRateShipping(worksheet, shipResponse.ShipEstimates, _settings.OrderCloudSettings.MedlineSupplierID);
             
             return shipResponse;
         }
@@ -141,11 +142,10 @@ namespace Marketplace.Common.Commands
                     foreach (var method in estimate.ShipMethods)
                     {
                         // free shipping on ground shipping or orders where we weren't able to calculate a shipping rate
-                        if (method.Name.Contains("GROUND") || method.ID == "NO_SHIPPING_RATES")
+                        if (method.Name.Contains("GROUND") || method.ID == ShippingConstants.NoRatesID)
                         {
                             method.xp.FreeShippingApplied = true;
                             method.xp.FreeShippingThreshold = supplier.xp.FreeShippingThreshold;
-                            method.xp.CostBeforeDiscount = method.Cost; // do we need this? xp.OriginalCost already exists
                             method.Cost = 0;
                         }
                     }
@@ -183,6 +183,50 @@ namespace Marketplace.Common.Commands
             return result;
         }
 
+        public static IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> estimates, string medlineSupplierID)
+        {
+            var result = estimates.Select(estimate => ApplyFlatRateShippingOnEstimate(estimate, orderWorksheet, medlineSupplierID)).ToList();
+            return result;
+        }
+
+        public static MarketplaceShipEstimate ApplyFlatRateShippingOnEstimate(MarketplaceShipEstimate estimate, MarketplaceOrderWorksheet orderWorksheet, string medlineSupplierID)
+        {
+            var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
+            if (supplierID != medlineSupplierID)
+            {
+                // for now we're hardcoding flat rates for just this supplier https://four51.atlassian.net/browse/SEB-1292
+                // at some point in the future this will be handled generically for any supplier
+                return estimate;
+            }
+            var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplierID);
+            var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
+            var qualifiesForFlatRateShipping = supplierSubTotal > .01M && estimate.ShipMethods.Any(method => method.Name.Contains("GROUND"));
+            if(qualifiesForFlatRateShipping)
+            {
+                estimate.ShipMethods = estimate.ShipMethods
+                                        .Where(method => method.Name.Contains("GROUND")) // flat rate shipping only applies to ground shipping methods
+                                        .Select(method => ApplyFlatRateShippingOnShipmethod(method, supplierSubTotal))
+                                        .ToList();
+            }
+
+            return estimate;
+        }
+
+        public static MarketplaceShipMethod ApplyFlatRateShippingOnShipmethod(MarketplaceShipMethod method, decimal supplierSubTotal)
+        {
+            if (supplierSubTotal > .01M && supplierSubTotal <= 499.99M)
+            {
+                method.Cost = 29.99M;
+            }
+            else if (supplierSubTotal > 499.9M)
+            {
+                method.Cost = 0;
+                method.xp.FreeShippingApplied = true;
+            }
+
+            return method;
+        }
+
         public static IList<MarketplaceShipEstimate> CheckForEmptyRates(IList<MarketplaceShipEstimate> estimates, decimal noRatesCost, int noRatesTransitDays)
         {
             // if there are no rates for a set of line items then return a mocked response so user can check out
@@ -196,7 +240,7 @@ namespace Marketplace.Common.Commands
                     {
                         new MarketplaceShipMethod
                         {
-                            ID = "NO_SHIPPING_RATES",
+                            ID = ShippingConstants.NoRatesID,
                             Name = "No shipping rates",
                             Cost = noRatesCost,
                             EstimatedTransitDays = noRatesTransitDays,
@@ -215,11 +259,11 @@ namespace Marketplace.Common.Commands
         {
             foreach (var shipEstimate in estimates)
             {
-                if (shipEstimate.ID == ShippingConstants.FreeShipping)
+                if (shipEstimate.ID == ShippingConstants.FreeShippingID)
                 {
                     foreach (var method in shipEstimate.ShipMethods)
                     {
-                        method.ID = ShippingConstants.FreeShipping;
+                        method.ID = ShippingConstants.FreeShippingID;
                         method.Cost = 0;
                         method.EstimatedTransitDays = freeShippingTransitDays;
                     }

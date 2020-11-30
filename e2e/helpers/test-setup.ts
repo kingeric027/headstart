@@ -78,8 +78,7 @@ const adminRoles: ApiRole[] = [
 
 export function setStagingUrl() {
 	const config: SdkConfiguration = {
-		baseApiUrl: 'https://stagingapi.ordercloud.io/v1',
-		baseAuthUrl: 'https://stagingapi.ordercloud.io/oauth/token',
+		baseApiUrl: 'https://stagingapi.ordercloud.io',
 	}
 	Configuration.Set(config)
 }

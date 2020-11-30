@@ -6,7 +6,8 @@ export const buyerLocation = [
     { value: 'State', path: 'State' },
     { value: 'Zip', path: 'Zip' },
     { value: 'Country', path: 'Country' },
-    { value: 'Company Name', path: 'CompanyName'},
+    { value: 'Company Name', path: 'CompanyName' },
+    { value: 'Primary Contact Name', path: 'xp.PrimaryContactName' },
     { value: 'Email', path: 'xp.Email' },
     { value: 'Phone', path: 'Phone' },
     { value: 'Opening Date', path: 'xp.OpeningDate' },
@@ -78,7 +79,7 @@ export const purchaseOrderDetail = [
 
 export const lineItemDetail = [
   { value: 'Order ID', path: 'MarketplaceOrder.ID' },
-  { value: 'Supplier ID', path: 'MarketplaceOrder.ToCompanyID' },
+  { value: 'Supplier ID', path: 'MarketplaceLineItem.SupplierID' },
   { value: 'Order Date', path: 'MarketplaceOrder.DateSubmitted' },
   { value: 'Total', path: 'MarketplaceOrder.Total' },
   { value: 'Tax', path: 'MarketplaceOrder.TaxCost' },

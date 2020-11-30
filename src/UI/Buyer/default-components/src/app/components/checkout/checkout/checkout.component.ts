@@ -15,6 +15,8 @@ import { SelectedCreditCard } from '../checkout-payment/checkout-payment.compone
 import { getOrderSummaryMeta, OrderSummaryMeta } from 'src/app/services/purchase-order.helper';
 import { ShopperContextService } from 'marketplace';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ModalState } from 'src/app/models/modal-state.class';
+import { ErrorConstants, getPaymentError } from '../../../services/error-constants';
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -34,7 +36,9 @@ export class OCMCheckout implements OnInit {
   shipEstimates: ShipEstimate[] = [];
   currentPanel: string;
   paymentError: string;
+  orderError: string;
   faCheck = faCheck;
+  orderErrorModal = ModalState.Closed;
   checkout: CheckoutService = this.context.order.checkout;
   sections: any = [
     {
@@ -65,6 +69,9 @@ export class OCMCheckout implements OnInit {
   ngOnInit(): void {
     this.context.order.onChange(order => (this.order = order));
     this.order = this.context.order.get();
+    if (this.order.IsSubmitted) {
+      this.handleOrderError('This order has already been submitted');
+    }
 
     this.lineItems = this.context.order.cart.get();
     this.orderPromotions = this.context.order.promos.get().Items;
@@ -100,6 +107,9 @@ export class OCMCheckout implements OnInit {
     this.cards = await this.context.currentUser.cards.List();
     await this.context.order.promos.applyAutomaticPromos();
     this.order = this.context.order.get();
+    if (this.order.IsSubmitted) {
+      this.handleOrderError(ErrorConstants.orderSubmittedError);
+    }
     this.lineItems = this.context.order.cart.get();
     this.destoryLoadingIndicator('payment');
   }
@@ -121,7 +131,7 @@ export class OCMCheckout implements OnInit {
       // so for now I always save any credit card in OC.
       // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(output.NewCard);
-      this.isNewCard=true;
+      this.isNewCard = true;
       await this.checkout.createSavedCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal);
     }
     if (this.orderSummaryMeta.POLineItemCount) {
@@ -149,14 +159,14 @@ export class OCMCheckout implements OnInit {
         cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment);
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID, ccPayment);
       } catch (e) {
-        return await this.handleSubmitError(e)
+        return this.handleSubmitError(e)
       }
     } else {
       try {
         cleanOrderID = await this.checkout.submitWithoutCreditCard();
         await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID);
       } catch (e) {
-        return await this.handleSubmitError(e)
+        return this.handleSubmitError(e)
       }
     }
     this.isLoading = false;
@@ -165,14 +175,23 @@ export class OCMCheckout implements OnInit {
   }
 
   async handleSubmitError(error: any): Promise<void> {
-    const errorReason = error?.response?.data?.Message || 'Unknown error'
-    const reason = errorReason.replace('AVS', 'Address Verification'); // AVS isn't likely something to be understood by a layperson
-    this.paymentError = `The authorization for your payment was declined by the processor due to ${reason}. Please reenter your information or use a different card.`
-    this.isLoading = false;
-    this.currentPanel = 'payment';
-    if (this.isNewCard) {
-      await this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
+    if(error?.message === ErrorConstants.orderSubmittedError) {
+      this.isLoading = false
+      this.handleOrderError(error.message);
+    } else {
+      this.paymentError = getPaymentError(error?.response?.data?.Message)
+      this.isLoading = false;
+      this.currentPanel = 'payment';
+      if (this.isNewCard) {
+        await this.context.currentUser.cards.Delete(this.getCCPaymentData().CreditCardID);
+      }
     }
+  }
+
+  handleOrderError(message: string): void {
+    this.orderError = message;
+    this.context.order.reset();
+    this.orderErrorModal = ModalState.Open;
   }
 
   getCCPaymentData(): OrderCloudIntegrationsCreditCardPayment {

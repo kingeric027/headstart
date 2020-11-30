@@ -12,7 +12,7 @@
                             [searchPlaceholder]="'locations'"
                             (requestOptionsUpdated)="updateRequestOptions($event.detail)">
             <div class="address-card pb-3 mb-3"
-                 *ngFor="let location of locations">
+                 *ngFor="let location of locations.Items">
               <ocm-location-list-item [location]="location"> </ocm-location-list-item>
             </div>
           </ocm-generic-list>

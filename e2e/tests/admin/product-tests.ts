@@ -258,7 +258,6 @@ test
 		.expect(await mainResourcePage.resourceExists(createdProductName))
 		.ok()
 	await adminHeaderPage.logout()
-	console.log(createdProductName)
 
 	//Below for Product visibility
 	await adminTestSetup()
