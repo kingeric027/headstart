@@ -23,6 +23,7 @@
         <div>
           <button
             class="btn btn-sm btn-primary"
+            id="confirm-address-delete"
             (click)="deleteAddress(currentAddress)"
             translate
           >
@@ -80,7 +81,7 @@
                 >
                   <!-- Edit Button -->
                   <div
-                    class="btn btn-light btn-icon ripple"
+                    class="btn btn-light btn-icon ripple address-edit"
                     (click)="showEditAddress(address)"
                   >
                     <div class="icon-wrapper">
@@ -89,7 +90,7 @@
                   </div>
                   <!-- Delete Button -->
                   <div
-                    class="btn btn-light btn-icon ripple"
+                    class="btn btn-light btn-icon ripple address-delete"
                     (click)="showAreYouSure(address)"
                   >
                     <div class="icon-wrapper">
