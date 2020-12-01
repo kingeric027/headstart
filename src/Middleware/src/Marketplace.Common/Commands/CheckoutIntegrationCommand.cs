@@ -70,23 +70,19 @@ namespace Marketplace.Common.Commands
             for (var i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.FirstOrDefault(supplierID).CarrierAccountID);
+                var profile = _profiles.FirstOrDefault(supplierID);
+                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == profile.CarrierAccountID).ToList(), profile); 
                 var cheapestMethods = WhereRateIsCheapestOfItsKind(methods);
                 shipResponse.ShipEstimates[i].ShipMethods = cheapestMethods.Select(s =>
                 {
-                    // apply a 75% markup to keyfob shipments https://four51.atlassian.net/browse/SEB-1260
-                    if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
-                    {
-                        s.Cost = Math.Round(s.Cost * (decimal)1.75, 2);
-                    } else
-                    {
-                        s.Cost = Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
-                    }
+                    // apply a 75% markup to key fob shipments https://four51.atlassian.net/browse/SEB-1260
+                    s.Cost = groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder) ? 
+                        Math.Round(s.Cost * (decimal)1.75, 2) : 
+                        Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
                     return s;
                 }).ToList();
             }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
-
 
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
                 shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency);
@@ -96,6 +92,14 @@ namespace Marketplace.Common.Commands
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
             
             return shipResponse;
+        }
+
+        public IEnumerable<MarketplaceShipMethod> FilterMethodsBySupplierConfig(List<MarketplaceShipMethod> methods, EasyPostShippingProfile profile)
+        {
+            // will attempt to filter out by supplier method specs, but if there are filters and the result is none and there are valid methods still return the methods
+            if (profile.AllowedServiceFilter.Count == 0) return methods;
+            var filtered_methods = methods.Where(s => profile.AllowedServiceFilter.Contains(s.Name)).Select(s => s).ToList();
+            return filtered_methods.Any() ? filtered_methods : methods;
         }
 
         public static IEnumerable<MarketplaceShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<MarketplaceShipMethod> methods)
