@@ -35,13 +35,21 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _blobQueue = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
             {
-                ConnectionString = settings.Env == AppEnvironment.Prod ? settings.BlobSettings.ConnectionString : "UseDevelopmentStorage=true",
+#if DEBUG
+                ConnectionString = "UseDevelopmentStorage=true",
+#else
+                ConnectionString = settings.BlobSettings.ConnectionString,
+#endif
                 Container = settings.BlobSettings.QueueName
             });
 
             _blobCache = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
             {
-                ConnectionString = settings.Env == AppEnvironment.Prod ? settings.BlobSettings.ConnectionString : "UseDevelopmentStorage=true",
+#if DEBUG
+                ConnectionString = "UseDevelopmentStorage=true",
+#else
+                ConnectionString = settings.BlobSettings.ConnectionString,
+#endif
                 Container = settings.BlobSettings.CacheName
             });
             _log = log;
