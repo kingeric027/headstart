@@ -10,7 +10,7 @@ class AddressBookPage {
 
 	constructor() {
 		this.addAddressButton = Selector('#add-address-button')
-		this.address = Selector('ocm-address-card').nth(1)
+		this.address = Selector('ocm-address-card')
 		this.smartyStreetsSuggestionHeader = Selector('address-suggestion')
 		this.confirmAddressDeleteButton = Selector('#confirm-address-delete')
 	}
