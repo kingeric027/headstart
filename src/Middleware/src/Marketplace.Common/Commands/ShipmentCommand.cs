@@ -37,6 +37,7 @@ namespace Marketplace.Common.Commands
         public List<DocumentRowError> Invalid = new List<DocumentRowError>();
     }
 
+    [SwaggerModel]
     public class BatchProcessSummary
     {
         public int TotalCount { get; set; }
@@ -52,6 +53,7 @@ namespace Marketplace.Common.Commands
         public string Error { get; set; }
     }
 
+    [SwaggerModel]
     public class BatchProcessResult
     {
         public BatchProcessSummary Meta { get; set; }
