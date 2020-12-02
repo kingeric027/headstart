@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core'
 
 @Pipe({
   name: 'paymentMethodDisplay',
@@ -6,13 +6,13 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class PaymentMethodDisplayPipe implements PipeTransform {
   transform(method: string): string {
     if (!method) {
-      return null;
+      return null
     }
     const PaymentMethodMap = {
       ['PurchaseOrder']: 'Purchase Order',
       ['SpendingAccount']: 'Spending Account',
       ['CreditCard']: 'Credit Card',
-    };
-    return PaymentMethodMap[method];
+    }
+    return PaymentMethodMap[method]
   }
 }

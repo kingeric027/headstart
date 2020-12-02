@@ -1,1 +1,7 @@
-export type OrderListColumn = 'ID' | 'Status' | 'DateSubmitted' | 'SubmittedBy' | 'Total' | 'Favorite';
+export type OrderListColumn =
+  | 'ID'
+  | 'Status'
+  | 'DateSubmitted'
+  | 'SubmittedBy'
+  | 'Total'
+  | 'Favorite'

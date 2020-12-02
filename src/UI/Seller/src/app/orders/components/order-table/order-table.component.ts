@@ -1,10 +1,10 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Order } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
-import { OrderService } from '@app-seller/orders/order.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Order } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute, Params } from '@angular/router'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
+import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
+import { OrderService } from '@app-seller/orders/order.service'
 
 @Component({
   selector: 'app-order-table',
@@ -12,9 +12,9 @@ import { OrderService } from '@app-seller/orders/order.service';
   styleUrls: ['./order-table.component.scss'],
 })
 export class OrderTableComponent extends ResourceCrudComponent<Order> {
-  isListPage: boolean;
-  shouldShowOrderToggle = false;
-  activeOrderDirectionButton: string;
+  isListPage: boolean
+  shouldShowOrderToggle = false
+  activeOrderDirectionButton: string
   constructor(
     private orderService: OrderService,
     changeDetectorRef: ChangeDetectorRef,
@@ -23,28 +23,31 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     ngZone: NgZone,
     private appAuthService: AppAuthService
   ) {
-    super(changeDetectorRef, orderService, router, activatedroute, ngZone);
-    this.shouldShowOrderToggle = this.appAuthService.getOrdercloudUserType() === SELLER;
-    activatedroute.queryParams.subscribe(params => {
+    super(changeDetectorRef, orderService, router, activatedroute, ngZone)
+    this.shouldShowOrderToggle =
+      this.appAuthService.getOrdercloudUserType() === SELLER
+    activatedroute.queryParams.subscribe((params) => {
       if (this.router.url.startsWith('/orders')) {
-        this.readFromUrlQueryParams(params);
+        this.readFromUrlQueryParams(params)
       }
-    });
-    activatedroute.params.subscribe(params => {
-      this.isListPage = !Boolean(params.orderID);
-    });
+    })
+    activatedroute.params.subscribe((params) => {
+      this.isListPage = !params.orderID
+    })
   }
   setOrderDirection(direction: string) {
     if (this.isListPage) {
-      this.orderService.setOrderDirection(direction);
+      this.orderService.setOrderDirection(direction)
     } else {
-      this.router.navigate(['/orders'], { queryParams: { OrderDirection: direction } });
+      this.router.navigate(['/orders'], {
+        queryParams: { OrderDirection: direction },
+      })
     }
   }
 
   private readFromUrlQueryParams(params: Params): void {
-    const { OrderDirection } = params;
-    this.activeOrderDirectionButton = OrderDirection;
+    const { OrderDirection } = params
+    this.activeOrderDirectionButton = OrderDirection
   }
   filterConfig = {
     Filters: [
@@ -53,7 +56,10 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         Path: 'Status',
         Items: [
           { Text: 'ADMIN.FILTER_OPTIONS.OPEN', Value: 'Open' },
-          { Text: 'ADMIN.FILTER_OPTIONS.AWAITING_APPROVAL', Value: 'AwaitingApproval' },
+          {
+            Text: 'ADMIN.FILTER_OPTIONS.AWAITING_APPROVAL',
+            Value: 'AwaitingApproval',
+          },
           { Text: 'ADMIN.FILTER_OPTIONS.COMPLETED', Value: 'Completed' },
           { Text: 'ADMIN.FILTER_OPTIONS.DECLINED', Value: 'Declined' },
           { Text: 'ADMIN.FILTER_OPTIONS.CANCELED', Value: 'Canceled' },
@@ -78,5 +84,5 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
         QueryRestriction: 'OrderDirection=Incoming',
       },
     ],
-  };
+  }
 }

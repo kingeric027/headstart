@@ -1,9 +1,9 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
-import { OrdercloudEnv } from 'marketplace';
-import { Environment } from './environment.interface';
-import afTheme from '../styles/themes/anytime-fitness/theme-config';
+import { OrdercloudEnv } from 'marketplace'
+import { Environment } from './environment.interface'
+import afTheme from '../styles/themes/anytime-fitness/theme-config'
 
 export const environment: Environment = {
   hostedApp: true,
@@ -13,13 +13,14 @@ export const environment: Environment = {
   baseUrl: 'https://anytimefitness.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
-  translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+  translateBlobUrl:
+    'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Production,
   theme: afTheme,
   instrumentationKey: '22575a56-7540-47c7-9a91-3cf5316531a3',
-};
+}
 /*
 
  * For easier debugging in development mode, you can import the following file

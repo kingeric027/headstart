@@ -1,20 +1,26 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { ReportsTemplateService, ReportTemplate } from '@app-seller/shared/services/middleware-api/reports-template.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ReportsTypeService } from '@app-seller/shared/services/middleware-api/reports-type.service';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ValidateRichTextDescription } from '@app-seller/validators/validators';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import {
+  ReportsTemplateService,
+  ReportTemplate,
+} from '@app-seller/shared/services/middleware-api/reports-template.service'
+import { Router, ActivatedRoute } from '@angular/router'
+import { ReportsTypeService } from '@app-seller/shared/services/middleware-api/reports-type.service'
+import { FormGroup, FormControl, Validators } from '@angular/forms'
+import { ValidateRichTextDescription } from '@app-seller/validators/validators'
 
 function createTemplateForm(template: ReportTemplate): FormGroup {
-  var resourceForm = new FormGroup({
+  const resourceForm = new FormGroup({
     Name: new FormControl(template?.Name, Validators.required),
-    Description: new FormControl(template?.Description, ValidateRichTextDescription),
+    Description: new FormControl(
+      template?.Description,
+      ValidateRichTextDescription
+    ),
     AvailableToSuppliers: new FormControl(template?.AvailableToSuppliers),
     Headers: new FormControl(template?.Headers || [], Validators.required),
-    Filters: new FormControl(template?.Filters || {})
-  });
-  return resourceForm;
+    Filters: new FormControl(template?.Filters || {}),
+  })
+  return resourceForm
 }
 
 @Component({
@@ -22,20 +28,27 @@ function createTemplateForm(template: ReportTemplate): FormGroup {
   templateUrl: './template-table.component.html',
   styleUrls: ['./template-table.component.scss'],
 })
-export class TemplateTableComponent extends ResourceCrudComponent<ReportTemplate>{
-  reportType: string;
+export class TemplateTableComponent extends ResourceCrudComponent<ReportTemplate> {
+  reportType: string
 
   constructor(
-      private reportsTemplateService: ReportsTemplateService,
-      private reportsTypeService: ReportsTypeService,
-      changeDetectorRef: ChangeDetectorRef,
-      router: Router,
-      activatedRoute: ActivatedRoute,
-      ngZone: NgZone,
-      ) {
-      super(changeDetectorRef, reportsTemplateService, router, activatedRoute, ngZone, createTemplateForm);
-      this.router = router;
-      const routeUrl = this.router.routerState.snapshot.url.split('/');
-      this.reportType = routeUrl[2];
+    private reportsTemplateService: ReportsTemplateService,
+    private reportsTypeService: ReportsTypeService,
+    changeDetectorRef: ChangeDetectorRef,
+    router: Router,
+    activatedRoute: ActivatedRoute,
+    ngZone: NgZone
+  ) {
+    super(
+      changeDetectorRef,
+      reportsTemplateService,
+      router,
+      activatedRoute,
+      ngZone,
+      createTemplateForm
+    )
+    this.router = router
+    const routeUrl = this.router.routerState.snapshot.url.split('/')
+    this.reportType = routeUrl[2]
   }
 }

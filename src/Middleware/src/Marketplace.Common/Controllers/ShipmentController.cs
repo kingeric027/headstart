@@ -40,7 +40,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ShipmentAdmin)]
         public async Task<BatchProcessResult> UploadShipments([FromForm] AssetUpload fileRequest)
         {
-            return  await _command.UploadShipments(fileRequest?.File, VerifiedUserContext.AccessToken);
+            return  await _command.UploadShipments(fileRequest?.File, VerifiedUserContext);
         }
     }
 }

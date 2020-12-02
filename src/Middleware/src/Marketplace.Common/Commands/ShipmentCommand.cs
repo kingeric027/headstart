@@ -8,6 +8,7 @@ using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -64,7 +65,7 @@ namespace Marketplace.Common.Commands
     public interface IShipmentCommand
     {
         Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
-        Task<BatchProcessResult> UploadShipments(IFormFile file, string supplierToken);
+        Task<BatchProcessResult> UploadShipments(IFormFile file, VerifiedUserContext userContext);
     }
     public class ShipmentCommand : IShipmentCommand
     {
@@ -94,6 +95,24 @@ namespace Marketplace.Common.Commands
             superShipment.Shipment.BuyerID = buyerID;
 
             MarketplaceShipment ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
+
+            //  platform issue. Cant save new xp values onto shipment line item. Update order line item to have this value.
+            var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null); 
+            await Throttler.RunAsync(shipmentItemsWithComment, 100, 5, (shipmentItem) =>
+            {
+                dynamic comments = new ExpandoObject();
+                var commentsByShipment = comments as IDictionary<string, object>;
+                commentsByShipment[ocShipment.ID] = shipmentItem.xp?.Comment;
+                return _oc.LineItems.PatchAsync(OrderDirection.Incoming, buyerOrderID, shipmentItem.LineItemID,
+                    new PartialLineItem()
+                    {
+                        xp = new
+                        {
+                            Comments = commentsByShipment
+                        }
+                    });
+            });
+
             IList<ShipmentItem> shipmentItemResponses = await Throttler.RunAsync(
                 superShipment.ShipmentItems,
                 100,
@@ -134,16 +153,16 @@ namespace Marketplace.Common.Commands
             return relatedBuyerOrder.FromCompanyID;
         }
 
-        public async Task<BatchProcessResult> UploadShipments(IFormFile file, string accessToken)
+        public async Task<BatchProcessResult> UploadShipments(IFormFile file, VerifiedUserContext userContext)
         {
             BatchProcessResult documentImportResult;
 
-            documentImportResult = await GetShipmentListFromFile(file, accessToken);
+            documentImportResult = await GetShipmentListFromFile(file, userContext);
 
             return documentImportResult;
         }
 
-        private async Task<BatchProcessResult> GetShipmentListFromFile(IFormFile file, string accessToken)
+        private async Task<BatchProcessResult> GetShipmentListFromFile(IFormFile file, VerifiedUserContext userContext)
         {
             BatchProcessResult processResults;
 
@@ -156,12 +175,12 @@ namespace Marketplace.Common.Commands
             shipments.RemoveRange(0, 2);
             DocumentImportResult result = Validate(shipments);
 
-            processResults = await ProcessShipments(result, accessToken);
+            processResults = await ProcessShipments(result, userContext);
 
             return await Task.FromResult(processResults);
         }
 
-        private async Task<BatchProcessResult> ProcessShipments(DocumentImportResult importResult, string accessToken)
+        private async Task<BatchProcessResult> ProcessShipments(DocumentImportResult importResult, VerifiedUserContext userContext)
         {
             BatchProcessResult processResult = new BatchProcessResult();
 
@@ -172,7 +191,7 @@ namespace Marketplace.Common.Commands
             {
                 try
                 {
-                    bool isSuccessful = await ProcessShipment(shipment, processResult, accessToken);
+                    bool isSuccessful = await ProcessShipment(shipment, processResult, userContext);
                 }
                 catch (Exception ex)
                 {
@@ -194,57 +213,57 @@ namespace Marketplace.Common.Commands
 
             return processResult;
 
-        }
-
-        private async void ValidateOrderStatus(Misc.Shipment shipment, BatchProcessResult processResult)
-        {
-            Order ocOrder = await GetOutgoingOrder(shipment);
-
-            var lineItemList = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, shipment.OrderID);
-
-            bool shippingComplete = ValidateLineItemCounts(lineItemList);
-
-            if (!shippingComplete)
-            {
-                PatchOrderStatus(ocOrder, ShippingStatus.PartiallyShipped, OrderStatus.Open);
-                return;
-            }
-
-            if (ocOrder.xp.SubmittedOrderStatus != OrderStatus.Open.ToString() && shippingComplete)
-            {
-                throw new Exception($"All items are shipped, but the order cannot be marked as Completed since the order status is currently {ocOrder?.Status.ToString("g")}");
-            }
-            else if (ocOrder.xp.SubmittedOrderStatus == OrderStatus.Open.ToString() && shippingComplete)
-            {
-                PatchOrderStatus(ocOrder, ShippingStatus.Shipped, OrderStatus.Completed);
-            }
-
-        }
-
-        private async void PatchOrderStatus(Order ocOrder, ShippingStatus shippingStatus, OrderStatus orderStatus)
-        {
+        }
+
+        private async void ValidateOrderStatus(Misc.Shipment shipment, BatchProcessResult processResult)
+        {
+            Order ocOrder = await GetOutgoingOrder(shipment);
+
+            var lineItemList = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, shipment.OrderID);
+
+            bool shippingComplete = ValidateLineItemCounts(lineItemList);
+
+            if (!shippingComplete)
+            {
+                PatchOrderStatus(ocOrder, ShippingStatus.PartiallyShipped, OrderStatus.Open);
+                return;
+            }
+
+            if (ocOrder.xp.SubmittedOrderStatus != OrderStatus.Open.ToString() && shippingComplete)
+            {
+                throw new Exception($"All items are shipped, but the order cannot be marked as Completed since the order status is currently {ocOrder?.Status.ToString("g")}");
+            }
+            else if (ocOrder.xp.SubmittedOrderStatus == OrderStatus.Open.ToString() && shippingComplete)
+            {
+                PatchOrderStatus(ocOrder, ShippingStatus.Shipped, OrderStatus.Completed);
+            }
+
+        }
+
+        private async void PatchOrderStatus(Order ocOrder, ShippingStatus shippingStatus, OrderStatus orderStatus)
+        {
             var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, SubmittedOrderStatus = orderStatus } };
 
-            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, ocOrder.ID, partialOrder);
-        }
-
-        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
-        {
-            if (lineItemList == null || lineItemList?.Items?.Count < 1)
-            {
-                return false;
-            }
-
-            foreach(LineItem lineItem in lineItemList.Items)
-            {
-                if (lineItem.Quantity > lineItem.QuantityShipped)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
+            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, ocOrder.ID, partialOrder);
+        }
+
+        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
+        {
+            if (lineItemList == null || lineItemList?.Items?.Count < 1)
+            {
+                return false;
+            }
+
+            foreach(LineItem lineItem in lineItemList.Items)
+            {
+                if (lineItem.Quantity > lineItem.QuantityShipped)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, OrderCloudException ex)
         {
             BatchProcessFailure failure = new BatchProcessFailure();
@@ -265,8 +284,25 @@ namespace Marketplace.Common.Commands
 
             return failure;
         }
+        private async Task PatchLineItemStatus(string supplierOrderID, ShipmentItem lineItem, VerifiedUserContext userContext)
+        {
+            var lineItemStatusChangeList = new List<LineItemStatusChange>();
+            lineItemStatusChangeList.Add(new LineItemStatusChange()
+            {
+                Quantity = lineItem.QuantityShipped,
+                ID = lineItem.LineItemID
+            });
 
-        private async Task<bool> ProcessShipment(Misc.Shipment shipment, BatchProcessResult result, string accessToken)
+            LineItemStatusChanges lineItemStatusChange = new LineItemStatusChanges()
+            {
+                Changes = lineItemStatusChangeList,
+                Status = LineItemStatus.Complete
+            };
+
+            await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, supplierOrderID, lineItemStatusChange, null);
+        }
+
+        private async Task<bool> ProcessShipment(Misc.Shipment shipment, BatchProcessResult result, VerifiedUserContext userContext)
         {
             PartialShipment newShipment = null;
             Shipment ocShipment;
@@ -286,9 +322,10 @@ namespace Marketplace.Common.Commands
                     LineItemID = lineItem.ID,
                     QuantityShipped = Convert.ToInt32(shipment.QuantityShipped),
                     UnitPrice = Convert.ToDecimal(shipment.Cost)
+                    
                 };
 
-                ocShipment = await GetShipmentByTrackingNumber(shipment, accessToken);
+                ocShipment = await GetShipmentByTrackingNumber(shipment, userContext?.AccessToken);
 
                 //If a user included a ShipmentID in the spreadsheet, find that shipment and patch it with the information on that row
                 if (ocShipment != null)
@@ -298,13 +335,14 @@ namespace Marketplace.Common.Commands
 
                 if (newShipment != null)
                 {
-                    Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, accessToken);
+                    Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, userContext?.AccessToken);
 
                     //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
-                    PatchPartialLineItemComment(lineItem, shipment, newShipment.ID);
+                    await PatchPartialLineItemComment(shipment, newShipment.ID);
 
+                    await PatchLineItemStatus(shipment.OrderID, newShipmentItem, userContext);
                     //POST a shipment item, passing it a Shipment ID parameter, and a request body of Order ID, Line Item ID, and Quantity Shipped
-                    await _oc.Shipments.SaveItemAsync(newShipment.ID, newShipmentItem, accessToken: accessToken);
+                    await _oc.Shipments.SaveItemAsync(newShipment.ID, newShipmentItem, accessToken: userContext?.AccessToken);
 
                     //Re-patch the shipment adding the date shipped now due to oc bug
                     var repatchedShipment = PatchShipment(ocShipment, shipment);
@@ -316,14 +354,12 @@ namespace Marketplace.Common.Commands
                 if (lineItem?.ID == null)
                 {
                     //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
-                    PatchPartialLineItemComment(lineItem, shipment, newShipment.ID);
+                    await PatchPartialLineItemComment(shipment, newShipment.ID);
 
                     //Create new lineItem
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
                 }
 
-                //Patch OrderStatus to completed if all items are submitted.
-                ValidateOrderStatus(shipment, result);
                 return true;
             }
             catch (OrderCloudException ex)
@@ -334,7 +370,7 @@ namespace Marketplace.Common.Commands
             catch (Exception ex)
             {
                 result.ProcessFailureList.Add(new BatchProcessFailure()
-                { 
+                {
                     Error = ex.Message,
                     Shipment = shipment
                 });
@@ -363,7 +399,7 @@ namespace Marketplace.Common.Commands
             {
                 return await _oc.LineItems.GetAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Unable to find LineItem for LineItemID: {shipment.LineItemID}", ex.InnerException);
             }
@@ -381,16 +417,21 @@ namespace Marketplace.Common.Commands
             {
                 throw new Exception($"Unable to find Order for OrderID: {shipment.OrderID}", ex.InnerException);
             }
-            
+
         }
 
-        private async void PatchPartialLineItemComment(LineItem lineItem, Misc.Shipment shipment, string newShipmentId)
+        private async Task<LineItem> PatchPartialLineItemComment(Misc.Shipment shipment, string newShipmentId)
         {
             PartialLineItem partialLineItem;
             Dictionary<string, object> commentDictonary = new Dictionary<string, object>();
 
             //Add new comment
-            commentDictonary.Add(newShipmentId, shipment.ShipmentLineItemComment);
+            if (shipment?.ShipmentLineItemComment == null || shipment?.ShipmentLineItemComment == "")
+            {
+                return null;
+            }
+
+            commentDictonary.Add(newShipmentId, shipment?.ShipmentLineItemComment);
 
             partialLineItem = new PartialLineItem()
             {
@@ -400,17 +441,17 @@ namespace Marketplace.Common.Commands
                 }
             };
 
-            await _oc.LineItems.PatchAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, partialLineItem);
+            return await _oc.LineItems.PatchAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, partialLineItem);
         }
 
         private async Task<Shipment> GetShipmentByTrackingNumber(Misc.Shipment shipment, string accessToken)
         {
-            Shipment shipmentResponse;
+            Shipment shipmentResponse = null;
 
             //if dictionary already contains shipment, return that shipment
-            if (shipment != null && _shipmentByTrackingNumber.ContainsKey(shipment.TrackingNumber)) 
-            { 
-                return _shipmentByTrackingNumber[shipment.TrackingNumber]; 
+            if (shipment != null && _shipmentByTrackingNumber.ContainsKey(shipment.TrackingNumber))
+            {
+                return _shipmentByTrackingNumber[shipment.TrackingNumber];
             }
 
             if (shipment?.ShipmentID != null)
@@ -420,7 +461,7 @@ namespace Marketplace.Common.Commands
                 {
                     shipmentResponse = await _oc.Shipments.GetAsync(shipment.ShipmentID, accessToken);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new Exception($"ShipmentID: {shipment.ShipmentID} could not be found. If you are not patching an existing shipment, this field must be blank so that the system can generate a Shipment ID for you. Error Detail: {ex.Message}");
                 }
@@ -429,21 +470,20 @@ namespace Marketplace.Common.Commands
                     //add shipment to dictionary if it's found
                     _shipmentByTrackingNumber.Add(shipmentResponse.TrackingNumber, shipmentResponse);
                 }
-            } 
+            }
             else if (shipment?.ShipmentID == null)
             {
                 PartialShipment newShipment = PatchShipment(null, shipment);
                 //Create shipment for tracking number provided if shipmentId wasn't included
-                Shipment createdShipment = await _oc.Shipments.CreateAsync(newShipment, accessToken);
-                if (createdShipment != null)
+                shipmentResponse = await _oc.Shipments.CreateAsync(newShipment, accessToken);
+                if (shipmentResponse != null)
                 {
-                    _shipmentByTrackingNumber.Add(createdShipment.TrackingNumber, createdShipment);
-                    return createdShipment;
+                    _shipmentByTrackingNumber.Add(shipmentResponse.TrackingNumber, shipmentResponse);
                 }
             }
-            return null;
+            return shipmentResponse;
         }
-        
+
 
         private PartialShipment PatchShipment(Shipment ocShipment, Misc.Shipment shipment)
         {
@@ -453,7 +493,7 @@ namespace Marketplace.Common.Commands
             if (ocShipment == null)
             {
                 isCreatingNew = true;
-            } 
+            }
             else
             {
                 newShipment.ID = ocShipment?.ID.Trim();
@@ -468,11 +508,11 @@ namespace Marketplace.Common.Commands
 
             newShipment.BuyerID = shipment.BuyerID;
             newShipment.Shipper = shipment.Shipper;
-            newShipment.DateShipped = isCreatingNew? null : shipment.DateShipped; //Must patch to null on new creation due to OC bug
+            newShipment.DateShipped = isCreatingNew ? null : shipment.DateShipped; //Must patch to null on new creation due to OC bug
             newShipment.DateDelivered = shipment.DateDelivered;
             newShipment.TrackingNumber = shipment.TrackingNumber;
             newShipment.Cost = Convert.ToDecimal(shipment.Cost);
-            newShipment.Account = shipment.Account;        
+            newShipment.Account = shipment.Account;
             newShipment.FromAddressID = shipment.FromAddressID;
             newShipment.ToAddressID = shipment.ToAddressID;
             newShipment.xp.Service = Convert.ToString(shipment.Service);
@@ -497,7 +537,7 @@ namespace Marketplace.Common.Commands
                         ErrorMessage = row.ErrorMessage,
                         Row = row.RowNumber++,
                         Column = row.ErrorColumnIndex
-                    }); 
+                    });
                 else
                 {
                     List<ValidationResult> results = new List<ValidationResult>();

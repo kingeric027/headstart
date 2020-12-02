@@ -1,9 +1,15 @@
 /* eslint-disable max-lines-per-function */
-import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, filter, flatMap } from 'rxjs/operators';
-import { AuthService } from '../../services/auth/auth.service';
+import { Injectable } from '@angular/core'
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+  HttpErrorResponse,
+} from '@angular/common/http'
+import { Observable, throwError } from 'rxjs'
+import { catchError, filter, flatMap } from 'rxjs/operators'
+import { AuthService } from '../../services/auth/auth.service'
 
 /**
  * handle 401 unauthorized responses gracefully
@@ -14,48 +20,55 @@ import { AuthService } from '../../services/auth/auth.service';
 })
 export class RefreshTokenInterceptor implements HttpInterceptor {
   constructor(private appAuthService: AuthService) {}
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
-      catchError(error => {
+      catchError((error) => {
         // rethrow any non auth errors
         if (!this.isAuthError(error)) {
-          return throwError(error);
+          return throwError(error)
         } else {
           // if a refresh attempt failed recently then ignore (3 seconds)`
           if (this.appAuthService.failedRefreshAttempt) {
-            return throwError(error);
+            return throwError(error)
           }
 
           // ensure there is no outstanding request already fetching token
           // if there is then wait for the token to resolve
-          const refreshToken = this.appAuthService.refreshToken.getValue();
+          const refreshToken = this.appAuthService.refreshToken.getValue()
           if (refreshToken || this.appAuthService.fetchingRefreshToken) {
             return this.appAuthService.refreshToken.pipe(
-              filter(token => token !== ''),
-              flatMap(token => {
+              filter((token) => token !== ''),
+              flatMap((token) => {
                 request = request.clone({
                   setHeaders: { Authorization: `Bearer ${token}` },
-                });
-                return next.handle(request);
+                })
+                return next.handle(request)
               })
-            );
+            )
           } else {
             // attempt refresh for new token
             return this.appAuthService.refresh().pipe(
-              flatMap(token => {
+              flatMap((token) => {
                 request = request.clone({
                   setHeaders: { Authorization: `Bearer ${token}` },
-                });
-                return next.handle(request);
+                })
+                return next.handle(request)
               })
-            );
+            )
           }
         }
       })
-    );
+    )
   }
 
   isAuthError(error: any): boolean {
-    return error instanceof HttpErrorResponse && error.url.includes('ordercloud.io') && error.status === 401;
+    return (
+      error instanceof HttpErrorResponse &&
+      error.url.includes('ordercloud.io') &&
+      error.status === 401
+    )
   }
 }

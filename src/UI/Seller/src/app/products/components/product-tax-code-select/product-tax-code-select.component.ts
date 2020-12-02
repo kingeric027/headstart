@@ -1,9 +1,17 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { FormGroup } from '@angular/forms'
 
-import { SuperMarketplaceProduct, ListPage, TaxProperties } from '@ordercloud/headstart-sdk';
-import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes';
-import { faTimesCircle, faCheckCircle, faAsterisk } from '@fortawesome/free-solid-svg-icons';
+import {
+  SuperMarketplaceProduct,
+  ListPage,
+  TaxProperties,
+} from '@ordercloud/headstart-sdk'
+import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
+import {
+  faTimesCircle,
+  faCheckCircle,
+  faAsterisk,
+} from '@fortawesome/free-solid-svg-icons'
 
 @Component({
   selector: 'product-tax-code-select-component',
@@ -12,37 +20,37 @@ import { faTimesCircle, faCheckCircle, faAsterisk } from '@fortawesome/free-soli
 })
 export class ProductTaxCodeSelect {
   @Input()
-  productForm: FormGroup;
+  productForm: FormGroup
   @Input()
-  superMarketplaceProductEditable: SuperMarketplaceProduct;
+  superMarketplaceProductEditable: SuperMarketplaceProduct
   @Input()
-  taxCodes: ListPage<TaxCodes>;
+  taxCodes: ListPage<TaxCodes>
   @Output()
-  handleTaxCodeCategorySelection = new EventEmitter<any>();
+  handleTaxCodeCategorySelection = new EventEmitter<any>()
   @Output()
-  handleTaxCodeSelection = new EventEmitter<any>();
+  handleTaxCodeSelection = new EventEmitter<any>()
   @Output()
-  handleTaxCodesSearched = new EventEmitter<string>();
+  handleTaxCodesSearched = new EventEmitter<string>()
   @Output()
-  handleIsResale = new EventEmitter<boolean>();
+  handleIsResale = new EventEmitter<boolean>()
   @Output()
-  onScrollEnd = new EventEmitter<string>();
+  onScrollEnd = new EventEmitter<string>()
   @Input()
-  readonly = false;
+  readonly = false
   @Input()
-  isRequired: boolean;
+  isRequired: boolean
   @Input()
-  isCreatingNew: boolean;
-  faTimesCircle = faTimesCircle;
-  faCheckCircle = faCheckCircle;
-  faAsterisk = faAsterisk;
+  isCreatingNew: boolean
+  faTimesCircle = faTimesCircle
+  faCheckCircle = faCheckCircle
+  faAsterisk = faAsterisk
 
   onTaxCodeCategorySelection(event): void {
-    this.handleTaxCodeCategorySelection.emit(event);
+    this.handleTaxCodeCategorySelection.emit(event)
   }
 
   handleIsResaleInput(event: boolean): void {
-    return this.handleIsResale.emit(event);
+    return this.handleIsResale.emit(event)
   }
 
   handleSelectTaxCode(taxCodeSelection: TaxProperties): void {
@@ -50,16 +58,16 @@ export class ProductTaxCodeSelect {
       target: {
         value: taxCodeSelection,
       },
-    };
-    this.handleTaxCodeSelection.emit(event);
+    }
+    this.handleTaxCodeSelection.emit(event)
   }
 
   onTaxCodesSearched(searchTerm: string) {
-    this.handleTaxCodesSearched.emit(searchTerm);
+    this.handleTaxCodesSearched.emit(searchTerm)
   }
 
   handleScrollEnd(searchTerm: string) {
-    this.onScrollEnd.emit(searchTerm);
+    this.onScrollEnd.emit(searchTerm)
   }
 
   taxSelectionsValid(): boolean {
@@ -68,6 +76,6 @@ export class ProductTaxCodeSelect {
       this.isRequired &&
       this.productForm.controls['TaxCodeCategory'].valid &&
       this.productForm.controls['TaxCode'].valid
-    );
+    )
   }
 }

@@ -14,8 +14,8 @@ interface testConfig {
 }
 
 const testConfig: testConfig = {
-	buyerAppUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
-	adminAppUrl: 'https://marketplace-admin-ui-test.azurewebsites.net/',
+	buyerAppUrl: process.env.TEST_BUYER_UI_URL,
+	adminAppUrl: process.env.TEST_ADMIN_UI_URL,
 	automationClientID: process.env.AUTOMATION_CLIENT_ID,
 	automationClientSecret: process.env.AUTOMATION_CLIENT_SECRET,
 	adminSellerUsername: process.env.ADMIN_SELLER_USER_USERNAME,

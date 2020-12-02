@@ -62,7 +62,7 @@ namespace Marketplace.Common.Constants
                 {
                     EmailSubject = "A quote has been requested",
                     DynamicText = "A quote has been requested for one of your products",
-                    DynamicText2 = "Please reach out to the customer direclty to give them more information about their quote."
+                    DynamicText2 = "Please reach out to the customer directly to give them more information about their quote."
                 } },
             };
             return dictionary[verifiedUser];
