@@ -38,22 +38,23 @@
           </ocm-toggle-favorite>
         </div>
         <small class="d-block">SKU: {{ _product?.ID }}</small>
-        <!-- TODO: Uncomment to have grid spec form option and fix related bugs
-      <div class="btn-group float-right"
-         *ngIf="specs?.length > 0">
-      <button class="btn btn-sm btn-outline-secondary"
-              [ngClass]="{'active' : !showGrid}"
-              (click)="toggleGrid(false)">
-        <fa-icon [icon]="faListUl">
-        </fa-icon>
-      </button>
-      <button class="btn btn-sm btn-outline-secondary"
-              [ngClass]="{'active' : showGrid}"
-              (click)="toggleGrid(true)">
-        <fa-icon [icon]="faTh">
-        </fa-icon>
-      </button>
-    </div> -->
+        <!-- TODO: Uncomment to have grid spec form option and fix related bugs -->
+        <div class="btn-group float-right" *ngIf="specs?.length > 0">
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            [ngClass]="{ active: !showGrid }"
+            (click)="toggleGrid(false)"
+          >
+            <fa-icon [icon]="faListUl"> </fa-icon>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            [ngClass]="{ active: showGrid }"
+            (click)="toggleGrid(true)"
+          >
+            <fa-icon [icon]="faTh"> </fa-icon>
+          </button>
+        </div>
       </div>
       <div *ngIf="supplierNote" class="alert alert-info my-3">
         <span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
@@ -159,7 +160,6 @@
           [specForm]="specForm"
           [superProduct]="_superProduct"
           [product]="_product"
-          [priceSchedule]="priceSchedule"
         >
         </ocm-grid-spec-form>
       </ng-container>
@@ -167,7 +167,6 @@
         <h3 class="small font-weight-bolder text-muted" translate>
           PRODUCTS.DETAILS.TIERED_PRICE_HEAD
         </h3>
-        :
         <div class="border-bottom border-medium mb-3 pb-3">
           <span translate>PRODUCTS.DETAILS.TIERED_PRICE_DESC</span>
           <div class="d-flex flex-row flex-wrap">
