@@ -114,7 +114,23 @@
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -135,6 +151,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -162,12 +180,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -175,6 +191,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -182,29 +199,46 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
 import {
   Supplier,
   OcSupplierService,
   OcMeService,
   OcSupplierUserGroupService,
-} from '@ordercloud/angular-sdk';
-import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service';
-import {Suppliers} from 'ordercloud-javascript-sdk';
+} from '@ordercloud/angular-sdk'
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
+import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
+import { Suppliers } from 'ordercloud-javascript-sdk'
 &nbsp;
-export const SUPPLIER_SUB_RESOURCE_LIST = [{route: 'users', display: 'ADMIN.NAV.USERS'},
-                                           {route: 'locations', display: 'ALIAS.SUPPLIER_LOCATIONS'}];
+export const SUPPLIER_SUB_RESOURCE_LIST = [
+  { route: 'users', display: 'ADMIN.NAV.USERS' },
+  { route: 'locations', display: 'ALIAS.SUPPLIER_LOCATIONS' },
+]
 &nbsp;
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({
   providedIn: 'root',
 })
 export class SupplierService extends ResourceCrudService&lt;Supplier&gt; {
-  ocSupplierService: OcSupplierService;
+  ocSupplierService: OcSupplierService
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  emptyResource = {</span>
     Name: '',
@@ -214,9 +248,9 @@ export class SupplierService extends ResourceCrudService&lt;Supplier&gt; {
       CountriesServicing: [],
       Images: [{ URL: '', Tag: null }],
       SupportContact: { Name: '', Email: '', Phone: '' },
-      SyncFrieghtPop: false
+      SyncFrieghtPop: false,
     },
-  };
+  }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  constructor(</span>
     router: Router,
@@ -224,30 +258,44 @@ export class SupplierService extends ResourceCrudService&lt;Supplier&gt; {
     private <span class="cstat-no" title="statement not covered" >ocSupplierUserGroupService: OcSupplierUserGroupService,</span>
     private <span class="cstat-no" title="statement not covered" >ocMeService: OcMeService,</span>
     public <span class="cstat-no" title="statement not covered" >currentUserService: CurrentUserService,</span>
-    private <span class="cstat-no" title="statement not covered" >middleware: MiddlewareAPIService,</span>
+    private <span class="cstat-no" title="statement not covered" >middleware: MiddlewareAPIService</span>
   ) {
-<span class="cstat-no" title="statement not covered" >    super(router, activatedRoute, Suppliers, currentUserService, '/suppliers', 'suppliers', SUPPLIER_SUB_RESOURCE_LIST);</span>
+<span class="cstat-no" title="statement not covered" >    super(</span>
+      router,
+      activatedRoute,
+      Suppliers,
+      currentUserService,
+      '/suppliers',
+      'suppliers',
+      SUPPLIER_SUB_RESOURCE_LIST
+    )
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >createNewResource</span>(resource: any): Promise&lt;any&gt; {
-<span class="cstat-no" title="statement not covered" >    resource.ID = '{supplierIncrementor}';</span>
-<span class="cstat-no" title="statement not covered" >    if (!resource.xp?.Images[0]?.URL) <span class="cstat-no" title="statement not covered" >resource.xp.Images = [];</span></span>
-    const newSupplier = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.Suppliers.Create(resource);</span>
-<span class="cstat-no" title="statement not covered" >    this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newSupplier];</span>
-<span class="cstat-no" title="statement not covered" >    this.resourceSubject.next(this.resourceSubject.value);</span>
-<span class="cstat-no" title="statement not covered" >    return newSupplier;</span>
+<span class="cstat-no" title="statement not covered" >    resource.ID = '{supplierIncrementor}'</span>
+<span class="cstat-no" title="statement not covered" >    if (!resource.xp?.Images[0]?.URL) <span class="cstat-no" title="statement not covered" >resource.xp.Images = []</span></span>
+    const newSupplier = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.Suppliers.Create(resource)</span>
+<span class="cstat-no" title="statement not covered" >    this.resourceSubject.value.Items = [</span>
+      ...this.resourceSubject.value.Items,
+      newSupplier,
+    ]
+<span class="cstat-no" title="statement not covered" >    this.resourceSubject.next(this.resourceSubject.value)</span>
+<span class="cstat-no" title="statement not covered" >    return newSupplier</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >updateResource</span>(originalID: string, resource: any): Promise&lt;any&gt; {
     //  if supplier user updating supplier need to call route in middleware because they dont have required role.
-    const newResource = <span class="cstat-no" title="statement not covered" >await this.middleware.updateSupplier(originalID, resource);</span>
+    const newResource = <span class="cstat-no" title="statement not covered" >await this.middleware.updateSupplier(</span>
+      originalID,
+      resource
+    )
 <span class="cstat-no" title="statement not covered" >    this.updateResourceSubject(newResource)</span>
-<span class="cstat-no" title="statement not covered" >    return newResource;</span>
+<span class="cstat-no" title="statement not covered" >    return newResource</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  addIntrinsicListArgs</span>(options: ListArgs): ListArgs {
-<span class="cstat-no" title="statement not covered" >    options.sortBy = ["NAME"];</span>
-<span class="cstat-no" title="statement not covered" >    return options;</span>
+<span class="cstat-no" title="statement not covered" >    options.sortBy = ['NAME']</span>
+<span class="cstat-no" title="statement not covered" >    return options</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -256,7 +304,7 @@ export class SupplierService extends ResourceCrudService&lt;Supplier&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

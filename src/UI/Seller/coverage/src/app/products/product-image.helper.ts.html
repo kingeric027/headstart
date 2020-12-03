@@ -71,7 +71,21 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -81,12 +95,17 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -96,38 +115,49 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Product, MeUser, User } from '@ordercloud/angular-sdk';
-import { environment } from 'src/environments/environment';
-import { MarketplaceProduct, MarketplaceLineItem } from '@ordercloud/headstart-sdk';
-import { UserContext } from '@app-seller/config/user-context';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Product, MeUser, User } from '@ordercloud/angular-sdk'
+import { environment } from 'src/environments/environment'
+import {
+  MarketplaceProduct,
+  MarketplaceLineItem,
+} from '@ordercloud/headstart-sdk'
+import { UserContext } from '@app-seller/config/user-context'
 &nbsp;
-export const IMAGE_HOST_URL = 'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product';
-export const PLACEHOLDER_URL = 'http://placehold.it/300x300';
-export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY';
+export const IMAGE_HOST_URL =
+  'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product'
+export const PLACEHOLDER_URL = 'http://placehold.it/300x300'
+export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY'
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >getProductSmallImageUrl(</span>product: MarketplaceProduct, sellerID: string): string {
-<span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`;</span>
+export function <span class="fstat-no" title="function not covered" >getProductSmallImageUrl(</span>
+  product: MarketplaceProduct,
+  sellerID: string
+): string {
+<span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`</span>
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >getProductMediumImageUrl(</span>product: MarketplaceProduct, sellerID: string): string {
-<span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`;</span>
+export function <span class="fstat-no" title="function not covered" >getProductMediumImageUrl(</span>
+  product: MarketplaceProduct,
+  sellerID: string
+): string {
+<span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`</span>
 }
-&nbsp;
 &nbsp;
 export const getPrimaryLineItemImage = <span class="fstat-no" title="function not covered" >(</span>
   lineItemID: string,
   lineItems: MarketplaceLineItem[],
   sellerID: string
 ): string =&gt; {
-  const li = <span class="cstat-no" title="statement not covered" >lineItems.find(<span class="fstat-no" title="function not covered" >item</span> =&gt; <span class="cstat-no" title="statement not covered" >item.ID === lineItemID)</span>;</span>
-<span class="cstat-no" title="statement not covered" >  return getProductMediumImageUrl(li.Product, sellerID);</span>
-};</pre></td></tr>
+  const li = <span class="cstat-no" title="statement not covered" >lineItems.find(<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.ID === lineItemID)</span></span>
+<span class="cstat-no" title="statement not covered" >  return getProductMediumImageUrl(li.Product, sellerID)</span>
+}
+&nbsp;</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\prettify.js"></script>

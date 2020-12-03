@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">33.33% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/6</span>
+        <span class='fraction'>6/6</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -30,21 +30,21 @@
         <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/4</span>
+        <span class='fraction'>4/4</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">25% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/4</span>
+        <span class='fraction'>4/4</span>
       </div>
     </div>
     <p class="quiet">
       Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
     </p>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -422,7 +422,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -525,11 +525,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">957x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -778,17 +778,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core'
 import {
   StateDefinition,
   CountryDefinition,
-} from '@app-seller/shared/services/geography/geography.models';
+} from '@app-seller/shared/services/geography/geography.models'
 &nbsp;
 @Injectable({
   providedIn: 'root',
 })
-<span class="fstat-no" title="function not covered" >export class AppGeographyService {</span>
-<span class="cstat-no" title="statement not covered" >  states: StateDefinition[] = [</span>
+export class AppGeographyService {
+  states: StateDefinition[] = [
     { label: 'Alabama', abbreviation: 'AL', country: 'US' },
     { label: 'Alaska', abbreviation: 'AK', country: 'US' },
     { label: 'Arizona', abbreviation: 'AZ', country: 'US' },
@@ -888,14 +888,14 @@ import {
     { label: 'Quebec', abbreviation: 'QC', country: 'CA' },
     { label: 'Saskatchewan', abbreviation: 'SK', country: 'CA' },
     { label: 'Yukon', abbreviation: 'YT', country: 'CA' },
-  ];
+  ]
 &nbsp;
-<span class="fstat-no" title="function not covered" >  getStates</span>(countryCode): StateDefinition[] {
-<span class="cstat-no" title="statement not covered" >    return this.states.filter(<span class="fstat-no" title="function not covered" >(s</span>tate) =&gt; <span class="cstat-no" title="statement not covered" >state.country === countryCode)</span>;</span>
+  getStates(countryCode): StateDefinition[] {
+    return this.states.filter((state) =&gt; state.country === countryCode)
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  getCountries</span>(): CountryDefinition[] {
-<span class="cstat-no" title="statement not covered" >    return [</span>
+  getCountries(): CountryDefinition[] {
+    return [
       { label: 'United States of America', abbreviation: 'US' },
       { label: 'Afghanistan', abbreviation: 'AF' },
       { label: 'Åland Islands', abbreviation: 'AX' },
@@ -1141,7 +1141,7 @@ import {
       { label: 'Yugoslavia', abbreviation: 'YU' },
       { label: 'Zambia', abbreviation: 'ZM' },
       { label: 'Zimbabwe', abbreviation: 'ZW' },
-    ];
+    ]
   }
 }
 &nbsp;</pre></td></tr>
@@ -1150,7 +1150,7 @@ import {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

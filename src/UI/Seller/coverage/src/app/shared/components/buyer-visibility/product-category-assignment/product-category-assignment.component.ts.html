@@ -35,9 +35,9 @@
         <span class='fraction'>0/16</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">8.77% </span>
+        <span class="strong">8.33% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>5/57</span>
+        <span class='fraction'>5/60</span>
       </div>
     </div>
     <p class="quiet">
@@ -167,7 +167,28 @@
 <a name='L119'></a><a href='#L119'>119</a>
 <a name='L120'></a><a href='#L120'>120</a>
 <a name='L121'></a><a href='#L121'>121</a>
-<a name='L122'></a><a href='#L122'>122</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -242,6 +263,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -269,28 +292,43 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { OcCategoryService, Category } from '@ordercloud/angular-sdk';
-import { faTimes, faAngleRight, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { OcCategoryService, Category } from '@ordercloud/angular-sdk'
+import {
+  faTimes,
+  faAngleRight,
+  faTimesCircle,
+} from '@fortawesome/free-solid-svg-icons'
 &nbsp;
 @Component({
   selector: 'product-category-assignment',
@@ -299,114 +337,127 @@ import { faTimes, faAngleRight, faTimesCircle } from '@fortawesome/free-solid-sv
 })
 export class ProductCategoryAssignment {
   @Input()
-  productID = '';
+  productID = ''
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  _assignedCategoriesStatic: Category[][] = [];</span>
-<span class="cstat-no" title="statement not covered" >  _assignedCategoriesEditable: Category[][] = [];</span>
+<span class="cstat-no" title="statement not covered" >  _assignedCategoriesStatic: Category[][] = []</span>
+<span class="cstat-no" title="statement not covered" >  _assignedCategoriesEditable: Category[][] = []</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  _catalogID = '';</span>
+<span class="cstat-no" title="statement not covered" >  _catalogID = ''</span>
 &nbsp;
   @Input()
 <span class="fstat-no" title="function not covered" >  set </span>assignedCategoriesStatic(value: Category[][]) {
-<span class="cstat-no" title="statement not covered" >    this.resetCategoryAssignment(value);</span>
+<span class="cstat-no" title="statement not covered" >    this.resetCategoryAssignment(value)</span>
   }
   @Input()
 <span class="fstat-no" title="function not covered" >  set </span>catalogID(value: string) {
-<span class="cstat-no" title="statement not covered" >    this._catalogID = value;</span>
-<span class="cstat-no" title="statement not covered" >    this.getTopLevelCategories();</span>
+<span class="cstat-no" title="statement not covered" >    this._catalogID = value</span>
+<span class="cstat-no" title="statement not covered" >    this.getTopLevelCategories()</span>
   }
 &nbsp;
   @Output()
-  assignmentsUpdated = new EventEmitter();
+  assignmentsUpdated = new EventEmitter()
   // could this all have been done drier with the ability to handle any number of category depths probably
   // just decided to keep do it with seperate variables for each level for simiplicity since there are only 3 levels
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  highLevelOptions: Category[] = [];</span>
-<span class="cstat-no" title="statement not covered" >  midLevelOptions: Category[] = [];</span>
-<span class="cstat-no" title="statement not covered" >  lowLevelOptions: Category[] = [];</span>
+<span class="cstat-no" title="statement not covered" >  highLevelOptions: Category[] = []</span>
+<span class="cstat-no" title="statement not covered" >  midLevelOptions: Category[] = []</span>
+<span class="cstat-no" title="statement not covered" >  lowLevelOptions: Category[] = []</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  highLevelSelection = '';</span>
-<span class="cstat-no" title="statement not covered" >  midLevelSelection = '';</span>
-<span class="cstat-no" title="statement not covered" >  lowLevelSelection = '';</span>
+<span class="cstat-no" title="statement not covered" >  highLevelSelection = ''</span>
+<span class="cstat-no" title="statement not covered" >  midLevelSelection = ''</span>
+<span class="cstat-no" title="statement not covered" >  lowLevelSelection = ''</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  showMidLevel = false;</span>
-<span class="cstat-no" title="statement not covered" >  showLowLevel = false;</span>
+<span class="cstat-no" title="statement not covered" >  showMidLevel = false</span>
+<span class="cstat-no" title="statement not covered" >  showLowLevel = false</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  assignedCategoryIDsStatic: string[] = [];</span>
-<span class="cstat-no" title="statement not covered" >  assignedCategoryIDsEditable: string[] = [];</span>
+<span class="cstat-no" title="statement not covered" >  assignedCategoryIDsStatic: string[] = []</span>
+<span class="cstat-no" title="statement not covered" >  assignedCategoryIDsEditable: string[] = []</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  faAngleRight = faAngleRight;</span>
-<span class="cstat-no" title="statement not covered" >  faTimesCircle = faTimesCircle;</span>
+<span class="cstat-no" title="statement not covered" >  faAngleRight = faAngleRight</span>
+<span class="cstat-no" title="statement not covered" >  faTimesCircle = faTimesCircle</span>
 &nbsp;
 <span class="fstat-no" title="function not covered" >  constructor(private <span class="cstat-no" title="statement not covered" ></span>ocCategoryService: OcCategoryService)</span> {}
 &nbsp;
   async <span class="fstat-no" title="function not covered" >getTopLevelCategories</span>(): Promise&lt;void&gt; {
     const highLevelCategories = <span class="cstat-no" title="statement not covered" >await this.ocCategoryService</span>
       .List(this._catalogID, { pageSize: 100, depth: '1' })
-      .toPromise();
-<span class="cstat-no" title="statement not covered" >    this.highLevelOptions = highLevelCategories.Items;</span>
+      .toPromise()
+<span class="cstat-no" title="statement not covered" >    this.highLevelOptions = highLevelCategories.Items</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  resetCategoryAssignment</span>(categorys: Category[][]): void {
-<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesStatic = categorys;</span>
-<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesEditable = this._assignedCategoriesStatic;</span>
+<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesStatic = categorys</span>
+<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesEditable = this._assignedCategoriesStatic</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >getSubcategories</span>(categoryID: string): Promise&lt;Category[]&gt; {
-<span class="cstat-no" title="statement not covered" >    return (await this.ocCategoryService</span>
-      .List(this._catalogID, {
-        depth: '1',
-        pageSize: 100,
-        filters: { ParentID: categoryID },
-      })
-      .toPromise()).Items;
+<span class="cstat-no" title="statement not covered" >    return (</span>
+      await this.ocCategoryService
+        .List(this._catalogID, {
+          depth: '1',
+          pageSize: 100,
+          filters: { ParentID: categoryID },
+        })
+        .toPromise()
+    ).Items
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >selectHighLevelCategory</span>(event: any): Promise&lt;void&gt; {
-    const categoryID = <span class="cstat-no" title="statement not covered" >event.target.value;</span>
-<span class="cstat-no" title="statement not covered" >    this.highLevelSelection = categoryID;</span>
-<span class="cstat-no" title="statement not covered" >    this.midLevelSelection = '';</span>
-<span class="cstat-no" title="statement not covered" >    this.lowLevelSelection = '';</span>
-<span class="cstat-no" title="statement not covered" >    this.showMidLevel = false;</span>
-<span class="cstat-no" title="statement not covered" >    this.showLowLevel = false;</span>
-    const subCategories = <span class="cstat-no" title="statement not covered" >await this.getSubcategories(categoryID);</span>
-<span class="cstat-no" title="statement not covered" >    this.midLevelOptions = subCategories;</span>
+    const categoryID = <span class="cstat-no" title="statement not covered" >event.target.value</span>
+<span class="cstat-no" title="statement not covered" >    this.highLevelSelection = categoryID</span>
+<span class="cstat-no" title="statement not covered" >    this.midLevelSelection = ''</span>
+<span class="cstat-no" title="statement not covered" >    this.lowLevelSelection = ''</span>
+<span class="cstat-no" title="statement not covered" >    this.showMidLevel = false</span>
+<span class="cstat-no" title="statement not covered" >    this.showLowLevel = false</span>
+    const subCategories = <span class="cstat-no" title="statement not covered" >await this.getSubcategories(categoryID)</span>
+<span class="cstat-no" title="statement not covered" >    this.midLevelOptions = subCategories</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >selectMidLevelCategory</span>(event: any): Promise&lt;void&gt; {
-    const categoryID = <span class="cstat-no" title="statement not covered" >event.target.value;</span>
-<span class="cstat-no" title="statement not covered" >    this.midLevelSelection = categoryID;</span>
-<span class="cstat-no" title="statement not covered" >    this.lowLevelSelection = '';</span>
-<span class="cstat-no" title="statement not covered" >    this.showLowLevel = false;</span>
-    const subCategories = <span class="cstat-no" title="statement not covered" >await this.getSubcategories(categoryID);</span>
-<span class="cstat-no" title="statement not covered" >    this.lowLevelOptions = subCategories;</span>
+    const categoryID = <span class="cstat-no" title="statement not covered" >event.target.value</span>
+<span class="cstat-no" title="statement not covered" >    this.midLevelSelection = categoryID</span>
+<span class="cstat-no" title="statement not covered" >    this.lowLevelSelection = ''</span>
+<span class="cstat-no" title="statement not covered" >    this.showLowLevel = false</span>
+    const subCategories = <span class="cstat-no" title="statement not covered" >await this.getSubcategories(categoryID)</span>
+<span class="cstat-no" title="statement not covered" >    this.lowLevelOptions = subCategories</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  selectLowLevelCategory</span>(event: any): void {
-    const categoryID = <span class="cstat-no" title="statement not covered" >event.target.value;</span>
-<span class="cstat-no" title="statement not covered" >    this.lowLevelSelection = categoryID;</span>
+    const categoryID = <span class="cstat-no" title="statement not covered" >event.target.value</span>
+<span class="cstat-no" title="statement not covered" >    this.lowLevelSelection = categoryID</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  addAssignment</span>(): void {
-    const newAssignmentHierarchy = <span class="cstat-no" title="statement not covered" >[this.highLevelOptions.find(<span class="fstat-no" title="function not covered" >h </span>=&gt; <span class="cstat-no" title="statement not covered" >h.ID === this.highLevelSelection)</span>];</span>
+    const newAssignmentHierarchy = <span class="cstat-no" title="statement not covered" >[</span>
+      this.highLevelOptions.find(<span class="fstat-no" title="function not covered" >(h</span>) =&gt; <span class="cstat-no" title="statement not covered" >h.ID === this.highLevelSelection)</span>,
+    ]
 <span class="cstat-no" title="statement not covered" >    if (this.midLevelSelection) {</span>
-<span class="cstat-no" title="statement not covered" >      newAssignmentHierarchy.push(this.midLevelOptions.find(<span class="fstat-no" title="function not covered" >m </span>=&gt; <span class="cstat-no" title="statement not covered" >m.ID === this.midLevelSelection)</span>);</span>
+<span class="cstat-no" title="statement not covered" >      newAssignmentHierarchy.push(</span>
+        this.midLevelOptions.find(<span class="fstat-no" title="function not covered" >(m</span>) =&gt; <span class="cstat-no" title="statement not covered" >m.ID === this.midLevelSelection)</span>
+      )
     }
 <span class="cstat-no" title="statement not covered" >    if (this.lowLevelSelection) {</span>
-<span class="cstat-no" title="statement not covered" >      newAssignmentHierarchy.push(this.lowLevelOptions.find(<span class="fstat-no" title="function not covered" >m </span>=&gt; <span class="cstat-no" title="statement not covered" >m.ID === this.lowLevelSelection)</span>);</span>
+<span class="cstat-no" title="statement not covered" >      newAssignmentHierarchy.push(</span>
+        this.lowLevelOptions.find(<span class="fstat-no" title="function not covered" >(m</span>) =&gt; <span class="cstat-no" title="statement not covered" >m.ID === this.lowLevelSelection)</span>
+      )
     }
-<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesEditable = [...this._assignedCategoriesEditable, newAssignmentHierarchy];</span>
-<span class="cstat-no" title="statement not covered" >    this.assignmentsUpdated.emit(this._assignedCategoriesEditable);</span>
+<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesEditable = [</span>
+      ...this._assignedCategoriesEditable,
+      newAssignmentHierarchy,
+    ]
+<span class="cstat-no" title="statement not covered" >    this.assignmentsUpdated.emit(this._assignedCategoriesEditable)</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  getAssignedCategoryDislay</span>(categoryHierarchy: Category[]): string {
-<span class="cstat-no" title="statement not covered" >    return categoryHierarchy.map(<span class="fstat-no" title="function not covered" >c </span>=&gt; <span class="cstat-no" title="statement not covered" >c.Name)</span>.join('-&gt;');</span>
+<span class="cstat-no" title="statement not covered" >    return categoryHierarchy.map(<span class="fstat-no" title="function not covered" >(c</span>) =&gt; <span class="cstat-no" title="statement not covered" >c.Name)</span>.join('-&gt;')</span>
   }
 <span class="fstat-no" title="function not covered" >  removeAssignment</span>(indexToRemove: number): void {
-    const assignedCategoriesCopy = <span class="cstat-no" title="statement not covered" >JSON.parse(JSON.stringify(this._assignedCategoriesEditable));</span>
-<span class="cstat-no" title="statement not covered" >    assignedCategoriesCopy.splice(indexToRemove, 1);</span>
-<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesEditable = assignedCategoriesCopy;</span>
-<span class="cstat-no" title="statement not covered" >    this.assignmentsUpdated.emit(assignedCategoriesCopy);</span>
+    const assignedCategoriesCopy = <span class="cstat-no" title="statement not covered" >JSON.parse(</span>
+      JSON.stringify(this._assignedCategoriesEditable)
+    )
+<span class="cstat-no" title="statement not covered" >    assignedCategoriesCopy.splice(indexToRemove, 1)</span>
+<span class="cstat-no" title="statement not covered" >    this._assignedCategoriesEditable = assignedCategoriesCopy</span>
+<span class="cstat-no" title="statement not covered" >    this.assignmentsUpdated.emit(assignedCategoriesCopy)</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -415,7 +466,7 @@ export class ProductCategoryAssignment {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\..\prettify.js"></script>

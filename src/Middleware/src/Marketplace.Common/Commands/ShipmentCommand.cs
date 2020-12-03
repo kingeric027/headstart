@@ -214,32 +214,7 @@ namespace Marketplace.Common.Commands
             return processResult;
 
         }
-
-        private async void ValidateOrderStatus(Misc.Shipment shipment, BatchProcessResult processResult)
-        {
-            Order ocOrder = await GetOutgoingOrder(shipment);
-
-            var lineItemList = await _oc.LineItems.ListAsync(OrderDirection.Outgoing, shipment.OrderID);
-
-            bool shippingComplete = ValidateLineItemCounts(lineItemList);
-
-            if (!shippingComplete)
-            {
-                PatchOrderStatus(ocOrder, ShippingStatus.PartiallyShipped, OrderStatus.Open);
-                return;
-            }
-
-            if (ocOrder.xp.SubmittedOrderStatus != OrderStatus.Open.ToString() && shippingComplete)
-            {
-                throw new Exception($"All items are shipped, but the order cannot be marked as Completed since the order status is currently {ocOrder?.Status.ToString("g")}");
-            }
-            else if (ocOrder.xp.SubmittedOrderStatus == OrderStatus.Open.ToString() && shippingComplete)
-            {
-                PatchOrderStatus(ocOrder, ShippingStatus.Shipped, OrderStatus.Completed);
-            }
-
-        }
-
+
         private async void PatchOrderStatus(Order ocOrder, ShippingStatus shippingStatus, OrderStatus orderStatus)
         {
             var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, SubmittedOrderStatus = orderStatus } };

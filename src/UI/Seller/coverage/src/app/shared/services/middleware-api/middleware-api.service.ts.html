@@ -106,7 +106,17 @@
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
 <a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -162,34 +172,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
-import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk';
-import { MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { Inject, Injectable } from '@angular/core'
+import {
+  AppConfig,
+  applicationConfiguration,
+} from '@app-seller/config/app.config'
+import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk'
+import { MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk'
 &nbsp;
 export interface SupplierFilterConfigDocument extends Document {
-  Doc: SupplierFilterConfig;
+  Doc: SupplierFilterConfig
 }
 export interface SupplierFilterConfig {
-  Display: string;
-  Path: string;
-  Items: Filter[];
-  AllowSupplierEdit: boolean;
-  AllowSellerEdit: boolean;
-  BuyerAppFilterType: BuyerAppFilterType;
+  Display: string
+  Path: string
+  Items: Filter[]
+  AllowSupplierEdit: boolean
+  AllowSellerEdit: boolean
+  BuyerAppFilterType: BuyerAppFilterType
 }
 export declare enum BuyerAppFilterType {
   SelectOption = 'SelectOption',
   NonUI = 'NonUI',
 }
 export interface Filter {
-  Text: string;
-  Value: string;
+  Text: string
+  Value: string
 }
 @Injectable({
   providedIn: 'root',
@@ -199,31 +216,35 @@ export class MiddlewareAPIService {
     headers: new HttpHeaders({
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
     }),
-  };
+  }
 <span class="fstat-no" title="function not covered" >  constructor(</span>
     private <span class="cstat-no" title="statement not covered" >ocTokenService: OcTokenService,</span>
     private <span class="cstat-no" title="statement not covered" >http: HttpClient,</span>
     @Inject(applicationConfiguration) private <span class="cstat-no" title="statement not covered" >appConfig: AppConfig</span>
-  ) { }
+  ) {}
 &nbsp;
   async <span class="fstat-no" title="function not covered" >acknowledgeQuoteOrder</span>(orderID: string): Promise&lt;Order&gt; {
-    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`;</span>
-<span class="cstat-no" title="statement not covered" >    return await this.http.post&lt;Order&gt;(url, this.headers).toPromise();</span>
+    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/order/acknowledgequote/${orderID}`</span>
+<span class="cstat-no" title="statement not covered" >    return await this.http.post&lt;Order&gt;(url, this.headers).toPromise()</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >isLocationDeletable</span>(locationID: string): Promise&lt;boolean&gt; {
-    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/supplier/candelete/${locationID}`;</span>
-<span class="cstat-no" title="statement not covered" >    return await this.http.get&lt;boolean&gt;(url, this.headers).toPromise();</span>
+    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/supplier/candelete/${locationID}`</span>
+<span class="cstat-no" title="statement not covered" >    return await this.http.get&lt;boolean&gt;(url, this.headers).toPromise()</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >updateSupplier</span>(supplierID: string, supplier: any): Promise&lt;any&gt; {
-    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/supplier/${supplierID}`;</span>
-<span class="cstat-no" title="statement not covered" >    return await this.http.patch(url, supplier, this.headers).toPromise(); </span>
+    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/supplier/${supplierID}`</span>
+<span class="cstat-no" title="statement not covered" >    return await this.http.patch(url, supplier, this.headers).toPromise()</span>
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >getSupplierFilterConfig</span>(): Promise&lt;ListPage&lt;SupplierFilterConfigDocument&gt;&gt; {
-    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/supplierfilterconfig`;</span>
-<span class="cstat-no" title="statement not covered" >    return await this.http.get&lt;ListPage&lt;SupplierFilterConfigDocument&gt;&gt;(url, this.headers).toPromise();</span>
+  async <span class="fstat-no" title="function not covered" >getSupplierFilterConfig</span>(): Promise&lt;
+    ListPage&lt;SupplierFilterConfigDocument&gt;
+  &gt; {
+    const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/supplierfilterconfig`</span>
+<span class="cstat-no" title="statement not covered" >    return await this.http</span>
+      .get&lt;ListPage&lt;SupplierFilterConfigDocument&gt;&gt;(url, this.headers)
+      .toPromise()
   }
 }
 &nbsp;</pre></td></tr>
@@ -232,7 +253,7 @@ export class MiddlewareAPIService {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

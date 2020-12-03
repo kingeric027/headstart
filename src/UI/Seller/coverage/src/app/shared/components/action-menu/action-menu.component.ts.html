@@ -125,7 +125,9 @@
 <a name='L77'></a><a href='#L77'>77</a>
 <a name='L78'></a><a href='#L78'>78</a>
 <a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -201,11 +203,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { getSupportedInputTypes } from '@angular/cdk/platform';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { getSupportedInputTypes } from '@angular/cdk/platform'
 &nbsp;
 @Component({
   selector: 'action-menu-component',
@@ -214,73 +218,75 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 })
 <span class="fstat-no" title="function not covered" >export class ActionMenuComponent {</span>
   @Input()
-  dataIsSaving = false;
+  dataIsSaving = false
   @Input()
-  isCreatingNew = false;
+  isCreatingNew = false
   @Input()
-  areChanges = false;
+  areChanges = false
   @Input()
-  allowDiscard = false;
+  allowDiscard = false
   @Input()
-  allowDelete = false;
+  allowDelete = false
   @Input()
-  isDeletable = false;
+  isDeletable = false
   @Input()
-  saveTextOverride = '';
+  saveTextOverride = ''
   @Input()
-  resourceName = '';
+  resourceName = ''
   @Input()
-  requireConfirmation = false;
+  requireConfirmation = false
   @Input()
-  disableSave = false;
+  disableSave = false
   @Input()
-  confirmText = '';
+  confirmText = ''
   @Input()
-  labelSingular: string;
+  labelSingular: string
   @Output()
-  executeSaveAction = new EventEmitter&lt;void&gt;();
+  executeSaveAction = new EventEmitter&lt;void&gt;()
   @Output()
-  executeDiscardAction = new EventEmitter&lt;void&gt;();
+  executeDiscardAction = new EventEmitter&lt;void&gt;()
   @Output()
-  executeDelete = new EventEmitter&lt;void&gt;();
+  executeDelete = new EventEmitter&lt;void&gt;()
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  showConfirm = false;</span>
+<span class="cstat-no" title="statement not covered" >  showConfirm = false</span>
 &nbsp;
 <span class="fstat-no" title="function not covered" >  requestUserConfirmation</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.showConfirm = true;</span>
+<span class="cstat-no" title="statement not covered" >    this.showConfirm = true</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  emitSave</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.executeSaveAction.emit();</span>
+<span class="cstat-no" title="statement not covered" >    this.executeSaveAction.emit()</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  handleSavePressed</span>(): void {
 <span class="cstat-no" title="statement not covered" >    if (this.showConfirm) {</span>
-<span class="cstat-no" title="statement not covered" >      this.requestUserConfirmation();</span>
+<span class="cstat-no" title="statement not covered" >      this.requestUserConfirmation()</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      this.emitSave();</span>
+<span class="cstat-no" title="statement not covered" >      this.emitSave()</span>
     }
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  handleDiscard</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.executeDiscardAction.emit();</span>
+<span class="cstat-no" title="statement not covered" >    this.executeDiscardAction.emit()</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  getSaveText</span>(): string {
 <span class="cstat-no" title="statement not covered" >    if (this.dataIsSaving) {</span>
-<span class="cstat-no" title="statement not covered" >      return 'ADMIN.DELETE.SAVING';</span>
+<span class="cstat-no" title="statement not covered" >      return 'ADMIN.DELETE.SAVING'</span>
     }
 <span class="cstat-no" title="statement not covered" >    if (this.showConfirm) {</span>
-<span class="cstat-no" title="statement not covered" >      return 'ADMIN.DELETE.PENDING_CONFIRMATION';</span>
+<span class="cstat-no" title="statement not covered" >      return 'ADMIN.DELETE.PENDING_CONFIRMATION'</span>
     }
 <span class="cstat-no" title="statement not covered" >    if (this.saveTextOverride) {</span>
-<span class="cstat-no" title="statement not covered" >      return this.saveTextOverride;</span>
+<span class="cstat-no" title="statement not covered" >      return this.saveTextOverride</span>
     }
-<span class="cstat-no" title="statement not covered" >    return this.isCreatingNew ? 'ADMIN.DELETE.CREATE' : 'ADMIN.DELETE.SAVE_CHANGES';</span>
+<span class="cstat-no" title="statement not covered" >    return this.isCreatingNew</span>
+      ? 'ADMIN.DELETE.CREATE'
+      : 'ADMIN.DELETE.SAVE_CHANGES'
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  handleDelete</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.executeDelete.emit();</span>
+<span class="cstat-no" title="statement not covered" >    this.executeDelete.emit()</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -289,7 +295,7 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

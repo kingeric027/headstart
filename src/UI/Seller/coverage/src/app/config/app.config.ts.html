@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.67% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/3</span>
+        <span class='fraction'>3/3</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -30,21 +30,21 @@
         <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/1</span>
+        <span class='fraction'>1/1</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.67% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>2/3</span>
+        <span class='fraction'>3/3</span>
       </div>
     </div>
     <p class="quiet">
       Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
     </p>
   </div>
-  <div class='status-line medium'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -205,7 +205,15 @@
 <a name='L157'></a><a href='#L157'>157</a>
 <a name='L158'></a><a href='#L158'>158</a>
 <a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -311,9 +319,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -364,9 +378,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { InjectionToken } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { ApiRole } from '@ordercloud/angular-sdk';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { InjectionToken } from '@angular/core'
+import { environment } from '../../environments/environment'
+import { ApiRole } from '@ordercloud/angular-sdk'
 &nbsp;
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
@@ -468,47 +484,54 @@ export const ocAppConfig: AppConfig = {
     'SupplierReader',
     'SupplierAddressReader',
   ] as ApiRole[],
-};
+  impersonatingBuyerCustomRoleScope: [
+    'MPLocationOrderApprover',
+    'MPLocationViewAllOrders',
+  ],
+}
 &nbsp;
-export const applicationConfiguration = new InjectionToken&lt;AppConfig&gt;('app.config', {
-  providedIn: 'root',
-  factory: <span class="fstat-no" title="function not covered" >() </span>=&gt; <span class="cstat-no" title="statement not covered" >ocAppConfig,</span>
-});
+export const applicationConfiguration = new InjectionToken&lt;AppConfig&gt;(
+  'app.config',
+  {
+    providedIn: 'root',
+    factory: () =&gt; ocAppConfig,
+  }
+)
 &nbsp;
 export interface AppConfig {
   /**
    * A short name for your app. It will be used as a
    * cookie prefix as well as general display throughout the app.
    */
-  appname: string;
+  appname: string
 &nbsp;
   /**
    * The identifier for the seller, buyer network or buyer application that
    * will be used for authentication. You can view client ids for apps
    * you own or are a contributor to on the [dashboard](https://developer.ordercloud.io/dashboard)
    */
-  sellerID: string;
-  clientID: string;
+  sellerID: string
+  clientID: string
   /**
    * base path to middleware
    */
-  middlewareUrl: string;
+  middlewareUrl: string
 &nbsp;
-  translateBlobUrl: string;
-  blobStorageUrl: string;
+  translateBlobUrl: string
+  blobStorageUrl: string
 &nbsp;
   // sellerName is being hard-coded until this is available to store in OrderCloud
-  sellerName: string;
+  sellerName: string
 &nbsp;
   //  buyer url and client ID are needed for impersonating buyers
-  buyerConfigs: any;
-  
+  buyerConfigs: any
+&nbsp;
   /**
    * An array of fields on a product that should be monitored for changes.
    * If a supplier makes a change to a field within this string array, the product will be deactivated
    * until a seller reviews the change and approves it.
    */
-  superProductFieldsToMonitor: string[];
+  superProductFieldsToMonitor: string[]
 &nbsp;
   /**
    * An array of security roles that will be requested upon login.
@@ -517,11 +540,12 @@ export interface AppConfig {
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
 &nbsp;
-  orderCloudApiUrl: string;
-  orderCloudApiVersion: string;
+  orderCloudApiUrl: string
+  orderCloudApiVersion: string
 &nbsp;
-  scope: ApiRole[];
-  impersonatingBuyerScope: ApiRole[];
+  scope: ApiRole[]
+  impersonatingBuyerScope: ApiRole[]
+  impersonatingBuyerCustomRoleScope: string[]
 }
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -529,7 +553,7 @@ export interface AppConfig {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\prettify.js"></script>

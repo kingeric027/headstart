@@ -69,7 +69,17 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -83,36 +93,56 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Order, OcOrderService } from '@ordercloud/angular-sdk';
-import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { OrderType } from '@app-seller/shared/models/MarketPlaceOrder.interface';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { Orders } from 'ordercloud-javascript-sdk';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
+import { Order, OcOrderService } from '@ordercloud/angular-sdk'
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
+import { OrderType } from '@app-seller/shared/models/MarketPlaceOrder.interface'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { Orders } from 'ordercloud-javascript-sdk'
 &nbsp;
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService extends ResourceCrudService&lt;Order&gt; {
-<span class="fstat-no" title="function not covered" >  constructor(</span>router: Router, activatedRoute: ActivatedRoute, 
-    currentUserService: CurrentUserService) {
-<span class="cstat-no" title="statement not covered" >    super(router, activatedRoute, Orders, currentUserService, '/orders', 'orders');</span>
+<span class="fstat-no" title="function not covered" >  constructor(</span>
+    router: Router,
+    activatedRoute: ActivatedRoute,
+    currentUserService: CurrentUserService
+  ) {
+<span class="cstat-no" title="statement not covered" >    super(</span>
+      router,
+      activatedRoute,
+      Orders,
+      currentUserService,
+      '/orders',
+      'orders'
+    )
   }
 <span class="fstat-no" title="function not covered" >  setOrderDirection</span>(orderDirection: string) {
-<span class="cstat-no" title="statement not covered" >    this.patchFilterState({ OrderDirection: orderDirection });</span>
+<span class="cstat-no" title="statement not covered" >    this.patchFilterState({ OrderDirection: orderDirection })</span>
   }
 <span class="fstat-no" title="function not covered" >  isQuoteOrder</span>(order: Order) {
-<span class="cstat-no" title="statement not covered" >    return order?.xp?.OrderType === OrderType.Quote;</span>
+<span class="cstat-no" title="statement not covered" >    return order?.xp?.OrderType === OrderType.Quote</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -121,7 +151,7 @@ export class OrderService extends ResourceCrudService&lt;Order&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\prettify.js"></script>

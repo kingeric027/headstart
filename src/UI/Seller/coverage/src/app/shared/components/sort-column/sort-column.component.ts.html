@@ -20,31 +20,31 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">33.33% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>5/15</span>
+        <span class='fraction'>15/15</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/5</span>
+        <span class='fraction'>5/5</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/3</span>
+        <span class='fraction'>3/3</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">28.57% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>4/14</span>
+        <span class='fraction'>14/14</span>
       </div>
     </div>
     <p class="quiet">
       Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
     </p>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -103,8 +103,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -115,33 +115,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 &nbsp;
 @Component({
   selector: 'shared-sort-column',
@@ -149,42 +149,42 @@ import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./sort-column.component.scss'],
 })
 export class SortColumnComponent {
-<span class="fstat-no" title="function not covered" >  constructor() {}</span>
-<span class="cstat-no" title="statement not covered" >  faCaretUp = faCaretUp;</span>
-<span class="cstat-no" title="statement not covered" >  faCaretDown = faCaretDown;</span>
+  constructor() {}
+  faCaretUp = faCaretUp
+  faCaretDown = faCaretDown
 &nbsp;
   // The name of the field providing data to this column. For example, ID, Description, Active
-  @Input() fieldName: string;
+  @Input() fieldName: string
 &nbsp;
   // Will be one of 'fieldName', '!fieldName', or undefined if not sorting on this column.
-  @Input() currentSort: string;
+  @Input() currentSort: string
 &nbsp;
   // Will emit a string containing sort info in the OrderCloud API request syntax.
   // e.g. 'ID' means sort by ID accesending, '!ID' will sort descending.
   // Documentation - https://developer.ordercloud.io/documentation/platform-guides/basic-api-features/sorting
-  @Output() sort = new EventEmitter&lt;string&gt;();
+  @Output() sort = new EventEmitter&lt;string&gt;()
 &nbsp;
-<span class="fstat-no" title="function not covered" >  changeSort</span>() {
-    let sort;
-<span class="cstat-no" title="statement not covered" >    switch (this.currentSort) {</span>
+  changeSort() {
+    let sort
+    switch (this.currentSort) {
       case this.fieldName:
-<span class="cstat-no" title="statement not covered" >        sort = `!${this.fieldName}`;</span>
-<span class="cstat-no" title="statement not covered" >        break;</span>
+        sort = `!${this.fieldName}`
+        break
       case `!${this.fieldName}`:
         // setting to undefined so sdk ignores parameter
-<span class="cstat-no" title="statement not covered" >        sort = undefined;</span>
-<span class="cstat-no" title="statement not covered" >        break;</span>
+        sort = undefined
+        break
       default:
-<span class="cstat-no" title="statement not covered" >        sort = this.fieldName;</span>
+        sort = this.fieldName
     }
-<span class="cstat-no" title="statement not covered" >    this.sort.emit(sort);</span>
+    this.sort.emit(sort)
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  showCaretIcon</span>(): boolean {
-<span class="cstat-no" title="statement not covered" >    return (</span>
+  showCaretIcon(): boolean {
+    return (
       this.currentSort === this.fieldName ||
       this.currentSort === `!${this.fieldName}`
-    );
+    )
   }
 }
 &nbsp;</pre></td></tr>
@@ -193,7 +193,7 @@ export class SortColumnComponent {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

@@ -106,7 +106,14 @@
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
 <a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -133,7 +140,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -162,69 +168,66 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, OnInit, Input, OnChanges } from '@angular/core';
-import { FormControl } from '@angular/forms';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, OnInit, Input, OnChanges } from '@angular/core'
+import { FormControl } from '@angular/forms'
+import { UserGroup, ProductAssignment } from '@ordercloud/angular-sdk'
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import {
-    UserGroup,
-    ProductAssignment
-} from '@ordercloud/angular-sdk';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { MarketplaceProduct, ChiliConfig, ChiliSpec, ChiliSpecXp, ChiliSpecUI } from '@ordercloud/headstart-sdk';
-import { TecraDocument, TecraSpec } from '../../../../shared/services/middleware-api/middleware-chili.service';
+  MarketplaceProduct,
+  ChiliConfig,
+  ChiliSpec,
+  ChiliSpecXp,
+  ChiliSpecUI,
+} from '@ordercloud/headstart-sdk'
+import {
+  TecraDocument,
+  TecraSpec,
+} from '../../../../shared/services/middleware-api/middleware-chili.service'
 &nbsp;
 @Component({
-    selector: 'variable-print-configuration-component',
-    templateUrl: './variable-print-configuration.component.html',
-    styleUrls: ['./variable-print-configuration.component.scss'],
+  selector: 'variable-print-configuration-component',
+  templateUrl: './variable-print-configuration.component.html',
+  styleUrls: ['./variable-print-configuration.component.scss'],
 })
 export class VariablePrintConfiguration implements OnInit {
-    @Input()
-    product: MarketplaceProduct;
-<span class="cstat-no" title="statement not covered" >    faExclamationCircle = faExclamationCircle;</span>
+  @Input()
+  product: MarketplaceProduct
+<span class="cstat-no" title="statement not covered" >  faExclamationCircle = faExclamationCircle</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    _buyerID = '';</span>
-<span class="cstat-no" title="statement not covered" >    _productID = '';</span>
-<span class="cstat-no" title="statement not covered" >    _folderName = '';</span>
-<span class="cstat-no" title="statement not covered" >    catalogs: UserGroup[] = [];</span>
-<span class="cstat-no" title="statement not covered" >    catalogAssignments: ProductAssignment[][] = [];</span>
+<span class="cstat-no" title="statement not covered" >  _buyerID = ''</span>
+<span class="cstat-no" title="statement not covered" >  _productID = ''</span>
+<span class="cstat-no" title="statement not covered" >  _folderName = ''</span>
+<span class="cstat-no" title="statement not covered" >  catalogs: UserGroup[] = []</span>
+<span class="cstat-no" title="statement not covered" >  catalogAssignments: ProductAssignment[][] = []</span>
 &nbsp;
+  @Input()
+<span class="fstat-no" title="function not covered" >  set </span>productID(value: string) {
+<span class="cstat-no" title="statement not covered" >    this._productID = value</span>
+  }
 &nbsp;
-    @Input()
-<span class="fstat-no" title="function not covered" >    set </span>productID(value: string) {
-<span class="cstat-no" title="statement not covered" >        this._productID = value;</span>
-    }
+  @Input()
+<span class="fstat-no" title="function not covered" >  set </span>folderName(value: string) {
+<span class="cstat-no" title="statement not covered" >    this._folderName = value</span>
+  }
 &nbsp;
-    @Input()
-<span class="fstat-no" title="function not covered" >    set </span>folderName(value: string) {
-<span class="cstat-no" title="statement not covered" >        this._folderName = value;</span>
-    }
+  @Input()
+<span class="fstat-no" title="function not covered" >  set </span>catalogID(value: string) {
+<span class="cstat-no" title="statement not covered" >    this._buyerID = value</span>
+  }
 &nbsp;
-    @Input()
-<span class="fstat-no" title="function not covered" >    set </span>catalogID(value: string) {
-<span class="cstat-no" title="statement not covered" >        this._buyerID = value;</span>
-    }
+  @Input()
+<span class="fstat-no" title="function not covered" >  set </span>availableCatelogs(value: UserGroup[]) {
+<span class="cstat-no" title="statement not covered" >    this.catalogs = value</span>
+  }
 &nbsp;
-    @Input()
-<span class="fstat-no" title="function not covered" >    set </span>availableCatelogs(value: UserGroup[]) {
-<span class="cstat-no" title="statement not covered" >        this.catalogs = value;</span>
-    }
+  @Input()
+<span class="fstat-no" title="function not covered" >  set </span>productAssignments(value: ProductAssignment[][]) {
+<span class="cstat-no" title="statement not covered" >    this.catalogAssignments = value</span>
+  }
 &nbsp;
-    @Input()
-<span class="fstat-no" title="function not covered" >    set </span>productAssignments(value: ProductAssignment[][]) {
-<span class="cstat-no" title="statement not covered" >        this.catalogAssignments = value;      </span>
-    }
+<span class="fstat-no" title="function not covered" >  constructor() {}</span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >    constructor(</span>
-&nbsp;
-    ) { }
-&nbsp;
-<span class="fstat-no" title="function not covered" >    ngOnInit</span>(): void {
-        
-    }
+<span class="fstat-no" title="function not covered" >  ngOnInit</span>(): void {}
 }
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -232,7 +235,7 @@ export class VariablePrintConfiguration implements OnInit {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\..\prettify.js"></script>

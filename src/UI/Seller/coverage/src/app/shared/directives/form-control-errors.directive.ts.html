@@ -35,9 +35,9 @@
         <span class='fraction'>0/7</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">16.67% </span>
+        <span class="strong">14.29% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>3/18</span>
+        <span class='fraction'>3/21</span>
       </div>
     </div>
     <p class="quiet">
@@ -95,7 +95,28 @@
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -104,7 +125,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -142,21 +167,34 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Directive, Self, ElementRef, OnInit, Renderer2, Input, ChangeDetectorRef } from '@angular/core';
-import { NgControl, FormGroup } from '@angular/forms';
-import { ErrorDictionary } from '../../../app/validators/validators';
-import { fromEvent } from 'rxjs';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+  Directive,
+  Self,
+  ElementRef,
+  OnInit,
+  Renderer2,
+  Input,
+  ChangeDetectorRef,
+} from '@angular/core'
+import { NgControl, FormGroup } from '@angular/forms'
+import { ErrorDictionary } from '../../../app/validators/validators'
+import { fromEvent } from 'rxjs'
 &nbsp;
 @Directive({
   selector: '[showErrors]',
 })
 export class FormControlErrorDirective implements OnInit {
-<span class="fstat-no" title="function not covered" >  constructor(@Self() private <span class="cstat-no" title="statement not covered" ></span>control: NgControl,</span> private <span class="cstat-no" title="statement not covered" >el: ElementRef,</span> private <span class="cstat-no" title="statement not covered" >renderer: Renderer2)</span> {}
+<span class="fstat-no" title="function not covered" >  constructor(</span>
+    @Self() private <span class="cstat-no" title="statement not covered" >control: NgControl,</span>
+    private <span class="cstat-no" title="statement not covered" >el: ElementRef,</span>
+    private <span class="cstat-no" title="statement not covered" >renderer: Renderer2</span>
+  ) {}
 &nbsp;
   @Input()
-  formControlName: string;
+  formControlName: string
 &nbsp;
   // resourceForm needs to be passed in to remove error messages when resetting the form
   // without changing the inputs, could be a better way
@@ -164,33 +202,34 @@ export class FormControlErrorDirective implements OnInit {
 <span class="fstat-no" title="function not covered" >  set </span>resourceForm(value: FormGroup) {
     // need this to remove the error when the selected resource is changed
 <span class="cstat-no" title="statement not covered" >    if (this.errorSpan) {</span>
-<span class="cstat-no" title="statement not covered" >      this.errorSpan.innerHTML = '';</span>
+<span class="cstat-no" title="statement not covered" >      this.errorSpan.innerHTML = ''</span>
     }
   }
 &nbsp;
-  errorSpan: HTMLElement;
+  errorSpan: HTMLElement
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ngOnInit</span>() {
-<span class="cstat-no" title="statement not covered" >    this.initializeSubscriptions();</span>
+<span class="cstat-no" title="statement not covered" >    this.initializeSubscriptions()</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  initializeSubscriptions</span>() {
-<span class="cstat-no" title="statement not covered" >    this.errorSpan = this.renderer.createElement('span');</span>
-<span class="cstat-no" title="statement not covered" >    this.renderer.appendChild(this.el.nativeElement.parentNode, this.errorSpan);</span>
-<span class="cstat-no" title="statement not covered" >    this.renderer.setAttribute(this.errorSpan, 'class', 'error-message');</span>
-    (<span class="cstat-no" title="statement not covered" >this.control as any).update.subscribe(this.displayErrorMsg);</span>
+<span class="cstat-no" title="statement not covered" >    this.errorSpan = this.renderer.createElement('span')</span>
+<span class="cstat-no" title="statement not covered" >    this.renderer.appendChild(this.el.nativeElement.parentNode, this.errorSpan)</span>
+<span class="cstat-no" title="statement not covered" >    this.renderer.setAttribute(this.errorSpan, 'class', 'error-message')</span>
+    ;(<span class="cstat-no" title="statement not covered" >this.control as any).update.subscribe(this.displayErrorMsg)</span>
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  displayErrorMsg = <span class="fstat-no" title="function not covered" >() </span>=&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    this.errorSpan.innerHTML = this.getErrorMsg(this.control);</span>
-  };
+<span class="cstat-no" title="statement not covered" >    this.errorSpan.innerHTML = this.getErrorMsg(this.control)</span>
+  }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  getErrorMsg</span>(control: NgControl) {
-<span class="cstat-no" title="statement not covered" >    if (!control.errors) <span class="cstat-no" title="statement not covered" >return '';</span></span>
-    let controlErrors = <span class="cstat-no" title="statement not covered" >Object.keys(control.errors);</span>
-<span class="cstat-no" title="statement not covered" >    if (control.value) <span class="cstat-no" title="statement not covered" >controlErrors = controlErrors.filter(<span class="fstat-no" title="function not covered" >x </span>=&gt; <span class="cstat-no" title="statement not covered" >x !== 'required')</span>;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (controlErrors.length === 0) <span class="cstat-no" title="statement not covered" >return '';</span></span>
-<span class="cstat-no" title="statement not covered" >    return ErrorDictionary[controlErrors[0]];</span>
+<span class="cstat-no" title="statement not covered" >    if (!control.errors) <span class="cstat-no" title="statement not covered" >return ''</span></span>
+    let controlErrors = <span class="cstat-no" title="statement not covered" >Object.keys(control.errors)</span>
+<span class="cstat-no" title="statement not covered" >    if (control.value)</span>
+<span class="cstat-no" title="statement not covered" >      controlErrors = controlErrors.filter(<span class="fstat-no" title="function not covered" >(x</span>) =&gt; <span class="cstat-no" title="statement not covered" >x !== 'required')</span></span>
+<span class="cstat-no" title="statement not covered" >    if (controlErrors.length === 0) <span class="cstat-no" title="statement not covered" >return ''</span></span>
+<span class="cstat-no" title="statement not covered" >    return ErrorDictionary[controlErrors[0]]</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -199,7 +238,7 @@ export class FormControlErrorDirective implements OnInit {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\prettify.js"></script>

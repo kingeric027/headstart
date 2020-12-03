@@ -582,7 +582,14 @@
 <a name='L534'></a><a href='#L534'>534</a>
 <a name='L535'></a><a href='#L535'>535</a>
 <a name='L536'></a><a href='#L536'>536</a>
-<a name='L537'></a><a href='#L537'>537</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1118,18 +1125,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
-import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper'
+import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper'
 &nbsp;
 export interface SummaryResourceInfoPaths {
-  toPrimaryHeader: string;
-  toSecondaryHeader: string;
-  toImage: string;
-  toExpandable: boolean;
+  toPrimaryHeader: string
+  toSecondaryHeader: string
+  toImage: string
+  toExpandable: boolean
 }
 &nbsp;
 export interface SummaryResourceInfoPathsDictionary {
-  [resourceType: string]: SummaryResourceInfoPaths;
+  [resourceType: string]: SummaryResourceInfoPaths
 }
 &nbsp;
 export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDictionary = {
@@ -1235,43 +1249,43 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
-};
+}
 &nbsp;
 export interface ResourceColumnConfiguration {
-  path: string;
-  header: string;
-  type: string;
-  sortable: boolean;
-  queryRestriction?: string;
+  path: string
+  header: string
+  type: string
+  sortable: boolean
+  queryRestriction?: string
 }
 &nbsp;
 export interface ResourceConfiguration {
-  fields: ResourceColumnConfiguration[];
-  imgPath?: string;
+  fields: ResourceColumnConfiguration[]
+  imgPath?: string
 }
 &nbsp;
 export interface ResourceCell {
-  type: string;
-  value: any;
+  type: string
+  value: any
 }
 &nbsp;
 export interface ResourceRow {
-  resource: any;
-  cells: ResourceCell[];
-  imgPath?: string;
+  resource: any
+  cells: ResourceCell[]
+  imgPath?: string
 }
 &nbsp;
 export interface ResourceConfigurationDictionary {
-  [resourceType: string]: ResourceConfiguration;
+  [resourceType: string]: ResourceConfiguration
 }
 &nbsp;
-export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE';
-export const BOOLEAN = 'BOOLEAN';
-export const BASIC_STRING = 'BASIC_STRING';
-export const DATE_TIME = 'DATE_TIME';
-export const CURRENCY = 'CURRENCY';
-export const COPY_OBJECT = 'COPY_OBJECT';
-export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON';
+export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE'
+export const BOOLEAN = 'BOOLEAN'
+export const BASIC_STRING = 'BASIC_STRING'
+export const DATE_TIME = 'DATE_TIME'
+export const CURRENCY = 'CURRENCY'
+export const COPY_OBJECT = 'COPY_OBJECT'
+export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON'
 &nbsp;
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -1511,6 +1525,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         sortable: true,
       },
       {
+        path: 'FromCompanyID',
+        header: 'ADMIN.HEADERS.FROM_COMPANY_ID',
+        type: BASIC_STRING,
+        sortable: true,
+        queryRestriction: 'OrderDirection=Incoming',
+      },
+      {
         path: 'ID',
         header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
@@ -1653,14 +1674,14 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
-};
+}
 &nbsp;</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

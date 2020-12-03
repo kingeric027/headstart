@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">8% </span>
+        <span class="strong">28% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/25</span>
+        <span class='fraction'>7/25</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
@@ -30,14 +30,14 @@
         <span class='fraction'>0/4</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">20% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/5</span>
+        <span class='fraction'>1/5</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">4.17% </span>
+        <span class="strong">25% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/24</span>
+        <span class='fraction'>6/24</span>
       </div>
     </div>
     <p class="quiet">
@@ -105,7 +105,19 @@
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -118,34 +130,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -158,69 +157,106 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { User, UserGroupAssignment } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerUserService } from '../buyer-user.service';
-import { BuyerService } from '../../buyers/buyer.service';
-import { UserGroupTypes } from '@app-seller/shared/components/user-group-assignments/user-group-assignments.constants';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { User, UserGroupAssignment } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { BuyerUserService } from '../buyer-user.service'
+import { BuyerService } from '../../buyers/buyer.service'
+import { UserGroupTypes } from '@app-seller/shared/components/user-group-assignments/user-group-assignments.constants'
 @Component({
   selector: 'app-buyer-user-table',
   templateUrl: './buyer-user-table.component.html',
   styleUrls: ['./buyer-user-table.component.scss'],
 })
 export class BuyerUserTableComponent extends ResourceCrudComponent&lt;User&gt; {
-<span class="cstat-no" title="statement not covered" >  permissionUserGroupAssignments: UserGroupAssignment[] = [];</span>
-<span class="cstat-no" title="statement not covered" >  locationUserGroupAssignments: UserGroupAssignment[] = [];</span>
+  permissionUserGroupAssignments: UserGroupAssignment[] = []
+  locationUserGroupAssignments: UserGroupAssignment[] = []
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(</span>
-    private <span class="cstat-no" title="statement not covered" >buyerUserService: BuyerUserService,</span>
+  constructor(
+    private buyerUserService: BuyerUserService,
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedroute: ActivatedRoute,
-    private <span class="cstat-no" title="statement not covered" >buyerService: BuyerService,</span>
+    private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-<span class="cstat-no" title="statement not covered" >    super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone);</span>
+    super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone)
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  captureUserGroupAssignments</span>(event): void {
 <span class="cstat-no" title="statement not covered" >    if (event.UserGroupType === UserGroupTypes.UserPermissions) {</span>
-<span class="cstat-no" title="statement not covered" >      this.permissionUserGroupAssignments = event.Assignments;</span>
+<span class="cstat-no" title="statement not covered" >      this.permissionUserGroupAssignments = event.Assignments</span>
     }
 <span class="cstat-no" title="statement not covered" >    if (event.UserGroupType === UserGroupTypes.BuyerLocation) {</span>
-<span class="cstat-no" title="statement not covered" >      this.locationUserGroupAssignments = event.Assignments;</span>
+<span class="cstat-no" title="statement not covered" >      this.locationUserGroupAssignments = event.Assignments</span>
     }
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >createNewResource</span>() {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      this.dataIsSaving = true;</span>
-      const user = <span class="cstat-no" title="statement not covered" >await this.buyerUserService.createNewResource(this.updatedResource);</span>
-<span class="cstat-no" title="statement not covered" >      await this.executeSupplierUserSecurityProfileAssignmentRequests(user);</span>
-<span class="cstat-no" title="statement not covered" >      this.selectResource(user);</span>
-<span class="cstat-no" title="statement not covered" >      this.dataIsSaving = false;</span>
+<span class="cstat-no" title="statement not covered" >      this.dataIsSaving = true</span>
+      const user = <span class="cstat-no" title="statement not covered" >await this.buyerUserService.createNewResource(</span>
+        this.updatedResource
+      )
+<span class="cstat-no" title="statement not covered" >      await this.executeSupplierUserSecurityProfileAssignmentRequests(user)</span>
+<span class="cstat-no" title="statement not covered" >      this.selectResource(user)</span>
+<span class="cstat-no" title="statement not covered" >      this.dataIsSaving = false</span>
     } catch (ex) {
-<span class="cstat-no" title="statement not covered" >      this.dataIsSaving = false;</span>
-<span class="cstat-no" title="statement not covered" >      throw ex;</span>
+<span class="cstat-no" title="statement not covered" >      this.dataIsSaving = false</span>
+<span class="cstat-no" title="statement not covered" >      throw ex</span>
     }
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >executeSupplierUserSecurityProfileAssignmentRequests</span>(user: User): Promise&lt;void&gt; {
-    let assignmentsToMake = <span class="cstat-no" title="statement not covered" >[...this.permissionUserGroupAssignments, ...this.locationUserGroupAssignments];</span>
-<span class="cstat-no" title="statement not covered" >    assignmentsToMake = assignmentsToMake.map(<span class="fstat-no" title="function not covered" >a </span>=&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      a.UserID = user.ID;</span>
-<span class="cstat-no" title="statement not covered" >      return a;</span>
-    });
-    const buyerID = <span class="cstat-no" title="statement not covered" >await this.buyerUserService.getParentResourceID();</span>
-<span class="cstat-no" title="statement not covered" >    await this.buyerUserService.updateUserUserGroupAssignments(buyerID, assignmentsToMake, [], assignmentsToMake.length &gt; 0);</span>
+  async <span class="fstat-no" title="function not covered" >executeSupplierUserSecurityProfileAssignmentRequests</span>(
+    user: User
+  ): Promise&lt;void&gt; {
+    let assignmentsToMake = <span class="cstat-no" title="statement not covered" >[</span>
+      ...this.permissionUserGroupAssignments,
+      ...this.locationUserGroupAssignments,
+    ]
+<span class="cstat-no" title="statement not covered" >    assignmentsToMake = assignmentsToMake.map(<span class="fstat-no" title="function not covered" >(a</span>) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      a.UserID = user.ID</span>
+<span class="cstat-no" title="statement not covered" >      return a</span>
+    })
+    const buyerID = <span class="cstat-no" title="statement not covered" >await this.buyerUserService.getParentResourceID()</span>
+<span class="cstat-no" title="statement not covered" >    await this.buyerUserService.updateUserUserGroupAssignments(</span>
+      buyerID,
+      assignmentsToMake,
+      [],
+      assignmentsToMake.length &gt; 0
+    )
   }
 }
 &nbsp;</pre></td></tr>
@@ -229,7 +265,7 @@ export class BuyerUserTableComponent extends ResourceCrudComponent&lt;User&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\..\prettify.js"></script>

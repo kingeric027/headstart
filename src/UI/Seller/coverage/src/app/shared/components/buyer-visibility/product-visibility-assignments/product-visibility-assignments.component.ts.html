@@ -134,7 +134,16 @@
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
 <a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -200,38 +209,47 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, OnInit, Input, OnChanges } from '@angular/core';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, OnInit, Input, OnChanges } from '@angular/core'
 import {
   Buyer,
   OcBuyerService,
   ProductAssignment,
   ProductCatalogAssignment,
   OcCatalogService,
-} from '@ordercloud/angular-sdk';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
+} from '@ordercloud/angular-sdk'
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
 &nbsp;
 @Component({
   selector: 'product-visibility-assignments-component',
@@ -240,74 +258,83 @@ import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
 })
 export class ProductVisibilityAssignments implements OnInit, OnChanges {
   @Input()
-  product: MarketplaceProduct;
-  buyers: Buyer[];
-  add: ProductAssignment[];
-  del: ProductAssignment[];
-  _productCatalogAssignmentsStatic: ProductCatalogAssignment[];
-  _productCatalogAssignmentsEditable: ProductCatalogAssignment[];
-  kitProductCatalogAssignments: ProductCatalogAssignment[];
-<span class="cstat-no" title="statement not covered" >  areChanges = false;</span>
-<span class="cstat-no" title="statement not covered" >  requestedUserConfirmation = false;</span>
-<span class="cstat-no" title="statement not covered" >  faExclamationCircle = faExclamationCircle;</span>
+  product: MarketplaceProduct
+  buyers: Buyer[]
+  add: ProductAssignment[]
+  del: ProductAssignment[]
+  _productCatalogAssignmentsStatic: ProductCatalogAssignment[]
+  _productCatalogAssignmentsEditable: ProductCatalogAssignment[]
+  kitProductCatalogAssignments: ProductCatalogAssignment[]
+<span class="cstat-no" title="statement not covered" >  areChanges = false</span>
+<span class="cstat-no" title="statement not covered" >  requestedUserConfirmation = false</span>
+<span class="cstat-no" title="statement not covered" >  faExclamationCircle = faExclamationCircle</span>
 &nbsp;
 <span class="fstat-no" title="function not covered" >  constructor(</span>
     private <span class="cstat-no" title="statement not covered" >ocBuyerService: OcBuyerService,</span>
     private <span class="cstat-no" title="statement not covered" >ocCatalogService: OcCatalogService</span>
-  ) { }
+  ) {}
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ngOnInit</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.getBuyers();</span>
-<span class="cstat-no" title="statement not covered" >    this.getProductCatalogAssignments(this.product);</span>
+<span class="cstat-no" title="statement not covered" >    this.getBuyers()</span>
+<span class="cstat-no" title="statement not covered" >    this.getProductCatalogAssignments(this.product)</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ngOnChanges</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.getProductCatalogAssignments(this.product);</span>
+<span class="cstat-no" title="statement not covered" >    this.getProductCatalogAssignments(this.product)</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  requestUserConfirmation</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this.requestedUserConfirmation = true;</span>
+<span class="cstat-no" title="statement not covered" >    this.requestedUserConfirmation = true</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >getBuyers</span>(): Promise&lt;void&gt; {
-    const buyers = <span class="cstat-no" title="statement not covered" >await this.ocBuyerService.List().toPromise();</span>
-<span class="cstat-no" title="statement not covered" >    this.buyers = buyers.Items;</span>
+    const buyers = <span class="cstat-no" title="statement not covered" >await this.ocBuyerService.List().toPromise()</span>
+<span class="cstat-no" title="statement not covered" >    this.buyers = buyers.Items</span>
   }
 &nbsp;
-&nbsp;
-&nbsp;
-  async <span class="fstat-no" title="function not covered" >getProductCatalogAssignments</span>(product: MarketplaceProduct): Promise&lt;void&gt; {
+  async <span class="fstat-no" title="function not covered" >getProductCatalogAssignments</span>(
+    product: MarketplaceProduct
+  ): Promise&lt;void&gt; {
     const productCatalogAssignments = <span class="cstat-no" title="statement not covered" >await this.ocCatalogService</span>
       .ListProductAssignments({ productID: product &amp;&amp; product.ID })
-      .toPromise();
-<span class="cstat-no" title="statement not covered" >    this._productCatalogAssignmentsStatic = productCatalogAssignments.Items;</span>
-<span class="cstat-no" title="statement not covered" >    this._productCatalogAssignmentsEditable = productCatalogAssignments.Items;</span>
+      .toPromise()
+<span class="cstat-no" title="statement not covered" >    this._productCatalogAssignmentsStatic = productCatalogAssignments.Items</span>
+<span class="cstat-no" title="statement not covered" >    this._productCatalogAssignmentsEditable = productCatalogAssignments.Items</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  isAssigned</span>(buyer: Buyer): boolean {
 <span class="cstat-no" title="statement not covered" >    return (</span>
       this._productCatalogAssignmentsEditable &amp;&amp;
       this._productCatalogAssignmentsEditable.some(
-<span class="fstat-no" title="function not covered" >        productAssignment</span> =&gt; <span class="cstat-no" title="statement not covered" >productAssignment.CatalogID === buyer.DefaultCatalogID</span>
+<span class="fstat-no" title="function not covered" >        (p</span>roductAssignment) =&gt;
+<span class="cstat-no" title="statement not covered" >          productAssignment.CatalogID === buyer.DefaultCatalogID</span>
       )
-    );
+    )
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  checkForProductCatalogAssignmentChanges</span>(): void {
 <span class="cstat-no" title="statement not covered" >    this.add = this._productCatalogAssignmentsEditable.filter(</span>
-<span class="fstat-no" title="function not covered" >      assignment</span> =&gt; <span class="cstat-no" title="statement not covered" >!JSON.stringify(this._productCatalogAssignmentsStatic).includes(assignment.CatalogID) ||</span>
-        !JSON.stringify(this.kitProductCatalogAssignments).includes(assignment.CatalogID)
-    );
+<span class="fstat-no" title="function not covered" >      (a</span>ssignment) =&gt;
+<span class="cstat-no" title="statement not covered" >        !JSON.stringify(this._productCatalogAssignmentsStatic).includes(</span>
+          assignment.CatalogID
+        ) ||
+        !JSON.stringify(this.kitProductCatalogAssignments).includes(
+          assignment.CatalogID
+        )
+    )
 <span class="cstat-no" title="statement not covered" >    this.del = this._productCatalogAssignmentsStatic.filter(</span>
-<span class="fstat-no" title="function not covered" >      assignment</span> =&gt; <span class="cstat-no" title="statement not covered" >!JSON.stringify(this._productCatalogAssignmentsEditable).includes(assignment.CatalogID)</span>
-    );
-<span class="cstat-no" title="statement not covered" >    this.areChanges = this.add.length &gt; 0 || this.del.length &gt; 0;</span>
-<span class="cstat-no" title="statement not covered" >    if (!this.areChanges) <span class="cstat-no" title="statement not covered" >this.requestedUserConfirmation = false;</span></span>
+<span class="fstat-no" title="function not covered" >      (a</span>ssignment) =&gt;
+<span class="cstat-no" title="statement not covered" >        !JSON.stringify(this._productCatalogAssignmentsEditable).includes(</span>
+          assignment.CatalogID
+        )
+    )
+<span class="cstat-no" title="statement not covered" >    this.areChanges = this.add.length &gt; 0 || this.del.length &gt; 0</span>
+<span class="cstat-no" title="statement not covered" >    if (!this.areChanges) <span class="cstat-no" title="statement not covered" >this.requestedUserConfirmation = false</span></span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  discardProductCatalogAssignmentChanges</span>(): void {
-<span class="cstat-no" title="statement not covered" >    this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsStatic;</span>
-<span class="cstat-no" title="statement not covered" >    this.checkForProductCatalogAssignmentChanges();</span>
+<span class="cstat-no" title="statement not covered" >    this._productCatalogAssignmentsEditable = this._productCatalogAssignmentsStatic</span>
+<span class="cstat-no" title="statement not covered" >    this.checkForProductCatalogAssignmentChanges()</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -316,7 +343,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\..\prettify.js"></script>

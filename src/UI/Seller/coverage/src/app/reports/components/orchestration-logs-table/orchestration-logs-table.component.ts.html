@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">33.33% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/6</span>
+        <span class='fraction'>6/6</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -30,21 +30,21 @@
         <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/1</span>
+        <span class='fraction'>1/1</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">20% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/5</span>
+        <span class='fraction'>5/5</span>
       </div>
     </div>
     <p class="quiet">
       Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
     </p>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -118,7 +118,13 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -130,22 +136,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -190,11 +193,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Router, ActivatedRoute } from '@angular/router';
-import { OrchestrationLogsService } from '@app-seller/reports/orchestration-logs.service';
-import { OrchestrationLog } from '@ordercloud/headstart-sdk';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Router, ActivatedRoute } from '@angular/router'
+import { OrchestrationLogsService } from '@app-seller/reports/orchestration-logs.service'
+import { OrchestrationLog } from '@ordercloud/headstart-sdk'
 &nbsp;
 @Component({
   selector: 'app-orchestration-logs-table',
@@ -202,19 +214,19 @@ import { OrchestrationLog } from '@ordercloud/headstart-sdk';
   styleUrls: ['./orchestration-logs-table.component.scss'],
 })
 export class OrchestrationLogsTableComponent extends ResourceCrudComponent&lt;OrchestrationLog&gt; {
-<span class="cstat-no" title="statement not covered" >  route = '/reports/orchestration-logs';</span>
+  route = '/reports/orchestration-logs'
 &nbsp;
-<span class="fstat-no" title="function not covered" >  constructor(</span>
-    private <span class="cstat-no" title="statement not covered" >service: OrchestrationLogsService,</span>
+  constructor(
+    private service: OrchestrationLogsService,
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedRoute: ActivatedRoute,
     ngZone: NgZone
   ) {
-<span class="cstat-no" title="statement not covered" >    super(changeDetectorRef, service, router, activatedRoute, ngZone);</span>
+    super(changeDetectorRef, service, router, activatedRoute, ngZone)
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  filterConfig = {</span>
+  filterConfig = {
     Filters: [
       {
         Display: 'ADMIN.FILTERS.LOGS_ON_BEFORE',
@@ -227,12 +239,18 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent&lt;Or
         Path: 'RecordType',
         Items: [
           { Text: 'ADMIN.FILTER_OPTIONS.CATALOG', Value: 'Catalog' },
-          { Text: 'ADMIN.FILTER_OPTIONS.PRICE_SCHEDULE', Value: 'PriceSchedule' },
+          {
+            Text: 'ADMIN.FILTER_OPTIONS.PRICE_SCHEDULE',
+            Value: 'PriceSchedule',
+          },
           { Text: 'ADMIN.FILTER_OPTIONS.PRODUCT', Value: 'Product' },
           { Text: 'ADMIN.FILTER_OPTIONS.PRODUCT_FACET', Value: 'ProductFacet' },
           { Text: 'ADMIN.FILTER_OPTIONS.SPEC', Value: 'Spec' },
           { Text: 'ADMIN.FILTER_OPTIONS.SPEC_OPTION', Value: 'SpecOption' },
-          { Text: 'ADMIN.FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT', Value: 'Spec' },
+          {
+            Text: 'ADMIN.FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT',
+            Value: 'Spec',
+          },
           { Text: 'ADMIN.FILTER_OPTIONS.USER', Value: 'User' },
         ],
         Type: 'Dropdown',
@@ -260,7 +278,7 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent&lt;Or
         Type: 'Dropdown',
       },
     ],
-  };
+  }
 }
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -268,7 +286,7 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent&lt;Or
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

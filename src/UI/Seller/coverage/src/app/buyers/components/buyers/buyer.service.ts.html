@@ -93,7 +93,15 @@
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -136,17 +144,25 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
-import { Buyer, Buyers } from 'ordercloud-javascript-sdk';
-import { ListArgs } from '@ordercloud/headstart-sdk';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
+import { Buyer, Buyers } from 'ordercloud-javascript-sdk'
+import { ListArgs } from '@ordercloud/headstart-sdk'
 &nbsp;
 export const BUYER_SUB_RESOURCE_LIST = [
   { route: 'users', display: 'ADMIN.NAV.USERS' },
@@ -155,7 +171,7 @@ export const BUYER_SUB_RESOURCE_LIST = [
   { route: 'approvals', display: 'ADMIN.NAV.APPROVALS' },
   { route: 'catalogs', display: 'ADMIN.NAV.CATALOGS' },
   { route: 'categories', display: 'ADMIN.NAV.CATEGORIES' },
-];
+]
 &nbsp;
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -165,26 +181,34 @@ export class BuyerService extends ResourceCrudService&lt;Buyer&gt; {
 <span class="cstat-no" title="statement not covered" >  emptyResource = {</span>
     Buyer: {
       Name: '',
-          Active: true,
-          xp: {
-              ChiliPublishFolder: ''
-          }
+      Active: true,
+      xp: {
+        ChiliPublishFolder: '',
+      },
     },
     Markup: {
       Percent: 0,
     },
-  };
+  }
 <span class="fstat-no" title="function not covered" >  constructor(</span>
     router: Router,
     activatedRoute: ActivatedRoute,
     currentUserService: CurrentUserService,
     private <span class="cstat-no" title="statement not covered" >buyerTempService: BuyerTempService</span>
   ) {
-<span class="cstat-no" title="statement not covered" >    super(router, activatedRoute, Buyers, currentUserService, '/buyers', 'buyers', BUYER_SUB_RESOURCE_LIST);</span>
+<span class="cstat-no" title="statement not covered" >    super(</span>
+      router,
+      activatedRoute,
+      Buyers,
+      currentUserService,
+      '/buyers',
+      'buyers',
+      BUYER_SUB_RESOURCE_LIST
+    )
   }
 <span class="fstat-no" title="function not covered" >  addIntrinsicListArgs</span>(options: ListArgs): ListArgs {
-<span class="cstat-no" title="statement not covered" >    options.sortBy = ["NAME"];</span>
-<span class="cstat-no" title="statement not covered" >    return options;</span>
+<span class="cstat-no" title="statement not covered" >    options.sortBy = ['NAME']</span>
+<span class="cstat-no" title="statement not covered" >    return options</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -193,7 +217,7 @@ export class BuyerService extends ResourceCrudService&lt;Buyer&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

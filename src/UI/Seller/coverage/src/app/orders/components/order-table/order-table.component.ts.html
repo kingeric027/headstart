@@ -128,7 +128,13 @@
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -155,6 +161,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -162,14 +169,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,6 +182,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -210,13 +213,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Order } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types';
-import { OrderService } from '@app-seller/orders/order.service';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Order } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute, Params } from '@angular/router'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
+import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
+import { OrderService } from '@app-seller/orders/order.service'
 &nbsp;
 @Component({
   selector: 'app-order-table',
@@ -224,9 +236,9 @@ import { OrderService } from '@app-seller/orders/order.service';
   styleUrls: ['./order-table.component.scss'],
 })
 export class OrderTableComponent extends ResourceCrudComponent&lt;Order&gt; {
-  isListPage: boolean;
-<span class="cstat-no" title="statement not covered" >  shouldShowOrderToggle = false;</span>
-  activeOrderDirectionButton: string;
+  isListPage: boolean
+<span class="cstat-no" title="statement not covered" >  shouldShowOrderToggle = false</span>
+  activeOrderDirectionButton: string
 <span class="fstat-no" title="function not covered" >  constructor(</span>
     private <span class="cstat-no" title="statement not covered" >orderService: OrderService,</span>
     changeDetectorRef: ChangeDetectorRef,
@@ -235,28 +247,31 @@ export class OrderTableComponent extends ResourceCrudComponent&lt;Order&gt; {
     ngZone: NgZone,
     private <span class="cstat-no" title="statement not covered" >appAuthService: AppAuthService</span>
   ) {
-<span class="cstat-no" title="statement not covered" >    super(changeDetectorRef, orderService, router, activatedroute, ngZone);</span>
-<span class="cstat-no" title="statement not covered" >    this.shouldShowOrderToggle = this.appAuthService.getOrdercloudUserType() === SELLER;</span>
-<span class="cstat-no" title="statement not covered" >    activatedroute.queryParams.subscribe(<span class="fstat-no" title="function not covered" >params</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    super(changeDetectorRef, orderService, router, activatedroute, ngZone)</span>
+<span class="cstat-no" title="statement not covered" >    this.shouldShowOrderToggle =</span>
+      this.appAuthService.getOrdercloudUserType() === SELLER
+<span class="cstat-no" title="statement not covered" >    activatedroute.queryParams.subscribe(<span class="fstat-no" title="function not covered" >(p</span>arams) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (this.router.url.startsWith('/orders')) {</span>
-<span class="cstat-no" title="statement not covered" >        this.readFromUrlQueryParams(params);</span>
+<span class="cstat-no" title="statement not covered" >        this.readFromUrlQueryParams(params)</span>
       }
-    });
-<span class="cstat-no" title="statement not covered" >    activatedroute.params.subscribe(<span class="fstat-no" title="function not covered" >params</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      this.isListPage = !Boolean(params.orderID);</span>
-    });
+    })
+<span class="cstat-no" title="statement not covered" >    activatedroute.params.subscribe(<span class="fstat-no" title="function not covered" >(p</span>arams) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      this.isListPage = !params.orderID</span>
+    })
   }
 <span class="fstat-no" title="function not covered" >  setOrderDirection</span>(direction: string) {
 <span class="cstat-no" title="statement not covered" >    if (this.isListPage) {</span>
-<span class="cstat-no" title="statement not covered" >      this.orderService.setOrderDirection(direction);</span>
+<span class="cstat-no" title="statement not covered" >      this.orderService.setOrderDirection(direction)</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      this.router.navigate(['/orders'], { queryParams: { OrderDirection: direction } });</span>
+<span class="cstat-no" title="statement not covered" >      this.router.navigate(['/orders'], {</span>
+        queryParams: { OrderDirection: direction },
+      })
     }
   }
 &nbsp;
   private <span class="fstat-no" title="function not covered" >readFromUrlQueryParams</span>(params: Params): void {
-    const { OrderDirection } = <span class="cstat-no" title="statement not covered" >params;</span>
-<span class="cstat-no" title="statement not covered" >    this.activeOrderDirectionButton = OrderDirection;</span>
+    const { OrderDirection } = <span class="cstat-no" title="statement not covered" >params</span>
+<span class="cstat-no" title="statement not covered" >    this.activeOrderDirectionButton = OrderDirection</span>
   }
 <span class="cstat-no" title="statement not covered" >  filterConfig = {</span>
     Filters: [
@@ -265,7 +280,10 @@ export class OrderTableComponent extends ResourceCrudComponent&lt;Order&gt; {
         Path: 'Status',
         Items: [
           { Text: 'ADMIN.FILTER_OPTIONS.OPEN', Value: 'Open' },
-          { Text: 'ADMIN.FILTER_OPTIONS.AWAITING_APPROVAL', Value: 'AwaitingApproval' },
+          {
+            Text: 'ADMIN.FILTER_OPTIONS.AWAITING_APPROVAL',
+            Value: 'AwaitingApproval',
+          },
           { Text: 'ADMIN.FILTER_OPTIONS.COMPLETED', Value: 'Completed' },
           { Text: 'ADMIN.FILTER_OPTIONS.DECLINED', Value: 'Declined' },
           { Text: 'ADMIN.FILTER_OPTIONS.CANCELED', Value: 'Canceled' },
@@ -290,7 +308,7 @@ export class OrderTableComponent extends ResourceCrudComponent&lt;Order&gt; {
         QueryRestriction: 'OrderDirection=Incoming',
       },
     ],
-  };
+  }
 }
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -298,7 +316,7 @@ export class OrderTableComponent extends ResourceCrudComponent&lt;Order&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>

@@ -111,7 +111,10 @@
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -164,20 +167,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ErrorHandler, Inject, Injector, Injectable } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ErrorHandler, Inject, Injector, Injectable } from '@angular/core'
+import { ToastrService } from 'ngx-toastr'
 &nbsp;
 /**
  * this error handler class extends angular's ErrorHandler
@@ -189,12 +195,12 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AppErrorHandler extends ErrorHandler {
 <span class="fstat-no" title="function not covered" >  constructor(@Inject(Injector) private readonly <span class="cstat-no" title="statement not covered" ></span>injector: Injector)</span> {
-<span class="cstat-no" title="statement not covered" >    super();</span>
+<span class="cstat-no" title="statement not covered" >    super()</span>
   }
 &nbsp;
   public <span class="fstat-no" title="function not covered" >handleError</span>(ex: any): void {
-<span class="cstat-no" title="statement not covered" >    this.displayError(ex);</span>
-<span class="cstat-no" title="statement not covered" >    super.handleError(ex);</span>
+<span class="cstat-no" title="statement not covered" >    this.displayError(ex)</span>
+<span class="cstat-no" title="statement not covered" >    super.handleError(ex)</span>
   }
   /**
    * use this to display error message
@@ -202,43 +208,46 @@ export class AppErrorHandler extends ErrorHandler {
    */
   public <span class="fstat-no" title="function not covered" >displayError</span>(ex: any): void {
 <span class="cstat-no" title="statement not covered" >    if (ex.rejection) {</span>
-<span class="cstat-no" title="statement not covered" >      ex = ex.rejection;</span>
+<span class="cstat-no" title="statement not covered" >      ex = ex.rejection</span>
     }
-    let message = <span class="cstat-no" title="statement not covered" >'';</span>
+    let message = <span class="cstat-no" title="statement not covered" >''</span>
 <span class="cstat-no" title="statement not covered" >    if (ex?.error?.Errors?.length) {</span>
-      const e = <span class="cstat-no" title="statement not covered" >ex.error.Errors[0];</span>
+      const e = <span class="cstat-no" title="statement not covered" >ex.error.Errors[0]</span>
 <span class="cstat-no" title="statement not covered" >      if (e.Data &amp;&amp; e.Data.WebhookName) {</span>
         // webhook error
-<span class="cstat-no" title="statement not covered" >        message = e.Data.body;</span>
+<span class="cstat-no" title="statement not covered" >        message = e.Data.body</span>
       } else <span class="cstat-no" title="statement not covered" >if (e.ErrorCode === 'NotFound') {</span>
-<span class="cstat-no" title="statement not covered" >        message = `${e.Data.ObjectType} ${e.Data.ObjectID} not found.`;</span>
+<span class="cstat-no" title="statement not covered" >        message = `${e.Data.ObjectType} ${e.Data.ObjectID} not found.`</span>
       } else {
-<span class="cstat-no" title="statement not covered" >        message = e.Message;</span>
+<span class="cstat-no" title="statement not covered" >        message = e.Message</span>
       }
     } else <span class="cstat-no" title="statement not covered" >if (ex?.error?.['error_description']) {</span>
-<span class="cstat-no" title="statement not covered" >      message = ex.error['error_description'];</span>
+<span class="cstat-no" title="statement not covered" >      message = ex.error['error_description']</span>
     } else <span class="cstat-no" title="statement not covered" >if (ex?.error?.[0]) {</span>
-<span class="cstat-no" title="statement not covered" >      message = ex?.error?.[0]?.Message;</span>
+<span class="cstat-no" title="statement not covered" >      message = ex?.error?.[0]?.Message</span>
     } else <span class="cstat-no" title="statement not covered" >if (ex.message) {</span>
-<span class="cstat-no" title="statement not covered" >      message = ex.message;</span>
+<span class="cstat-no" title="statement not covered" >      message = ex.message</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      message = 'An error occurred';</span>
+<span class="cstat-no" title="statement not covered" >      message = 'An error occurred'</span>
     }
 <span class="cstat-no" title="statement not covered" >    if (typeof message === 'object') {</span>
-<span class="cstat-no" title="statement not covered" >      message = JSON.stringify(message);</span>
+<span class="cstat-no" title="statement not covered" >      message = JSON.stringify(message)</span>
     }
-<span class="cstat-no" title="statement not covered" >    if (message === 'Token refresh attempt not possible' || message === 'Access token is invalid or expired.') {</span>
+<span class="cstat-no" title="statement not covered" >    if (</span>
+      message === 'Token refresh attempt not possible' ||
+      message === 'Access token is invalid or expired.'
+    ) {
       // display user friendly error
-<span class="cstat-no" title="statement not covered" >      message = 'Your session has expired. Please log in.';</span>
+<span class="cstat-no" title="statement not covered" >      message = 'Your session has expired. Please log in.'</span>
     }
-<span class="cstat-no" title="statement not covered" >    this.toastrService.error(message, 'Error', { onActivateTick: true });</span>
+<span class="cstat-no" title="statement not covered" >    this.toastrService.error(message, 'Error', { onActivateTick: true })</span>
   }
 &nbsp;
   /**
    * Need to get ToastrService from injector rather than constructor injection to avoid cyclic dependency error
    */
 <span class="fstat-no" title="function not covered" >  private get </span>toastrService(): ToastrService {
-<span class="cstat-no" title="statement not covered" >    return this.injector.get(ToastrService);</span>
+<span class="cstat-no" title="statement not covered" >    return this.injector.get(ToastrService)</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -247,7 +256,7 @@ export class AppErrorHandler extends ErrorHandler {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\prettify.js"></script>

@@ -93,7 +93,20 @@
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -126,24 +139,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Component, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { schemas } from './swagger-spec';
-import { SwaggerSpecProperty } from '@app-seller/shared/models/swagger-spec-proeprty.interface';
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+  Component,
+  Input,
+  ChangeDetectorRef,
+  Output,
+  EventEmitter,
+} from '@angular/core'
+import { schemas } from './swagger-spec'
+import { SwaggerSpecProperty } from '@app-seller/shared/models/swagger-spec-proeprty.interface'
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
 &nbsp;
 @Component({
   selector: 'resource-edit-component',
@@ -151,29 +171,30 @@ import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interf
   styleUrls: ['./resource-edit.component.scss'],
 })
 export class ResourceEditComponent {
-  _resource: any;
-  _resourceFields: SwaggerSpecProperty[];
+  _resource: any
+  _resourceFields: SwaggerSpecProperty[]
 &nbsp;
 <span class="fstat-no" title="function not covered" >  constructor(private <span class="cstat-no" title="statement not covered" ></span>changeDetectorRef: ChangeDetectorRef)</span> {}
 &nbsp;
   @Input()
 <span class="fstat-no" title="function not covered" >  set </span>resource(value: any) {
-<span class="cstat-no" title="statement not covered" >    this._resource = value;</span>
-<span class="cstat-no" title="statement not covered" >    this.changeDetectorRef.detectChanges();</span>
+<span class="cstat-no" title="statement not covered" >    this._resource = value</span>
+<span class="cstat-no" title="statement not covered" >    this.changeDetectorRef.detectChanges()</span>
   }
   @Input()
 <span class="fstat-no" title="function not covered" >  set </span>resourceType(value: string) {
-<span class="cstat-no" title="statement not covered" >    this._resourceFields = this.buildResourceFields(value);</span>
+<span class="cstat-no" title="statement not covered" >    this._resourceFields = this.buildResourceFields(value)</span>
   }
   @Output()
-  updateResource = new EventEmitter&lt;ResourceUpdate&gt;();
+  updateResource = new EventEmitter&lt;ResourceUpdate&gt;()
 &nbsp;
 <span class="fstat-no" title="function not covered" >  handleUpdateResource</span>(event: any, fieldType: string) {
     const resourceUpdate = <span class="cstat-no" title="statement not covered" >{</span>
       field: event.target.id,
-      value: fieldType === 'boolean' ? event.target.checked : event.target.value,
-    };
-<span class="cstat-no" title="statement not covered" >    this.updateResource.emit(resourceUpdate);</span>
+      value:
+        fieldType === 'boolean' ? event.target.checked : event.target.value,
+    }
+<span class="cstat-no" title="statement not covered" >    this.updateResource.emit(resourceUpdate)</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  buildResourceFields</span>(resourceType: string): SwaggerSpecProperty[] {
@@ -182,9 +203,9 @@ export class ResourceEditComponent {
 <span class="cstat-no" title="statement not covered" >        return {</span>
           field: key,
           type: value['type'],
-        };
+        }
       })
-      .filter(<span class="fstat-no" title="function not covered" >r </span>=&gt; <span class="cstat-no" title="statement not covered" >r.field !== 'xp')</span>;
+      .filter(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; <span class="cstat-no" title="statement not covered" >r.field !== 'xp')</span>
   }
 }
 &nbsp;</pre></td></tr>
@@ -193,7 +214,7 @@ export class ResourceEditComponent {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Nov 17 2020 17:27:50 GMT-0600 (Central Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Dec 03 2020 13:44:27 GMT-0600 (Central Standard Time)
 </div>
 </div>
 <script src="..\..\..\..\..\prettify.js"></script>
