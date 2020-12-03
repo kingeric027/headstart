@@ -61,7 +61,7 @@ namespace ordercloud.integrations.cms
 		public async Task<DocSchemaDO> GetDO(string schemaInteropID, VerifiedUserContext user)
 		{
 			var schema = await GetWithoutExceptions(schemaInteropID, user);
-			if (schema == null) throw new OrderCloudIntegrationException.NotFoundException("Schema", schemaInteropID);
+			if (schema == null) { throw new OrderCloudIntegrationException.NotFoundException("Schema", schemaInteropID); }
 			return schema;
 		}
 
@@ -69,7 +69,7 @@ namespace ordercloud.integrations.cms
 		{
 			var dataObject = SchemaMapper.MapTo(schema);
 			var existing = await GetWithoutExceptions(dataObject.InteropID, user);
-			if (existing != null) throw new DuplicateIDException();
+			if (existing != null) { throw new DuplicateIDException(); }
 			dataObject = Init(dataObject, user);
 			dataObject = await Validate(dataObject);
 			var newSchema = await _store.AddAsync(dataObject);
@@ -81,7 +81,7 @@ namespace ordercloud.integrations.cms
 			if (schemaInteropID != schema.ID)
 			{
 				var matchingID = await GetWithoutExceptions(schema.ID, user);
-				if (matchingID != null) throw new DuplicateIDException();
+				if (matchingID != null) { throw new DuplicateIDException(); }
 			}
 			var existingSchema = await GetWithoutExceptions(schemaInteropID, user);
 			if (existingSchema == null) existingSchema = Init(new DocSchemaDO(), user);

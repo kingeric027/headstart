@@ -17,11 +17,11 @@ namespace ordercloud.integrations.tecra.Storage
 
 	public class ChiliBlobStorage : IChiliBlobStorage
 	{
-		private readonly CMSConfig _config;
+		private readonly OrderCloudTecraConfig _config;
 		private readonly IOrderCloudIntegrationsBlobService _blob;
 		string chiliContainer = "chili-assets";
 
-		public ChiliBlobStorage(CMSConfig config)
+		public ChiliBlobStorage(OrderCloudTecraConfig config)
 		{
 			_config = config;
 			_blob = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
