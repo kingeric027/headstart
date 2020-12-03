@@ -36,7 +36,7 @@ export class OCMGridSpecForm {
     private specFormService: SpecFormService,
     private context: ShopperContextService,
     private productDetailService: ProductDetailService
-  ) {}
+  ) { }
 
   @Input() set superProduct(value: SuperMarketplaceProduct) {
     this._superProduct = value
@@ -125,7 +125,6 @@ export class OCMGridSpecForm {
 
   getErrorMsg(event: any) {
     this.errorMsg = event
-    console.log(event)
   }
 
   validateQuantity(lineItems: any): boolean {
