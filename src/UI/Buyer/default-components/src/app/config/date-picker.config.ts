@@ -1,5 +1,9 @@
-import { Injectable } from '@angular/core';
-import { NgbDateStruct, NgbDateAdapter, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { Injectable } from '@angular/core'
+import {
+  NgbDateStruct,
+  NgbDateAdapter,
+  NgbDateParserFormatter,
+} from '@ng-bootstrap/ng-bootstrap'
 
 /**
  * this adapter allows us to use the native date object when
@@ -17,11 +21,11 @@ export class NgbDateNativeAdapter extends NgbDateAdapter<Date> {
           month: date.getMonth() + 1,
           day: date.getDate(),
         }
-      : null;
+      : null
   }
 
   toModel(date: NgbDateStruct): Date {
-    return date ? new Date(date.year, date.month - 1, date.day) : null;
+    return date ? new Date(date.year, date.month - 1, date.day) : null
   }
 }
 
@@ -34,16 +38,20 @@ export class NgbDateNativeAdapter extends NgbDateAdapter<Date> {
 })
 export class NgbDateCustomParserFormatter extends NgbDateParserFormatter {
   parse(value: string): NgbDateStruct {
-    if (!value) return null;
-    const dateParts = value.trim().split('-');
+    if (!value) return null
+    const dateParts = value.trim().split('-')
     if (dateParts.length === 1 && this.isNumber(dateParts[0])) {
-      return { year: this.toInteger(dateParts[0]), month: null, day: null };
-    } else if (dateParts.length === 2 && this.isNumber(dateParts[0]) && this.isNumber(dateParts[1])) {
+      return { year: this.toInteger(dateParts[0]), month: null, day: null }
+    } else if (
+      dateParts.length === 2 &&
+      this.isNumber(dateParts[0]) &&
+      this.isNumber(dateParts[1])
+    ) {
       return {
         year: this.toInteger(dateParts[1]),
         month: this.toInteger(dateParts[0]),
         day: null,
-      };
+      }
     } else if (
       dateParts.length === 3 &&
       this.isNumber(dateParts[0]) &&
@@ -54,33 +62,33 @@ export class NgbDateCustomParserFormatter extends NgbDateParserFormatter {
         year: this.toInteger(dateParts[2]),
         month: this.toInteger(dateParts[0]),
         day: this.toInteger(dateParts[1]),
-      };
+      }
     }
   }
 
   format(date: NgbDateStruct): string {
-    let stringDate = '';
+    let stringDate = ''
     if (date) {
-      stringDate += `${this.padNumber(date.month)}-`;
-      stringDate += `${this.padNumber(date.day)}-`;
-      stringDate += date.year;
+      stringDate += `${this.padNumber(date.month)}-`
+      stringDate += `${this.padNumber(date.day)}-`
+      stringDate += date.year
     }
-    return stringDate;
+    return stringDate
   }
 
   padNumber(value: number): string {
     if (this.isNumber(value)) {
-      return `0${value}`.slice(-2);
+      return `0${value}`.slice(-2)
     } else {
-      return '';
+      return ''
     }
   }
 
   isNumber(value: any): boolean {
-    return !isNaN(this.toInteger(value));
+    return !isNaN(this.toInteger(value))
   }
 
   toInteger(value: any): number {
-    return parseInt(`${value}`, 10);
+    return parseInt(`${value}`, 10)
   }
 }

@@ -1,16 +1,21 @@
-import { Component, Input } from '@angular/core';
-import { faCircle, faClock, faBan } from '@fortawesome/free-solid-svg-icons';
-import { OrderStatus, ClaimStatus, ShippingStatus, LineItemStatus } from 'marketplace';
+import { Component, Input } from '@angular/core'
+import { faCircle, faClock, faBan } from '@fortawesome/free-solid-svg-icons'
+import {
+  OrderStatus,
+  ClaimStatus,
+  ShippingStatus,
+  LineItemStatus,
+} from 'marketplace'
 
 @Component({
   templateUrl: './order-status-icon.component.html',
   styleUrls: ['./order-status-icon.component.scss'],
 })
 export class OCMOrderStatusIcon {
-  @Input() status: OrderStatus;
-  faCircle = faCircle;
-  faClock = faClock;
-  faBan = faBan;
+  @Input() status: OrderStatus
+  faCircle = faCircle
+  faClock = faClock
+  faBan = faBan
   statusIconMapping = {
     [OrderStatus.Completed]: this.faCircle,
     [OrderStatus.AwaitingApproval]: this.faClock,
@@ -27,6 +32,6 @@ export class OCMOrderStatusIcon {
     [LineItemStatus.Returned]: this.faCircle,
     [LineItemStatus.Submitted]: this.faCircle,
     [LineItemStatus.ReturnRequested]: this.faClock,
-    [LineItemStatus.CancelRequested]: this.faClock
-  };
+    [LineItemStatus.CancelRequested]: this.faClock,
+  }
 }

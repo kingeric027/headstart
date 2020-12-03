@@ -1,11 +1,11 @@
 /*
-* Marketplace has distinct roles which are sometimes a combination of OrderCloud roles or sometimes a single OrderCloud role
-* We have choosen to represent these MP roles with security profiles and identifying custom roles for example: MPProductAdmin (OrderCloud roles: ProductAdmin, FacetAdmin, SpecAdmin)
-*
-*/
+ * Marketplace has distinct roles which are sometimes a combination of OrderCloud roles or sometimes a single OrderCloud role
+ * We have choosen to represent these MP roles with security profiles and identifying custom roles for example: MPProductAdmin (OrderCloud roles: ProductAdmin, FacetAdmin, SpecAdmin)
+ *
+ */
 interface MPRole {
-  RoleName: string;
-  OrderCloudRoles: string[];
+  RoleName: string
+  OrderCloudRoles: string[]
 }
 
 export const MPRoles = {
@@ -30,7 +30,7 @@ export const MPRoles = {
   MPReportReader: 'MPReportReader',
   MPReportAdmin: 'MPReportAdmin',
   MPStorefrontAdmin: 'MPStorefrontAdmin',
-};
+}
 
 const OrderCloudRoles = {
   AddressAdmin: 'AddressAdmin',
@@ -109,18 +109,25 @@ const OrderCloudRoles = {
   WebhookAdmin: 'WebhookAdmin',
   WebhookReader: 'WebhookReader',
   XpIndexAdmin: 'XpIndexAdmin',
-};
+}
 
 const MPMeProductAdmin: MPRole = {
   // Assigned to user types who want to manage own products in OC
   RoleName: MPRoles.MPMeProductAdmin,
-  OrderCloudRoles: [OrderCloudRoles.ProductAdmin, OrderCloudRoles.PriceScheduleAdmin, OrderCloudRoles.InventoryAdmin],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.ProductAdmin,
+    OrderCloudRoles.PriceScheduleAdmin,
+    OrderCloudRoles.InventoryAdmin,
+  ],
+}
 const MPMeProductReader: MPRole = {
   // Assigned to user types who want to view own products in OC
   RoleName: MPRoles.MPMeProductReader,
-  OrderCloudRoles: [OrderCloudRoles.ProductReader, OrderCloudRoles.PriceScheduleReader],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.ProductReader,
+    OrderCloudRoles.PriceScheduleReader,
+  ],
+}
 const MPProductAdmin: MPRole = {
   // Assigned to user types who want to manager the display to buyers of others products in OC
   RoleName: MPRoles.MPProductAdmin,
@@ -130,47 +137,54 @@ const MPProductAdmin: MPRole = {
     OrderCloudRoles.ProductAssignmentAdmin,
     OrderCloudRoles.ProductFacetAdmin,
   ],
-};
+}
 const MPProductReader: MPRole = {
   // Assigned to user types who want to view the display to buyers of others products in OC but cannot manager (might not be needed for SEB)
   RoleName: MPRoles.MPProductReader,
-  OrderCloudRoles: [OrderCloudRoles.ProductReader, OrderCloudRoles.CatalogReader, OrderCloudRoles.ProductFacetReader],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.ProductReader,
+    OrderCloudRoles.CatalogReader,
+    OrderCloudRoles.ProductFacetReader,
+  ],
+}
 const MPPromotionAdmin: MPRole = {
   // Assigned to user types who want to administer promotions
   RoleName: MPRoles.MPPromotionAdmin,
   OrderCloudRoles: [OrderCloudRoles.PromotionAdmin],
-};
+}
 const MPPromotionReader: MPRole = {
   // Assigned to user types who want to view promotions
   RoleName: MPRoles.MPPromotionReader,
   OrderCloudRoles: [OrderCloudRoles.PromotionReader],
-};
+}
 const MPCategoryAdmin: MPRole = {
   // Assigned to user types who want to administer categorys and assignments
   RoleName: MPRoles.MPCategoryAdmin,
   OrderCloudRoles: [OrderCloudRoles.CategoryAdmin],
-};
+}
 const MPCategoryReader: MPRole = {
   // Assigned to user types who want to view categorys
   RoleName: MPRoles.MPCategoryReader,
   OrderCloudRoles: [OrderCloudRoles.CategoryReader],
-};
+}
 const MPOrderAdmin: MPRole = {
   // Assigned to user types who want to edit orders, line items, and shipments. Would likely by a supplier who needs to make manual updates to an order
   RoleName: MPRoles.MPOrderAdmin,
   OrderCloudRoles: [OrderCloudRoles.OrderAdmin, OrderCloudRoles.ShipmentReader],
-};
+}
 const MPOrderReader: MPRole = {
   // Assigned to a user type who wants to view orders. Would likely be a seller user who shouldn't edit orders but wants to view
   RoleName: MPRoles.MPOrderReader,
-  OrderCloudRoles: [OrderCloudRoles.OrderReader, OrderCloudRoles.ShipmentReader],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.OrderReader,
+    OrderCloudRoles.ShipmentReader,
+  ],
+}
 const MPShipmentAdmin: MPRole = {
   // Assigned to a user type who wants to administer shipping for a supplier
   RoleName: MPRoles.MPShipmentAdmin,
   OrderCloudRoles: [OrderCloudRoles.OrderReader, OrderCloudRoles.ShipmentAdmin],
-};
+}
 // unclear if we need a MeBuyerAdmin
 // will need to be some disucssion about the breakout of these for SEB
 const MPBuyerAdmin: MPRole = {
@@ -184,7 +198,7 @@ const MPBuyerAdmin: MPRole = {
     OrderCloudRoles.CreditCardAdmin,
     OrderCloudRoles.ApprovalRuleAdmin,
   ],
-};
+}
 const MPBuyerReader: MPRole = {
   // Assigned to a user type who wants to view buyers and related subresources
   RoleName: MPRoles.MPBuyerReader,
@@ -196,12 +210,12 @@ const MPBuyerReader: MPRole = {
     OrderCloudRoles.CreditCardReader,
     OrderCloudRoles.ApprovalRuleReader,
   ],
-};
+}
 const MPSellerAdmin: MPRole = {
   // Assigned to a user type who wants to view buyers and related subresources
   RoleName: MPRoles.MPSellerAdmin,
   OrderCloudRoles: [OrderCloudRoles.AdminUserAdmin],
-};
+}
 const MPSupplierAdmin: MPRole = {
   // Assigned to a user type who wants to view buyers and related subresources
   RoleName: MPRoles.MPSupplierAdmin,
@@ -210,7 +224,7 @@ const MPSupplierAdmin: MPRole = {
     OrderCloudRoles.SupplierUserAdmin,
     OrderCloudRoles.SupplierAddressAdmin,
   ],
-};
+}
 const MPMeSupplierAdmin: MPRole = {
   RoleName: MPRoles.MPMeSupplierAdmin,
   OrderCloudRoles: [
@@ -218,31 +232,43 @@ const MPMeSupplierAdmin: MPRole = {
     OrderCloudRoles.SupplierAddressReader,
     OrderCloudRoles.SupplierUserReader,
   ],
-};
+}
 const MPMeSupplierAddressAdmin: MPRole = {
   RoleName: MPRoles.MPMeSupplierAddressAdmin,
-  OrderCloudRoles: [OrderCloudRoles.SupplierReader, OrderCloudRoles.SupplierAddressAdmin],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.SupplierReader,
+    OrderCloudRoles.SupplierAddressAdmin,
+  ],
+}
 const MPMeSupplierUserAdmin: MPRole = {
   RoleName: MPRoles.MPMeSupplierUserAdmin,
-  OrderCloudRoles: [OrderCloudRoles.SupplierReader, OrderCloudRoles.SupplierUserAdmin],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.SupplierReader,
+    OrderCloudRoles.SupplierUserAdmin,
+  ],
+}
 const MPReportReader: MPRole = {
   RoleName: MPRoles.MPReportReader,
-  OrderCloudRoles: [OrderCloudRoles.SupplierReader, OrderCloudRoles.SupplierAdmin],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.SupplierReader,
+    OrderCloudRoles.SupplierAdmin,
+  ],
+}
 const MPReportAdmin: MPRole = {
   RoleName: MPRoles.MPReportAdmin,
   OrderCloudRoles: [OrderCloudRoles.AdminUserAdmin],
-};
+}
 const MPStorefrontAdmin: MPRole = {
   RoleName: MPRoles.MPStorefrontAdmin,
-  OrderCloudRoles: [OrderCloudRoles.ProductFacetAdmin, OrderCloudRoles.ProductFacetReader],
-};
+  OrderCloudRoles: [
+    OrderCloudRoles.ProductFacetAdmin,
+    OrderCloudRoles.ProductFacetReader,
+  ],
+}
 
 interface UserType {
-  Name: string;
-  MPRoles: MPRole[];
+  Name: string
+  MPRoles: MPRole[]
 }
 const MarketPlaceManager = {
   Name: 'MarketPlaceManager',
@@ -257,9 +283,9 @@ const MarketPlaceManager = {
     MPMeSupplierAdmin,
     MPStorefrontAdmin,
     MPReportReader,
-    MPReportAdmin
+    MPReportAdmin,
   ],
-};
+}
 
 // SEB Specific Roles
 // Ultimately these will not be hardcoded in the app but live outside and by dynamic
@@ -274,11 +300,18 @@ const SupplierManager = {
     MPMeSupplierAdmin,
     MPMeSupplierAddressAdmin,
     MPMeSupplierUserAdmin,
-    MPReportReader
+    MPReportReader,
   ],
-};
+}
 const SupplierTeamMember = {
   Name: 'SupplierTeamMember',
-  MPRoles: [MPMeProductAdmin, MPOrderAdmin, MPShipmentAdmin, MPMeSupplierAdmin, MPMeSupplierAddressAdmin, MPReportReader],
-};
-const SEBUserTypes = [SupplierManager, SupplierTeamMember, MarketPlaceManager];
+  MPRoles: [
+    MPMeProductAdmin,
+    MPOrderAdmin,
+    MPShipmentAdmin,
+    MPMeSupplierAdmin,
+    MPMeSupplierAddressAdmin,
+    MPReportReader,
+  ],
+}
+const SEBUserTypes = [SupplierManager, SupplierTeamMember, MarketPlaceManager]

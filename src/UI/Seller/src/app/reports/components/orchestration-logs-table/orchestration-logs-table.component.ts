@@ -1,8 +1,8 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Router, ActivatedRoute } from '@angular/router';
-import { OrchestrationLogsService } from '@app-seller/reports/orchestration-logs.service';
-import { OrchestrationLog } from '@ordercloud/headstart-sdk';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Router, ActivatedRoute } from '@angular/router'
+import { OrchestrationLogsService } from '@app-seller/reports/orchestration-logs.service'
+import { OrchestrationLog } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'app-orchestration-logs-table',
@@ -10,7 +10,7 @@ import { OrchestrationLog } from '@ordercloud/headstart-sdk';
   styleUrls: ['./orchestration-logs-table.component.scss'],
 })
 export class OrchestrationLogsTableComponent extends ResourceCrudComponent<OrchestrationLog> {
-  route = '/reports/orchestration-logs';
+  route = '/reports/orchestration-logs'
 
   constructor(
     private service: OrchestrationLogsService,
@@ -19,7 +19,7 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
     activatedRoute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, service, router, activatedRoute, ngZone);
+    super(changeDetectorRef, service, router, activatedRoute, ngZone)
   }
 
   filterConfig = {
@@ -35,12 +35,18 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
         Path: 'RecordType',
         Items: [
           { Text: 'ADMIN.FILTER_OPTIONS.CATALOG', Value: 'Catalog' },
-          { Text: 'ADMIN.FILTER_OPTIONS.PRICE_SCHEDULE', Value: 'PriceSchedule' },
+          {
+            Text: 'ADMIN.FILTER_OPTIONS.PRICE_SCHEDULE',
+            Value: 'PriceSchedule',
+          },
           { Text: 'ADMIN.FILTER_OPTIONS.PRODUCT', Value: 'Product' },
           { Text: 'ADMIN.FILTER_OPTIONS.PRODUCT_FACET', Value: 'ProductFacet' },
           { Text: 'ADMIN.FILTER_OPTIONS.SPEC', Value: 'Spec' },
           { Text: 'ADMIN.FILTER_OPTIONS.SPEC_OPTION', Value: 'SpecOption' },
-          { Text: 'ADMIN.FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT', Value: 'Spec' },
+          {
+            Text: 'ADMIN.FILTER_OPTIONS.SPEC_PRODUCT_ASSIGNMENT',
+            Value: 'Spec',
+          },
           { Text: 'ADMIN.FILTER_OPTIONS.USER', Value: 'User' },
         ],
         Type: 'Dropdown',
@@ -68,5 +74,5 @@ export class OrchestrationLogsTableComponent extends ResourceCrudComponent<Orche
         Type: 'Dropdown',
       },
     ],
-  };
+  }
 }

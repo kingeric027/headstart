@@ -1,44 +1,53 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, Validators, FormControl } from '@angular/forms';
-import { MeUser } from 'ordercloud-javascript-sdk';
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, Validators, FormControl } from '@angular/forms'
+import { MeUser } from 'ordercloud-javascript-sdk'
 import {
   ValidateName,
   ValidateEmail,
   ValidatePhone,
   ValidateStrongPassword,
   ValidateFieldMatches,
-} from '../../../validators/validators';
-import { AppConfig, ShopperContextService } from 'marketplace';
+} from '../../../validators/validators'
+import { AppConfig, ShopperContextService } from 'marketplace'
 
 @Component({
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class OCMRegister implements OnInit {
-  form: FormGroup;
-  appName: string;
+  form: FormGroup
+  appName: string
 
-  constructor(private context: ShopperContextService, public appConfig: AppConfig) {}
+  constructor(
+    private context: ShopperContextService,
+    public appConfig: AppConfig
+  ) {}
 
   // TODO: validation isn't working
   ngOnInit(): void {
-    this.appName = this.context.appSettings.appname;
+    this.appName = this.context.appSettings.appname
     this.form = new FormGroup({
       Username: new FormControl('', Validators.required),
       FirstName: new FormControl('', [Validators.required, ValidateName]),
       LastName: new FormControl('', [Validators.required, ValidateName]),
       Email: new FormControl('', [Validators.required, ValidateEmail]),
       Phone: new FormControl('', ValidatePhone),
-      Password: new FormControl('', [Validators.required, ValidateStrongPassword]),
-      ConfirmPassword: new FormControl('', [Validators.required, ValidateFieldMatches('Password')]),
-    });
+      Password: new FormControl('', [
+        Validators.required,
+        ValidateStrongPassword,
+      ]),
+      ConfirmPassword: new FormControl('', [
+        Validators.required,
+        ValidateFieldMatches('Password'),
+      ]),
+    })
   }
 
   // TODO: requires anonymous token, but not checked for here
   async onSubmit(): Promise<void> {
-    const me: MeUser = this.form.value;
-    me.Active = true;
-    await this.context.authentication.register(me);
-    this.context.router.toLogin();
+    const me: MeUser = this.form.value
+    me.Active = true
+    await this.context.authentication.register(me)
+    this.context.router.toLogin()
   }
 }

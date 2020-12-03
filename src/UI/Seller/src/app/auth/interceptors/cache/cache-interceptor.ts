@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'
 import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
+} from '@angular/common/http'
+import { Observable } from 'rxjs'
 
 /**
  * append headers to disable IE11's aggressive caching of GET requests
@@ -25,7 +25,7 @@ export class CacheInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const hasIE11 = window.navigator.userAgent.includes('Trident/');
+    const hasIE11 = window.navigator.userAgent.includes('Trident/')
     if (hasIE11 && request.method === 'GET') {
       request = request.clone({
         setHeaders: {
@@ -33,8 +33,8 @@ export class CacheInterceptor implements HttpInterceptor {
           Pragma: 'no-cache',
           Expires: 'Sat, 01 Jan 2000 00:00:00 GMT',
         },
-      });
+      })
     }
-    return next.handle(request);
+    return next.handle(request)
   }
 }

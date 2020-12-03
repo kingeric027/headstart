@@ -1,14 +1,14 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk';
+import { Pipe, PipeTransform } from '@angular/core'
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
 
 @Pipe({
   name: 'UofM',
 })
 export class UnitOfMeasurePipe implements PipeTransform {
   transform(product: MarketplaceProduct): string {
-    const uofm = product?.xp?.UnitOfMeasure;  
+    const uofm = product?.xp?.UnitOfMeasure
     if (uofm?.Qty == null || uofm?.Unit == null) {
-        return '';
+      return ''
     }
     return `${uofm.Qty} / ${uofm.Unit}`
   }

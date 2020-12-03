@@ -1,10 +1,10 @@
-import { Injectable, Inject } from '@angular/core';
-import { CanActivate, CanActivateChild, Router } from '@angular/router';
-import { DOCUMENT } from '@angular/common';
-import { TokenHelperService } from '../../services/token-helper/token-helper.service';
-import { Tokens } from 'ordercloud-javascript-sdk';
-import { AuthService } from '../../services/auth/auth.service';
-import { AppConfig } from '../../shopper-context';
+import { Injectable, Inject } from '@angular/core'
+import { CanActivate, CanActivateChild, Router } from '@angular/router'
+import { DOCUMENT } from '@angular/common'
+import { TokenHelperService } from '../../services/token-helper/token-helper.service'
+import { Tokens } from 'ordercloud-javascript-sdk'
+import { AuthService } from '../../services/auth/auth.service'
+import { AppConfig } from '../../shopper-context'
 
 @Injectable({
   providedIn: 'root',
@@ -29,69 +29,70 @@ export class HasTokenGuard implements CanActivate, CanActivateChild {
   async canActivate(): Promise<boolean> {
     // check for impersonation superseeds existing tokens to allow impersonating buyers sequentially.
     if (this.isImpersonating()) {
-      const token = this.getQueryParamToken();
-      this.auth.loginWithTokens(token); 
-      return true;
+      const token = this.getQueryParamToken()
+      this.auth.loginWithTokens(token)
+      return true
     } else if (this.isSingleSignOn()) {
-      const token = this.getQueryParamSSOToken();
-      this.auth.loginWithTokens(token, null, true);
-      return true;
+      const token = this.getQueryParamSSOToken()
+      this.auth.loginWithTokens(token, null, true)
+      return true
     }
 
-    const isAccessTokenValid = this.isTokenValid();
-    const refreshTokenExists = Tokens.GetRefreshToken() && this.auth.getRememberStatus();
+    const isAccessTokenValid = this.isTokenValid()
+    const refreshTokenExists =
+      Tokens.GetRefreshToken() && this.auth.getRememberStatus()
     if (!isAccessTokenValid && refreshTokenExists) {
-      await this.auth.refresh().toPromise();
-      return true;
+      await this.auth.refresh().toPromise()
+      return true
     }
 
     // send profiled users to login to get new token
     if (!isAccessTokenValid && !this.appConfig.anonymousShoppingEnabled) {
-      this.router.navigate(['/login']);
-      return false;
+      this.router.navigate(['/login'])
+      return false
     }
     // get new anonymous token and then let them continue
     if (!isAccessTokenValid && this.appConfig.anonymousShoppingEnabled) {
-      await this.auth.anonymousLogin();
-      return true;
+      await this.auth.anonymousLogin()
+      return true
     }
-    this.auth.isLoggedIn = true;
-    return isAccessTokenValid;
+    this.auth.isLoggedIn = true
+    return isAccessTokenValid
   }
 
   async canActivateChild(): Promise<boolean> {
-    return this.canActivate();
+    return this.canActivate()
   }
 
   private isImpersonating(): boolean {
-    return this.document.location.pathname === '/impersonation';
+    return this.document.location.pathname === '/impersonation'
   }
 
   private isSingleSignOn(): boolean {
-    const url = new URL(window.location.href);
-    return !!(url.searchParams.get('ssoToken'));
+    const url = new URL(window.location.href)
+    return !!url.searchParams.get('ssoToken')
   }
 
   private getQueryParamToken(): string {
-    const match = /token=([^&]*)/.exec(this.document.location.search);
-    if (!match) throw Error(`Missing url query param 'token'`);
-    return match[1];
+    const match = /token=([^&]*)/.exec(this.document.location.search)
+    if (!match) throw Error(`Missing url query param 'token'`)
+    return match[1]
   }
 
   private getQueryParamSSOToken(): string {
-    const match = /ssoToken=([^&]*)/.exec(this.document.location.search);
-    if (!match) throw Error(`Missing url query param 'ssoToken'`);
-    return match[1];
+    const match = /ssoToken=([^&]*)/.exec(this.document.location.search)
+    if (!match) throw Error(`Missing url query param 'ssoToken'`)
+    return match[1]
   }
 
   private isTokenValid(): boolean {
-    const decodedToken = this.tokenHelper.getDecodedOCToken();
+    const decodedToken = this.tokenHelper.getDecodedOCToken()
 
     if (!decodedToken) {
-      return false;
+      return false
     }
 
-    const expiresIn = decodedToken.exp * 1000;
-    return Date.now() < expiresIn;
+    const expiresIn = decodedToken.exp * 1000
+    return Date.now() < expiresIn
   }
 }

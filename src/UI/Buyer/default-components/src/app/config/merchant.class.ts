@@ -1,6 +1,6 @@
 export interface MerchantDefinition {
-  cardConnectMerchantID: string;
-  currency: string;
+  cardConnectMerchantID: string
+  currency: string
 }
 
 export class MerchantConfig {
@@ -8,9 +8,9 @@ export class MerchantConfig {
     { cardConnectMerchantID: '840000000052', currency: 'USD' },
     { cardConnectMerchantID: '840000000037', currency: 'CAD' },
     { cardConnectMerchantID: '840000000062', currency: 'EUR' },
-  ];
+  ]
 
   static getMerchant(currency: string): MerchantDefinition {
-    return this.merchants.find(merchant => merchant.currency === currency);
+    return this.merchants.find((merchant) => merchant.currency === currency)
   }
 }

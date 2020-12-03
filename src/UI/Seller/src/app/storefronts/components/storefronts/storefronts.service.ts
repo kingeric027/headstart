@@ -1,13 +1,23 @@
-import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { OcBuyerService, Buyer, ApiClient, OcApiClientService } from '@ordercloud/angular-sdk';
-import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { SuperMarketplaceBuyer, BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service';
-import { ApiClients } from 'ordercloud-javascript-sdk';
+import { Injectable } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
+import {
+  OcBuyerService,
+  Buyer,
+  ApiClient,
+  OcApiClientService,
+} from '@ordercloud/angular-sdk'
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
+import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import {
+  SuperMarketplaceBuyer,
+  BuyerTempService,
+} from '@app-seller/shared/services/middleware-api/buyer-temp.service'
+import { ApiClients } from 'ordercloud-javascript-sdk'
 
-export const STOREFRONTS_SUB_RESOURCE_LIST = [{ route: 'pages', display: 'Pages' }];
+export const STOREFRONTS_SUB_RESOURCE_LIST = [
+  { route: 'pages', display: 'Pages' },
+]
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -31,8 +41,12 @@ export class StorefrontsService extends ResourceCrudService<ApiClient> {
     AssignedSupplierCount: 0,
     OrderCheckoutIntegrationEventID: null,
     OrderCheckoutIntegrationEventName: null,
-  };
-  constructor(router: Router, activatedRoute: ActivatedRoute, currentUserService: CurrentUserService) {
+  }
+  constructor(
+    router: Router,
+    activatedRoute: ActivatedRoute,
+    currentUserService: CurrentUserService
+  ) {
     super(
       router,
       activatedRoute,
@@ -41,11 +55,11 @@ export class StorefrontsService extends ResourceCrudService<ApiClient> {
       '/storefronts',
       'storefronts',
       STOREFRONTS_SUB_RESOURCE_LIST
-    );
+    )
   }
 
   addIntrinsicListArgs(options: ListArgs): ListArgs {
-    options.filters = { AppName: 'Storefront*' };
-    return options;
+    options.filters = { AppName: 'Storefront*' }
+    return options
   }
 }

@@ -1,20 +1,22 @@
 export interface Filter {
-  name: string;
-  path: string;
-  nestedDataPath?: string;
-  dataKey?: string;
-  sourceType: string;
-  source: string;
-  filterValues: any[];
+  name: string
+  path: string
+  nestedDataPath?: string
+  dataKey?: string
+  sourceType: string
+  source: string
+  filterValues: any[]
 }
 
 export const buyerLocation: Filter[] = [
-  { name: 'Buyer', 
-    path: 'BuyerID', 
-    dataKey: 'ID', 
-    sourceType: 'oc', 
-    source: 'ocBuyerService', 
-    filterValues: [] },
+  {
+    name: 'Buyer',
+    path: 'BuyerID',
+    dataKey: 'ID',
+    sourceType: 'oc',
+    source: 'ocBuyerService',
+    filterValues: [],
+  },
   {
     name: 'Country',
     path: 'Country',
@@ -31,7 +33,7 @@ export const buyerLocation: Filter[] = [
     source: 'GeographyConfig',
     filterValues: [],
   },
-];
+]
 
 export const salesOrderDetail: Filter[] = [
   {
@@ -55,8 +57,8 @@ export const salesOrderDetail: Filter[] = [
     sourceType: 'model',
     source: 'GeographyConfig',
     filterValues: [],
-  }
-];
+  },
+]
 
 export const purchaseOrderDetail: Filter[] = [
   {
@@ -72,8 +74,8 @@ export const purchaseOrderDetail: Filter[] = [
     sourceType: 'model',
     source: 'OrderType',
     filterValues: [],
-  }
-];
+  },
+]
 
 export const lineItemDetail: Filter[] = [
   {
@@ -97,5 +99,5 @@ export const lineItemDetail: Filter[] = [
     sourceType: 'model',
     source: 'GeographyConfig',
     filterValues: [],
-  }
-];
+  },
+]

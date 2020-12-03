@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core'
 import { Address } from 'ordercloud-javascript-sdk'
 
 @Component({
@@ -7,12 +7,12 @@ import { Address } from 'ordercloud-javascript-sdk'
   encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class OCMAddressCard {
-  @Input() address = {} as Address;
-  @Input() highlight?: boolean;
+  @Input() address = {} as Address
+  @Input() highlight?: boolean
 
   // make into pipe?
   getFullName(address: Address): string {
-    const fullName = `${address?.FirstName || ''} ${address?.LastName || ''}`;
-    return fullName.trim();
+    const fullName = `${address?.FirstName || ''} ${address?.LastName || ''}`
+    return fullName.trim()
   }
 }

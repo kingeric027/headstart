@@ -1,5 +1,10 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { OrderStatus, ShippingStatus, LineItemStatus, ClaimStatus } from 'marketplace';
+import { Pipe, PipeTransform } from '@angular/core'
+import {
+  OrderStatus,
+  ShippingStatus,
+  LineItemStatus,
+  ClaimStatus,
+} from 'marketplace'
 
 @Pipe({
   name: 'orderStatusDisplay',
@@ -22,14 +27,14 @@ export class OrderStatusDisplayPipe implements PipeTransform {
     [LineItemStatus.Complete]: 'Complete',
     [LineItemStatus.Submitted]: 'Submitted',
     [ClaimStatus.Pending]: 'Pending',
-    [ClaimStatus.NoClaim]: 'No Claim'
-  };
+    [ClaimStatus.NoClaim]: 'No Claim',
+  }
 
   transform(status: OrderStatus): string {
     if (!status) {
-      return null;
+      return null
     }
-    const displayValue = this.OrderStatusMap[status];
-    return displayValue;
+    const displayValue = this.OrderStatusMap[status]
+    return displayValue
   }
 }

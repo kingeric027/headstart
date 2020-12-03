@@ -1,11 +1,14 @@
-import { Component, ChangeDetectorRef, Inject, Input } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component';
-import { MeUser } from '@ordercloud/angular-sdk';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import { AppAuthService } from '@app-seller/auth';
+import { Component, ChangeDetectorRef, Inject, Input } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import {
+  AppConfig,
+  applicationConfiguration,
+} from '@app-seller/config/app.config'
+import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component'
+import { MeUser } from '@ordercloud/angular-sdk'
+import { faEdit } from '@fortawesome/free-solid-svg-icons'
+import { AppAuthService } from '@app-seller/auth'
 
 @Component({
   selector: 'account-summary',
@@ -14,8 +17,8 @@ import { AppAuthService } from '@app-seller/auth';
 })
 export class AccountSummaryComponent extends AccountContent {
   @Input()
-  user: MeUser;
-  faEdit = faEdit;
+  user: MeUser
+  faEdit = faEdit
   constructor(
     router: Router,
     activatedRoute: ActivatedRoute,
@@ -24,6 +27,13 @@ export class AccountSummaryComponent extends AccountContent {
     @Inject(applicationConfiguration) appConfig: AppConfig,
     appAuthService: AppAuthService
   ) {
-    super(router, activatedRoute, changeDetectorRef, currentUserService, appConfig, appAuthService);
+    super(
+      router,
+      activatedRoute,
+      changeDetectorRef,
+      currentUserService,
+      appConfig,
+      appAuthService
+    )
   }
 }

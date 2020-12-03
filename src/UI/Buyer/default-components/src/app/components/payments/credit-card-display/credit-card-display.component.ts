@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
-import { BuyerCreditCard, Address } from 'ordercloud-javascript-sdk';
-import { MarketplaceBuyerCreditCard } from 'marketplace';
+import { Component, Input } from '@angular/core'
+import { BuyerCreditCard, Address } from 'ordercloud-javascript-sdk'
+import { MarketplaceBuyerCreditCard } from 'marketplace'
 
 @Component({
   templateUrl: './credit-card-display.component.html',
@@ -8,10 +8,10 @@ import { MarketplaceBuyerCreditCard } from 'marketplace';
 })
 export class OCMCreditCardDisplay {
   @Input() set card(value: MarketplaceBuyerCreditCard) {
-    this.creditCard = value;
-    this.address = value?.xp?.CCBillingAddress;
+    this.creditCard = value
+    this.address = value?.xp?.CCBillingAddress
   }
-  @Input() highlight?: boolean;
-  creditCard: BuyerCreditCard;
-  address: Address;
+  @Input() highlight?: boolean
+  creditCard: BuyerCreditCard
+  address: Address
 }

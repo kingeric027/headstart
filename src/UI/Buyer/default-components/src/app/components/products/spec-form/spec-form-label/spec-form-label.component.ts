@@ -1,32 +1,42 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { FieldConfig } from '../field-config.interface';
-import { Field } from '../field.interface';
-import { specErrors } from '../errors';
+import { Component, OnInit } from '@angular/core'
+import { FormGroup } from '@angular/forms'
+import { FieldConfig } from '../field-config.interface'
+import { Field } from '../field.interface'
+import { specErrors } from '../errors'
 
 @Component({
   selector: 'spec-form-label',
   template: `
-    <div class="form-group mb-0 justify-content-center" [formGroup]="group" [class.row]="compact">
+    <div
+      class="form-group mb-0 justify-content-center"
+      [formGroup]="group"
+      [class.row]="compact"
+    >
       <label
         class="text-uppercase font-weight-bolder small text-muted d-flex align-items-center"
         [class.col-3]="compact"
         for="{{ config.name }}-readonly"
         >{{ config.label }}
       </label>
-      <input class="form-control" [class.col-7]="compact" type="text" readonly placeholder="{{ config.options[0] }}" />
+      <input
+        class="form-control"
+        [class.col-7]="compact"
+        type="text"
+        readonly
+        placeholder="{{ config.options[0] }}"
+      />
     </div>
   `,
   styleUrls: ['./spec-form-label.component.scss'],
 })
 export class SpecFormLabelComponent implements Field, OnInit {
-  config: FieldConfig;
-  group: FormGroup;
-  index: number;
-  compact?: boolean;
-  errorMsgs = specErrors;
+  config: FieldConfig
+  group: FormGroup
+  index: number
+  compact?: boolean
+  errorMsgs = specErrors
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 }
