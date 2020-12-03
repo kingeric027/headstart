@@ -11,12 +11,19 @@ describe('BuyerTableComponent', () => {
   let fixture: ComponentFixture<BuyerTableComponent>
 
   const router = {
+    routerState: { snapshot: { url: 'url/url2' } },
     navigateByUrl: jasmine.createSpy('navigateByUrl'),
     url: '/my-',
   }
-  const activatedRoute = {}
+  const activatedRoute = { params: of({}) }
   const httpClient = {}
   const buyerService = {
+    getParentOrSecondaryIDParamName() {
+      return '1'
+    },
+    getParentResourceID() {
+      return 1
+    },
     isSupplierUser() {
       return true
     },

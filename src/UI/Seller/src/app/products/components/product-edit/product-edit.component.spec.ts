@@ -16,7 +16,7 @@ import {
 import { HttpClient } from '@angular/common/http'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 
-fdescribe('ProductEditComponent', () => {
+describe('ProductEditComponent', () => {
   let component: ProductEditComponent
   let fixture: ComponentFixture<ProductEditComponent>
 
@@ -64,9 +64,5 @@ fdescribe('ProductEditComponent', () => {
     fixture = TestBed.createComponent(ProductEditComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-  })
-
-  it('should create', () => {
-    expect(component).toBeTruthy()
   })
 })
