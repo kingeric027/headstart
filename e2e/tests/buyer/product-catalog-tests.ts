@@ -49,39 +49,34 @@ test('Can the User select a Variant Product | 6789', async t => {
 
 test('Can the page be affected by adjusting facets | 6790', async t => {
 	await buyerHeaderPage.clickProductsLink()
+
 	const facetName = 'COLOR'
 	const facetValue = 'Black'
 	const expectedProductName =
-		'10x20 ML Pop up Canopy Tent Aluminum Commercial Grade with Roller Bag'
-	const initialFirstProductName = await productListPage.products
-		.nth(0)
-		.find('a')
-		.getAttribute('name')
+		'10X20 ML POP UP CANOPY TENT ALUMINUM COMMERCIAL GRADE WITH ROLLER BAG'
+	const beforeFacetFirstProductName = await productListPage.products.nth(0)
+		.innerText
+	const facetCheckbox = productListPage.facets
+		.withText(createRegExp(facetName))
+		.find('label')
+		.withText(createRegExp(facetValue))
+		.parent(0)
+		.find('input')
 
 	await productListPage.applyFacet(facetName, facetValue)
 
 	//assert the facet is selected
-	await t
-		.expect(
-			productListPage.facets
-				.withText(createRegExp(facetName))
-				.find('label')
-				.withText(createRegExp(facetValue))
-				.parent(0)
-				.find('input').checked
-		)
-		.ok()
+	await t.expect(facetCheckbox.checked).ok()
 
 	//assert that list with facet selection is different than initial list
-	t.expect(initialFirstProductName !== expectedProductName)
+	await t.expect(beforeFacetFirstProductName).notContains(expectedProductName)
 
 	//assert that facet selection updated list with expected first product
 	await t
 		.expect(
-			(await productListPage.products
-				.nth(0)
-				.find('a')
-				.getAttribute('name')) === expectedProductName
+			(await productListPage.products.nth(0).innerText).includes(
+				expectedProductName
+			)
 		)
 		.ok()
 })
@@ -97,6 +92,7 @@ test('Does selecting a Product Card bring the User to the details page | 6791', 
 
 	//assert user is on product details page after product click
 	await t.expect(getLocation()).contains('/products/')
+	await t.expect(productDetailPage.addToCartButton.exists).ok()
 })
 
 test('Can a User add a product to their Cart from the Catalog page | 6792', async t => {
