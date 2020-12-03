@@ -199,17 +199,19 @@ export class OrderDetailsComponent {
     return this.orderService.isSupplierOrder(orderID);
   }
 
-  async getBuyerOrder(order: Order): Promise<void> {
+  async setData(order: Order): Promise<void> {
+    this._order = order;
     if(this.isSupplierOrder(order.ID)){
       const orderData = await this.middleware.getSupplierData(order.ID);
       this._buyerOrder = orderData.BuyerOrder.Order;
+      this._lineItems = await this.getAllLineItems(order)
     } else {
       this._buyerOrder = order;
     }
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
-    await this.getBuyerOrder(order);
+    await this.setData(order);
     this.orderAvatarInitials = !this.isQuoteOrder(order)
       ? `${this._buyerOrder?.FromUser?.FirstName?.slice(
           0,
@@ -223,9 +225,7 @@ export class OrderDetailsComponent {
           1
         ).toUpperCase()}`
     this.setOrderProgress(order)
-    this._order = order
     this.getIncomingOrOutgoing()
-    this._lineItems = await this.getAllLineItems(order)
     const paymentsResponse = await this.ocPaymentService
       .List(this.orderDirection, order.ID)
       .toPromise()
