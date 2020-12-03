@@ -1,4 +1,4 @@
-import { RouteConfig } from './route-config';
+import { RouteConfig } from './route-config'
 
 export const ProfileRoutes: RouteConfig[] = [
   {
@@ -31,4 +31,4 @@ export const ProfileRoutes: RouteConfig[] = [
     url: '/profile/details',
     showInDropdown: false,
   },
-];
+]

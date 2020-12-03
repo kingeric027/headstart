@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
-import { FieldConfig } from '../field-config.interface';
-import { Field } from '../field.interface';
-import { specErrors } from '../errors';
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormArray, AbstractControl } from '@angular/forms'
+import { FieldConfig } from '../field-config.interface'
+import { Field } from '../field.interface'
+import { specErrors } from '../errors'
 
 @Component({
   selector: 'spec-form-input',
@@ -17,7 +17,10 @@ import { specErrors } from '../errors';
           [formControlName]="config.name"
         />
         <div
-          *ngIf="byIndex(index).invalid && (byIndex(index).dirty || byIndex(index).touched)"
+          *ngIf="
+            byIndex(index).invalid &&
+            (byIndex(index).dirty || byIndex(index).touched)
+          "
           alert="alert alert-danger"
         >
           <div *ngIf="byIndex(index).errors['required']">
@@ -32,19 +35,19 @@ import { specErrors } from '../errors';
   styleUrls: ['./spec-form-input.component.scss'],
 })
 export class SpecFormInputComponent implements Field, OnInit {
-  config: FieldConfig;
-  group: FormGroup;
-  ctrls: FormArray;
-  index: number;
-  errorMsgs = specErrors;
+  config: FieldConfig
+  group: FormGroup
+  ctrls: FormArray
+  index: number
+  errorMsgs = specErrors
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
-    this.ctrls = this.group.get('ctrls') as FormArray;
+    this.ctrls = this.group.get('ctrls') as FormArray
   }
 
   byIndex(index: number): AbstractControl {
-    return (this.group.get('ctrls') as FormArray).at(index);
+    return (this.group.get('ctrls') as FormArray).at(index)
   }
 }

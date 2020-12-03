@@ -74,6 +74,7 @@ namespace Marketplace.Common
         public string ProvisionSupplierID { get; set; }
         public string SEBDistributionSupplierID { get; set; }
         public string FirstChoiceSupplierID { get; set; }
+        public string MedlineSupplierID { get; set; }
     }
 
 	public class AvalaraSettings

@@ -79,7 +79,7 @@ namespace ordercloud.integrations.cms
 		public async Task<DocumentDO> GetDOByInternalSchemaID(string schemaID, string documentInteropID, VerifiedUserContext user)
 		{
 			var document = await GetWithoutExceptions(schemaID, documentInteropID, user);
-			if (document == null) throw new OrderCloudIntegrationException.NotFoundException("Document", documentInteropID);
+			if (document == null) { throw new OrderCloudIntegrationException.NotFoundException("Document", documentInteropID); }
 			return document;
 		}
 
@@ -88,7 +88,7 @@ namespace ordercloud.integrations.cms
 			DocumentDO dataObject = DocumentMapper.MapTo(document);
 			var schema = await _schemas.GetDO(schemaInteropID, user);
 			var matchingID = await GetWithoutExceptions(schema.id, dataObject.InteropID, user);
-			if (matchingID != null) throw new DuplicateIDException();
+			if (matchingID != null) { throw new DuplicateIDException(); }
 			dataObject = Init(dataObject, schema, user);
 			dataObject = await SchemaHelper.ValidateDocumentAgainstSchema(schema, dataObject);
 			var newDocument = await _store.AddAsync(dataObject);
@@ -101,7 +101,7 @@ namespace ordercloud.integrations.cms
 			if (documentInteropID != document.ID)
 			{
 				var matchingID = await GetWithoutExceptions(schema.id, document.ID, user);
-				if (matchingID != null) throw new DuplicateIDException();
+				if (matchingID != null) { throw new DuplicateIDException(); }
 			}
 			var existingDocument = await GetWithoutExceptions(schema.id, documentInteropID, user);
 			if (existingDocument == null) existingDocument = Init(new DocumentDO(), schema, user);

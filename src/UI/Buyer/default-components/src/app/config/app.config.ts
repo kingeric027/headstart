@@ -1,6 +1,6 @@
-import { AppConfig, OrdercloudEnv } from 'marketplace';
-import { environment } from 'src/environments/environment';
-import { ApiRole } from '../../../../marketplace/node_modules/ordercloud-javascript-sdk/dist';
+import { AppConfig, OrdercloudEnv } from 'marketplace'
+import { environment } from 'src/environments/environment'
+import { ApiRole } from '../../../../marketplace/node_modules/ordercloud-javascript-sdk/dist'
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
@@ -15,7 +15,8 @@ export const ocAppConfig: AppConfig = {
   ordercloudEnv: environment.ordercloudEnv,
   theme: environment.theme,
   anonymousShoppingEnabled: false,
-  avalaraCompanyId: environment.ordercloudEnv === OrdercloudEnv.Production ? 902271 : 280411,
+  avalaraCompanyId:
+    environment.ordercloudEnv === OrdercloudEnv.Production ? 902271 : 280411,
   instrumentationKey: environment.instrumentationKey,
   scope: [
     'MeAddressAdmin',
@@ -43,6 +44,6 @@ export const ocAppConfig: AppConfig = {
     'MPLocationAddressAdmin',
     'MPLocationResaleCertAdmin',
 
-    'DocumentReader' // might be able to get rid of this if we assign to buyer, talk to team first
+    'DocumentReader', // might be able to get rid of this if we assign to buyer, talk to team first
   ] as ApiRole[],
-};
+}

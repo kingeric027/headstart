@@ -61,6 +61,18 @@ namespace Marketplace.Common.Models
                 Markup = 1.1M,
                 Default = false
             });
+            this.ShippingProfiles.Add(new EasyPostShippingProfile()
+            {
+                ID = "Medline",
+                SupplierID = settings.OrderCloudSettings.MedlineSupplierID,
+                CarrierAccountID = settings.EasyPostSettings.SEBDistributionFedexAccountId,
+                Customs_Signer = "Christa Zaspel",
+                Restriction_Type = "none",
+                EEL_PFC = "NOEEI30.37(a)",
+                Customs_Certify = true,
+                Markup = 1.1M,
+                Default = false
+            });
         }
 
         public override EasyPostShippingProfile FirstOrDefault(string id)

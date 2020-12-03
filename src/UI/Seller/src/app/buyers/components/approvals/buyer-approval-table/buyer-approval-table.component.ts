@@ -1,9 +1,9 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { ApprovalRule } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerApprovalService } from '../buyer-approval.service';
-import { BuyerService } from '../../buyers/buyer.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { ApprovalRule } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { BuyerApprovalService } from '../buyer-approval.service'
+import { BuyerService } from '../../buyers/buyer.service'
 
 @Component({
   selector: 'app-buyer-approval-table',
@@ -19,6 +19,12 @@ export class BuyerApprovalTableComponent extends ResourceCrudComponent<ApprovalR
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerApprovalService, router, activatedroute, ngZone);
+    super(
+      changeDetectorRef,
+      buyerApprovalService,
+      router,
+      activatedroute,
+      ngZone
+    )
   }
 }

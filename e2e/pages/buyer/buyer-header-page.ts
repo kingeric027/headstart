@@ -3,9 +3,11 @@ import loadingHelper from '../../helpers/loading-helper'
 import { createRegExp } from '../../helpers/regExp-helper'
 
 class BuyerHeaderPage {
+	homepageBrandLogo: Selector
 	accountDropdown: Selector
 	logoutButton: Selector
 	productsLink: Selector
+	suppliersLink: Selector
 	searchBar: Selector
 	cartButton: Selector
 	myProfileLink: Selector
@@ -21,8 +23,10 @@ class BuyerHeaderPage {
 		this.accountDropdown = Selector('#accountDropdown').withText(
 			createRegExp('account')
 		)
+		this.homepageBrandLogo = Selector('img').withAttribute('class', 'logo')
 		this.logoutButton = Selector('a').withAttribute('href', '/login')
 		this.productsLink = Selector('a').withText(createRegExp('products'))
+		this.suppliersLink = Selector('#suppliers-link')
 		this.searchBar = Selector('#search-addon')
 		this.cartButton = Selector('span').withText(createRegExp('cart'))
 		this.myProfileLink = Selector('a').withText(createRegExp('my profile'))
@@ -83,6 +87,10 @@ class BuyerHeaderPage {
 		await t.click(this.awaitingMyApprovalLink)
 	}
 
+	async clickHomepageBrandLogo() {
+		await t.click(this.homepageBrandLogo)
+	}
+
 	async logout() {
 		await this.clickAccountButton()
 		await t.click(this.logoutButton)
@@ -90,6 +98,10 @@ class BuyerHeaderPage {
 
 	async clickProductsLink() {
 		await t.click(this.productsLink)
+	}
+
+	async clickSuppliersLink() {
+		await t.click(this.suppliersLink)
 	}
 
 	async search(searchText: string) {

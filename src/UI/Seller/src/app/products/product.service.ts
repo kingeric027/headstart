@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Injectable } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
 import {
   Product,
   OcPriceScheduleService,
@@ -7,12 +7,20 @@ import {
   ProductAssignment,
   OcCategoryService,
   CategoryProductAssignment,
-} from '@ordercloud/angular-sdk';
-import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { Products, ListPage } from 'ordercloud-javascript-sdk';
-import { ChiliService, TecraDocument, TecraSpec } from '@app-seller/shared/services/middleware-api/middleware-chili.service';
-import { ChiliConfig, ChiliSpec, ChiliSpecOption } from '@ordercloud/headstart-sdk';
+} from '@ordercloud/angular-sdk'
+import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { Products, ListPage } from 'ordercloud-javascript-sdk'
+import {
+  ChiliService,
+  TecraDocument,
+  TecraSpec,
+} from '@app-seller/shared/services/middleware-api/middleware-chili.service'
+import {
+  ChiliConfig,
+  ChiliSpec,
+  ChiliSpecOption,
+} from '@ordercloud/headstart-sdk'
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -56,6 +64,8 @@ export class ProductService extends ResourceCrudService<Product> {
         ProductType: null,
         StaticContent: null,
         ArtworkRequired: false,
+        FreeShipping: false,
+        FreeShippingMessage: 'Free Shipping',
       },
     },
     PriceSchedule: {
@@ -77,7 +87,7 @@ export class ProductService extends ResourceCrudService<Product> {
     },
     Specs: [],
     Variants: [],
-  };
+  }
 
   constructor(
     router: Router,
@@ -88,7 +98,14 @@ export class ProductService extends ResourceCrudService<Product> {
     public currentUserService: CurrentUserService,
     public chiliService: ChiliService
   ) {
-    super(router, activatedRoute, Products, currentUserService, '/products', 'products');
+    super(
+      router,
+      activatedRoute,
+      Products,
+      currentUserService,
+      '/products',
+      'products'
+    )
   }
 
   async updateProductCatalogAssignments(
@@ -97,15 +114,19 @@ export class ProductService extends ResourceCrudService<Product> {
     buyerID: string,
     priceScheduleID: string
   ): Promise<void> {
-    add = add.map(a => {
-      a.PriceScheduleID = priceScheduleID;
-      return a;
-    });
-    const addRequests = add.map(newAssignment => Products.SaveAssignment(newAssignment));
-    const deleteRequests = del.map(assignmentToRemove =>
-      Products.DeleteAssignment(assignmentToRemove.ProductID, buyerID, { userGroupID: assignmentToRemove.UserGroupID })
-    );
-    await Promise.all([...addRequests, ...deleteRequests]);
+    add = add.map((a) => {
+      a.PriceScheduleID = priceScheduleID
+      return a
+    })
+    const addRequests = add.map((newAssignment) =>
+      Products.SaveAssignment(newAssignment)
+    )
+    const deleteRequests = del.map((assignmentToRemove) =>
+      Products.DeleteAssignment(assignmentToRemove.ProductID, buyerID, {
+        userGroupID: assignmentToRemove.UserGroupID,
+      })
+    )
+    await Promise.all([...addRequests, ...deleteRequests])
   }
 
   async updateProductCategoryAssignments(
@@ -113,61 +134,66 @@ export class ProductService extends ResourceCrudService<Product> {
     del: CategoryProductAssignment[],
     buyerID: string
   ): Promise<void> {
-    const addRequests = add.map(newAssignment =>
-      this.ocCategoryService.SaveProductAssignment(buyerID, newAssignment).toPromise()
-    );
-    const deleteRequests = del.map(assignmentToRemove =>
+    const addRequests = add.map((newAssignment) =>
       this.ocCategoryService
-        .DeleteProductAssignment(buyerID, assignmentToRemove.CategoryID, assignmentToRemove.ProductID)
+        .SaveProductAssignment(buyerID, newAssignment)
         .toPromise()
-    );
-    await Promise.all([...addRequests, ...deleteRequests]);
-    }
+    )
+    const deleteRequests = del.map((assignmentToRemove) =>
+      this.ocCategoryService
+        .DeleteProductAssignment(
+          buyerID,
+          assignmentToRemove.CategoryID,
+          assignmentToRemove.ProductID
+        )
+        .toPromise()
+    )
+    await Promise.all([...addRequests, ...deleteRequests])
+  }
 
-    async getTecraDocuments(): Promise<TecraDocument[]> {
-        return this.chiliService.getDocuments();
-    }
-    async getTecraDocumentsByFolder(
-        folder: string
-    ): Promise<TecraDocument[]> {
-        return this.chiliService.getDocumentsByFolder(folder);
-    }
+  async getTecraDocuments(): Promise<TecraDocument[]> {
+    return this.chiliService.getDocuments()
+  }
+  async getTecraDocumentsByFolder(folder: string): Promise<TecraDocument[]> {
+    return this.chiliService.getDocumentsByFolder(folder)
+  }
 
-    async getTecraSpecs(
-        docID: string,
-    ): Promise<TecraSpec[]> {
-        return this.chiliService.getSpecs(docID);
-    }
+  async getTecraSpecs(docID: string): Promise<TecraSpec[]> {
+    return this.chiliService.getSpecs(docID)
+  }
 
-    async listChiliConfigs(): Promise<ListPage<ChiliConfig>>
-    {
-        return this.chiliService.listChiliConfigs();
-    }
+  async listChiliConfigs(): Promise<ListPage<ChiliConfig>> {
+    return this.chiliService.listChiliConfigs()
+  }
 
-    async saveChiliConfig(config: ChiliConfig): Promise<ChiliConfig>
-    {
-        return this.chiliService.saveChiliConfig(config);
-    }
-    async deleteChiliConfig(id: string)
-    {
-        this.chiliService.deleteChiliConfig(id);
-    }
-    async saveChiliSpec(spec: ChiliSpec): Promise<ChiliSpec> {
-        return this.chiliService.saveChiliSpec(spec);
-    }
-    async deleteChiliSpec(id: string) {
-        this.chiliService.deleteChiliSpec(id);
-    }
-    async saveChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
-        return this.chiliService.saveChiliSpecOption(specID, spec);
-    }
-    async updateChiliSpecOption(specID: string, spec: ChiliSpecOption): Promise<ChiliSpecOption> {
-        return this.chiliService.updateChiliSpecOption(specID, spec);
-    }
-    async deleteChiliSpecOption(specID: string, optionID: string) {
-        this.chiliService.deleteChiliSpecOption(specID, optionID);
-    }
-    async getChiliTemplate(id: string) {
-        return this.chiliService.getChiliTemplate(id);
-    }
+  async saveChiliConfig(config: ChiliConfig): Promise<ChiliConfig> {
+    return this.chiliService.saveChiliConfig(config)
+  }
+  async deleteChiliConfig(id: string) {
+    this.chiliService.deleteChiliConfig(id)
+  }
+  async saveChiliSpec(spec: ChiliSpec): Promise<ChiliSpec> {
+    return this.chiliService.saveChiliSpec(spec)
+  }
+  async deleteChiliSpec(id: string) {
+    this.chiliService.deleteChiliSpec(id)
+  }
+  async saveChiliSpecOption(
+    specID: string,
+    spec: ChiliSpecOption
+  ): Promise<ChiliSpecOption> {
+    return this.chiliService.saveChiliSpecOption(specID, spec)
+  }
+  async updateChiliSpecOption(
+    specID: string,
+    spec: ChiliSpecOption
+  ): Promise<ChiliSpecOption> {
+    return this.chiliService.updateChiliSpecOption(specID, spec)
+  }
+  async deleteChiliSpecOption(specID: string, optionID: string) {
+    this.chiliService.deleteChiliSpecOption(specID, optionID)
+  }
+  async getChiliTemplate(id: string) {
+    return this.chiliService.getChiliTemplate(id)
+  }
 }

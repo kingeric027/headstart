@@ -1,20 +1,23 @@
-import { Injectable } from '@angular/core';
-import { ListPage, MarketplaceLineItem, MarketplaceOrder } from '@ordercloud/headstart-sdk';
+import { Injectable } from '@angular/core'
+import {
+  ListPage,
+  MarketplaceLineItem,
+  MarketplaceOrder,
+} from '@ordercloud/headstart-sdk'
 import {
   LineItems,
   Me,
   Order,
   Orders,
   OrderPromotion,
-  OrderWorksheet,
   ShipEstimate,
   IntegrationEvents,
-} from 'ordercloud-javascript-sdk';
-import { BehaviorSubject } from 'rxjs';
-import { listAll } from '../../functions/listAll';
-import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context';
-import { CurrentUserService } from '../current-user/current-user.service';
-import { TokenHelperService } from '../token-helper/token-helper.service';
+} from 'ordercloud-javascript-sdk'
+import { BehaviorSubject } from 'rxjs'
+import { listAll } from '../../functions/listAll'
+import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context'
+import { CurrentUserService } from '../current-user/current-user.service'
+import { TokenHelperService } from '../token-helper/token-helper.service'
 
 @Injectable({
   providedIn: 'root',
@@ -23,11 +26,11 @@ export class OrderStateService {
   public readonly DefaultLineItems: ListPage<MarketplaceLineItem> = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
-  };
+  }
   public readonly DefaultOrderPromos: ListPage<OrderPromotion> = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
-  };
+  }
   private readonly DefaultOrder: MarketplaceOrder = {
     xp: {
       AvalaraTaxTransactionCode: '',
@@ -42,11 +45,17 @@ export class OrderStateService {
       ClaimStatus: ClaimStatus.NoClaim,
       ShippingStatus: ShippingStatus.Processing,
     },
-  };
-  private orderSubject = new BehaviorSubject<MarketplaceOrder>(this.DefaultOrder);
-  private shipEstimatesSubject = new BehaviorSubject<ShipEstimate[]>([]);
-  private orderPromosSubject = new BehaviorSubject<ListPage<OrderPromotion>>(this.DefaultOrderPromos);
-  private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(this.DefaultLineItems);
+  }
+  private orderSubject = new BehaviorSubject<MarketplaceOrder>(
+    this.DefaultOrder
+  )
+  private shipEstimatesSubject = new BehaviorSubject<ShipEstimate[]>([])
+  private orderPromosSubject = new BehaviorSubject<ListPage<OrderPromotion>>(
+    this.DefaultOrderPromos
+  )
+  private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(
+    this.DefaultLineItems
+  )
 
   constructor(
     private tokenHelper: TokenHelperService,
@@ -55,47 +64,49 @@ export class OrderStateService {
   ) {}
 
   get order(): MarketplaceOrder {
-    return this.orderSubject.value;
+    return this.orderSubject.value
   }
 
   set order(value: MarketplaceOrder) {
-    this.orderSubject.next(value);
+    this.orderSubject.next(value)
   }
 
   get shipEstimates(): ShipEstimate[] {
-    return this.shipEstimatesSubject.value;
+    return this.shipEstimatesSubject.value
   }
 
   set shipEstimates(value: ShipEstimate[]) {
-    this.shipEstimatesSubject.next(value);
+    this.shipEstimatesSubject.next(value)
   }
 
   get lineItems(): ListPage<MarketplaceLineItem> {
-    return this.lineItemSubject.value;
+    return this.lineItemSubject.value
   }
 
   set lineItems(value: ListPage<MarketplaceLineItem>) {
-    this.lineItemSubject.next(value);
+    this.lineItemSubject.next(value)
   }
 
   get orderPromos(): ListPage<OrderPromotion> {
-    return this.orderPromosSubject.value;
+    return this.orderPromosSubject.value
   }
 
   set orderPromos(value: ListPage<OrderPromotion>) {
-    this.orderPromosSubject.next(value);
+    this.orderPromosSubject.next(value)
   }
 
   onOrderChange(callback: (order: MarketplaceOrder) => void): void {
-    this.orderSubject.subscribe(callback);
+    this.orderSubject.subscribe(callback)
   }
 
-  onLineItemsChange(callback: (lineItems: ListPage<MarketplaceLineItem>) => void): void {
-    this.lineItemSubject.subscribe(callback);
+  onLineItemsChange(
+    callback: (lineItems: ListPage<MarketplaceLineItem>) => void
+  ): void {
+    this.lineItemSubject.subscribe(callback)
   }
 
   onPromosChange(callback: (promos: ListPage<OrderPromotion>) => void): void {
-    this.orderPromosSubject.subscribe(callback);
+    this.orderPromosSubject.subscribe(callback)
   }
 
   async reset(): Promise<void> {
@@ -109,50 +120,69 @@ export class OrderStateService {
     const [ordersForResubmit, ordersNeverSubmitted] = await Promise.all([
       this.getOrdersForResubmit(),
       this.getOrdersNeverSubmitted(),
-    ]);
+    ])
     if (ordersForResubmit.Items.length) {
-      this.order = ordersForResubmit.Items[0];
+      this.order = ordersForResubmit.Items[0]
     } else if (ordersNeverSubmitted.Items.length) {
-      this.order = ordersNeverSubmitted.Items[0];
+      this.order = ordersNeverSubmitted.Items[0]
     } else if (this.appConfig.anonymousShoppingEnabled) {
-      this.order = { ID: this.tokenHelper.getAnonymousOrderID() };
+      this.order = { ID: this.tokenHelper.getAnonymousOrderID() }
     } else {
-      this.DefaultOrder.xp.Currency = this.currentUserService.get().Currency;
-      this.order = (await Orders.Create('Outgoing', this.DefaultOrder as Order)) as MarketplaceOrder;
+      this.DefaultOrder.xp.Currency = this.currentUserService.get().Currency
+      this.order = (await Orders.Create(
+        'Outgoing',
+        this.DefaultOrder as Order
+      )) as MarketplaceOrder
     }
     if (this.order.DateCreated) {
-      await this.resetLineItems();
+      await this.resetLineItems()
     }
-    this.orderPromos = await Orders.ListPromotions('Outgoing', this.order.ID);
+    this.orderPromos = await Orders.ListPromotions('Outgoing', this.order.ID)
 
-    await this.getShipEstimates();
+    await this.getShipEstimates()
   }
 
   async getShipEstimates(): Promise<void> {
-    const orderWorksheet = await IntegrationEvents.GetWorksheet('Outgoing', this.order.ID);
+    const orderWorksheet = await IntegrationEvents.GetWorksheet(
+      'Outgoing',
+      this.order.ID
+    )
 
     if (orderWorksheet?.ShipEstimateResponse?.ShipEstimates) {
-      this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates;
+      this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates
     }
   }
 
   async resetLineItems(): Promise<void> {
-    this.lineItems = await listAll(LineItems, LineItems.List, 'outgoing', this.order.ID);
+    this.lineItems = await listAll(
+      LineItems,
+      LineItems.List,
+      'outgoing',
+      this.order.ID
+    )
   }
 
   private async getOrdersForResubmit(): Promise<ListPage<MarketplaceOrder>> {
     const orders = await Me.ListOrders({
       sortBy: '!DateCreated',
-      filters: { DateDeclined: '*', status: 'Unsubmitted', 'xp.IsResubmitting': 'True' },
-    });
-    return orders;
+      filters: {
+        DateDeclined: '*',
+        status: 'Unsubmitted',
+        'xp.IsResubmitting': 'True',
+      },
+    })
+    return orders
   }
 
   private async getOrdersNeverSubmitted(): Promise<ListPage<MarketplaceOrder>> {
     const orders = await Me.ListOrders({
       sortBy: '!DateCreated',
-      filters: { DateDeclined: '!*', status: 'Unsubmitted', 'xp.OrderType': 'Standard' },
-    });
-    return orders;
+      filters: {
+        DateDeclined: '!*',
+        status: 'Unsubmitted',
+        'xp.OrderType': 'Standard',
+      },
+    })
+    return orders
   }
 }

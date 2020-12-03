@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Category } from '@ordercloud/angular-sdk';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service';
-import { RegexService } from '@app-seller/shared/services/regex/regex.service';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
+import { Category } from '@ordercloud/angular-sdk'
+import { FormGroup, FormBuilder, Validators } from '@angular/forms'
+import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service'
+import { RegexService } from '@app-seller/shared/services/regex/regex.service'
 
 @Component({
   selector: 'category-form',
@@ -10,12 +10,12 @@ import { RegexService } from '@app-seller/shared/services/regex/regex.service';
   styleUrls: ['./category-form.component.scss'],
 })
 export class CategoryFormComponent implements OnInit {
-  private _existingCategory: Category = {};
+  private _existingCategory: Category = {}
   @Input()
-  btnText: string;
+  btnText: string
   @Output()
-  formSubmitted = new EventEmitter();
-  categoryForm: FormGroup;
+  formSubmitted = new EventEmitter()
+  categoryForm: FormGroup
 
   constructor(
     private formBuilder: FormBuilder,
@@ -24,22 +24,22 @@ export class CategoryFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.setForm();
+    this.setForm()
   }
 
   @Input()
   set existingCategory(category: Category) {
-    this._existingCategory = category || {};
+    this._existingCategory = category || {}
     if (!this.categoryForm) {
-      this.setForm();
-      return;
+      this.setForm()
+      return
     }
     this.categoryForm.setValue({
       ID: this._existingCategory.ID || '',
       Name: this._existingCategory.Name || '',
       Description: this._existingCategory.Description || '',
       Active: !!this._existingCategory.Active,
-    });
+    })
   }
 
   setForm() {
@@ -54,20 +54,20 @@ export class CategoryFormComponent implements OnInit {
       ],
       Description: [this._existingCategory.Description || ''],
       Active: [!!this._existingCategory.Active],
-    });
+    })
   }
 
   protected onSubmit() {
     if (this.categoryForm.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.categoryForm);
+      return this.formErrorService.displayFormErrors(this.categoryForm)
     }
 
-    this.formSubmitted.emit(this.categoryForm.value);
+    this.formSubmitted.emit(this.categoryForm.value)
   }
 
   // control display of error messages
   protected hasRequiredError = (controlName: string) =>
-    this.formErrorService.hasRequiredError(controlName, this.categoryForm);
+    this.formErrorService.hasRequiredError(controlName, this.categoryForm)
   protected hasPatternError = (controlName: string) =>
-    this.formErrorService.hasPatternError(controlName, this.categoryForm);
+    this.formErrorService.hasPatternError(controlName, this.categoryForm)
 }

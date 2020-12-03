@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
+import { FormGroup, FormBuilder, Validators } from '@angular/forms'
 
-import { BuyerAddress, Address } from '@ordercloud/angular-sdk';
-import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service';
-import { AppGeographyService } from '@app-seller/shared/services/geography/geography.service';
-import { RegexService } from '@app-seller/shared/services/regex/regex.service';
+import { BuyerAddress, Address } from '@ordercloud/angular-sdk'
+import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service'
+import { AppGeographyService } from '@app-seller/shared/services/geography/geography.service'
+import { RegexService } from '@app-seller/shared/services/regex/regex.service'
 
 @Component({
   selector: 'shared-address-form',
@@ -12,14 +12,14 @@ import { RegexService } from '@app-seller/shared/services/regex/regex.service';
   styleUrls: ['./address-form.component.scss'],
 })
 export class AddressFormComponent implements OnInit {
-  private _existingAddress: BuyerAddress = {};
+  private _existingAddress: BuyerAddress = {}
   @Input()
-  btnText: string;
+  btnText: string
   @Output()
-  formSubmitted = new EventEmitter<{ address: Address; prevID: string }>();
-  stateOptions: string[] = [];
-  countryOptions: { label: string; abbreviation: string }[];
-  addressForm: FormGroup;
+  formSubmitted = new EventEmitter<{ address: Address; prevID: string }>()
+  stateOptions: string[] = []
+  countryOptions: { label: string; abbreviation: string }[]
+  addressForm: FormGroup
 
   constructor(
     private geographyService: AppGeographyService,
@@ -27,19 +27,19 @@ export class AddressFormComponent implements OnInit {
     private formErrorService: AppFormErrorService,
     private regexService: RegexService
   ) {
-    this.countryOptions = this.geographyService.getCountries();
+    this.countryOptions = this.geographyService.getCountries()
   }
 
   ngOnInit() {
-    this.setForm();
+    this.setForm()
   }
 
   @Input()
   set existingAddress(address: BuyerAddress) {
-    this._existingAddress = address || {};
+    this._existingAddress = address || {}
     if (!this.addressForm) {
-      this.setForm();
-      return;
+      this.setForm()
+      return
     }
 
     this.addressForm.setValue({
@@ -54,8 +54,8 @@ export class AddressFormComponent implements OnInit {
       Zip: this._existingAddress.Zip || '',
       Country: this._existingAddress.Country || 'US',
       Phone: this._existingAddress.Phone || '',
-    });
-    this.onCountryChange();
+    })
+    this.onCountryChange()
   }
 
   setForm() {
@@ -94,39 +94,39 @@ export class AddressFormComponent implements OnInit {
         this._existingAddress.Phone || '',
         Validators.pattern(this.regexService.Phone),
       ],
-    });
-    this.onCountryChange();
+    })
+    this.onCountryChange()
   }
 
   onCountryChange(event?) {
-    const country = this.addressForm.value.Country;
+    const country = this.addressForm.value.Country
     this.stateOptions = this.geographyService
       .getStates(country)
-      .map((s) => s.abbreviation);
+      .map((s) => s.abbreviation)
     this.addressForm
       .get('Zip')
       .setValidators([
         Validators.required,
         Validators.pattern(this.regexService.getZip(country)),
-      ]);
+      ])
     if (event) {
-      this.addressForm.patchValue({ State: null, Zip: '' });
+      this.addressForm.patchValue({ State: null, Zip: '' })
     }
   }
 
   protected onSubmit() {
     if (this.addressForm.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.addressForm);
+      return this.formErrorService.displayFormErrors(this.addressForm)
     }
     this.formSubmitted.emit({
       address: this.addressForm.value,
       prevID: this._existingAddress.ID,
-    });
+    })
   }
 
   // control display of error messages
   protected hasRequiredError = (controlName: string) =>
-    this.formErrorService.hasRequiredError(controlName, this.addressForm);
+    this.formErrorService.hasRequiredError(controlName, this.addressForm)
   protected hasPatternError = (controlName: string) =>
-    this.formErrorService.hasPatternError(controlName, this.addressForm);
+    this.formErrorService.hasPatternError(controlName, this.addressForm)
 }

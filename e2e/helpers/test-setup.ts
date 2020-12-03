@@ -78,8 +78,7 @@ const adminRoles: ApiRole[] = [
 
 export function setStagingUrl() {
 	const config: SdkConfiguration = {
-		baseApiUrl: 'https://stagingapi.ordercloud.io/v1',
-		baseAuthUrl: 'https://stagingapi.ordercloud.io/oauth/token',
+		baseApiUrl: 'https://stagingapi.ordercloud.io',
 	}
 	Configuration.Set(config)
 }
@@ -109,9 +108,9 @@ export async function baseTestCleanup(
 	await deleteUser(userID, buyerID, authToken)
 }
 
-export async function buyerTestSetup(authToken: string) {
+export async function buyerTestSetup(authToken: string, country?: string) {
 	await t.maximizeWindow()
-	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
+	const user: OrderCloudSDK.User = await createUser(authToken, '0005', country)
 
 	await authBuyerBrowser(user)
 

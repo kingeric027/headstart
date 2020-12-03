@@ -1,25 +1,25 @@
-<form [formGroup]="form"
-      (ngSubmit)="onSubmit()"
-      novalidate>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
   <div class="row">
     <div class="col-sm-4">
       <div class="form-group">
-        <label for="signed"
-               translate>PROFILE.CERT_FORM.SIGNED</label>
+        <label for="signed" translate>PROFILE.CERT_FORM.SIGNED</label>
         <div class="input-group">
-          <input formControlName="SignedDate"
-                 class="form-control border-right-0"
-                 placeholder="mm-dd-yyyy"
-                 ngbDatepicker
-                 #signed="ngbDatepicker"
-                 id="signed"
-                 showErrors />
+          <input
+            formControlName="SignedDate"
+            class="form-control border-right-0"
+            placeholder="mm-dd-yyyy"
+            ngbDatepicker
+            #signed="ngbDatepicker"
+            id="signed"
+            showErrors
+          />
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary"
-                    (click)="signed.toggle()"
-                    type="button">
-              <fa-icon [icon]="faCalendar"
-                       id="calendar-addon-from"></fa-icon>
+            <button
+              class="btn btn-outline-secondary"
+              (click)="signed.toggle()"
+              type="button"
+            >
+              <fa-icon [icon]="faCalendar" id="calendar-addon-from"></fa-icon>
             </button>
           </div>
         </div>
@@ -27,23 +27,25 @@
     </div>
     <div class="col-sm-4">
       <div class="form-group">
-        <label for="expired"
-               translate>PROFILE.CERT_FORM.EXP_DATE</label>
+        <label for="expired" translate>PROFILE.CERT_FORM.EXP_DATE</label>
         <div class="input-group">
-          <input formControlName="ExpirationDate"
-                 class="form-control border-right-0"
-                 placeholder="mm-dd-yyyy"
-                 ngbDatepicker
-                 minDate="today"
-                 #expired="ngbDatepicker"
-                 showErrors
-                 id="expired" />
+          <input
+            formControlName="ExpirationDate"
+            class="form-control border-right-0"
+            placeholder="mm-dd-yyyy"
+            ngbDatepicker
+            minDate="today"
+            #expired="ngbDatepicker"
+            showErrors
+            id="expired"
+          />
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary"
-                    (click)="expired.toggle()"
-                    type="button">
-              <fa-icon [icon]="faCalendar"
-                       id="calendar-addon-to"></fa-icon>
+            <button
+              class="btn btn-outline-secondary"
+              (click)="expired.toggle()"
+              type="button"
+            >
+              <fa-icon [icon]="faCalendar" id="calendar-addon-to"></fa-icon>
             </button>
           </div>
         </div>
@@ -51,26 +53,31 @@
     </div>
     <div class="col-sm-4">
       <div class="form-group">
-        <label for="expired"
-               translate>PROFILE.CERT_FORM.PDF</label>
+        <label for="expired" translate>PROFILE.CERT_FORM.PDF</label>
         <div class="input-group">
-          <input formControlName="pdf"
-                 type="file"
-                 class="form-control border-right-0"
-                 accept=".pdf"
-                 (change)="onFileChange($event)"
-                 showErrors />
+          <input
+            formControlName="pdf"
+            type="file"
+            class="form-control border-right-0"
+            accept=".pdf"
+            (change)="onFileChange($event)"
+            showErrors
+          />
         </div>
       </div>
     </div>
   </div>
   <div class="d-flex justify-content-end align-items-center">
-    <button type="submit"
-            class="btn btn-primary btn-sm mr-2"
-            translate>PROFILE.CERT_FORM.SAVE</button>
-    <button type="button"
-            class="btn btn-link text-danger"
-            (click)="onDismiss()"
-            translate>PROFILE.CERT_FORM.CANCEL</button>
+    <button type="submit" class="btn btn-primary btn-sm mr-2" translate>
+      PROFILE.CERT_FORM.SAVE
+    </button>
+    <button
+      type="button"
+      class="btn btn-link text-danger"
+      (click)="onDismiss()"
+      translate
+    >
+      PROFILE.CERT_FORM.CANCEL
+    </button>
   </div>
 </form>
