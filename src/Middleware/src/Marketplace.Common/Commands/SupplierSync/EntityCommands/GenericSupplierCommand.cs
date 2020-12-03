@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.SupplierSync
+namespace Marketplace.Common.Commands
 {
     [SupplierSync("Generic")]
     public class GenericSupplierCommand : ISupplierSyncCommand

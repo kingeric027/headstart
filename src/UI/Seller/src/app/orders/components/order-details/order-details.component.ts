@@ -61,6 +61,7 @@ export class OrderDetailsComponent {
   faInfoCircle = faInfoCircle
   faUser = faUserAlt
   _order: Order = {}
+  _buyerOrder: Order = {}
   _lineItems: MarketplaceLineItem[] = []
   _payments: Payment[] = []
   images: any[] = []
@@ -194,12 +195,26 @@ export class OrderDetailsComponent {
     return this.orderService.isQuoteOrder(order)
   }
 
+  isSupplierOrder(orderID: string): boolean {
+    return this.orderService.isSupplierOrder(orderID);
+  }
+
+  async getBuyerOrder(order: Order): Promise<void> {
+    if(this.isSupplierOrder(order.ID)){
+      const orderData = await this.middleware.getSupplierData(order.ID);
+      this._buyerOrder = orderData.BuyerOrder.Order;
+    } else {
+      this._buyerOrder = order;
+    }
+  }
+
   private async handleSelectedOrderChange(order: Order): Promise<void> {
+    await this.getBuyerOrder(order);
     this.orderAvatarInitials = !this.isQuoteOrder(order)
-      ? `${order?.FromUser?.FirstName?.slice(
+      ? `${this._buyerOrder?.FromUser?.FirstName?.slice(
           0,
           1
-        ).toUpperCase()}${order?.FromUser?.LastName?.slice(0, 1).toUpperCase()}`
+        ).toUpperCase()}${this._buyerOrder?.FromUser?.LastName?.slice(0, 1).toUpperCase()}`
       : `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(
           0,
           1
