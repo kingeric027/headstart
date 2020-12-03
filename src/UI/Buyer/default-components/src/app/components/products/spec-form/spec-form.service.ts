@@ -64,6 +64,40 @@ export class SpecFormService {
     return specs
   }
 
+  public getLineItemImageUrl(
+    images: Asset[],
+    specs: Spec[],
+    specForm?: FormGroup
+  ): string {
+    if (!specs.length) {
+      const firstImage = images[0]
+      return firstImage?.Url
+    }
+    const image = images?.find((img) =>
+      this.isImageMatchingSpecs(img, specs, specForm)
+    )
+    if (!image) return images[0]?.Url
+    return image?.Url
+  }
+
+  private isImageMatchingSpecs(
+    image: Asset,
+    specs: Spec[],
+    specForm: FormGroup
+  ): boolean {
+    // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
+    const liSpecs = this.getLineItemSpecs(specs, specForm)
+    return liSpecs.every((spec) =>
+      image.Tags.find((tag) =>
+        tag?.split('-').includes(
+          spec.Value.split(' ')
+            .join('')
+            .replace(/[^a-zA-Z0-9 ]/g, '')
+        )
+      )
+    )
+  }
+
   public getGridLineItemSpecs(
     buyerSpecs: Spec[],
     specValues: string[]
@@ -87,29 +121,29 @@ export class SpecFormService {
     return specs
   }
 
-  public getLineItemImageUrl(
+  public getGridLineItemImageUrl(
     images: Asset[],
     specs: Spec[],
-    specForm: FormGroup
+    specValues: string[]
   ): string {
     if (!specs.length) {
       const firstImage = images[0]
       return firstImage?.Url
     }
     const image = images?.find((img) =>
-      this.isImageMatchingSpecs(img, specs, specForm)
+      this.isGridImageMatchingSpecs(img, specs, specValues)
     )
     if (!image) return images[0]?.Url
     return image?.Url
   }
 
-  private isImageMatchingSpecs(
+  private isGridImageMatchingSpecs(
     image: Asset,
     specs: Spec[],
-    specForm: FormGroup
+    specValues: string[]
   ): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
-    const liSpecs = this.getLineItemSpecs(specs, specForm)
+    const liSpecs = this.getGridLineItemSpecs(specs, specValues)
     return liSpecs.every((spec) =>
       image.Tags.find((tag) =>
         tag?.split('-').includes(

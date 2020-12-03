@@ -1,44 +1,53 @@
 import { Component, Input } from '@angular/core'
-import { Spec, PriceSchedule, ListPage } from 'ordercloud-javascript-sdk'
-import { MarketplaceMeProduct, ShopperContextService } from 'marketplace'
-import { SpecFormService, GridSpecOption } from '../spec-form/spec-form.service'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
+import { FormGroup } from '@angular/forms'
 import {
-  MarketplaceLineItem,
+  PriceSchedule,
   SuperMarketplaceProduct,
 } from '@ordercloud/headstart-sdk'
-import { FormGroup } from '@angular/forms'
+import { MarketplaceMeProduct, ShopperContextService } from 'marketplace'
+import { PriceBreak, Spec } from 'ordercloud-javascript-sdk'
+import { ProductDetailService } from '../product-details/product-detail.service'
+import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
+import { GridSpecOption, SpecFormService } from '../spec-form/spec-form.service'
+import { minBy as _minBy } from 'lodash'
 
 @Component({
   templateUrl: `./grid-spec-form.component.html`,
 })
 export class OCMGridSpecForm {
-  @Input() priceSchedule: PriceSchedule
   _specs: Spec[]
-  _product: MarketplaceMeProduct
   _specForm: FormGroup
   _superProduct: SuperMarketplaceProduct
+  product: MarketplaceMeProduct
   specOptions: string[]
-  lineItems: MarketplaceLineItem[] = []
+  lineItems: any[] = []
   lineTotals: number[] = []
+  unitPrices: number[] = []
   totalPrice = 0
   isAddingToCart = false
-
+  priceSchedule: PriceSchedule
+  priceBreaks: PriceBreak[]
+  price: number
+  percentSavings: number
+  totalQty: number
+  qtyValid = false
+  errorMsg = ''
   constructor(
     private specFormService: SpecFormService,
-    private context: ShopperContextService
-  ) {}
+    private context: ShopperContextService,
+    private productDetailService: ProductDetailService
+  ) { }
+
   @Input() set superProduct(value: SuperMarketplaceProduct) {
     this._superProduct = value
-  }
-  @Input() set product(value: MarketplaceMeProduct) {
-    this._product = value
+    this.product = this._superProduct.Product
+    this.priceBreaks = this._superProduct.PriceSchedule.PriceBreaks
+    this.priceSchedule = this._superProduct.PriceSchedule
   }
   @Input() set specs(value: Spec[]) {
     this._specs = value
     this.getSpecOptions(value)
   }
-
   @Input() set specForm(value: FormGroup) {
     this._specForm = value
   }
@@ -73,7 +82,10 @@ export class OCMGridSpecForm {
           result.push(optionValue + ', ' + combination)
         }
       }
-      result.forEach(() => this.lineTotals.push(0))
+      result.forEach(() => {
+        this.lineTotals.push(0)
+        this.unitPrices.push(0)
+      })
       return result
     }
   }
@@ -84,14 +96,14 @@ export class OCMGridSpecForm {
     specArray = specArray.map((x) => x.replace(/\s/g, ''))
     const item = {
       Quantity: event.qty,
-      Product: this._product,
-      ProductID: this._product.ID,
+      Product: this.product,
+      ProductID: this.product.ID,
       Specs: this.specFormService.getGridLineItemSpecs(this._specs, specArray),
       xp: {
-        ImageUrl: this.specFormService.getLineItemImageUrl(
+        ImageUrl: this.specFormService.getGridLineItemImageUrl(
           this._superProduct.Images,
-          this._superProduct.Specs,
-          this._specForm
+          this._specs,
+          specArray
         ),
       },
     }
@@ -100,18 +112,57 @@ export class OCMGridSpecForm {
     )
     if (i === -1) this.lineItems.push(item)
     else this.lineItems[i] = item
-    this.lineTotals[indexOfSpec] = this.getLineTotal(
-      event.qty,
-      this.specFormService.getGridLineItemSpecs(this._specs, specArray)
-    )
+    const liQuantities = []
+    this.lineItems.forEach((li) => liQuantities.push(li.Quantity))
+    this.totalQty = liQuantities.reduce((acc, curr) => {
+      return acc + curr
+    })
+    this.qtyValid = this.validateQuantity(this.lineItems)
+    this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs[0])
+    this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs[0])
     this.totalPrice = this.getTotalPrice()
   }
 
-  getLineTotal(qty: number, options: GridSpecOption[]): number {
-    let markup = 0
-    const price = this.priceSchedule?.PriceBreaks[0].Price
-    options.forEach((spec) => (markup += spec.Markup))
-    return (markup + price) * qty
+  getErrorMsg(event: any) {
+    this.errorMsg = event
+  }
+
+  validateQuantity(lineItems: any): boolean {
+    return this.totalQty >= lineItems[0].Product.PriceSchedule.MinQty &&
+      lineItems[0].Product.PriceSchedule.MaxQuantity !== null
+      ? this.totalQty <= lineItems[0].Product.PriceSchedule.MaxQuantity
+      : this.totalQty !== 0
+  }
+
+  getUnitPrice(qty: number, specs: GridSpecOption): number {
+    if (!this.priceBreaks?.length) return
+    const startingBreak = _minBy(this.priceBreaks, 'Quantity')
+    const selectedBreak = this.priceBreaks.reduce((current, candidate) => {
+      return candidate.Quantity > current.Quantity && candidate.Quantity <= qty
+        ? candidate
+        : current
+    }, startingBreak)
+    return specs.Markup
+      ? selectedBreak.Price + specs.Markup
+      : selectedBreak.Price
+  }
+
+  getLineTotal(qty: number, specs: GridSpecOption): number {
+    if (qty > 0) {
+      if (this.priceBreaks?.length) {
+        const basePrice = qty * this.priceBreaks[0].Price
+        this.percentSavings = this.productDetailService.getPercentSavings(
+          this.price,
+          basePrice
+        )
+      }
+      return this.productDetailService.getGridLineItemPrice(
+        this.priceBreaks,
+        specs,
+        qty
+      )
+    }
+    return 0
   }
 
   async addToCart(): Promise<void> {
