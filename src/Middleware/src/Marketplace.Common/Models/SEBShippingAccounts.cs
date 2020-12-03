@@ -39,7 +39,7 @@ namespace Marketplace.Common.Models
             this.ShippingProfiles.Add(new EasyPostShippingProfile()
             {
                 ID = "SMG",
-                SupplierID = "050",
+                SupplierID = settings.OrderCloudSettings.FirstChoiceSupplierID,
                 CarrierAccountID = settings.EasyPostSettings.SMGFedexAccountId,
                 Customs_Signer = "Bob Bernier",
                 Restriction_Type = "none",
