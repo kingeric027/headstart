@@ -44,7 +44,7 @@ namespace ordercloud.integrations.cms
 					Container = $"assets-{container.id}", // SellerOrgID can contain "_", an illegal character for blob containers.
 					AccessType = BlobContainerPublicAccessType.Container
 				});
-				storageConnections.Add(container.id, blobService);
+				storageConnections.TryAdd(container.id, blobService);
 			}
 			try
 			{
