@@ -41,11 +41,6 @@ namespace Orchestration.Tests
         {
             get
             {
-                yield return new TestCaseData(RecordType.HydratedProduct,
-                    new TemplateHydratedProduct()
-                    {
-                        Product = new TemplateProduct() {ID = "id"}
-                    });
                 yield return new TestCaseData(RecordType.Product, new MarketplaceProduct()
                 {
                     ID = "id"
