@@ -72,7 +72,7 @@ test('Can the page be affected by adjusting facets | 6790', async t => {
 		)
 		.ok()
 
-	//assert that list without facet selection is different than default list
+	//assert that list with facet selection is different than initial list
 	t.expect(initialFirstProductName !== expectedProductName)
 
 	//assert that facet selection updated list with expected first product
