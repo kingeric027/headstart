@@ -48,7 +48,15 @@ namespace Marketplace.Tests
                 new MarketplaceShipMethod() {Name = "UPS GROUND"}
             };
 
-            var mockProfiles = new SelfEsteemBrandsShippingProfiles(Substitute.For<AppSettings>());
+            var settings = new AppSettings()
+            {
+                OrderCloudSettings = new OrderCloudSettings()
+                {
+                    FirstChoiceSupplierID = "050"
+                }
+            };
+
+            var mockProfiles = new SelfEsteemBrandsShippingProfiles(settings);
 
             var configured_filter = command.FilterMethodsBySupplierConfig(mockMethods, mockProfiles.FirstOrDefault("050"));
             var misconfigured_filter = command.FilterMethodsBySupplierConfig(mockNotFoundMethods, mockProfiles.FirstOrDefault("050"));

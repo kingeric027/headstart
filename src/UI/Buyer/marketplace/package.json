@@ -7,7 +7,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "npm run lint && ng build",
+    "build": "ng build",
     "test": "ng test",
     "lint": "eslint projects/marketplace/src/**/*.ts --quiet",
     "lint-project": "eslint projects/marketplace/src/**/*.{ts,js} --fix",
