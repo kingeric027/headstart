@@ -60,9 +60,8 @@ namespace Marketplace.API
 			var cmsConfig = new CMSConfig()
 			{
 				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
-				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
-				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
-			};
+				BlobStorageHostUrl = _settings.BlobSettings.HostUrl
+            };
             var currencyConfig = new BlobServiceConfig()
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
@@ -105,7 +104,6 @@ namespace Marketplace.API
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
                 .Inject<IDocumentQuery>()
-                .Inject<IBlobStorage>()
                 .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()

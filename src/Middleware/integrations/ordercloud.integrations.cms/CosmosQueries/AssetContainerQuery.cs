@@ -1,42 +1,40 @@
 ﻿using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
-using Microsoft.Azure.Documents.Client;
-using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using ordercloud.integrations.cms.Models;
 using System.Linq;
-using Microsoft.AspNetCore.Server.IIS.Core;
 
 namespace ordercloud.integrations.cms
 {
 	public interface IAssetContainerQuery
 	{
-		Task<AssetContainerDO> CreateDefaultIfNotExists(VerifiedUserContext user);
+
+		Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user);
+		Task<Customer> GetCustomer(string sellerID);
 	}
 
 	public class AssetContainerQuery: IAssetContainerQuery
 	{
 		private readonly ICosmosStore<AssetContainerDO> _store;
-		private readonly IBlobStorage _blob;
 		public const string SinglePartitionID = "SinglePartitionID"; // TODO - is there a better way?
 
-		public AssetContainerQuery(ICosmosStore<AssetContainerDO> store, IBlobStorage blob)
+		public AssetContainerQuery(ICosmosStore<AssetContainerDO> store)
 		{
 			_store = store;
-			_blob = blob;
 		}
 
-		public async Task<AssetContainerDO> CreateDefaultIfNotExists(VerifiedUserContext user)
+		public async Task<AssetContainer> CreateDefaultIfNotExists(VerifiedUserContext user)
 		{
-			var customer = await GetCustomer(user);
+			AssetContainerDO container;
+			var customer = await GetCustomer(user.SellerID);
+
 			if (customer.AssetPartitionStrategy == AssetPartitionStrategy.PartitionByCompanyID)
 			{
 				var existingContainer = await _store.Query().FirstOrDefaultAsync(c =>
 				c.SellerID == user.SellerID &&
 				c.BuyerID == user.BuyerID &&
 				c.SupplierID == user.SupplierID);
-				return existingContainer ?? await _store.AddAsync(new AssetContainerDO()
+				container = existingContainer ?? await _store.AddAsync(new AssetContainerDO()
 				{
 					SellerID = user.SellerID,
 					BuyerID = user.BuyerID,
@@ -45,13 +43,13 @@ namespace ordercloud.integrations.cms
 			} else
 			{
 				var existingContainer = await _store.Query().FirstOrDefaultAsync(c => c.SellerID == user.SellerID);
-				return existingContainer ?? await _store.AddAsync(new AssetContainerDO() { SellerID = user.SellerID });
-			}			
+				container = existingContainer ?? await _store.AddAsync(new AssetContainerDO() { SellerID = user.SellerID });
+			}
+			return AssetContainerMapper.MapTo(container, customer);
 		}
 
-		private async Task<Customer> GetCustomer(VerifiedUserContext user)
+		public async Task<Customer> GetCustomer(string sellerID)
 		{
-			var sellerID = user.SellerID;
 			var customers = await _store.QuerySingleAsync<CustomerSettingsObject>("SELECT * FROM c WHERE c.id = 'Customer_Settings_Object'");
 			if (customers == null) throw new MissingConfigationException();
 			var customer = customers.Customers?.FirstOrDefault(c => 

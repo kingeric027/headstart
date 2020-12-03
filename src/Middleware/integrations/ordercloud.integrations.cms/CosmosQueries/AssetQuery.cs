@@ -34,14 +34,12 @@ namespace ordercloud.integrations.cms
 		private readonly CMSConfig _config;
 		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
-		private readonly IBlobStorage _blob;
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob, CMSConfig config)
+		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, CMSConfig config)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
-			_blob = blob;
 			_config = config;
 		}
 
@@ -57,12 +55,15 @@ namespace ordercloud.integrations.cms
 			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var assets = list.ToListPage(arguments.Page, arguments.PageSize, count);
-			return AssetMapper.MapTo(_config, assets);
+			return AssetMapper.MapTo(container.Customer, assets);
 		}
 
 		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
-		{ 
-			return AssetMapper.MapTo(_config, await GetDO(assetInteropID, user));
+		{
+			var container = await _containers.CreateDefaultIfNotExists(user);
+			var asset = await GetWithoutExceptions(container.id, assetInteropID);
+			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
+			return AssetMapper.MapTo(container.Customer, asset);
 		}
 
 		public async Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user)
@@ -84,11 +85,11 @@ namespace ordercloud.integrations.cms
 				{
 					asset = await OpenImageAndUploadThumbs(container, asset, form);
 				}
-				await _blob.UploadAsset(container, asset.id, form.File);
+				await StorageHelper.UploadAsset(container, asset.id, form.File);
 			}
 			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
-			return AssetMapper.MapTo(_config, newAsset);
+			return AssetMapper.MapTo(container.Customer, newAsset);
 		}
 
 		public async Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user)
@@ -123,7 +124,7 @@ namespace ordercloud.integrations.cms
 
 			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpsertAsync(existingAsset);
-			return AssetMapper.MapTo(_config, updatedAsset);
+			return AssetMapper.MapTo(container.Customer, updatedAsset);
 		}
 
 		public async Task Delete(string assetInteropID, VerifiedUserContext user)
@@ -135,15 +136,14 @@ namespace ordercloud.integrations.cms
 			var small = Task.CompletedTask;
 			if (asset.Type == AssetType.Image)
 			{
-				medium = _blob.DeleteAsset(container, $"{asset.id}-m");
-				small = _blob.DeleteAsset(container, $"{asset.id}-s");
+				medium = StorageHelper.DeleteAsset(container, $"{asset.id}-m");
+				small = StorageHelper.DeleteAsset(container, $"{asset.id}-s");
 			}
-			await Task.WhenAll(medium, small, _blob.DeleteAsset(container, asset.id));
+			await Task.WhenAll(medium, small, StorageHelper.DeleteAsset(container, asset.id));
 		}
 
 		public async Task<ListPage<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs, ListArgsPageOnly args)
 		{
-
 			return await _assetStore.FindMultipleAsync(assetIDs, args);
 		}
 
@@ -154,7 +154,7 @@ namespace ordercloud.integrations.cms
 			return asset;
 		}
 
-		private async Task<AssetDO> OpenImageAndUploadThumbs(AssetContainerDO container, AssetDO asset, AssetUpload form)
+		private async Task<AssetDO> OpenImageAndUploadThumbs(AssetContainer container, AssetDO asset, AssetUpload form)
 		{
 			if (!ValidImageFormats.Contains(form.File.ContentType))
 			{
@@ -169,8 +169,8 @@ namespace ordercloud.integrations.cms
 				var small = image.ResizeSmallerDimensionToTarget(100);
 				var medium = image.ResizeSmallerDimensionToTarget(300);
 				await Task.WhenAll(new[] {
-					_blob.UploadAsset(container, $"{asset.id}-m", medium),
-					_blob.UploadAsset(container, $"{asset.id}-s", small)
+					StorageHelper.UploadImage(container, $"{asset.id}-m", medium),
+					StorageHelper.UploadImage(container, $"{asset.id}-s", small)
 				});
 			}
 			return asset;
