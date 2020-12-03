@@ -125,7 +125,6 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   private async listSavedBuyerLocations(): Promise<void> {
-    // this.existingBuyerLocations = await this.context.addresses.listBuyerLocations()
     const listOptions = {
       page: 1,
       pageSize: 100
