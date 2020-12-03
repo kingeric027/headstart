@@ -44,7 +44,7 @@ namespace ordercloud.integrations.cms
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var assetedResource = await GetExisting(resource, user.SellerID);
-			if (assetedResource == null) return new ListPage<Asset>().Empty();
+			if (assetedResource == null) { return new ListPage<Asset>().Empty(); }
 			var assetIDs = assetedResource.ImageAssetIDs
 				.Concat(assetedResource.AllOtherAssetIDs)
 				.ToList();
@@ -146,7 +146,7 @@ namespace ordercloud.integrations.cms
 
 		private List<string> GetAssetIDs(AssetedResourceDO assetedResource, AssetType assetType)
 		{
-			if (assetType == AssetType.Image) return assetedResource.ImageAssetIDs;
+			if (assetType == AssetType.Image) { return assetedResource.ImageAssetIDs; }
 			return assetedResource.AllOtherAssetIDs;
 		}
 

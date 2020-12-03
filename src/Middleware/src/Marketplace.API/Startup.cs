@@ -46,7 +46,7 @@ namespace Marketplace.API
         public void ConfigureServices(IServiceCollection services)
         {
 			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
-              _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
+              "https://localhost:8081", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
 
 
             var avalaraConfig = new AvalaraConfig()
@@ -62,6 +62,10 @@ namespace Marketplace.API
 				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
 				BlobStorageHostUrl = _settings.BlobSettings.HostUrl
             };
+            var tecraConfig = _settings.TecraSettings;
+            tecraConfig.BlobStorageHostUrl = _settings.BlobSettings.HostUrl;
+            tecraConfig.BlobStorageConnectionString = _settings.BlobSettings.ConnectionString;
+
             var currencyConfig = new BlobServiceConfig()
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
@@ -138,7 +142,7 @@ namespace Marketplace.API
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings))
-                .AddSingleton<OrderCloudTecraConfig>(x => _settings.TecraSettings)
+                .AddSingleton<OrderCloudTecraConfig>(x => tecraConfig)
                 .Inject<IOrderCloudIntegrationsTecraService>()
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations")

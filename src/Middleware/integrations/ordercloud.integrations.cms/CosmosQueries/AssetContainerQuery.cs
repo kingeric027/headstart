@@ -51,12 +51,12 @@ namespace ordercloud.integrations.cms
 		public async Task<Customer> GetCustomer(string sellerID)
 		{
 			var customers = await _store.QuerySingleAsync<CustomerSettingsObject>("SELECT * FROM c WHERE c.id = 'Customer_Settings_Object'");
-			if (customers == null) throw new MissingConfigationException();
+			if (customers == null) { throw new MissingConfigationException(); }
 			var customer = customers.Customers?.FirstOrDefault(c => 
 				sellerID == c.SellerID || 
 				sellerID == $"{c.SellerID}_Staging" ||
 				sellerID == $"{c.SellerID}_Sandbox");
-			if (customer == null) throw new NotConfiguredForAssetsException(sellerID);
+			if (customer == null) { throw new NotConfiguredForAssetsException(sellerID); }
 			return customer;
 		}
 	}

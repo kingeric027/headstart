@@ -31,16 +31,14 @@ namespace ordercloud.integrations.cms
 
 	public class AssetQuery : IAssetQuery
 	{
-		private readonly CMSConfig _config;
 		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, CMSConfig config)
+		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
-			_config = config;
 		}
 
 		public async Task<ListPage<Asset>> List(ListArgs<Asset> args, VerifiedUserContext user)
@@ -62,7 +60,7 @@ namespace ordercloud.integrations.cms
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
-			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
+			if (asset == null) { throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID); }
 			return AssetMapper.MapTo(container.Customer, asset);
 		}
 
@@ -70,7 +68,7 @@ namespace ordercloud.integrations.cms
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
-			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
+			if (asset == null) { throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID); }
 			return asset;
 		}
 
@@ -79,13 +77,13 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = AssetMapper.MapFromUpload(container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
-			if (matchingID != null) throw new DuplicateIDException();
+			if (matchingID != null) { throw new DuplicateIDException(); }
 			if (form.File != null) {
 				if (asset.Type == AssetType.Image)
 				{
 					asset = await OpenImageAndUploadThumbs(container, asset, form);
 				}
-				await StorageHelper.UploadAsset(container, asset.id, form.File);
+				await StorageHelper.UploadFile(container, asset.id, form.File);
 			}
 			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
@@ -98,11 +96,15 @@ namespace ordercloud.integrations.cms
 			if (assetInteropID != asset.ID)
 			{
 				var matchingID = await GetWithoutExceptions(container.id, asset.ID);
-				if (matchingID != null) throw new DuplicateIDException();
+				if (matchingID != null) { 
+					throw new DuplicateIDException(); 
+				}
 			}
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) {
-				if (asset.Url == null) throw new AssetCreateValidationException("If you are not uploading a file, you must include a Url");
+				if (asset.Url == null) { 
+					throw new AssetCreateValidationException("If you are not uploading a file, you must include a Url"); 
+				}
 				existingAsset = new AssetDO()
 				{
 					Type = asset.Type,
@@ -150,7 +152,7 @@ namespace ordercloud.integrations.cms
 		public async Task<AssetDO> GetByInternalID(string assetID)
 		{
 			var asset = await _assetStore.Query().FirstOrDefaultAsync(a => a.id == assetID);
-			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetID);
+			if (asset == null) { throw new OrderCloudIntegrationException.NotFoundException("Asset", assetID); }
 			return asset;
 		}
 
