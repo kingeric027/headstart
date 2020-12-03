@@ -16,5 +16,6 @@ module.exports = {
   },
   rules: {
     // specify lint rules to overwrite rules inherited from the extended configs
+    "@typescript-eslint/no-misused-promises": "off" // https://four51.slack.com/archives/C01DTREGY76/p1607007043017800
   },
 }
