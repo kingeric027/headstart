@@ -38,6 +38,8 @@ namespace ordercloud.integrations.tecra
         public string WorkspaceID { get; set; }
         public string SettingsID { get; set; }
         public string StoreID { get; set; }
+        public string BlobStorageHostUrl { get; set; }
+        public string BlobStorageConnectionString { get; set; }
     }
 
 

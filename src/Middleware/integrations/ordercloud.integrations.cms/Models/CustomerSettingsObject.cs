@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ordercloud.integrations.cms.Models
+namespace ordercloud.integrations.cms
 {
 	public class CustomerSettingsObject : CosmosObject
 	{
@@ -15,6 +15,8 @@ namespace ordercloud.integrations.cms.Models
 	{
 		public string SellerID { get; set; }
 		public string Name { get; set; }
+		public string StorageUrlHost { get; set; }
+		public string StorageConnectionString { get; set; }
 		public AssetPartitionStrategy AssetPartitionStrategy { get; set; }
 	}
 

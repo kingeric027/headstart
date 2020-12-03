@@ -23,6 +23,7 @@ namespace Marketplace.Common.Commands
         public string ErrorMessage { get; set; }
         public int Column { get; set; }
     }
+
     public class DocumentImportSummary
     {
         public int TotalCount { get; set; }

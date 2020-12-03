@@ -6,8 +6,7 @@ namespace ordercloud.integrations.cms
 {
 	public class CMSConfig
 	{
-		public string BaseUrl { get; set; }
-		public string BlobStorageHostUrl { get; set; }
-		public string BlobStorageConnectionString { get; set; }
+		public string BaseUrl { get; set; } // only used for schema links
+		public string BlobStorageHostUrl { get; set; } // only used for placeholder images
 	}
 }
