@@ -7,7 +7,6 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
-using Marketplace.Common.Commands.SupplierSync;
 using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
