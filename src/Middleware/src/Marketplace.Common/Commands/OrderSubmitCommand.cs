@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 
 namespace Marketplace.Common.Commands
 {
@@ -22,12 +23,14 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
         private readonly IOrderCloudIntegrationsCardConnectCommand _card;
+        private readonly TelemetryClient _telemetry;
 
         public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card)
         {
             _oc = oc;
             _settings = settings;
             _card = card;
+            _telemetry = new TelemetryClient();
         }
 
         public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
@@ -46,12 +49,25 @@ namespace Marketplace.Common.Commands
                 return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, user.AccessToken));
             } catch(Exception e)
             {
-                // TODO: 
-                // if an error happens here we're in a bad state because user was charged
-                // but order didn't submit
-                // log this somewhere or send email
+                LogError(e, incrementedOrderID, worksheet, user);
                 throw e;
             }
+        }
+
+        private void LogError(Exception e, string orderID, MarketplaceOrderWorksheet worksheet, VerifiedUserContext user)
+        {
+            // track exception in app insights
+            // to find go to Transaction Search > Event Type = Exception > Filter by any of these custom properties
+            var customProperties = new Dictionary<string, string>
+                {
+                    { "ErrorCode", "Order.Submit.PaymentCaptureOrderFailed" },
+                    { "Message", "Payment was captured but order was not submitted" },
+                    { "OrderID", orderID },
+                    { "BuyerID", worksheet.Order.FromCompanyID },
+                    { "UserEmail", user.Email }
+                };
+            _telemetry.TrackException(e, customProperties);
+            Console.WriteLine(_telemetry);
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)

@@ -28,6 +28,8 @@ using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
 using LazyCache;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 
 namespace Marketplace.API
 {
@@ -46,7 +48,6 @@ namespace Marketplace.API
         {
 			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
               _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-
 
             var avalaraConfig = new AvalaraConfig()
 			{
@@ -164,7 +165,12 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
-            services.AddApplicationInsightsTelemetry(_settings.ApplicationInsightsSettings.InstrumentationKey);
+
+
+            services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
+                EnableAdaptiveSampling = false, // retain all data
+                InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
