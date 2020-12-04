@@ -34,6 +34,11 @@ import {
 import { AxiosError } from 'axios'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 
+interface CheckoutSection {
+  id: string
+  valid: boolean
+}
+
 @Component({
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
@@ -56,7 +61,7 @@ export class OCMCheckout implements OnInit {
   faCheck = faCheck
   orderErrorModal = ModalState.Closed
   checkout: CheckoutService = this.context.order.checkout
-  sections: { id: string; valid: boolean }[] = [
+  sections: CheckoutSection[] = [
     {
       id: 'login',
       valid: false,
