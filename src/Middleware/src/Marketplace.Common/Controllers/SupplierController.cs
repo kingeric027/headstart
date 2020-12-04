@@ -47,7 +47,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("PATCH Supplier")]
 		[DocIgnore] // PartialSupplier throws an openapi error?
-		[HttpPatch, Route("{supplierID}"), OrderCloudIntegrationsAuth]
+		[HttpPatch, Route("{supplierID}"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin, ApiRole.OrderReader)]
 		public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, [FromBody] PartialSupplier supplier)
 		{
 			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext);
