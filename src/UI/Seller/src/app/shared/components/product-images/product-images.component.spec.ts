@@ -8,7 +8,7 @@ describe('ProductImagesComponent', () => {
   let component: ProductImagesComponent;
   let fixture: ComponentFixture<ProductImagesComponent>;
   const toastrService = { warning: jasmine.createSpy('warning') };
-  const mockProduct = { xp: { imageURLs: ['A', 'B', 'C', 'D'] } };
+  const mockProduct = { Name: 'productName', xp: { imageURLs: ['A', 'B', 'C', 'D'] } };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

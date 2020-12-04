@@ -1,24 +1,61 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { SupplierService } from './../../suppliers/supplier.service'
+import { SupplierAddressService } from './../supplier-address.service'
+import { SupplierLocationTableComponent } from './supplier-location-table.component'
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { HttpClient } from '@angular/common/http'
+import { Router, ActivatedRoute } from '@angular/router'
+import { of } from 'rxjs'
 
-import { SupplierTableComponent } from './supplier-table.component';
+describe('SupplierLocationTableComponent', () => {
+  let component: SupplierLocationTableComponent
+  let fixture: ComponentFixture<SupplierLocationTableComponent>
 
-describe('SupplierTableComponent', () => {
-  let component: SupplierTableComponent;
-  let fixture: ComponentFixture<SupplierTableComponent>;
+  const router = {
+    navigateByUrl: jasmine.createSpy('navigateByUrl'),
+    url: '/my-',
+    routerState: { snapshot: { url: 'https://test' } },
+  }
+  const activatedRoute = { params: of({}) }
+  const httpClient = {}
+  const supplierAddressService = {
+    isSupplierUser() {
+      return true
+    },
+    getMyResource() {
+      return {}
+    },
+    copyResource() {},
+    getParentResourceID() {
+      return 1
+    },
+    getParentOrSecondaryIDParamName() {
+      return 'TestID'
+    },
+    resourceSubject: of({}),
+  }
+
+  const supplierService = {}
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SupplierTableComponent],
-    }).compileComponents();
-  }));
+      declarations: [SupplierLocationTableComponent],
+      providers: [
+        { provide: Router, useValue: router },
+        { provide: ActivatedRoute, useValue: activatedRoute },
+        { provide: HttpClient, useValue: httpClient },
+        { provide: SupplierAddressService, useValue: supplierAddressService },
+        { provide: SupplierService, useValue: supplierService },
+      ],
+    }).compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SupplierTableComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(SupplierLocationTableComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

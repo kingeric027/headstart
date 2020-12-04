@@ -6,16 +6,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { InjectionToken } from '@angular/core';
 
 import { ForgotPasswordComponent } from '@app-seller/auth/containers/forgot-password/forgot-password.component';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 
-import {
-  Configuration,
-  OcPasswordResetService,
-  OcTokenService,
-} from '@ordercloud/angular-sdk';
+import { Configuration, OcTokenService, OcForgottenPasswordService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
 import { ToastrService } from 'ngx-toastr';
 
@@ -25,9 +18,7 @@ describe('ForgotPasswordComponent', () => {
 
   const router = { navigateByUrl: jasmine.createSpy('navigateByUrl') };
   const ocPasswordService = {
-    SendVerificationCode: jasmine
-      .createSpy('SendVerificationCode')
-      .and.returnValue(of(true)),
+    SendVerificationCode: jasmine.createSpy('SendVerificationCode').and.returnValue(of(true)),
   };
   const toastrService = { success: jasmine.createSpy('success') };
 
@@ -37,7 +28,7 @@ describe('ForgotPasswordComponent', () => {
       imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule],
       providers: [
         { provide: Router, useValue: router },
-        { provide: OcPasswordResetService, useValue: ocPasswordService },
+        { provide: OcForgottenPasswordService, useValue: ocPasswordService },
         { provide: ToastrService, useValue: toastrService },
         {
           provide: applicationConfiguration,
@@ -79,9 +70,7 @@ describe('ForgotPasswordComponent', () => {
         ClientID: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
         URL: 'http://localhost:9876',
       });
-      expect(toastrService.success).toHaveBeenCalledWith(
-        'Password Reset Email Sent!'
-      );
+      expect(toastrService.success).toHaveBeenCalledWith('Password Reset Email Sent!');
       expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
     });
   });

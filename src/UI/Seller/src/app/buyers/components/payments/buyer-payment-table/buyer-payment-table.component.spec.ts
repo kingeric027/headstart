@@ -1,24 +1,59 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { BuyerPaymentService } from './../buyer-payment.service'
+import { BuyerPaymentTableComponent } from './buyer-payment-table.component'
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { HttpClient } from '@angular/common/http'
+import { Router, ActivatedRoute } from '@angular/router'
+import { of } from 'rxjs'
+import { BuyerService } from '../../buyers/buyer.service'
 
-import { SupplierTableComponent } from './supplier-table.component';
+describe('BuyerPaymentTableComponent', () => {
+  let component: BuyerPaymentTableComponent
+  let fixture: ComponentFixture<BuyerPaymentTableComponent>
 
-describe('SupplierTableComponent', () => {
-  let component: SupplierTableComponent;
-  let fixture: ComponentFixture<SupplierTableComponent>;
+  const router = {
+    navigateByUrl: jasmine.createSpy('navigateByUrl'),
+    url: '/my-',
+    routerState: { snapshot: { url: 'https://test' } },
+  }
+  const activatedRoute = { params: of({}) }
+  const httpClient = {}
+  const buyerService = {
+    isSupplierUser() {
+      return true
+    },
+    getMyResource() {
+      return {}
+    },
+    copyResource() {},
+    getParentResourceID() {
+      return 1
+    },
+    getParentOrSecondaryIDParamName() {
+      return 'TestID'
+    },
+    resourceSubject: of({}),
+  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SupplierTableComponent],
-    }).compileComponents();
-  }));
+      declarations: [BuyerPaymentTableComponent],
+      providers: [
+        { provide: Router, useValue: router },
+        { provide: ActivatedRoute, useValue: activatedRoute },
+        { provide: HttpClient, useValue: httpClient },
+        { provide: BuyerPaymentService, useValue: buyerService },
+        { provide: BuyerService, useValue: buyerService },
+      ],
+    }).compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SupplierTableComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(BuyerPaymentTableComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

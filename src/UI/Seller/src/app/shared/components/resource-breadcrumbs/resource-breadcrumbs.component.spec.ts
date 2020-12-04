@@ -1,25 +1,37 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ActivatedRoute, Router } from '@angular/router'
+import { of } from 'rxjs/internal/observable/of'
 
-import { ResourceBreadcrumbsComponent } from './resource-breadcrumbs.component';
+import { ResourceBreadcrumbsComponent } from './resource-breadcrumbs.component'
 
 describe('ResourceBreadcrumbsComponent', () => {
-  let component: ResourceBreadcrumbsComponent;
-  let fixture: ComponentFixture<ResourceBreadcrumbsComponent>;
+  let component: ResourceBreadcrumbsComponent
+  let fixture: ComponentFixture<ResourceBreadcrumbsComponent>
+  const router = {
+    events: of({}),
+    navigateByUrl: jasmine.createSpy('navigateByUrl'),
+    url: 'url/',
+    routerState: { snapshot: { url: 'url/' } },
+  }
+  const activatedRoute = { queryParams: of({}), params: of({}) }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ResourceBreadcrumbsComponent ]
-    })
-    .compileComponents();
-  }));
+      declarations: [ResourceBreadcrumbsComponent],
+      providers: [
+        { provide: Router, useValue: router },
+        { provide: ActivatedRoute, useValue: activatedRoute },
+      ],
+    }).compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResourceBreadcrumbsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(ResourceBreadcrumbsComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})
