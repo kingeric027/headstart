@@ -28,21 +28,18 @@ namespace Marketplace.Tests
     class UnitPriceTests
     {
         private IOrderCloudClient _oc;
-        //private MarketplaceLineItem _lineItem;
-        private VerifiedUserContext _verifiedUser;
-        private Task<SuperMarketplaceMeProduct> _taskSuperMarketplaceMeProduct;
-        private AppSettings _settings;
+        private LineItemCommand _commandSub;
+        private List<MarketplaceLineItem> _existingLineItems;
 
         [SetUp]
         public void Setup()
         {
             _oc = Substitute.For<IOrderCloudClient>();
-            //_lineItem = Substitute.For<MarketplaceLineItem>();
-            _verifiedUser = Substitute.For<VerifiedUserContext>();
-            //_taskSuperMarketplaceMeProduct = Substitute.For<Task<SuperMarketplaceMeProduct>>(() => null);
-            _settings = Substitute.For<AppSettings>();
+            _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, _oc, default, default);
+            _existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
         }
 
+        //Substitute.For<ILineItemsResource>().PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, TestConstants.orderID, lineItem.ID, default).ReturnsForAnyArgs((Task)null);
         public class TestConstants
         {
             public const string orderID = "testorder";
@@ -51,15 +48,11 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_NoMarkups_CumulativeQtyFalse()
         {
-            LineItemCommand _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, default, default, default);
-
             SuperMarketplaceMeProduct product = BuildProductData(false);
-
-            List<MarketplaceLineItem> existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
 
             MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(2, 0);
 
-            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, existingLineItems, lineItem);
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 5);
         }
@@ -67,15 +60,11 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_NoMarkups_CumulativeQtyFalse()
         {
-            LineItemCommand _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, default, default, default);
-
             SuperMarketplaceMeProduct product = BuildProductData(false);
-
-            List<MarketplaceLineItem> existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
 
             MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(5, 0);
 
-            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, existingLineItems, lineItem);
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 3.5);
         }
@@ -83,15 +72,11 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_OneMarkup_CumulativeQtyFalse()
         {
-            LineItemCommand _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, default, default, default);
-
             SuperMarketplaceMeProduct product = BuildProductData(false);
-
-            List<MarketplaceLineItem> existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
 
             MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(2, 1);
 
-            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, existingLineItems, lineItem);
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 7.25);
         }
@@ -99,15 +84,11 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_OneMarkup_CumulativeQtyFalse()
         {
-            LineItemCommand _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, default, default, default);
-
             SuperMarketplaceMeProduct product = BuildProductData(false);
-
-            List<MarketplaceLineItem> existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
 
             MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(5, 1);
 
-            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, existingLineItems, lineItem);
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 5.75);
         }
@@ -115,15 +96,11 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_TwoMarkups_CumulativeQtyFalse()
         {
-            LineItemCommand _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, default, default, default);
-
             SuperMarketplaceMeProduct product = BuildProductData(false);
-
-            List<MarketplaceLineItem> existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
 
             MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(2, 2);
 
-            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, existingLineItems, lineItem);
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 11.25);
         }
@@ -131,17 +108,41 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_TwoMarkups_CumulativeQtyFalse()
         {
-            LineItemCommand _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, default, default, default);
-
             SuperMarketplaceMeProduct product = BuildProductData(false);
-
-            List<MarketplaceLineItem> existingLineItems = BuildExistingLineItemData(); // Existing total quantity is always 2, one for each variant of a single product
 
             MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(5, 2);
 
-            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, existingLineItems, lineItem);
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 9.75);
+        }
+
+        [Test]
+        public async Task GetUnitPrice_FirstPriceBreak_NoMarkups_CumulativeQtyTrue()
+        {
+            SuperMarketplaceMeProduct product = BuildProductData(true);
+
+            MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(2, 0);
+
+            Substitute.For<ILineItemsResource>().PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, TestConstants.orderID, lineItem.ID, default).ReturnsForAnyArgs((Task)null);
+
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
+
+            Assert.AreEqual(lineItemTotal, 5);
+        }
+
+        [Test]
+        public async Task GetUnitPrice_SecondPriceBreak_NoMarkups_CumulativeQtyTrue()
+        {
+            SuperMarketplaceMeProduct product = BuildProductData(true);
+
+            MarketplaceLineItem lineItem = SetLineItemQtyAndNumberOfMarkedUpSpecs(5, 0);
+
+            Substitute.For<ILineItemsResource>().PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, TestConstants.orderID, lineItem.ID, default).ReturnsForAnyArgs((Task)null);
+
+            decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
+
+            Assert.AreEqual(lineItemTotal, 3.5);
         }
 
         private SuperMarketplaceMeProduct BuildProductData(bool UseCumulativeQty)
@@ -176,10 +177,13 @@ namespace Marketplace.Tests
         private List<MarketplaceLineItem> BuildExistingLineItemData()
         {
             MarketplaceLineItem existinglineItem1 = Substitute.For<MarketplaceLineItem>();
+            MarketplaceLineItem test = new MarketplaceLineItem();
             existinglineItem1.Quantity = 1;
+            existinglineItem1.xp = new LineItemXp() { PrintArtworkURL = null };
 
             MarketplaceLineItem existinglineItem2 = Substitute.For<MarketplaceLineItem>();
             existinglineItem2.Quantity = 1;
+            existinglineItem2.xp = new LineItemXp() { PrintArtworkURL = null };
 
             List<MarketplaceLineItem> existingLineItems = new List<MarketplaceLineItem> { existinglineItem1, existinglineItem2 };
 
