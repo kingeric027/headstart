@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAccordion, NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import {
   ShipMethodSelection,
   ShipEstimate,
@@ -32,8 +32,7 @@ import {
   ErrorCodes,
 } from 'src/app/services/error-constants'
 import { AxiosError } from 'axios'
-import * as OrderCloudSDK from 'ordercloud-javascript-sdk'
-import { OCMOrderValidationModalComponent } from '../order-validation-modal/order-validation-modal.component'
+import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -84,15 +83,14 @@ export class OCMCheckout implements OnInit {
   constructor(
     private context: ShopperContextService,
     private spinner: NgxSpinnerService,
-    private toastrService: ToastrService,
-    private modalService: NgbModal
+    private toastrService: ToastrService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.context.order.onChange((order) => (this.order = order))
     this.order = this.context.order.get()
     if (this.order.IsSubmitted) {
-      this.handleOrderError('This order has already been submitted')
+      await this.handleOrderError('This order has already been submitted')
     }
 
     this.lineItems = this.context.order.cart.get()
@@ -136,7 +134,7 @@ export class OCMCheckout implements OnInit {
     await this.context.order.promos.applyAutomaticPromos()
     this.order = this.context.order.get()
     if (this.order.IsSubmitted) {
-      await this.handleOrderError()
+      await this.handleOrderError('This order has already been submitted')
     }
     this.lineItems = this.context.order.cart.get()
     this.destoryLoadingIndicator('payment')
@@ -220,7 +218,7 @@ export class OCMCheckout implements OnInit {
       throw new Error('An unknown error has occurred')
     }
     if (error.ErrorCode === ErrorCodes.OrderSubmit.AlreadySubmitted) {
-      await this.handleOrderError()
+      await this.handleOrderError('This order has already been submitted')
     } else if (
       error.ErrorCode === ErrorCodes.OrderSubmit.MissingShippingSelections
     ) {
@@ -236,8 +234,8 @@ export class OCMCheckout implements OnInit {
     }
   }
 
-  async handleOrderError(): Promise<void> {
-    this.orderError = 'This order has already been submitted'
+  async handleOrderError(message: string): Promise<void> {
+    this.orderError = message
     await this.context.order.reset()
     this.orderErrorModal = ModalState.Open
   }
