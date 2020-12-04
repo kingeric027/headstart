@@ -11,9 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using Marketplace.Common.Services;
-using NPOI.OpenXmlFormats.Wordprocessing;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -58,7 +56,6 @@ namespace Marketplace.Orchestration
                     }
                 })
                 .AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<BlobService>((s) => new BlobService(settings.BlobSettings.EnvironmentString))
                 .Inject<IAssetQuery>()
                 .Inject<IAssetedResourceQuery>()
                 .Inject<IOrchestrationCommand>()

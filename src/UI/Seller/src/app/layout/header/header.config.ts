@@ -378,12 +378,12 @@ export const getHeaderConfig = (
 
 const filterOutNavGroupings = (
   navGroupings: MPRoute[],
-  userRoles: string[],
+  userRoles: string[] = [],
   orderCloudUserType: string
 ): MPRoute[] => {
   return navGroupings.filter((navGrouping) => {
     return (
-      navGrouping.rolesWithAccess.some((role) => userRoles.includes(role)) &&
+      navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) &&
       (!navGrouping.orderCloudUserTypesWithAccess ||
         navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType))
     )

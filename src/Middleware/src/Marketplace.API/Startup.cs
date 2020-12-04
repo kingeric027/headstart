@@ -24,11 +24,12 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
 using LazyCache;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 
 namespace Marketplace.API
 {
@@ -47,7 +48,6 @@ namespace Marketplace.API
         {
 			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
               _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-
 
             var avalaraConfig = new AvalaraConfig()
 			{
@@ -100,6 +100,8 @@ namespace Marketplace.API
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
+                .Inject<IOrderCommand>()
+                .Inject<IOrderSubmitCommand>()
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IMarketplaceProductCommand>()
                 .Inject<ILineItemCommand>()
@@ -117,7 +119,6 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
-                .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
@@ -164,7 +165,12 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
-            services.AddApplicationInsightsTelemetry(_settings.ApplicationInsightsSettings.InstrumentationKey);
+
+
+            services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
+                EnableAdaptiveSampling = false, // retain all data
+                InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

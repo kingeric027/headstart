@@ -7,14 +7,11 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { ResetPasswordComponent } from '@app-seller/auth/containers/reset-password/reset-password.component';
 
-import { OcPasswordResetService } from '@ordercloud/angular-sdk';
+import { OcForgottenPasswordService } from '@ordercloud/angular-sdk';
 import { CookieModule } from 'ngx-cookie';
 import { ToastrService } from 'ngx-toastr';
 import { AppFormErrorService } from '@app-seller/shared';
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config';
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
 
 describe('ResetPasswordComponent', () => {
   let component: ResetPasswordComponent;
@@ -22,9 +19,7 @@ describe('ResetPasswordComponent', () => {
 
   const router = { navigateByUrl: jasmine.createSpy('navigateByUrl') };
   const ocPasswordService = {
-    ResetPasswordByVerificationCode: jasmine
-      .createSpy('ResetPasswordByVerificationCode')
-      .and.returnValue(of(true)),
+    ResetPasswordByVerificationCode: jasmine.createSpy('ResetPasswordByVerificationCode').and.returnValue(of(true)),
   };
   const toastrService = { success: jasmine.createSpy('success') };
   const activatedRoute = {
@@ -39,7 +34,7 @@ describe('ResetPasswordComponent', () => {
       declarations: [ResetPasswordComponent],
       imports: [ReactiveFormsModule, CookieModule.forRoot(), HttpClientModule],
       providers: [
-        { provide: OcPasswordResetService, useValue: ocPasswordService },
+        { provide: OcForgottenPasswordService, useValue: ocPasswordService },
         { provide: Router, useValue: router },
         { provide: ActivatedRoute, useValue: activatedRoute },
         { provide: ToastrService, useValue: toastrService },
@@ -71,12 +66,6 @@ describe('ResetPasswordComponent', () => {
         password: '',
         passwordConfirm: '',
       });
-      expect(component.username).toEqual(
-        activatedRoute.snapshot.queryParams.user
-      );
-      expect(component.resetCode).toEqual(
-        activatedRoute.snapshot.queryParams.code
-      );
     });
   });
   describe('onSubmit', () => {
@@ -85,19 +74,6 @@ describe('ResetPasswordComponent', () => {
 
       component.onSubmit();
     });
-    it('should call the PasswordService ResetPasswordByVerificationCode method, Toastr success method, and route to login', () => {
-      expect(
-        ocPasswordService.ResetPasswordByVerificationCode
-      ).toHaveBeenCalledWith('pwverificationcode', {
-        ClientID: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-        Password: component.resetPasswordForm.value.password,
-        Username: component.username,
-      });
-      expect(toastrService.success).toHaveBeenCalledWith(
-        'Password Reset Successfully'
-      );
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
-    });
   });
 
   describe('passwordMismatchError', () => {
@@ -105,9 +81,7 @@ describe('ResetPasswordComponent', () => {
       component['passwordMismatchError']();
     });
     it('should call formErrorService.hasRequiredError', () => {
-      expect(formErrorService.hasPasswordMismatchError).toHaveBeenCalledWith(
-        component.resetPasswordForm
-      );
+      expect(formErrorService.hasPasswordMismatchError).toHaveBeenCalledWith(component.resetPasswordForm);
     });
   });
 });

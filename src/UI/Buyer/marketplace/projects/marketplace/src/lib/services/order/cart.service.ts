@@ -16,7 +16,6 @@ import {
   HeadStartSDK,
   ListPage,
 } from '@ordercloud/headstart-sdk'
-import { TempSdk } from '../../services/temp-sdk/temp-sdk.service'
 import { CheckoutService } from './checkout.service'
 
 @Injectable({
@@ -24,14 +23,18 @@ import { CheckoutService } from './checkout.service'
 })
 export class CartService {
   public onAdd = new Subject<MarketplaceLineItem>() // need to make available as observable
-  public onChange = this.state.onLineItemsChange.bind(this.state)
+  public onChange: (
+    callback: (lineItems: ListPage<MarketplaceLineItem>) => void
+  ) => void
   private initializingOrder = false
 
   constructor(
     private state: OrderStateService,
-    private tempSdk: TempSdk,
     private checkout: CheckoutService
-  ) {}
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.onChange = this.state.onLineItemsChange.bind(this.state)
+  }
 
   get(): ListPage<MarketplaceLineItem> {
     return this.lineItems
@@ -73,9 +76,9 @@ export class CartService {
     )
     Object.assign(this.state.order, this.calculateOrder())
     try {
-      await this.tempSdk.deleteLineItem(this.state.order.ID, lineItemID)
+      await HeadStartSDK.Orders.DeleteLineItem(this.state.order.ID, lineItemID)
     } finally {
-      this.state.reset()
+      await this.state.reset()
     }
   }
 
@@ -90,7 +93,7 @@ export class CartService {
     try {
       return await this.upsertLineItem(lineItem)
     } finally {
-      this.state.reset()
+      await this.state.reset()
     }
   }
 
@@ -143,7 +146,7 @@ export class CartService {
     try {
       await Orders.Delete('Outgoing', ID)
     } finally {
-      this.state.reset()
+      await this.state.reset()
     }
   }
 

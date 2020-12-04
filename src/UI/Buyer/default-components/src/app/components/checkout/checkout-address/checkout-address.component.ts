@@ -13,8 +13,8 @@ import {
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper'
 import { NgxSpinnerService } from 'ngx-spinner'
-import { ErrorConstants } from '../../../services/error-constants'
-import {flatten as _flatten} from 'lodash';
+import { ErrorMessages } from '../../../services/error-constants'
+import { flatten as _flatten } from 'lodash'
 // TODO - Make this component "Dumb" by removing the dependence on context service
 // and instead have it use inputs and outputs to interact with the CheckoutComponent.
 // Goal is to get all the checkout logic and state into one component.
@@ -103,7 +103,7 @@ export class OCMCheckoutAddress implements OnInit {
         this.spinner.hide()
       }
     } catch (e) {
-      if (e?.message === ErrorConstants.orderNotAccessibleError) {
+      if (e?.message === ErrorMessages.orderNotAccessibleError) {
         this.handleOrderError.emit(e.message)
       } else if (e?.response?.data?.Message) {
         this._addressError = e?.response?.data?.Message
@@ -127,23 +127,35 @@ export class OCMCheckoutAddress implements OnInit {
   private async listSavedBuyerLocations(): Promise<void> {
     const listOptions = {
       page: 1,
-      pageSize: 100
+      pageSize: 100,
     }
-    this.existingBuyerLocations = await this.context.addresses.listBuyerLocations(listOptions);
+    this.existingBuyerLocations = await this.context.addresses.listBuyerLocations(
+      listOptions
+    )
     this.homeCountry = this.existingBuyerLocations?.Items[0]?.Country || 'US'
     if (this.existingBuyerLocations?.Meta.TotalPages <= 1) {
       if (this.existingBuyerLocations?.Items.length === 1) {
         this.selectedBuyerLocation = this.selectedShippingAddress = this.existingBuyerLocations.Items[0]
       }
     } else {
-      let requests = [];
-      for(let page = 2; page <= this.existingBuyerLocations.Meta.TotalPages; page++) {
-        listOptions.page = page;
-        requests = [...requests, this.context.addresses.listBuyerLocations(listOptions)]
+      let requests = []
+      for (
+        let page = 2;
+        page <= this.existingBuyerLocations.Meta.TotalPages;
+        page++
+      ) {
+        listOptions.page = page
+        requests = [
+          ...requests,
+          this.context.addresses.listBuyerLocations(listOptions),
+        ]
       }
-      return await Promise.all(requests).then(response => {
-        this.existingBuyerLocations.Items = [...this.existingBuyerLocations.Items, ..._flatten(response.map(r => r.Items))];
-      });
+      return await Promise.all(requests).then((response) => {
+        this.existingBuyerLocations.Items = [
+          ...this.existingBuyerLocations.Items,
+          ..._flatten(response.map((r) => r.Items)),
+        ]
+      })
     }
   }
 

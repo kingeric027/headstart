@@ -10,7 +10,6 @@ import {
   Order,
   LineItem,
   IntegrationEvents,
-  Tokens,
 } from 'ordercloud-javascript-sdk'
 import {
   MarketplaceOrder,
@@ -23,16 +22,20 @@ import { PromoService } from './promo.service'
   providedIn: 'root',
 })
 export class CurrentOrderService {
-  onChange = this.state.onOrderChange.bind(this.state)
-  reset = this.state.reset.bind(this.state)
-
+  onChange: (callback: (order: MarketplaceOrder) => void) => void
+  reset: () => Promise<void>
   constructor(
     private cartService: CartService,
     private promoService: PromoService,
     private checkoutService: CheckoutService,
     private state: OrderStateService,
     private appConfig: AppConfig
-  ) {}
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.onChange = this.state.onOrderChange.bind(this.state)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.reset = this.state.reset.bind(this.state)
+  }
 
   get(): MarketplaceOrder {
     return this.state.order

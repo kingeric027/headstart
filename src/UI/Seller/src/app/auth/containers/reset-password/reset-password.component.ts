@@ -38,8 +38,6 @@ export class ResetPasswordComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private toasterService: ToastrService,
-    private formBuilder: FormBuilder,
-    private ocMeService: OcMeService,
     private formErrorService: AppFormErrorService,
     private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig
