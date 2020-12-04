@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import * as jwtDecode from 'jwt-decode';
-import { of, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { DecodedOrderCloudToken } from '@app-seller/shared/models/decoded-token.interface';
-import { OcTokenService } from '@ordercloud/angular-sdk';
-import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service';
-import { AppAuthService } from '@app-seller/auth/services/app-auth.service';
+import { Injectable } from '@angular/core'
+import { CanActivate, Router } from '@angular/router'
+import * as jwtDecode from 'jwt-decode'
+import { of, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { DecodedOrderCloudToken } from '@app-seller/shared/models/decoded-token.interface'
+import { OcTokenService } from '@ordercloud/angular-sdk'
+import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 
 @Injectable({
   providedIn: 'root',
@@ -27,34 +27,34 @@ export class IsSellerGuard implements CanActivate {
      * if the token is actually not valid it will fail on a call
      * and the refresh-token interceptor will handle it correctly
      */
-    const isSeller = this.isSeller();
+    const isSeller = this.isSeller()
 
     if (!isSeller) {
-      this.appAuthService.logout();
-      this.router.navigate(['/login']);
+      this.appAuthService.logout()
+      this.router.navigate(['/login'])
     }
 
-    this.appStateService.isLoggedIn.next(isSeller);
-    return of(isSeller);
+    this.appStateService.isLoggedIn.next(isSeller)
+    return of(isSeller)
   }
 
   private isSeller(): boolean {
-    const token = this.ocTokenService.GetAccess();
+    const token = this.ocTokenService.GetAccess()
 
     if (!token) {
-      return false;
+      return false
     }
 
-    let decodedToken: DecodedOrderCloudToken;
+    let decodedToken: DecodedOrderCloudToken
     try {
-      decodedToken = jwtDecode(token);
+      decodedToken = jwtDecode(token)
     } catch (e) {
-      decodedToken = null;
+      decodedToken = null
     }
     if (!decodedToken) {
-      return false;
+      return false
     }
 
-    return decodedToken.usrtype === 'admin';
+    return decodedToken.usrtype === 'admin'
   }
 }

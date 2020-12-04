@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { getSupportedInputTypes } from '@angular/cdk/platform';
+import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { getSupportedInputTypes } from '@angular/cdk/platform'
 
 @Component({
   selector: 'action-menu-component',
@@ -8,72 +8,74 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 })
 export class ActionMenuComponent {
   @Input()
-  dataIsSaving = false;
+  dataIsSaving = false
   @Input()
-  isCreatingNew = false;
+  isCreatingNew = false
   @Input()
-  areChanges = false;
+  areChanges = false
   @Input()
-  allowDiscard = false;
+  allowDiscard = false
   @Input()
-  allowDelete = false;
+  allowDelete = false
   @Input()
-  isDeletable = false;
+  isDeletable = false
   @Input()
-  saveTextOverride = '';
+  saveTextOverride = ''
   @Input()
-  resourceName = '';
+  resourceName = ''
   @Input()
-  requireConfirmation = false;
+  requireConfirmation = false
   @Input()
-  disableSave = false;
+  disableSave = false
   @Input()
-  confirmText = '';
+  confirmText = ''
   @Input()
-  labelSingular: string;
+  labelSingular: string
   @Output()
-  executeSaveAction = new EventEmitter<void>();
+  executeSaveAction = new EventEmitter<void>()
   @Output()
-  executeDiscardAction = new EventEmitter<void>();
+  executeDiscardAction = new EventEmitter<void>()
   @Output()
-  executeDelete = new EventEmitter<void>();
+  executeDelete = new EventEmitter<void>()
 
-  showConfirm = false;
+  showConfirm = false
 
   requestUserConfirmation(): void {
-    this.showConfirm = true;
+    this.showConfirm = true
   }
 
   emitSave(): void {
-    this.executeSaveAction.emit();
+    this.executeSaveAction.emit()
   }
 
   handleSavePressed(): void {
     if (this.showConfirm) {
-      this.requestUserConfirmation();
+      this.requestUserConfirmation()
     } else {
-      this.emitSave();
+      this.emitSave()
     }
   }
 
   handleDiscard(): void {
-    this.executeDiscardAction.emit();
+    this.executeDiscardAction.emit()
   }
 
   getSaveText(): string {
     if (this.dataIsSaving) {
-      return 'ADMIN.DELETE.SAVING';
+      return 'ADMIN.DELETE.SAVING'
     }
     if (this.showConfirm) {
-      return 'ADMIN.DELETE.PENDING_CONFIRMATION';
+      return 'ADMIN.DELETE.PENDING_CONFIRMATION'
     }
     if (this.saveTextOverride) {
-      return this.saveTextOverride;
+      return this.saveTextOverride
     }
-    return this.isCreatingNew ? 'ADMIN.DELETE.CREATE' : 'ADMIN.DELETE.SAVE_CHANGES';
+    return this.isCreatingNew
+      ? 'ADMIN.DELETE.CREATE'
+      : 'ADMIN.DELETE.SAVE_CHANGES'
   }
 
   handleDelete(): void {
-    this.executeDelete.emit();
+    this.executeDelete.emit()
   }
 }

@@ -1,11 +1,11 @@
-import { Pipe, PipeTransform } from "@angular/core";
+import { Pipe, PipeTransform } from '@angular/core'
 
 @Pipe({
-  name: "yesNo"
+  name: 'yesNo',
 })
 export class YesNoFormatPipe implements PipeTransform {
   transform(value: any, ...args: any[]): any {
-    const myBool = (value === 'true') || (value === true);
-    return myBool ? "Yes" : "No";
+    const myBool = value === 'true' || value === true
+    return myBool ? 'Yes' : 'No'
   }
 }

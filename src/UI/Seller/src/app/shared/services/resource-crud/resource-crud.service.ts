@@ -1,6 +1,6 @@
-import { BehaviorSubject } from 'rxjs';
-import { Router, Params, ActivatedRoute } from '@angular/router';
-import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config';
+import { BehaviorSubject } from 'rxjs'
+import { Router, Params, ActivatedRoute } from '@angular/router'
+import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config'
 import {
   Options,
   RequestStatus,
@@ -11,31 +11,37 @@ import {
   REFRESHING_ITEMS,
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
-} from './resource-crud.types';
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface';
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs';
-import { set as _set } from 'lodash';
-import { CurrentUserService } from '../current-user/current-user.service';
-import { BuyerAddress, ListPage } from 'ordercloud-javascript-sdk';
-import { singular } from 'pluralize';
+} from './resource-crud.types'
+import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
+import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
+import { set as _set } from 'lodash'
+import { CurrentUserService } from '../current-user/current-user.service'
+import { BuyerAddress, ListPage } from 'ordercloud-javascript-sdk'
+import { singular } from 'pluralize'
 
 export abstract class ResourceCrudService<ResourceType> {
-  public resourceSubject: BehaviorSubject<ListPage<ResourceType>> = new BehaviorSubject<ListPage<ResourceType>>({
+  public resourceSubject: BehaviorSubject<
+    ListPage<ResourceType>
+  > = new BehaviorSubject<ListPage<ResourceType>>({
     Meta: {},
     Items: [],
-  });
-  public resourceRequestStatus: BehaviorSubject<RequestStatus> = new BehaviorSubject<RequestStatus>(GETTING_NEW_ITEMS);
-  public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>({});
+  })
+  public resourceRequestStatus: BehaviorSubject<RequestStatus> = new BehaviorSubject<RequestStatus>(
+    GETTING_NEW_ITEMS
+  )
+  public optionsSubject: BehaviorSubject<Options> = new BehaviorSubject<Options>(
+    {}
+  )
 
-  route = '';
-  myRoute = '';
-  primaryResourceLevel = '';
+  route = ''
+  myRoute = ''
+  primaryResourceLevel = ''
   // example: for supplier user service the primary is supplier and the secondary is users
-  secondaryResourceLevel = '';
-  subResourceList: any[];
-  emptyResource: any = {};
+  secondaryResourceLevel = ''
+  subResourceList: any[]
+  emptyResource: any = {}
 
-  private itemsPerPage = 100;
+  private itemsPerPage = 100
 
   constructor(
     protected router: Router,
@@ -46,45 +52,50 @@ export abstract class ResourceCrudService<ResourceType> {
     primaryResourceLevel: string,
     subResourceList: any[] = [],
     secondaryResourceLevel = '',
-    myRoute = '',
+    myRoute = ''
   ) {
-    this.route = route;
-    this.myRoute = myRoute;
-    this.primaryResourceLevel = primaryResourceLevel;
-    this.secondaryResourceLevel = secondaryResourceLevel;
-    this.subResourceList = subResourceList;
+    this.route = route
+    this.myRoute = myRoute
+    this.primaryResourceLevel = primaryResourceLevel
+    this.secondaryResourceLevel = secondaryResourceLevel
+    this.subResourceList = subResourceList
 
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe((params) => {
       // this prevents service from reading from query params when not on the route related to the service
       if (this.isOnRelatedRoute()) {
-        this.readFromUrlQueryParams(params);
+        this.readFromUrlQueryParams(params)
       } else {
-        this.optionsSubject.next({});
+        this.optionsSubject.next({})
       }
-    });
+    })
     this.optionsSubject.subscribe(async (options: Options) => {
-      const parentResourceID = await this.getParentResourceID();
+      const parentResourceID = await this.getParentResourceID()
       if (parentResourceID !== REDIRECT_TO_FIRST_PARENT) {
-        this.listResources();
+        this.listResources()
       }
-    });
+    })
   }
 
   // Can Override
   async list(args: any[]): Promise<ListPage<ResourceType>> {
-    return await this.ocService.List(...args);
+    return await this.ocService.List(...args)
   }
 
   public async getMyResource(): Promise<any> {
     if (this.primaryResourceLevel === 'suppliers') {
-      return this.currentUserService.getMySupplier();
+      return this.currentUserService.getMySupplier()
     }
   }
 
   async listResources(pageNumber = 1, searchText = ''): Promise<void> {
-    const shouldList = await this.shouldListResources();
+    const shouldList = await this.shouldListResources()
     if (shouldList) {
-      const { sortBy, search, filters, OrderDirection } = this.optionsSubject.value;
+      const {
+        sortBy,
+        search,
+        filters,
+        OrderDirection,
+      } = this.optionsSubject.value
       let options: ListArgs = {
         page: pageNumber,
         // allows a list call to pass in a search term that will not appear in the query params
@@ -92,132 +103,144 @@ export abstract class ResourceCrudService<ResourceType> {
         sortBy,
         pageSize: this.itemsPerPage,
         filters,
-      };
-      options = this.addIntrinsicListArgs(options);
-      const resourceResponse = await this.listWithStatusIndicator(options, OrderDirection);
+      }
+      options = this.addIntrinsicListArgs(options)
+      const resourceResponse = await this.listWithStatusIndicator(
+        options,
+        OrderDirection
+      )
       if (pageNumber === 1) {
-        this.setNewResources(resourceResponse);
+        this.setNewResources(resourceResponse)
       } else {
-        this.addResources(resourceResponse);
+        this.addResources(resourceResponse)
       }
     }
   }
 
   addIntrinsicListArgs(options: ListArgs): ListArgs {
-    return options;
+    return options
   }
 
   getFetchStatus(options: Options): RequestStatus {
-    const isSubsequentPage = options.page > 1;
-    const areCurrentlyItems = this.resourceSubject.value.Items.length;
+    const isSubsequentPage = options.page > 1
+    const areCurrentlyItems = this.resourceSubject.value.Items.length
     // will not want to show a loading indicator in certain situations so this
     // differentiates between refreshes and new lists
     // when filters are applied REFRESHING_ITEMS will be returned
     if (!areCurrentlyItems && !isSubsequentPage) {
-      return GETTING_NEW_ITEMS;
+      return GETTING_NEW_ITEMS
     }
     if (!isSubsequentPage && areCurrentlyItems) {
-      return REFRESHING_ITEMS;
+      return REFRESHING_ITEMS
     }
     if (isSubsequentPage && areCurrentlyItems) {
-      return FETCHING_SUBSEQUENT_PAGES;
+      return FETCHING_SUBSEQUENT_PAGES
     }
     // return isSubsequentPage || !areCurrentlyItems ? GETTING_NEW_ITEMS : REFRESHING_ITEMS;
   }
 
-  getSucessStatus(options: Options, resourceResponse: ListPage<ResourceType>): RequestStatus {
-    const areFilters = this.areFiltersOnOptions(options);
-    const areItems = !!resourceResponse.Items.length;
-    if (areItems) return SUCCESSFUL_WITH_ITEMS;
-    return areFilters ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS : SUCCESSFUL_NO_ITEMS_NO_FILTERS;
+  getSucessStatus(
+    options: Options,
+    resourceResponse: ListPage<ResourceType>
+  ): RequestStatus {
+    const areFilters = this.areFiltersOnOptions(options)
+    const areItems = !!resourceResponse.Items.length
+    if (areItems) return SUCCESSFUL_WITH_ITEMS
+    return areFilters
+      ? SUCCESSFUL_NO_ITEMS_WITH_FILTERS
+      : SUCCESSFUL_NO_ITEMS_NO_FILTERS
   }
 
   async shouldListResources(): Promise<boolean> {
     if (!this.secondaryResourceLevel) {
       // for primary resources list if on the route
-      return this.router.url.startsWith(this.route);
+      return this.router.url.startsWith(this.route)
     } else {
-      const parentResourceID = await this.getParentResourceID();
+      const parentResourceID = await this.getParentResourceID()
       // for secondary resources list there is a parent ID
-      return !!parentResourceID && this.router.url.includes(this.secondaryResourceLevel);
+      return (
+        !!parentResourceID &&
+        this.router.url.includes(this.secondaryResourceLevel)
+      )
     }
   }
 
   async isSupplierUser(): Promise<boolean> {
-    return await this.currentUserService.isSupplierUser();
+    return await this.currentUserService.isSupplierUser()
   }
 
   async constructResourceURLs(resourceID = ''): Promise<string[]> {
-    const newUrlPieces = [];
-    newUrlPieces.push(this.route);
+    const newUrlPieces = []
+    newUrlPieces.push(this.route)
     if (this.secondaryResourceLevel) {
-      const parentResourceID = await this.getParentResourceID();
-      newUrlPieces.push(`/${parentResourceID}`);
-      newUrlPieces.push(`/${this.secondaryResourceLevel}`);
+      const parentResourceID = await this.getParentResourceID()
+      newUrlPieces.push(`/${parentResourceID}`)
+      newUrlPieces.push(`/${this.secondaryResourceLevel}`)
     }
     if (resourceID) {
-      newUrlPieces.push(`/${resourceID}`);
+      newUrlPieces.push(`/${resourceID}`)
     }
-    return newUrlPieces;
+    return newUrlPieces
   }
 
   selectParentResource(resource: any): void {
-    const newUrl = this.updateUrlForUpdatedParent(resource);
-    this.router.navigateByUrl(newUrl);
+    const newUrl = this.updateUrlForUpdatedParent(resource)
+    this.router.navigateByUrl(newUrl)
 
     // this settimeout ensures that the new parent resource ID is in the url before the resources are listed
     // find a better way to update the resources on the parent resource ID change
     setTimeout(() => {
-      this.listResources();
-    });
+      this.listResources()
+    })
   }
 
   updateUrlForUpdatedParent(resource: any): string {
-    const queryParams = this.router.url.split('?')[1];
-    let newUrl = `${this.primaryResourceLevel}/${resource.ID}/${this.secondaryResourceLevel}`;
+    const queryParams = this.router.url.split('?')[1]
+    let newUrl = `${this.primaryResourceLevel}/${resource.ID}/${this.secondaryResourceLevel}`
     if (queryParams) {
-      newUrl += `?${queryParams}`;
+      newUrl += `?${queryParams}`
     }
-    return newUrl;
+    return newUrl
   }
 
   async constructNewRouteInformation(resourceID = ''): Promise<any[]> {
-    let newUrl = '';
-    const queryParams = this.activatedRoute.snapshot.queryParams;
+    let newUrl = ''
+    const queryParams = this.activatedRoute.snapshot.queryParams
     if (this.secondaryResourceLevel) {
-      const parentResourceID = await this.getParentResourceID();
-      newUrl += this.router.url.startsWith('/my-') ?
-        `${this.myRoute}/${this.secondaryResourceLevel}` :
-        `${this.route}/${parentResourceID}/${this.secondaryResourceLevel}`;
+      const parentResourceID = await this.getParentResourceID()
+      newUrl += this.router.url.startsWith('/my-')
+        ? `${this.myRoute}/${this.secondaryResourceLevel}`
+        : `${this.route}/${parentResourceID}/${this.secondaryResourceLevel}`
     } else {
-      newUrl += `${this.route}`;
+      newUrl += `${this.route}`
     }
     if (resourceID) {
-      newUrl += `/${resourceID}`;
+      newUrl += `/${resourceID}`
     }
-    return [newUrl, queryParams];
+    return [newUrl, queryParams]
   }
 
   private isMyResource(): boolean {
-    return this.router.url.startsWith('/my-');
+    return this.router.url.startsWith('/my-')
   }
 
   async getParentResourceID(): Promise<string> {
     if (this.isMyResource()) {
-      const myResource = await this.getMyResource();
-      return myResource.ID;
+      const myResource = await this.getMyResource()
+      return myResource.ID
     } else {
-      const urlPieces = this.router.url.split('/');
-      const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`);
-      return urlPieces[indexOfParent + 1];
+      const urlPieces = this.router.url.split('/')
+      const indexOfParent = urlPieces.indexOf(`${this.primaryResourceLevel}`)
+      return urlPieces[indexOfParent + 1]
     }
   }
 
   async getResourceById(resourceID: string): Promise<any> {
-    const orderDirection = this.optionsSubject.value.OrderDirection;
-    const args = await this.createListArgs([resourceID], orderDirection);
-    if (this.primaryResourceLevel === 'kitproducts') return this.ocService.Get(resourceID);
-    else return this.ocService.Get(...args);
+    const orderDirection = this.optionsSubject.value.OrderDirection
+    const args = await this.createListArgs([resourceID], orderDirection)
+    if (this.primaryResourceLevel === 'kitproducts')
+      return this.ocService.Get(resourceID)
+    else return this.ocService.Get(...args)
   }
 
   async createListArgs(options: any[], orderDirection = ''): Promise<any[]> {
@@ -229,140 +252,155 @@ export abstract class ResourceCrudService<ResourceType> {
       // placeholder conditional for getting the supplier order list page running
       // will need to integrate this with the filter on the order list page as a seller
       // user and potentially refactor later
-      return [orderDirection || 'Incoming', ...options];
+      return [orderDirection || 'Incoming', ...options]
     }
     if (this.secondaryResourceLevel || this.isMyResource()) {
-      const parentResourceID = await this.getParentResourceID();
-      return [parentResourceID, ...options];
+      const parentResourceID = await this.getParentResourceID()
+      return [parentResourceID, ...options]
     } else {
-      return [...options];
+      return [...options]
     }
   }
 
   async findOrGetResourceByID(resourceID: string): Promise<any> {
-    const resourceInList = this.resourceSubject.value.Items.find((i: any) => this.checkForResourceMatch(i, resourceID));
+    const resourceInList = this.resourceSubject.value.Items.find((i: any) =>
+      this.checkForResourceMatch(i, resourceID)
+    )
     if (resourceInList) {
-      return resourceInList;
+      return resourceInList
     } else {
       if (resourceID !== REDIRECT_TO_FIRST_PARENT) {
-        return await this.getResourceById(resourceID);
+        return await this.getResourceById(resourceID)
       }
     }
   }
 
   checkForResourceMatch(i: any, resourceID: string): boolean {
-    return i.ID === resourceID;
+    return i.ID === resourceID
   }
 
   async updateResource(originalID: string, resource: any): Promise<any> {
-    const args = await this.createListArgs([originalID, resource]);
-    const newResource = await this.ocService.Save(...args);
-    this.updateResourceSubject(newResource);
-    return newResource;
+    const args = await this.createListArgs([originalID, resource])
+    const newResource = await this.ocService.Save(...args)
+    this.updateResourceSubject(newResource)
+    return newResource
   }
 
   updateResourceSubject(newResource: any): void {
-    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) => this.checkForNewResourceMatch(i, newResource));
-    this.resourceSubject.value.Items[resourceIndex] = newResource;
-    this.resourceSubject.next(this.resourceSubject.value);
+    const resourceIndex = this.resourceSubject.value.Items.findIndex((i: any) =>
+      this.checkForNewResourceMatch(i, newResource)
+    )
+    this.resourceSubject.value.Items[resourceIndex] = newResource
+    this.resourceSubject.next(this.resourceSubject.value)
   }
 
   checkForNewResourceMatch(i: any, newResource: any): boolean {
-    return i.ID === newResource.ID;
+    return i.ID === newResource.ID
   }
 
   async deleteResource(resourceID: string): Promise<null> {
-    const args = await this.createListArgs([resourceID]);
-    await this.ocService.Delete(...args);
-    this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter((i: any) => i.ID !== resourceID);
-    this.resourceSubject.next(this.resourceSubject.value);
-    return;
+    const args = await this.createListArgs([resourceID])
+    await this.ocService.Delete(...args)
+    this.resourceSubject.value.Items = this.resourceSubject.value.Items.filter(
+      (i: any) => i.ID !== resourceID
+    )
+    this.resourceSubject.next(this.resourceSubject.value)
+    return
   }
 
   async createNewResource(resource: any): Promise<any> {
-    const args = await this.createListArgs([resource]);
-    const newResource = await this.ocService.Create(...args);
-    this.resourceSubject.value.Items = [...this.resourceSubject.value.Items, newResource];
-    this.resourceSubject.next(this.resourceSubject.value);
-    return newResource;
+    const args = await this.createListArgs([resource])
+    const newResource = await this.ocService.Create(...args)
+    this.resourceSubject.value.Items = [
+      ...this.resourceSubject.value.Items,
+      newResource,
+    ]
+    this.resourceSubject.next(this.resourceSubject.value)
+    return newResource
   }
 
   setNewResources(resourceResponse: ListPage<ResourceType>): void {
-    this.resourceSubject.next(resourceResponse);
+    this.resourceSubject.next(resourceResponse)
   }
 
   addResources(resourceResponse: ListPage<ResourceType>): void {
     this.resourceSubject.next({
       Meta: resourceResponse.Meta,
       Items: [...this.resourceSubject.value.Items, ...resourceResponse.Items],
-    });
+    })
   }
 
   getNextPage(): void {
-    if (this.resourceSubject.value.Meta && this.resourceSubject.value.Meta.Page) {
-      this.listResources(this.resourceSubject.value.Meta.Page + 1);
+    if (
+      this.resourceSubject.value.Meta &&
+      this.resourceSubject.value.Meta.Page
+    ) {
+      this.listResources(this.resourceSubject.value.Meta.Page + 1)
     }
   }
 
   patchFilterState(patch: Options): void {
-    const activeOptions = { ...this.optionsSubject.value, ...patch };
-    const queryParams = this.mapToUrlQueryParams(activeOptions);
-    this.router.navigate([], { queryParams }); // update url, which will call readFromUrlQueryParams()
+    const activeOptions = { ...this.optionsSubject.value, ...patch }
+    const queryParams = this.mapToUrlQueryParams(activeOptions)
+    this.router.navigate([], { queryParams }) // update url, which will call readFromUrlQueryParams()
   }
 
   toPage(pageNumber: number): void {
-    this.patchFilterState({ page: pageNumber || undefined });
+    this.patchFilterState({ page: pageNumber || undefined })
   }
 
   sortBy(field: string): void {
     // temporarily as any until changed to latest oc sdk
-    this.patchFilterState({ sortBy: field || undefined } as any);
+    this.patchFilterState({ sortBy: field || undefined } as any)
   }
 
   searchBy(searchTerm: string): void {
-    this.patchFilterState({ search: searchTerm || undefined });
+    this.patchFilterState({ search: searchTerm || undefined })
   }
 
   addFilters(newFilters: ListArgs): void {
-    const newFilterDictionary = { ...this.optionsSubject.value.filters, ...newFilters };
-    this.patchFilterState({ filters: newFilterDictionary });
+    const newFilterDictionary = {
+      ...this.optionsSubject.value.filters,
+      ...newFilters,
+    }
+    this.patchFilterState({ filters: newFilterDictionary })
   }
 
   removeFilters(filtersToRemove: string[]): void {
-    const newFilterDictionary = { ...this.optionsSubject.value.filters };
-    filtersToRemove.forEach(filter => {
+    const newFilterDictionary = { ...this.optionsSubject.value.filters }
+    filtersToRemove.forEach((filter) => {
       if (newFilterDictionary[filter]) {
-        delete newFilterDictionary[filter];
+        delete newFilterDictionary[filter]
       }
-    });
-    this.patchFilterState({ filters: newFilterDictionary });
+    })
+    this.patchFilterState({ filters: newFilterDictionary })
   }
 
   clearSort(): void {
-    this.sortBy(undefined);
+    this.sortBy(undefined)
   }
 
   clearSearch(): void {
-    this.searchBy(undefined);
+    this.searchBy(undefined)
   }
 
   clearAllFilters(): void {
-    this.patchFilterState({ filters: {} });
+    this.patchFilterState({ filters: {} })
   }
 
   clearResources(): void {
-    this.resourceSubject.next({ Meta: {}, Items: [] });
+    this.resourceSubject.next({ Meta: {}, Items: [] })
   }
 
   getRouteFromResourceName(resourceName: string): string {
-    return `/${resourceName}`;
+    return `/${resourceName}`
   }
 
   hasFilters(): boolean {
-    const filters = this.optionsSubject.value;
+    const filters = this.optionsSubject.value
     return Object.entries(filters).some(([key, value]) => {
-      return !!value;
-    });
+      return !!value
+    })
   }
 
   areFiltersOnOptions(options: Options): boolean {
@@ -370,113 +408,144 @@ export abstract class ResourceCrudService<ResourceType> {
       !!options.search ||
       (options.filters &&
         Object.entries(options.filters).some(([key, value]) => {
-          return !!value;
+          return !!value
         }))
-    );
+    )
   }
 
   // Used to update the URL
   mapToUrlQueryParams(options: Options): Params {
-    const { sortBy, search, filters, OrderDirection } = options;
-    return { sortBy, search, ...filters, OrderDirection };
+    const { sortBy, search, filters, OrderDirection } = options
+    return { sortBy, search, ...filters, OrderDirection }
   }
 
   // TODO - move to some other file. Not related to resource crud
   getSuggestedAddresses = (ex): ListPage<BuyerAddress<any>> => {
     if (ex?.Message === 'Address not valid') {
-      return ex?.Data?.SuggestedAddresses;
+      return ex?.Data?.SuggestedAddresses
     }
     for (const err of ex?.error?.Errors) {
       if (err.ErrorCode === 'blocked by web hook') {
-        return err.Data?.Body?.SuggestedAddresses;
+        return err.Data?.Body?.SuggestedAddresses
       }
     }
-  };
+  }
 
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
-    const { sortBy, search, OrderDirection, ...filters } = params;
-    this.optionsSubject.next({ sortBy, search, filters, OrderDirection });
+    const { sortBy, search, OrderDirection, ...filters } = params
+    this.optionsSubject.next({ sortBy, search, filters, OrderDirection })
   }
 
-  private async listWithStatusIndicator(options: Options, orderDirection = ''): Promise<ListPage<ResourceType>> {
+  private async listWithStatusIndicator(
+    options: Options,
+    orderDirection = ''
+  ): Promise<ListPage<ResourceType>> {
     try {
-      this.resourceRequestStatus.next(this.getFetchStatus(options));
-      const args = await this.createListArgs([options], orderDirection);
-      let resourceResponse;
-      if (this.primaryResourceLevel === 'kitproducts') { resourceResponse = await this.ocService.List(); }
-      else { resourceResponse = await this.list(args); }
-      this.resourceRequestStatus.next(this.getSucessStatus(options, resourceResponse));
-      return resourceResponse;
+      this.resourceRequestStatus.next(this.getFetchStatus(options))
+      const args = await this.createListArgs([options], orderDirection)
+      let resourceResponse
+      if (this.primaryResourceLevel === 'kitproducts') {
+        resourceResponse = await this.ocService.List()
+      } else {
+        resourceResponse = await this.list(args)
+      }
+      this.resourceRequestStatus.next(
+        this.getSucessStatus(options, resourceResponse)
+      )
+      return resourceResponse
     } catch (error) {
-      this.resourceRequestStatus.next(ERROR);
-      throw error;
+      this.resourceRequestStatus.next(ERROR)
+      throw error
     }
   }
 
   private isOnRelatedRoute(): boolean {
     const isOnSubResource =
       this.subResourceList &&
-      this.subResourceList.some(subResource => {
-        return this.router.url.includes(`/${subResource.route}`);
-      });
-    const isOnBaseRoute = this.router.url.includes(this.route);
-    const isOnRelatedSubResource = this.router.url.includes(`/${this.secondaryResourceLevel}`);
+      this.subResourceList.some((subResource) => {
+        return this.router.url.includes(`/${subResource.route}`)
+      })
+    const isOnBaseRoute = this.router.url.includes(this.route)
+    const isOnRelatedSubResource = this.router.url.includes(
+      `/${this.secondaryResourceLevel}`
+    )
     if (!isOnBaseRoute) {
-      return false;
-    } else if (isOnSubResource && this.secondaryResourceLevel && isOnRelatedSubResource) {
-      return true;
+      return false
+    } else if (
+      isOnSubResource &&
+      this.secondaryResourceLevel &&
+      isOnRelatedSubResource
+    ) {
+      return true
     } else if (!isOnSubResource && !this.secondaryResourceLevel) {
-      return true;
+      return true
     } else {
-      return false;
+      return false
     }
   }
 
-
-  getUpdatedEditableResource<T>(resourceUpdate: ResourceUpdate, resourceToUpdate: T): T {
-    const updatedResourceCopy: any = this.copyResource(resourceToUpdate);
-    const update = _set(updatedResourceCopy, resourceUpdate.field, resourceUpdate.value);
-    if (resourceUpdate.field === 'Product.Inventory.Enabled' && resourceUpdate.value === false) {
+  getUpdatedEditableResource<T>(
+    resourceUpdate: ResourceUpdate,
+    resourceToUpdate: T
+  ): T {
+    const updatedResourceCopy: any = this.copyResource(resourceToUpdate)
+    const update = _set(
+      updatedResourceCopy,
+      resourceUpdate.field,
+      resourceUpdate.value
+    )
+    if (
+      resourceUpdate.field === 'Product.Inventory.Enabled' &&
+      resourceUpdate.value === false
+    ) {
       update.Product.Inventory.QuantityAvailable = null
-      update.Product.Inventory.OrderCanExceed = false;
+      update.Product.Inventory.OrderCanExceed = false
     }
-    return update;
+    return update
   }
 
   copyResource<T>(resource: T): T {
-    return JSON.parse(JSON.stringify(resource));
+    return JSON.parse(JSON.stringify(resource))
   }
 
   // TODO: Refactor to remove duplicate function (function exists in resource-table.component.ts)
   checkIfCreatingNew(): boolean {
-    const routeUrl = this.router.routerState.snapshot.url;
-    const splitUrl = routeUrl.split('/');
+    const routeUrl = this.router.routerState.snapshot.url
+    const splitUrl = routeUrl.split('/')
     const endUrl =
-      this.primaryResourceLevel === 'products' ? splitUrl[splitUrl.length - 2] : splitUrl[splitUrl.length - 1];
-    return endUrl === 'new' || endUrl.startsWith('new?');
+      this.primaryResourceLevel === 'products'
+        ? splitUrl[splitUrl.length - 2]
+        : splitUrl[splitUrl.length - 1]
+    return endUrl === 'new' || endUrl.startsWith('new?')
   }
 
   checkForChanges<T>(resourceEditable: T, resourceStatic: T): boolean {
-    return JSON.stringify(resourceEditable) !== JSON.stringify(resourceStatic);
+    return JSON.stringify(resourceEditable) !== JSON.stringify(resourceStatic)
   }
 
-  getSaveBtnText(dataIsSaving: boolean, isCreatingNew: boolean, isError?: boolean): string {
+  getSaveBtnText(
+    dataIsSaving: boolean,
+    isCreatingNew: boolean,
+    isError?: boolean
+  ): string {
     if (isError) return 'Re-submit'
-    if (dataIsSaving) return 'Saving...';
-    if (isCreatingNew) return 'Create';
-    if (!isCreatingNew) return 'Save Changes';
+    if (dataIsSaving) return 'Saving...'
+    if (isCreatingNew) return 'Create'
+    if (!isCreatingNew) return 'Save Changes'
   }
 
   getParentIDParamName(): string {
-    return `${singular(this.primaryResourceLevel)}ID`;
+    return `${singular(this.primaryResourceLevel)}ID`
   }
 
   getParentOrSecondaryIDParamName(): string {
-    return `${singular(this.secondaryResourceLevel || this.primaryResourceLevel)}ID`;
+    return `${singular(
+      this.secondaryResourceLevel || this.primaryResourceLevel
+    )}ID`
   }
 
   getResourceID(resource: any): string {
-    return resource?.ID;
+    return resource?.ID
   }
 }

@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.SupplierSync
+namespace Marketplace.Common.Commands
 {
     [SupplierSync("027"),SupplierSync("093"), SupplierSync("129"), SupplierSync("waxinthecitydistribution")]
     public class WaxInTheCityDistributionCommand : ISupplierSyncCommand

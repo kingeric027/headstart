@@ -7,7 +7,6 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
-using Marketplace.Common.Commands.SupplierSync;
 using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
@@ -36,7 +35,6 @@ namespace Marketplace.Orchestration
             {
                 BaseUrl = settings.EnvironmentSettings.BaseUrl,
                 BlobStorageHostUrl = settings.BlobSettings.HostUrl,
-                BlobStorageConnectionString = settings.BlobSettings.ConnectionString
             };
             builder.Services
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
@@ -63,7 +61,6 @@ namespace Marketplace.Orchestration
                 .AddSingleton<BlobService>((s) => new BlobService(settings.BlobSettings.EnvironmentString))
                 .Inject<IAssetQuery>()
                 .Inject<IAssetedResourceQuery>()
-                .Inject<IBlobStorage>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()

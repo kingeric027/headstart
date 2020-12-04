@@ -1,16 +1,16 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Category } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerService } from '../../buyers/buyer.service';
-import { BuyerCatalogService } from '../buyer-catalog.service';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MarketplaceUserGroup } from '@ordercloud/headstart-sdk';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Category } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { BuyerService } from '../../buyers/buyer.service'
+import { BuyerCatalogService } from '../buyer-catalog.service'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { MarketplaceUserGroup } from '@ordercloud/headstart-sdk'
 
 function createBuyerCatalogForm(userGroup: MarketplaceUserGroup) {
   return new FormGroup({
     Name: new FormControl(userGroup.Name, Validators.required),
-  });
+  })
 }
 
 @Component({
@@ -27,6 +27,13 @@ export class BuyerCatalogTableComponent extends ResourceCrudComponent<Category> 
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerCatalogService, router, activatedroute, ngZone, createBuyerCatalogForm);
+    super(
+      changeDetectorRef,
+      buyerCatalogService,
+      router,
+      activatedroute,
+      ngZone,
+      createBuyerCatalogForm
+    )
   }
 }

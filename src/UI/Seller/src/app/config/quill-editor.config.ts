@@ -19,5 +19,5 @@ const GlobalQuillEditorConfig = {
 
     ['link', 'image', 'video'], // link and image, video
   ],
-};
-export default GlobalQuillEditorConfig;
+}
+export default GlobalQuillEditorConfig

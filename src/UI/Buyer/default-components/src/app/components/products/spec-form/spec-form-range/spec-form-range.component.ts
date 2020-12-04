@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
-import { FieldConfig } from '../field-config.interface';
-import { Field } from '../field.interface';
-import { specErrors } from '../errors';
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormArray, AbstractControl } from '@angular/forms'
+import { FieldConfig } from '../field-config.interface'
+import { Field } from '../field.interface'
+import { specErrors } from '../errors'
 
 @Component({
   selector: 'spec-form-range',
@@ -21,11 +21,18 @@ import { specErrors } from '../errors';
           [formControlName]="config.name"
         />
         <div
-          *ngIf="byIndex(index).invalid && (byIndex(index).dirty || byIndex(index).touched)"
+          *ngIf="
+            byIndex(index).invalid &&
+            (byIndex(index).dirty || byIndex(index).touched)
+          "
           alert="alert alert-danger"
         >
           <div
-            *ngIf="byIndex(index).errors['required'] || byIndex(index).errors['min'] || byIndex(index).errors['max']"
+            *ngIf="
+              byIndex(index).errors['required'] ||
+              byIndex(index).errors['min'] ||
+              byIndex(index).errors['max']
+            "
           >
             <div *ngIf="byIndex(index).errors['required']">
               {{ errorMsgs.required }}
@@ -40,19 +47,19 @@ import { specErrors } from '../errors';
   styleUrls: ['./spec-form-range.component.scss'],
 })
 export class SpecFormRangeComponent implements Field, OnInit {
-  config: FieldConfig;
-  group: FormGroup;
-  ctrls: FormArray;
-  index: number;
-  errorMsgs = specErrors;
+  config: FieldConfig
+  group: FormGroup
+  ctrls: FormArray
+  index: number
+  errorMsgs = specErrors
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
-    this.ctrls = this.group.get('ctrls') as FormArray;
+    this.ctrls = this.group.get('ctrls') as FormArray
   }
 
   byIndex(index: number): AbstractControl {
-    return this.ctrls.at(index);
+    return this.ctrls.at(index)
   }
 }

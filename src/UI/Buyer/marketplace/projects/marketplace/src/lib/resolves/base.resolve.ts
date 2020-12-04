@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Resolve } from '@angular/router';
-import { CurrentUserService } from '../services/current-user/current-user.service';
-import { ProductCategoriesService } from '../services/product-categories/product-categories.service';
-import { CurrentOrderService } from '../services/order/order.service';
-import { OrdersToApproveStateService } from '../services/order-history/order-to-approve-state.service';
-import { ExchangeRatesService } from '../services/exchange-rates/exchange-rates.service';
-import { StaticPageService } from '../services/static-page/static-page.service';
+import { Injectable } from '@angular/core'
+import { Resolve } from '@angular/router'
+import { CurrentUserService } from '../services/current-user/current-user.service'
+import { ProductCategoriesService } from '../services/product-categories/product-categories.service'
+import { CurrentOrderService } from '../services/order/order.service'
+import { OrdersToApproveStateService } from '../services/order-history/order-to-approve-state.service'
+import { ExchangeRatesService } from '../services/exchange-rates/exchange-rates.service'
+import { StaticPageService } from '../services/static-page/static-page.service'
 
 @Injectable({
   providedIn: 'root',
@@ -21,12 +21,12 @@ export class BaseResolve implements Resolve<any> {
   ) {}
 
   async resolve(): Promise<void> {
-    await this.currentUser.reset();
-    const order = this.currentOrder.reset();
-    const ordersToApprove = this.ordersToApprove.reset();
-    const categories = this.productCategories.setCategories();
-    const exchangeRates = this.exchangeRates.reset();
-    this.staticPageService.initialize();
-    await Promise.all([order, ordersToApprove, categories, exchangeRates]);
+    await this.currentUser.reset()
+    const order = this.currentOrder.reset()
+    const ordersToApprove = this.ordersToApprove.reset()
+    const categories = this.productCategories.setCategories()
+    const exchangeRates = this.exchangeRates.reset()
+    this.staticPageService.initialize()
+    await Promise.all([order, ordersToApprove, categories, exchangeRates])
   }
 }

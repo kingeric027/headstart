@@ -1,7 +1,7 @@
-import { Theme } from 'marketplace';
+import { Theme } from 'marketplace'
 
 const headstartdemoTheme: Theme = {
-    logoSrc: `assets/generic-logo.png`,
-};
+  logoSrc: `assets/generic-logo.png`,
+}
 
-export default headstartdemoTheme;
+export default headstartdemoTheme

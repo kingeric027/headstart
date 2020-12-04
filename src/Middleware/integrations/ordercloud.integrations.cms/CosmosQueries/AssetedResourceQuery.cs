@@ -26,13 +26,15 @@ namespace ordercloud.integrations.cms
 		private readonly IAssetQuery _assets;
 		private readonly CMSConfig _config;
 		private readonly IAppCache _cache;
+		private readonly IAssetContainerQuery _container;
 
-		public AssetedResourceQuery(ICosmosStore<AssetedResourceDO> store, IAssetQuery assets, CMSConfig config, IAppCache cache)
+		public AssetedResourceQuery(IAssetContainerQuery container, ICosmosStore<AssetedResourceDO> store, IAssetQuery assets, CMSConfig config, IAppCache cache)
 		{
 			_store = store;
 			_assets = assets;
 			_config = config;
 			_cache = cache;
+			_container = container;
 		}
 
 		public async Task<ListPage<Asset>> ListAssets(Resource resource, ListArgsPageOnly args, VerifiedUserContext user)
@@ -42,14 +44,17 @@ namespace ordercloud.integrations.cms
 			// Confirm user has access to resource.
 			// await new MultiTenantOCClient(user).Get(resource); Commented out until I solve visiblity for /me endpoints
 			var assetedResource = await GetExisting(resource, user.SellerID);
-			if (assetedResource == null) return new ListPage<Asset>().Empty();
+			if (assetedResource == null) { return new ListPage<Asset>().Empty(); }
 			var assetIDs = assetedResource.ImageAssetIDs
 				.Concat(assetedResource.AllOtherAssetIDs)
 				.ToList();
-			var assets = await _assets.ListByInternalIDs(assetIDs, args);
+			var customerTask = _container.GetCustomer(user.SellerID);
+			var assetsTask = _assets.ListByInternalIDs(assetIDs, args);
+			var customer = await customerTask;
+			var assets = await assetsTask;
 			var items = assets.Items.Select(a => {
 				int indexWithinType = GetAssetIDs(assetedResource, a.Type).IndexOf(a.id);
-				var asset = AssetMapper.MapTo(_config, a);
+				var asset = AssetMapper.MapTo(customer, a);
 				return (asset, indexWithinType);
 			}).OrderBy(c => c.asset.Type).ThenBy(c => c.indexWithinType).Select(x => x.asset).ToList();
 			return new ListPage<Asset>()
@@ -73,8 +78,11 @@ namespace ordercloud.integrations.cms
 				}
 				try
                 {
-					var asset = await _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
-					return asset.Url ?? $"{_config.BlobStorageHostUrl}/assets-{asset.ContainerID}/{asset.id}-{size.ToString().ToLower()}";
+					var customerTask = _container.GetCustomer(sellerID);
+					var assetTask = _assets.GetByInternalID(assetedResource.ImageAssetIDs.First());
+					var customer = await customerTask;
+					var asset = await assetTask;
+					return asset.Url ?? $"{customer.StorageUrlHost}/assets-{asset.ContainerID}/{asset.id}-{size.ToString().ToLower()}";
 				} catch(OrderCloudIntegrationException.NotFoundException)
                 {
 					return GetPlaceholderImageUrl(resource.ResourceType ?? 0);
@@ -138,7 +146,7 @@ namespace ordercloud.integrations.cms
 
 		private List<string> GetAssetIDs(AssetedResourceDO assetedResource, AssetType assetType)
 		{
-			if (assetType == AssetType.Image) return assetedResource.ImageAssetIDs;
+			if (assetType == AssetType.Image) { return assetedResource.ImageAssetIDs; }
 			return assetedResource.AllOtherAssetIDs;
 		}
 

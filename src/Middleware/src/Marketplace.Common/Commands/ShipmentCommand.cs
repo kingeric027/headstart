@@ -23,6 +23,7 @@ namespace Marketplace.Common.Commands
         public string ErrorMessage { get; set; }
         public int Column { get; set; }
     }
+
     public class DocumentImportSummary
     {
         public int TotalCount { get; set; }
@@ -37,6 +38,7 @@ namespace Marketplace.Common.Commands
         public List<DocumentRowError> Invalid = new List<DocumentRowError>();
     }
 
+    [SwaggerModel]
     public class BatchProcessSummary
     {
         public int TotalCount { get; set; }
@@ -52,6 +54,7 @@ namespace Marketplace.Common.Commands
         public string Error { get; set; }
     }
 
+    [SwaggerModel]
     public class BatchProcessResult
     {
         public BatchProcessSummary Meta { get; set; }
@@ -289,7 +292,7 @@ namespace Marketplace.Common.Commands
                     Shipment processedShipment = await _oc.Shipments.PatchAsync(newShipment.ID, newShipment, userContext?.AccessToken);
 
                     //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
-                    PatchPartialLineItemComment(shipment, newShipment.ID);
+                    await PatchPartialLineItemComment(shipment, newShipment.ID);
 
                     await PatchLineItemStatus(shipment.OrderID, newShipmentItem, userContext);
                     //POST a shipment item, passing it a Shipment ID parameter, and a request body of Order ID, Line Item ID, and Quantity Shipped
@@ -305,7 +308,7 @@ namespace Marketplace.Common.Commands
                 if (lineItem?.ID == null)
                 {
                     //Before updating shipment item, must post the shipment line item comment to the order line item due to OC bug.
-                    PatchPartialLineItemComment(shipment, newShipment.ID);
+                    await PatchPartialLineItemComment(shipment, newShipment.ID);
 
                     //Create new lineItem
                     await _oc.Shipments.SaveItemAsync(shipment.ShipmentID, newShipmentItem);
@@ -371,7 +374,7 @@ namespace Marketplace.Common.Commands
 
         }
 
-        private async void PatchPartialLineItemComment(Misc.Shipment shipment, string newShipmentId)
+        private async Task<LineItem> PatchPartialLineItemComment(Misc.Shipment shipment, string newShipmentId)
         {
             PartialLineItem partialLineItem;
             Dictionary<string, object> commentDictonary = new Dictionary<string, object>();
@@ -379,7 +382,7 @@ namespace Marketplace.Common.Commands
             //Add new comment
             if (shipment?.ShipmentLineItemComment == null || shipment?.ShipmentLineItemComment == "")
             {
-                return;
+                return null;
             }
 
             commentDictonary.Add(newShipmentId, shipment?.ShipmentLineItemComment);
@@ -392,12 +395,12 @@ namespace Marketplace.Common.Commands
                 }
             };
 
-            await _oc.LineItems.PatchAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, partialLineItem);
+            return await _oc.LineItems.PatchAsync(OrderDirection.Outgoing, shipment.OrderID, shipment.LineItemID, partialLineItem);
         }
 
         private async Task<Shipment> GetShipmentByTrackingNumber(Misc.Shipment shipment, string accessToken)
         {
-            Shipment shipmentResponse;
+            Shipment shipmentResponse = null;
 
             //if dictionary already contains shipment, return that shipment
             if (shipment != null && _shipmentByTrackingNumber.ContainsKey(shipment.TrackingNumber))
@@ -426,14 +429,13 @@ namespace Marketplace.Common.Commands
             {
                 PartialShipment newShipment = PatchShipment(null, shipment);
                 //Create shipment for tracking number provided if shipmentId wasn't included
-                Shipment createdShipment = await _oc.Shipments.CreateAsync(newShipment, accessToken);
-                if (createdShipment != null)
+                shipmentResponse = await _oc.Shipments.CreateAsync(newShipment, accessToken);
+                if (shipmentResponse != null)
                 {
-                    _shipmentByTrackingNumber.Add(createdShipment.TrackingNumber, createdShipment);
-                    return createdShipment;
+                    _shipmentByTrackingNumber.Add(shipmentResponse.TrackingNumber, shipmentResponse);
                 }
             }
-            return null;
+            return shipmentResponse;
         }
 
 

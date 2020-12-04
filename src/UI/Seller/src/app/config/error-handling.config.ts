@@ -1,5 +1,5 @@
-import { ErrorHandler, Inject, Injector, Injectable } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
+import { ErrorHandler, Inject, Injector, Injectable } from '@angular/core'
+import { ToastrService } from 'ngx-toastr'
 
 /**
  * this error handler class extends angular's ErrorHandler
@@ -11,12 +11,12 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AppErrorHandler extends ErrorHandler {
   constructor(@Inject(Injector) private readonly injector: Injector) {
-    super();
+    super()
   }
 
   public handleError(ex: any): void {
-    this.displayError(ex);
-    super.handleError(ex);
+    this.displayError(ex)
+    super.handleError(ex)
   }
   /**
    * use this to display error message
@@ -24,42 +24,45 @@ export class AppErrorHandler extends ErrorHandler {
    */
   public displayError(ex: any): void {
     if (ex.rejection) {
-      ex = ex.rejection;
+      ex = ex.rejection
     }
-    let message = '';
+    let message = ''
     if (ex?.error?.Errors?.length) {
-      const e = ex.error.Errors[0];
+      const e = ex.error.Errors[0]
       if (e.Data && e.Data.WebhookName) {
         // webhook error
-        message = e.Data.body;
+        message = e.Data.body
       } else if (e.ErrorCode === 'NotFound') {
-        message = `${e.Data.ObjectType} ${e.Data.ObjectID} not found.`;
+        message = `${e.Data.ObjectType} ${e.Data.ObjectID} not found.`
       } else {
-        message = e.Message;
+        message = e.Message
       }
     } else if (ex?.error?.['error_description']) {
-      message = ex.error['error_description'];
+      message = ex.error['error_description']
     } else if (ex?.error?.[0]) {
-      message = ex?.error?.[0]?.Message;
+      message = ex?.error?.[0]?.Message
     } else if (ex.message) {
-      message = ex.message;
+      message = ex.message
     } else {
-      message = 'An error occurred';
+      message = 'An error occurred'
     }
     if (typeof message === 'object') {
-      message = JSON.stringify(message);
+      message = JSON.stringify(message)
     }
-    if (message === 'Token refresh attempt not possible' || message === 'Access token is invalid or expired.') {
+    if (
+      message === 'Token refresh attempt not possible' ||
+      message === 'Access token is invalid or expired.'
+    ) {
       // display user friendly error
-      message = 'Your session has expired. Please log in.';
+      message = 'Your session has expired. Please log in.'
     }
-    this.toastrService.error(message, 'Error', { onActivateTick: true });
+    this.toastrService.error(message, 'Error', { onActivateTick: true })
   }
 
   /**
    * Need to get ToastrService from injector rather than constructor injection to avoid cyclic dependency error
    */
   private get toastrService(): ToastrService {
-    return this.injector.get(ToastrService);
+    return this.injector.get(ToastrService)
   }
 }

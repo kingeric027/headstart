@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
 @Component({
   template: '<ocm-reset-password></ocm-reset-password>',

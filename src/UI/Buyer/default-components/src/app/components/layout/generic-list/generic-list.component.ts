@@ -1,5 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { Meta } from 'ordercloud-javascript-sdk';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+} from '@angular/core'
+import { Meta } from 'ordercloud-javascript-sdk'
 
 @Component({
   templateUrl: './generic-list.component.html',
@@ -14,22 +20,22 @@ export class OCMGenericList implements OnChanges {
    *  Right now it includes functionality for searching and paginating a list of objects, for example, addresses.
    */
   // Information about pagination
-  @Input() meta: Meta;
+  @Input() meta: Meta
 
-  @Input() searchPlaceholder: string;
+  @Input() searchPlaceholder: string
 
   // Event to capture search changes or page changes
   @Output()
   requestOptionsUpdated = new EventEmitter<{
-    page?: number;
-    search?: string;
-  }>();
+    page?: number
+    search?: string
+  }>()
 
-  _searchPlaceholder: string;
+  _searchPlaceholder: string
 
-  constructor() { }
+  constructor() {}
 
   ngOnChanges(): void {
-    this._searchPlaceholder = this.searchPlaceholder;
+    this._searchPlaceholder = this.searchPlaceholder
   }
 }

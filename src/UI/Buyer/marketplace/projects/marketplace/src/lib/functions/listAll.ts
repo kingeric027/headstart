@@ -1,9 +1,9 @@
-import { flatten, range } from 'lodash';
-import { Meta } from 'ordercloud-javascript-sdk';
+import { flatten, range } from 'lodash'
+import { Meta } from 'ordercloud-javascript-sdk'
 
 interface ListPage<T> {
-  Items?: T[];
-  Meta?: Meta;
+  Items?: T[]
+  Meta?: Meta
 }
 
 /**
@@ -23,19 +23,24 @@ export async function listAll<T = any>(
   ...listArgs: any[]
 ): Promise<ListPage<T>> {
   // get or create filters obj if it doesnt exist
-  listFunc = listFunc.bind(service);
-  const hasFiltersObj = typeof listArgs[listArgs.length - 1] === 'object';
-  const filtersObj = hasFiltersObj ? listArgs.pop() : {};
+  listFunc = listFunc.bind(service)
+  const hasFiltersObj = typeof listArgs[listArgs.length - 1] === 'object'
+  const filtersObj = hasFiltersObj ? listArgs.pop() : {}
 
   // set page and pageSize
-  filtersObj.page = 1;
-  filtersObj.pageSize = 100;
+  filtersObj.page = 1
+  filtersObj.pageSize = 100
 
-  const result1 = await listFunc(...listArgs, filtersObj);
-  const additionalPages = range(2, result1?.Meta.TotalPages + 1);
+  const result1 = await listFunc(...listArgs, filtersObj)
+  const additionalPages = range(2, result1?.Meta.TotalPages + 1)
 
-  const requests = additionalPages.map((page: number) => listFunc(...listArgs, { ...filtersObj, page }));
-  const results: ListPage<T>[] = await Promise.all(requests);
+  const requests = additionalPages.map((page: number) =>
+    listFunc(...listArgs, { ...filtersObj, page })
+  )
+  const results: ListPage<T>[] = await Promise.all(requests)
   // combine and flatten items for all list calls
-  return { Items: flatten([result1, ...results].map(r => r.Items)), Meta: result1.Meta };
+  return {
+    Items: flatten([result1, ...results].map((r) => r.Items)),
+    Meta: result1.Meta,
+  }
 }

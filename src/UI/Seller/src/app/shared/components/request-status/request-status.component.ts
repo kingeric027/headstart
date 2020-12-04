@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core'
 
 @Component({
   selector: 'request-status',
@@ -7,9 +7,9 @@ import { Component, Input } from '@angular/core';
 })
 export class RequestStatus {
   @Input()
-  requestStatus: RequestStatus;
+  requestStatus: RequestStatus
   @Input()
-  subResourceName = '';
+  subResourceName = ''
   @Input()
-  selectedParentResouceName;
+  selectedParentResouceName
 }

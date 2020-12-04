@@ -1,10 +1,10 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { Buyer } from '@ordercloud/angular-sdk';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerService } from '../buyer.service';
-import { MarketplaceBuyer } from '@ordercloud/headstart-sdk';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { Buyer } from '@ordercloud/angular-sdk'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Router, ActivatedRoute } from '@angular/router'
+import { BuyerService } from '../buyer.service'
+import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 
 @Component({
   selector: 'buyer-table',
@@ -12,7 +12,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./buyer-table.component.scss'],
 })
 export class BuyerTableComponent extends ResourceCrudComponent<Buyer> {
-  route = 'buyer';
+  route = 'buyer'
 
   constructor(
     private buyerService: BuyerService,
@@ -21,6 +21,6 @@ export class BuyerTableComponent extends ResourceCrudComponent<Buyer> {
     activatedRoute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerService, router, activatedRoute, ngZone);
+    super(changeDetectorRef, buyerService, router, activatedRoute, ngZone)
   }
 }

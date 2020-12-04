@@ -8,27 +8,27 @@ import {
   UserGroup,
   ApiRole,
   Sortable,
-} from 'ordercloud-javascript-sdk';
+} from 'ordercloud-javascript-sdk'
 import {
   MarketplaceLocationUserGroup,
   ProductXp,
   TaxCertificate,
   MarketplaceAddressBuyer,
   MarketplaceProduct,
-} from '@ordercloud/headstart-sdk';
+} from '@ordercloud/headstart-sdk'
 
 // todo replace with sdk
 export interface SupplierFilterConfigDocument extends Document {
-  Doc: SupplierFilterConfig;
+  Doc: SupplierFilterConfig
 }
 
 export interface SupplierFilterConfig {
-  Display: string;
-  Path: string;
-  Items: Filter[];
-  AllowSupplierEdit: boolean;
-  AllowSellerEdit: boolean;
-  BuyerAppFilterType: BuyerAppFilterType;
+  Display: string
+  Path: string
+  Items: Filter[]
+  AllowSupplierEdit: boolean
+  AllowSellerEdit: boolean
+  BuyerAppFilterType: BuyerAppFilterType
 }
 
 export enum BuyerAppFilterType {
@@ -37,77 +37,77 @@ export enum BuyerAppFilterType {
 }
 
 export interface Filter {
-  Text: string;
-  Value: string;
+  Text: string
+  Value: string
 }
 
 export interface ContactSupplierBody {
-  Product: MarketplaceProduct;
-  BuyerRequest: BuyerRequestForInfo;
+  Product: MarketplaceProduct
+  BuyerRequest: BuyerRequestForInfo
 }
 
 export interface BuyerRequestForInfo {
-  FirstName: string;
-  LastName: string;
-  BuyerLocation: string;
-  Email: string;
-  Phone: string;
-  Comments: string;
+  FirstName: string
+  LastName: string
+  BuyerLocation: string
+  Email: string
+  Phone: string
+  Comments: string
 }
 // end todo replace with sdk
 
 export interface LineItemGroupSupplier {
-  supplier: Supplier;
-  shipFrom: Address;
+  supplier: Supplier
+  shipFrom: Address
 }
 
 export interface CurrentUser extends MeUser {
-  FavoriteProductIDs: string[];
-  FavoriteOrderIDs: string[];
-  UserGroups: MarketplaceLocationUserGroup[];
-  Currency: CurrenySymbol;
+  FavoriteProductIDs: string[]
+  FavoriteOrderIDs: string[]
+  UserGroups: MarketplaceLocationUserGroup[]
+  Currency: CurrenySymbol
 }
 
 export interface ExchangeRates {
-  Currency: string;
-  Symbol: string;
-  Name: string;
-  Rate: number;
-  Icon: string;
+  Currency: string
+  Symbol: string
+  Name: string
+  Rate: number
+  Icon: string
 }
 
 export interface SupplierFilters {
-  supplierID?: string;
-  page?: number;
-  sortBy?: Sortable<'Suppliers.List'>;
-  activeFilters?: any;
-  search?: string;
+  supplierID?: string
+  page?: number
+  sortBy?: Sortable<'Suppliers.List'>
+  activeFilters?: any
+  search?: string
 }
 
 export interface ShippingRate {
-  Id: string;
-  AccountName: string;
-  Carrier: string;
-  Currency: string;
-  DeliveryDate: Date;
-  DeliveryDays: number;
-  CarrierQuoteId: string;
-  Service: string;
-  TotalCost: number;
+  Id: string
+  AccountName: string
+  Carrier: string
+  Currency: string
+  DeliveryDate: Date
+  DeliveryDays: number
+  CarrierQuoteId: string
+  Service: string
+  TotalCost: number
 }
 
 export interface ProductFilters {
-  page?: number;
-  sortBy?: string[];
-  search?: string;
-  showOnlyFavorites?: boolean;
-  categoryID?: string;
-  activeFacets?: any;
+  page?: number
+  sortBy?: string[]
+  search?: string
+  showOnlyFavorites?: boolean
+  categoryID?: string
+  activeFacets?: any
 }
 
 export interface PermissionType {
-  UserGroupSuffix: string;
-  DisplayText: string;
+  UserGroupSuffix: string
+  DisplayText: string
 }
 
 export const PermissionTypes: PermissionType[] = [
@@ -118,23 +118,23 @@ export const PermissionTypes: PermissionType[] = [
   { UserGroupSuffix: 'ViewAllOrders', DisplayText: 'View All Orders' },
   { UserGroupSuffix: 'CreditCardAdmin', DisplayText: 'Credit Card Admin' },
   { UserGroupSuffix: 'AddressAdmin', DisplayText: 'Address Admin' },
-];
+]
 
 export interface OrderFilters {
-  page?: number;
-  sortBy?: Sortable<'Me.ListOrders'>;
-  search?: string;
-  showOnlyFavorites?: boolean;
-  status?: OrderStatus;
+  page?: number
+  sortBy?: Sortable<'Me.ListOrders'>
+  search?: string
+  showOnlyFavorites?: boolean
+  status?: OrderStatus
   /**
    * mm-dd-yyyy
    */
-  fromDate?: string;
+  fromDate?: string
   /**
    * mm-dd-yyyy
    */
-  toDate?: string;
-  location?: string;
+  toDate?: string
+  location?: string
 }
 
 export enum OrderAddressType {
@@ -183,23 +183,23 @@ export enum LineItemStatus {
 }
 
 export interface CreditCard {
-  CardholderName: string;
-  CardNumber: string;
-  ExpirationDate: string;
-  SecurityCode: string;
-  ID?: string;
+  CardholderName: string
+  CardNumber: string
+  ExpirationDate: string
+  SecurityCode: string
+  ID?: string
 }
 
 export interface OrderReorderResponse {
-  ValidLi: Array<LineItem>;
-  InvalidLi: Array<LineItem>;
+  ValidLi: Array<LineItem>
+  InvalidLi: Array<LineItem>
 }
 
 /**
  * LineItem with the full product details. Currently used in the cart page only.
  */
 export interface LineItemWithProduct extends LineItem {
-  Product?: BuyerProduct;
+  Product?: BuyerProduct
 }
 
 export enum OrdercloudEnv {
@@ -209,7 +209,7 @@ export enum OrdercloudEnv {
 }
 
 export interface Theme {
-  logoSrc: string;
+  logoSrc: string
 }
 
 export class AppConfig {
@@ -217,111 +217,111 @@ export class AppConfig {
    * A short name for your app. It will be used as a
    * cookie prefix as well as general display throughout the app.
    */
-  appname: string;
+  appname: string
   /**
    * The identifier for the seller, buyer network or buyer application that
    * will be used for authentication. You can view client ids for apps
    * you own or are a contributor to on the [dashboard](https://developer.ordercloud.io/dashboard)
    */
-  clientID: string;
+  clientID: string
   /**
    * The identifier for the marketplace.
    */
-  marketplaceID: string;
+  marketplaceID: string
   /**
    * If set to true users can browse and submit orders without profiling themselves. This requires
    * additional set up in the dashboard. Click here to
    * [learn more](https://developer.ordercloud.io/documentation/platform-guides/authentication/anonymous-shopping)
    */
-  anonymousShoppingEnabled: boolean;
-  baseUrl: string;
+  anonymousShoppingEnabled: boolean
+  baseUrl: string
   /**
    * base path to middleware
    */
-  translateBlobUrl: string;
-  ordercloudEnv: OrdercloudEnv;
-  avalaraCompanyId: number;
-  middlewareUrl: string;
-  creditCardIframeUrl: string;
+  translateBlobUrl: string
+  ordercloudEnv: OrdercloudEnv
+  avalaraCompanyId: number
+  middlewareUrl: string
+  creditCardIframeUrl: string
   /**
    *  The ID of the seller organization.
    */
-  sellerID: string;
+  sellerID: string
   /**
    *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
    */
-  ssoLink: string;
+  ssoLink: string
   /**
    * An array of security roles that will be requested upon login.
    * These roles allow access to specific endpoints in the OrderCloud.io API.
    * To learn more about these roles and the security profiles that comprise them
    * read [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
-  scope: ApiRole[];
-  theme: Theme;
+  scope: ApiRole[]
+  theme: Theme
   /**
    * Microsoft Azure Application Insights instrumentation key
    */
-  instrumentationKey: string;
+  instrumentationKey: string
 }
 
 export interface DecodedOCToken {
   /**
    * the ordercloud username
    */
-  usr: string;
+  usr: string
 
   /**
    * the client id used when making token request
    */
-  cid: string;
+  cid: string
 
   /**
    * helpful for identifying user types in an app
    * that may have both types
    */
-  usrtype: 'admin' | 'buyer';
+  usrtype: 'admin' | 'buyer'
 
   /**
    * list of security profile roles that this user
    * has access to, read more about security profile roles
    * [here](https://developer.ordercloud.io/documentation/platform-guides/authentication/security-profiles)
    */
-  role: string[]; // TODO: add security profile roles to the sdk
+  role: string[] // TODO: add security profile roles to the sdk
 
   /**
    * the issuer of the token - should always be https://auth.ordercloud.io
    */
-  iss: string;
+  iss: string
 
   /**
    * the audience - who should be consuming this token
    * this should always be https://api.ordercloud.io (the ordercloud api)
    */
-  aud: string;
+  aud: string
 
   /**
    * expiration of the token (in seconds) since the
    * UNIX epoch (January 1, 1970 00:00:00 UTC)
    */
-  exp: number;
+  exp: number
 
   /**
    * point at which token was issued (in seconds) since the
    * UNIX epoch (January 1, 1970 00:00:00 UTC)
    */
-  nbf: number;
+  nbf: number
 
   /**
    * the order id assigned to the anonymous user,
    * this value will *only* exist for anonymous users
    */
-  orderid?: string;
+  orderid?: string
 }
 
 export interface BuyerLocationWithCert {
-  location?: MarketplaceAddressBuyer;
-  certificate?: TaxCertificate;
+  location?: MarketplaceAddressBuyer
+  certificate?: TaxCertificate
 }
 
 // TODO - remove once SDK has enum types
@@ -332,12 +332,12 @@ export enum OrderType {
 
 // Product Model
 // a corresponding model in the C# product
-export type MarketplaceMeProduct = BuyerProduct<ProductXp>;
+export type MarketplaceMeProduct = BuyerProduct<ProductXp>
 
-export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>;
+export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>
 
 export interface CreditCardXP {
-  CCBillingAddress: Address;
+  CCBillingAddress: Address
 }
 
 // TODO - remove when sdk has enum types
@@ -374,4 +374,4 @@ export type CurrenySymbol =
   | 'AUD'
   | 'ILS'
   | 'KRW'
-  | 'PLN';
+  | 'PLN'

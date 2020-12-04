@@ -6,7 +6,6 @@ using Marketplace.Common.Queries;
 using Marketplace.Common;
 using System.Threading.Tasks;
 using System.Linq;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
