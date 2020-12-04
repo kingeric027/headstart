@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using Marketplace.Common;
-using Marketplace.Common.Commands.SupplierSync;
+using Marketplace.Common.Commands;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using NPOI.HSSF.UserModel;

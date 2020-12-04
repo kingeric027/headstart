@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;

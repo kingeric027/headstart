@@ -59,13 +59,13 @@
         </div>
         <div class="ml-2" *ngIf="!isQuoteOrder(_order)">
           <p class="h5 mb-0 text-capitalize font-weight-bold">
-            {{ _order?.FromUser?.FirstName }} {{ _order?.FromUser?.LastName }}
+            {{ _buyerOrder?.FromUser?.FirstName }} {{ _buyerOrder?.FromUser?.LastName }}
           </p>
-          <p class="mb-0" *ngIf="_order?.FromUser?.Phone">
-            {{ _order?.FromUser?.Phone | tel }}
+          <p class="mb-0" *ngIf="_buyerOrder?.FromUser?.Phone">
+            {{ _buyerOrder?.FromUser?.Phone | tel }}
           </p>
-          <p class="mb-0" *ngIf="_order?.FromUser?.Email">
-            {{ _order?.FromUser?.Email }}
+          <p class="mb-0" *ngIf="_buyerOrder?.FromUser?.Email">
+            {{ _buyerOrder?.FromUser?.Email }}
           </p>
         </div>
         <div class="ml-2" *ngIf="isQuoteOrder(_order)">

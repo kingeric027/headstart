@@ -15,7 +15,7 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using IPartial = ordercloud.integrations.library.IPartial;
 
-namespace Marketplace.Common.Commands.SupplierSync
+namespace Marketplace.Common.Commands
 {
     public interface IProductTemplateCommand
     {

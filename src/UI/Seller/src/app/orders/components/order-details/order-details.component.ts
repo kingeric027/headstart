@@ -61,6 +61,7 @@ export class OrderDetailsComponent {
   faInfoCircle = faInfoCircle
   faUser = faUserAlt
   _order: Order = {}
+  _buyerOrder: Order = {}
   _lineItems: MarketplaceLineItem[] = []
   _payments: Payment[] = []
   images: any[] = []
@@ -194,12 +195,29 @@ export class OrderDetailsComponent {
     return this.orderService.isQuoteOrder(order)
   }
 
+  isSupplierOrder(orderID: string): boolean {
+    return this.orderService.isSupplierOrder(orderID);
+  }
+
+  async setData(order: Order): Promise<void> {
+    this._order = order;
+    if(this.isSupplierOrder(order.ID)){
+      const orderData = await this.middleware.getSupplierData(order.ID);
+      this._buyerOrder = orderData.BuyerOrder.Order;
+      this._lineItems = orderData.BuyerOrder.LineItems;
+    } else {
+      this._buyerOrder = order;
+      this._lineItems = await this.getAllLineItems(order)
+    }
+  }
+
   private async handleSelectedOrderChange(order: Order): Promise<void> {
+    await this.setData(order);
     this.orderAvatarInitials = !this.isQuoteOrder(order)
-      ? `${order?.FromUser?.FirstName?.slice(
+      ? `${this._buyerOrder?.FromUser?.FirstName?.slice(
           0,
           1
-        ).toUpperCase()}${order?.FromUser?.LastName?.slice(0, 1).toUpperCase()}`
+        ).toUpperCase()}${this._buyerOrder?.FromUser?.LastName?.slice(0, 1).toUpperCase()}`
       : `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(
           0,
           1
@@ -208,9 +226,7 @@ export class OrderDetailsComponent {
           1
         ).toUpperCase()}`
     this.setOrderProgress(order)
-    this._order = order
     this.getIncomingOrOutgoing()
-    this._lineItems = await this.getAllLineItems(order)
     const paymentsResponse = await this.ocPaymentService
       .List(this.orderDirection, order.ID)
       .toPromise()

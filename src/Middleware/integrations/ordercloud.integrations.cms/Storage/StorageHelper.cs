@@ -6,13 +6,15 @@ using ordercloud.integrations.library;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace ordercloud.integrations.cms
 {
 	public static class StorageHelper
 	{
 		// Keys are container ids. 
-		private static Dictionary<string, OrderCloudIntegrationsBlobService> storageConnections = new Dictionary<string, OrderCloudIntegrationsBlobService>();
+		private static ConcurrentDictionary<string, OrderCloudIntegrationsBlobService> storageConnections = 
+			new ConcurrentDictionary<string, OrderCloudIntegrationsBlobService>();
 		
 		public static async Task UploadFile(AssetContainer container, string blobName, IFormFile file)
 		{
@@ -42,7 +44,7 @@ namespace ordercloud.integrations.cms
 					Container = $"assets-{container.id}", // SellerOrgID can contain "_", an illegal character for blob containers.
 					AccessType = BlobContainerPublicAccessType.Container
 				});
-				storageConnections.Add(container.id, blobService);
+				storageConnections.TryAdd(container.id, blobService);
 			}
 			try
 			{

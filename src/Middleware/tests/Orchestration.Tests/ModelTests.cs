@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
 using NUnit.Framework;
 using OrderCloud.SDK;

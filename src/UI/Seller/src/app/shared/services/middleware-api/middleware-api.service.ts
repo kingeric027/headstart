@@ -64,4 +64,11 @@ export class MiddlewareAPIService {
       .get<ListPage<SupplierFilterConfigDocument>>(url, this.headers)
       .toPromise()
   }
+
+  async getSupplierData(supplierOrderID: string): Promise<any> {
+    const url = `${this.appConfig.middlewareUrl}/supplier/orderdetails/${supplierOrderID}`
+    return await this.http
+      .get<any>(url, this.headers)
+      .toPromise()
+  }
 }

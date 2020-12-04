@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Models;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;

@@ -24,7 +24,6 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
@@ -119,7 +118,6 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
-                .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
