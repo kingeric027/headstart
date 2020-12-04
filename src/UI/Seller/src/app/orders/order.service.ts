@@ -30,4 +30,8 @@ export class OrderService extends ResourceCrudService<Order> {
   isQuoteOrder(order: Order) {
     return order?.xp?.OrderType === OrderType.Quote
   }
+
+  isSupplierOrder(orderID: string) {
+    return orderID.split("-").length > 1; 
+  }
 }
