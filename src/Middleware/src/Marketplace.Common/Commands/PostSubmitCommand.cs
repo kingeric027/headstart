@@ -333,8 +333,7 @@ namespace Marketplace.Common.Commands
             return await Task.FromResult(new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet, List<ProcessResultAction>>(marketplaceOrders, marketplaceOrderWorksheet, activities));
         }
 
-        //TODO: probably want to move this to a command so it's isolated and testable
-        private async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrderWorksheet buyerOrder, List<Order> supplierOrders)
+        public  async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrderWorksheet buyerOrder, List<Order> supplierOrders)
         {
             var updatedSupplierOrders = new List<MarketplaceOrder>();
             var supplierIDs = new List<string>();
@@ -344,7 +343,7 @@ namespace Marketplace.Common.Commands
             foreach (var supplierOrder in supplierOrders)
             {
                 supplierIDs.Add(supplierOrder.ToCompanyID);
-                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs?.Where(addressID => addressID != null && addressID.Contains(supplierOrder.ToCompanyID)).ToList();
+                var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID != null && addressID.Contains(supplierOrder.ToCompanyID)).ToList();
                 var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierOrder.ToCompanyID);
                 var suppliersShipEstimates = buyerOrder.ShipEstimateResponse?.ShipEstimates?.Where(se => se.xp.SupplierID == supplier.ID);
                 var supplierOrderPatch = new PartialOrder() {
@@ -386,14 +385,14 @@ namespace Marketplace.Common.Commands
 
         private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<MarketplaceShipEstimate> shipEstimates)
 		{
-            var selectedShipMethods = shipEstimates.Select(se =>
+            var selectedShipMethods = shipEstimates.Select(shipEstimate =>
             {
-                var selected = se.ShipMethods.First(sm => sm.ID == se.SelectedShipMethodID);
+                var selected = shipEstimate.ShipMethods.FirstOrDefault(sm => sm.ID == shipEstimate.SelectedShipMethodID);
                 return new ShipMethodSupplierView()
                 {
                     EstimatedTransitDays = selected.EstimatedTransitDays,
                     Name = selected.Name,
-                    ShipFromAddressID = se.xp.ShipFromAddressID
+                    ShipFromAddressID = shipEstimate.xp.ShipFromAddressID
                 };
             }).ToList();
             return selectedShipMethods;

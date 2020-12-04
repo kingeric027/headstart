@@ -48,10 +48,12 @@ namespace Marketplace.Common.Commands
 
     }
 
+    [SwaggerModel]
     public class BatchProcessFailure
     {
         public Misc.Shipment Shipment { get; set; }
         public string Error { get; set; }
+
     }
 
     [SwaggerModel]
