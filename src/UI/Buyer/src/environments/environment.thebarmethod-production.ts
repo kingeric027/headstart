@@ -3,23 +3,24 @@
 
 import { Environment } from './environment.interface'
 import bmTheme from '../styles/themes/bar-method/theme-config'
+import { OrdercloudEnv } from 'src/app/shopper-context'
 
 export const environment: Environment = {
   hostedApp: true,
   appname: 'The Bar Method',
   clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
-  marketplaceID: 'SEB_TEST',
-  baseUrl: 'https://thebarmethod-staging.sebvendorportal.com',
-  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
-  creditCardIframeUrl:
-    'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+  marketplaceID: 'SEB',
+  baseUrl: 'https://thebarmethod.sebvendorportal.com',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:
     'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
-  ssoLink: null,
-  ordercloudEnv: OrdercloudEnv.Staging,
+  ssoLink:
+    'https://stage-authorize.anytimefitness.com/authorize?response_type=code&client_id=86d70db9-22e6-47ba-a1ab-bbe00c9b6451&redirect_uri=https://selfesteembrands-api-qa.azurewebsites.net/authorize',
+  ordercloudEnv: OrdercloudEnv.Production,
   theme: bmTheme,
-  instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+  instrumentationKey: '22575a56-7540-47c7-9a91-3cf5316531a3',
 }
 /*
 

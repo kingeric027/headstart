@@ -2,14 +2,15 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { Environment } from './environment.interface'
-import bmTheme from '../styles/themes/bar-method/theme-config'
+import wtcTheme from '../styles/themes/waxing-the-city/theme-config'
+import { OrdercloudEnv } from 'src/app/shopper-context'
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'The Bar Method',
-  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
+  appname: 'Waxing The City',
+  clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB_TEST',
-  baseUrl: 'https://thebarmethod-staging.sebvendorportal.com',
+  baseUrl: 'https://waxingthecity-staging.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
@@ -18,7 +19,7 @@ export const environment: Environment = {
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Staging,
-  theme: bmTheme,
+  theme: wtcTheme,
   instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
 }
 /*

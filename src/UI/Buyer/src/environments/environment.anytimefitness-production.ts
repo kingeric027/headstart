@@ -2,24 +2,24 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 
 import { Environment } from './environment.interface'
-import bmTheme from '../styles/themes/bar-method/theme-config'
+import afTheme from '../styles/themes/anytime-fitness/theme-config'
+import { OrdercloudEnv } from 'src/app/shopper-context'
 
 export const environment: Environment = {
   hostedApp: true,
-  appname: 'The Bar Method',
-  clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
-  marketplaceID: 'SEB_TEST',
-  baseUrl: 'https://thebarmethod-staging.sebvendorportal.com',
-  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
-  creditCardIframeUrl:
-    'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
+  appname: 'Anytime Fitness',
+  clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
+  marketplaceID: 'SEB',
+  baseUrl: 'https://anytimefitness.sebvendorportal.com',
+  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:
     'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   ssoLink: null,
-  ordercloudEnv: OrdercloudEnv.Staging,
-  theme: bmTheme,
-  instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+  ordercloudEnv: OrdercloudEnv.Production,
+  theme: afTheme,
+  instrumentationKey: '22575a56-7540-47c7-9a91-3cf5316531a3',
 }
 /*
 
