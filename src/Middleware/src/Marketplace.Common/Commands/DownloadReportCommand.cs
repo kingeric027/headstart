@@ -4,26 +4,29 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
-using OrderCloud.AzureStorage;
 using System;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Linq;
 using Marketplace.Common.Models;
 using OrderCloud.SDK;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands
 {
     public class DownloadReportCommand
     {
-        private readonly BlobService _blob;
         private readonly CloudBlobContainer _container;
 
-
-        public DownloadReportCommand(BlobService blob)
+        public DownloadReportCommand(AppSettings settings)
         {
-            _blob = blob;
-            _container = _blob.BlobClient.GetContainerReference("downloads");
+            var blobService = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
+            {
+                ConnectionString = settings.BlobSettings.ConnectionString,
+                Container = "downloads",
+                AccessType = BlobContainerPublicAccessType.Off
+            });
+            _container = blobService.Container;
         }
 
         public async Task<string> ExportToExcel(ReportTypeEnum reportType, ReportTemplate reportTemplate, IEnumerable<object> data)

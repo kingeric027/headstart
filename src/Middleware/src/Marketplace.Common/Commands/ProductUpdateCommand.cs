@@ -10,7 +10,6 @@ using NPOI.OpenXmlFormats;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using OrderCloud.SDK;
 using SendGrid.Helpers.Mail;
 using System;
@@ -35,21 +34,25 @@ namespace Marketplace.Common.Commands
         private readonly ResourceHistoryQuery<ProductHistory> _productQuery;
         private readonly ResourceHistoryQuery<PriceScheduleHistory> _priceScheduleQuery;
         private readonly IOrderCloudClient _oc;
-        private readonly BlobService _blob;
         private readonly CloudBlobContainer _container;
         private readonly ISendgridService _sendgridService;
         public ProductUpdateCommand(
             IOrderCloudClient oc,
             ResourceHistoryQuery<ProductHistory> productQuery,
             ResourceHistoryQuery<PriceScheduleHistory> priceScheduleQuery,
-            BlobService blob, 
+            AppSettings settings, 
             ISendgridService sendGrid)
         {
+            var blobService = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
+            {
+                ConnectionString = settings.BlobSettings.ConnectionString,
+                Container = "productupdates",
+                AccessType = BlobContainerPublicAccessType.Off
+            });
             _productQuery = productQuery;
             _priceScheduleQuery = priceScheduleQuery;
             _oc = oc;
-            _blob = blob;
-            _container = _blob.BlobClient.GetContainerReference("productupdates");
+            _container = blobService.Container;
             _sendgridService = sendGrid;
     }
 
