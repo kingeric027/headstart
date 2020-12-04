@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import { NgbAccordion } from '@ng-bootstrap/ng-bootstrap'
+import { NgbAccordion, NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap'
 import {
   ShipMethodSelection,
   ShipEstimate,
@@ -23,10 +23,21 @@ import {
 import { ShopperContextService } from 'marketplace'
 import { NgxSpinnerService } from 'ngx-spinner'
 import { ModalState } from 'src/app/models/modal-state.class'
+import { ToastrService } from 'ngx-toastr'
 import {
-  ErrorConstants,
+  MiddlewareError,
+  extractMiddlewareError,
+  isInventoryError,
   getPaymentError,
-} from '../../../services/error-constants'
+  ErrorCodes,
+} from 'src/app/services/error-constants'
+import { AxiosError } from 'axios'
+import { HeadStartSDK } from '@ordercloud/headstart-sdk'
+
+interface CheckoutSection {
+  id: string
+  valid: boolean
+}
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -50,7 +61,7 @@ export class OCMCheckout implements OnInit {
   faCheck = faCheck
   orderErrorModal = ModalState.Closed
   checkout: CheckoutService = this.context.order.checkout
-  sections: any = [
+  sections: CheckoutSection[] = [
     {
       id: 'login',
       valid: false,
@@ -76,21 +87,21 @@ export class OCMCheckout implements OnInit {
 
   constructor(
     private context: ShopperContextService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private toastrService: ToastrService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.context.order.onChange((order) => (this.order = order))
     this.order = this.context.order.get()
     if (this.order.IsSubmitted) {
-      this.handleOrderError('This order has already been submitted')
+      await this.handleOrderError('This order has already been submitted')
     }
 
     this.lineItems = this.context.order.cart.get()
     this.orderPromotions = this.context.order.promos.get().Items
     this.isAnon = this.context.currentUser.isAnonymous()
     this.currentPanel = this.isAnon ? 'login' : 'shippingAddress'
-    this.reIDLineItems()
     this.orderSummaryMeta = getOrderSummaryMeta(
       this.order,
       this.orderPromotions,
@@ -101,6 +112,7 @@ export class OCMCheckout implements OnInit {
     this.setValidation('login', !this.isAnon)
 
     this.isNewCard = false
+    await this.reIDLineItems()
   }
 
   async reIDLineItems(): Promise<void> {
@@ -127,13 +139,13 @@ export class OCMCheckout implements OnInit {
     await this.context.order.promos.applyAutomaticPromos()
     this.order = this.context.order.get()
     if (this.order.IsSubmitted) {
-      this.handleOrderError(ErrorConstants.orderSubmittedError)
+      await this.handleOrderError('This order has already been submitted')
     }
     this.lineItems = this.context.order.cart.get()
     this.destoryLoadingIndicator('payment')
   }
 
-  navigateBackToAddress() {
+  navigateBackToAddress(): void {
     this.toSection('shippingAddress')
   }
 
@@ -183,51 +195,85 @@ export class OCMCheckout implements OnInit {
   async submitOrderWithComment(comment: string): Promise<void> {
     this.initLoadingIndicator('submitLoading')
     await this.checkout.addComment(comment)
-    let cleanOrderID = ''
-    if (this.orderSummaryMeta.StandardLineItemCount) {
-      try {
-        const ccPayment = this.getCCPaymentData()
-        cleanOrderID = await this.checkout.submitWithCreditCard(ccPayment)
-        await this.checkout.appendPaymentMethodToOrderXp(
-          cleanOrderID,
-          ccPayment
-        )
-      } catch (e) {
-        return this.handleSubmitError(e)
-      }
-    } else {
-      try {
-        cleanOrderID = await this.checkout.submitWithoutCreditCard()
-        await this.checkout.appendPaymentMethodToOrderXp(cleanOrderID)
-      } catch (e) {
-        return this.handleSubmitError(e)
-      }
+    try {
+      const payment = this.orderSummaryMeta.StandardLineItemCount
+        ? this.getCCPaymentData()
+        : null
+      const order = await HeadStartSDK.Orders.Submit(
+        'Outgoing',
+        this.order.ID,
+        payment
+      )
+      await this.checkout.appendPaymentMethodToOrderXp(order.ID, payment)
+      this.isLoading = false
+      await this.context.order.reset() // get new current order
+      this.toastrService.success('Order submitted successfully', 'Success')
+      this.context.router.toMyOrderDetails(order.ID)
+    } catch (e) {
+      await this.handleSubmitError(e)
     }
+  }
+
+  async handleSubmitError(exception: AxiosError): Promise<void> {
+    await this.context.order.reset() // orderID might've been incremented
     this.isLoading = false
-    // todo: "Order Submitted Successfully" message
-    this.context.router.toMyOrderDetails(cleanOrderID)
-  }
 
-  async handleSubmitError(error: any): Promise<void> {
-    if (error?.message === ErrorConstants.orderSubmittedError) {
-      this.isLoading = false
-      this.handleOrderError(error.message)
-    } else {
-      this.paymentError = getPaymentError(error?.response?.data?.Message)
-      this.isLoading = false
-      this.currentPanel = 'payment'
-      if (this.isNewCard) {
-        await this.context.currentUser.cards.Delete(
-          this.getCCPaymentData().CreditCardID
-        )
-      }
+    const error = extractMiddlewareError(exception)
+    if (!error) {
+      throw new Error('An unknown error has occurred')
+    }
+    if (error.ErrorCode === ErrorCodes.OrderSubmit.AlreadySubmitted) {
+      await this.handleOrderError('This order has already been submitted')
+    } else if (
+      error.ErrorCode === ErrorCodes.OrderSubmit.MissingShippingSelections
+    ) {
+      this.handleMissingShippingSelectionsError()
+    } else if (
+      error.ErrorCode === ErrorCodes.OrderSubmit.OrderCloudValidationError
+    ) {
+      this.handleOrderCloudValidationError(error)
+    } else if (error.ErrorCode.includes('CreditCardAuth.')) {
+      await this.handleCreditcardError(error)
+    } else if (error.ErrorCode == ErrorCodes.InternalServerError) {
+      throw new Error(error.Message)
     }
   }
 
-  handleOrderError(message: string): void {
+  async handleOrderError(message: string): Promise<void> {
     this.orderError = message
-    this.context.order.reset()
+    await this.context.order.reset()
     this.orderErrorModal = ModalState.Open
+  }
+
+  handleMissingShippingSelectionsError(): void {
+    this.currentPanel = 'shipping'
+    throw new Error(
+      'Order missing shipping selections - please select shipping selections'
+    )
+  }
+
+  handleOrderCloudValidationError(error: MiddlewareError): void {
+    // TODO: blow this out into a modal that allows user to easily take action on line items in cart
+    const innerErrors = error.Data as MiddlewareError[]
+    innerErrors.forEach((e) => {
+      if (isInventoryError(e)) {
+        if (e.ErrorCode === 'Inventory.Insufficient') {
+          throw new Error(
+            `Insufficient inventory for product ${e.Data.ProductID}. Quantity Available ${e.Data.QuantityAvailable}`
+          )
+        }
+      }
+    })
+  }
+
+  async handleCreditcardError(error: MiddlewareError): Promise<void> {
+    this.currentPanel = 'payment'
+    this.paymentError = getPaymentError(error.Message)
+    if (this.isNewCard) {
+      await this.context.currentUser.cards.Delete(
+        this.getCCPaymentData().CreditCardID
+      )
+    }
   }
 
   getCCPaymentData(): OrderCloudIntegrationsCreditCardPayment {
@@ -268,7 +314,7 @@ export class OCMCheckout implements OnInit {
     this.accordian.toggle(id)
   }
 
-  beforeChange($event: any): void {
+  beforeChange($event: NgbPanelChangeEvent): void {
     if (this.currentPanel === $event.panelId) {
       return $event.preventDefault()
     }

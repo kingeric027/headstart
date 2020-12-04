@@ -1,4 +1,4 @@
-import { AppConfig, MarketplaceBuyerCreditCard } from '../../shopper-context'
+import { MarketplaceBuyerCreditCard } from '../../shopper-context'
 import {
   Payment,
   Orders,
@@ -16,12 +16,12 @@ import { OrderStateService } from './order-state.service'
 import {
   HeadStartSDK,
   Address,
-  OrderCloudIntegrationsCreditCardPayment,
   OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
   ListPage,
   MarketplaceLineItem,
   MarketplaceAddressBuyer,
+  OrderCloudIntegrationsCreditCardPayment,
 } from '@ordercloud/headstart-sdk'
 
 @Injectable({
@@ -30,30 +30,12 @@ import {
 export class CheckoutService {
   constructor(
     private paymentHelper: PaymentHelperService,
-    private state: OrderStateService,
-    private appConfig: AppConfig
+    private state: OrderStateService
   ) {}
-
-  async submitWithCreditCard(
-    payment: OrderCloudIntegrationsCreditCardPayment
-  ): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    await this.incrementOrderIfNeeded()
-    payment.OrderID = this.order.ID
-    await HeadStartSDK.MePayments.Post(payment) // authorize card
-    const orderID = this.submit()
-    return orderID
-  }
-
-  async submitWithoutCreditCard(): Promise<string> {
-    await this.incrementOrderIfNeeded()
-    const orderID = this.submit()
-    return orderID
-  }
 
   async appendPaymentMethodToOrderXp(
     orderID: string,
-    ccPayment?: any
+    ccPayment?: OrderCloudIntegrationsCreditCardPayment
   ): Promise<void> {
     const paymentMethod = ccPayment?.CreditCardID
       ? 'Credit Card'
@@ -67,18 +49,10 @@ export class CheckoutService {
     return await this.patch({ Comments: comment })
   }
 
-  async incrementOrderIfNeeded(): Promise<void> {
-    // 'as any' can be removed after sdk update
-    if (!(this.order.xp as any)?.IsResubmitting) {
-      this.order = (await Orders.Patch('Outgoing', this.order.ID, {
-        ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
-      })) as MarketplaceOrder
-    }
-  }
-
   async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     ;(address as any).ID = null
     this.order = await HeadStartSDK.ValidatedAddresses.SetShippingAddress(
       'Outgoing',
@@ -242,18 +216,6 @@ export class CheckoutService {
       Payments.Delete('Outgoing', this.order.ID, payment.ID)
     )
     return Promise.all(deleteAll)
-  }
-
-  // Private Methods
-  private async submit(): Promise<string> {
-    // TODO - auth call on submit probably needs to be enforced in the middleware, not frontend.;
-    const currentOrder = await Orders.Get('Outgoing', this.order.ID)
-    if (currentOrder.IsSubmitted) {
-      throw new Error('Order has already been submitted')
-    }
-    const submittedOrder = await Orders.Submit('Outgoing', this.order.ID)
-    await this.state.reset()
-    return submittedOrder.ID
   }
 
   private async createCCPayment(
