@@ -97,6 +97,7 @@ export class OrderDetailsComponent {
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER
+    this.setOrderDirection()
   }
 
   setOrderProgress(order: MarketplaceOrder): void {
@@ -176,7 +177,7 @@ export class OrderDetailsComponent {
     return fullName.trim()
   }
 
-  getIncomingOrOutgoing(): void {
+  setOrderDirection(): void {
     const url = window.location.href
     if (url.includes('Outgoing')) {
       this.orderDirection = 'Outgoing'
@@ -212,6 +213,7 @@ export class OrderDetailsComponent {
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
+    this.setOrderDirection()
     await this.setData(order)
     this.orderAvatarInitials = !this.isQuoteOrder(order)
       ? `${this._buyerOrder?.FromUser?.FirstName?.slice(
@@ -229,7 +231,6 @@ export class OrderDetailsComponent {
           1
         ).toUpperCase()}`
     this.setOrderProgress(order)
-    this.getIncomingOrOutgoing()
     const paymentsResponse = await this.ocPaymentService
       .List(this.orderDirection, order.ID)
       .toPromise()
