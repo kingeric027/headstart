@@ -9,7 +9,7 @@ export const ErrorDictionary = {
   name: "Name can only contain characters Aa-Zz 0-9 - ' .",
   phone: 'Phone can only contain 20 numbers or "-" chars (no spaces)',
   zip: 'Zip Code is invalid',
-  DateError: 'Enter date of the form mm-dd-yyyy',
+  DateError: 'Enter date of the form YYYY-MM-DD',
   date: 'Enter date of the form mm-dd-yyyy',
   required: 'This field is required',
   email: 'Please enter a valid email',
