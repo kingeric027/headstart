@@ -14,14 +14,16 @@ namespace ordercloud.integrations.library
     {
         public ClaimsPrincipal Principal { get; set; }
         private JwtSecurityToken _token { get; set; }
+        private IOrderCloudClient _oc { get; set;}
 
-        public VerifiedUserContext() { }
+        public VerifiedUserContext(IOrderCloudClient oc) {
+            _oc = oc;
+        }
 
         public async Task<VerifiedUserContext> Define(OrderCloudClientConfig config)
         {
-            var _oc = new OrderCloudClient(config);
             var auth = await _oc.AuthenticateAsync();
-            var user = await new OrderCloudClientWithContext(auth.AccessToken).Me.GetAsync();
+            var user = await _oc.Me.GetAsync();
             var jwt = new JwtSecurityToken(auth.AccessToken);
 
             var cid = new ClaimsIdentity("OrderCloudIntegrations");
