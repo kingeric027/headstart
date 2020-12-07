@@ -196,28 +196,31 @@ export class OrderDetailsComponent {
   }
 
   isSupplierOrder(orderID: string): boolean {
-    return this.orderService.isSupplierOrder(orderID);
+    return this.orderService.isSupplierOrder(orderID)
   }
 
   async setData(order: Order): Promise<void> {
-    this._order = order;
-    if(this.isSupplierOrder(order.ID)){
-      const orderData = await this.middleware.getSupplierData(order.ID);
-      this._buyerOrder = orderData.BuyerOrder.Order;
-      this._lineItems = orderData.BuyerOrder.LineItems;
+    this._order = order
+    if (this.isSupplierOrder(order.ID)) {
+      const orderData = await this.middleware.getSupplierData(order.ID)
+      this._buyerOrder = orderData.BuyerOrder.Order
+      this._lineItems = orderData.BuyerOrder.LineItems
     } else {
-      this._buyerOrder = order;
+      this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)
     }
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
-    await this.setData(order);
+    await this.setData(order)
     this.orderAvatarInitials = !this.isQuoteOrder(order)
       ? `${this._buyerOrder?.FromUser?.FirstName?.slice(
           0,
           1
-        ).toUpperCase()}${this._buyerOrder?.FromUser?.LastName?.slice(0, 1).toUpperCase()}`
+        ).toUpperCase()}${this._buyerOrder?.FromUser?.LastName?.slice(
+          0,
+          1
+        ).toUpperCase()}`
       : `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(
           0,
           1
