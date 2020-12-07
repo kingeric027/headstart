@@ -19,19 +19,18 @@ namespace ordercloud.integrations.smartystreets
 	public class SmartyStreetsService : ISmartyStreetsService
 	{
 		private readonly SmartyStreetsConfig _config;
-		private readonly ClientBuilder _builder;
+		private readonly Client _smartyStreetsClients;
 		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete-pro.api.smartystreets.com";
 
 		public SmartyStreetsService(SmartyStreetsConfig config)
 		{
-			_config = config;
-			_builder = new ClientBuilder(_config.AuthID, _config.AuthToken);
+			var builder = new ClientBuilder(_config.AuthID, _config.AuthToken);
+			_smartyStreetsClients = builder.BuildUsStreetApiClient();
 		}
 
 		public async Task<List<Candidate>> ValidateSingleUSAddress(Lookup lookup)
 		{
-			var client = _builder.BuildUsStreetApiClient();
-			client.Send(lookup);
+			_smartyStreetsClients.Send(lookup);
 			return await Task.FromResult(lookup.Result);
 		}
 
