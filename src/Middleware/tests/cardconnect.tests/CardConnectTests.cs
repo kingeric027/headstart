@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Threading.Tasks;
+using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
 using NUnit.Framework;
 using ordercloud.integrations.cardconnect;
@@ -20,7 +21,7 @@ namespace CardConnect.Tests
                 Authorization = "",
                 Site = "fts-uat",
                 BaseUrl = "cardconnect.com"
-            });
+            }, new PerBaseUrlFlurlClientFactory());
         }
 
         [TearDown]
