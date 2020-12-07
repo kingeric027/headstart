@@ -67,7 +67,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.anytimefitness-production.ts"
               } ],
               "optimization": true,
@@ -96,7 +96,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.anytimefitness-staging.ts"
               } ],
               "optimization": true,
@@ -125,7 +125,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.basecampfitness-production.ts"
               } ],
               "optimization": true,
@@ -154,7 +154,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.basecampfitness-staging.ts"
               } ],
               "optimization": true,
@@ -183,7 +183,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.waxingthecity-production.ts"
               } ],
               "optimization": true,
@@ -212,7 +212,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.waxingthecity-staging.ts"
               } ],
               "optimization": true,
@@ -241,7 +241,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.thebarmethod-production.ts"
               } ],
               "optimization": true,
@@ -270,7 +270,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.thebarmethod-staging.ts"
               } ],
               "optimization": true,
@@ -299,7 +299,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.headstartdemo-test.ts"
               } ],
               "optimization": true,
@@ -328,7 +328,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.brandweardesigns-test.ts"
               } ],
               "optimization": true,
@@ -357,7 +357,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.fastsigns-test.ts"
               } ],
               "optimization": true,
@@ -386,7 +386,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.go2partners-test.ts"
               } ],
               "optimization": true,
@@ -415,7 +415,7 @@
                 ]
               },
               "fileReplacements": [ {
-                "replace": "src/environments/environment.ts",
+                "replace": "src/environments/environment.local.ts",
                 "with": "src/environments/environment.waxingthecity-test.ts"
               } ],
               "optimization": true,

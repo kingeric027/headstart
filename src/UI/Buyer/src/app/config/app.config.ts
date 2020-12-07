@@ -1,5 +1,5 @@
 import { ApiRole } from 'ordercloud-javascript-sdk'
-import { environment } from 'src/environments/environment'
+import { environment } from 'src/environments/environment.local'
 import { AppConfig, OrdercloudEnv } from '../shopper-context'
 
 export const ocAppConfig: AppConfig = {
