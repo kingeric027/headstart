@@ -172,6 +172,8 @@ namespace ordercloud.integrations.cms
 					_blob.UploadAsset(container, $"{asset.id}-m", medium),
 					_blob.UploadAsset(container, $"{asset.id}-s", small)
 				});
+				small.Dispose();
+				medium.Dispose();
 			}
 			return asset;
 		}
