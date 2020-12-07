@@ -19,22 +19,28 @@ export class OCMCart {
   orderSummaryMeta: OrderSummaryMeta
   @Input() set order(value: MarketplaceOrder) {
     this._order = value
-    this.setOrderSummaryMeta()
+    if (this._order) {
+      this.setOrderSummaryMeta()
+    }
   }
   @Input() set lineItems(value: ListPage<LineItemWithProduct>) {
     this._lineItems = value
-    this.setOrderSummaryMeta()
+    if (this._lineItems) {
+      this.setOrderSummaryMeta()
+    }
   }
 
   @Input() set orderPromos(value: ListPage<OrderPromotion>) {
     this._orderPromos = value
-    this.setOrderSummaryMeta()
+    if (this._orderPromos) {
+      this.setOrderSummaryMeta()
+    }
   }
 
   constructor(private context: ShopperContextService) {}
 
   setOrderSummaryMeta(): void {
-    if (this._order && this._lineItems) {
+    if (this._order && this._lineItems && this._orderPromos) {
       this.orderSummaryMeta = getOrderSummaryMeta(
         this._order,
         this._orderPromos?.Items,

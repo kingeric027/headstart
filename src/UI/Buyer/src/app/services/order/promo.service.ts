@@ -21,10 +21,15 @@ import { TempSdk } from '../temp-sdk/temp-sdk.service'
 })
 export class PromoService {
   public onAdd = new Subject<OrderPromotion>() // need to make available as observable
-  public onChange = this.state.onPromosChange.bind(this.state)
+  public onChange: (
+    callback: (promos: ListPage<OrderPromotion>) => void
+  ) => void
   private initializingOrder = false
 
-  constructor(private state: OrderStateService, private tempsdk: TempSdk) {}
+  constructor(private state: OrderStateService, private tempsdk: TempSdk) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.onChange = this.state.onPromosChange.bind(this.state)
+  }
 
   get(): ListPage<OrderPromotion> {
     return this.promos

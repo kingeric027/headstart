@@ -36,11 +36,11 @@ namespace ordercloud.integrations.library
         /// <summary>
         /// Overload for when you don't need to pass back an object
         /// </summary>
-        public static void That(bool condition, ErrorCode errorCode)
+        public static void That(bool condition, ErrorCode errorCode, object data = null)
         {
             if (!condition)
             {
-                throw new OrderCloudIntegrationException(errorCode, null);
+                throw new OrderCloudIntegrationException(errorCode, data);
             }
         }
 

@@ -9,7 +9,7 @@ import { MarketplaceUserGroup } from '@ordercloud/headstart-sdk'
 
 function createBuyerCatalogForm(userGroup: MarketplaceUserGroup) {
   return new FormGroup({
-    Name: new FormControl(userGroup.Name, Validators.required),
+    Name: new FormControl(userGroup?.Name, Validators.required),
   })
 }
 

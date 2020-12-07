@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core'
-import { HeadStartSDK } from '@ordercloud/headstart-sdk'
+import { HeadStartSDK, JDocument } from '@ordercloud/headstart-sdk'
 import { AppConfig } from '../../shopper-context'
 
 @Injectable({
   providedIn: 'root',
 })
 export class StaticPageService {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pages: any[] = [] // TODO: add PageDocument type to cms library so this is strongly typed
+  pages: JDocument[] = []
 
   constructor(public appConfig: AppConfig) {}
 

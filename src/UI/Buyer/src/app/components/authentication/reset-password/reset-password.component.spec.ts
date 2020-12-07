@@ -1,19 +1,15 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { InjectionToken } from '@angular/core';
 import { of } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 
-import { ResetPasswordComponent } from 'src/app/ocm-default-components/components/reset-password/reset-password.component';
-import { applicationConfiguration, AppConfig } from 'src/app/config/app.config';
-
-import { OcPasswordResetService } from '@ordercloud/angular-sdk';
 import { ToastrService } from 'ngx-toastr';
+import { OCMResetPassword } from './reset-password.component';
 
-describe('ResetPasswordComponent', () => {
-  let component: ResetPasswordComponent;
-  let fixture: ComponentFixture<ResetPasswordComponent>;
+describe('OCMResetPassword', () => {
+  let component: OCMResetPassword;
+  let fixture: ComponentFixture<OCMResetPassword>;
 
   const router = { navigateByUrl: jasmine.createSpy('navigateByUrl') };
   const ocPasswordService = {
@@ -31,23 +27,18 @@ describe('ResetPasswordComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResetPasswordComponent],
+      declarations: [OCMResetPassword],
       imports: [ReactiveFormsModule, HttpClientModule],
       providers: [
-        { provide: OcPasswordResetService, useValue: ocPasswordService },
         { provide: Router, useValue: router },
         { provide: ActivatedRoute, useValue: activatedRoute },
         { provide: ToastrService, useValue: toastrService },
-        {
-          provide: applicationConfiguration,
-          useValue: new InjectionToken<AppConfig>('app.config'),
-        },
       ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResetPasswordComponent);
+    fixture = TestBed.createComponent(OCMResetPassword);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -65,7 +56,6 @@ describe('ResetPasswordComponent', () => {
         passwordConfirm: '',
       });
       expect(component.username).toEqual(activatedRoute.snapshot.queryParams.user);
-      expect(component.resetCode).toEqual(activatedRoute.snapshot.queryParams.code);
     });
   });
   describe('onSubmit', () => {

@@ -38,6 +38,7 @@ namespace Marketplace.Models
         public string PaymentMethod { get; set; }
         public MarketplaceAddressBuyer ShippingAddress { get; set; }
         public List<ShipMethodSupplierView> SelectedShipMethodsSupplierView { get; set; }
+        public bool? IsResubmitting { get; set; }
     }
 
     [SwaggerModel]
