@@ -174,6 +174,8 @@ namespace ordercloud.integrations.cms
 					StorageHelper.UploadImage(container, $"{asset.id}-m", medium),
 					StorageHelper.UploadImage(container, $"{asset.id}-s", small)
 				});
+				small.Dispose();
+				medium.Dispose();
 			}
 			return asset;
 		}
