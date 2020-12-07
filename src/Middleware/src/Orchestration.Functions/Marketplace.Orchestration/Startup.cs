@@ -12,6 +12,7 @@ using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using Marketplace.Common.Services;
+using Flurl.Http.Configuration;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -43,7 +44,6 @@ namespace Marketplace.Orchestration
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
-                .Inject<IFlurlClient>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl,
@@ -55,6 +55,7 @@ namespace Marketplace.Orchestration
                         ApiRole.FullAccess
                     }
                 })
+                .AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>()
                 .AddSingleton<CMSConfig>(x => cmsConfig)
                 .Inject<IAssetQuery>()
                 .Inject<IAssetedResourceQuery>()
