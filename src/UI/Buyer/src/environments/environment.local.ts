@@ -63,7 +63,7 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://api-test.sebvendorportal.com',
+        : 'https://middleware-api-test.sebvendorportal.com',
     cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
     creditCardIframeUrl: 
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
@@ -84,7 +84,7 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://api-test.sebvendorportal.com',
+        : 'https://middleware-api-test.sebvendorportal.com',
     cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
@@ -105,7 +105,7 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://api-test.sebvendorportal.com',
+        : 'https://middleware-api-test.sebvendorportal.com',
     cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,      
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
@@ -126,7 +126,7 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://api-test.sebvendorportal.com',
+        : 'https://middleware-api-test.sebvendorportal.com',
     cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',

@@ -11,7 +11,7 @@ export const environment: Environment = {
   clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
   marketplaceID: 'SEB',
   baseUrl: 'https://anytimefitness.sebvendorportal.com',
-  middlewareUrl: 'https://api.sebvendorportal.com',
+  middlewareUrl: 'https://middleware-api.sebvendorportal.com',
   cmsUrl: 'https://ordercloud-cms.azurewebsites.net',  
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:

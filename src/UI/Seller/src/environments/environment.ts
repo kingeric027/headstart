@@ -41,7 +41,7 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://api-test.sebvendorportal.com',
+        : 'https://middleware-api-test.sebvendorportal.com',
     cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Marketplace Admin Local',
     translateBlobUrl:

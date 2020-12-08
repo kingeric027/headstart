@@ -7,7 +7,7 @@ export const environment: Environment = {
   hostedApp: true,
   clientID: 'C1D92C43-C7AF-467B-B3DF-D4751D70CAE6',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
-  middlewareUrl: 'https://api-staging.sebvendorportal.com',
+  middlewareUrl: 'https://middleware-api-staging.sebvendorportal.com',
   cmsUrl: 'https://ordercloud-cms-staging.azurewebsites.net',
   appname: 'Marketplace Admin Staging',
   translateBlobUrl:
