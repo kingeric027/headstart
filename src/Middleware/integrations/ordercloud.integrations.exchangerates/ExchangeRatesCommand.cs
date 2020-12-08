@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using Newtonsoft.Json;
+using Flurl.Http.Configuration;
 
 namespace ordercloud.integrations.exchangerates
 {
@@ -28,20 +29,16 @@ namespace ordercloud.integrations.exchangerates
         private readonly IOrderCloudIntegrationsExchangeRatesClient _client;
         private readonly IOrderCloudIntegrationsBlobService _blob;
 
-        public ExchangeRatesCommand() : this(new BlobServiceConfig())
-        {
-            _client = new OrderCloudIntegrationsExchangeRatesClient();
-        }
 
-        public ExchangeRatesCommand(BlobServiceConfig config)
+        public ExchangeRatesCommand(BlobServiceConfig config, IFlurlClientFactory flurlFactory)
         {
-            _client = new OrderCloudIntegrationsExchangeRatesClient();
+            _client = new OrderCloudIntegrationsExchangeRatesClient(flurlFactory);
             _blob = new OrderCloudIntegrationsBlobService(config);
         }
 
-        public ExchangeRatesCommand(IOrderCloudIntegrationsBlobService blob)
+        public ExchangeRatesCommand(IOrderCloudIntegrationsBlobService blob, IFlurlClientFactory flurlFactory)
         {
-            _client = new OrderCloudIntegrationsExchangeRatesClient();
+            _client = new OrderCloudIntegrationsExchangeRatesClient(flurlFactory);
             _blob = blob;
         }
 
