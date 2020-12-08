@@ -12,7 +12,7 @@ export const environment: Environment = {
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
   marketplaceID: 'SEB_TEST',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
-  middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  middlewareUrl: 'https://middleware-api-test.sebvendorportal.com',
   cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',

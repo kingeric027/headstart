@@ -20,6 +20,7 @@ using SendGrid.Helpers.Mail;
 using System.Dynamic;
 using NSubstitute.Extensions;
 using AutoFixture;
+using SendGrid;
 
 namespace Marketplace.Tests
 {
@@ -27,6 +28,7 @@ namespace Marketplace.Tests
     {
         private IOrderCloudClient _oc;
         private AppSettings _settings;
+        private ISendGridClient _sendGridClient;
         private ISendgridService _command;
         private const string ORDER_SUBMIT_TEMPLATE_ID = "order_submit_template_id";
         private const string LINE_ITEM_STATUS_CHANGE = "line_item_status_change";
@@ -41,7 +43,9 @@ namespace Marketplace.Tests
         {
             _oc = Substitute.For<IOrderCloudClient>();
             _settings = Substitute.For<AppSettings>();
-            _command = new SendgridService(_settings, _oc);
+            _sendGridClient = Substitute.For<ISendGridClient>();
+
+            _command = new SendgridService(_settings, _oc, _sendGridClient);
         }
 
         public class TestConstants
@@ -81,7 +85,7 @@ namespace Marketplace.Tests
             _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier2ID}").Returns(GetSupplierWorksheet(TestConstants.supplier2ID, TestConstants.lineItem2ID, TestConstants.lineItem2Total));
             _oc.Suppliers.ListAsync<MarketplaceSupplier>(Arg.Any<string>()).ReturnsForAnyArgs(Task.FromResult(GetSupplierList()));
             _oc.AdminUsers.ListAsync<MarketplaceSellerUser>().ReturnsForAnyArgs(Task.FromResult(GetSellerUserList()));
-            var _commandSub = Substitute.ForPartsOf<SendgridService>(_settings, _oc);
+            var _commandSub = Substitute.ForPartsOf<SendgridService>(_settings, _oc, _sendGridClient);
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmailMultipleRcpts(default, default, default, default)).DoNotCallBase();
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmail(default, default, default, default)).DoNotCallBase();
 
