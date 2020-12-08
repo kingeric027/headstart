@@ -129,8 +129,14 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{templateID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliTemplate> Get(string templateID)
         {
-            var result = await _command.Get(templateID, this.VerifiedUserContext);
-            return result;
+            return await _command.Get(templateID, this.VerifiedUserContext);
+        }
+
+        [DocName("Get a Chili Template")]
+        [HttpGet, Route("me/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<MeChiliTemplate> GetMe(string templateID)
+        {
+            return await _command.GetMe(templateID, this.VerifiedUserContext);
         }
     }
 
