@@ -198,7 +198,7 @@ export class OCMCheckout implements OnInit {
     try {
       const payment = this.orderSummaryMeta.StandardLineItemCount
         ? this.getCCPaymentData()
-        : null
+        : {}
       const order = await HeadStartSDK.Orders.Submit(
         'Outgoing',
         this.order.ID,
