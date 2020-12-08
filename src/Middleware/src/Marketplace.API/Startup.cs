@@ -32,6 +32,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Flurl.Http.Configuration;
 using System.Net;
+using SendGrid;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
 
@@ -135,6 +136,8 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
+                .Inject<IOrderCloudIntegrationsTecraService>()
+                .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -162,8 +165,7 @@ namespace Marketplace.API
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings, flurlClientFactory))
                 .AddSingleton<OrderCloudTecraConfig>(x => tecraConfig)
-                .Inject<IOrderCloudIntegrationsTecraService>()
-                .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
+                .AddSingleton<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = _settings.OrderCloudSettings.ApiUrl,
