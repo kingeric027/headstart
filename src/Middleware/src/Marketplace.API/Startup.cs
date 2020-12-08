@@ -29,6 +29,9 @@ using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
 using LazyCache;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using System.Net;
 
 namespace Marketplace.API
 {
@@ -135,6 +138,7 @@ namespace Marketplace.API
                     }
                 ))
                 .AddSingleton<CMSConfig>(x => cmsConfig)
+                .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient>()
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
@@ -169,6 +173,8 @@ namespace Marketplace.API
                 EnableAdaptiveSampling = false, // retain all data
                 InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
             });
+
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
