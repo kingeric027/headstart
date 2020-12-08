@@ -45,7 +45,14 @@ export class AddressService {
   async listBuyerLocations(
     args: ListArgs = {}
   ): Promise<ListPage<MarketplaceAddressBuyer>> {
-    args.filters = { ...args.filters, Editable: 'false' }
+    args.filters = { ...args.filters, Editable: 'false' };
+    return await this.list(args)
+  }
+
+  async listShippingAddresses(
+    args: ListArgs = {}
+  ): Promise<ListPage<MarketplaceAddressBuyer>> {
+    args.filters = { ...args.filters, Shipping: 'true' };
     return await this.list(args)
   }
 
