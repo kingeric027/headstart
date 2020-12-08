@@ -6,7 +6,7 @@ export const getPrimaryImageUrl = (
   product: MarketplaceMeProduct,
   user: CurrentUser
 ): string => {
-  return `${ocAppConfig.middlewareUrl}/assets/${user.Seller.ID}/products/${product.ID}/thumbnail?size=M`
+  return `${ocAppConfig.cmsUrl}/assets/${user.Seller.ID}/products/${product.ID}/thumbnail?size=M`
 }
 
 export const getPrimaryLineItemImage = (

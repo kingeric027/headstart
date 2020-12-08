@@ -64,7 +64,8 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://marketplace-middleware-test.azurewebsites.net',
-    creditCardIframeUrl:
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
+    creditCardIframeUrl: 
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
       'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
@@ -84,6 +85,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://marketplace-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -104,6 +106,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://marketplace-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,      
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -124,6 +127,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://marketplace-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -144,6 +148,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://headstartdemo-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -164,6 +169,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://fastsigns-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -184,6 +190,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://go2partners-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net' ,  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -204,6 +211,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://brandweardesigns-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:

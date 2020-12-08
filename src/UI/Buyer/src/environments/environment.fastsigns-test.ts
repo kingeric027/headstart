@@ -8,6 +8,7 @@ export const environment: Environment = {
   clientID: '3B7CD2F7-36D8-4DC4-9616-0CB1C86C9FB3',
   marketplaceID: 'FS_TEST',
   baseUrl: 'https://fastsigns-buyer-ui-test.azurewebsites.net/',
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
   middlewareUrl: 'https://fastsigns-middleware-test.azurewebsites.net',
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
