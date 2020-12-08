@@ -9,6 +9,7 @@ export const environment: Environment = {
   marketplaceID: 'GO2_TEST',
   baseUrl: 'https://go2partners-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://go2partners-middleware-test.azurewebsites.net',
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   instrumentationKey: '38f23bfa-b9af-4670-8441-4376ced20620',

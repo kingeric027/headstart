@@ -12,6 +12,7 @@ export const environment: Environment = {
   marketplaceID: 'SEB',
   baseUrl: 'https://anytimefitness.sebvendorportal.com',
   middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  cmsUrl: 'https://ordercloud-cms.azurewebsites.net',  
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:
     'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',

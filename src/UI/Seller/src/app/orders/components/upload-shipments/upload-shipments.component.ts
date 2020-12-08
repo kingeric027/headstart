@@ -13,6 +13,7 @@ import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { getPsHeight } from '@app-seller/shared/services/dom.helper'
 import { BatchProcessResult } from './shipment-upload.interface'
 import { NgxSpinnerService } from 'ngx-spinner'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 @Component({
   selector: 'upload-shipments',
@@ -139,7 +140,7 @@ export class UploadShipmentsComponent {
       asset,
       accessToken
     )
-    await HeadStartSDK.Assets.SaveAssetAssignment(
+    await ContentManagementClient.Assets.SaveAssetAssignment(
       { ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID },
       accessToken
     )

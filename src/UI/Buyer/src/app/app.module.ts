@@ -201,6 +201,7 @@ import { RouteService } from './services/route/route.service'
 import { ShopperContextService } from './services/shopper-context/shopper-context.service'
 import { TempSdk } from './services/temp-sdk/temp-sdk.service'
 import { TokenHelperService } from './services/token-helper/token-helper.service'
+import { CMSConfiguration } from './services/cms-api/cms-utils'
 
 export function HttpLoaderFactory(
   http: HttpClient,
@@ -422,6 +423,9 @@ export class AppModule {
   ) {
     MktpConfiguration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
+    })
+    CMSConfiguration.Set({
+      baseApiUrl: this.appConfig.cmsUrl
     })
     Configuration.Set(this.getOrdercloudSDKConfig(appConfig))
     translate.setDefaultLang('en')

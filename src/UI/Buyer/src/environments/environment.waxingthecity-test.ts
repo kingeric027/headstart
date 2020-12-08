@@ -13,6 +13,7 @@ export const environment: Environment = {
   marketplaceID: 'SEB_TEST',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://marketplace-middleware-test.azurewebsites.net',
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:

@@ -3,6 +3,7 @@ export interface Environment {
   sellerID: string
   clientID: string
   middlewareUrl: string
+  cmsUrl: string
   appname: string
   translateBlobUrl: string
   blobStorageUrl: string

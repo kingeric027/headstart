@@ -7,6 +7,7 @@ export const ocAppConfig: AppConfig = {
   clientID: environment.clientID,
   sellerID: environment.sellerID,
   middlewareUrl: environment.middlewareUrl,
+  cmsUrl: environment.cmsUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
   orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
@@ -134,7 +135,7 @@ export interface AppConfig {
    * base path to middleware
    */
   middlewareUrl: string
-
+  cmsUrl: string
   translateBlobUrl: string
   blobStorageUrl: string
 
