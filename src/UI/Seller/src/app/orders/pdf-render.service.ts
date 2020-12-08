@@ -92,10 +92,8 @@ export class PDFService {
       const imgData = canvas.toDataURL('image/png')
       pdf.addImage(imgData, 'PNG', 20, 20, 170, 170 / aspectRatio)
       pdf.save(orderID + '.pdf')
+    } finally {
       this.removeNodesOfClass(document, 'hidden-print-area')
-    } catch(e) {
-      this.removeNodesOfClass(document, 'hidden-print-area')
-      throw e;
     }
 
   }
