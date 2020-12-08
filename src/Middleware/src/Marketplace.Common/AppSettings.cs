@@ -41,6 +41,7 @@ namespace Marketplace.Common
     public class EnvironmentSettings
     {
         public string BaseUrl { get; set; }
+        public int AppTimeoutInSeconds { get; set; }
 	}
 
     public class ApplicationInsightsSettings

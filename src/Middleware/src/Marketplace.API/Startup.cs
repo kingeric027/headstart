@@ -50,8 +50,12 @@ namespace Marketplace.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
-              _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
+			var cosmosConfig = new CosmosConfig(
+                _settings.CosmosSettings.DatabaseName,
+                _settings.CosmosSettings.EndpointUri,
+                _settings.CosmosSettings.PrimaryKey,
+                _settings.EnvironmentSettings.AppTimeoutInSeconds
+            );
 
             var avalaraConfig = new AvalaraConfig()
 			{
@@ -181,7 +185,9 @@ namespace Marketplace.API
                 InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
             });
 
+
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+            FlurlHttp.Configure(settings => settings.Timeout = TimeSpan.FromSeconds(_settings.EnvironmentSettings.AppTimeoutInSeconds));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
