@@ -54,7 +54,13 @@ namespace Marketplace.API
                 _settings.CosmosSettings.DatabaseName,
                 _settings.CosmosSettings.EndpointUri,
                 _settings.CosmosSettings.PrimaryKey,
-                _settings.EnvironmentSettings.AppTimeoutInSeconds
+                _settings.CosmosSettings.RequestTimeoutInSeconds,
+                _settings.CosmosSettings.MaxConnectionLimit,
+                _settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
+                _settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
+                _settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
+                _settings.CosmosSettings.MaxRequestsPerTcpConnection,
+                _settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
             );
 
             var avalaraConfig = new AvalaraConfig()
@@ -187,7 +193,7 @@ namespace Marketplace.API
 
 
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;
-            FlurlHttp.Configure(settings => settings.Timeout = TimeSpan.FromSeconds(_settings.EnvironmentSettings.AppTimeoutInSeconds));
+            FlurlHttp.Configure(settings => settings.Timeout = TimeSpan.FromSeconds(_settings.FlurlSettings.TimeoutInSeconds));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
