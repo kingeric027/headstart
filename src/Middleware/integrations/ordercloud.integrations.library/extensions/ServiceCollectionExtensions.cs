@@ -54,7 +54,14 @@ namespace ordercloud.integrations.library
                 new ConnectionPolicy
                 {
                     ConnectionProtocol = Protocol.Tcp,
-                    ConnectionMode = ConnectionMode.Direct
+                    ConnectionMode = ConnectionMode.Direct,
+                    RequestTimeout = config.RequestTimeout,
+                    MaxConnectionLimit = config.MaxConnectionLimit,
+                    IdleTcpConnectionTimeout = config.IdleTcpConnectionTimeout,
+                    OpenTcpConnectionTimeout = config.OpenTcpConnectionTimeoutInSeconds,
+                    MaxTcpConnectionsPerEndpoint = config.MaxTcpConnectionsPerEndpoint,
+                    MaxRequestsPerTcpConnection = config.MaxRequestsPerTcpConnection,
+                    EnableTcpConnectionEndpointRediscovery = config.EnableTcpConnectionEndpointRediscovery
                 }, defaultCollectionThroughput: 400)
             {
                 UniqueKeyPolicy = new UniqueKeyPolicy()

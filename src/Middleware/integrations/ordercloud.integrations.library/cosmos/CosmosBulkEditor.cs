@@ -40,7 +40,14 @@ namespace ordercloud.integrations.library
             client = new DocumentClient(new Uri(config.EndpointUri), config.PrimaryKey, new ConnectionPolicy
             {
                 ConnectionMode = ConnectionMode.Direct,
-                ConnectionProtocol = Protocol.Tcp
+                ConnectionProtocol = Protocol.Tcp,
+                RequestTimeout = config.RequestTimeout,
+                MaxConnectionLimit = config.MaxConnectionLimit,
+                IdleTcpConnectionTimeout = config.IdleTcpConnectionTimeout,
+                OpenTcpConnectionTimeout = config.OpenTcpConnectionTimeoutInSeconds,
+                MaxTcpConnectionsPerEndpoint = config.MaxTcpConnectionsPerEndpoint,
+                MaxRequestsPerTcpConnection = config.MaxRequestsPerTcpConnection,
+                EnableTcpConnectionEndpointRediscovery = config.EnableTcpConnectionEndpointRediscovery
             });
         }
 
