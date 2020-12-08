@@ -193,7 +193,7 @@ namespace Marketplace.Common.Commands
 					ApiRole.FullAccess
 				}
 			};
-			return await new VerifiedUserContext().Define(ocConfig);
+			return await new VerifiedUserContext(_oc).Define(ocConfig);
 		}
 
 		private async Task CreateContentDocSchemas(VerifiedUserContext userContext)

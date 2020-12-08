@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 
 namespace ordercloud.integrations.exchangerates
 {
@@ -15,12 +16,9 @@ namespace ordercloud.integrations.exchangerates
     {
         private readonly IFlurlClient _flurl;
 
-        public OrderCloudIntegrationsExchangeRatesClient()
+        public OrderCloudIntegrationsExchangeRatesClient(IFlurlClientFactory flurlFactory)
         {
-            _flurl = new FlurlClient
-            {
-                BaseUrl = $"https://api.exchangeratesapi.io/"
-            };
+            _flurl = flurlFactory.Get($"https://api.exchangeratesapi.io/");
         }
 
         private IFlurlRequest Request(string resource)

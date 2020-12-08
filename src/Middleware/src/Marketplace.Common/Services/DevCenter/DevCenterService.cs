@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 using Marketplace.Common.Services.DevCenter.Models;
 using OrderCloud.SDK;
 
@@ -19,10 +20,10 @@ namespace Marketplace.Common.Services.DevCenter
         private readonly IFlurlClient _client;
         private readonly AppSettings _settings;
 
-        public DevCenterService(AppSettings settings)
+        public DevCenterService(AppSettings settings, IFlurlClientFactory flurlFactory)
         {
             _settings = settings;
-            _client = new FlurlClient($"{settings.OrderCloudSettings.DevcenterApiUrl}/api/v1/");
+            _client = flurlFactory.Get($"{settings.OrderCloudSettings.DevcenterApiUrl}/api/v1/");
         }
 
         public async Task<DevCenterUser> GetMe(string token)
