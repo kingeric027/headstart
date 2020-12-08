@@ -31,6 +31,9 @@ using LazyCache;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Flurl.Http.Configuration;
+using System.Net;
+using SmartyStreets;
+using SmartyStreets.USStreetApi;
 
 namespace Marketplace.API
 {
@@ -79,6 +82,7 @@ namespace Marketplace.API
             };
 
             var flurlClientFactory = new PerBaseUrlFlurlClientFactory();
+            var smartyStreetsUsClient = new ClientBuilder().BuildUsStreetApiClient();
 
             services
                 .AddLazyCache()
@@ -141,16 +145,14 @@ namespace Marketplace.API
                     }
                 ))
                 .AddSingleton<CMSConfig>(x => cmsConfig)
+                .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
-                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
+                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings, flurlClientFactory))
                 .AddSingleton<OrderCloudTecraConfig>(x => tecraConfig)
                 .Inject<IOrderCloudIntegrationsTecraService>()
-                .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
-                .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations")
-                .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
                 .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
@@ -169,11 +171,17 @@ namespace Marketplace.API
                 })
                 .AddAuthentication();
 
-
-            services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
+            var serviceProvider = services.BuildServiceProvider();
+            services
+                .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
+                .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations", opts => opts.OrderCloudClient = serviceProvider.GetService<IOrderCloudClient>())
+                .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
+                .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
                 EnableAdaptiveSampling = false, // retain all data
                 InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
             });
+
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
