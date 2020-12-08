@@ -20,6 +20,13 @@ namespace ordercloud.integrations.library
             _oc = oc;
         }
 
+        /// <summary>
+        /// This method is not for regular use. If you are attempting to use it for any reason consult the project lead
+        /// If you need the context of an authenticated user ensure you're using a valid OrderCloudIntegrationsAuth attribute
+        /// and reference the VerifiedUserContext from the BaseController
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public async Task<VerifiedUserContext> Define(OrderCloudClientConfig config)
         {
             var auth = await _oc.AuthenticateAsync();
