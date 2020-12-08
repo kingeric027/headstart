@@ -24,13 +24,13 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
 using LazyCache;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Flurl.Http.Configuration;
 using System.Net;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
@@ -50,9 +50,18 @@ namespace Marketplace.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
-              _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
-
+			var cosmosConfig = new CosmosConfig(
+                _settings.CosmosSettings.DatabaseName,
+                _settings.CosmosSettings.EndpointUri,
+                _settings.CosmosSettings.PrimaryKey,
+                _settings.CosmosSettings.RequestTimeoutInSeconds,
+                _settings.CosmosSettings.MaxConnectionLimit,
+                _settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
+                _settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
+                _settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
+                _settings.CosmosSettings.MaxRequestsPerTcpConnection,
+                _settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+            );
 
             var avalaraConfig = new AvalaraConfig()
 			{
@@ -65,9 +74,12 @@ namespace Marketplace.API
 			var cmsConfig = new CMSConfig()
 			{
 				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
-				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
-				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
-			};
+				BlobStorageHostUrl = _settings.BlobSettings.HostUrl
+            };
+            var tecraConfig = _settings.TecraSettings;
+            tecraConfig.BlobStorageHostUrl = _settings.BlobSettings.HostUrl;
+            tecraConfig.BlobStorageConnectionString = _settings.BlobSettings.ConnectionString;
+
             var currencyConfig = new BlobServiceConfig()
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
@@ -97,7 +109,6 @@ namespace Marketplace.API
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
-                .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
@@ -105,6 +116,8 @@ namespace Marketplace.API
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
+                .Inject<IOrderCommand>()
+                .Inject<IOrderSubmitCommand>()
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IMarketplaceProductCommand>()
                 .Inject<ILineItemCommand>()
@@ -113,7 +126,6 @@ namespace Marketplace.API
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
                 .Inject<IDocumentQuery>()
-                .Inject<IBlobStorage>()
                 .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
@@ -123,7 +135,7 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
-                .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
+                .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
@@ -179,7 +191,9 @@ namespace Marketplace.API
                 InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
             });
 
+
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+            FlurlHttp.Configure(settings => settings.Timeout = TimeSpan.FromSeconds(_settings.FlurlSettings.TimeoutInSeconds));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

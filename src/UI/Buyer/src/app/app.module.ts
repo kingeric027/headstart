@@ -180,6 +180,27 @@ import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/
 import { Configuration, SdkConfiguration } from 'ordercloud-javascript-sdk'
 import { AppConfig, OrdercloudEnv } from './shopper-context'
 import { Configuration as MktpConfiguration } from '@ordercloud/headstart-sdk'
+import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve'
+import { MeProductResolver } from './resolves/me.product.resolve'
+import { ChiliTemplateResolver } from './resolves/chili-template.resolve'
+import { AuthService } from './services/auth/auth.service'
+import { CreditCardService } from './services/current-user/credit-card.service'
+import { CurrentUserService } from './services/current-user/current-user.service'
+import { ExchangeRatesService } from './services/exchange-rates/exchange-rates.service'
+import { OrderHistoryService } from './services/order-history/order-history.service'
+import { OrdersToApproveStateService } from './services/order-history/order-to-approve-state.service'
+import { CartService } from './services/order/cart.service'
+import { CheckoutService } from './services/order/checkout.service'
+import { OrderStateService } from './services/order/order-state.service'
+import { CurrentOrderService } from './services/order/order.service'
+import { PaymentHelperService } from './services/payment-helper/payment-helper.service'
+import { PDFService } from './services/pdf-render/pdf-render.service'
+import { ProductFilterService } from './services/product-filter/product-filter.service'
+import { ReorderHelperService } from './services/reorder/reorder.service'
+import { RouteService } from './services/route/route.service'
+import { ShopperContextService } from './services/shopper-context/shopper-context.service'
+import { TempSdk } from './services/temp-sdk/temp-sdk.service'
+import { TokenHelperService } from './services/token-helper/token-helper.service'
 
 export function HttpLoaderFactory(
   http: HttpClient,
@@ -361,6 +382,28 @@ const components = [
     NgbModule,
   ],
   providers: [
+    MeListAddressResolver,
+    MeListBuyerLocationResolver,
+    MeProductResolver,
+    AuthService,
+    CreditCardService,
+    CurrentOrderService,
+    CurrentUserService,
+    ExchangeRatesService,
+    OrderHistoryService,
+    OrdersToApproveStateService,
+    TempSdk,
+    PaymentHelperService,
+    PDFService,
+    ProductFilterService,
+    ReorderHelperService,
+    RouteService,
+    TokenHelperService,
+    CartService,
+    CheckoutService,
+    OrderStateService,
+    ShopperContextService,
+    ChiliTemplateResolver,
     { provide: AppConfig, useValue: ocAppConfig },
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },

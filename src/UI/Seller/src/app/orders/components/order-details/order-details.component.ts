@@ -97,6 +97,7 @@ export class OrderDetailsComponent {
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER
+    this.setOrderDirection()
   }
 
   setOrderProgress(order: MarketplaceOrder): void {
@@ -176,7 +177,7 @@ export class OrderDetailsComponent {
     return fullName.trim()
   }
 
-  getIncomingOrOutgoing(): void {
+  setOrderDirection(): void {
     const url = window.location.href
     if (url.includes('Outgoing')) {
       this.orderDirection = 'Outgoing'
@@ -196,28 +197,32 @@ export class OrderDetailsComponent {
   }
 
   isSupplierOrder(orderID: string): boolean {
-    return this.orderService.isSupplierOrder(orderID);
+    return this.orderService.isSupplierOrder(orderID)
   }
 
   async setData(order: Order): Promise<void> {
-    this._order = order;
-    if(this.isSupplierOrder(order.ID)){
-      const orderData = await this.middleware.getSupplierData(order.ID);
-      this._buyerOrder = orderData.BuyerOrder.Order;
-      this._lineItems = orderData.BuyerOrder.LineItems;
+    this._order = order
+    if (this.isSupplierOrder(order.ID)) {
+      const orderData = await this.middleware.getSupplierData(order.ID)
+      this._buyerOrder = orderData.BuyerOrder.Order
+      this._lineItems = orderData.BuyerOrder.LineItems
     } else {
-      this._buyerOrder = order;
+      this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)
     }
   }
 
   private async handleSelectedOrderChange(order: Order): Promise<void> {
-    await this.setData(order);
+    this.setOrderDirection()
+    await this.setData(order)
     this.orderAvatarInitials = !this.isQuoteOrder(order)
       ? `${this._buyerOrder?.FromUser?.FirstName?.slice(
           0,
           1
-        ).toUpperCase()}${this._buyerOrder?.FromUser?.LastName?.slice(0, 1).toUpperCase()}`
+        ).toUpperCase()}${this._buyerOrder?.FromUser?.LastName?.slice(
+          0,
+          1
+        ).toUpperCase()}`
       : `${order?.xp?.QuoteOrderInfo?.FirstName?.slice(
           0,
           1
@@ -226,7 +231,6 @@ export class OrderDetailsComponent {
           1
         ).toUpperCase()}`
     this.setOrderProgress(order)
-    this.getIncomingOrOutgoing()
     const paymentsResponse = await this.ocPaymentService
       .List(this.orderDirection, order.ID)
       .toPromise()

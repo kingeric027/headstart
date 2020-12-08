@@ -28,8 +28,18 @@ namespace Marketplace.Orchestration
                 .InjectAzureFunctionSettings<AppSettings>(connectionString)
                 .BindSettings<AppSettings>();
 
-            var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName,
-                settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
+            var cosmosConfig = new CosmosConfig(
+                settings.CosmosSettings.DatabaseName,
+                settings.CosmosSettings.EndpointUri,
+                settings.CosmosSettings.PrimaryKey,
+                settings.CosmosSettings.RequestTimeoutInSeconds,
+                settings.CosmosSettings.MaxConnectionLimit,
+                settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
+                settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
+                settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
+                settings.CosmosSettings.MaxRequestsPerTcpConnection,
+                settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+            );
             var cmsConfig = new CMSConfig()
             {
                 BaseUrl = settings.EnvironmentSettings.BaseUrl,

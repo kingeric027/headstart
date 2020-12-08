@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
     [SwaggerModel]
     public class ChiliTemplate
     {
-        public SuperMarketplaceProduct Product { get; set; }
+        public SuperMarketplaceMeProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
         public string Frame { get; set; }
@@ -115,7 +115,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpecOption> Get(string specID, string specOptionID, VerifiedUserContext user)
         {
-            return await _oc.Specs.GetOptionAsync<ChiliSpecOption>(specID, specOptionID, user.AccessToken);
+            return await _oc.Specs.GetOptionAsync<ChiliSpecOption>(specID, specOptionID);
         }
 
         public async Task<ListPage<ChiliSpecOption>> List(string specID, ListArgs<ChiliSpecOption> args, VerifiedUserContext user)
@@ -133,18 +133,18 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpecOption> Create(string specID, ChiliSpecOption specOption, VerifiedUserContext user)
         {
-            var result = await _oc.Specs.CreateOptionAsync<ChiliSpecOption>(specID, specOption, user.AccessToken);
+            var result = await _oc.Specs.CreateOptionAsync<ChiliSpecOption>(specID, specOption);
             return result;
         }
 
         public async Task<ChiliSpecOption> Update(string specID, string specOptionID, ChiliSpecOption specOption, VerifiedUserContext user)
         {
-            return await _oc.Specs.SaveOptionAsync<ChiliSpecOption>(specID, specOptionID, specOption, user.AccessToken);
+            return await _oc.Specs.SaveOptionAsync<ChiliSpecOption>(specID, specOptionID, specOption);
         }
 
         public async Task Delete(string specID, string specOptionID, VerifiedUserContext user)
         {
-            await _oc.Specs.DeleteOptionAsync(specID, specOptionID, user.AccessToken);
+            await _oc.Specs.DeleteOptionAsync(specID, specOptionID);
         }
     }
 
@@ -183,7 +183,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpec> Get(string specID, VerifiedUserContext user)
         {
-            return await _oc.Specs.GetAsync<ChiliSpec>(specID, user.AccessToken);
+            return await _oc.Specs.GetAsync<ChiliSpec>(specID);
         }
 
         public async Task<ListPage<ChiliSpec>> List(ListArgs<ChiliSpec> args, VerifiedUserContext user)
@@ -194,25 +194,24 @@ namespace Marketplace.Common.Commands
                 sortBy: args.SortBy.FirstOrDefault(),
                 filters: args.Filters.ToJRaw(),
                 search: args.Search,
-                searchOn: args.SearchOn,
-                accessToken: user.AccessToken);
+                searchOn: args.SearchOn);
             return list;
         }
 
         public async Task<ChiliSpec> Create(ChiliSpec spec, VerifiedUserContext user)
         {
-            var result = await _oc.Specs.CreateAsync<ChiliSpec>(spec, user.AccessToken);
+            var result = await _oc.Specs.CreateAsync<ChiliSpec>(spec);
             return result;
         }
 
         public async Task<ChiliSpec> Update(string specID, ChiliSpec spec, VerifiedUserContext user)
         {
-            return await _oc.Specs.SaveAsync<ChiliSpec>(specID, spec, user.AccessToken);
+            return await _oc.Specs.SaveAsync<ChiliSpec>(specID, spec);
         }
 
         public async Task Delete(string specID, VerifiedUserContext user)
         {
-            await _oc.Specs.DeleteAsync(specID, user.AccessToken);
+            await _oc.Specs.DeleteAsync(specID);
         }
     }
 
@@ -250,23 +249,23 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliConfig> Get(string configID, VerifiedUserContext user)
         {
-            return await _query.Get(configID, user.ClientID);
+            return await _query.Get(configID, _settings.ChiliPublishSettings.ClientId.ToLower());
         }
 
         public async Task<ListPage<ChiliConfig>> List(ListArgs<ChiliConfig> args, VerifiedUserContext user)
         {
-            return await _query.List(args, user.ClientID);
+            return await _query.List(args, _settings.ChiliPublishSettings.ClientId.ToLower());
         }
 
         public async Task<ChiliConfig> Save(ChiliConfig config, VerifiedUserContext user)
         {
-            config.OwnerClientID = user.ClientID;
-            return await _query.Save(config, user.ClientID);
+            config.OwnerClientID = _settings.ChiliPublishSettings.ClientId.ToLower();
+            return await _query.Save(config, _settings.ChiliPublishSettings.ClientId.ToLower());
         }
 
         public async Task Delete(string configID, VerifiedUserContext user)
         {
-            await _query.Delete(configID, user.ClientID);
+            await _query.Delete(configID, _settings.ChiliPublishSettings.ClientId.ToLower());
         }
     }
 
@@ -280,10 +279,10 @@ namespace Marketplace.Common.Commands
         private readonly AppSettings _settings;
         private readonly OrderCloudClientConfig _config;
         private readonly IOrderCloudClient _oc;
-        private readonly IMarketplaceProductCommand _product;
+        private readonly IMeProductCommand _product;
         private readonly ChiliPublishConfigQuery _query;
 
-        public ChiliTemplateCommand(AppSettings settings, IMarketplaceProductCommand product, ChiliPublishConfigQuery query)
+        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, ChiliPublishConfigQuery query)
         {
             _settings = settings;
             _product = product;
@@ -309,9 +308,9 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliTemplate> Get(string templateID, VerifiedUserContext user)
         {
-            var template = await _query.Get(templateID, user.ClientID);
+            var template = await _query.Get(templateID, _settings.ChiliPublishSettings.ClientId.ToLower());
             var product = await _product.Get(template.SupplierProductID, user);
-            var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s, user.AccessToken));
+            var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s));
 
             var result = new ChiliTemplate()
             {
