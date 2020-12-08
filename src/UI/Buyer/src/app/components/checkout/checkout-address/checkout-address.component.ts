@@ -144,10 +144,12 @@ export class OCMCheckoutAddress implements OnInit {
         page <= this.existingBuyerLocations.Meta.TotalPages;
         page++
       ) {
-        listOptions.page = page
+        listOptions.page = page;
+        // Hack to avoid page being mutated after the request has been added to the queue
+        const copiedListOptions = JSON.parse(JSON.stringify(listOptions));
         requests = [
           ...requests,
-          this.context.addresses.listBuyerLocations(listOptions),
+          this.context.addresses.listBuyerLocations(copiedListOptions),
         ]
       }
       return await Promise.all(requests).then((response) => {
@@ -173,9 +175,11 @@ export class OCMCheckoutAddress implements OnInit {
         page++
       ) {
         listOptions.page = page;
+        // Hack to avoid page being mutated after the request has been added to the queue
+        const copiedListOptions = JSON.parse(JSON.stringify(listOptions));
         requests = [
           ...requests,
-          this.context.addresses.listShippingAddresses(listOptions),
+          this.context.addresses.listShippingAddresses(copiedListOptions),
         ]
       }
       return await Promise.all(requests).then((response) => {
