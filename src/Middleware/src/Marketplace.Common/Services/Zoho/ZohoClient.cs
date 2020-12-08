@@ -22,9 +22,14 @@ namespace Marketplace.Common.Services.Zoho
     }
     public partial class ZohoClient
     {
-        private static readonly IFlurlClientFactory _clientFac = new PerBaseUrlFlurlClientFactory();
-        private IFlurlClient ApiClient => _clientFac.Get(Config.ApiUrl);
-        private static IFlurlClient AuthClient => _clientFac.Get("https://accounts.zoho.com/oauth/v2/");
+        private readonly IFlurlClientFactory _flurlFactory;
+        public ZohoClient(IFlurlClientFactory flurlFactory)
+        {
+            _flurlFactory = flurlFactory;
+        }
+
+        private IFlurlClient ApiClient => _flurlFactory.Get(Config.ApiUrl);
+        private IFlurlClient AuthClient => _flurlFactory.Get("https://accounts.zoho.com/oauth/v2/");
         public ZohoTokenResponse TokenResponse { get; set; }
 
         public bool IsAuthenticated => TokenResponse?.access_token != null;
