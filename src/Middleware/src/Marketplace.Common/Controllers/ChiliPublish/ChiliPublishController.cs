@@ -150,14 +150,14 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{configID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliConfig> Get(string configID)
         {
-            return await _command.Get(configID);
+            return await _command.Get(configID, this.VerifiedUserContext);
         }
 
         [DocName("List Chili Assignment")]
         [HttpGet, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ListPage<ChiliConfig>> List(ListArgs<ChiliConfig> args)
         {
-            return await _command.List(args);
+            return await _command.List(args, this.VerifiedUserContext);
         }
 
 		[DocName("Create a Chili Assignment")]
@@ -165,21 +165,21 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ChiliConfig> Create([FromBody] ChiliConfig config)
         {
-            return await _command.Save(config);
+            return await _command.Save(config, this.VerifiedUserContext);
         }
 
         [DocName("Update a Chili Assignment")]
         [HttpPut, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ChiliConfig> Update([FromBody] ChiliConfig config)
         {
-            return await _command.Save(config);
+            return await _command.Save(config, this.VerifiedUserContext);
         }
 
         [DocName("Delete a Chili Assignment")]
         [HttpDelete, Route("{configID}"), OrderCloudIntegrationsAuth]
         public async Task Delete(string configID)
         {
-            await _command.Delete(configID);
+            await _command.Delete(configID, this.VerifiedUserContext);
         }
 	}
 
