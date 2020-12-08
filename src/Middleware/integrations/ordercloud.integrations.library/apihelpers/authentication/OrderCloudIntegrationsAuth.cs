@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ordercloud.integrations.library.extensions;
 using OrderCloud.SDK;
+using Flurl.Http;
 
 namespace ordercloud.integrations.library
 {
@@ -62,7 +63,10 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
-                var user = await new OrderCloudClientWithContext(token).Me.GetAsync();
+                // TODO: winmark calls this from other oc environments so we cant use sdk
+                // remove once winmark uses cms api
+                //var user = await Options.OrderCloudClient.Me.GetAsync(token);
+                var user = await $"{jwt.GetApiUrl()}/v1/me".WithOAuthBearerToken(token).GetJsonAsync<MeUser>();
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));
@@ -102,6 +106,6 @@ namespace ordercloud.integrations.library
 
     public class OrderCloudIntegrationsAuthOptions : AuthenticationSchemeOptions
     {
-
+        public IOrderCloudClient OrderCloudClient { get; set; }
     }
 }

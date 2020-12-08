@@ -43,7 +43,7 @@ namespace Marketplace.Common.Commands
     [SwaggerModel]
     public class ChiliSpec : Spec<ChiliSpecXp, SpecOption>
     {
-        
+
     }
 
     [SwaggerModel]
@@ -77,7 +77,7 @@ namespace Marketplace.Common.Commands
         public string SpecID { get; set; }
     }
 
-    
+
     #endregion
 
     public interface IChiliSpecOptionCommand
@@ -189,12 +189,12 @@ namespace Marketplace.Common.Commands
         public async Task<ListPage<ChiliSpec>> List(ListArgs<ChiliSpec> args, VerifiedUserContext user)
         {
             var list = await _oc.Specs.ListAsync<ChiliSpec>(
-                page: args.Page, 
-                pageSize: args.PageSize, 
-                sortBy: args.SortBy.FirstOrDefault(), 
+                page: args.Page,
+                pageSize: args.PageSize,
+                sortBy: args.SortBy.FirstOrDefault(),
                 filters: args.Filters.ToJRaw(),
-                search: args.Search, 
-                searchOn: args.SearchOn, 
+                search: args.Search,
+                searchOn: args.SearchOn,
                 accessToken: user.AccessToken);
             return list;
         }
@@ -312,9 +312,9 @@ namespace Marketplace.Common.Commands
             var template = await _query.Get(templateID, user.ClientID);
             var product = await _product.Get(template.SupplierProductID, user);
             var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s, user.AccessToken));
-            
+
             var result = new ChiliTemplate()
-            {     
+            {
                 ChiliTemplateID = template.ChiliTemplateID,
                 Product = product,
                 TemplateSpecs = templateSpecs.ToList()

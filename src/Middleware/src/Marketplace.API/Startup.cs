@@ -24,13 +24,16 @@ using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
+using OrderCloud.AzureStorage;
 using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
 using System.Runtime.InteropServices;
 using LazyCache;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Flurl.Http.Configuration;
+using System.Net;
+using SmartyStreets;
+using SmartyStreets.USStreetApi;
 
 namespace Marketplace.API
 {
@@ -50,6 +53,7 @@ namespace Marketplace.API
 			var cosmosConfig = new CosmosConfig(_settings.CosmosSettings.DatabaseName,
               _settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey);
 
+
             var avalaraConfig = new AvalaraConfig()
 			{
 				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
@@ -61,12 +65,9 @@ namespace Marketplace.API
 			var cmsConfig = new CMSConfig()
 			{
 				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
-				BlobStorageHostUrl = _settings.BlobSettings.HostUrl
-            };
-            var tecraConfig = _settings.TecraSettings;
-            tecraConfig.BlobStorageHostUrl = _settings.BlobSettings.HostUrl;
-            tecraConfig.BlobStorageConnectionString = _settings.BlobSettings.ConnectionString;
-
+				BlobStorageHostUrl = _settings.BlobSettings.HostUrl,
+				BlobStorageConnectionString = _settings.BlobSettings.ConnectionString
+			};
             var currencyConfig = new BlobServiceConfig()
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
@@ -79,6 +80,7 @@ namespace Marketplace.API
             };
 
             var flurlClientFactory = new PerBaseUrlFlurlClientFactory();
+            var smartyStreetsUsClient = new ClientBuilder().BuildUsStreetApiClient();
 
             services
                 .AddLazyCache()
@@ -95,6 +97,7 @@ namespace Marketplace.API
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
+                .Inject<IFlurlClient>()
                 .Inject<IZohoClient>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
@@ -102,8 +105,6 @@ namespace Marketplace.API
                 .Inject<IOrchestrationLogCommand>()
                 .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
-                .Inject<IOrderCommand>()
-                .Inject<IOrderSubmitCommand>()
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IMarketplaceProductCommand>()
                 .Inject<ILineItemCommand>()
@@ -112,6 +113,7 @@ namespace Marketplace.API
                 .Inject<ISendgridService>()
                 .Inject<IAssetQuery>()
                 .Inject<IDocumentQuery>()
+                .Inject<IBlobStorage>()
                 .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
@@ -121,7 +123,7 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
-                .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
+                .AddSingleton<BlobService>((s) => new BlobService(_settings.BlobSettings.ConnectionString))
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
                     ApiUrl = "https://books.zoho.com/api/v3",
@@ -141,16 +143,14 @@ namespace Marketplace.API
                     }
                 ))
                 .AddSingleton<CMSConfig>(x => cmsConfig)
+                .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
-                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
+                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings, flurlClientFactory))
                 .AddSingleton<OrderCloudTecraConfig>(x => tecraConfig)
                 .Inject<IOrderCloudIntegrationsTecraService>()
-                .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
-                .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations")
-                .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
                 .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
@@ -169,11 +169,17 @@ namespace Marketplace.API
                 })
                 .AddAuthentication();
 
-
-            services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
+            var serviceProvider = services.BuildServiceProvider();
+            services
+                .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
+                .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations", opts => opts.OrderCloudClient = serviceProvider.GetService<IOrderCloudClient>())
+                .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
+                .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
                 EnableAdaptiveSampling = false, // retain all data
                 InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
             });
+
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
