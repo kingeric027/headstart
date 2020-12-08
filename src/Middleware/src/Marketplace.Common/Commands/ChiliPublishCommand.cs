@@ -116,13 +116,13 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpecOption> Get(string specID, string specOptionID)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             return await _oc.Specs.GetOptionAsync<ChiliSpecOption>(specID, specOptionID, _context.AccessToken);
         }
 
         public async Task<ListPage<ChiliSpecOption>> List(string specID, ListArgs<ChiliSpecOption> args)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             var list = await _oc.Specs.ListOptionsAsync<ChiliSpecOption>(specID,
                 page: args.Page,
                 pageSize: args.PageSize,
@@ -136,20 +136,20 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpecOption> Create(string specID, ChiliSpecOption specOption)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             var result = await _oc.Specs.CreateOptionAsync<ChiliSpecOption>(specID, specOption, _context.AccessToken);
             return result;
         }
 
         public async Task<ChiliSpecOption> Update(string specID, string specOptionID, ChiliSpecOption specOption)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             return await _oc.Specs.SaveOptionAsync<ChiliSpecOption>(specID, specOptionID, specOption, _context.AccessToken);
         }
 
         public async Task Delete(string specID, string specOptionID)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             await _oc.Specs.DeleteOptionAsync(specID, specOptionID, _context.AccessToken);
         }
 
@@ -191,13 +191,13 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpec> Get(string specID)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             return await _oc.Specs.GetAsync<ChiliSpec>(specID, _context.AccessToken);
         }
 
         public async Task<ListPage<ChiliSpec>> List(ListArgs<ChiliSpec> args)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             var list = await _oc.Specs.ListAsync<ChiliSpec>(
                 page: args.Page, 
                 pageSize: args.PageSize, 
@@ -211,20 +211,20 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliSpec> Create(ChiliSpec spec)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             var result = await _oc.Specs.CreateAsync<ChiliSpec>(spec, _context.AccessToken);
             return result;
         }
 
         public async Task<ChiliSpec> Update(string specID, ChiliSpec spec)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             return await _oc.Specs.SaveAsync<ChiliSpec>(specID, spec, _context.AccessToken);
         }
 
         public async Task Delete(string specID)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             await _oc.Specs.DeleteAsync(specID, _context.AccessToken);
         }
     }
@@ -243,11 +243,13 @@ namespace Marketplace.Common.Commands
         private readonly ChiliPublishConfigQuery _query;
         private readonly OrderCloudClientConfig _config;
         private VerifiedUserContext _context;
+        private readonly IOrderCloudClient _oc;
 
-        public ChiliConfigCommand(AppSettings settings, ChiliPublishConfigQuery query)
+        public ChiliConfigCommand(AppSettings settings, ChiliPublishConfigQuery query, IOrderCloudClient oc)
         {
             _settings = settings;
             _query = query;
+            _oc = oc;
             _config = new OrderCloudClientConfig
             {
                 AuthUrl = _settings.OrderCloudSettings.ApiUrl,
@@ -264,26 +266,26 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliConfig> Get(string configID)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             return await _query.Get(configID, _context.ClientID);
         }
 
         public async Task<ListPage<ChiliConfig>> List(ListArgs<ChiliConfig> args)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             return await _query.List(args, _context.ClientID);
         }
 
         public async Task<ChiliConfig> Save(ChiliConfig config)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             config.OwnerClientID = _context.ClientID;
             return await _query.Save(config, _context.ClientID);
         }
 
         public async Task Delete(string configID)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             await _query.Delete(configID, _context.ClientID);
         }
     }
@@ -328,7 +330,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<ChiliTemplate> Get(string templateID, VerifiedUserContext user)
         {
-            _context = await new VerifiedUserContext().Define(_config);
+            _context = await new VerifiedUserContext(_oc).Define(_config);
             var template = await _query.Get(templateID, _context.ClientID);
             var product = await _product.Get(template.SupplierProductID, _context);
             var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s, _context.AccessToken));

@@ -62,7 +62,7 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
-                var user = await new OrderCloudClientWithContext(token).Me.GetAsync();
+                var user = await Options.OrderCloudClient.Me.GetAsync();
                 if (!user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
                 cid.AddClaim(new Claim("username", user.Username));
@@ -102,6 +102,6 @@ namespace ordercloud.integrations.library
 
     public class OrderCloudIntegrationsAuthOptions : AuthenticationSchemeOptions
     {
-
+        public IOrderCloudClient OrderCloudClient { get; set; }
     }
 }
