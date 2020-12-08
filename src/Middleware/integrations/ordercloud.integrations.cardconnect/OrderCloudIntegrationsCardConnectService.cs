@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cardconnect
@@ -28,17 +29,10 @@ namespace ordercloud.integrations.cardconnect
         private readonly IFlurlClient _flurl;
         public OrderCloudIntegrationsCardConnectConfig Config { get; }
 
-        public OrderCloudIntegrationsCardConnectService() : this(new OrderCloudIntegrationsCardConnectConfig())
-        {
-        }
-
-        public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config)
+        public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config, IFlurlClientFactory flurlFactory)
         {
             Config = config;
-            _flurl = new FlurlClient
-            {
-                BaseUrl = $"https://{Config.Site}.{Config.BaseUrl}/"
-            };
+            _flurl = flurlFactory.Get($"https://{Config.Site}.{Config.BaseUrl}/");
         }
 
         private IFlurlRequest Request(string resource, string currency = null)

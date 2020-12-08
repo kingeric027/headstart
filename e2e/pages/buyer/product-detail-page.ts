@@ -6,6 +6,8 @@ class ProductDetailPage {
 	addToCartButton: Selector
 	requestQuoteButton: Selector
 	viewQuoteRequestButton: Selector
+	sizeDropdown: Selector
+	sizeOptions: Selector
 
 	constructor() {
 		this.addToCartButton = Selector('button').withText(
@@ -17,6 +19,8 @@ class ProductDetailPage {
 		this.viewQuoteRequestButton = Selector('button').withText(
 			createRegExp('view quote request')
 		)
+		this.sizeDropdown = Selector('#Size')
+		this.sizeOptions = this.sizeDropdown.find('option')
 	}
 
 	async clickAddToCartButton() {
@@ -30,6 +34,11 @@ class ProductDetailPage {
 	async clickViewQuoteRequestButton() {
 		await t.click(this.viewQuoteRequestButton)
 		await loadingHelper.thisWait()
+	}
+
+	async selectSizeVariant(sizeSelection: string) {
+		await t.click(this.sizeDropdown)
+		await t.click(this.sizeOptions.withText(createRegExp(sizeSelection)))
 	}
 }
 

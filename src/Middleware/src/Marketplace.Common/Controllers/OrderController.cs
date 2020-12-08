@@ -9,6 +9,7 @@ using ordercloud.integrations.library;
 using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Extended;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using ordercloud.integrations.cardconnect;
 
 namespace Marketplace.Common.Controllers
 {
@@ -19,11 +20,21 @@ namespace Marketplace.Common.Controllers
     {
         
         private readonly IOrderCommand _command;
+        private readonly IOrderSubmitCommand _orderSubmitCommand;
         private readonly ILineItemCommand _lineItemCommand;
-        public OrderController(IOrderCommand command, ILineItemCommand lineItemCommand, AppSettings settings) : base(settings)
+        public OrderController(IOrderCommand command, ILineItemCommand lineItemCommand, AppSettings settings, IOrderSubmitCommand orderSubmitCommand) : base(settings)
         {
             _command = command;
             _lineItemCommand = lineItemCommand;
+            _orderSubmitCommand = orderSubmitCommand;
+        }
+
+        [DocName("Submit Order")]
+        [DocComments("Performs validation, submits credit card payment and finally submits order via OrderCloud")]
+        [HttpPost, Route("{direction}/{orderID}/submit"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<MarketplaceOrder> Submit(OrderDirection direction, string orderID, [FromBody] OrderCloudIntegrationsCreditCardPayment payment)
+        {
+            return await _orderSubmitCommand.SubmitOrderAsync(orderID, direction, payment, VerifiedUserContext);
         }
 
         [DocName("POST Acknowledge Quote Order")]

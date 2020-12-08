@@ -23,6 +23,7 @@ namespace Marketplace.Common.Commands
         public string ErrorMessage { get; set; }
         public int Column { get; set; }
     }
+
     public class DocumentImportSummary
     {
         public int TotalCount { get; set; }
@@ -47,10 +48,12 @@ namespace Marketplace.Common.Commands
 
     }
 
+    [SwaggerModel]
     public class BatchProcessFailure
     {
         public Misc.Shipment Shipment { get; set; }
         public string Error { get; set; }
+
     }
 
     [SwaggerModel]
@@ -215,8 +218,32 @@ namespace Marketplace.Common.Commands
 
             return processResult;
 
-        }
+        }
 
+        private async void PatchOrderStatus(Order ocOrder, ShippingStatus shippingStatus, OrderStatus orderStatus)
+        {
+            var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, SubmittedOrderStatus = orderStatus } };
+
+            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, ocOrder.ID, partialOrder);
+        }
+
+        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
+        {
+            if (lineItemList == null || lineItemList?.Items?.Count < 1)
+            {
+                return false;
+            }
+
+            foreach(LineItem lineItem in lineItemList.Items)
+            {
+                if (lineItem.Quantity > lineItem.QuantityShipped)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, OrderCloudException ex)
         {
             BatchProcessFailure failure = new BatchProcessFailure();

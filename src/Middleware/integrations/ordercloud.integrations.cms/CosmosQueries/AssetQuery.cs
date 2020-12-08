@@ -31,18 +31,14 @@ namespace ordercloud.integrations.cms
 
 	public class AssetQuery : IAssetQuery
 	{
-		private readonly CMSConfig _config;
 		private readonly ICosmosStore<AssetDO> _assetStore;
 		private readonly IAssetContainerQuery _containers;
-		private readonly IBlobStorage _blob;
 		private static readonly string[] ValidImageFormats = new[] { "image/png", "image/jpg", "image/jpeg" };
 
-		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers, IBlobStorage blob, CMSConfig config)
+		public AssetQuery(ICosmosStore<AssetDO> assetStore, IAssetContainerQuery containers)
 		{
 			_assetStore = assetStore;
 			_containers = containers;
-			_blob = blob;
-			_config = config;
 		}
 
 		public async Task<ListPage<Asset>> List(ListArgs<Asset> args, VerifiedUserContext user)
@@ -57,19 +53,22 @@ namespace ordercloud.integrations.cms
 			var list = await query.WithPagination(arguments.Page, arguments.PageSize).ToPagedListAsync();
 			var count = await query.CountAsync();
 			var assets = list.ToListPage(arguments.Page, arguments.PageSize, count);
-			return AssetMapper.MapTo(_config, assets);
+			return AssetMapper.MapTo(container.Customer, assets);
 		}
 
 		public async Task<Asset> Get(string assetInteropID, VerifiedUserContext user)
-		{ 
-			return AssetMapper.MapTo(_config, await GetDO(assetInteropID, user));
+		{
+			var container = await _containers.CreateDefaultIfNotExists(user);
+			var asset = await GetWithoutExceptions(container.id, assetInteropID);
+			if (asset == null) { throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID); }
+			return AssetMapper.MapTo(container.Customer, asset);
 		}
 
 		public async Task<AssetDO> GetDO(string assetInteropID, VerifiedUserContext user)
 		{
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = await GetWithoutExceptions(container.id, assetInteropID);
-			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID);
+			if (asset == null) { throw new OrderCloudIntegrationException.NotFoundException("Asset", assetInteropID); }
 			return asset;
 		}
 
@@ -78,17 +77,17 @@ namespace ordercloud.integrations.cms
 			var container = await _containers.CreateDefaultIfNotExists(user);
 			var asset = AssetMapper.MapFromUpload(container, form);
 			var matchingID = await GetWithoutExceptions(container.id, asset.InteropID);
-			if (matchingID != null) throw new DuplicateIDException();
+			if (matchingID != null) { throw new DuplicateIDException(); }
 			if (form.File != null) {
 				if (asset.Type == AssetType.Image)
 				{
 					asset = await OpenImageAndUploadThumbs(container, asset, form);
 				}
-				await _blob.UploadAsset(container, asset.id, form.File);
+				await StorageHelper.UploadFile(container, asset.id, form.File);
 			}
 			asset.History = HistoryBuilder.OnCreate(user);
 			var newAsset = await _assetStore.AddAsync(asset);
-			return AssetMapper.MapTo(_config, newAsset);
+			return AssetMapper.MapTo(container.Customer, newAsset);
 		}
 
 		public async Task<Asset> Save(string assetInteropID, Asset asset, VerifiedUserContext user)
@@ -97,11 +96,15 @@ namespace ordercloud.integrations.cms
 			if (assetInteropID != asset.ID)
 			{
 				var matchingID = await GetWithoutExceptions(container.id, asset.ID);
-				if (matchingID != null) throw new DuplicateIDException();
+				if (matchingID != null) { 
+					throw new DuplicateIDException(); 
+				}
 			}
 			var existingAsset = await GetWithoutExceptions(container.id, assetInteropID);
 			if (existingAsset == null) {
-				if (asset.Url == null) throw new AssetCreateValidationException("If you are not uploading a file, you must include a Url");
+				if (asset.Url == null) { 
+					throw new AssetCreateValidationException("If you are not uploading a file, you must include a Url"); 
+				}
 				existingAsset = new AssetDO()
 				{
 					Type = asset.Type,
@@ -123,7 +126,7 @@ namespace ordercloud.integrations.cms
 
 			// Intentionally don't allow changing the type. Could mess with assignments.
 			var updatedAsset = await _assetStore.UpsertAsync(existingAsset);
-			return AssetMapper.MapTo(_config, updatedAsset);
+			return AssetMapper.MapTo(container.Customer, updatedAsset);
 		}
 
 		public async Task Delete(string assetInteropID, VerifiedUserContext user)
@@ -135,26 +138,25 @@ namespace ordercloud.integrations.cms
 			var small = Task.CompletedTask;
 			if (asset.Type == AssetType.Image)
 			{
-				medium = _blob.DeleteAsset(container, $"{asset.id}-m");
-				small = _blob.DeleteAsset(container, $"{asset.id}-s");
+				medium = StorageHelper.DeleteAsset(container, $"{asset.id}-m");
+				small = StorageHelper.DeleteAsset(container, $"{asset.id}-s");
 			}
-			await Task.WhenAll(medium, small, _blob.DeleteAsset(container, asset.id));
+			await Task.WhenAll(medium, small, StorageHelper.DeleteAsset(container, asset.id));
 		}
 
 		public async Task<ListPage<AssetDO>> ListByInternalIDs(IEnumerable<string> assetIDs, ListArgsPageOnly args)
 		{
-
 			return await _assetStore.FindMultipleAsync(assetIDs, args);
 		}
 
 		public async Task<AssetDO> GetByInternalID(string assetID)
 		{
 			var asset = await _assetStore.Query().FirstOrDefaultAsync(a => a.id == assetID);
-			if (asset == null) throw new OrderCloudIntegrationException.NotFoundException("Asset", assetID);
+			if (asset == null) { throw new OrderCloudIntegrationException.NotFoundException("Asset", assetID); }
 			return asset;
 		}
 
-		private async Task<AssetDO> OpenImageAndUploadThumbs(AssetContainerDO container, AssetDO asset, AssetUpload form)
+		private async Task<AssetDO> OpenImageAndUploadThumbs(AssetContainer container, AssetDO asset, AssetUpload form)
 		{
 			if (!ValidImageFormats.Contains(form.File.ContentType))
 			{
@@ -168,10 +170,17 @@ namespace ordercloud.integrations.cms
 				asset.Metadata.ImageVerticalResolution = (decimal)image.VerticalResolution;
 				var small = image.ResizeSmallerDimensionToTarget(100);
 				var medium = image.ResizeSmallerDimensionToTarget(300);
-				await Task.WhenAll(new[] {
-					_blob.UploadAsset(container, $"{asset.id}-m", medium),
-					_blob.UploadAsset(container, $"{asset.id}-s", small)
+				try
+				{
+					await Task.WhenAll(new[] {
+					StorageHelper.UploadImage(container, $"{asset.id}-m", medium),
+					StorageHelper.UploadImage(container, $"{asset.id}-s", small)
 				});
+				} finally
+				{
+					small.Dispose();
+					medium.Dispose();
+				}
 			}
 			return asset;
 		}

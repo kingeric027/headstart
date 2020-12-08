@@ -7,14 +7,12 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
-using Marketplace.Common.Commands.SupplierSync;
 using Microsoft.Extensions.DependencyInjection;
 using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using Marketplace.Common.Services;
-using NPOI.OpenXmlFormats.Wordprocessing;
+using Flurl.Http.Configuration;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -30,13 +28,22 @@ namespace Marketplace.Orchestration
                 .InjectAzureFunctionSettings<AppSettings>(connectionString)
                 .BindSettings<AppSettings>();
 
-            var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName,
-                settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
+            var cosmosConfig = new CosmosConfig(
+                settings.CosmosSettings.DatabaseName,
+                settings.CosmosSettings.EndpointUri,
+                settings.CosmosSettings.PrimaryKey,
+                settings.CosmosSettings.RequestTimeoutInSeconds,
+                settings.CosmosSettings.MaxConnectionLimit,
+                settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
+                settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
+                settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
+                settings.CosmosSettings.MaxRequestsPerTcpConnection,
+                settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+            );
             var cmsConfig = new CMSConfig()
             {
                 BaseUrl = settings.EnvironmentSettings.BaseUrl,
                 BlobStorageHostUrl = settings.BlobSettings.HostUrl,
-                BlobStorageConnectionString = settings.BlobSettings.ConnectionString
             };
             builder.Services
                 .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
@@ -47,7 +54,6 @@ namespace Marketplace.Orchestration
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
-                .Inject<IFlurlClient>()
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl,
@@ -59,11 +65,10 @@ namespace Marketplace.Orchestration
                         ApiRole.FullAccess
                     }
                 })
+                .AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>()
                 .AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<BlobService>((s) => new BlobService(settings.BlobSettings.EnvironmentString))
                 .Inject<IAssetQuery>()
                 .Inject<IAssetedResourceQuery>()
-                .Inject<IBlobStorage>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()

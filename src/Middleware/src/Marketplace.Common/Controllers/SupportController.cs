@@ -66,7 +66,7 @@ namespace Marketplace.Common.Controllers
         }
 
         // good debug method for testing rates with orders
-        [HttpGet, Route("shippingrates/{orderID}")]
+        [HttpGet, Route("shippingrates/{orderID}"), OrderCloudIntegrationsAuth]
         public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
         {
             return await _checkoutIntegrationCommand.GetRatesAsync(orderID);

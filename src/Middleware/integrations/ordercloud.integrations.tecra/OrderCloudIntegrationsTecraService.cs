@@ -12,6 +12,7 @@ using ordercloud.integrations.tecra.Storage;
 using OrderCloud.SDK;
 using Polly.Retry;
 using Polly;
+using Flurl.Http.Configuration;
 
 namespace ordercloud.integrations.tecra
 {
@@ -38,6 +39,8 @@ namespace ordercloud.integrations.tecra
         public string WorkspaceID { get; set; }
         public string SettingsID { get; set; }
         public string StoreID { get; set; }
+        public string BlobStorageHostUrl { get; set; }
+        public string BlobStorageConnectionString { get; set; }
     }
 
 
@@ -48,13 +51,10 @@ namespace ordercloud.integrations.tecra
         private readonly IChiliBlobStorage _blob;
         public OrderCloudTecraConfig Config { get; }
 
-        public OrderCloudIntegrationsTecraService(OrderCloudTecraConfig config, IChiliBlobStorage blob)
+        public OrderCloudIntegrationsTecraService(OrderCloudTecraConfig config, IChiliBlobStorage blob, IFlurlClientFactory flurlFactory)
         {
             Config = config;
-            _flurl = new FlurlClient
-            {
-                BaseUrl = $"{Config.BaseUrl}/"
-            };
+            _flurl = flurlFactory.Get($"{Config.BaseUrl}/");
             _blob = blob;
         }
         private IFlurlRequest Token(string resource)
