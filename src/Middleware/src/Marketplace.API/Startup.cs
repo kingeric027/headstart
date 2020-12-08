@@ -138,8 +138,8 @@ namespace Marketplace.API
                     }
                 ))
                 .AddSingleton<CMSConfig>(x => cmsConfig)
-                .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient>()
-                .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig))
+                .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
+                .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
