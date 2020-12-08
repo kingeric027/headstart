@@ -129,30 +129,30 @@
               PRODUCTS.DETAILS.ADD_TO_CART
             </button>
           </div>
-          <ocm-modal [state]="quoteFormModal" [modalTitle]="'Request Quote'">
-            <ocm-quote-request-form
-              (formSubmitted)="submitQuoteOrder($event.detail.user)"
-              [CurrentUser]="currentUser"
-              (formDismissed)="dismissQuoteForm()"
-            ></ocm-quote-request-form>
-          </ocm-modal>
-          <ocm-modal
-            [state]="contactSupplierFormModal"
-            [modalTitle]="'Product Inquiry'"
-          >
-            <ocm-contact-supplier-form
-              (contactFormSubmitted)="
-                submitContactSupplierForm($event.detail.formData)
-              "
-              [CurrentUser]="currentUser"
-              (contactFormDismissed)="dismissContactSupplierForm()"
-            ></ocm-contact-supplier-form>
-          </ocm-modal>
         </div>
         <div *ngIf="!isOrderable" class="alert alert-info" translate>
           PRODUCTS.DETAILS.VIEW_ONLY
         </div>
       </ng-container>
+      <ocm-modal [state]="quoteFormModal" [modalTitle]="'Request Quote'">
+        <ocm-quote-request-form
+          (formSubmitted)="submitQuoteOrder($event.detail.user)"
+          [CurrentUser]="currentUser"
+          (formDismissed)="dismissQuoteForm()"
+        ></ocm-quote-request-form>
+      </ocm-modal>
+      <ocm-modal
+        [state]="contactSupplierFormModal"
+        [modalTitle]="'Product Inquiry'"
+      >
+        <ocm-contact-supplier-form
+          (contactFormSubmitted)="
+            submitContactSupplierForm($event.detail.formData)
+          "
+          [CurrentUser]="currentUser"
+          (contactFormDismissed)="dismissContactSupplierForm()"
+        ></ocm-contact-supplier-form>
+      </ocm-modal>
       <ng-container *ngIf="showGrid">
         <ocm-grid-spec-form
           *ngIf="isOrderable && specs?.length > 0"

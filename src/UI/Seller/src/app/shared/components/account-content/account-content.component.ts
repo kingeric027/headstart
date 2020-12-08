@@ -25,6 +25,7 @@ import {
 import { AppAuthService } from '@app-seller/auth'
 import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
 import { NoResultsComponent } from '@ordercloud/angular-cms-components/shared/components/no-results/no-results.component'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 export abstract class AccountContent implements AfterViewChecked, OnInit {
   activePage: string
@@ -81,7 +82,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
   }
 
   retrieveNotifications() {
-    HeadStartSDK.Documents.List('MonitoredProductFieldModifiedNotification', {
+    ContentManagementClient.Documents.List('MonitoredProductFieldModifiedNotification', {
       pageSize: 100,
       sortBy: ['!History.DateUpdated'],
     }).then((results: any) => {
@@ -170,14 +171,14 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
         Object.keys(this.currentUserService.profileImgSubject.value).length > 0
       ) {
         // If logo exists, remove the assignment, then the logo itself
-        await HeadStartSDK.Assets.DeleteAssetAssignment(
+        await ContentManagementClient.Assets.DeleteAssetAssignment(
           this.currentUserService.profileImgSubject.value.ID,
           this.userContext?.Me?.ID,
           'AdminUsers',
           null,
           null
         )
-        await HeadStartSDK.Assets.Delete(
+        await ContentManagementClient.Assets.Delete(
           this.currentUserService.profileImgSubject.value.ID
         )
       }
@@ -187,14 +188,14 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
         Object.keys(this.currentUserService.profileImgSubject.value).length > 0
       ) {
         // If logo exists, remove the assignment, then the logo itself
-        await HeadStartSDK.Assets.DeleteAssetAssignment(
+        await ContentManagementClient.Assets.DeleteAssetAssignment(
           this.currentUserService.profileImgSubject.value.ID,
           this.userContext?.Me?.ID,
           'SupplierUsers',
           this.userContext?.Me?.Supplier?.ID,
           'Suppliers'
         )
-        await HeadStartSDK.Assets.Delete(
+        await ContentManagementClient.Assets.Delete(
           this.currentUserService.profileImgSubject.value.ID
         )
       }
@@ -232,7 +233,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
       accessToken
     )
     if (this.userContext.UserType === 'SELLER') {
-      await HeadStartSDK.Assets.SaveAssetAssignment(
+      await ContentManagementClient.Assets.SaveAssetAssignment(
         {
           ResourceType: 'AdminUsers',
           ResourceID: userID,
@@ -241,7 +242,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
         accessToken
       )
     } else {
-      await HeadStartSDK.Assets.SaveAssetAssignment(
+      await ContentManagementClient.Assets.SaveAssetAssignment(
         {
           ParentResourceType: 'Suppliers',
           ParentResourceID: this.userContext.Me.Supplier.ID,
@@ -260,7 +261,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     try {
       if (this.userContext.UserType === 'SELLER') {
         // Remove the profile img asset assignment
-        await HeadStartSDK.Assets.DeleteAssetAssignment(
+        await ContentManagementClient.Assets.DeleteAssetAssignment(
           this.currentUserService.profileImgSubject.value.ID,
           this.userContext?.Me?.ID,
           'AdminUsers',
@@ -268,12 +269,12 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
           null
         )
         // Remove the profile img asset
-        await HeadStartSDK.Assets.Delete(
+        await ContentManagementClient.Assets.Delete(
           this.currentUserService.profileImgSubject.value.ID
         )
       } else {
         // Remove the profile img asset assignment
-        await HeadStartSDK.Assets.DeleteAssetAssignment(
+        await ContentManagementClient.Assets.DeleteAssetAssignment(
           this.currentUserService.profileImgSubject.value.ID,
           this.userContext?.Me?.ID,
           'SupplierUsers',
@@ -281,7 +282,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
           'Suppliers'
         )
         // Remove the profile img asset
-        await HeadStartSDK.Assets.Delete(
+        await ContentManagementClient.Assets.Delete(
           this.currentUserService.profileImgSubject.value.ID
         )
       }
@@ -296,10 +297,10 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
 
   setProfileImgSrc(): void {
     if (this.userContext.UserType === 'SELLER') {
-      const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/AdminUsers/${this.userContext.Me.ID}/thumbnail?size=m`
+      const url = `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/AdminUsers/${this.userContext.Me.ID}/thumbnail?size=m`
       this.myProfileImg = url
     } else {
-      const url = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this.userContext.Me.Supplier.ID}/SupplierUsers/${this.userContext.Me.ID}/thumbnail?size=m`
+      const url = `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this.userContext.Me.Supplier.ID}/SupplierUsers/${this.userContext.Me.ID}/thumbnail?size=m`
       this.myProfileImg = url
     }
   }

@@ -47,6 +47,7 @@ import { ToastrService } from 'ngx-toastr'
 import { User, OcSupplierUserService, Buyer } from '@ordercloud/angular-sdk'
 import { Buyers } from 'ordercloud-javascript-sdk'
 import { Router } from '@angular/router'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -118,11 +119,11 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   async handleSelectedSupplierChange(
     supplier: MarketplaceSupplier
   ): Promise<void> {
-    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`
+    this.logoUrl = `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`
     !this.isCreatingNew &&
       (this.hasLogo =
         (
-          await await HeadStartSDK.Assets.ListAssets(
+          await await ContentManagementClient.Assets.ListAssets(
             'Suppliers',
             this._supplierEditable?.ID,
             { filters: { Tags: ['Logo'] } }
@@ -238,21 +239,21 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     } else {
       this.logoLoading = true
       const file: File = event?.target?.files[0]
-      const logoAssets = await HeadStartSDK.Assets.ListAssets(
+      const logoAssets = await ContentManagementClient.Assets.ListAssets(
         'Suppliers',
         this._supplierEditable?.ID,
         { filters: { Tags: ['Logo'] } }
       )
       if (logoAssets?.Items?.length > 0) {
         // If logo exists, remove the assignment, then the logo itself
-        await HeadStartSDK.Assets.DeleteAssetAssignment(
+        await ContentManagementClient.Assets.DeleteAssetAssignment(
           logoAssets?.Items[0]?.ID,
           this._supplierEditable?.ID,
           'Suppliers',
           null,
           null
         )
-        await HeadStartSDK.Assets.Delete(logoAssets.Items[0].ID)
+        await ContentManagementClient.Assets.Delete(logoAssets.Items[0].ID)
       }
       // Then upload logo asset
       try {
@@ -283,7 +284,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       asset,
       accessToken
     )
-    await HeadStartSDK.Assets.SaveAssetAssignment(
+    await ContentManagementClient.Assets.SaveAssetAssignment(
       {
         ResourceType: 'Suppliers',
         ResourceID: supplierID,
@@ -297,13 +298,13 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     this.logoLoading = true
     try {
       // Get the logo asset
-      const logoAssets = await HeadStartSDK.Assets.ListAssets(
+      const logoAssets = await ContentManagementClient.Assets.ListAssets(
         'Suppliers',
         this._supplierEditable?.ID,
         { filters: { Tags: ['Logo'] } }
       )
       // Remove the logo asset assignment
-      await HeadStartSDK.Assets.DeleteAssetAssignment(
+      await ContentManagementClient.Assets.DeleteAssetAssignment(
         logoAssets?.Items[0]?.ID,
         this._supplierEditable?.ID,
         'Suppliers',
@@ -311,7 +312,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
         null
       )
       // Remove the logo asset
-      await HeadStartSDK.Assets.Delete(logoAssets.Items[0].ID)
+      await ContentManagementClient.Assets.Delete(logoAssets.Items[0].ID)
     } catch (err) {
       throw err
     } finally {
@@ -327,7 +328,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
       .getElementById('supplier-logo')
       ?.setAttribute(
         'src',
-        `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`
+        `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/Suppliers/${this._supplierEditable?.ID}/thumbnail?size=m`
       )
   }
 

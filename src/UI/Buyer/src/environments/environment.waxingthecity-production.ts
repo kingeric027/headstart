@@ -11,7 +11,8 @@ export const environment: Environment = {
   clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB',
   baseUrl: 'https://waxingthecity.sebvendorportal.com',
-  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  middlewareUrl: 'https://middleware-api.sebvendorportal.com',
+  cmsUrl: 'https://ordercloud-cms.azurewebsites.net',  
   creditCardIframeUrl: 'https://fts.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:
     'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',

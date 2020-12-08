@@ -25,6 +25,7 @@ import { Location } from '@angular/common'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { Buyer, OcBuyerService } from '@ordercloud/angular-sdk'
 import { TabIndexMapper } from './tab-mapper'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 @Component({
   selector: 'app-kits-edit',
   templateUrl: './kits-edit.component.html',
@@ -457,7 +458,7 @@ export class KitsEditComponent implements OnInit {
       asset,
       accessToken
     )
-    await HeadStartSDK.Assets.SaveAssetAssignment(
+    await ContentManagementClient.Assets.SaveAssetAssignment(
       { ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID },
       accessToken
     )
@@ -467,7 +468,7 @@ export class KitsEditComponent implements OnInit {
   async removeFile(file: Asset): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     // Remove the image assignment, then remove the image
-    await HeadStartSDK.Assets.DeleteAssetAssignment(
+    await ContentManagementClient.Assets.DeleteAssetAssignment(
       file.ID,
       this.kitProductStatic.ID,
       'Products',
@@ -475,7 +476,7 @@ export class KitsEditComponent implements OnInit {
       null,
       accessToken
     )
-    await HeadStartSDK.Assets.Delete(file.ID, accessToken)
+    await ContentManagementClient.Assets.Delete(file.ID, accessToken)
     if (file.Type === 'Image') {
       this.kitProductStatic.Images = this.kitProductStatic.Images.filter(
         (i) => i.ID !== file.ID
