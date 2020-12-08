@@ -9,7 +9,7 @@ export const environment: Environment = {
   hostedApp: true,
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   clientID: 'C1D92C43-C7AF-467B-B3DF-D4751D70CAE6',
-  middlewareUrl: 'https://marketplace-middleware.azurewebsites.net',
+  middlewareUrl: 'https://seb-middleware.azurewebsites.net',
   cmsUrl: 'https://ordercloud-cms.azurewebsites.net',  
   appname: 'Self Esteem Brands',
   translateBlobUrl:

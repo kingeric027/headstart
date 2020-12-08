@@ -41,8 +41,8 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://marketplace-middleware-test.azurewebsites.net',
-        cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+        : 'https://seb-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Marketplace Admin Local',
     translateBlobUrl:
       'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
@@ -77,7 +77,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://brandweardesigns-middleware-test.azurewebsites.net',
-        cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Marketplace Admin',
     translateBlobUrl:
       'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
@@ -100,7 +100,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://headstartdemo-middleware-test.azurewebsites.net',
-        cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Headstart Demo Admin',
     translateBlobUrl:
       'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
@@ -123,7 +123,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://fastsigns-middleware-test.azurewebsites.net',
-        cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'FASTSIGNS Admin',
     translateBlobUrl:
       'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
@@ -146,7 +146,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://go2partners-middleware-test.azurewebsites.net',
-        cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'GO2 Partners Admin',
     translateBlobUrl:
       'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',

@@ -11,7 +11,7 @@ export const environment: Environment = {
   clientID: '0BF4E739-7C2A-45A9-9A08-2AD44EB75F1D',
   marketplaceID: 'SEB_TEST',
   baseUrl: 'https://waxingthecity-staging.sebvendorportal.com',
-  middlewareUrl: 'https://marketplace-middleware-staging.azurewebsites.net',
+  middlewareUrl: 'https://seb-middleware-staging.azurewebsites.net',
   cmsUrl: 'https://ordercloud-cms-staging.azurewebsites.net',  
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
