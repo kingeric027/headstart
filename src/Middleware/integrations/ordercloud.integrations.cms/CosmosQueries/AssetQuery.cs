@@ -170,10 +170,17 @@ namespace ordercloud.integrations.cms
 				asset.Metadata.ImageVerticalResolution = (decimal)image.VerticalResolution;
 				var small = image.ResizeSmallerDimensionToTarget(100);
 				var medium = image.ResizeSmallerDimensionToTarget(300);
-				await Task.WhenAll(new[] {
+				try
+				{
+					await Task.WhenAll(new[] {
 					StorageHelper.UploadImage(container, $"{asset.id}-m", medium),
 					StorageHelper.UploadImage(container, $"{asset.id}-s", small)
 				});
+				} finally
+				{
+					small.Dispose();
+					medium.Dispose();
+				}
 			}
 			return asset;
 		}
