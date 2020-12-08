@@ -29,14 +29,14 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{specOptionID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliSpecOption> Get(string specID, string specOptionID)
         {
-            return await _command.Get(specID, specOptionID);
+            return await _command.Get(specID, specOptionID, this.VerifiedUserContext);
         }
 
         [DocName("List Chili Spec Options")]
         [HttpGet, OrderCloudIntegrationsAuth]
         public async Task<ListPage<ChiliSpecOption>> List(string specID, ListArgs<ChiliSpecOption> args)
         {
-            return await _command.List(specID, args);
+            return await _command.List(specID, args, this.VerifiedUserContext);
         }
 
         [DocName("Create a Chili Spec Option")]
@@ -44,21 +44,21 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ChiliSpecOption> Create(string specID, [FromBody] ChiliSpecOption specOption)
         {
-            return await _command.Create(specID, specOption);
+            return await _command.Create(specID, specOption, this.VerifiedUserContext);
         }
 
         [DocName("Update a Chili Spec Option")]
         [HttpPut, Route("{specOptionID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliSpecOption> Update(string specID, string specOptionID, [FromBody] ChiliSpecOption spec)
         {
-            return await _command.Update(specID, specOptionID, spec);
+            return await _command.Update(specID, specOptionID, spec, this.VerifiedUserContext);
         }
 
         [DocName("Delete a Chili Spec")]
         [HttpDelete, Route("{specOptionID}"), OrderCloudIntegrationsAuth]
         public async Task Delete(string specID, string specOptionID)
         {
-            await _command.Delete(specID, specOptionID);
+            await _command.Delete(specID, specOptionID, this.VerifiedUserContext);
         }
     }
 
@@ -79,14 +79,14 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{specID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliSpec> Get(string specID)
         {
-            return await _command.Get(specID);
+            return await _command.Get(specID, this.VerifiedUserContext);
         }
 
         [DocName("List Chili Specs")]
         [HttpGet, OrderCloudIntegrationsAuth]
         public async Task<ListPage<ChiliSpec>> List(ListArgs<ChiliSpec> args)
         {
-            return await _command.List(args);
+            return await _command.List(args, this.VerifiedUserContext);
         }
 
         [DocName("Create a Chili Spec")]
@@ -94,21 +94,21 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ChiliSpec> Create([FromBody] ChiliSpec spec)
         {
-            return await _command.Create(spec);
+            return await _command.Create(spec, this.VerifiedUserContext);
         }
 
         [DocName("Update a Chili Spec")]
         [HttpPut, Route("{specID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliSpec> Update(string specID, [FromBody] ChiliSpec spec)
         {
-            return await _command.Update(specID, spec);
+            return await _command.Update(specID, spec, this.VerifiedUserContext);
         }
 
         [DocName("Delete a Chili Spec")]
         [HttpDelete, Route("{specID}"), OrderCloudIntegrationsAuth]
         public async Task Delete(string specID)
         {
-            await _command.Delete(specID);
+            await _command.Delete(specID, this.VerifiedUserContext);
         }
     }
 
