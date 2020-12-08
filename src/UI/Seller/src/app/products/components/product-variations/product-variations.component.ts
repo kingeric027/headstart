@@ -37,6 +37,7 @@ import { AppAuthService } from '@app-seller/auth'
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import { BehaviorSubject } from 'rxjs'
 import { Products } from 'ordercloud-javascript-sdk'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 @Component({
   selector: 'product-variations-component',
@@ -543,7 +544,7 @@ export class ProductVariations implements OnChanges {
     // TODO: optimize this so we aren't having to update all images, just 'changed' ones
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     const requests = this.superProductEditable.Images.map((i) =>
-      HeadStartSDK.Assets.Save(i.ID, i, accessToken)
+      ContentManagementClient.Assets.Save(i.ID, i, accessToken)
     )
     await Promise.all(requests)
     // Ensure there is no mistaken change detection

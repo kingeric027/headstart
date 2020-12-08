@@ -5,6 +5,7 @@ import { JDocument, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk'
 import { STOREFRONTS_SUB_RESOURCE_LIST } from '../storefronts/storefronts.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { ocAppConfig } from '@app-seller/config/app.config'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 // TODO - this service is only relevent if you're already on the storefronts details page. How can we enforce/inidcate that?
 @Injectable({
@@ -45,7 +46,7 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
     super(
       router,
       activatedRoute,
-      HeadStartSDK.Documents,
+      ContentManagementClient.Documents,
       currentUserService,
       '/storefronts',
       'storefronts',
@@ -55,7 +56,7 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
   }
   // Overwritten functions
   async list(args: any[]): Promise<ListPage<JDocument>> {
-    return await HeadStartSDK.Documents.ListDocuments(
+    return await ContentManagementClient.Documents.ListDocuments(
       'cms-page-schema',
       'ApiClients',
       args[0] /* The ResourceID */
@@ -65,7 +66,7 @@ export class StorefrontPageService extends ResourceCrudService<JDocument> {
   async getResourceById(resourceID: string): Promise<any> {
     const orderDirection = this.optionsSubject.value.OrderDirection
     const args = await this.createListArgs([resourceID], orderDirection)
-    return HeadStartSDK.Documents.Get('cms-page-schema', resourceID)
+    return ContentManagementClient.Documents.Get('cms-page-schema', resourceID)
   }
   // End Overwritten functions
 }

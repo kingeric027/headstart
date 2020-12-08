@@ -69,6 +69,7 @@ import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 @Component({
   selector: 'app-product-edit',
@@ -217,7 +218,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async refreshProductData(
     superProduct: SuperMarketplaceProduct
   ): Promise<void> {
-    const productModifiedNotifications = await HeadStartSDK.Documents.ListDocuments(
+    const productModifiedNotifications = await ContentManagementClient.Documents.ListDocuments(
       'MonitoredProductFieldModifiedNotification',
       'Products',
       superProduct?.Product?.ID
@@ -801,7 +802,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       asset,
       accessToken
     )
-    await HeadStartSDK.Assets.SaveAssetAssignment(
+    await ContentManagementClient.Assets.SaveAssetAssignment(
       { ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID },
       accessToken
     )
@@ -841,7 +842,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async removeFile(file: Asset): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     // Remove the image assignment, then remove the image
-    await HeadStartSDK.Assets.DeleteAssetAssignment(
+    await ContentManagementClient.Assets.DeleteAssetAssignment(
       file.ID,
       this._superMarketplaceProductStatic.Product.ID,
       'Products',
@@ -849,7 +850,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       null,
       accessToken
     )
-    await HeadStartSDK.Assets.Delete(file.ID, accessToken)
+    await ContentManagementClient.Assets.Delete(file.ID, accessToken)
     if (file.Type === 'Image') {
       this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(
         (i) => i.ID !== file.ID
