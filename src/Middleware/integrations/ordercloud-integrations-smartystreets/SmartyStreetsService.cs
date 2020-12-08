@@ -22,10 +22,10 @@ namespace ordercloud.integrations.smartystreets
 		private readonly Client _smartyStreetsClients;
 		private readonly string AutoCompleteBaseUrl = "https://us-autocomplete-pro.api.smartystreets.com";
 
-		public SmartyStreetsService(SmartyStreetsConfig config)
+		public SmartyStreetsService(SmartyStreetsConfig config, Client smartyStreetsClients)
 		{
-			var builder = new ClientBuilder(_config.AuthID, _config.AuthToken);
-			_smartyStreetsClients = builder.BuildUsStreetApiClient();
+			_config = config;
+			_smartyStreetsClients = smartyStreetsClients;
 		}
 
 		public async Task<List<Candidate>> ValidateSingleUSAddress(Lookup lookup)

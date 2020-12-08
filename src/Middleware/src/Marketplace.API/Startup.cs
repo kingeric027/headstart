@@ -32,6 +32,8 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Flurl.Http.Configuration;
 using System.Net;
+using SmartyStreets;
+using SmartyStreets.USStreetApi;
 
 namespace Marketplace.API
 {
@@ -80,6 +82,7 @@ namespace Marketplace.API
             };
 
             var flurlClientFactory = new PerBaseUrlFlurlClientFactory();
+            var smartyStreetsUsClient = new ClientBuilder().BuildUsStreetApiClient();
 
             services
                 .AddLazyCache()
@@ -146,7 +149,7 @@ namespace Marketplace.API
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
-                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings))
+                .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings, flurlClientFactory))
                 .AddSingleton<OrderCloudTecraConfig>(x => tecraConfig)
                 .Inject<IOrderCloudIntegrationsTecraService>()
