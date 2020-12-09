@@ -32,6 +32,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Flurl.Http.Configuration;
 using System.Net;
+using SendGrid;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
 using Marketplace.Common.Services.CMS;
@@ -93,7 +94,7 @@ namespace Marketplace.API
             };
 
             var flurlClientFactory = new PerBaseUrlFlurlClientFactory();
-            var smartyStreetsUsClient = new ClientBuilder().BuildUsStreetApiClient();
+            var smartyStreetsUsClient = new ClientBuilder(_settings.SmartyStreetSettings.AuthID, _settings.SmartyStreetSettings.AuthToken).BuildUsStreetApiClient();
 
             services
                 .AddLazyCache()
@@ -137,6 +138,8 @@ namespace Marketplace.API
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
                 .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = _settings.CMSSettings.BaseUrl }))
+                .Inject<IOrderCloudIntegrationsTecraService>()
+                .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
@@ -164,8 +167,7 @@ namespace Marketplace.API
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings, flurlClientFactory))
                 .AddSingleton<OrderCloudTecraConfig>(x => tecraConfig)
-                .Inject<IOrderCloudIntegrationsTecraService>()
-                .AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
+                .AddSingleton<IOrderCloudClient>(provider => new OrderCloudClient(new OrderCloudClientConfig
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = _settings.OrderCloudSettings.ApiUrl,

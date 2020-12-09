@@ -166,6 +166,7 @@ namespace Marketplace.Common.Commands.Crud
 			var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
 				filters: args.ToFilterString(),
 				search: args.Search,
+				sortBy: args.SortBy.FirstOrDefault(),
 				pageSize: args.PageSize,
 				page: args.Page,
 				accessToken: token);

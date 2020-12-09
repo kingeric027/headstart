@@ -61,16 +61,14 @@ namespace ordercloud.integrations.tecra
         public async Task<string> TecraProof(string id)
         {
             TecraToken auth = await _tecra.GetToken();
-            string specs = await _tecra.GetTecraProofByStoreID(auth.access_token, id);
+            string specs = await _tecra.DownloadProof(auth.access_token, id);
             return specs;
-
         }
         public async Task<string> TecraPDF(string id)
         {
             TecraToken auth = await _tecra.GetToken();
-            string specs = await _tecra.GetTecraPDFByStoreID(auth.access_token, id);
+            string specs = await _tecra.DownloadPDF(auth.access_token, id);
             return specs;
-
         }
 
     }

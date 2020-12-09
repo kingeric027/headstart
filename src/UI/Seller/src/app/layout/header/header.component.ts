@@ -21,6 +21,7 @@ import { getHeaderConfig, MPRoute } from './header.config'
 import { AppAuthService } from '@app-seller/auth'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { environment } from 'src/environments/environment'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 @Component({
   selector: 'layout-header',
@@ -110,6 +111,7 @@ export class HeaderComponent implements OnInit {
 
   logout() {
     this.ocTokenService.RemoveAccess()
+    ContentManagementClient.Tokens.RemoveAccessToken()
     this.appStateService.isLoggedIn.next(false)
     this.router.navigate(['/login'])
   }
