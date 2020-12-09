@@ -17,6 +17,15 @@ namespace Marketplace.Common.Commands
     [SwaggerModel]
     public class ChiliTemplate
     {
+        public SuperMarketplaceProduct Product { get; set; }
+        public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
+        public string ChiliTemplateID { get; set; }
+        public string Frame { get; set; }
+    }
+
+    [SwaggerModel]
+    public class MeChiliTemplate
+    {
         public SuperMarketplaceMeProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
@@ -272,6 +281,7 @@ namespace Marketplace.Common.Commands
     public interface IChiliTemplateCommand
     {
         Task<ChiliTemplate> Get(string templateID, VerifiedUserContext user);
+        Task<MeChiliTemplate> GetMe(string templateID, VerifiedUserContext user);
     }
 
     public class ChiliTemplateCommand : IChiliTemplateCommand
@@ -280,12 +290,14 @@ namespace Marketplace.Common.Commands
         private readonly OrderCloudClientConfig _config;
         private readonly IOrderCloudClient _oc;
         private readonly IMeProductCommand _product;
+        private readonly IMarketplaceProductCommand _adminProduct;
         private readonly ChiliPublishConfigQuery _query;
 
-        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, ChiliPublishConfigQuery query)
+        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, IMarketplaceProductCommand adminProduct, ChiliPublishConfigQuery query)
         {
             _settings = settings;
             _product = product;
+            _adminProduct = adminProduct;
             _query = query;
             _config = new OrderCloudClientConfig
             {
@@ -305,11 +317,25 @@ namespace Marketplace.Common.Commands
             _oc = new OrderCloudClient(_config);
         }
 
+        public async Task<MeChiliTemplate> GetMe(string templateID, VerifiedUserContext user)
+        {
+            var template = await _query.Get(templateID, _settings.ChiliPublishSettings.ClientId.ToLower());
+            var product = await _product.Get(template.SupplierProductID, user);
+            var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s));
+
+            var result = new MeChiliTemplate()
+            {
+                ChiliTemplateID = template.ChiliTemplateID,
+                Product = product,
+                TemplateSpecs = templateSpecs.ToList()
+            };
+            return result;
+        }
 
         public async Task<ChiliTemplate> Get(string templateID, VerifiedUserContext user)
         {
             var template = await _query.Get(templateID, _settings.ChiliPublishSettings.ClientId.ToLower());
-            var product = await _product.Get(template.SupplierProductID, user);
+            var product = await _adminProduct.Get(template.SupplierProductID, user);
             var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s));
 
             var result = new ChiliTemplate()
