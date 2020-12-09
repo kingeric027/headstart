@@ -84,7 +84,12 @@ namespace Marketplace.Common.Services.CMS
 
 		protected async Task<ListPage<T>> ListAsync<T>(ListArgs<T> args, string token, params string[] pathSegments)
 		{
-			var sortBy = string.Join(",", args.SortBy); // is this correct?
+			var filters = args.Filters.Select(f => {
+				var param = f.QueryParams.FirstOrDefault();
+				return new { key = param.Item1, value = param.Item2 };
+			});
+
+			var sortBy = string.Join(",", args.SortBy); 
 
 			return await BuildRequest(token, pathSegments)
 				.SetQueryParams(new { search = args.Search, searchOn = args.SearchOn, sortBy, page = args.Page, pageSize = args.PageSize })
@@ -149,11 +154,11 @@ namespace Marketplace.Common.Services.CMS
 	{
 		public SchemaResource(CMSClientConfig config) : base(config) { }
 
-		public Task<ListPage<DocSchema>> List(ListArgs<DocSchema> args, string token) => ListAsync(args, token, "schema");
-		public Task<DocSchema> Get(string schemaID, string token) => GetAsync<DocSchema>(token, "schema", schemaID);
-		public Task<DocSchema> Create(DocSchema schema, string token) => PostAsync(schema, token, "schema");
-		public Task<DocSchema> Save(string schemaID, DocSchema schema, string token) => PutAsync<DocSchema>(schema, token, "schema", schemaID);
-		public Task Delete(string schemaID, string token) => DeleteAsync(token, "schema", schemaID);
+		public Task<ListPage<DocSchema>> List(ListArgs<DocSchema> args, string token) => ListAsync(args, token, "schemas");
+		public Task<DocSchema> Get(string schemaID, string token) => GetAsync<DocSchema>(token, "schemas", schemaID);
+		public Task<DocSchema> Create(DocSchema schema, string token) => PostAsync(schema, token, "schemas");
+		public Task<DocSchema> Save(string schemaID, DocSchema schema, string token) => PutAsync<DocSchema>(schema, token, "schemas", schemaID);
+		public Task Delete(string schemaID, string token) => DeleteAsync(token, "schemas", schemaID);
 	}
 
 	public class AssetResource : CMSResource, IAssetResource
