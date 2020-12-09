@@ -19,17 +19,12 @@ namespace ordercloud.integrations.tecra.Storage
 	{
 		private readonly OrderCloudTecraConfig _config;
 		private readonly IOrderCloudIntegrationsBlobService _blob;
-		string chiliContainer = "chili-assets";
+        private const string chiliContainer = "chili-assets";
 
-		public ChiliBlobStorage(OrderCloudTecraConfig config)
+        public ChiliBlobStorage(OrderCloudTecraConfig config, IOrderCloudIntegrationsBlobService blob)
 		{
 			_config = config;
-			_blob = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
-			{
-				ConnectionString = _config.BlobStorageConnectionString,
-				Container = chiliContainer,
-				AccessType = BlobContainerPublicAccessType.Container
-			});
+            _blob = blob;
 		}
 
 		public async Task<string> UploadAsset(string blobName, byte[] bytes, string fileType)
