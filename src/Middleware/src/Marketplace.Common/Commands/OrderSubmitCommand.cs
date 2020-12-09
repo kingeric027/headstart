@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace Marketplace.Common.Commands
 {
@@ -25,12 +26,12 @@ namespace Marketplace.Common.Commands
         private readonly IOrderCloudIntegrationsCardConnectCommand _card;
         private readonly TelemetryClient _telemetry;
 
-        public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card)
+        public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card, TelemetryClient telemetry)
         {
             _oc = oc;
             _settings = settings;
             _card = card;
-            _telemetry = new TelemetryClient();
+            _telemetry = telemetry;
         }
 
         public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)

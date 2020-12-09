@@ -30,13 +30,6 @@ namespace Marketplace.Common.Commands
             Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized view this order"));
             try
             {
-                var oc = new OrderCloudClient(new OrderCloudClientConfig()
-                {
-                    AuthUrl = _settings.OrderCloudSettings.ApiUrl,
-                    ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-                    ClientId = user.ClientID
-                });
-
                 var type = 
                     Assembly.GetExecutingAssembly().GetTypeByAttribute<SupplierSyncAttribute>(attribute => attribute.SupplierID == supplierID) ??
                     Assembly.GetExecutingAssembly().GetTypeByAttribute<SupplierSyncAttribute>(attribute => attribute.SupplierID == "Generic");
