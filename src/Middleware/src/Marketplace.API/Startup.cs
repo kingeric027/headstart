@@ -191,15 +191,16 @@ namespace Marketplace.API
                 })
                 .AddAuthentication();
 
+
             var serviceProvider = services.BuildServiceProvider();
             services
                 .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations", opts => opts.OrderCloudClient = serviceProvider.GetService<IOrderCloudClient>())
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
                 .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
-                EnableAdaptiveSampling = false, // retain all data
-                InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
-            });
+                    EnableAdaptiveSampling = false, // retain all data
+                    InstrumentationKey = _settings.ApplicationInsightsSettings.InstrumentationKey
+                });
 
 
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;

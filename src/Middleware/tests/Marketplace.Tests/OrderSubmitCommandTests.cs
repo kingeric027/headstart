@@ -16,6 +16,9 @@ using ordercloud.integrations.library;
 using Marketplace.Models.Models.Marketplace;
 using System.Security.Claims;
 using Marketplace.Models;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Channel;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace Marketplace.Tests
 {
@@ -48,7 +51,11 @@ namespace Marketplace.Tests
             _oc.Orders.PatchAsync(OrderDirection.Incoming, "mockOrderID", Arg.Any<PartialOrder>()).Returns(Task.FromResult(new Order { ID = "SEB12345" }));
             _oc.AuthenticateAsync().Returns(Task.FromResult(new TokenResponse { AccessToken = "mockToken" }));
             _oc.Orders.SubmitAsync<MarketplaceOrder>(Arg.Any<OrderDirection>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Task.FromResult(new MarketplaceOrder { ID = "submittedorderid" }));
-            _sut = new OrderSubmitCommand(_oc, _settings, _card); // sut is subject under test
+            var telemetry = new TelemetryClient(new TelemetryConfiguration
+            {
+                TelemetryChannel = Substitute.For<ITelemetryChannel>()
+            });
+            _sut = new OrderSubmitCommand(_oc, _settings, _card, telemetry); // sut is subject under test
         }
 
         [Test]
