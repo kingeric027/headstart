@@ -91,6 +91,7 @@ namespace Marketplace.Models
         public MarketplaceShipEstimate ShipMethod { get; set; }
     }
 
+    [SwaggerModel]
     public class MarketplaceOrderLineItemData
     {
         public MarketplaceOrder Order { get; set; }
