@@ -31,11 +31,10 @@ class ProductListPage {
 	async sortProducts(sortOption: string) {
 		const sortByDropdown = this.productSortBy.find('select')
 		await t.click(sortByDropdown)
-		await t.expect(this.sortByOptions.visible).ok
 		const selectedSortOption = this.sortByOptions.withText(
 			createRegExp(sortOption)
 		)
-
+		await t.expect(selectedSortOption.exists).ok()
 		await t.click(selectedSortOption)
 	}
 }
