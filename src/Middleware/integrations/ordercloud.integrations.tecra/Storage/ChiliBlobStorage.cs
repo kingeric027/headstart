@@ -11,9 +11,9 @@ using System.IO;
 namespace ordercloud.integrations.tecra.Storage
 {
 	public interface IChiliBlobStorage
-	{
-		Task<string> UploadAsset(string blobName, Stream image, string fileType);
-	}
+    {
+        Task<string> UploadAsset(string blobName, byte[] bytes, string fileType);
+    }
 
 	public class ChiliBlobStorage : IChiliBlobStorage
 	{
@@ -32,11 +32,11 @@ namespace ordercloud.integrations.tecra.Storage
 			});
 		}
 
-		public async Task<string> UploadAsset(string blobName, Stream image, string fileType)
+		public async Task<string> UploadAsset(string blobName, byte[] bytes, string fileType)
 		{
 			try
 			{
-				await _blob.Save(blobName, image, fileType);
+				await _blob.Save(blobName, bytes, fileType);
 				return _config.BlobStorageHostUrl + "/" + chiliContainer + "/" + blobName;
 			}
 			catch (Exception ex)

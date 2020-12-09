@@ -5,6 +5,7 @@ using System.Net;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
+using Flurl;
 using Flurl.Http;
 using ordercloud.integrations.library;
 using ordercloud.integrations.tecra.Models;
@@ -43,8 +44,6 @@ namespace ordercloud.integrations.tecra
         public string BlobStorageConnectionString { get; set; }
     }
 
-
-
     public class OrderCloudIntegrationsTecraService : IOrderCloudIntegrationsTecraService
     {
         private readonly IFlurlClient _flurl;
@@ -54,8 +53,8 @@ namespace ordercloud.integrations.tecra
         public OrderCloudIntegrationsTecraService(OrderCloudTecraConfig config, IChiliBlobStorage blob, IFlurlClientFactory flurlFactory)
         {
             Config = config;
-            _flurl = flurlFactory.Get($"{Config.BaseUrl}/");
             _blob = blob;
+            _flurl = flurlFactory.Get($"{Config.BaseUrl}/");
         }
         private IFlurlRequest Token(string resource)
         {
@@ -67,40 +66,44 @@ namespace ordercloud.integrations.tecra
         }
         public async Task<TecraToken> GetToken() 
         {
-            var request = "grant_type=client_credentials&client_id=" + Config.ClientId + "&client_secret=" + Config.ClientSecret;
-            return await this.Token("auth/token").PostStringAsync(request).ReceiveJson<TecraToken>();
+            return await this.Token("auth/token")
+                .PostStringAsync($"grant_type=client_credentials&client_id={Config.ClientId}&client_secret={Config.ClientSecret}")
+                .ReceiveJson<TecraToken>();
         }
 
         public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token)
         {
-            return await this.Request("api/chili/documents", token).SetQueryParam("storeid", Config.StoreID).GetJsonAsync<TecraDocument[]>();
+            return await this.Request("api/chili/documents", token)
+                .SetQueryParam("storeid", Config.StoreID)
+                .GetJsonAsync<TecraDocument[]>();
         }
         public async Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder)
         {
-            TecraDocumentRequest request = new TecraDocumentRequest();
-            request.chiliurl = Config.ChiliUrl;
-            request.environment = Config.Environment;
-            request.username = Config.Username;
-            request.password = Config.Password;
-            request.folder = folder;
-            return await this.Request("api/chili/alldocuments", token).PostJsonAsync(request).ReceiveJson<TecraDocument[]>();
+            return await this.Request("api/chili/alldocuments", token).PostJsonAsync(new TecraDocumentRequest
+            {
+                chiliurl = Config.ChiliUrl,
+                environment = Config.Environment,
+                username = Config.Username,
+                password = Config.Password,
+                folder = folder
+            }).ReceiveJson<TecraDocument[]>();
         }
         public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id)
         {
-            TecraDocumentRequest request = new TecraDocumentRequest();
-            return await this.Request($"api/chili/{id}/variabledefinitions", token).SetQueryParam("storeid", Config.StoreID).GetJsonAsync<TecraSpec[]>();
+            return await this.Request($"api/chili/{id}/variabledefinitions", token)
+                .SetQueryParam("storeid", Config.StoreID)
+                .GetJsonAsync<TecraSpec[]>();
         }
         public async Task<string> GetTecraFrame(string token, string id)
         {
-            //TODO - Make wsid and folder dynamic
-            TecraFrameParams tparams = new TecraFrameParams();
-            tparams.docid = id;
-            tparams.storeid= Config.StoreID;
-            tparams.wsid = Config.WorkspaceID;
-            tparams.folder = "root";
-            tparams.vpid = "";
-
-            return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
+            return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(new TecraFrameParams
+            {
+                docid = id,
+                storeid = Config.StoreID,
+                wsid = Config.WorkspaceID,
+                folder = "root",
+                vpid = ""
+            }).GetJsonAsync<string>();
         }
 
         private AsyncRetryPolicy Retry()
@@ -116,65 +119,28 @@ namespace ordercloud.integrations.tecra
         }
         private async Task<string> DownloadProof(string token, string id) 
         {
-            TecraProofParams tparams = new TecraProofParams();
-            string azureFilePath = "";
-            tparams.docid = id;
-            tparams.storeid = Config.StoreID;
-            tparams.page = 1;
-
-            //Download the png
-            string proofURL = await this.Request("api/v1/chili/getproofimagebystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
-            string fileName = id + ".png";
-
-            //Save it in Azure Storage
-            WebClient wc = new WebClient();
-            using (MemoryStream stream = new MemoryStream(wc.DownloadData(proofURL)))
-            {
-                azureFilePath = await _blob.UploadAsset(fileName, stream, "image/png");
-            }
-
-            return azureFilePath;
-
+            var file = await this.Request("api/v1/chili/getproofimagebystoreid", token)
+                .SetQueryParams(new TecraProofParams { docid = id, storeid = Config.StoreID, page = 1 })
+                .GetBytesAsync();
+            return await _blob.UploadAsset($"{id}.png", file, "image/png");
         }
         
         private async Task<string> DownloadPDF(string token, string id) 
         {
-            //TODO - Make wsid and folder dynamic
-            TecraPDFParams tparams = new TecraPDFParams();
-            string azureFilePath = "";
-            tparams.docid = id;
-            tparams.storeid = Config.StoreID;
-            tparams.settingsid = Config.SettingsID;
-
-            //Download the png
-            string pdfURL = await this.Request("api/v1/chili/generatepdfbystoreid", token).SetQueryParams(tparams).GetJsonAsync<string>();
-            string fileName = id + ".pdf";
-
-            //Save it in Azure Storage
-            WebClient wc = new WebClient();
-            using (MemoryStream stream = new MemoryStream(wc.DownloadData(pdfURL)))
-            {
-                azureFilePath = await _blob.UploadAsset(fileName, stream, "application/pdf");
-            }
-
-            return azureFilePath;
-
+            var file = await this.Request("api/v1/chili/getproofimagebystoreid", token)
+                .SetQueryParams(new TecraPDFParams { docid = id, storeid = Config.StoreID, settingsid = Config.SettingsID })
+                .GetBytesAsync();
+            return await _blob.UploadAsset($"{id}.png", file, "application/pdf");
         }
 
         public async Task<string> GetTecraProofByStoreID(string token, string id)
         {
-            return await Retry()
-                    .ExecuteAsync(() => {
-                        return DownloadProof(token, id);
-                    });
+            return await Retry().ExecuteAsync(() => DownloadProof(token, id));
             
         }
         public async Task<string> GetTecraPDFByStoreID(string token, string id)
         {
-            return await Retry()
-                    .ExecuteAsync(() => {
-                        return DownloadPDF(token, id);
-                    });
+            return await Retry().ExecuteAsync(() => DownloadPDF(token, id));
 
         }
     }
