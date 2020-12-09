@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Net;
-using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
-using Flurl;
 using Flurl.Http;
-using ordercloud.integrations.library;
+using Flurl.Http.Configuration;
 using ordercloud.integrations.tecra.Models;
 using ordercloud.integrations.tecra.Storage;
-using OrderCloud.SDK;
 using Polly.Retry;
 using Polly;
-using Flurl.Http.Configuration;
 
 namespace ordercloud.integrations.tecra
 {
