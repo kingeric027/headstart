@@ -41,8 +41,8 @@ namespace Marketplace.Common.Commands
 			var _product = _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
 			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
-			var _images = _marketplaceProductCommand.GetProductImages(id, user);
-			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user);
+			var _images = _marketplaceProductCommand.GetProductImages(id, user.AccessToken);
+			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user.AccessToken);
 			var unconvertedSuperMarketplaceProduct = new SuperMarketplaceMeProduct 
 			{
 				Product = await _product,

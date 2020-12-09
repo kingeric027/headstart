@@ -13,6 +13,7 @@ using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using Marketplace.Common.Services;
 using Flurl.Http.Configuration;
+using Marketplace.Common.Services.CMS;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -54,6 +55,7 @@ namespace Marketplace.Orchestration
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
+                .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = settings.CMSSettings.BaseUrl }))
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl,

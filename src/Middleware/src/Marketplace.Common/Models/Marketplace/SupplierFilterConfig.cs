@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
-using ordercloud.integrations.cms;
 using Newtonsoft.Json.Linq;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
@@ -10,11 +9,6 @@ using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
 namespace Marketplace.Models
 {
-    [SwaggerModel]
-    public class SupplierFilterConfigDocument : Document<SupplierFilterConfig>
-    {
-    }
-
     [SwaggerModel]
     public class SupplierFilterConfig
     {

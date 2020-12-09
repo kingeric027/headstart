@@ -1,11 +1,8 @@
 ﻿using NPOI.OpenXmlFormats.Dml;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 
 namespace Marketplace.Models
 {
-    [SwaggerModel]
-    public class MonitoredProductFieldModifiedNotificationDocument : Document<MonitoredProductFieldModifiedNotification> { }
     [SwaggerModel]
     public class MonitoredProductFieldModifiedNotification
     {

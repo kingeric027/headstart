@@ -28,21 +28,20 @@ namespace ordercloud.integrations.avalara
 
 	public class AvalaraCommand : IAvalaraCommand
 	{
-		const string PROD_URL = "https://rest.avatax.com/api/v2";
-		const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
+        private const string PROD_URL = "https://rest.avatax.com/api/v2";
+        private const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
 		private readonly AvalaraConfig _settings;
 		private readonly AvaTaxClient _avaTax;
 		private readonly string _companyCode;
 		private readonly string _baseUrl;
 
-		public AvalaraCommand(AvalaraConfig settings)
+		public AvalaraCommand(AvalaraConfig settings, AvaTaxClient client)
 		{
 			_settings = settings;
 			_companyCode = _settings.CompanyCode;
 			_baseUrl = _settings.Env == AvaTaxEnvironment.Production ? PROD_URL : SANDBOX_URL;
-			_avaTax = new AvaTaxClient("four51 marketplace", "v1", "machine_name", _settings.Env)
-					.WithSecurity(_settings.AccountID, _settings.LicenseKey);
-		}
+            _avaTax = client;
+        }
 
 		public async Task<TransactionModel> GetEstimateAsync(OrderWorksheet orderWorksheet)
 		{

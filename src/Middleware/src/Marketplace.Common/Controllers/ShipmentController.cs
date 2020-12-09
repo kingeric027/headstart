@@ -8,7 +8,6 @@ using ordercloud.integrations.library;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Microsoft.AspNetCore.Http;
 using Marketplace.Common.Models.Misc;
-using ordercloud.integrations.cms;
 
 namespace Marketplace.Common.Controllers
 {
@@ -38,9 +37,14 @@ namespace Marketplace.Common.Controllers
         [DocName("POST Batch Shipment Update")]
         [Route("batch/uploadshipment")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ShipmentAdmin)]
-        public async Task<BatchProcessResult> UploadShipments([FromForm] AssetUpload fileRequest)
+        public async Task<BatchProcessResult> UploadShipments([FromForm] FileUpload fileRequest)
         {
             return  await _command.UploadShipments(fileRequest?.File, VerifiedUserContext);
         }
+    }
+
+    public class FileUpload
+    {
+        public IFormFile File { get; set; }
     }
 }
