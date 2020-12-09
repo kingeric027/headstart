@@ -160,7 +160,9 @@ namespace Marketplace.API
                 .AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
-                .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig))
+                .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig, 
+                        new AvaTaxClient("four51 marketplace", "v1", "machine_name", avalaraConfig.Env)
+                            .WithSecurity(_settings.AvalaraSettings.AccountID, _settings.AvalaraSettings.LicenseKey)))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
                 .AddSingleton<IOrderCloudIntegrationsCardConnectService>(x => new OrderCloudIntegrationsCardConnectService(_settings.CardConnectSettings, flurlClientFactory))
