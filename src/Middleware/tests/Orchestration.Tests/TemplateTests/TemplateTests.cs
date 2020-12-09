@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
+using Marketplace.Common.Services.CMS.Models;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using NPOI.HSSF.UserModel;

@@ -34,6 +34,7 @@ using Flurl.Http.Configuration;
 using System.Net;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
+using Marketplace.Common.Services.CMS;
 
 namespace Marketplace.API
 {
@@ -135,6 +136,7 @@ namespace Marketplace.API
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
+                .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = _settings.CMSSettings.BaseUrl }))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {

@@ -3,7 +3,6 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
-using ordercloud.integrations.cms;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -41,7 +40,7 @@ namespace ordercloud.integrations.tecra.Storage
 			}
 			catch (Exception ex)
 			{
-				throw new StorageConnectionException(chiliContainer, ex);
+				throw new Exception($"Container - {chiliContainer}. {ex}");
 			}
 		}
 	}
