@@ -17,8 +17,8 @@ namespace ordercloud.integrations.tecra
         Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id);
         Task<string> GetTecraFrame(string token, string id);
         Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder);
-        Task<string> GetTecraProofByStoreID(string token, string id);
-        Task<string> GetTecraPDFByStoreID(string token, string id);
+        Task<string> DownloadProof(string token, string id);
+        Task<string> DownloadPDF(string token, string id);
 
     }
     public class OrderCloudTecraConfig
@@ -100,42 +100,20 @@ namespace ordercloud.integrations.tecra
             }).GetJsonAsync<string>();
         }
 
-        private static AsyncRetryPolicy Retry()
+        public async Task<string> DownloadProof(string token, string id)
         {
-            // retries three times, waits five seconds in-between failures
-            return Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(new[] {
-                    TimeSpan.FromSeconds(5),
-                    TimeSpan.FromSeconds(5),
-                    TimeSpan.FromSeconds(5),
-                });
-        }
-        private async Task<string> DownloadProof(string token, string id) 
-        {
-            var file = await this.Request("api/v1/chili/getproofimagebystoreid", token)
+            var url = await this.Request("api/v1/chili/getproofimagebystoreid", token)
                 .SetQueryParams(new TecraProofParams { docid = id, storeid = _config.StoreID, page = 1 })
-                .GetBytesAsync();
+                .GetJsonAsync<string>();
+            var file = await url.GetBytesAsync();
             return await _blob.UploadAsset($"{id}.png", file, "image/png");
         }
-        
-        private async Task<string> DownloadPDF(string token, string id) 
+        public async Task<string> DownloadPDF(string token, string id)
         {
-            var file = await this.Request("api/v1/chili/getproofimagebystoreid", token)
-                .SetQueryParams(new TecraPDFParams { docid = id, storeid = _config.StoreID, settingsid = _config.SettingsID })
-                .GetBytesAsync();
-            return await _blob.UploadAsset($"{id}.png", file, "application/pdf");
-        }
-
-        public async Task<string> GetTecraProofByStoreID(string token, string id)
-        {
-            return await Retry().ExecuteAsync(() => DownloadProof(token, id));
-            
-        }
-        public async Task<string> GetTecraPDFByStoreID(string token, string id)
-        {
-            return await Retry().ExecuteAsync(() => DownloadPDF(token, id));
-
+            var url = await this.Request("api/v1/chili/generatepdfbystoreid", token)
+                .SetQueryParams(new TecraPDFParams { docid = id, storeid = _config.StoreID, settingsid = _config.SettingsID }).GetJsonAsync<string>();
+            var file = await url.GetBytesAsync();
+            return await _blob.UploadAsset($"{id}.pdf", file, "application/pdf");
         }
     }
 }

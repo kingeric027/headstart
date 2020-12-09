@@ -12,7 +12,7 @@ namespace ordercloud.integrations.tecra.Storage
 {
 	public interface IChiliBlobStorage
     {
-        Task<string> UploadAsset(string blobName, byte[] bytes, string fileType);
+		Task<string> UploadAsset(string blobName, byte[] bytes, string fileType);
     }
 
 	public class ChiliBlobStorage : IChiliBlobStorage
