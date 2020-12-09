@@ -48,13 +48,13 @@ namespace ordercloud.integrations.tecra
     {
         private readonly IFlurlClient _flurl;
         private readonly IChiliBlobStorage _blob;
-        public OrderCloudTecraConfig Config { get; }
+        private readonly OrderCloudTecraConfig _config;
 
         public OrderCloudIntegrationsTecraService(OrderCloudTecraConfig config, IChiliBlobStorage blob, IFlurlClientFactory flurlFactory)
         {
-            Config = config;
+            _config = config;
             _blob = blob;
-            _flurl = flurlFactory.Get($"{Config.BaseUrl}/");
+            _flurl = flurlFactory.Get($"{_config.BaseUrl}/");
         }
         private IFlurlRequest Token(string resource)
         {
@@ -67,31 +67,32 @@ namespace ordercloud.integrations.tecra
         public async Task<TecraToken> GetToken() 
         {
             return await this.Token("auth/token")
-                .PostStringAsync($"grant_type=client_credentials&client_id={Config.ClientId}&client_secret={Config.ClientSecret}")
+                .PostStringAsync($"grant_type=client_credentials&client_id={_config.ClientId}&client_secret={_config.ClientSecret}")
                 .ReceiveJson<TecraToken>();
         }
 
         public async Task<IEnumerable<TecraDocument>> GetTecraDocuments(string token)
         {
             return await this.Request("api/chili/documents", token)
-                .SetQueryParam("storeid", Config.StoreID)
+                .SetQueryParam("storeid", _config.StoreID)
                 .GetJsonAsync<TecraDocument[]>();
         }
+
         public async Task<IEnumerable<TecraDocument>> TecraDocumentsByFolder(string token, string folder)
         {
             return await this.Request("api/chili/alldocuments", token).PostJsonAsync(new TecraDocumentRequest
             {
-                chiliurl = Config.ChiliUrl,
-                environment = Config.Environment,
-                username = Config.Username,
-                password = Config.Password,
+                chiliurl = _config.ChiliUrl,
+                environment = _config.Environment,
+                username = _config.Username,
+                password = _config.Password,
                 folder = folder
             }).ReceiveJson<TecraDocument[]>();
         }
         public async Task<IEnumerable<TecraSpec>> GetTecraSpecs(string token, string id)
         {
             return await this.Request($"api/chili/{id}/variabledefinitions", token)
-                .SetQueryParam("storeid", Config.StoreID)
+                .SetQueryParam("storeid", _config.StoreID)
                 .GetJsonAsync<TecraSpec[]>();
         }
         public async Task<string> GetTecraFrame(string token, string id)
@@ -99,14 +100,14 @@ namespace ordercloud.integrations.tecra
             return await this.Request($"api/v1/chili/loadtemplatebystoreid", token).SetQueryParams(new TecraFrameParams
             {
                 docid = id,
-                storeid = Config.StoreID,
-                wsid = Config.WorkspaceID,
+                storeid = _config.StoreID,
+                wsid = _config.WorkspaceID,
                 folder = "root",
                 vpid = ""
             }).GetJsonAsync<string>();
         }
 
-        private AsyncRetryPolicy Retry()
+        private static AsyncRetryPolicy Retry()
         {
             // retries three times, waits five seconds in-between failures
             return Policy
@@ -120,7 +121,7 @@ namespace ordercloud.integrations.tecra
         private async Task<string> DownloadProof(string token, string id) 
         {
             var file = await this.Request("api/v1/chili/getproofimagebystoreid", token)
-                .SetQueryParams(new TecraProofParams { docid = id, storeid = Config.StoreID, page = 1 })
+                .SetQueryParams(new TecraProofParams { docid = id, storeid = _config.StoreID, page = 1 })
                 .GetBytesAsync();
             return await _blob.UploadAsset($"{id}.png", file, "image/png");
         }
@@ -128,7 +129,7 @@ namespace ordercloud.integrations.tecra
         private async Task<string> DownloadPDF(string token, string id) 
         {
             var file = await this.Request("api/v1/chili/getproofimagebystoreid", token)
-                .SetQueryParams(new TecraPDFParams { docid = id, storeid = Config.StoreID, settingsid = Config.SettingsID })
+                .SetQueryParams(new TecraPDFParams { docid = id, storeid = _config.StoreID, settingsid = _config.SettingsID })
                 .GetBytesAsync();
             return await _blob.UploadAsset($"{id}.png", file, "application/pdf");
         }
