@@ -32,6 +32,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Flurl.Http.Configuration;
 using System.Net;
+using Microsoft.ApplicationInsights;
 using SendGrid;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
@@ -137,6 +138,7 @@ namespace Marketplace.API
                 .Inject<IChiliBlobStorage>()
                 .Inject<ISupplierApiClientHelper>()
                 .Inject<IOrderCloudIntegrationsTecraService>()
+                .Inject<TelemetryClient>()
                 .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
