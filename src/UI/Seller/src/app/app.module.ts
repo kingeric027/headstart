@@ -121,7 +121,6 @@ export class AppModule {
     HeadstartConfiguration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
     })
-    debugger;
     CMSConfiguration.Set({
       baseApiUrl: this.appConfig.cmsUrl,
     })
