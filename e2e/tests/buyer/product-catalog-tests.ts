@@ -90,10 +90,12 @@ test('Does the Sort By dropdown properly adjust the order that items populate', 
 		.innerText
 
 	//assert that first product name after Z to A sort is greater (later in the alphabet) than before the sort
-	t.expect(
-		afterSortFirstProductName.substring(0, 1) >
-			beforeSortFirstProductName.substring(0, 1)
-	)
+	await t
+		.expect(
+			afterSortFirstProductName.substring(0, 1) >
+				beforeSortFirstProductName.substring(0, 1)
+		)
+		.ok()
 })
 
 test('Does selecting a Product Card bring the User to the details page | 6791', async t => {
