@@ -147,23 +147,22 @@ namespace Marketplace.API
                 .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
-                .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClientConfig() {
-                    ApiUrl = "https://books.zoho.com/api/v3",
-                    AccessToken = _settings.ZohoSettings.AccessToken,
-                    ClientId = _settings.ZohoSettings.ClientId,
-                    ClientSecret = _settings.ZohoSettings.ClientSecret,
-                    OrganizationID = _settings.ZohoSettings.OrgID },
-                    new OrderCloudClientConfig {
+                .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClient(
+                    new ZohoClientConfig() {
+                        ApiUrl = "https://books.zoho.com/api/v3",
+                        AccessToken = _settings.ZohoSettings.AccessToken,
+                        ClientId = _settings.ZohoSettings.ClientId,
+                        ClientSecret = _settings.ZohoSettings.ClientSecret,
+                        OrganizationID = _settings.ZohoSettings.OrgID
+                    }), 
+                    new OrderCloudClient(new OrderCloudClientConfig
+                    {
                         ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                         AuthUrl = _settings.OrderCloudSettings.ApiUrl,
                         ClientId = _settings.OrderCloudSettings.ClientID,
                         ClientSecret = _settings.OrderCloudSettings.ClientSecret,
-                        Roles = new[]
-                            {
-                                ApiRole.FullAccess
-                            }
-                    }
-                ))
+                        Roles = new[] { ApiRole.FullAccess }
+                })))
                 .AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
                 .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))

@@ -30,33 +30,13 @@ namespace Marketplace.Common.Commands.Zoho
         private const int delay = 250;
         private const int concurrent = 1;
 
-        public ZohoCommand(ZohoClientConfig zoho_config, OrderCloudClientConfig oc_config)
+        public ZohoCommand(IZohoClient zoho, IOrderCloudClient oc)
         {
-            _zoho = new ZohoClient(zoho_config);
-            _oc = new OrderCloudClient(oc_config);
-        }
-        public ZohoCommand(AppSettings settings)
-        {
-            _zoho = new ZohoClient(new ZohoClientConfig()
-            {
-                ApiUrl = "https://books.zoho.com/api/v3",
-                AccessToken = settings.ZohoSettings.AccessToken,
-                ClientId = settings.ZohoSettings.ClientId,
-                ClientSecret = settings.ZohoSettings.ClientSecret,
-                OrganizationID = settings.ZohoSettings.OrgID
-            });
-            _oc = new OrderCloudClient(new OrderCloudClientConfig()
-            {
-                AuthUrl = settings.OrderCloudSettings.ApiUrl,
-                ApiUrl = settings.OrderCloudSettings.ApiUrl,
-                ClientId = settings.OrderCloudSettings.ClientID,
-                ClientSecret = settings.OrderCloudSettings.ClientSecret,
-                GrantType = GrantType.ClientCredentials,
-                Roles = new[] { ApiRole.FullAccess }
-            });
+            _zoho = zoho;
+            _oc = oc;
             _zoho.AuthenticateAsync();
         }
-
+        
         public async Task<ZohoOrganizationList> ListOrganizations()
         {
             await _zoho.AuthenticateAsync();
