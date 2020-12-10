@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Me } from 'ordercloud-javascript-sdk'
+import { Configuration, Me, Tokens } from 'ordercloud-javascript-sdk'
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import {
   TaxCertificate,
@@ -8,13 +8,14 @@ import {
   ListPage,
 } from '@ordercloud/headstart-sdk'
 import { AppConfig } from '../../shopper-context'
+import Axios, { AxiosRequestConfig } from 'axios'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AddressService {
   constructor(
-    private appConfig: AppConfig // remove below when sdk is regenerated
+    private appConfig: AppConfig
   ) {}
 
   async get(addressID: string): Promise<MarketplaceAddressBuyer> {
@@ -60,28 +61,27 @@ export class AddressService {
     locationID: string,
     certificate: TaxCertificate
   ): Promise<TaxCertificate> {
-    return await HeadStartSDK.Avalaras.CreateCertificate(
-      this.appConfig.avalaraCompanyId,
-      locationID,
-      certificate
-    )
+    var url = `${this.appConfig.middlewareUrl}/avalara/certificate/${locationID}`;
+    var response = await Axios.post(url, certificate, this.BuildConfig());
+    return response.data;
   }
 
   async updateCertificate(
     locationID: string,
     certificate: TaxCertificate
   ): Promise<TaxCertificate> {
-    return await HeadStartSDK.Avalaras.UpdateCertificate(
-      this.appConfig.avalaraCompanyId,
-      locationID,
-      certificate
-    )
+    var url = `${this.appConfig.middlewareUrl}/avalara/certificate/${locationID}`;
+    var response = await Axios.put(url, certificate, this.BuildConfig());
+    return response.data;
   }
 
   async getCertificate(locationID: string): Promise<TaxCertificate> {
-    return await HeadStartSDK.Avalaras.GetCertificate(
-      this.appConfig.avalaraCompanyId,
-      locationID
-    )
+    var url = `${this.appConfig.middlewareUrl}/avalara/certificate/${locationID}`;
+    var response = await Axios.get(url, this.BuildConfig());
+    return response.data;
+  }
+
+  BuildConfig(): AxiosRequestConfig {
+    return { headers: { Authorization: `Bearer ${Tokens.GetAccessToken()}`}};
   }
 }
