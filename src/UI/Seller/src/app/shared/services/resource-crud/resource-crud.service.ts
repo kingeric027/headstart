@@ -355,7 +355,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   searchBy(searchTerm: string): void {
-    this.patchFilterState({ search: searchTerm, searchType: 'ExactPhrasePrefix' || undefined })
+    this.patchFilterState({ search: searchTerm || undefined, searchType: 'ExactPhrasePrefix'})
   }
 
   addFilters(newFilters: ListArgs): void {

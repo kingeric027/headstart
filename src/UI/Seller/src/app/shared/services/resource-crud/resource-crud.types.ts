@@ -2,7 +2,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 
 export interface Options extends ListArgs {
   OrderDirection?: string,
-  searchType?: string
+  searchType?: 'AnyTerm' | 'AllTermsAnyField' | 'AllTermsSameField' | 'ExactPhrase' | 'ExactPhrasePrefix'
 }
 
 export const GETTING_NEW_ITEMS = 'GETTING_NEW_ITEMS'
