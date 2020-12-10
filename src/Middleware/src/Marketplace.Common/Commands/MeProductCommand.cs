@@ -114,7 +114,7 @@ namespace Marketplace.Common.Commands
 				var searchText = args.Search ?? "";
 				var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
 				var sortBy = args.SortBy.FirstOrDefault();
-				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, sortBy: sortBy, searchOn: searchFields, accessToken: user.AccessToken);
+				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
 				var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 				var exchangeRatesRequest = GetExchangeRates(user);
 
