@@ -23,7 +23,6 @@ import { AppConfig, CurrentUser, ProductFilters } from 'src/app/shopper-context'
 import { RouteConfig } from 'src/app/services/route/route-config'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { StaticPageService } from 'src/app/services/static-page/static-page.service'
-import { Title } from '@angular/platform-browser'
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -70,7 +69,6 @@ export class OCMAppHeader implements OnInit {
     public context: ShopperContextService,
     public appConfig: AppConfig,
     public staticPageService: StaticPageService,
-    public titleService: Title
   ) {
     this.profileRoutes = context.router.getProfileRoutes()
     this.orderRoutes = context.router.getOrderRoutes()
@@ -90,15 +88,9 @@ export class OCMAppHeader implements OnInit {
       .subscribe(this.handleFiltersChange)
     this.context.router.onUrlChange((path) => {
       this.activePath = path;
-      this.titleService.setTitle(this.getPageTitle());
     })
     this.buildAddToCartListener()
     this.flagIcon = this.getCurrencyFlag()
-  }
-
-  getPageTitle(): string {
-    const title = this.activePath.replace('/', '');
-    return title.charAt(0).toUpperCase() + title.slice(1)
   }
 
   // TODO: add PageDocument type to cms library so this is strongly typed
