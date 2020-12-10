@@ -113,7 +113,6 @@ namespace Marketplace.API
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IDevCenterService>()
-                .Inject<IZohoClient>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
                 .Inject<IOrchestrationCommand>()
@@ -149,6 +148,7 @@ namespace Marketplace.API
                 .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
+                .Inject<IZohoClient>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClient(
                     new ZohoClientConfig() {
                         ApiUrl = "https://books.zoho.com/api/v3",
@@ -156,7 +156,7 @@ namespace Marketplace.API
                         ClientId = _settings.ZohoSettings.ClientId,
                         ClientSecret = _settings.ZohoSettings.ClientSecret,
                         OrganizationID = _settings.ZohoSettings.OrgID
-                    }), 
+                    }, flurlClientFactory), 
                     new OrderCloudClient(new OrderCloudClientConfig
                     {
                         ApiUrl = _settings.OrderCloudSettings.ApiUrl,
