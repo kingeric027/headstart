@@ -76,6 +76,7 @@ export class LineItemTableComponent {
 
   getShipMethodString(lineItem: MarketplaceLineItem): string {
     const salesOrderID = this._order.ID.split('-')[0]
+    const isPurchaseOrder = salesOrderID !== this._order.ID
     const supplierOrder = this._supplierOrders?.find(
       (order) => order.ID === `${salesOrderID}-${lineItem.SupplierID}`
     )
@@ -85,9 +86,12 @@ export class LineItemTableComponent {
     ).find((sm) => sm.ShipFromAddressID === shipFromID)
     if (shipMethod == null) return 'No Data'
     const name = shipMethod.Name.replace(/_/g, ' ')
+    if(isPurchaseOrder) {
+      return `${name}, Estimated ${shipMethod.EstimatedTransitDays} Day Delivery`
+    } 
     const delivery = new Date(this._order.DateSubmitted)
     delivery.setDate(delivery.getDate() + shipMethod.EstimatedTransitDays)
-    return `${name}, ${delivery.toLocaleDateString('en-US')} Delivery`
+    return `${name},  ${delivery.toLocaleDateString('en-US')} Delivery`
   }
 
   setupForm(): void {
