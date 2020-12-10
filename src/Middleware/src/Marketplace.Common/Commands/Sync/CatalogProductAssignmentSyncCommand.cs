@@ -5,7 +5,6 @@ using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
-using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands

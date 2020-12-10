@@ -335,7 +335,7 @@ namespace Marketplace.Common.Commands
         public async Task<ChiliTemplate> Get(string templateID, VerifiedUserContext user)
         {
             var template = await _query.Get(templateID, _settings.ChiliPublishSettings.ClientId.ToLower());
-            var product = await _adminProduct.Get(template.SupplierProductID, user);
+            var product = await _adminProduct.Get(template.SupplierProductID, user.AccessToken);
             var templateSpecs = await Throttler.RunAsync(template.Specs, 100, 30, s => _oc.Specs.GetAsync<ChiliSpec>(s));
 
             var result = new ChiliTemplate()

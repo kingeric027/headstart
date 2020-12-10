@@ -31,7 +31,13 @@ namespace Marketplace.Common
         public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
         public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
         public FlurlSettings FlurlSettings { get; set; } = new FlurlSettings();
+        public CMSSettings CMSSettings { get; set; } = new CMSSettings();
     }
+
+    public class CMSSettings
+	{
+        public string BaseUrl { get; set; }
+	}
 
     public class UI
     {

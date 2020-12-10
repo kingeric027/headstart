@@ -56,7 +56,7 @@ namespace Marketplace.Common.Commands
                 pageSize: 100,
                 accessToken: user.AccessToken
                 ));
-                ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
+                ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
                 var configToUse = new OrderCloudClientConfig
                 {

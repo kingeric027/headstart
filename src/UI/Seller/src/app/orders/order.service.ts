@@ -24,7 +24,7 @@ export class OrderService extends ResourceCrudService<Order> {
       'orders'
     )
   }
-  setOrderDirection(orderDirection: string) {
+  setOrderDirection(orderDirection: 'Incoming' | 'Outgoing') {
     this.patchFilterState({ OrderDirection: orderDirection })
   }
   isQuoteOrder(order: Order) {
