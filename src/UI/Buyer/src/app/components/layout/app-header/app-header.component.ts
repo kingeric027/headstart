@@ -68,7 +68,7 @@ export class OCMAppHeader implements OnInit {
   constructor(
     public context: ShopperContextService,
     public appConfig: AppConfig,
-    public staticPageService: StaticPageService,
+    public staticPageService: StaticPageService
   ) {
     this.profileRoutes = context.router.getProfileRoutes()
     this.orderRoutes = context.router.getOrderRoutes()
@@ -86,9 +86,7 @@ export class OCMAppHeader implements OnInit {
     this.context.productFilters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))
       .subscribe(this.handleFiltersChange)
-    this.context.router.onUrlChange((path) => {
-      this.activePath = path;
-    })
+    this.context.router.onUrlChange((path) => (this.activePath = path))
     this.buildAddToCartListener()
     this.flagIcon = this.getCurrencyFlag()
   }
