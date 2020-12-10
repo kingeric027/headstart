@@ -23,6 +23,7 @@ import {
   MarketplaceAddressBuyer,
   OrderCloudIntegrationsCreditCardPayment,
 } from '@ordercloud/headstart-sdk'
+import { max } from 'lodash'
 
 @Injectable({
   providedIn: 'root',
@@ -159,12 +160,41 @@ export class CheckoutService {
     /* line item ids are significant for suppliers creating a relationship
      * between their shipments and line items in ordercloud
      * we are sequentially labeling these ids for ease of shipping */
-    const lineItemIDChanges = lineItems.map((li, index) => {
-      return LineItems.Patch('Outgoing', orderID, li.ID, {
-        ID: this.createIDFromIndex(index),
-      })
+    const patchQueue: Promise<any>[] = [] //This is an array of operations we will add to.
+    const unIndexedLi = lineItems.filter((li) => li.ID.length != 4)
+    let indexedLi = lineItems.filter((li) => li.ID.length === 4)
+    lineItems.forEach((li, index) => {
+      if (
+        !lineItems.map((li) => li.ID).includes(this.createIDFromIndex(index))
+      ) {
+        //first check if there are any that have not been idexed at all
+        if (unIndexedLi.length) {
+          const liToPatch = unIndexedLi[0]
+          patchQueue.push(
+            LineItems.Patch('Outgoing', orderID, liToPatch.ID, {
+              ID: this.createIDFromIndex(index),
+            })
+          )
+          unIndexedLi.shift() //now remove that li from the unIndexed array
+        } else {
+          //otherwise grab the highest indexed line item and patch that to fill the hole.
+          const maxIndex = max(
+            indexedLi.map((li) => Number(li.ID.substring(1)))
+          )
+          const indextoMatch = this.createIDFromIndex(maxIndex - 1)
+          const liToPatch = indexedLi.find((li) => {
+            return li.ID === indextoMatch
+          })
+          patchQueue.push(
+            LineItems.Patch('Outgoing', orderID, liToPatch.ID, {
+              ID: this.createIDFromIndex(index),
+            })
+          )
+          indexedLi = indexedLi.filter((li) => li.ID !== indextoMatch) // now remove that from indexedLi array so we dont patch it again
+        }
+      }
     })
-    await Promise.all(lineItemIDChanges)
+    await Promise.all(patchQueue)
     await this.state.resetLineItems()
   }
 
