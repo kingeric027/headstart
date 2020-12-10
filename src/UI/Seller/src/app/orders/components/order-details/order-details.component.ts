@@ -205,7 +205,7 @@ export class OrderDetailsComponent {
     if (this.isSupplierOrder(order.ID)) {
       const orderData = await this.middleware.getSupplierData(order.ID)
       this._buyerOrder = orderData.BuyerOrder.Order
-      this._lineItems = orderData.BuyerOrder.LineItems
+      this._lineItems = orderData.SupplierOrder.LineItems;
     } else {
       this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)

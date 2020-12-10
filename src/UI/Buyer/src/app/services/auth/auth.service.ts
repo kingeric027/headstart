@@ -23,6 +23,8 @@ import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service'
 import { ApplicationInsightsService } from '../application-insights/application-insights.service'
 import { TokenHelperService } from '../token-helper/token-helper.service'
+import { CMSConfiguration } from '../cms-api/cms-utils'
+import { ContentManagementClient } from '../cms-api/cms-api'
 
 @Injectable({
   providedIn: 'root',
@@ -136,6 +138,7 @@ export class AuthService {
     rememberMe = false
   ): void {
     this.tokenHelper.setIsSSO(isSSO)
+    ContentManagementClient.Tokens.SetAccessToken(token);
     HeadStartSDK.Tokens.SetAccessToken(token)
     this.setToken(token)
     if (rememberMe && refreshToken) {
@@ -156,6 +159,7 @@ export class AuthService {
         this.appConfig.clientID,
         this.appConfig.scope
       )
+      ContentManagementClient.Tokens.SetAccessToken(creds.access_token);
       HeadStartSDK.Tokens.SetAccessToken(creds.access_token)
       this.setToken(creds.access_token)
       return creds
@@ -167,6 +171,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     Tokens.RemoveAccessToken()
+    ContentManagementClient.Tokens.RemoveAccessToken();
     HeadStartSDK.Tokens.RemoveAccessToken()
     this.isLoggedIn = false
     this.appInsightsService.clearUser()

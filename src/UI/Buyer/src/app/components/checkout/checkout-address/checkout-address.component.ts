@@ -144,10 +144,12 @@ export class OCMCheckoutAddress implements OnInit {
         page <= this.existingBuyerLocations.Meta.TotalPages;
         page++
       ) {
-        listOptions.page = page
+        listOptions.page = page;
+        // Hack to avoid page being mutated after the request has been added to the queue
+        const copiedListOptions = JSON.parse(JSON.stringify(listOptions));
         requests = [
           ...requests,
-          this.context.addresses.listBuyerLocations(listOptions),
+          this.context.addresses.listBuyerLocations(copiedListOptions),
         ]
       }
       return await Promise.all(requests).then((response) => {
@@ -160,9 +162,33 @@ export class OCMCheckoutAddress implements OnInit {
   }
 
   private async listSavedShippingAddresses(): Promise<void> {
-    this.existingShippingAddresses = await this.context.addresses.list({
-      filters: { Shipping: true },
-    })
+    const listOptions = {
+      page: 1,
+      pageSize: 100
+    }
+    this.existingShippingAddresses = await this.context.addresses.listShippingAddresses(listOptions);
+    if (this.existingShippingAddresses?.Meta.TotalPages > 1) {
+      let requests = []
+      for (
+        let page = 2;
+        page <= this.existingShippingAddresses.Meta.TotalPages;
+        page++
+      ) {
+        listOptions.page = page;
+        // Hack to avoid page being mutated after the request has been added to the queue
+        const copiedListOptions = JSON.parse(JSON.stringify(listOptions));
+        requests = [
+          ...requests,
+          this.context.addresses.listShippingAddresses(copiedListOptions),
+        ]
+      }
+      return await Promise.all(requests).then((response) => {
+        this.existingShippingAddresses.Items = [
+          ...this.existingShippingAddresses.Items,
+          ..._flatten(response.map((r) => r.Items)),
+        ]
+      })
+    }
   }
 
   private async saveNewShippingAddress(

@@ -15,14 +15,14 @@ export function getProductSmallImageUrl(
   product: MarketplaceProduct,
   sellerID: string
 ): string {
-  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`
+  return `${environment.cmsUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`
 }
 
 export function getProductMediumImageUrl(
   product: MarketplaceProduct,
   sellerID: string
 ): string {
-  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`
+  return `${environment.cmsUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`
 }
 
 export const getPrimaryLineItemImage = (

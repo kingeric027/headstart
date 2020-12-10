@@ -99,7 +99,7 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
-    if (this.orderDirection !== null && this.orderDirection !== undefined) {
+    if (this.orderDirection && this._order.ID) {
       this.superShipments = []
       await this.getShipments(this._order.ID)
       await this.getLineItems(this._order.ID)

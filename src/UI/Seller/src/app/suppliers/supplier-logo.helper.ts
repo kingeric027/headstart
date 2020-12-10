@@ -7,12 +7,12 @@ export function getSupplierLogoSmallUrl(
   supplier: MarketplaceSupplier,
   sellerID: string
 ): string {
-  return `${environment.middlewareUrl}/assets/${sellerID}/suppliers/${supplier.ID}/thumbnail?size=s`
+  return `${environment.cmsUrl}/assets/${sellerID}/suppliers/${supplier.ID}/thumbnail?size=s`
 }
 
 export function getSupplierLogoMediumUrl(
   supplier: MarketplaceSupplier,
   sellerID: string
 ): string {
-  return `${environment.middlewareUrl}/assets/${sellerID}/suppliers/${supplier.ID}/thumbnail?size=m`
+  return `${environment.cmsUrl}/assets/${sellerID}/suppliers/${supplier.ID}/thumbnail?size=m`
 }

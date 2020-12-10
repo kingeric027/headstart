@@ -41,8 +41,8 @@ namespace Marketplace.Common.Commands
 			var _product = _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
 			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
-			var _images = _marketplaceProductCommand.GetProductImages(id, user);
-			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user);
+			var _images = _marketplaceProductCommand.GetProductImages(id, user.AccessToken);
+			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user.AccessToken);
 			var unconvertedSuperMarketplaceProduct = new SuperMarketplaceMeProduct 
 			{
 				Product = await _product,
@@ -113,7 +113,8 @@ namespace Marketplace.Common.Commands
 		{
 				var searchText = args.Search ?? "";
 				var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
-				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, accessToken: user.AccessToken);
+				var sortBy = args.SortBy.FirstOrDefault();
+				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, sortBy: sortBy, searchOn: searchFields, accessToken: user.AccessToken);
 				var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 				var exchangeRatesRequest = GetExchangeRates(user);
 

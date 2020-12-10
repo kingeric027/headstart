@@ -5,6 +5,7 @@ export const environment: Environment = {
   sellerID: 'BRANDWEARDESIGNS_TEST',
   clientID: '13FB36D2-52CA-44D7-B426-2B4BB474EB47',
   middlewareUrl: 'https://brandweardesigns-middleware-test.azurewebsites.net',
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
   appname: 'BRANDWEAR Designs Admin',
   translateBlobUrl:
     'https://stbrandweartest.blob.core.windows.net/ngx-translate/i18n/',

@@ -82,16 +82,20 @@ export class PDFService {
   }
 
   private async generateNoImagePDF(orderDetailObject, printObj, orderID) {
-    this.removeNodesOfClass(orderDetailObject, 'img-thumbnail')
-    const canvas = await html2canvas(printObj, { allowTaint: true })
-    const pdf = new jsPDF()
-    const width = canvas.width
-    const height = canvas.height
-    const aspectRatio = width / height
-    const imgData = canvas.toDataURL('image/png')
-    pdf.addImage(imgData, 'PNG', 20, 20, 170, 170 / aspectRatio)
-    pdf.save(orderID + '.pdf')
-    this.removeNodesOfClass(document, 'hidden-print-area')
+    try {
+      this.removeNodesOfClass(orderDetailObject, 'img-thumbnail')
+      const canvas = await html2canvas(printObj, { allowTaint: true })
+      const pdf = new jsPDF()
+      const width = canvas.width
+      const height = canvas.height
+      const aspectRatio = width / height
+      const imgData = canvas.toDataURL('image/png')
+      pdf.addImage(imgData, 'PNG', 20, 20, 170, 170 / aspectRatio)
+      pdf.save(orderID + '.pdf')
+    } finally {
+      this.removeNodesOfClass(document, 'hidden-print-area')
+    }
+
   }
 
   private removeNodesOfClass(parentObject: any, classToRemove: string): void {

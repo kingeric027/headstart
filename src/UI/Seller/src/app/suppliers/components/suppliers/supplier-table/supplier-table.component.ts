@@ -36,6 +36,7 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { AppAuthService } from '@app-seller/auth'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 export interface SupplierCategoryConfigFilters {
   Display: string
   Path: string
@@ -191,7 +192,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
           asset,
           accessToken
         )
-        await HeadStartSDK.Assets.SaveAssetAssignment(
+        await ContentManagementClient.Assets.SaveAssetAssignment(
           {
             ResourceType: 'Suppliers',
             ResourceID: supplier.ID,
