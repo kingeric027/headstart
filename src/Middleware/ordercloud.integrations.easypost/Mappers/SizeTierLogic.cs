@@ -44,9 +44,9 @@ namespace ordercloud.integrations.easypost
 	{
 		// This is intended to be a max parcel dimension, but is not being honored because of a bug in the math. see line 83 about percentage 1 vs 100
 		// however, fixing that math produces some crazy rates (~$1000).
-		public static readonly decimal FULL_PACKAGE_DIMENSION = 11; // inches. 
-        public static readonly decimal DEFAULT_WEIGHT = 5;
-		public decimal PercentFilled { get; set; } = 0;
+		public static readonly double FULL_PACKAGE_DIMENSION = 11; // inches. 
+        public static readonly double DEFAULT_WEIGHT = 5;
+		public double PercentFilled { get; set; } = 0;
 		public decimal Weight { get; set; } = 0; // lbs 
 	}
 
@@ -96,24 +96,24 @@ namespace ordercloud.integrations.easypost
 
 			var combinationPackages = parcels.Select((package, index) =>
 			{
-				var dimension = (int)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
+				var dimension = (double)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
 				return new EasyPostParcel()
 				{
 					weight = (double)package.Weight,
-					length = dimension,
-					width = dimension,
-					height = dimension,
+					length = Math.Max(dimension, Package.FULL_PACKAGE_DIMENSION),
+					width = Math.Max(dimension, Package.FULL_PACKAGE_DIMENSION),
+					height = Math.Max(dimension, Package.FULL_PACKAGE_DIMENSION)
 				};
 			}).Select(p => CapParcelDimensions(p, TARGET_REASONABLE_PARCEL_DIMENSION));
 
 			var individualPackages = lineItemsThatShipAlone.Select(li => new EasyPostParcel()
             {
                 // length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
-                weight = (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
-                length = (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
-                width = (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
-                height = (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
-            }).Select(p => CapParcelDimensions(p, EASYPOST_MAX_PARCEL_DIMENSION));
+                weight = li.Product.ShipWeight.ValueOrDefault(Package.DEFAULT_WEIGHT), // (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
+                length = li.Product.ShipLength.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
+                width = li.Product.ShipWeight.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
+                height = li.Product.ShipHeight.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
+			}).Select(p => CapParcelDimensions(p, EASYPOST_MAX_PARCEL_DIMENSION));
 
 			return combinationPackages.Union(individualPackages).ToList();
 		}
