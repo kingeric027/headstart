@@ -144,6 +144,7 @@ namespace Marketplace.API
                 })))
                 .Inject<ISupplierApiClientHelper>()
                 .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = _settings.CMSSettings.BaseUrl }))
+                .AddSingleton<OrderCloudTecraConfig>(x => _settings.TecraSettings)
                 .Inject<IOrderCloudIntegrationsTecraService>()
                 .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
