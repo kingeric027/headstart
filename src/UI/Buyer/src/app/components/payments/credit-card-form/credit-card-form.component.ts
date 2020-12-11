@@ -1,4 +1,13 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core'
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  SimpleChange,
+} from '@angular/core'
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe'
 import { ValidateCreditCard } from 'src/app/validators/validators'
@@ -7,6 +16,7 @@ import { GeographyConfig } from 'src/app/config/geography.class'
 import { faCcMastercard, faCcVisa } from '@fortawesome/free-brands-svg-icons'
 import { getZip } from 'src/app/services/zip-validator.helper'
 import { TypedFormGroup } from 'ngx-forms-typed'
+import { ComponentChanges } from 'src/app/models/component-changes.interface'
 
 export interface CreditCardFormOutput {
   card: OrderCloudIntegrationsCreditCardToken
@@ -30,35 +40,17 @@ interface CreditCard {
   templateUrl: './credit-card-form.component.html',
   styleUrls: ['./credit-card-form.component.scss'],
 })
-export class OCMCreditCardForm implements OnInit {
+export class OCMCreditCardForm implements OnInit, OnChanges {
   @Output() formSubmitted = new EventEmitter<CreditCardFormOutput>()
   @Output() formDismissed = new EventEmitter()
   @Input() card: OrderCloudIntegrationsCreditCardToken
   @Input() submitText: string
-  @Input() set showCVV(value: boolean) {
-    if (value && !this._showCVV) {
-      this.buildCVVForm()
-    }
-    if (!value && this._showCVV) {
-      this.removeCVVForm()
-    }
-    this._showCVV = value
-  }
-  @Input() set showCardDetails(_showCardDetails: boolean) {
-    if (_showCardDetails && !this._showCardDetails) {
-      // set to true, previously false
-      this.buildCardDetailsForm(this.card)
-    }
-    if (!_showCardDetails && this._showCardDetails) {
-      // set to false, previously true
-      this.removeCardDetailsForm()
-    }
-    this._showCardDetails = _showCardDetails
-  }
   @Input() termsAccepted: boolean
-
-  _showCVV = false
+  @Input() showCVV = false
+  @Input() showCardDetails = true
+  _termsAccepted: boolean
   _showCardDetails = true
+  _showCVV = false
   cardError?: string
   cardForm = new FormGroup({}) as TypedFormGroup<CreditCard>
   monthOptions = [
@@ -89,6 +81,47 @@ export class OCMCreditCardForm implements OnInit {
 
   ngOnInit(): void {
     this.buildCardDetailsForm(this.card)
+  }
+
+  ngOnChanges(changes: ComponentChanges<OCMCreditCardForm>): void {
+    // template can't reference input properties directly because they may change outside of angular's knowledge
+    // instead reference controlled variables that are only updated when angular knows about them (in ngOnChanges)
+    if (changes.showCardDetails) {
+      this._showCardDetails = changes.showCardDetails.currentValue
+    }
+    if (changes.termsAccepted) {
+      this._termsAccepted = changes.termsAccepted.currentValue
+    }
+    if (changes.showCVV) {
+      this._showCVV = changes.showCVV.currentValue
+    }
+
+    if (changes.showCVV) {
+      const { currentValue, previousValue } = changes.showCVV
+      this.handleShowCVVChanges(currentValue, previousValue)
+    }
+    if (changes.showCardDetails) {
+      const { currentValue, previousValue } = changes.showCardDetails
+      this.handleShowDetailChanges(currentValue, previousValue)
+    }
+  }
+
+  handleShowCVVChanges(currentValue: boolean, previousValue: boolean): void {
+    if (currentValue && !previousValue) {
+      this.buildCVVForm()
+    }
+    if (!currentValue && previousValue) {
+      this.removeCVVForm()
+    }
+  }
+
+  handleShowDetailChanges(currentValue: boolean, previousValue: boolean): void {
+    if (currentValue && !previousValue) {
+      this.buildCardDetailsForm(this.card)
+    }
+    if (!currentValue && previousValue) {
+      this.removeCardDetailsForm()
+    }
   }
 
   ccEntered({
