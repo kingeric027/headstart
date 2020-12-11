@@ -76,6 +76,9 @@ namespace Marketplace.Common.Commands
                 await ocClient.AuthenticateAsync();
                 var token = ocClient.TokenResponse.AccessToken;
                 product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, token);
+
+                //Delete document after acceptance
+                await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
             }
             await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
             var superProduct = await _productCommand.Get(productID, user.AccessToken);
