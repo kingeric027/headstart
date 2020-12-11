@@ -72,7 +72,7 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
           const userTriggered = this.form.dirty
           return searchTerm !== this.previousSearchTerm && userTriggered
         }),
-        debounceTime(500),
+        debounceTime(800),
         takeWhile(() => this.alive)
       )
       .subscribe((searchTerm) => {
