@@ -1,17 +1,28 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core'
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe'
-import {
-  ValidateCreditCard,
-  ValidateUSZip,
-} from 'src/app/validators/validators'
+import { ValidateCreditCard } from 'src/app/validators/validators'
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk'
 import { GeographyConfig } from 'src/app/config/geography.class'
 import { faCcMastercard, faCcVisa } from '@fortawesome/free-brands-svg-icons'
 import { getZip } from 'src/app/services/zip-validator.helper'
+import { TypedFormGroup } from 'ngx-forms-typed'
 
 export interface CreditCardFormOutput {
   card: OrderCloudIntegrationsCreditCardToken
+  cvv: string
+}
+
+interface CreditCard {
+  token: string
+  name: string
+  month: string
+  year: string
+  street: string
+  state: string
+  city: string
+  zip: string
+  country: string
   cvv: string
 }
 
@@ -33,21 +44,23 @@ export class OCMCreditCardForm implements OnInit {
     }
     this._showCVV = value
   }
-  @Input() set showCardDetails(value: boolean) {
-    if (value && !this._showCardDetails) {
+  @Input() set showCardDetails(_showCardDetails: boolean) {
+    if (_showCardDetails && !this._showCardDetails) {
+      // set to true, previously false
       this.buildCardDetailsForm(this.card)
     }
-    if (!value && this._showCardDetails) {
+    if (!_showCardDetails && this._showCardDetails) {
+      // set to false, previously true
       this.removeCardDetailsForm()
     }
-    this._showCardDetails = value
+    this._showCardDetails = _showCardDetails
   }
   @Input() termsAccepted: boolean
 
   _showCVV = false
   _showCardDetails = true
   cardError?: string
-  cardForm = new FormGroup({})
+  cardForm = new FormGroup({}) as TypedFormGroup<CreditCard>
   monthOptions = [
     '01',
     '02',
