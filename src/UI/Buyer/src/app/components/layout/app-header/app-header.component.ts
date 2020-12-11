@@ -182,6 +182,10 @@ export class OCMAppHeader implements OnInit {
     this.context.router.toProductList({ search: searchStr })
   }
 
+  isRouteActive(url: string): boolean {
+    return this.activePath === url || (this.activePath === '/profile' && url === '/profile/details');
+  }
+
   logout(): void {
     this.context.authentication.logout()
   }
