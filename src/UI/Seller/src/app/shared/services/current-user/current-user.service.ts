@@ -19,10 +19,10 @@ import {
 } from '@app-seller/auth/services/app-auth.service'
 import { AppStateService } from '../app-state/app-state.service'
 import { UserContext } from '@app-seller/config/user-context'
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
 import { HeadStartSDK, Asset } from '@ordercloud/headstart-sdk'
 import { Tokens } from 'ordercloud-javascript-sdk'
 import { BehaviorSubject } from 'rxjs'
+import { ContentManagementClient } from '../cms-api/cms-api'
 
 @Injectable({
   providedIn: 'root',
@@ -61,6 +61,7 @@ export class CurrentUserService {
       this.appAuthService.setRememberStatus(true)
     }
     HeadStartSDK.Tokens.SetAccessToken(accessToken.access_token)
+    ContentManagementClient.Tokens.SetAccessToken(accessToken.access_token)
     Tokens.SetAccessToken(accessToken.access_token)
     this.ocTokenService.SetAccess(accessToken.access_token)
     this.appStateService.isLoggedIn.next(true)
@@ -68,7 +69,7 @@ export class CurrentUserService {
     this.userSubject.next(this.me)
     let imgAssets: ListPage<Asset>
     if (this.me.Supplier) {
-      imgAssets = await HeadStartSDK.Assets.ListAssetsOnChild(
+      imgAssets = await ContentManagementClient.Assets.ListAssetsOnChild(
         'Suppliers',
         this.me.Supplier.ID,
         'SupplierUsers',
@@ -76,7 +77,7 @@ export class CurrentUserService {
         { filters: { Tags: ['ProfileImg'] } }
       )
     } else {
-      imgAssets = await HeadStartSDK.Assets.ListAssets(
+      imgAssets = await ContentManagementClient.Assets.ListAssets(
         'AdminUsers',
         this.me.ID,
         { filters: { Tags: ['ProfileImg'] } }

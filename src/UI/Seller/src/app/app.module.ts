@@ -45,6 +45,7 @@ import {
   AppConfig,
   ocAppConfig,
 } from './config/app.config'
+import { CMSConfiguration } from './shared/services/cms-api/cms-utils'
 
 export function HttpLoaderFactory(
   http: HttpClient,
@@ -119,6 +120,9 @@ export class AppModule {
     translate.setDefaultLang('en')
     HeadstartConfiguration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
+    })
+    CMSConfiguration.Set({
+      baseApiUrl: this.appConfig.cmsUrl,
     })
     OcConfiguration.Set(this.getOrdercloudSDKConfig(appConfig))
   }

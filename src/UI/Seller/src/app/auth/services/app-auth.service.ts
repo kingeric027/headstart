@@ -21,6 +21,7 @@ import {
   OrderCloudUserType,
 } from '@app-seller/shared/models/ordercloud-user.types'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 export const TokenRefreshAttemptNotPossible =
   'Token refresh attempt not possible'
@@ -51,6 +52,7 @@ export class AppAuthService {
     return this.fetchRefreshToken().pipe(
       tap((token) => {
         this.ocTokenService.SetAccess(token)
+        ContentManagementClient.Tokens.SetAccessToken(token)
         this.refreshToken.next(token)
         this.appStateService.isLoggedIn.next(true)
       }),
@@ -119,7 +121,10 @@ export class AppAuthService {
         .RefreshToken(refreshToken, this.appConfig.clientID)
         .pipe(
           map((authResponse) => authResponse.access_token),
-          tap((token) => this.ocTokenService.SetAccess(token)),
+          tap((token) => {
+            ContentManagementClient.Tokens.SetAccessToken(token)
+            this.ocTokenService.SetAccess(token)
+          }),
           catchError((error) => {
             return throwError(error)
           })
@@ -131,6 +136,7 @@ export class AppAuthService {
   logout(): Observable<any> {
     const cookiePrefix = this.appConfig.appname.replace(/ /g, '_').toLowerCase()
     HeadStartSDK.Tokens.RemoveAccessToken()
+    ContentManagementClient.Tokens.RemoveAccessToken()
     const appCookieNames = _keys(this.cookieService.getAll())
     appCookieNames.forEach((cookieName) => {
       if (cookieName.includes(cookiePrefix)) {

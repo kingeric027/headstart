@@ -81,6 +81,23 @@ test('Can the page be affected by adjusting facets | 6790', async t => {
 		.ok()
 })
 
+test('Does the Sort By dropdown properly adjust the order that items populate', async t => {
+	await buyerHeaderPage.clickProductsLink()
+	const beforeSortFirstProductName = await productListPage.products.nth(0)
+		.innerText
+	await productListPage.sortProducts('Name: Z to A')
+	const afterSortFirstProductName = await productListPage.products.nth(0)
+		.innerText
+
+	//assert that first product name after Z to A sort is greater (later in the alphabet) than before the sort
+	await t
+		.expect(
+			afterSortFirstProductName.substring(0, 1) >
+				beforeSortFirstProductName.substring(0, 1)
+		)
+		.ok()
+})
+
 test('Does selecting a Product Card bring the User to the details page | 6791', async t => {
 	const productName = '100 CLASS T-SHIRT'
 	await buyerHeaderPage.search(productName)

@@ -129,8 +129,14 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{templateID}"), OrderCloudIntegrationsAuth]
         public async Task<ChiliTemplate> Get(string templateID)
         {
-            var result = await _command.Get(templateID, this.VerifiedUserContext);
-            return result;
+            return await _command.Get(templateID, this.VerifiedUserContext);
+        }
+
+        [DocName("Get a Chili Template")]
+        [HttpGet, Route("me/{templateID}"), OrderCloudIntegrationsAuth]
+        public async Task<MeChiliTemplate> GetMe(string templateID)
+        {
+            return await _command.GetMe(templateID, this.VerifiedUserContext);
         }
     }
 
@@ -160,7 +166,7 @@ namespace Marketplace.Common.Controllers
             return await _command.List(args, this.VerifiedUserContext);
         }
 
-		[DocName("Create a Chili Assignment")]
+        [DocName("Create a Chili Assignment")]
         [DocIgnore]
         [HttpPost, Route(""), OrderCloudIntegrationsAuth]
         public async Task<ChiliConfig> Create([FromBody] ChiliConfig config)
@@ -181,7 +187,7 @@ namespace Marketplace.Common.Controllers
         {
             await _command.Delete(configID, this.VerifiedUserContext);
         }
-	}
+    }
 
     [DocComments("\"Integration\" represents an array of Tecra Documents")]
     [MarketplaceSection.Content(ListOrder = 4)]
@@ -293,7 +299,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [DocName("Get Tecra PDF")]
-        [HttpGet, Route("")]
+        [HttpGet, Route("{id}")]
         public async Task<string> Get(string id)
         {
             var result = await _tecra.TecraPDF(id);

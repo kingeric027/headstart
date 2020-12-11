@@ -6,10 +6,10 @@ import {
   ChiliConfig,
   ChiliSpec,
   ListPage,
-  ChiliTemplate,
+  MeChiliTemplate,
 } from '@ordercloud/headstart-sdk'
 import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http'
-import { TempSdk } from '../temp-sdk/temp-sdk.service';
+import { TempSdk } from '../temp-sdk/temp-sdk.service'
 
 @Injectable({
   providedIn: 'root',
@@ -58,14 +58,14 @@ export class ChiliConfigService {
       .get<ChiliSpec>(url, { headers, params })
       .toPromise()
   }
-  async getChiliTemplate(id: string): Promise<ChiliTemplate> {
+  async getChiliTemplate(id: string): Promise<MeChiliTemplate> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     })
-    const url = `${this.appConfig.middlewareUrl}/chili/template/${id}`
+    const url = `${this.appConfig.middlewareUrl}/chili/template/me/${id}`
     return this.httpClient
-      .get<ChiliTemplate>(url, { headers })
+      .get<MeChiliTemplate>(url, { headers })
       .toPromise()
   }
 
@@ -100,11 +100,9 @@ export class ChiliConfigService {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     })
-    let params = new HttpParams()
-    params = params.append('id', id)
-    const url = `${this.appConfig.middlewareUrl}/tecra/pdf`
+    const url = `${this.appConfig.middlewareUrl}/tecra/pdf/${id}`
     return this.httpClient
-      .get<string>(url, { headers, params })
+      .get<string>(url, { headers })
       .toPromise()
   }
 }

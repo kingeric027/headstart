@@ -137,7 +137,7 @@ export class FullResourceTableComponent {
   getImage(resource: any): string {
     const resourceType =
       this.resourceType === 'kitproducts' ? 'products' : this.resourceType
-    return `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/${resourceType}/${resource.ID}/thumbnail?size=s`
+    return `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/${resourceType}/${resource.ID}/thumbnail?size=s`
   }
 
   selectResource(value: any) {

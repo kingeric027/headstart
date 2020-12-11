@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using System.Linq;
-using ordercloud.integrations.cms;
 using System.Dynamic;
 using System;
+using Marketplace.Common.Services.CMS;
 
 namespace Marketplace.Common.Commands
 {
@@ -20,13 +20,11 @@ namespace Marketplace.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
-        private readonly IDocumentQuery _query;
 
-        public MarketplaceBuyerCommand(AppSettings settings, IOrderCloudClient oc, IDocumentQuery query)
+        public MarketplaceBuyerCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _settings = settings;
             _oc = oc;
-            _query = query;
         }
         public async Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer superBuyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {

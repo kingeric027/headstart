@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,12 +20,14 @@ namespace Marketplace.Common.Controllers
         private static ICheckoutIntegrationCommand _checkoutIntegrationCommand;
         private static IPostSubmitCommand _postSubmitCommand;
         private static IZohoCommand _zoho;
+        private readonly IOrderCloudClient _oc;
 
-        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho) : base(settings)
+        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc) : base(settings)
         {
             _checkoutIntegrationCommand = checkoutIntegrationCommand;
             _postSubmitCommand = postSubmitCommand;
             _zoho = zoho;
+            _oc = oc;
         }
 
         [HttpGet, Route("shipping")]
@@ -66,10 +68,17 @@ namespace Marketplace.Common.Controllers
         }
 
         // good debug method for testing rates with orders
-        [HttpGet, Route("shippingrates/{orderID}"), OrderCloudIntegrationsAuth]
+        [HttpGet, Route("shippingrates/{orderID}")]
         public async Task<ShipEstimateResponse> GetShippingRates(string orderID)
         {
             return await _checkoutIntegrationCommand.GetRatesAsync(orderID);
+        }
+
+        [HttpPost, Route("postordersubmit/{orderID}"), OrderCloudIntegrationsAuth]
+        public async Task<OrderSubmitResponse> ManuallyRunPostOrderSubmit(string orderID)
+        {
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            return await _postSubmitCommand.HandleBuyerOrderSubmit(worksheet);
         }
     }
 
