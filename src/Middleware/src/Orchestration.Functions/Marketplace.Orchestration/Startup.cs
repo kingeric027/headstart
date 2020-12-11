@@ -40,7 +40,8 @@ namespace Marketplace.Orchestration
                 settings.CosmosSettings.MaxRequestsPerTcpConnection,
                 settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
             );
-            builder.Services    
+            builder.Services
+                .AddLazyCache()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
