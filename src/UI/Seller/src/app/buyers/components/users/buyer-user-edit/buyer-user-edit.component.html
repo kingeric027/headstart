@@ -42,6 +42,7 @@
               class="form-control"
               id="Username"
               maxlength="100"
+              showErrors
               aria-describedby="Username"
               formControlName="Username"
               (input)="updateResourceFromEvent($event, 'Username')"
@@ -62,6 +63,8 @@
               (input)="updateResourceFromEvent($event, 'Email')"
               placeholder="Enter Email"
             />
+            <span *ngIf="hasValidEmailError()"
+            class="error-message">Please enter a valid email address</span>
           </div>
         </div>
       </div>
@@ -80,6 +83,7 @@
               class="form-control"
               id="FirstName"
               maxlength="100"
+              showErrors
               aria-describedby="FirstName"
               formControlName="FirstName"
               (input)="updateResourceFromEvent($event, 'FirstName')"
@@ -93,6 +97,7 @@
               class="form-control"
               id="LastName"
               maxlength="100"
+              showErrors
               aria-describedby="LastName"
               formControlName="LastName"
               (input)="updateResourceFromEvent($event, 'LastName')"

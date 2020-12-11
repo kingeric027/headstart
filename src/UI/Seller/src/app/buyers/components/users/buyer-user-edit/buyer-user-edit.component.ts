@@ -31,7 +31,7 @@ export class BuyerUserEditComponent {
   selectedResource: User
   countryOptions: SupportedCountries[]
   isUserAssignedToGroups: boolean
-  constructor(public buyerUserService: BuyerUserService) {
+  constructor(public buyerUserService: BuyerUserService, public appFormErrorService: AppFormErrorService) {
     this.isCreatingNew = this.buyerUserService.checkIfCreatingNew()
     this.countryOptions = GeographyConfig.getCountries()
   }
@@ -66,4 +66,8 @@ export class BuyerUserEditComponent {
       this.resourceForm.controls.Country.enable()
     }
   }
+
+  hasValidEmailError = (): boolean => 
+    this.appFormErrorService.hasInvalidIdError(this.resourceForm.get('Email'))
+  
 }
