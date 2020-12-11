@@ -48,8 +48,8 @@ type MiddlewareLocationSelection = LOCAL | TEST
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
 const appName: AppName = WAXING_THE_CITY
-const middlewareLocationSelection: MiddlewareLocationSelection = TEST
-const localMiddlewareURL = 'https://localhost:44381'
+const middlewareLocationSelection: MiddlewareLocationSelection = LOCAL
+const localMiddlewareURL = 'https://localhost:5001'
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -64,8 +64,8 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://middleware-api-test.sebvendorportal.com',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
-    creditCardIframeUrl: 
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
+    creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
       'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
@@ -85,7 +85,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://middleware-api-test.sebvendorportal.com',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -106,7 +106,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://middleware-api-test.sebvendorportal.com',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,      
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -127,7 +127,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://middleware-api-test.sebvendorportal.com',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -148,7 +148,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://headstartdemo-middleware-test.azurewebsites.net',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -169,7 +169,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://fastsigns-middleware-test.azurewebsites.net',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -190,7 +190,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://go2partners-middleware-test.azurewebsites.net',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net' ,  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:
@@ -211,7 +211,7 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://brandweardesigns-middleware-test.azurewebsites.net',
-    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net'  ,  
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     creditCardIframeUrl:
       'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
     translateBlobUrl:

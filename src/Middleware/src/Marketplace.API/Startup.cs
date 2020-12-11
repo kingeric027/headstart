@@ -15,7 +15,6 @@ using Marketplace.Common.Services;
 using Marketplace.Common.Services.DevCenter;
 using Marketplace.Common.Services.ShippingIntegration;
 using Marketplace.Common.Services.Zoho;
-using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
@@ -73,13 +72,9 @@ namespace Marketplace.API
 				AccountID = _settings.AvalaraSettings.AccountID,
 				LicenseKey = _settings.AvalaraSettings.LicenseKey,
 				CompanyCode = _settings.AvalaraSettings.CompanyCode,
+                CompanyID = _settings.AvalaraSettings.CompanyID,
 				HostUrl = _settings.EnvironmentSettings.BaseUrl
 			};
-			var cmsConfig = new CMSConfig()
-			{
-				BaseUrl = _settings.EnvironmentSettings.BaseUrl,
-				BlobStorageHostUrl = _settings.BlobSettings.HostUrl
-            };
             var tecraConfig = _settings.TecraSettings;
             tecraConfig.BlobStorageHostUrl = _settings.BlobSettings.HostUrl;
             tecraConfig.BlobStorageConnectionString = _settings.BlobSettings.ConnectionString;
@@ -102,12 +97,6 @@ namespace Marketplace.API
                 .AddLazyCache()
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
-                .InjectCosmosStore<DocSchemaDO, DocSchemaDO>(cosmosConfig)
-                .InjectCosmosStore<DocumentDO, DocumentDO>(cosmosConfig)
-                .InjectCosmosStore<DocumentAssignmentDO, DocumentAssignmentDO>(cosmosConfig)
-                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig).Inject<AppSettings>()
                 .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
@@ -127,9 +116,6 @@ namespace Marketplace.API
                 .Inject<IMeProductCommand>()
                 .Inject<IMarketplaceCatalogCommand>()
                 .Inject<ISendgridService>()
-                .Inject<IAssetQuery>()
-                .Inject<IDocumentQuery>()
-                .Inject<ISchemaQuery>()
                 .Inject<IMarketplaceSupplierCommand>()
                 .Inject<IOrderCloudIntegrationsCardConnectCommand>()
                 .Inject<IOrderCloudIntegrationsTecraCommand>()
@@ -166,9 +152,8 @@ namespace Marketplace.API
                         ClientSecret = _settings.OrderCloudSettings.ClientSecret,
                         Roles = new[] { ApiRole.FullAccess }
                 })))
-                .AddSingleton<CMSConfig>(x => cmsConfig)
                 .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
-                .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
+                .AddSingleton<IExchangeRatesCommand>(provider => new ExchangeRatesCommand(currencyConfig, flurlClientFactory, provider.GetService<IAppCache>()))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig, 
                         new AvaTaxClient("four51 marketplace", "v1", "machine_name", avalaraConfig.Env)
                             .WithSecurity(_settings.AvalaraSettings.AccountID, _settings.AvalaraSettings.LicenseKey)))
@@ -192,7 +177,6 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
-
 
             var serviceProvider = services.BuildServiceProvider();
             services

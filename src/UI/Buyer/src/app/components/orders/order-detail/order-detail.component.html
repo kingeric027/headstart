@@ -252,7 +252,8 @@
         *ngIf="
           orderDetails &&
           showDetails() &&
-          !showRequestReturn && !showRequestCancel
+          !showRequestReturn &&
+          !showRequestCancel
         "
         [isOrderToApprove]="isOrderToApprove"
         [orderDetails]="orderDetails"
@@ -260,7 +261,10 @@
       </ocm-order-historical>
     </div>
   </div>
-  <ocm-order-shipments *ngIf="showShipments() && !showRequestReturn">
+  <ocm-order-shipments
+    *ngIf="showShipments() && !showRequestReturn"
+    [orderID]="order.ID"
+  >
   </ocm-order-shipments>
   <ocm-order-return
     class="col-md-6"

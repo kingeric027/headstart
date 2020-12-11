@@ -22,6 +22,7 @@ import { ProductDetailService } from './product-detail.service'
 import { ToastrService } from 'ngx-toastr'
 import { ContactSupplierBody, CurrentUser, MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { Title } from '@angular/platform-browser'
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -82,6 +83,7 @@ export class OCMProductDetails implements OnInit {
     this.isOrderable = !!superProduct.PriceSchedule
     this.supplierNote = this._product.xp && this._product.xp.Note
     this.specs = superProduct.Specs
+    this.setPageTitle()
     this.populateInactiveVariants(superProduct)
     this.listChiliConfigs()
   }
@@ -95,6 +97,9 @@ export class OCMProductDetails implements OnInit {
     )
   }
 
+  setPageTitle() {
+    this.context.router.setPageTitle(this._superProduct.Product.Name);
+  }
   async listChiliConfigs(): Promise<void> {
     if (!this._product?.xp?.ArtworkRequired) {
       return
