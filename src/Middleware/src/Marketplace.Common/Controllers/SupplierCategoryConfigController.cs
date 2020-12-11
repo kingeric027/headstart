@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
 using ordercloud.integrations.library;
-using ordercloud.integrations.cms;
 using Marketplace.Models;
 using Newtonsoft.Json.Linq;
+using Marketplace.Common.Services.CMS;
+using Marketplace.Common.Services.CMS.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -15,19 +16,19 @@ namespace Marketplace.Common.Controllers
     [MarketplaceSection.Marketplace(ListOrder = 5)]
     public class SupplierFilterConfigController : BaseController
     {
-        private readonly IDocumentQuery _query;
+        private readonly ICMSClient _cms;
 
-        public SupplierFilterConfigController(AppSettings settings, IDocumentQuery query) : base(settings)
+        public SupplierFilterConfigController(AppSettings settings, ICMSClient cms) : base(settings)
         {
-            _query = query;
+            _cms = cms;
         }
 
         [DocName("GET SupplierCategoryConfig")]
         [HttpGet, Route("/supplierfilterconfig"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.SupplierReader)]
-        public async Task<ListPage<SupplierFilterConfigDocument>> Get()
+        public async Task<ListPage<Document<SupplierFilterConfig>>> Get()
         {
-            var config = await _query.List<SupplierFilterConfig>("SupplierFilterConfig", new ListArgs<Document<SupplierFilterConfig>>(), VerifiedUserContext);
-            return config.Reserialize<ListPage<SupplierFilterConfigDocument>>();
+            var config = await _cms.Documents.List("SupplierFilterConfig", new ListArgs<Document<SupplierFilterConfig>>(), VerifiedUserContext.AccessToken);
+            return config.Reserialize<ListPage<Document<SupplierFilterConfig>>>();
         }
     }
 }

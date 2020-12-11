@@ -21,28 +21,27 @@ namespace ordercloud.integrations.avalara
 		// When should we do this? 
 		Task<TransactionModel> CommitTransactionAsync(string transactionCode);
 		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs);
-		Task<TaxCertificate> GetCertificateAsync(int companyID, int certificateID);
-		Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert);
-		Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert);
+		Task<TaxCertificate> GetCertificateAsync(int certificateID);
+		Task<TaxCertificate> CreateCertificateAsync(TaxCertificate cert, Address buyerLocation);
+		Task<TaxCertificate> UpdateCertificateAsync(int certificateID, TaxCertificate cert, Address buyerLocation);
 	}
 
 	public class AvalaraCommand : IAvalaraCommand
 	{
-		const string PROD_URL = "https://rest.avatax.com/api/v2";
-		const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
+        private const string PROD_URL = "https://rest.avatax.com/api/v2";
+        private const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
 		private readonly AvalaraConfig _settings;
 		private readonly AvaTaxClient _avaTax;
 		private readonly string _companyCode;
 		private readonly string _baseUrl;
 
-		public AvalaraCommand(AvalaraConfig settings)
+		public AvalaraCommand(AvalaraConfig settings, AvaTaxClient client)
 		{
 			_settings = settings;
 			_companyCode = _settings.CompanyCode;
 			_baseUrl = _settings.Env == AvaTaxEnvironment.Production ? PROD_URL : SANDBOX_URL;
-			_avaTax = new AvaTaxClient("four51 marketplace", "v1", "machine_name", _settings.Env)
-					.WithSecurity(_settings.AccountID, _settings.LicenseKey);
-		}
+            _avaTax = client;
+        }
 
 		public async Task<TransactionModel> GetEstimateAsync(OrderWorksheet orderWorksheet)
 		{
@@ -71,25 +70,30 @@ namespace ordercloud.integrations.avalara
 			return codeList;
 		}
 
-		public async Task<TaxCertificate> GetCertificateAsync(int companyID, int certificateID)
+		public async Task<TaxCertificate> GetCertificateAsync(int certificateID)
 		{
+			var companyID = _settings.CompanyID;
 			var certificate = _avaTax.GetCertificateAsync(companyID, certificateID, "");
 			var pdf = GetCertificateBase64String(companyID, certificateID);
 			var mappedCertificate = TaxCertificateMapper.Map(await certificate, await pdf);
 			return mappedCertificate;
 		}
 
-		public async Task<TaxCertificate> CreateCertificateAsync(int companyID, TaxCertificate cert)
+		public async Task<TaxCertificate> CreateCertificateAsync(TaxCertificate cert, Address buyerLocation)
 		{
-			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { TaxCertificateMapper.Map(cert) });
+			var companyID = _settings.CompanyID;
+			var certificates = await _avaTax.CreateCertificatesAsync(companyID, false, new List<CertificateModel> { 
+				TaxCertificateMapper.Map(cert, buyerLocation, companyID) 
+			});
 			var pdf = await GetCertificateBase64String(companyID, certificates[0].id ?? 0);
 			var mappedCertificate = TaxCertificateMapper.Map(certificates[0], pdf);
 			return mappedCertificate;
 		}
 
-		public async Task<TaxCertificate> UpdateCertificateAsync(int companyID, int certificateID, TaxCertificate cert)
+		public async Task<TaxCertificate> UpdateCertificateAsync(int certificateID, TaxCertificate cert, Address buyerLocation)
 		{
-			var certificate = _avaTax.UpdateCertificateAsync(companyID, certificateID, TaxCertificateMapper.Map(cert));
+			var companyID = _settings.CompanyID;
+			var certificate = _avaTax.UpdateCertificateAsync(companyID, certificateID, TaxCertificateMapper.Map(cert, buyerLocation, companyID));
 			var pdf = GetCertificateBase64String(companyID, certificateID);
 			var mappedCertificate = TaxCertificateMapper.Map(await certificate, await pdf);
 			return mappedCertificate;

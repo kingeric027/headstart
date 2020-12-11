@@ -6,7 +6,7 @@ using ordercloud.integrations.library;
 using Marketplace.Models;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Models.Marketplace;
-using ordercloud.integrations.cms;
+using Marketplace.Common.Services.CMS.Models;
 
 namespace Marketplace.Common.Controllers
 {
@@ -25,39 +25,39 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceKitProduct> Get(string id)
         {
-            return await _command.Get(id, VerifiedUserContext);
+            return await _command.Get(id, VerifiedUserContext.AccessToken);
         }
         
         [DocName("Create Kit Product")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceKitProduct> Create([FromBody] MarketplaceKitProduct kitProduct)
         {
-            return await _command.Post(kitProduct, VerifiedUserContext);
+            return await _command.Post(kitProduct, VerifiedUserContext.AccessToken);
         }
         [DocName("List Kit Products")]
         [HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args)
         {
-            return await _command.List(args, VerifiedUserContext);
+            return await _command.List(args, VerifiedUserContext.AccessToken);
         }
         [DocName("List Me Kit Products")]
         [HttpGet, Route("me"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<ListPage<MarketplaceKitProduct>> ListMeKits(ListArgs<Document<KitProduct>> args)
         {
-            return await _command.List(args, VerifiedUserContext);
+            return await _command.List(args, VerifiedUserContext.AccessToken);
         }
         [DocName("Save Kit Product")]
         [HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task<MarketplaceKitProduct> Save([FromBody] MarketplaceKitProduct kitProduct, string id)
         {
-            return await _command.Put(id, kitProduct, VerifiedUserContext);
+            return await _command.Put(id, kitProduct, VerifiedUserContext.AccessToken);
         }
 
         [DocName("Delete Kit Product")]
         [HttpDelete, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
         public async Task Delete(string id)
         {
-            await _command.Delete(id, VerifiedUserContext);
+            await _command.Delete(id, VerifiedUserContext.AccessToken);
         }
     }
 }

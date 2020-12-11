@@ -1,7 +1,9 @@
 ﻿using ordercloud.integrations.library;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace ordercloud.integrations.cms
+namespace Marketplace.Common.Services.CMS.Models
 {
 	public enum ParentResourceType
 	{
@@ -57,7 +59,7 @@ namespace ordercloud.integrations.cms
 	}
 
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-	public class ParentAttribute: Attribute
+	public class ParentAttribute : Attribute
 	{
 		public ParentResourceType ParentType { get; set; }
 		public ParentAttribute(ParentResourceType type)

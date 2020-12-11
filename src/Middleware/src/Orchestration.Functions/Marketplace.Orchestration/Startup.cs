@@ -8,11 +8,11 @@ using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
 using Microsoft.Extensions.DependencyInjection;
-using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using Marketplace.Common.Services;
 using Flurl.Http.Configuration;
+using Marketplace.Common.Services.CMS;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -40,20 +40,12 @@ namespace Marketplace.Orchestration
                 settings.CosmosSettings.MaxRequestsPerTcpConnection,
                 settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
             );
-            var cmsConfig = new CMSConfig()
-            {
-                BaseUrl = settings.EnvironmentSettings.BaseUrl,
-                BlobStorageHostUrl = settings.BlobSettings.HostUrl,
-            };
-            builder.Services
-                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
+            builder.Services    
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
+                .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = settings.CMSSettings.BaseUrl }))
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl,
@@ -66,9 +58,6 @@ namespace Marketplace.Orchestration
                     }
                 })
                 .AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>()
-                .AddSingleton<CMSConfig>(x => cmsConfig)
-                .Inject<IAssetQuery>()
-                .Inject<IAssetedResourceQuery>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()

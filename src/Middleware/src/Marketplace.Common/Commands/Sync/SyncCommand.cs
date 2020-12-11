@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Marketplace.Common.Models;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
-using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using Action = Marketplace.Common.Models.Action;
+using Marketplace.Common.Services.CMS;
 
 namespace Marketplace.Common.Commands
 {
@@ -30,13 +30,11 @@ namespace Marketplace.Common.Commands
         protected readonly AppSettings _settings;
         protected readonly LogQuery _log;
         private readonly IOrderCloudClient _client;
-        private readonly IAssetQuery _assets;
-        private readonly IAssetedResourceQuery _assetAssignment;
+        private readonly ICMSClient _cms;
         
-        public SyncCommand(AppSettings settings, IOrderCloudClient client, IAssetQuery assets, IAssetedResourceQuery assetAssignment, LogQuery log) : this(settings, client, log)
+        public SyncCommand(AppSettings settings, IOrderCloudClient client, ICMSClient cms, LogQuery log) : this(settings, client, log)
         {
-            _assets = assets;
-            _assetAssignment = assetAssignment;
+            _cms = cms;
         }
 
         public SyncCommand(AppSettings settings, IOrderCloudClient client, LogQuery log)
@@ -69,7 +67,7 @@ namespace Marketplace.Common.Commands
                 }
                 case 5:
                 {
-                    var command = (IWorkItemCommand)Activator.CreateInstance(type, _settings, _log, _client, _assets, _assetAssignment);
+                    var command = (IWorkItemCommand)Activator.CreateInstance(type, _settings, _log, _client, _cms);
                     var method = command.GetType()
                         .GetMethod($"{wi.Action}Async", BindingFlags.Public | BindingFlags.Instance);
                     if (method == null) throw new MissingMethodException($"{wi.RecordType}SyncCommand is missing");

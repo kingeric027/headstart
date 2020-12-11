@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Misc;
@@ -32,7 +33,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("PUT Monitored Product Field Modified")]
 		[HttpPut, Route("monitored-product-field-modified/{documentID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus([FromBody] MonitoredProductFieldModifiedNotificationDocument document)
+		public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus([FromBody] Document<MonitoredProductFieldModifiedNotification> document)
 		{
 			return await _command.UpdateMonitoredSuperProductNotificationStatus(document, document.Doc.Supplier.ID, document.Doc.Product.ID, VerifiedUserContext);
 		}
