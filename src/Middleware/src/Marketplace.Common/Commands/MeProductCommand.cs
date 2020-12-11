@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LazyCache;
 using Marketplace.Common.Commands.Crud;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Common.Services;
@@ -28,13 +29,22 @@ namespace Marketplace.Common.Commands
 		private readonly IExchangeRatesCommand _exchangeRatesCommand;
 		private readonly IMarketplaceProductCommand _marketplaceProductCommand;
 		private readonly ISendgridService _sendgridService;
-		public MeProductCommand(IOrderCloudClient elevatedOc, IMarketplaceBuyerCommand marketplaceBuyerCommand, IExchangeRatesCommand exchangeRatesCommand, IMarketplaceProductCommand marketplaceProductCommand, ISendgridService sendgridService)
+		private readonly IAppCache _cache;
+		public MeProductCommand(
+			IOrderCloudClient elevatedOc, 
+			IMarketplaceBuyerCommand marketplaceBuyerCommand,
+			IExchangeRatesCommand exchangeRatesCommand,
+			IMarketplaceProductCommand marketplaceProductCommand,
+			ISendgridService sendgridService,
+			IAppCache cache
+		)
 		{
 			_oc = elevatedOc;
 			_marketplaceBuyerCommand = marketplaceBuyerCommand;
 			_exchangeRatesCommand = exchangeRatesCommand;
 			_marketplaceProductCommand = marketplaceProductCommand;
 			_sendgridService = sendgridService;
+			_cache = cache;
 		}
 		public async Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
 		{
@@ -111,20 +121,21 @@ namespace Marketplace.Common.Commands
 
 		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
 		{
-				var searchText = args.Search ?? "";
-				var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
-				var sortBy = args.SortBy.FirstOrDefault();
-				var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, sortBy: sortBy, searchOn: searchFields, accessToken: user.AccessToken);
-				var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-				var exchangeRatesRequest = GetExchangeRates(user);
+			var searchText = args.Search ?? "";
+			var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
+			var sortBy = args.SortBy.FirstOrDefault();
+			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
+			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
+			var exchangeRatesRequest = GetExchangeRates(user);
+			await Task.WhenAll(meProductsRequest, defaultMarkupMultiplierRequest, exchangeRatesRequest);
+				
+			var meProducts = await meProductsRequest;
+			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
+			var exchangeRates = await exchangeRatesRequest;
 
-				var meProducts = await meProductsRequest;
-				var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-				var exchangeRates = await exchangeRatesRequest;
+			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
 
-				meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
-
-				return meProducts;
+			return meProducts;
 		}
 
 		public async Task RequestProductInfo(ContactSupplierBody template)
@@ -177,7 +188,7 @@ namespace Marketplace.Common.Commands
 
         private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
 		{
-			var buyer = await _marketplaceBuyerCommand.Get(user.BuyerID);
+			var buyer = await _cache.GetOrAddAsync($"buyer_{user.BuyerID}", () => _marketplaceBuyerCommand.Get(user.BuyerID), TimeSpan.FromHours(1));
 
 			// must convert markup to decimal before division to prevent rouding error
 			var markupPercent = (decimal)buyer.Markup.Percent / 100;

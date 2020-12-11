@@ -224,7 +224,7 @@
                 <a
                   *ngIf="profileRoute.showInDropdown"
                   class="nav-item dropdown-item cursor-pointer"
-                  [ngClass]="{ active: activePath === profileRoute.url }"
+                  [ngClass]="{ active: isRouteActive(profileRoute.url) }"
                   (click)="context.router[profileRoute.routerCall]()"
                   >{{ profileRoute.displayText }}</a
                 >

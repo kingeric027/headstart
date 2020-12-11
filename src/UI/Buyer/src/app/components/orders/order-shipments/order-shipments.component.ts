@@ -1,25 +1,24 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import { MarketplaceShipmentWithItems } from '@ordercloud/headstart-sdk'
-import { ActivatedRoute } from '@angular/router'
-import { OrderHistoryService } from 'src/app/services/order-history/order-history.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
   templateUrl: './order-shipments.component.html',
   styleUrls: ['./order-shipments.component.scss'],
 })
-export class OCMOrderShipments implements OnInit {
+export class OCMOrderShipments {
+  @Input() set orderID(_orderID: string) {
+    if (_orderID) {
+      void this.init(_orderID)
+    }
+  }
   selectedShipment: MarketplaceShipmentWithItems
   shipments: MarketplaceShipmentWithItems[]
 
-  constructor(private context: ShopperContextService,
-         private activatedRoute: ActivatedRoute,
-        private orderHistory: OrderHistoryService) {
-          this.orderHistory.activeOrderID = this.activatedRoute.snapshot.params.orderID
-        }
+  constructor(private context: ShopperContextService) {}
 
-  async ngOnInit(): Promise<void> {
-    this.shipments = await this.context.orderHistory.listShipments()
+  async init(orderID: string): Promise<void> {
+    this.shipments = await this.context.orderHistory.listShipments(orderID)
     this.selectedShipment = this.shipments[0]
   }
 

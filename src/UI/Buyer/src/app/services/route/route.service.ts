@@ -8,6 +8,7 @@ import {
   SupplierFilters,
   OrderStatus,
   OrderViewContext,
+  AppConfig,
 } from '../../shopper-context'
 import { OrderFilterService } from '../order-history/order-filter.service'
 import { ProfileRoutes } from './profile-routing.config'
@@ -15,6 +16,7 @@ import { OrderRoutes } from './order-routing.config'
 import { RouteConfig } from './route-config'
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service'
 import { TokenHelperService } from '../token-helper/token-helper.service'
+import { Title } from '@angular/platform-browser'
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +27,9 @@ export class RouteService {
     private supplierFilterService: SupplierFilterService,
     private productFilterService: ProductFilterService,
     private orderFilterService: OrderFilterService,
-    private tokenHelperService: TokenHelperService
+    private tokenHelperService: TokenHelperService,
+    private titleService: Title,
+    private appConfig: AppConfig
   ) {}
 
   getActiveUrl(): string {
@@ -61,6 +65,11 @@ export class RouteService {
         map((e) => (e as any).url)
       )
       .subscribe(callback)
+  }
+
+  setPageTitle(titleString?: string) {
+    const title = titleString ? this.appConfig.appname + ': ' + titleString : this.appConfig.appname;
+    this.titleService.setTitle(title);
   }
 
   toProductDetails(productID: string): void {

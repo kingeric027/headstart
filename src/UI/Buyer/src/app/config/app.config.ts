@@ -16,8 +16,6 @@ export const ocAppConfig: AppConfig = {
   ordercloudEnv: environment.ordercloudEnv,
   theme: environment.theme,
   anonymousShoppingEnabled: false,
-  avalaraCompanyId:
-    environment.ordercloudEnv === OrdercloudEnv.Production ? 902271 : 280411,
   instrumentationKey: environment.instrumentationKey,
   scope: [
     'MeAddressAdmin',
