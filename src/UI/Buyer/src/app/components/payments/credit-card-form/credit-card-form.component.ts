@@ -1,12 +1,9 @@
 import {
   Component,
-  OnInit,
   Output,
   EventEmitter,
   Input,
   OnChanges,
-  SimpleChanges,
-  SimpleChange,
 } from '@angular/core'
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe'
@@ -40,17 +37,17 @@ interface CreditCard {
   templateUrl: './credit-card-form.component.html',
   styleUrls: ['./credit-card-form.component.scss'],
 })
-export class OCMCreditCardForm implements OnInit, OnChanges {
+export class OCMCreditCardForm implements OnChanges {
   @Output() formSubmitted = new EventEmitter<CreditCardFormOutput>()
   @Output() formDismissed = new EventEmitter()
   @Input() card: OrderCloudIntegrationsCreditCardToken
   @Input() submitText: string
   @Input() termsAccepted: boolean
-  @Input() showCVV = false
-  @Input() showCardDetails = true
+  @Input() showCVV: boolean
+  @Input() showCardDetails: boolean
   _termsAccepted: boolean
-  _showCardDetails = true
-  _showCVV = false
+  _showCardDetails: boolean
+  _showCVV: boolean
   cardError?: string
   cardForm = new FormGroup({}) as TypedFormGroup<CreditCard>
   monthOptions = [
@@ -77,10 +74,6 @@ export class OCMCreditCardForm implements OnInit, OnChanges {
   constructor(private creditCardFormatPipe: CreditCardFormatPipe) {
     this.countryOptions = GeographyConfig.getCountries()
     this.stateOptions = this.getStateOptions(this.defaultCountry)
-  }
-
-  ngOnInit(): void {
-    this.buildCardDetailsForm(this.card)
   }
 
   ngOnChanges(changes: ComponentChanges<OCMCreditCardForm>): void {
