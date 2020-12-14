@@ -199,7 +199,7 @@ namespace Marketplace.Common.Commands
 		private async Task<List<OrderCloudIntegrationsConversionRate>> GetExchangeRates(VerifiedUserContext user)
 		{
 			var buyerUserGroups = await _oc.Me.ListUserGroupsAsync<MarketplaceLocationUserGroup>(opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation"), user.AccessToken);
-			var currency = buyerUserGroups.Items.First(u => u.xp.Currency != null).xp.Currency;
+			var currency = buyerUserGroups.Items.FirstOrDefault(u => u.xp.Currency != null)?.xp?.Currency;
 			Require.That(currency != null, new ErrorCode("Exchange Rate Error", 400, "Exchange Rate Not Defined For User"));
 
 			// ideally shouldn't need to do this, to get around problem with optional type
