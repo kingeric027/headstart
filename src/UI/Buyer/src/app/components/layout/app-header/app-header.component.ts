@@ -79,6 +79,7 @@ export class OCMAppHeader implements OnInit {
     this.screenSize = getScreenSizeBreakPoint()
     this.categories = this.context.categories.all
     this.appName = this.context.appSettings.appname
+    this.activePath = this.context.router.getActiveUrl();
     this.isSSO = this.context.currentUser.isSSO()
     this.isAnonymous = this.context.currentUser.isAnonymous()
     this.context.order.onChange((order) => (this.order = order))
@@ -180,6 +181,10 @@ export class OCMAppHeader implements OnInit {
   searchProducts(searchStr: string): void {
     this.searchTermForProducts = searchStr
     this.context.router.toProductList({ search: searchStr })
+  }
+
+  isRouteActive(url: string): boolean {
+    return this.activePath === url || (this.activePath === '/profile' && url === '/profile/details');
   }
 
   logout(): void {

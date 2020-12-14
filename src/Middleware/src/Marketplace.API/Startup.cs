@@ -153,7 +153,7 @@ namespace Marketplace.API
                         Roles = new[] { ApiRole.FullAccess }
                 })))
                 .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
-                .AddSingleton<IExchangeRatesCommand>(x => new ExchangeRatesCommand(currencyConfig, flurlClientFactory))
+                .AddSingleton<IExchangeRatesCommand>(provider => new ExchangeRatesCommand(currencyConfig, flurlClientFactory, provider.GetService<IAppCache>()))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig, 
                         new AvaTaxClient("four51 marketplace", "v1", "machine_name", avalaraConfig.Env)
                             .WithSecurity(_settings.AvalaraSettings.AccountID, _settings.AvalaraSettings.LicenseKey)))
@@ -177,7 +177,6 @@ namespace Marketplace.API
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
-
 
             var serviceProvider = services.BuildServiceProvider();
             services

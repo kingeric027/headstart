@@ -21,6 +21,7 @@
       id="search-addon"
       formControlName="search"
       (keyup.enter)="search()"
+      autocomplete="off"
     />
     <div *ngIf="showClear()" class="input-group-append">
       <button
