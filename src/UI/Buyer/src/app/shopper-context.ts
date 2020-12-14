@@ -240,7 +240,6 @@ export class AppConfig {
    */
   translateBlobUrl: string
   ordercloudEnv: OrdercloudEnv
-  avalaraCompanyId: number
   cmsUrl: string
   middlewareUrl: string
   creditCardIframeUrl: string

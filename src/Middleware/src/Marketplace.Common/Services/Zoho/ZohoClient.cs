@@ -23,6 +23,7 @@ namespace Marketplace.Common.Services.Zoho
     public partial class ZohoClient
     {
         private readonly IFlurlClientFactory _flurlFactory;
+
         public ZohoClient(IFlurlClientFactory flurlFactory)
         {
             _flurlFactory = flurlFactory;
@@ -38,10 +39,16 @@ namespace Marketplace.Common.Services.Zoho
 
         public ZohoClient() : this(new ZohoClientConfig()) { }
 
-        public ZohoClient(ZohoClientConfig config)
+        public ZohoClient(ZohoClientConfig config, IFlurlClientFactory flurlFactory)
         {
+            _flurlFactory = flurlFactory;
             Config = config;
             InitResources();
+        }
+
+        public ZohoClient(ZohoClientConfig config)
+        {
+            this.Config = config;
         }
 
         public async Task<ZohoTokenResponse> AuthenticateAsync()

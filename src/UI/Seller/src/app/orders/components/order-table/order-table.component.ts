@@ -35,7 +35,7 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
       this.isListPage = !params.orderID
     })
   }
-  setOrderDirection(direction: string) {
+  setOrderDirection(direction: 'Incoming' | 'Outgoing') {
     if (this.isListPage) {
       this.orderService.setOrderDirection(direction)
     } else {

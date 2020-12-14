@@ -355,7 +355,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   searchBy(searchTerm: string): void {
-    this.patchFilterState({ search: searchTerm || undefined })
+    this.patchFilterState({ search: searchTerm || undefined, searchType: 'ExactPhrasePrefix'})
   }
 
   addFilters(newFilters: ListArgs): void {
@@ -415,8 +415,8 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Used to update the URL
   mapToUrlQueryParams(options: Options): Params {
-    const { sortBy, search, filters, OrderDirection } = options
-    return { sortBy, search, ...filters, OrderDirection }
+    const { sortBy, search, searchType, filters, OrderDirection } = options
+    return { sortBy, search, searchType, ...filters, OrderDirection }
   }
 
   // TODO - move to some other file. Not related to resource crud
