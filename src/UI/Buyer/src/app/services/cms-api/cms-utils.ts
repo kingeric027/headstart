@@ -546,7 +546,7 @@ class HttpClient {
     const sdkConfig = CMSConfiguration.Get()
     const requestConfig = {
       ...config,
-      ParamSerializer,
+      paramSerializer: ParamSerializer,
       timeout: sdkConfig.timeoutInMilliseconds,
       headers: {
         'Content-Type': 'application/json',
