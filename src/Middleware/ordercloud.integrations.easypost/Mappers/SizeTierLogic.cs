@@ -111,7 +111,7 @@ namespace ordercloud.integrations.easypost
                 // length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
                 weight = li.Product.ShipWeight.ValueOrDefault(Package.DEFAULT_WEIGHT), // (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
                 length = li.Product.ShipLength.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
-                width = li.Product.ShipWeight.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
+                width = li.Product.ShipWidth.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
                 height = li.Product.ShipHeight.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
 			}).Select(p => CapParcelDimensions(p, EASYPOST_MAX_PARCEL_DIMENSION));
 
