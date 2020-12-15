@@ -252,7 +252,7 @@
           <div class="col-md-12">
             <textarea
               *ngIf="!readOnly || li?.xp?.SupplierComments"
-              [attr.readonly]="readOnly ? '' : null"
+              [attr.readonly]="readOnly || isQtyChanging(li.ID) ? '' : null"
               type="text"
               [ngModel]="li?.xp?.SupplierComments"
               maxlength="500"
@@ -504,8 +504,8 @@
     </div>
     <div class="col-12 mb-3" *ngIf="showKitDetails">
       <textarea
-        *ngIf="!readOnly || (kit && kit[0] && kit[0]?.xp?.SupplierComments)"
-        [attr.readonly]="readOnly ? '' : null"
+        *ngIf="!readOnly || (kit && kit[0]?.xp?.SupplierComments)"
+        [attr.readonly]="readOnly || isQtyChanging(kit[0].ID) ? '' : null"
         type="text"
         [ngModel]="kit[0]?.xp?.SupplierComments"
         maxlength="500"

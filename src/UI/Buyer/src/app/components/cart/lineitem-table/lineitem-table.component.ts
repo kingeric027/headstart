@@ -38,7 +38,7 @@ export class OCMLineitemTable implements OnInit {
   productsInKit: MarketplaceKitProduct[] = []
   updatingLiIDs: string[] = []
   _groupByKits: boolean
-  _lineItems = []
+  _lineItems: MarketplaceLineItem[] = []
   _orderCurrency: string
   showKitDetails = true
   constructor(
@@ -55,7 +55,7 @@ export class OCMLineitemTable implements OnInit {
     }
     this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(this._lineItems)
     this.liGroupedByKit = this.groupLineItemsByKitID(this._lineItems)
-    this.setSupplierInfo(this.liGroupedByShipFrom)
+    void this.setSupplierInfo(this.liGroupedByShipFrom)
   }
 
   ngOnInit(): void {
@@ -95,12 +95,12 @@ export class OCMLineitemTable implements OnInit {
     )
   }
 
-  removeLineItem(lineItemID: string): void {
-    this.context.order.cart.remove(lineItemID)
+  async removeLineItem(lineItemID: string): Promise<void> {
+    await this.context.order.cart.remove(lineItemID)
   }
 
-  removeKit(kit: any): void {
-    this.context.order.cart.removeMany(kit)
+  async removeKit(kit: MarketplaceLineItem[]): Promise<void> {
+    await this.context.order.cart.removeMany(kit)
   }
 
   toProductDetails(productID: string): void {
