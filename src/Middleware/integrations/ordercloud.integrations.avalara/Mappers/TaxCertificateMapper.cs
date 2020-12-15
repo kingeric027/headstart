@@ -1,4 +1,5 @@
 ﻿using Avalara.AvaTax.RestClient;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +12,7 @@ namespace ordercloud.integrations.avalara
 		private static readonly string RESALE_EXEMPTION_REASON = "RESALE";
 
 		// Resale Exemption Certificates
-		public static CertificateModel Map(TaxCertificate source)
+		public static CertificateModel Map(TaxCertificate source, Address buyerLocation, int avalaraCompanyID)
 		{
 			return new CertificateModel()
 			{
@@ -29,7 +30,27 @@ namespace ordercloud.integrations.avalara
 				exemptionReason = new ExemptionReasonModel()
 				{
 					name = RESALE_EXEMPTION_REASON
-				}
+				},
+				customers = new List<CustomerModel> { Map(buyerLocation, avalaraCompanyID) }
+			};
+		}
+
+		public static CustomerModel Map(Address buyerLocation, int avalaraCompanyID)
+		{
+			return new CustomerModel()
+			{
+				companyId = avalaraCompanyID,
+				customerCode = buyerLocation.ID,
+				name = buyerLocation.AddressName,
+				line1 = buyerLocation.Street1,
+				line2 = buyerLocation.Street2,
+				city = buyerLocation.City,
+				postalCode = buyerLocation.Zip,
+				region = buyerLocation.State,
+				country = buyerLocation.Country,
+				emailAddress = buyerLocation.xp.Email,
+				contactName = buyerLocation.xp.PrimaryContactName,
+				isShip = true
 			};
 		}
 

@@ -33,7 +33,6 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(): void {
     if (this.searchTermInput !== null && this.searchTermInput !== undefined) {
       this.previousSearchTerm = this.searchTermInput
-      this.form.setValue({ search: this.searchTermInput })
     }
   }
 
@@ -72,7 +71,7 @@ export class OCMSearch implements OnInit, OnChanges, OnDestroy {
           const userTriggered = this.form.dirty
           return searchTerm !== this.previousSearchTerm && userTriggered
         }),
-        debounceTime(500),
+        debounceTime(800),
         takeWhile(() => this.alive)
       )
       .subscribe((searchTerm) => {
