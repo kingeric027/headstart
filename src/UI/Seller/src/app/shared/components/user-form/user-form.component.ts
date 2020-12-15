@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { User } from '@ordercloud/angular-sdk';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service';
-import { RegexService } from '@app-seller/shared/services/regex/regex.service';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
+import { User } from '@ordercloud/angular-sdk'
+import { FormGroup, FormBuilder, Validators } from '@angular/forms'
+import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service'
+import { RegexService } from '@app-seller/shared/services/regex/regex.service'
 
 @Component({
   selector: 'user-form',
@@ -10,12 +10,12 @@ import { RegexService } from '@app-seller/shared/services/regex/regex.service';
   styleUrls: ['./user-form.component.scss'],
 })
 export class UserFormComponent implements OnInit {
-  protected _existingUser = {} as User;
+  protected _existingUser = {} as User
   @Input()
-  btnText: string;
+  btnText: string
   @Output()
-  formSubmitted = new EventEmitter<{ user: User; prevID: string }>();
-  userForm: FormGroup;
+  formSubmitted = new EventEmitter<{ user: User; prevID: string }>()
+  userForm: FormGroup
 
   constructor(
     private formBuilder: FormBuilder,
@@ -24,15 +24,15 @@ export class UserFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.setForm();
+    this.setForm()
   }
 
   @Input()
   set existingUser(user: User) {
-    this._existingUser = user || ({} as User);
+    this._existingUser = user || ({} as User)
     if (!this.userForm) {
-      this.setForm();
-      return;
+      this.setForm()
+      return
     }
 
     this.userForm.setValue({
@@ -43,12 +43,15 @@ export class UserFormComponent implements OnInit {
       Phone: this._existingUser.Phone || '',
       Email: this._existingUser.Email || '',
       Active: !!this._existingUser.Active,
-    });
+    })
   }
 
   setForm() {
     this.userForm = this.formBuilder.group({
-      ID: [this._existingUser.ID || '', Validators.pattern(this.regexService.ID)],
+      ID: [
+        this._existingUser.ID || '',
+        Validators.pattern(this.regexService.ID),
+      ],
       Username: [this._existingUser.Username || '', Validators.required],
       FirstName: [
         this._existingUser.FirstName || '',
@@ -58,27 +61,34 @@ export class UserFormComponent implements OnInit {
         this._existingUser.LastName || '',
         [Validators.required, Validators.pattern(this.regexService.HumanName)],
       ],
-      Phone: [this._existingUser.Phone || '', Validators.pattern(this.regexService.Phone)],
-      Email: [this._existingUser.Email || '', [Validators.required, Validators.email]],
+      Phone: [
+        this._existingUser.Phone || '',
+        Validators.pattern(this.regexService.Phone),
+      ],
+      Email: [
+        this._existingUser.Email || '',
+        [Validators.required, Validators.email],
+      ],
       Active: [!!this._existingUser.Active],
-    });
+    })
   }
 
   protected onSubmit() {
     if (this.userForm.status === 'INVALID') {
-      return this.formErrorService.displayFormErrors(this.userForm);
+      return this.formErrorService.displayFormErrors(this.userForm)
     }
 
     this.formSubmitted.emit({
       user: this.userForm.value,
       prevID: this._existingUser.ID,
-    });
+    })
   }
 
   // control display of error messages
   protected hasRequiredError = (controlName: string) =>
-    this.formErrorService.hasRequiredError(controlName, this.userForm);
+    this.formErrorService.hasRequiredError(controlName, this.userForm)
   protected hasPatternError = (controlName: string) =>
-    this.formErrorService.hasPatternError(controlName, this.userForm);
-  protected hasEmailError = () => this.formErrorService.hasValidEmailError(this.userForm.get('Email'));
+    this.formErrorService.hasPatternError(controlName, this.userForm)
+  protected hasEmailError = () =>
+    this.formErrorService.hasValidEmailError(this.userForm.get('Email'))
 }

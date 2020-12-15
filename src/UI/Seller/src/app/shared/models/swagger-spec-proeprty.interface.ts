@@ -1,6 +1,6 @@
 export interface SwaggerSpecProperty {
-  field: string;
-  type: SwaggerSpecPropertyType;
+  field: string
+  type: SwaggerSpecPropertyType
 }
 
 export enum SwaggerSpecPropertyType {

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cardconnect
@@ -17,6 +18,7 @@ namespace ordercloud.integrations.cardconnect
         public string Site { get; set; }
         public string BaseUrl { get; set; }
         public string Authorization { get; set; }
+        public string AuthorizationCad { get; set; } // we need a separate merchant account for canadian currency
         public string UsdMerchantID { get; set; }
         public string CadMerchantID { get; set; }
         public string EurMerchantID { get; set; }
@@ -27,22 +29,15 @@ namespace ordercloud.integrations.cardconnect
         private readonly IFlurlClient _flurl;
         public OrderCloudIntegrationsCardConnectConfig Config { get; }
 
-        public OrderCloudIntegrationsCardConnectService() : this(new OrderCloudIntegrationsCardConnectConfig())
-        {
-        }
-
-        public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config)
+        public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config, IFlurlClientFactory flurlFactory)
         {
             Config = config;
-            _flurl = new FlurlClient
-            {
-                BaseUrl = $"https://{Config.Site}.{Config.BaseUrl}/"
-            };
+            _flurl = flurlFactory.Get($"https://{Config.Site}.{Config.BaseUrl}/");
         }
 
         private IFlurlRequest Request(string resource, string currency = null)
         {
-            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : "c2VidmVuZG86cjZ6bUA0OWJjTCF3RFQ5dyNZTlA=")}");
+            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : Config.AuthorizationCad)}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)

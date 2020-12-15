@@ -1,11 +1,15 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { BuyerAddress, ListPage, Address } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ValidateUSZip, ValidatePhone, ValidateEmail } from '@app-seller/validators/validators';
-import { BuyerLocationService } from '../buyer-location.service';
-import { BuyerService } from '../../buyers/buyer.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { BuyerAddress, ListPage, Address } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+import {
+  ValidateUSZip,
+  ValidatePhone,
+  ValidateEmail,
+} from '@app-seller/validators/validators'
+import { BuyerLocationService } from '../buyer-location.service'
+import { BuyerService } from '../../buyers/buyer.service'
 
 @Component({
   selector: 'app-buyer-location-table',
@@ -13,8 +17,8 @@ import { BuyerService } from '../../buyers/buyer.service';
   styleUrls: ['./buyer-location-table.component.scss'],
 })
 export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddress> {
-  suggestedAddresses: ListPage<Address>;
-  selectedAddress: Address;
+  suggestedAddresses: ListPage<Address>
+  selectedAddress: Address
 
   constructor(
     private buyerLocationService: BuyerLocationService,
@@ -24,6 +28,12 @@ export class BuyerLocationTableComponent extends ResourceCrudComponent<BuyerAddr
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerLocationService, router, activatedroute, ngZone);
+    super(
+      changeDetectorRef,
+      buyerLocationService,
+      router,
+      activatedroute,
+      ngZone
+    )
   }
 }

@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands.SupplierSync;
+﻿using Marketplace.Common.Commands;
 using Marketplace.Common.Models;
 using Marketplace.Models;
 using ordercloud.integrations.library;

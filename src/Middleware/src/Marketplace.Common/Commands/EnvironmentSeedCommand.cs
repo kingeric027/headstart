@@ -7,11 +7,12 @@ using Marketplace.Common.Services.DevCenter;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Marketplace.Common.Services.CMS;
+using Marketplace.Common.Services.CMS.Models;
 
 namespace Marketplace.Common.Commands
 {
@@ -27,8 +28,7 @@ namespace Marketplace.Common.Commands
 		private readonly IDevCenterService _dev;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IMarketplaceBuyerCommand _buyerCommand;
-		private readonly ISchemaQuery _schemaQuery;
-		private readonly IDocumentQuery _docQuery;
+		private readonly ICMSClient _cms;
 
 		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
 		private readonly string _buyerLocalApiClientName = "Default Marketplace Buyer UI LOCAL"; // used for pointing integration events to the ngrok url
@@ -42,8 +42,7 @@ namespace Marketplace.Common.Commands
 			IDevCenterService dev,
 			IMarketplaceSupplierCommand supplierCommand,
 			IMarketplaceBuyerCommand buyerCommand,
-			ISchemaQuery schemaQuery,
-			IDocumentQuery docQuery,
+			ICMSClient cms,
 			IOrderCloudClient oc
 		)
 		{
@@ -51,8 +50,7 @@ namespace Marketplace.Common.Commands
 			_dev = dev;
 			_supplierCommand = supplierCommand;
 			_buyerCommand = buyerCommand;
-			_schemaQuery = schemaQuery;
-			_docQuery = docQuery;
+			_cms = cms;
 			_oc = oc;
 		}
 
@@ -193,7 +191,7 @@ namespace Marketplace.Common.Commands
 					ApiRole.FullAccess
 				}
 			};
-			return await new VerifiedUserContext().Define(ocConfig);
+			return await new VerifiedUserContext(_oc).Define(ocConfig);
 		}
 
 		private async Task CreateContentDocSchemas(VerifiedUserContext userContext)
@@ -213,8 +211,8 @@ namespace Marketplace.Common.Commands
 			};
 
 			await Task.WhenAll(
-				_schemaQuery.Create(kitSchema, userContext),
-				_schemaQuery.Create(supplierFilterConfigSchema, userContext)
+				_cms.Schemas.Create(kitSchema, userContext.AccessToken),
+				_cms.Schemas.Create(supplierFilterConfigSchema, userContext.AccessToken)
 			);
         }
 
@@ -222,15 +220,15 @@ namespace Marketplace.Common.Commands
         {
 			// any default created docs should be generic enough to be used by all orgs
 			await Task.WhenAll(
-				_docQuery.Create("SupplierFilterConfig", GetCountriesServicingDoc(), userContext),
-				_docQuery.Create("SupplierFilterConfig", GetServiceCategoryDoc(), userContext),
-				_docQuery.Create("SupplierFilterConfig", GetVendorLevelDoc(), userContext)
+				_cms.Documents.Create("SupplierFilterConfig", GetCountriesServicingDoc(), userContext.AccessToken),
+				_cms.Documents.Create("SupplierFilterConfig", GetServiceCategoryDoc(), userContext.AccessToken),
+				_cms.Documents.Create("SupplierFilterConfig", GetVendorLevelDoc(), userContext.AccessToken)
 			);
         }
 
-		private SupplierFilterConfigDocument GetCountriesServicingDoc()
+		private Document<SupplierFilterConfig> GetCountriesServicingDoc()
         {
-			return new SupplierFilterConfigDocument
+			return new Document<SupplierFilterConfig>
 			{
 				ID = "CountriesServicing",
 				Doc = new SupplierFilterConfig
@@ -254,7 +252,7 @@ namespace Marketplace.Common.Commands
 
 		private dynamic GetServiceCategoryDoc()
 		{
-			return new SupplierFilterConfigDocument
+			return new Document<SupplierFilterConfig>
 			{
 				ID = "ServiceCategory",
 				Doc = new SupplierFilterConfig
@@ -272,9 +270,9 @@ namespace Marketplace.Common.Commands
 			};
 		}
 
-		private SupplierFilterConfigDocument GetVendorLevelDoc()
+		private Document<SupplierFilterConfig> GetVendorLevelDoc()
         {
-			return new SupplierFilterConfigDocument
+			return new Document<SupplierFilterConfig>
 			{
 				ID = "VendorLevel",
 				Doc = new SupplierFilterConfig
@@ -684,6 +682,9 @@ namespace Marketplace.Common.Commands
 			// buyer
 			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
 			
+			// buyer impersonation - indicating the most roles a buyer user could have for impersonation purposes
+			new MarketplaceSecurityProfile() { CustomRoles = new[] {CustomRole.MPBaseBuyer, CustomRole.MPLocationOrderApprover, CustomRole.MPLocationViewAllOrders }, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
+
 			/* these roles don't do much, access to changing location information will be done through middleware calls that
 			*  confirm the user is in the location specific access user group. These roles will be assigned to the location 
 			*  specific user group and allow us to determine if a user has an admin role for at least one location through 

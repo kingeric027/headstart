@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
-import { StorefrontsService } from '../storefronts.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { ApiClient } from '@ordercloud/angular-sdk';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core'
+import { StorefrontsService } from '../storefronts.service'
+import { Router, ActivatedRoute } from '@angular/router'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { ApiClient } from '@ordercloud/angular-sdk'
 
 @Component({
   selector: 'app-storefront-table',
@@ -10,7 +10,7 @@ import { ApiClient } from '@ordercloud/angular-sdk';
   styleUrls: ['./storefront-table.component.scss'],
 })
 export class StorefrontTableComponent extends ResourceCrudComponent<ApiClient> {
-  route = 'storefronts';
+  route = 'storefronts'
   constructor(
     private storefrontsService: StorefrontsService,
     changeDetectorRef: ChangeDetectorRef,
@@ -18,6 +18,6 @@ export class StorefrontTableComponent extends ResourceCrudComponent<ApiClient> {
     activatedRoute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, storefrontsService, router, activatedRoute, ngZone);
+    super(changeDetectorRef, storefrontsService, router, activatedRoute, ngZone)
   }
 }

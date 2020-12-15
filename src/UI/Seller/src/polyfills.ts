@@ -1,7 +1,7 @@
 /***************************************************************************************************
  * Load `$localize` onto the global scope - used if i18n tags appear in Angular templates.
  */
-import '@angular/localize/init';
+import '@angular/localize/init'
 /**
  * This file includes polyfills needed by Angular and is loaded before the app.
  * You can add your own extra polyfills to this file.
@@ -26,7 +26,7 @@ import '@angular/localize/init';
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
 
 /** IE10 and IE11 requires the following for the Reflect API. */
-import 'core-js/es7/reflect';
+import 'core-js/es7/reflect'
 
 /**
  * Required to support Web Animations `@angular/platform-browser/animations`.
@@ -37,7 +37,7 @@ import 'core-js/es7/reflect';
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js/dist/zone'; // Included with Angular CLI.
+import 'zone.js/dist/zone' // Included with Angular CLI.
 
 /***************************************************************************************************
  * APPLICATION IMPORTS
@@ -48,7 +48,7 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  * which was broken by angular v6:
  * https://github.com/algolia/algoliasearch-client-javascript/issues/691
  */
-(window as any).process = { env: {} };
+;(window as any).process = { env: {} }
 
 /**
  * this polyfill is to allow us to use avatax clientside
@@ -67,10 +67,10 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  *
  * from:https://github.com/jserz/js_piece/blob/master/DOM/ChildNode/remove()/remove().md
  */
-((arr) => {
+;((arr) => {
   arr.forEach((item) => {
     if (item.hasOwnProperty('remove')) {
-      return;
+      return
     }
     Object.defineProperty(item, 'remove', {
       configurable: true,
@@ -78,9 +78,9 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
       writable: true,
       value: function remove() {
         if (this.parentNode !== null) {
-          this.parentNode.removeChild(this);
+          this.parentNode.removeChild(this)
         }
       },
-    });
-  });
-})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+    })
+  })
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype])

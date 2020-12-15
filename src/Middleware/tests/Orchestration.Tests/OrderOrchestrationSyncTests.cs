@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Common;
-using Marketplace.Common.Commands.SupplierSync;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;

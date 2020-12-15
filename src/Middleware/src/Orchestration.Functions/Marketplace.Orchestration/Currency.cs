@@ -10,19 +10,21 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
+using Flurl.Http.Configuration;
+using LazyCache;
 
 namespace Marketplace.Orchestration
 {
     public class Currency
     {
         private readonly IExchangeRatesCommand _command;
-        public Currency(AppSettings settings)
+        public Currency(AppSettings settings, IFlurlClientFactory flurlFactory, IAppCache cache)
         {
             _command = new ExchangeRatesCommand(new BlobServiceConfig()
             {
                 ConnectionString = settings.ExchangeRatesSettings.ConnectionString,
                 Container = settings.ExchangeRatesSettings.Container
-            });
+            }, flurlFactory, cache);
         }
 
         [FunctionName("Currency")]

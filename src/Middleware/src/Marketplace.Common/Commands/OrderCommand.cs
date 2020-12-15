@@ -29,19 +29,17 @@ namespace Marketplace.Common.Commands
     public class OrderCommand : IOrderCommand
     {
         private readonly IOrderCloudClient _oc;
-		private readonly IExchangeRatesCommand _exchangeRates;
-        private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
-        private readonly IMeProductCommand _meProductCommand;
         private readonly IPromotionCommand _promotionCommand;
         
-        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
+        public OrderCommand(
+            ILocationPermissionCommand locationPermissionCommand,
+            IOrderCloudClient oc,
+            IPromotionCommand promotionCommand
+            )
         {
 			_oc = oc;
-            _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
-			_exchangeRates = exchangeRates;
-            _meProductCommand = meProductCommand;
             _promotionCommand = promotionCommand;
 		}
 

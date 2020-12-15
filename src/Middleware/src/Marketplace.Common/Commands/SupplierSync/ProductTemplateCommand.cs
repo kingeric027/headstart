@@ -4,18 +4,18 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using Npoi.Mapper;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using IPartial = ordercloud.integrations.library.IPartial;
 
-namespace Marketplace.Common.Commands.SupplierSync
+namespace Marketplace.Common.Commands
 {
     public interface IProductTemplateCommand
     {

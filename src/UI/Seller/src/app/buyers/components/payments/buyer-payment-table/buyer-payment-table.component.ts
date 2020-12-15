@@ -1,9 +1,9 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { CreditCard } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerPaymentService } from '../buyer-payment.service';
-import { BuyerService } from '../../buyers/buyer.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { CreditCard } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { BuyerPaymentService } from '../buyer-payment.service'
+import { BuyerService } from '../../buyers/buyer.service'
 
 @Component({
   selector: 'app-buyer-payment-table',
@@ -19,6 +19,12 @@ export class BuyerPaymentTableComponent extends ResourceCrudComponent<CreditCard
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerPaymentService, router, activatedroute, ngZone);
+    super(
+      changeDetectorRef,
+      buyerPaymentService,
+      router,
+      activatedroute,
+      ngZone
+    )
   }
 }

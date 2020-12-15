@@ -1,9 +1,9 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Category } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { BuyerCategoryService } from '@app-seller/shared/services/buyer/buyer-category-service';
-import { BuyerService } from '../../buyers/buyer.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Category } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { BuyerCategoryService } from '@app-seller/shared/services/buyer/buyer-category-service'
+import { BuyerService } from '../../buyers/buyer.service'
 
 @Component({
   selector: 'app-buyer-category-table',
@@ -19,18 +19,24 @@ export class BuyerCategoryTableComponent extends ResourceCrudComponent<Category>
     private buyerService: BuyerService,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, buyerCategoryService, router, activatedroute, ngZone);
+    super(
+      changeDetectorRef,
+      buyerCategoryService,
+      router,
+      activatedroute,
+      ngZone
+    )
   }
 
   async createNewResource(): Promise<void> {
     // dataIsSaving indicator is used in the resource table to conditionally tell the
     // submit button to disable
-    const routeUrl = this.router.routerState.snapshot.url;
+    const routeUrl = this.router.routerState.snapshot.url
     if (!this.updatedResource?.ParentID && routeUrl.includes('?')) {
-      const splitUrl = routeUrl.split('=');
-      const endUrl = splitUrl[splitUrl.length - 1];
-      this.updatedResource.ParentID = endUrl;
+      const splitUrl = routeUrl.split('=')
+      const endUrl = splitUrl[splitUrl.length - 1]
+      this.updatedResource.ParentID = endUrl
     }
-    super.createNewResource();
+    super.createNewResource()
   }
 }

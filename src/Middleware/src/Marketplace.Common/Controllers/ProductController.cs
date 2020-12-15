@@ -29,35 +29,35 @@ namespace Marketplace.Common.Controllers
 		[HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
 		public async Task<SuperMarketplaceProduct> Get(string id)
 		{
-			return await _command.Get(id, VerifiedUserContext);
+			return await _command.Get(id, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("LIST Super Product")]
 		[HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
 		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args)
 		{
-			return await _command.List(args, VerifiedUserContext);
+			return await _command.List(args, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("POST Super Product")]
 		[HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> Post([FromBody] SuperMarketplaceProduct obj)
 		{
-			return await _command.Post(obj, this.VerifiedUserContext);
+			return await _command.Post(obj, VerifiedUserContext);
 		}
 
 		[DocName("PUT Super Product")]
 		[HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<SuperMarketplaceProduct> Put([FromBody] SuperMarketplaceProduct obj, string id)
 		{
-			return await _command.Put(id, obj, this.VerifiedUserContext);
+			return await _command.Put(id, obj, this.VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("DELETE Product")]
 		[HttpDelete, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task Delete(string id)
 		{
-			await _command.Delete(id, VerifiedUserContext);
+			await _command.Delete(id, VerifiedUserContext.AccessToken);
 		}
 
 
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Controllers
 		[HttpGet, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID)
 		{
-			return await _command.GetPricingOverride(id, buyerID, VerifiedUserContext);
+			return await _command.GetPricingOverride(id, buyerID, VerifiedUserContext.AccessToken);
 		}
 
 		// todo add auth for seller user
@@ -74,7 +74,7 @@ namespace Marketplace.Common.Controllers
 		[HttpPost, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
 		{
-			return await _command.CreatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext);
+			return await _command.CreatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext.AccessToken);
 		}
 
 		// todo add auth for seller user
@@ -82,7 +82,7 @@ namespace Marketplace.Common.Controllers
 		[HttpPut, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
 		{
-			return await _command.UpdatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext);
+			return await _command.UpdatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext.AccessToken);
 		}
 
 		// todo add auth for seller user
@@ -90,7 +90,7 @@ namespace Marketplace.Common.Controllers
 		[HttpDelete, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
 		public async Task DeletePricingOverride(string id, string buyerID)
 		{
-			await _command.DeletePricingOverride(id, buyerID, VerifiedUserContext);
+			await _command.DeletePricingOverride(id, buyerID, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("PATCH Product filter option override")]

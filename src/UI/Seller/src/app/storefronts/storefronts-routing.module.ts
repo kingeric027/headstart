@@ -1,8 +1,8 @@
 // core services
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { StorefrontTableComponent } from './components/storefronts/storefronts-table/storefront-table.component';
-import { StorefrontPageTableComponent } from './components/pages/storefront-page-table/storefront-page-table.component';
+import { NgModule } from '@angular/core'
+import { RouterModule, Routes } from '@angular/router'
+import { StorefrontTableComponent } from './components/storefronts/storefronts-table/storefront-table.component'
+import { StorefrontPageTableComponent } from './components/pages/storefront-page-table/storefront-page-table.component'
 
 const routes: Routes = [
   { path: '', component: StorefrontTableComponent },
@@ -10,8 +10,11 @@ const routes: Routes = [
   { path: ':storefrontID', component: StorefrontTableComponent },
   { path: ':storefrontID/pages', component: StorefrontPageTableComponent },
   { path: ':storefrontID/pages/new', component: StorefrontPageTableComponent },
-  { path: ':storefrontID/pages/:pageID', component: StorefrontPageTableComponent },
-];
+  {
+    path: ':storefrontID/pages/:pageID',
+    component: StorefrontPageTableComponent,
+  },
+]
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

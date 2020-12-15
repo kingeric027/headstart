@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ordercloud.integrations.library.extensions;
 using OrderCloud.SDK;
+using Flurl.Http;
+using LazyCache;
 
 namespace ordercloud.integrations.library
 {
@@ -36,10 +38,17 @@ namespace ordercloud.integrations.library
     {
         public const string BaseUserRole = "BaseUserRole"; // Everyone with a valid OC token has this role 
 
-        public OrderCloudIntegrationsAuthHandler(IOptionsMonitor<OrderCloudIntegrationsAuthOptions> options, ILoggerFactory logger,
-            UrlEncoder encoder, ISystemClock clock)
-            : base(options, logger, encoder, clock)
-        { }
+        private readonly IAppCache _cache;
+
+        public OrderCloudIntegrationsAuthHandler(
+            IOptionsMonitor<OrderCloudIntegrationsAuthOptions> options,
+            ILoggerFactory logger,
+            UrlEncoder encoder,
+            ISystemClock clock,
+            IAppCache cache) : base(options, logger, encoder, clock)
+        {
+            _cache = cache;
+        }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -53,6 +62,7 @@ namespace ordercloud.integrations.library
                 var jwt = new JwtSecurityToken(token);
 				var clientId = jwt.GetClientID();
 				var usrtype = jwt.GetUserType();
+
                 if (clientId == null)
                     return AuthenticateResult.Fail("The provided bearer token does not contain a 'cid' (Client ID) claim.");
 
@@ -62,9 +72,29 @@ namespace ordercloud.integrations.library
                 cid.AddClaim(new Claim("clientid", clientId));
                 cid.AddClaim(new Claim("accesstoken", token));
 
-                var user = await new OrderCloudClientWithContext(token).Me.GetAsync();
-                if (!user.Active)
+                var allowFetchUserRetry = false;
+                var user = await _cache.GetOrAddAsync(token, () => {
+                    try {
+                        // TODO: winmark calls this from other oc environments so we cant use sdk
+                        // remove once winmark uses cms api
+                        //var user = await Options.OrderCloudClient.Me.GetAsync(token);
+                        return $"{jwt.GetApiUrl()}/v1/me".WithOAuthBearerToken(token).GetJsonAsync<MeUser>();
+                    }
+                    catch (FlurlHttpException ex) when ((int?)ex.Call.Response?.StatusCode < 500) {
+                        return null;
+                    }
+                    catch (Exception) {
+                        allowFetchUserRetry = true;
+                        return null;
+                    }
+                }, TimeSpan.FromMinutes(5));
+
+                if (allowFetchUserRetry)
+                    _cache.Remove(token); // not their fault, don't make them wait 5 min
+
+                if (user == null || !user.Active)
                     return AuthenticateResult.Fail("Authentication failure");
+
                 cid.AddClaim(new Claim("username", user.Username));
                 cid.AddClaim(new Claim("userid", user.ID));
                 cid.AddClaim(new Claim("email", user.Email ?? ""));
@@ -102,6 +132,6 @@ namespace ordercloud.integrations.library
 
     public class OrderCloudIntegrationsAuthOptions : AuthenticationSchemeOptions
     {
-
+        public IOrderCloudClient OrderCloudClient { get; set; }
     }
 }

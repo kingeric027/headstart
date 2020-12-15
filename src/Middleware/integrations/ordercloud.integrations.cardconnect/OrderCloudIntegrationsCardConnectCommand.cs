@@ -42,18 +42,18 @@ namespace ordercloud.integrations.cardconnect
 		)
 		{
 			Require.That((payment.CreditCardID != null) || (payment.CreditCardDetails != null),
-				new ErrorCode("Missing credit card info", 400, "Request must include either CreditCardDetails or CreditCardID"));
+				new ErrorCode("CreditCard.CreditCardAuth", 400, "Request must include either CreditCardDetails or CreditCardID"));
 
 			var cc = await GetMeCardDetails(payment, user);
 
-			Require.That(payment.IsValidCvv(cc), new ErrorCode("Invalid CVV", 400, "CVV is required for Credit Card Payment"));
-			Require.That(cc.Token != null, new ErrorCode("Invalid credit card token", 400, "Credit card must have valid authorization token"));
+			Require.That(payment.IsValidCvv(cc), new ErrorCode("CreditCardAuth.InvalidCvv", 400, "CVV is required for Credit Card Payment"));
+			Require.That(cc.Token != null, new ErrorCode("CreditCardAuth.InvalidToken", 400, "Credit card must have valid authorization token"));
 			Require.That(cc.xp.CCBillingAddress != null, new ErrorCode("Invalid Bill Address", 400, "Credit card must have a billing address"));
 
 			var orderWorksheet = await _oc.IntegrationEvents.GetWorksheetAsync(OrderDirection.Incoming, payment.OrderID);
 			var order = orderWorksheet.Order;
 
-			Require.That(!order.IsSubmitted, new ErrorCode("Invalid Order Status", 400, "Order has already been submitted"));
+			Require.That(!order.IsSubmitted, new ErrorCode("CreditCardAuth.AlreadySubmitted", 400, "Order has already been submitted"));
 
 			var ccAmount = GetAmountToCharge(orderWorksheet);
 
@@ -72,7 +72,7 @@ namespace ordercloud.integrations.cardconnect
                 {
                     Data = ex.Response,
                     Message = ex.ApiError.Message,
-                    ErrorCode = ex.ApiError.ErrorCode
+                    ErrorCode = $"CreditCardAuth.{ex.ApiError.ErrorCode}"
                 });
 			}
 		}

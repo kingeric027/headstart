@@ -30,7 +30,14 @@ namespace Marketplace.Common
         public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
         public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
         public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
+        public FlurlSettings FlurlSettings { get; set; } = new FlurlSettings();
+        public CMSSettings CMSSettings { get; set; } = new CMSSettings();
     }
+
+    public class CMSSettings
+	{
+        public string BaseUrl { get; set; }
+	}
 
     public class UI
     {
@@ -73,6 +80,9 @@ namespace Marketplace.Common
         public string DevcenterApiUrl { get; set; }
         public string ProvisionSupplierID { get; set; }
         public string SEBDistributionSupplierID { get; set; }
+        public string FirstChoiceSupplierID { get; set; }
+        public string MedlineSupplierID { get; set; }
+        public string IncrementorPrefix { get; set; }
     }
 
 	public class AvalaraSettings
@@ -80,6 +90,7 @@ namespace Marketplace.Common
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }
+        public int CompanyID { get; set; }
 	}
 
     public class ChiliPublishSettings
@@ -103,5 +114,10 @@ namespace Marketplace.Common
     {
         public string ApiKey { get; set; }
         public string FromEmail { get; set; }
+    }
+
+    public class FlurlSettings
+    {
+        public int TimeoutInSeconds { get; set; }
     }
 }

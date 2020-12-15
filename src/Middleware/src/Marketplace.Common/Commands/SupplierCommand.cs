@@ -19,18 +19,21 @@ namespace Marketplace.Common.Commands
         Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false);
         Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user);
         Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user);
+        Task<MarketplaceSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
         private readonly IOrderCloudClient _oc;
+        private readonly ISupplierSyncCommand _supplierSync;
         private readonly AppSettings _settings;
         private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc, ISupplierApiClientHelper apiClientHelper)
+        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc, ISupplierApiClientHelper apiClientHelper, ISupplierSyncCommand supplierSync)
         {
             _settings = settings;
             _oc = oc;
             _apiClientHelper = apiClientHelper;
+            _supplierSync = supplierSync;
         }
         public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user)
         {
@@ -53,7 +56,7 @@ namespace Marketplace.Common.Commands
                 pageSize: 100,
                 accessToken: user.AccessToken
                 ));
-                ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user);
+                ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
                 var configToUse = new OrderCloudClientConfig
                 {
@@ -192,6 +195,12 @@ namespace Marketplace.Common.Commands
                     }, token);
                 }
             }
+        }
+
+        public async Task<MarketplaceSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user)
+        {
+            var orderData = await _supplierSync.GetOrderAsync(supplierOrderID, user);
+            return (MarketplaceSupplierOrderData)orderData.ToObject(typeof(MarketplaceSupplierOrderData));
         }
     }
 }

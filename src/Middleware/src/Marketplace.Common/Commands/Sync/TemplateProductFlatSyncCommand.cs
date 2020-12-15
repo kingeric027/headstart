@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Exceptions;
 using Marketplace.Common.Helpers;
 using Marketplace.Common.Models;
@@ -12,25 +11,23 @@ using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
 using Marketplace.Models.Extended;
-using ordercloud.integrations.cms;
-using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
+using Marketplace.Common.Services.CMS.Models;
+using Marketplace.Common.Services.CMS;
 
 namespace Marketplace.Common.Commands
 {
     public class TemplateProductFlatSyncCommand : SyncCommand, IWorkItemCommand
     {
         private readonly IOrderCloudClient _oc;
-        private readonly IAssetQuery _assets;
-        private readonly IAssetedResourceQuery _assignment;
+        private readonly ICMSClient _cms;
         private readonly IOrderCloudIntegrationsFunctionToken _token;
         private VerifiedUserContext _user;
 
-        public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, IAssetQuery assets, IAssetedResourceQuery assignment) : base(settings, oc, assets, assignment, log)
+        public TemplateProductFlatSyncCommand(AppSettings settings, LogQuery log, IOrderCloudClient oc, ICMSClient cms) : base(settings, oc, cms, log)
         {
             _oc = oc;
-            _assets = assets;
-            _assignment = assignment;
+            _cms = cms;
             _token = new OrderCloudIntegrationsFunctionToken(settings);
         }
 
@@ -103,14 +100,14 @@ namespace Marketplace.Common.Commands
                 };
                 if (obj.Url != null)
                 {
-                    image = await _assets.Save(obj.ID, image, _user);
-                    await _assignment.SaveAssignment(new AssetAssignment()
+                    image = await _cms.Assets.Save(obj.ID, image, _user.AccessToken);
+                    await _cms.Assets.SaveAssetAssignment(new AssetAssignment()
                     {
                         AssetID = image.ID,
                         //ParentResourceID = product.ID,
                         ResourceType = ResourceType.Products,
                         ResourceID = product.ID
-                    }, _user);
+                    }, _user.AccessToken);
                 }
                 
                 return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
@@ -208,7 +205,7 @@ namespace Marketplace.Common.Commands
                 Asset image = null;
                 if (obj.Url != null)
                 {
-                    image = await _assets.Save(obj.ID, new Asset()
+                    image = await _cms.Assets.Save(obj.ID, new Asset()
                     {
                         ID = obj.ID,
                         Active = true,
@@ -217,14 +214,14 @@ namespace Marketplace.Common.Commands
                         Url = obj.Url,
                         Title = obj.ImageTitle,
                         Tags = obj.Tags?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
-                    }, _user);
-                    await _assignment.SaveAssignment(new AssetAssignment()
+                    }, _user.AccessToken);
+                    await _cms.Assets.SaveAssetAssignment(new AssetAssignment()
                     {
                         AssetID = image.ID,
                         ParentResourceID = product.ID,
                         ResourceType = ResourceType.Products,
                         ResourceID = product.ID
-                    }, _user);
+                    }, _user.AccessToken);
                 }
 
                 return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
@@ -359,7 +356,7 @@ namespace Marketplace.Common.Commands
                 Asset image = null;
                 if (obj.Url != null)
                 {
-                    image = await _assets.Save(obj.ID, new Asset()
+                    image = await _cms.Assets.Save(obj.ID, new Asset()
                     {
                         ID = obj.ID,
                         Active = true,
@@ -368,14 +365,14 @@ namespace Marketplace.Common.Commands
                         Url = obj.Url,
                         Title = obj.ImageTitle,
                         Tags = obj.Tags?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
-                    }, _user);
-                    await _assignment.SaveAssignment(new AssetAssignment()
+                    }, _user.AccessToken);
+                    await _cms.Assets.SaveAssetAssignment(new AssetAssignment()
                     {
                         AssetID = image.ID,
                         ParentResourceID = product.ID,
                         ResourceType = ResourceType.Products,
                         ResourceID = product.ID
-                    }, _user);
+                    }, _user.AccessToken);
                 }
 
                 return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
@@ -427,14 +424,10 @@ namespace Marketplace.Common.Commands
             {
                 var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
                 var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
-                var assn = await _assignment.GetThumbnail(
-                    new Resource()
-                    {
-                        ParentResourceID = product.ID, ResourceType = ResourceType.Products, ResourceID = product.ID
-                    }, ThumbSize.M, _user.SellerID);
+                var assn = await _cms.Assets.ListAssets(ResourceType.Products, product.ID, new ListArgsPageOnly() { PageSize = 1 } , wi.Token);
                 Asset image = null;
-                if (assn != null)
-                    image = await _assets.Get(wi.RecordId, _user);
+                if (assn.Items.Count > 0)
+                    image = await _cms.Assets.Get(wi.RecordId, _user.AccessToken);
 
                 return JObject.FromObject(Map(product, priceSchedule, image), OrchestrationSerializer.Serializer);
             }

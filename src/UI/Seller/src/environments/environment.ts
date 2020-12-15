@@ -1,30 +1,35 @@
-import { Environment } from './environment.interface';
+import { Environment } from './environment.interface'
 
 // App Constants
-const BRANDWEAR_DESIGNS = 'BRANDWEAR_DESIGNS';
-type BRANDWEAR_DESIGNS = typeof BRANDWEAR_DESIGNS;
-const FAST_SIGNS = 'FAST_SIGNS';
-type FAST_SIGNS = typeof FAST_SIGNS;
-const HEADSTART_DEMO = 'HEADSTART_DEMO';
-type HEADSTART_DEMO = typeof HEADSTART_DEMO;
-const SELF_ESTEEM_BRANDS = 'SELF_ESTEEM_BRANDS';
-type SELF_ESTEEM_BRANDS = typeof SELF_ESTEEM_BRANDS;
-const GO2PARTNERS = 'GO2PARTNERS';
-type GO2PARTNERS = typeof GO2PARTNERS;
+const BRANDWEAR_DESIGNS = 'BRANDWEAR_DESIGNS'
+type BRANDWEAR_DESIGNS = typeof BRANDWEAR_DESIGNS
+const FAST_SIGNS = 'FAST_SIGNS'
+type FAST_SIGNS = typeof FAST_SIGNS
+const HEADSTART_DEMO = 'HEADSTART_DEMO'
+type HEADSTART_DEMO = typeof HEADSTART_DEMO
+const SELF_ESTEEM_BRANDS = 'SELF_ESTEEM_BRANDS'
+type SELF_ESTEEM_BRANDS = typeof SELF_ESTEEM_BRANDS
+const GO2PARTNERS = 'GO2PARTNERS'
+type GO2PARTNERS = typeof GO2PARTNERS
 
-type AppName = BRANDWEAR_DESIGNS | FAST_SIGNS | HEADSTART_DEMO | SELF_ESTEEM_BRANDS | GO2PARTNERS;
+type AppName =
+  | BRANDWEAR_DESIGNS
+  | FAST_SIGNS
+  | HEADSTART_DEMO
+  | SELF_ESTEEM_BRANDS
+  | GO2PARTNERS
 
-const LOCAL = 'LOCAL';
-type LOCAL = typeof LOCAL;
-const TEST = 'TEST';
-type TEST = typeof TEST;
-type MiddlewareLocationSelection = LOCAL | TEST;
+const LOCAL = 'LOCAL'
+type LOCAL = typeof LOCAL
+const TEST = 'TEST'
+type TEST = typeof TEST
+type MiddlewareLocationSelection = LOCAL | TEST
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const appName: AppName = SELF_ESTEEM_BRANDS;
-const middlewareLocationSelection: MiddlewareLocationSelection = TEST;
-const localMiddlewareURL = 'https://localhost:44340';
+const appName: AppName = SELF_ESTEEM_BRANDS
+const middlewareLocationSelection: MiddlewareLocationSelection = TEST
+const localMiddlewareURL = 'https://localhost:44340'
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -36,9 +41,11 @@ const devEnvironments: Record<string, Environment> = {
     middlewareUrl:
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
-        : 'https://marketplace-middleware-test.azurewebsites.net',
+        : 'https://middleware-api-test.sebvendorportal.com',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Marketplace Admin Local',
-    translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    translateBlobUrl:
+      'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
     orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
@@ -70,8 +77,10 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://brandweardesigns-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Marketplace Admin',
-    translateBlobUrl: 'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
+    translateBlobUrl:
+      'https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://marktplacetest.blob.core.windows.net',
     orderCloudApiUrl: 'https://stagingapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
@@ -91,8 +100,10 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://headstartdemo-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'Headstart Demo Admin',
-    translateBlobUrl: 'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
+    translateBlobUrl:
+      'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
     blobStorageUrl: 'https://stfour51demotest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
@@ -112,8 +123,10 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://fastsigns-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'FASTSIGNS Admin',
-    translateBlobUrl: 'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
+    translateBlobUrl:
+      'https://stfastsignstest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://stfastsignstest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
@@ -133,8 +146,10 @@ const devEnvironments: Record<string, Environment> = {
       middlewareLocationSelection === ('LOCAL' as any)
         ? localMiddlewareURL
         : 'https://go2partners-middleware-test.azurewebsites.net',
+    cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
     appname: 'GO2 Partners Admin',
-    translateBlobUrl: 'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',
+    translateBlobUrl:
+      'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',
     blobStorageUrl: 'https://stgo2partnerstest.blob.core.windows.net',
     orderCloudApiUrl: 'https://sandboxapi.ordercloud.io',
     orderCloudApiVersion: 'v1',
@@ -146,5 +161,5 @@ const devEnvironments: Record<string, Environment> = {
     },
     superProductFieldsToMonitor: [],
   },
-};
-export const environment: Environment = devEnvironments[appName];
+}
+export const environment: Environment = devEnvironments[appName]

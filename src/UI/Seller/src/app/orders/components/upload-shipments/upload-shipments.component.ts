@@ -1,15 +1,19 @@
-import { OcTokenService } from '@ordercloud/angular-sdk';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, Inject } from '@angular/core';
-import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { Observable } from 'rxjs';
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
-import { DomSanitizer } from '@angular/platform-browser';
-import { AppAuthService } from '@app-seller/auth';
-import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk';
-import { getPsHeight } from '@app-seller/shared/services/dom.helper';
-import { BatchProcessResult } from './shipment-upload.interface';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { OcTokenService } from '@ordercloud/angular-sdk'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { Component, Inject } from '@angular/core'
+import {
+  AppConfig,
+  applicationConfiguration,
+} from '@app-seller/config/app.config'
+import { Observable } from 'rxjs'
+import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
+import { DomSanitizer } from '@angular/platform-browser'
+import { AppAuthService } from '@app-seller/auth'
+import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk'
+import { getPsHeight } from '@app-seller/shared/services/dom.helper'
+import { BatchProcessResult } from './shipment-upload.interface'
+import { NgxSpinnerService } from 'ngx-spinner'
+import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
 
 @Component({
   selector: 'upload-shipments',
@@ -22,111 +26,136 @@ export class UploadShipmentsComponent {
     @Inject(applicationConfiguration) private appConfig: AppConfig,
     private sanitizer: DomSanitizer,
     private appAuthService: AppAuthService,
-   private spinner: NgxSpinnerService,
-   private ocTokenService: OcTokenService
+    private spinner: NgxSpinnerService,
+    private ocTokenService: OcTokenService
   ) {
-    this.contentHeight = getPsHeight('base-layout-item');
+    this.contentHeight = getPsHeight('base-layout-item')
   }
 
-
-  files: FileHandle[] = [];
-  contentHeight = 0;
-  showUploadSummary = false;
-  batchProcessResult: BatchProcessResult;
-  showResults = false;
+  files: FileHandle[] = []
+  contentHeight = 0
+  showUploadSummary = false
+  batchProcessResult: BatchProcessResult
+  showResults = false
 
   downloadTemplate(): void {
-    const file = 'Shipment_Import_Template.xlsx';
-    this.getSharedAccessSignature(file).subscribe(sharedAccessSignature => {
-      const uri = `${this.appConfig.blobStorageUrl}/downloads/Shipment_Import_Template.xlsx${sharedAccessSignature}`;
-      const link = document.createElement('a');
-      link.download = file;
-      link.href = uri;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
+    const file = 'Shipment_Import_Template.xlsx'
+    this.getSharedAccessSignature(file).subscribe((sharedAccessSignature) => {
+      const uri = `${this.appConfig.blobStorageUrl}/downloads/Shipment_Import_Template.xlsx${sharedAccessSignature}`
+      const link = document.createElement('a')
+      link.download = file
+      link.href = uri
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    })
   }
 
- private getSharedAccessSignature(fileName: string): Observable<string> {
-    return this.http.get<string>(`${this.appConfig.middlewareUrl}/reports/download-shared-access/${fileName}`, { headers: this.buildHeaders() });
+  private getSharedAccessSignature(fileName: string): Observable<string> {
+    return this.http.get<string>(
+      `${this.appConfig.middlewareUrl}/reports/download-shared-access/${fileName}`,
+      { headers: this.buildHeaders() }
+    )
   }
   private buildHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-    });
+    })
   }
   async manualFileUpload(event, fileType: string): Promise<void> {
-    this.showUploadSummary = true;
-    this.showResults = false;
-    this.spinner.show();
-    const accessToken = await this.appAuthService.fetchToken().toPromise();
-    let asset: AssetUpload = {};
+    this.showUploadSummary = true
+    this.showResults = false
+    this.spinner.show()
+    const accessToken = await this.appAuthService.fetchToken().toPromise()
+    let asset: AssetUpload = {}
 
     if (fileType === 'staticContent') {
-      if (event?.File !== null && event?.File !== undefined && !Array.isArray(event)){
-              asset = { Active: true, Title: 'document', File: event.File, FileName: 'shipments_to_process' } as AssetUpload;
-
-      } else {
-        const mappedFiles: FileHandle[] = Array.from(event).map((file: File) => {
+      if (
+        event?.File !== null &&
+        event?.File !== undefined &&
+        !Array.isArray(event)
+      ) {
         asset = {
           Active: true,
           Title: 'document',
-          File: file,
+          File: event.File,
           FileName: 'shipments_to_process',
-        } as AssetUpload;
-        return { File: file, URL, Filename: 'shipments_to_process' };
-      });
+        } as AssetUpload
+      } else {
+        const mappedFiles: FileHandle[] = Array.from(event).map(
+          (file: File) => {
+            asset = {
+              Active: true,
+              Title: 'document',
+              File: file,
+              FileName: 'shipments_to_process',
+            } as AssetUpload
+            return { File: file, URL, Filename: 'shipments_to_process' }
+          }
+        )
       }
-  
-      const headers = new HttpHeaders({ Authorization: `Bearer ${accessToken}` });
 
-      const formData = new FormData();
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${accessToken}`,
+      })
+
+      const formData = new FormData()
 
       for (const prop in asset) {
         if (asset.hasOwnProperty(prop)) {
-          formData.append(prop, asset[prop]);
+          formData.append(prop, asset[prop])
         }
       }
 
       this.http
-        .post(this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment', formData, { headers })
+        .post(
+          this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment',
+          formData,
+          { headers }
+        )
         .subscribe((result: BatchProcessResult) => {
           if (result !== null) {
-            this.batchProcessResult = result;
-            this.spinner.hide();
-            this.showResults = true;
+            this.batchProcessResult = result
+            this.spinner.hide()
+            this.showResults = true
           }
-        });
+        })
     }
   }
 
-  async uploadAsset(productID: string, file: FileHandle, isAttachment = false): Promise<any> {
-    const accessToken = await this.appAuthService.fetchToken().toPromise();
+  async uploadAsset(
+    productID: string,
+    file: FileHandle,
+    isAttachment = false
+  ): Promise<any> {
+    const accessToken = await this.appAuthService.fetchToken().toPromise()
     const asset = {
       Active: true,
       Title: isAttachment ? 'Product_Attachment' : null,
       File: file.File,
       FileName: file.Filename,
-    } as AssetUpload;
-    const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(asset, accessToken);
-    await HeadStartSDK.Assets.SaveAssetAssignment(
+    } as AssetUpload
+    const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(
+      asset,
+      accessToken
+    )
+    await ContentManagementClient.Assets.SaveAssetAssignment(
       { ResourceType: 'Products', ResourceID: productID, AssetID: newAsset.ID },
       accessToken
-    );
-    return await HeadStartSDK.Products.Get(productID, accessToken);
+    )
+    return await HeadStartSDK.Products.Get(productID, accessToken)
   }
 
   getColumnHeader(columnNumber: number): string {
     //Ensure number is within the amount of columns on the Excel sheet.
     if (columnNumber >= 1 && columnNumber <= 16) {
-      return ShipmentImportColumnHeader[columnNumber];
+      return ShipmentImportColumnHeader[columnNumber]
     }
   }
 
   stageDocument(event): void {
-    console.log(event);
+    console.log(event)
   }
 }
 

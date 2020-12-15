@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Marketplace.Common;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Models;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using NSubstitute;
 using NUnit.Framework;
+using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
+using ordercloud.integrations.exchangerates;
 using OrderCloud.SDK;
 
 namespace Marketplace.Tests
@@ -15,6 +22,48 @@ namespace Marketplace.Tests
         public void Setup()
         {
 
+        }
+
+        [Test]
+        public void TestSupplierFilter()
+        {
+            var command = new CheckoutIntegrationCommand(
+                Substitute.For<IAvalaraCommand>(),
+                Substitute.For<IExchangeRatesCommand>(),
+                Substitute.For<IOrderCloudClient>(),
+                Substitute.For<IEasyPostShippingService>(),
+                Substitute.For<AppSettings>()
+            );
+
+            var mockMethods = new List<MarketplaceShipMethod>()
+            {
+                new MarketplaceShipMethod() {Name = "FEDEX_GROUND"},
+                new MarketplaceShipMethod() {Name = "USPS Priority"},
+                new MarketplaceShipMethod() {Name = "UPS GROUND"}
+            };
+
+            var mockNotFoundMethods = new List<MarketplaceShipMethod>()
+            {
+                new MarketplaceShipMethod() {Name = "USPS Priority"},
+                new MarketplaceShipMethod() {Name = "UPS GROUND"}
+            };
+
+            var settings = new AppSettings()
+            {
+                OrderCloudSettings = new OrderCloudSettings()
+                {
+                    FirstChoiceSupplierID = "050"
+                }
+            };
+
+            var mockProfiles = new SelfEsteemBrandsShippingProfiles(settings);
+
+            var configured_filter = command.FilterMethodsBySupplierConfig(mockMethods, mockProfiles.FirstOrDefault("050"));
+            var misconfigured_filter = command.FilterMethodsBySupplierConfig(mockNotFoundMethods, mockProfiles.FirstOrDefault("050"));
+            var unconfigured_filter = command.FilterMethodsBySupplierConfig(mockMethods, mockProfiles.FirstOrDefault(null));
+            Assert.IsTrue(configured_filter.Count() == 1);
+            Assert.IsTrue(unconfigured_filter.Count() == 3);
+            Assert.IsTrue(misconfigured_filter.Count() == 2);
         }
 
         [Test]

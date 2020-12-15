@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.IdentityModel.Tokens;
+using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace Marketplace.Tests
@@ -20,6 +24,31 @@ namespace Marketplace.Tests
                 source = source.GetType().GetProperty(prop).GetValue(source, null);
             }
             return source;
+        }
+
+        public static string MockOrderCloudToken(string clientID = "mockClientID")
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("blahblahblahblahblahblahblahblahblahblah"));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: "mydomain.com",
+                audience: "mydomain.com",
+                claims: new[] { new Claim("cid", clientID) },
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public static VerifiedUserContext MockUserContext()
+        {
+
+            var cid = new ClaimsIdentity("OrderCloudIntegrations");
+            cid.AddClaim(new Claim("accesstoken", MockOrderCloudToken()));
+            var principal = new ClaimsPrincipal(cid);
+            var context = new VerifiedUserContext(principal);
+            return context;
         }
     }
 }

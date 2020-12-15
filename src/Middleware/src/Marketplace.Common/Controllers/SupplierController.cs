@@ -53,5 +53,12 @@ namespace Marketplace.Common.Controllers
 			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext);
 		}
 
+		[DocName("GET Supplier Order Details")]
+		[HttpGet, Route("orderdetails/{supplierOrderID}"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin, ApiRole.OrderReader)]
+		public async Task<MarketplaceSupplierOrderData> GetSupplierOrder(string supplierOrderID)
+        {
+			return await _command.GetSupplierOrderData(supplierOrderID, VerifiedUserContext);
+        }
+
 	}
 }

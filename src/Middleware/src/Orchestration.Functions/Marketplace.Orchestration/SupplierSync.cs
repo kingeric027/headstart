@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Marketplace.Common.Commands;
 
 namespace Marketplace.Orchestration
 {

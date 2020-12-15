@@ -70,23 +70,19 @@ namespace Marketplace.Common.Commands
             for (var i = 0; i < groupedLineItems.Count; i++)
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
-                var methods = shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == _profiles.FirstOrDefault(supplierID).CarrierAccountID);
+                var profile = _profiles.FirstOrDefault(supplierID);
+                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == profile.CarrierAccountID).ToList(), profile); 
                 var cheapestMethods = WhereRateIsCheapestOfItsKind(methods);
                 shipResponse.ShipEstimates[i].ShipMethods = cheapestMethods.Select(s =>
                 {
-                    // apply a 75% markup to keyfob shipments https://four51.atlassian.net/browse/SEB-1260
-                    if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
-                    {
-                        s.Cost = Math.Round(s.Cost * (decimal)1.75, 2);
-                    } else
-                    {
-                        s.Cost = Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
-                    }
+                    // apply a 75% markup to key fob shipments https://four51.atlassian.net/browse/SEB-1260
+                    s.Cost = groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder) ? 
+                        Math.Round(s.Cost * (decimal)1.75, 2) : 
+                        Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
                     return s;
                 }).ToList();
             }
             var buyerCurrency = worksheet.Order.xp.Currency ?? CurrencySymbol.USD;
-
 
             if (buyerCurrency != CurrencySymbol.USD) // shipper currency is USD
                 shipResponse.ShipEstimates = await ConvertShippingRatesCurrency(shipResponse.ShipEstimates, CurrencySymbol.USD, buyerCurrency);
@@ -94,8 +90,17 @@ namespace Marketplace.Common.Commands
             shipResponse.ShipEstimates = UpdateFreeShippingRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.FreeShippingTransitDays);
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
+            shipResponse.ShipEstimates = ApplyFlatRateShipping(worksheet, shipResponse.ShipEstimates, _settings.OrderCloudSettings.MedlineSupplierID);
             
             return shipResponse;
+        }
+
+        public IEnumerable<MarketplaceShipMethod> FilterMethodsBySupplierConfig(List<MarketplaceShipMethod> methods, EasyPostShippingProfile profile)
+        {
+            // will attempt to filter out by supplier method specs, but if there are filters and the result is none and there are valid methods still return the methods
+            if (profile.AllowedServiceFilter.Count == 0) return methods;
+            var filtered_methods = methods.Where(s => profile.AllowedServiceFilter.Contains(s.Name)).Select(s => s).ToList();
+            return filtered_methods.Any() ? filtered_methods : methods;
         }
 
         public static IEnumerable<MarketplaceShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<MarketplaceShipMethod> methods)
@@ -141,11 +146,10 @@ namespace Marketplace.Common.Commands
                     foreach (var method in estimate.ShipMethods)
                     {
                         // free shipping on ground shipping or orders where we weren't able to calculate a shipping rate
-                        if (method.Name.Contains("GROUND") || method.ID == "NO_SHIPPING_RATES")
+                        if (method.Name.Contains("GROUND") || method.ID == ShippingConstants.NoRatesID)
                         {
                             method.xp.FreeShippingApplied = true;
                             method.xp.FreeShippingThreshold = supplier.xp.FreeShippingThreshold;
-                            method.xp.CostBeforeDiscount = method.Cost; // do we need this? xp.OriginalCost already exists
                             method.Cost = 0;
                         }
                     }
@@ -183,6 +187,50 @@ namespace Marketplace.Common.Commands
             return result;
         }
 
+        public static IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> estimates, string medlineSupplierID)
+        {
+            var result = estimates.Select(estimate => ApplyFlatRateShippingOnEstimate(estimate, orderWorksheet, medlineSupplierID)).ToList();
+            return result;
+        }
+
+        public static MarketplaceShipEstimate ApplyFlatRateShippingOnEstimate(MarketplaceShipEstimate estimate, MarketplaceOrderWorksheet orderWorksheet, string medlineSupplierID)
+        {
+            var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
+            if (supplierID != medlineSupplierID)
+            {
+                // for now we're hardcoding flat rates for just this supplier https://four51.atlassian.net/browse/SEB-1292
+                // at some point in the future this will be handled generically for any supplier
+                return estimate;
+            }
+            var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplierID);
+            var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
+            var qualifiesForFlatRateShipping = supplierSubTotal > .01M && estimate.ShipMethods.Any(method => method.Name.Contains("GROUND"));
+            if(qualifiesForFlatRateShipping)
+            {
+                estimate.ShipMethods = estimate.ShipMethods
+                                        .Where(method => method.Name.Contains("GROUND")) // flat rate shipping only applies to ground shipping methods
+                                        .Select(method => ApplyFlatRateShippingOnShipmethod(method, supplierSubTotal))
+                                        .ToList();
+            }
+
+            return estimate;
+        }
+
+        public static MarketplaceShipMethod ApplyFlatRateShippingOnShipmethod(MarketplaceShipMethod method, decimal supplierSubTotal)
+        {
+            if (supplierSubTotal > .01M && supplierSubTotal <= 499.99M)
+            {
+                method.Cost = 29.99M;
+            }
+            else if (supplierSubTotal > 499.9M)
+            {
+                method.Cost = 0;
+                method.xp.FreeShippingApplied = true;
+            }
+
+            return method;
+        }
+
         public static IList<MarketplaceShipEstimate> CheckForEmptyRates(IList<MarketplaceShipEstimate> estimates, decimal noRatesCost, int noRatesTransitDays)
         {
             // if there are no rates for a set of line items then return a mocked response so user can check out
@@ -196,7 +244,7 @@ namespace Marketplace.Common.Commands
                     {
                         new MarketplaceShipMethod
                         {
-                            ID = "NO_SHIPPING_RATES",
+                            ID = ShippingConstants.NoRatesID,
                             Name = "No shipping rates",
                             Cost = noRatesCost,
                             EstimatedTransitDays = noRatesTransitDays,
@@ -215,11 +263,11 @@ namespace Marketplace.Common.Commands
         {
             foreach (var shipEstimate in estimates)
             {
-                if (shipEstimate.ID == ShippingConstants.FreeShipping)
+                if (shipEstimate.ID == ShippingConstants.FreeShippingID)
                 {
                     foreach (var method in shipEstimate.ShipMethods)
                     {
-                        method.ID = ShippingConstants.FreeShipping;
+                        method.ID = ShippingConstants.FreeShippingID;
                         method.Cost = 0;
                         method.EstimatedTransitDays = freeShippingTransitDays;
                     }

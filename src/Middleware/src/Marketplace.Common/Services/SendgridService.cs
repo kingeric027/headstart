@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 using Marketplace.Common.Constants;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
@@ -51,53 +53,52 @@ namespace Marketplace.Common.Services
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
         private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
         private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-d0e5fda7ce8c4ffe9da1fe82ab14beb6";
-        public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
+        private readonly ISendGridClient _client;
+
+        public SendgridService(AppSettings settings, IOrderCloudClient ocClient, ISendGridClient client)
         {
             _oc = ocClient;
+            _client = client;
             _settings = settings;
         }
 
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent) //temp function until all endpoints are accessible for template data
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
-            await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public virtual async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
-            await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public virtual async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
-            await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
-            using (Stream stream = await fileReference.OpenReadAsync())
+            using (var stream = await fileReference.OpenReadAsync())
             {
                 await msg.AddAttachmentAsync(fileName, stream);
             }
-                await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
-            EmailTemplate templateData = new EmailTemplate()
+            var templateData = new EmailTemplate()
             {
                 Data = new
                 {
