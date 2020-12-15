@@ -88,6 +88,7 @@
               Amount to
               {{ _tableStatus === 'Canceled' ? 'Cancel' : 'Backorder' }}
             </th>
+            <th>Comments</th>
             <th>Status</th>
             <th>Total</th>
           </tr>
@@ -167,6 +168,7 @@
                 max="{{ quantityCanChange(li) }}"
               />
             </td>
+            <td>{{ li.xp.SupplierComments }}</td>
             <td class="align-middle">
               {{ getLineItemStatusDisplay(li) }}
               <div *ngIf="li.xp.Returns?.length || li.xp.Cancelations?.length">
