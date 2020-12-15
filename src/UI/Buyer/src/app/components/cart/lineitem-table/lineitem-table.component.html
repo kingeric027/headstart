@@ -249,6 +249,17 @@
               </div>
             </div>
           </div>
+          <div class="col-md-12">
+            <textarea
+              *ngIf="!readOnly"
+              type="text"
+              [ngModel]="li?.xp?.SupplierComments"
+              maxlength="500"
+              placeholder="Comments (optional)"
+              class="form-control"
+              (change)="changeComments(li.ID, $event.target.value)"
+            ></textarea>
+          </div>
         </div>
         <button
           class="btn btn-remove wobble"
@@ -293,7 +304,6 @@
           }}</a>
         </div>
       </div>
-      <ng-content></ng-content>
     </div>
     <div class="card-body pt-sm-2" *ngIf="showKitDetails">
       <!-- Line Item Labels: Start -->
@@ -491,10 +501,22 @@
       </div>
       <!-- line item: End -->
     </div>
-    <div *ngIf="showKitDetails" class="col-md text-right">
+    <div class="col-12" *ngIf="showKitDetails">
+      <textarea
+        *ngIf="!readOnly"
+        type="text"
+        [ngModel]="kit[0]?.xp?.SupplierComments"
+        maxlength="500"
+        placeholder="Comments (optional)"
+        class="form-control"
+        (change)="changeComments(kit[0].ID, $event.target.value)"
+      ></textarea>
+    </div>
+    <div *ngIf="showKitDetails" class="col-md">
       <button
         class="btn btn-remove wobble"
         type="button"
+        style="position: relative"
         *ngIf="!readOnly"
         (click)="removeKit(kit)"
         translate

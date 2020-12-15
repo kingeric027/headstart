@@ -57,7 +57,10 @@ export class CartService {
               li.ProductID === lineItem.ProductID &&
               li?.xp?.KitProductID === lineItem?.xp?.KitProductID
           )
-          if (kitLiWithSameProduct && this.hasSameSpecs(lineItem, kitLiWithSameProduct)) {
+          if (
+            kitLiWithSameProduct &&
+            this.hasSameSpecs(lineItem, kitLiWithSameProduct)
+          ) {
             // combine any line items that have the same productID/specs into one line item
             lineItem.Quantity += kitLiWithSameProduct.Quantity
           }
@@ -105,6 +108,29 @@ export class CartService {
   ): Promise<MarketplaceLineItem> {
     try {
       return await this.upsertLineItem(lineItem)
+    } finally {
+      await this.state.reset()
+    }
+  }
+
+  async addSupplierComments(
+    lineItemID: string,
+    comments: string
+  ): Promise<MarketplaceLineItem> {
+    try {
+      const lineToUpdate = this.state.lineItems.Items.find(
+        (li) => li.ID === lineItemID
+      )
+      lineToUpdate.xp.SupplierComments = comments
+
+      // only include properties seller can edit (exclude private addresses)
+      const { ProductID, Specs, Quantity, xp } = lineToUpdate
+      return await this.upsertLineItem({
+        ProductID,
+        Specs,
+        Quantity,
+        xp,
+      })
     } finally {
       await this.state.reset()
     }
