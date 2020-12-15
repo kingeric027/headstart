@@ -251,7 +251,8 @@
           </div>
           <div class="col-md-12">
             <textarea
-              *ngIf="!readOnly"
+              *ngIf="!readOnly || li?.xp?.SupplierComments"
+              [attr.readonly]="readOnly ? '' : null"
               type="text"
               [ngModel]="li?.xp?.SupplierComments"
               maxlength="500"
@@ -501,9 +502,10 @@
       </div>
       <!-- line item: End -->
     </div>
-    <div class="col-12" *ngIf="showKitDetails">
+    <div class="col-12 mb-3" *ngIf="showKitDetails">
       <textarea
-        *ngIf="!readOnly"
+        *ngIf="!readOnly || (kit && kit[0] && kit[0]?.xp?.SupplierComments)"
+        [attr.readonly]="readOnly ? '' : null"
         type="text"
         [ngModel]="kit[0]?.xp?.SupplierComments"
         maxlength="500"
