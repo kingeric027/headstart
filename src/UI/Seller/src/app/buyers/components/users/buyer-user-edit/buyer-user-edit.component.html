@@ -29,7 +29,7 @@
               [resourceForm]="resourceForm"
               aria-describedby="Active"
               formControlName="Active"
-              (input)="updateResourceFromEvent($event, 'Active')"
+              (input)="updateResourceFromEvent()"
             />
             <span class="slider round cursor-pointer"></span>
           </label>
@@ -45,7 +45,7 @@
               showErrors
               aria-describedby="Username"
               formControlName="Username"
-              (input)="updateResourceFromEvent($event, 'Username')"
+              (input)="updateResourceFromEvent()"
               placeholder="Enter Username"
             />
           </div>
@@ -60,7 +60,7 @@
               [resourceForm]="resourceForm"
               aria-describedby="Email"
               formControlName="Email"
-              (input)="updateResourceFromEvent($event, 'Email')"
+              (input)="updateResourceFromEvent()"
               placeholder="Enter Email"
             />
             <span *ngIf="hasValidEmailError()"
@@ -86,7 +86,7 @@
               showErrors
               aria-describedby="FirstName"
               formControlName="FirstName"
-              (input)="updateResourceFromEvent($event, 'FirstName')"
+              (input)="updateResourceFromEvent()"
               placeholder="Enter First Name"
             />
           </div>
@@ -100,7 +100,7 @@
               showErrors
               aria-describedby="LastName"
               formControlName="LastName"
-              (input)="updateResourceFromEvent($event, 'LastName')"
+              (input)="updateResourceFromEvent()"
               placeholder="Enter Last Name"
             />
           </div>
@@ -116,7 +116,7 @@
               id="Country"
               showErrors
               aria-describedby="Country"
-              (change)="updateResourceFromEvent($event, 'xp.Country')"
+              (change)="updateResourceFromEvent()"
             >
               <option [ngValue]="''" disabled>Select a Country</option>
               <option
@@ -136,7 +136,7 @@
               maxlength="2"
               [resourceForm]="resourceForm"
               formControlName="Country"
-              (input)="updateResourceFromEvent($event, 'xp.Country')"
+              (input)="updateResourceFromEvent()"
               placeholder="Enter Country Code"
             />
             <p

@@ -44,11 +44,10 @@ export class BuyerUserEditComponent {
       LastName: new FormControl(user.LastName, Validators.required),
       Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
       Country: new FormControl(user.xp?.Country, Validators.required),
-    })
+    });
   }
 
-  updateResourceFromEvent(event: any, field: string): void {
-    this.resourceForm.get(field).setValue(field === 'Active' ? event.target.checked : event.target.value)
+  updateResourceFromEvent(): void {
     this.updateResource.emit(this.resourceForm)
   }
 

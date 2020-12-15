@@ -5,7 +5,6 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { BuyerUserService } from '../buyer-user.service'
 import { BuyerService } from '../../buyers/buyer.service'
 import { UserGroupTypes } from '@app-seller/shared/components/user-group-assignments/user-group-assignments.constants'
-import { ToastrService } from 'ngx-toastr'
 @Component({
   selector: 'app-buyer-user-table',
   templateUrl: './buyer-user-table.component.html',
@@ -20,7 +19,6 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedroute: ActivatedRoute,
-    private toasterService: ToastrService,
     ngZone: NgZone
   ) {
     super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone)
@@ -46,7 +44,6 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false;
-      this.toasterService.error('Error creating user')
       throw ex
     }
   }
