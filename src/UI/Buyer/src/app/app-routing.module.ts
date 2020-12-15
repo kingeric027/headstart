@@ -5,7 +5,10 @@ import { IsProfiledUserGuard } from './interceptors/is-profiled-user/is-profiled
 import { BaseResolve } from './resolves/base.resolve'
 import { ChiliTemplateResolver } from './resolves/chili-template.resolve'
 import { MeProductResolver } from './resolves/me.product.resolve'
-import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve'
+import {
+  MeListAddressResolver,
+  MeListBuyerLocationResolver,
+} from './resolves/me.resolve'
 import { AddressListWrapperComponent } from './wrapper-components/address-list-wrapper.component'
 import { CartWrapperComponent } from './wrapper-components/cart-wrapper.component'
 import { CheckoutWrapperComponent } from './wrapper-components/checkout-wrapper.component'
@@ -27,7 +30,7 @@ import { ResetPasswordWrapperComponent } from './wrapper-components/reset-passwo
 import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component'
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component'
 
- const MarketplaceRoutes: Routes = [
+const MarketplaceRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
   { path: 'register', component: RegisterWrapperComponent },
   { path: 'forgot-password', component: ForgotPasswordWrapperComponent },
@@ -66,6 +69,18 @@ import { SupplierListWrapperComponent } from './wrapper-components/supplier-list
       },
       {
         path: 'products/:productID/:configurationID',
+        resolve: {
+          template: ChiliTemplateResolver,
+        },
+        children: [
+          {
+            path: '',
+            component: ProductChiliConfigurationWrapperComponent,
+          },
+        ],
+      },
+      {
+        path: 'products/:productID/:configurationID/:documentID',
         resolve: {
           template: ChiliTemplateResolver,
         },
