@@ -116,36 +116,6 @@ const Orders: MPRoute = {
   route: '/orders',
 }
 
-const AwaitingApprovalOrders: MPRoute = {
-  rolesWithAccess: [
-    MPRoles.MPOrderAdmin,
-    MPRoles.MPOrderReader,
-    MPRoles.MPShipmentAdmin,
-  ],
-  title: 'ADMIN.NAV.AWAITING_APPROVAL_ORDERS',
-  route: '/orders',
-}
-
-const ShippedOrders: MPRoute = {
-  rolesWithAccess: [
-    MPRoles.MPOrderAdmin,
-    MPRoles.MPOrderReader,
-    MPRoles.MPShipmentAdmin,
-  ],
-  title: 'ADMIN.NAV.SHIPPED_ORDERS',
-  route: '/orders',
-}
-
-const CancelledOrders: MPRoute = {
-  rolesWithAccess: [
-    MPRoles.MPOrderAdmin,
-    MPRoles.MPOrderReader,
-    MPRoles.MPShipmentAdmin,
-  ],
-  title: 'ADMIN.NAV.CANCELLED_ORDERS',
-  route: '/orders',
-}
-
 const SellerOrderNavGrouping: MPRoute = {
   rolesWithAccess: [
     MPRoles.MPOrderAdmin,
@@ -177,13 +147,7 @@ const SupplierOrderNavGrouping: MPRoute = {
   title: 'ADMIN.NAV.ORDERS',
   route: '/orders',
   orderCloudUserTypesWithAccess: [SUPPLIER],
-  subRoutes: [
-    Orders,
-    AwaitingApprovalOrders,
-    ShippedOrders,
-    CancelledOrders,
-    SupplierOrderBatchUpload,
-  ],
+  subRoutes: [Orders, SupplierOrderBatchUpload],
 }
 
 // Buyers
