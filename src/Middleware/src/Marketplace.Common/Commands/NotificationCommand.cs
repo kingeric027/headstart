@@ -52,7 +52,21 @@ namespace Marketplace.Common.Commands
         }
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
-            var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+            MarketplaceProduct product = null;
+            try
+            {
+                product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+
+            }
+            catch (OrderCloudException ex)
+            {
+                //Product was deleted after it was updated. Delete orphaned notification 
+               if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
+                {
+                    await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                    return new SuperMarketplaceProduct();
+                }
+            }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
                 var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
@@ -80,7 +94,10 @@ namespace Marketplace.Common.Commands
                 //Delete document after acceptance
                 await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
             }
-            await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+            else
+            {
+                await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+            }
             var superProduct = await _productCommand.Get(productID, user.AccessToken);
             superProduct.Product = product;
             return superProduct;
