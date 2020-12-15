@@ -23,7 +23,7 @@ export class BuyerUserEditComponent {
     this.createBuyerUserForm(buyerUser)
   }
   @Output()
-  updateResource = new EventEmitter<any>()
+  updateResource = new EventEmitter<FormGroup>()
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>()
   isCreatingNew: boolean
@@ -38,7 +38,7 @@ export class BuyerUserEditComponent {
 
   createBuyerUserForm(user: User) {
     this.resourceForm = new FormGroup({
-      Active: new FormControl(user.Active),
+      Active: new FormControl(user.Active || false),
       Username: new FormControl(user.Username, Validators.required),
       FirstName: new FormControl(user.FirstName, Validators.required),
       LastName: new FormControl(user.LastName, Validators.required),
@@ -48,9 +48,8 @@ export class BuyerUserEditComponent {
   }
 
   updateResourceFromEvent(event: any, field: string): void {
-    field === 'Active'
-      ? this.updateResource.emit({ value: event.target.checked, field })
-      : this.updateResource.emit({ value: event.target.value, field })
+    this.resourceForm.get(field).setValue(field === 'Active' ? event.target.checked : event.target.value)
+    this.updateResource.emit(this.resourceForm)
   }
 
   addUserGroupAssignments(event): void {
