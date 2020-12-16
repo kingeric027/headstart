@@ -12,7 +12,7 @@ export const environment: Environment = {
   marketplaceID: 'SEB_TEST',
   baseUrl: 'https://thebarmethod-staging.sebvendorportal.com',
   middlewareUrl: 'https://middleware-api-staging.sebvendorportal.com',
-  cmsUrl: 'https://ordercloud-cms-staging.azurewebsites.net',  
+  cmsUrl: 'https://ordercloud-cms-staging.azurewebsites.net',
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
   translateBlobUrl:
@@ -21,7 +21,7 @@ export const environment: Environment = {
   ssoLink: null,
   ordercloudEnv: OrdercloudEnv.Staging,
   theme: bmTheme,
-  instrumentationKey: '922d3e50-9271-4864-88f2-3c676b08e614',
+  instrumentationKey: 'ec212601-1d32-4fd4-872f-7f073b50ae7c',
 }
 /*
 
