@@ -140,7 +140,7 @@
           </div>
           <div class="col-md-1 d-flex align-items-center">
             <div class="d-flex justify-content-start align-items-center">
-              <div
+              <div *ngIf="filterForm"
                 class="icon-button ripple"
                 placement="{{
                   screenSize === 'xs' && 'sm' && 'md' ? 'left' : 'bottom'
@@ -164,7 +164,7 @@
                 </fa-layers>
               </div>
               <div
-                *ngIf="activeFilterCount > 0"
+                *ngIf="filterForm && activeFilterCount > 0"
                 class="icon-button ripple"
                 (click)="clearAllFilters()"
               >
