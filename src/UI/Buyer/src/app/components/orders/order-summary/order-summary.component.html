@@ -1,7 +1,7 @@
 <div class="card shadow mb-1" *ngIf="_orderSummaryMeta">
   <h2 class="h5 card-header" translate>ORDERS.SUMMARY.SUMMARY</h2>
-  <div class="card-body">
-    <div class="card-title">
+  <div *ngIf="_orderSummaryMeta.StandardLineItemCount" class="card-body">
+    <h5 class="card-title">
       {{ _orderSummaryMeta.StandardLineItemCount }}
       <span *ngIf="!_orderSummaryMeta.POLineItemCount" translate
         >ORDERS.SUMMARY.ITEM_COUNT</span
@@ -9,15 +9,15 @@
       <span *ngIf="_orderSummaryMeta.POLineItemCount" translate
         >Item(s) paid by Credit Card</span
       >
-    </div>
+    </h5>
     <div class="text-right">
-      <span class="float-left" translate>ORDERS.SUMMARY.SUBTOTAL</span>
+      <b class="float-left" translate>ORDERS.SUMMARY.SUBTOTAL</b>
       <span class="sub-total">{{
         _orderSummaryMeta.CreditCardDisplaySubtotal | currency: _orderCurrency
       }}</span>
     </div>
     <div class="text-right">
-      <span class="float-left" translate>ORDERS.SUMMARY.SHIPPING</span>
+      <b class="float-left" translate>ORDERS.SUMMARY.SHIPPING</b>
       <span
         *ngIf="!_orderSummaryMeta.ShippingAndTaxOverrideText"
         class="font-italic"
@@ -30,7 +30,7 @@
       >
     </div>
     <div class="text-right">
-      <span class="float-left" translate>ORDERS.SUMMARY.TAX</span>
+      <b class="float-left" translate>ORDERS.SUMMARY.TAX</b>
       <span
         *ngIf="!_orderSummaryMeta.ShippingAndTaxOverrideText"
         class="font-italic"
@@ -46,14 +46,15 @@
       *ngIf="_orderSummaryMeta.DiscountTotal > 0"
       class="text-right text-danger"
     >
-      <span class="float-left" translate>ORDERS.SUMMARY.DISCOUNT_TOTAL</span>
+      <b class="float-left" translate>ORDERS.SUMMARY.DISCOUNT_TOTAL</b>
       <span class="font-italic"
         >-
         {{ _orderSummaryMeta.DiscountTotal | currency: _orderCurrency }}</span
       >
     </div>
     <div *ngIf="_orderSummaryMeta.POLineItemCount" class="text-right lead">
-      <span class="float-left" translate>Credit Card total</span>
+      <hr />
+      <b class="float-left" translate>Credit Card total</b>
       <span class="order-total">{{
         _orderSummaryMeta.CreditCardTotal | currency: _orderCurrency
       }}</span>
@@ -70,21 +71,15 @@
   </div>
 
   <div *ngIf="_orderSummaryMeta.POLineItemCount" class="card-body">
-    <h3 class="card-title">
+    <h5 class="card-title">
       {{ _orderSummaryMeta.POLineItemCount }}
       <span translate>Item(s) paid by purchase order</span>
-    </h3>
+    </h5>
     <div class="text-right">
       <b class="float-left" translate>ORDERS.SUMMARY.SUBTOTAL</b
       ><span class="sub-total">{{
         _orderSummaryMeta.POSubtotal | currency: _orderCurrency
       }}</span>
-    </div>
-    <div class="text-right">
-      <b class="float-left" translate>ORDERS.SUMMARY.TAX</b>
-      <span class="tax-cost" translate
-        >ORDERS.SUMMARY.POTAXANDSHIPPINGOVERRIDE</span
-      >
     </div>
     <div class="text-right">
       <b class="float-left" translate>ORDERS.SUMMARY.SHIPPING</b>
@@ -98,6 +93,12 @@
         class="tax-cost"
         translate
         >{{ _orderSummaryMeta.POShippingCost | currency: _orderCurrency }}</span
+      >
+    </div>
+    <div class="text-right">
+      <b class="float-left" translate>ORDERS.SUMMARY.TAX</b>
+      <span class="tax-cost" translate
+        >ORDERS.SUMMARY.POTAXANDSHIPPINGOVERRIDE</span
       >
     </div>
 
