@@ -44,7 +44,7 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
       this.selectResource(user)
       this.dataIsSaving = false
     } catch (ex) {
-      this.dataIsSaving = false;
+      this.dataIsSaving = false
       throw ex
     }
   }
@@ -69,8 +69,8 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
     )
   }
 
-  updateResource($event: any) {
-    this.resourceForm = $event;
-    this.updatedResource = $event.value;
+  updateResource($event: any): void {
+    this.resourceForm = $event
+    this.updatedResource = $event.value
   }
 }
