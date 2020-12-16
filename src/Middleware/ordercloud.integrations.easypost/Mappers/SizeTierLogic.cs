@@ -1,4 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using ordercloud.integrations.library.extensions;
+using OrderCloud.SDK;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
 using System.Text.Json.Serialization;
 
 namespace ordercloud.integrations.easypost
@@ -34,145 +40,91 @@ namespace ordercloud.integrations.easypost
 		F
 	}
 
-	//public static class SmartPackageMapper
-	//{
-	//    public static RateRequestBody Map(List<LineItem> obj)
-	//    {
-	//        var firstLineItem = obj[0];
-	//        var shipToAddress = firstLineItem.ShippingAddress;
-	//        var shipFromAddress = firstLineItem.ShipFromAddress;
+	public class Package
+	{
+		// This is intended to be a max parcel dimension, but is not being honored because of a bug in the math. see line 83 about percentage 1 vs 100
+		// however, fixing that math produces some crazy rates (~$1000).
+		public static readonly double FULL_PACKAGE_DIMENSION = 11; // inches. 
+        public static readonly double DEFAULT_WEIGHT = 5;
+		public double PercentFilled { get; set; } = 0;
+		public decimal Weight { get; set; } = 0; // lbs 
+	}
+
+	public static class SmartPackageMapper
+	{
+		// Any parcel sent to easy post with a dimension over 33 returns no rates.
+		// Dimensions around 33 return high rates in the $200's for the slowest shipping tiers 
+		private static readonly int EASYPOST_MAX_PARCEL_DIMENSION = 33; // inches. 
+
+		// 22 inches seems to produce rates around $20 for the slowest tiers, which feels reasonable
+		private static readonly int TARGET_REASONABLE_PARCEL_DIMENSION = 22; // inches
+
+		private static readonly Dictionary<SizeTier, double> SIZE_FACTOR_MAP = new Dictionary<SizeTier, double>() 
+		{
+			{ SizeTier.A, .385 }, // 38.5% of a full package
+			{ SizeTier.B, .10 },
+			{ SizeTier.C, .031 },
+			{ SizeTier.D, .0134 },
+			{ SizeTier.E, .0018 },
+			{ SizeTier.F, .00067 }
+		};
+
+		public static List<EasyPostParcel> MapLineItemsIntoPackages(List<LineItem> lineItems)
+		{
+			var lineItemsThatCanShipTogether = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
+			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
 
 
-	//        return new RateRequestBody
-	//        {
-	//            ConsigneeAddress = RateAddressMapper.Map(shipToAddress),
-	//            ShipperAddress = RateAddressMapper.Map(shipFromAddress),
-	//            Items = MapLineItemsIntoPackages(obj),
-	//            Accessorials = AccessorialMapper.Map(obj, shipToAddress, shipFromAddress)
-	//        };
-	//    }
+			var parcels = lineItemsThatCanShipTogether
+				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
+				.Aggregate(new List<Package>(), (packages, item) =>
+				{
+					if (packages.Count == 0) packages.Add(new Package());
+					var percentFillToAdd = (double)SIZE_FACTOR_MAP[item.Product.xp.SizeTier];
+					var currentPackage = packages.Last();
+					if (currentPackage.PercentFilled + percentFillToAdd > 100) // this should be a 1, not a 100. However, this mathematically correct packaging produces very high rates.
+					{
+						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
+						packages.Add(newPackage);
+					} else
+					{
+						currentPackage.PercentFilled += percentFillToAdd;
+						currentPackage.Weight += item.Product.ShipWeight ?? 0;
+					}
+					return packages;
+				});
 
-	//    private static Dictionary<SizeTier, decimal> SIZE_FACTOR_MAP = new Dictionary<SizeTier, decimal>()
-	//    {
-	//        { SizeTier.A, .385M },
-	//        { SizeTier.B, .10M },
-	//        { SizeTier.C, .031M },
-	//        { SizeTier.D, .0134M },
-	//        { SizeTier.E, .0018M },
-	//        { SizeTier.F, .00067M }
-	//    };
+			var combinationPackages = parcels.Select((package, index) =>
+			{
+				var dimension = (double)Math.Ceiling(package.PercentFilled * Package.FULL_PACKAGE_DIMENSION);
+				return new EasyPostParcel()
+				{
+					weight = (double)package.Weight,
+					length = Math.Max(dimension, Package.FULL_PACKAGE_DIMENSION),
+					width = Math.Max(dimension, Package.FULL_PACKAGE_DIMENSION),
+					height = Math.Max(dimension, Package.FULL_PACKAGE_DIMENSION)
+				};
+			}).Select(p => CapParcelDimensions(p, TARGET_REASONABLE_PARCEL_DIMENSION));
 
-	//    private static Dictionary<decimal, int> PERCENT_FILL_TO_SIDE_LENGTH_MAP = new Dictionary<decimal, int>()
-	//    {
-	//        { 0.0117392937640872M, 5 },
-	//        { 0.0202854996243426M, 6 },
-	//        { 0.0322126220886552M, 7 },
-	//        { 0.048084147257701M, 8 },
-	//        { 0.0684635612321563M, 9 },
-	//        { 0.0939143501126972M, 10 },
-	//        { 0.125M, 11 },
-	//        { 0.162283996994741M, 12 },
-	//        { 0.206329827197596M, 13 },
-	//        { 0.257700976709241M, 14 },
-	//        { 0.316960931630353M, 15 },
-	//        { 0.384673178061608M, 16 },
-	//        { 0.461401202103681M, 17 },
-	//        { 0.54770848985725M, 18 },
-	//        { 0.64415852742299M, 19 },
-	//        { 0.751314800901578M, 20 },
-	//        { 0.869740796393689M, 21 },
-	//        { 1M, 22 }
-	//    };
+			var individualPackages = lineItemsThatShipAlone.Select(li => new EasyPostParcel()
+            {
+                // length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
+                weight = li.Product.ShipWeight.ValueOrDefault(Package.DEFAULT_WEIGHT), // (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
+                length = li.Product.ShipLength.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
+                width = li.Product.ShipWidth.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
+                height = li.Product.ShipHeight.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
+			}).Select(p => CapParcelDimensions(p, EASYPOST_MAX_PARCEL_DIMENSION));
 
-	//    private static decimal MAX_PERCENT_FILL = .80M;
+			return combinationPackages.Union(individualPackages).ToList();
+		}
 
-	//    private static List<Item> MapLineItemsIntoPackages(List<MarketplaceLineItem> lineItems)
-	//    {
-	//        var lineItemsCanCombineBySizeDescending = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
 
-	//        // tuple item1 = percent filled, item 2 = weight
-	//        var packageContents = new List<Tuple<decimal, decimal>>();
-	//        var currentPercentFilled = 0M;
-	//        var currentWeight = 0M;
-
-	//        foreach (var lineItem in lineItemsCanCombineBySizeDescending)
-	//        {
-	//            var i = 0;
-	//            var percentByQuantity = SIZE_FACTOR_MAP[lineItem.Product.xp.SizeTier];
-	//            while (i < lineItem.Quantity)
-	//            {
-	//                if (currentPercentFilled + percentByQuantity < MAX_PERCENT_FILL)
-	//                {
-	//                    currentPercentFilled += percentByQuantity;
-	//                    currentWeight += lineItem.Product.ShipWeight ?? 0M;
-	//                }
-	//                else
-	//                {
-	//                    packageContents.Add(new Tuple<decimal, decimal>(currentPercentFilled, currentWeight));
-	//                    currentWeight = 0;
-	//                    currentPercentFilled = 0;
-	//                }
-	//                i++;
-	//            }
-	//        }
-
-	//        if (currentPercentFilled > 0 && currentWeight > 0)
-	//        {
-	//            packageContents.Add(new Tuple<decimal, decimal>(currentPercentFilled, currentWeight));
-	//        }
-
-	//        var packages = packageContents.Select(packageContents => GetSideLengthAndWeight(packageContents));
-
-	//        var combinationPackages = packages.Select((package, index) =>
-	//        {
-	//            return new Item()
-	//            {
-	//                Weight = package.Item2,
-	//                Length = package.Item1,
-	//                Width = package.Item1,
-	//                Height = package.Item1,
-	//                Quantity = 1,
-	//                PackageId = index.ToString(),
-	//                PackageType = PackageType.Box,
-	//                FreightClass = 1,
-	//                Unit = Unit.lbs_inch
-	//            };
-	//        }).ToList();
-
-	//        var individualLineItems = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
-	//        var individualPackages = individualLineItems.Select(li =>
-	//        {
-	//            return new Item()
-	//            {
-	//                Weight = li.Product.ShipWeight ?? 0,
-	//                Length = li.Product.ShipLength ?? 0,
-	//                Width = li.Product.ShipWidth ?? 0,
-	//                Height = li.Product.ShipHeight ?? 0,
-	//                Quantity = li.Quantity,
-	//                PackageId = li.ID,
-	//                PackageType = PackageType.Box,
-	//                FreightClass = 1,
-	//                Unit = Unit.lbs_inch
-	//            };
-	//        });
-
-	//        return combinationPackages.Union(individualPackages).ToList();
-	//    }
-
-	//    private static Tuple<int, decimal> GetSideLengthAndWeight(Tuple<decimal, decimal> packageContents)
-	//    {
-	//        var (percentFilled, weight) = packageContents;
-	//        var bigEnoughBox = PERCENT_FILL_TO_SIDE_LENGTH_MAP.First(entry =>
-	//        {
-	//            var boxPercentSide = entry.Key;
-	//            var sideLength = entry.Value;
-	//            var paddedPercentBoxSize = boxPercentSide * MAX_PERCENT_FILL;
-
-	//            return percentFilled < paddedPercentBoxSize;
-	//        });
-
-	//        return new Tuple<int, decimal>(bigEnoughBox.Value, weight);
-
-	//    }
-	//}
+		private static EasyPostParcel CapParcelDimensions(EasyPostParcel parcel, double maximumDimension)
+		{
+			parcel.height = Math.Min(parcel.height, maximumDimension);
+			parcel.width = Math.Min(parcel.width, maximumDimension);
+			parcel.length = Math.Min(parcel.length, maximumDimension);
+			return parcel;
+		}
+	}
 }

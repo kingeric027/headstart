@@ -1,8 +1,8 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { Promotion } from '@ordercloud/angular-sdk';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { Router, ActivatedRoute } from '@angular/router';
-import { PromotionService } from '@app-seller/promotions/promotion.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { Promotion } from '@ordercloud/angular-sdk'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { Router, ActivatedRoute } from '@angular/router'
+import { PromotionService } from '@app-seller/promotions/promotion.service'
 
 @Component({
   selector: 'app-promotion-table',
@@ -17,6 +17,6 @@ export class PromotionTableComponent extends ResourceCrudComponent<Promotion> {
     activatedRoute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, promotionService, router, activatedRoute, ngZone);
+    super(changeDetectorRef, promotionService, router, activatedRoute, ngZone)
   }
 }

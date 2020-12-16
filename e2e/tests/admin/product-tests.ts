@@ -243,7 +243,7 @@ test
 			await baseTestCleanup(
 				t.ctx.testUser.ID,
 				'0005',
-				t.fixtureCtx.adminClientAuth
+				t.fixtureCtx.clientAuth
 			)
 		}
 	})('Can product be Created and checked out with? | 20036', async t => {
@@ -258,7 +258,6 @@ test
 		.expect(await mainResourcePage.resourceExists(createdProductName))
 		.ok()
 	await adminHeaderPage.logout()
-	console.log(createdProductName)
 
 	//Below for Product visibility
 	await adminTestSetup()
@@ -283,7 +282,7 @@ test
 	await buyerHeaderPage.clickCartButton()
 	await shoppingCartPage.clickCheckoutButton()
 	await checkoutPage.clickSaveAndContinueButton()
-	await checkoutPage.selectShippingOption(createdProductName, '1 day')
+	await checkoutPage.selectShippingOption(createdProductName, 'day')
 	await checkoutPage.clickSaveAndContinueButton()
 	await checkoutPage.selectCreditCard(buyerUser.FirstName)
 	await checkoutPage.enterCVV('900')

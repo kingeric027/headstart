@@ -14,10 +14,10 @@ namespace ordercloud.integrations.library
 {
     public static class OrderCloudIntegrationsConfigureWebApiServicesExtensions
     {
-        public static IServiceCollection OrderCloudIntegrationsConfigureWebApiServices<T>(this IServiceCollection services, T settings, string cors_policy = null, Action<MvcJsonOptions> options = null)
+        public static IServiceCollection OrderCloudIntegrationsConfigureWebApiServices<T>(this IServiceCollection services, T settings, BlobServiceConfig errorLogBlobConfig, string cors_policy = null, Action<MvcJsonOptions> options = null)
             where T : class
         {
-            services.AddTransient<GlobalExceptionHandler>();
+            services.AddSingleton(x => new GlobalExceptionHandler(errorLogBlobConfig));
             services.Inject<IOrderCloudClient>();
             services.AddSingleton(settings);
             services.AddMvc(o => { o.Filters.Add(typeof(ValidateModelAttribute)); })

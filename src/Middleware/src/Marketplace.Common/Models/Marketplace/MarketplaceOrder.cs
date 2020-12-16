@@ -7,6 +7,8 @@ using OrderCloud.SDK;
 using System.Collections.Generic;
 using Avalara.AvaTax.RestClient;
 using Marketplace.Common.Exceptions;
+using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Models.Models.Marketplace;
 
 namespace Marketplace.Models
 {
@@ -36,6 +38,7 @@ namespace Marketplace.Models
         public string PaymentMethod { get; set; }
         public MarketplaceAddressBuyer ShippingAddress { get; set; }
         public List<ShipMethodSupplierView> SelectedShipMethodsSupplierView { get; set; }
+        public bool? IsResubmitting { get; set; }
     }
 
     [SwaggerModel]
@@ -78,6 +81,21 @@ namespace Marketplace.Models
         public string LineItemID { get; set; }
         public string RMANumber { get; set; }
         public bool IsResolved { get; set; }
+    }
+
+    [SwaggerModel]
+    public class MarketplaceSupplierOrderData
+    {
+        public MarketplaceOrderLineItemData SupplierOrder { get; set; }
+        public MarketplaceOrderLineItemData BuyerOrder { get; set; }
+        public MarketplaceShipEstimate ShipMethod { get; set; }
+    }
+
+    [SwaggerModel]
+    public class MarketplaceOrderLineItemData
+    {
+        public MarketplaceOrder Order { get; set; }
+        public List<MarketplaceLineItem> LineItems { get; set; }
     }
 
     public class MarketplaceOrderSubmitPayload

@@ -5,13 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Dynamitey;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 using Marketplace.Common.Constants;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
-using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using SendGrid;
@@ -26,14 +27,13 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
-
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
-        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
+        Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
-        Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload);
-        Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload);
+        Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
+        Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification);
         Task SendLineItemStatusChangeEmail(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, string firstName, string lastName, string email, EmailDisplayText lineItemEmailDisplayText);
         Task SendLineItemStatusChangeEmailMultipleRcpts(MarketplaceOrder order, LineItemStatusChanges lineItemStatusChanges, List<MarketplaceLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText);
         Task SendContactSupplierAboutProductEmail(ContactSupplierBody template);
@@ -46,59 +46,59 @@ namespace Marketplace.Common.Services
         private readonly AppSettings _settings; 
         private readonly IOrderCloudClient _oc;
         private const string ORDER_SUBMIT_TEMPLATE_ID = "d-defb11ada55d48d8a38dc1074eaaca67";
+        private const string ORDER_APPROVAL_TEMPLATE_ID = "d-2f3b92b95b7b45ea8f8fb94c8ac928e0";
         private const string LINE_ITEM_STATUS_CHANGE = "d-4ca85250efaa4d3f8a2e3144d4373f8c";
         private const string QUOTE_ORDER_SUBMIT_TEMPLATE_ID = "d-3266ef3d70b54d78a74aaf012eaf5e64";
         private const string BUYER_NEW_USER_TEMPLATE_ID = "d-f3831baa2beb4c19aeace19e48132768";
         private const string BUYER_PASSWORD_RESET_TEMPLATE_ID = "d-ca6a6ff8c9ac4264bf86b5d6cdd3a038";
         private const string INFORMATION_REQUEST = "d-e6bad6d1df2a4876a9f7ea2d3ac50e02";
-        private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-8d60fcbc191b4fd1ae526e28713e6abe";
-        public SendgridService(AppSettings settings, IOrderCloudClient ocClient)
+        private const string PRODUCT_UPDATE_TEMPLATE_ID = "d-d0e5fda7ce8c4ffe9da1fe82ab14beb6";
+        private readonly ISendGridClient _client;
+
+        public SendgridService(AppSettings settings, IOrderCloudClient ocClient, ISendGridClient client)
         {
             _oc = ocClient;
+            _client = client;
             _settings = settings;
         }
 
         public async Task SendSingleEmail(string from, string to, string subject, string htmlContent) //temp function until all endpoints are accessible for template data
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleEmail(fromEmail, toEmail, subject, null, htmlContent);
-            await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public virtual async Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
-            await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public virtual async Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
-            await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public async Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName)
         {
-            var client = new SendGridClient(_settings.SendgridSettings.ApiKey);
             var fromEmail = new EmailAddress(from);
             var msg = MailHelper.CreateSingleTemplateEmailToMultipleRecipients(fromEmail, tos, templateID, templateData);
-            using (Stream stream = await fileReference.OpenReadAsync())
+            using (var stream = await fileReference.OpenReadAsync())
             {
                 await msg.AddAttachmentAsync(fileName, stream);
             }
-                await client.SendEmailAsync(msg);
+            await _client.SendEmailAsync(msg);
         }
 
         public async Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification)
         {
-            EmailTemplate templateData = new EmailTemplate()
+            var templateData = new EmailTemplate()
             {
                 Data = new
                 {
@@ -160,9 +160,17 @@ namespace Marketplace.Common.Services
         public async Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName)
         {
             var yesterday = DateTime.Now.AddDays(-1).ToString();
-            var templateData = new
+            EmailTemplate templateData = new EmailTemplate()
             {
-                date = yesterday
+                Data = new
+                {
+                    date = yesterday
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = $"Product Updates from {yesterday}",
+                    DynamicText = $"Please see the attached file of newly created and updated products from {yesterday}"
+                }
             };
             await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, PRODUCT_UPDATE_TEMPLATE_ID, templateData, fileReference, fileName);
         }
@@ -199,22 +207,18 @@ namespace Marketplace.Common.Services
                 Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = new
-                {
-                    messageNotification.Recipient.FirstName,
-                    messageNotification.Recipient.LastName,
-                    OrderID = messageNotification.EventBody.Order.ID
-                },
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -244,26 +248,26 @@ namespace Marketplace.Common.Services
             await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, BUYER_NEW_USER_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderApprovedEmail(MarketplaceOrderApprovePayload payload)
+        public async Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderApprovedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
-        public async Task SendOrderDeclinedEmail(MarketplaceOrderDeclinePayload payload)
+        public async Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
         {
-            var lineItems = await _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, payload.Response.Body.ID);
+            var order = messageNotification.EventBody.Order;
             EmailTemplate templateData = new EmailTemplate()
             {
-                Data = GetOrderTemplateData(payload.Response.Body, lineItems.Items),
+                Data = GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, payload.Response.Body.FromUser.Email, ORDER_SUBMIT_TEMPLATE_ID, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, ORDER_APPROVAL_TEMPLATE_ID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderWorksheet)
@@ -348,31 +352,6 @@ namespace Marketplace.Common.Services
             var supplierOrderWorksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{orderWorksheet.Order.ID}-{supplierID}");
             supplierOrderWorksheet.Order.BillingAddress = orderWorksheet.Order.BillingAddress;
             supplierOrderWorksheet.Order.FromUser = orderWorksheet.Order.FromUser;
-
-            //  Get the shipping total from selected shipping methods for that supplier
-            var supplierShipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates.Where(estimate => estimate.xp?.SupplierID == supplierID);
-            var supplierShippingSelections = new List<ShipMethod>();
-            foreach (var estimate in supplierShipEstimates)
-            {
-                var selection = estimate.ShipMethods.Where(method => method.ID == estimate.SelectedShipMethodID).FirstOrDefault();
-                supplierShippingSelections.Add(selection);
-            }
-            supplierOrderWorksheet.Order.ShippingCost = supplierShippingSelections.Select(s => s.Cost).Sum();
-
-            //  now get correct tax for line items on supplier order
-            var supplierLineItemIds = supplierOrderWorksheet.LineItems.Select(li => li.ID).ToList();
-            var supplierShippingRateIDs = supplierShippingSelections.Select(s => s.ID).ToList();
-            var supplierTax = (decimal)0.0;
-            foreach (var line in orderWorksheet.OrderCalculateResponse.xp?.TaxResponse?.lines)
-            {
-                if (supplierLineItemIds.Contains(line?.lineNumber) || supplierShippingRateIDs.Contains(line?.lineNumber) && line.tax != null)
-                {
-                    //  Add tax from line items and shipping rates associated with this supplier
-                    supplierTax += (decimal)line?.tax;
-                }
-            }
-            supplierOrderWorksheet.Order.TaxCost = supplierTax;
-            supplierOrderWorksheet.Order.Total = supplierOrderWorksheet.Order.Total + supplierOrderWorksheet.Order.TaxCost + supplierOrderWorksheet.Order.ShippingCost;
             return supplierOrderWorksheet;
         }
 
@@ -461,7 +440,7 @@ namespace Marketplace.Common.Services
                     Note = template.BuyerRequest.Comments
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, template.BuyerRequest.Email, INFORMATION_REQUEST, templateData);
+            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, supplierEmail, INFORMATION_REQUEST, templateData);
             var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<MarketplaceUser>(
                     filters: $"xp.RequestInfoEmails=true",
                     page: page,
@@ -503,7 +482,7 @@ namespace Marketplace.Common.Services
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
-            var currencyString = order.xp.Currency.ToString();
+            var currencyString = order.xp?.Currency?.ToString();
             return new OrderTemplateData()
             {
                 FirstName = order.FromUser.FirstName,
@@ -535,11 +514,11 @@ namespace Marketplace.Common.Services
         {
             return new QuoteOrderTemplateData()
             {
-                FirstName = order.FromUser.FirstName,
-                LastName = order.FromUser.LastName,
-                Phone = order.xp.QuoteOrderInfo.Phone,
-                Email = order.FromUser.Email,
-                Location = order.xp.QuoteOrderInfo.BuyerLocation,
+                FirstName = order.xp?.QuoteOrderInfo?.FirstName,
+                LastName = order.xp?.QuoteOrderInfo?.LastName,
+                Phone = order.xp?.QuoteOrderInfo?.Phone,
+                Email = order.xp?.QuoteOrderInfo?.Email,
+                Location = order.xp?.QuoteOrderInfo?.BuyerLocation,
                 ProductID = lineItems.FirstOrDefault().Product.ID,
                 ProductName = lineItems.FirstOrDefault().Product.Name,
                 Order = order,

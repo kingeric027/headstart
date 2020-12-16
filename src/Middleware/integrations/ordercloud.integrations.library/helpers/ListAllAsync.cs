@@ -26,5 +26,26 @@ namespace ordercloud.integrations.library.helpers
                 select item).ToList();
             return data;
         }
+
+        public static async Task<List<T>> ListWithFacets<T>(Func<int, Task<ListPageWithFacets<T>>> listFunc)
+        {
+            var pageTasks = new List<Task<ListPageWithFacets<T>>>();
+            var totalPages = 0;
+            var i = 1;
+            do
+            {
+                pageTasks.Add(listFunc(i++));
+                var running = pageTasks.Where(t => !t.IsCompleted && !t.IsFaulted).ToList();
+                if (totalPages == 0 || running.Count >= 16) // throttle parallel tasks at 16
+                    totalPages = (await await Task.WhenAny(running)).Meta.TotalPages;  //Set total number of pages based on returned Meta.
+            } while (i <= totalPages);
+            var data = (
+                from finalResult in await Task.WhenAll(pageTasks) //When all pageTasks are complete, save items in data variable.
+                from item in finalResult.Items
+                select item).ToList();
+            return data;
+        }
     }
+
+
 }

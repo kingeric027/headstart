@@ -11,6 +11,7 @@ using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Marketplace.Common.Services.ShippingIntegration.Models;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -28,19 +29,17 @@ namespace Marketplace.Common.Commands
     public class OrderCommand : IOrderCommand
     {
         private readonly IOrderCloudClient _oc;
-		private readonly IExchangeRatesCommand _exchangeRates;
-        private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
-        private readonly IMeProductCommand _meProductCommand;
         private readonly IPromotionCommand _promotionCommand;
         
-        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
+        public OrderCommand(
+            ILocationPermissionCommand locationPermissionCommand,
+            IOrderCloudClient oc,
+            IPromotionCommand promotionCommand
+            )
         {
 			_oc = oc;
-            _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
-			_exchangeRates = exchangeRates;
-            _meProductCommand = meProductCommand;
             _promotionCommand = promotionCommand;
 		}
 
@@ -104,15 +103,14 @@ namespace Marketplace.Common.Commands
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
-            // todo support >100 
-            var lineItems =  _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+            var lineItems = ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, page: page, pageSize: 100));
             var promotions = _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
             var payments = _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
             var approvals = _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
             return new OrderDetails
             {
                 Order = order,
-                LineItems = (await lineItems).Items,
+                LineItems = (await lineItems),
                 Promotions = (await promotions).Items,
                 Payments = (await payments).Items,
                 Approvals = (await approvals).Items
@@ -124,10 +122,9 @@ namespace Marketplace.Common.Commands
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
-            // todo support >100 and figure out how to make these calls in parallel and 
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, page: page, pageSize: 100));
             var shipments = await _oc.Orders.ListShipmentsAsync<MarketplaceShipmentWithItems>(OrderDirection.Incoming, orderID);
-            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.Items.ToList()));
+            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.ToList()));
             return shipmentsWithItems.ToList();
         }
 

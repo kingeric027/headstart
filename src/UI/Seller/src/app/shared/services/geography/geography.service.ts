@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'
 import {
   StateDefinition,
   CountryDefinition,
-} from '@app-seller/shared/services/geography/geography.models';
+} from '@app-seller/shared/services/geography/geography.models'
 
 @Injectable({
   providedIn: 'root',
@@ -108,10 +108,10 @@ export class AppGeographyService {
     { label: 'Quebec', abbreviation: 'QC', country: 'CA' },
     { label: 'Saskatchewan', abbreviation: 'SK', country: 'CA' },
     { label: 'Yukon', abbreviation: 'YT', country: 'CA' },
-  ];
+  ]
 
   getStates(countryCode): StateDefinition[] {
-    return this.states.filter((state) => state.country === countryCode);
+    return this.states.filter((state) => state.country === countryCode)
   }
 
   getCountries(): CountryDefinition[] {
@@ -361,6 +361,6 @@ export class AppGeographyService {
       { label: 'Yugoslavia', abbreviation: 'YU' },
       { label: 'Zambia', abbreviation: 'ZM' },
       { label: 'Zimbabwe', abbreviation: 'ZW' },
-    ];
+    ]
   }
 }

@@ -4,63 +4,72 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using System.Linq;
-using ordercloud.integrations.cms;
 using System.Dynamic;
 using System;
 using Marketplace.Common.Commands.Crud;
 using ordercloud.integrations.library.Cosmos;
 using System.Collections.Generic;
 using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
+using Marketplace.Common.Services.CMS;
+using Marketplace.Common.Services.CMS.Models;
 
 namespace Marketplace.Common.Commands
 {
     public interface INotificationCommand
     {
         Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user);
-        Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(MonitoredProductFieldModifiedNotificationDocument document, string supplierID, string productID, VerifiedUserContext user);
+        Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user);
     }
     public class NotificationCommand : INotificationCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
-        private readonly IDocumentQuery _query;
-        private readonly IDocumentAssignmentQuery _assignmentQuery;
+        private readonly ICMSClient _cms;
         private readonly IMarketplaceProductCommand _productCommand;
+        private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, IDocumentQuery query, IDocumentAssignmentQuery assignmentQuery, IMarketplaceProductCommand productCommand)
+        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, ICMSClient cms, IMarketplaceProductCommand productCommand, ISupplierApiClientHelper apiClientHelper)
         {
             _oc = oc;
             _settings = settings;
-            _query = query;
-            _assignmentQuery = assignmentQuery;
+            _cms = cms;
             _productCommand = productCommand;
+            _apiClientHelper = apiClientHelper;
         }
         public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
         {
             // Make the Product.Active = false;
             var _product = await _oc.Products.PatchAsync(notification.Product.ID, new PartialProduct { Active = false }, user.AccessToken);
-            var document = new MonitoredProductFieldModifiedNotificationDocument();
+            var document = new Document<MonitoredProductFieldModifiedNotification>();
             document.Doc = notification;
             document.ID = CosmosInteropID.New();
             // Create notifictaion in the cms
-            await _query.Create<MonitoredProductFieldModifiedNotification>("MonitoredProductFieldModifiedNotification", document, user);
+            await _cms.Documents.Create("MonitoredProductFieldModifiedNotification", document, user.AccessToken);
             // Assign the notification to the product
-            await _assignmentQuery.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user);
-            return await _productCommand.Get(_product.ID, user);
+            await _cms.Documents.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user.AccessToken);
+            return await _productCommand.Get(_product.ID, user.AccessToken);
         }
-        public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(MonitoredProductFieldModifiedNotificationDocument document, string supplierID, string productID, VerifiedUserContext user)
+        public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
-            var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+            MarketplaceProduct product = null;
+            try
+            {
+                product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+
+            }
+            catch (OrderCloudException ex)
+            {
+                //Product was deleted after it was updated. Delete orphaned notification 
+               if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
+                {
+                    await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                    return new SuperMarketplaceProduct();
+                }
+            }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                //Use supplier integrations client with a DefaultContextUserName to access a supplier token.  
-                //All suppliers have integration clients with a default user of dev_{supplierID}.
-                var assignments = await _oc.ApiClients.ListAssignmentsAsync(supplierID: supplierID);
-
-                if (!assignments.Items.HasItem()) { throw new Exception($"Integration Client default user not found. SupplierID: {supplierID}, ProductID: {productID}"); }
-
-                ApiClient supplierClient = await _oc.ApiClients.GetAsync(assignments.Items[0].ApiClientID);
-
+                var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
                 if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
 
                 var configToUse = new OrderCloudClientConfig
@@ -81,9 +90,15 @@ namespace Marketplace.Common.Commands
                 await ocClient.AuthenticateAsync();
                 var token = ocClient.TokenResponse.AccessToken;
                 product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, token);
+
+                //Delete document after acceptance
+                await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
             }
-            await _query.Save<MonitoredProductFieldModifiedNotification>("MonitoredProductFieldModifiedNotification", document.ID, document, user);
-            var superProduct = await _productCommand.Get(productID, user);
+            else
+            {
+                await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+            }
+            var superProduct = await _productCommand.Get(productID, user.AccessToken);
             superProduct.Product = product;
             return superProduct;
         }

@@ -15,6 +15,9 @@ class AdminHeaderPage {
 	catalogsLink: Selector
 	locationsLink: Selector
 	allProductsLink: Selector
+	promotionsLink: Selector
+	ordersDropdown: Selector
+	salesOrdersLink: Selector
 
 	constructor() {
 		this.accountDropdown = Selector('a.nav-link__user')
@@ -30,6 +33,11 @@ class AdminHeaderPage {
 		this.productsDropdown = Selector('a').withText(createRegExp('products'))
 		this.allProductsLink = Selector('a').withText(
 			createRegExp('all products')
+		)
+		this.promotionsLink = Selector('a').withText(createRegExp('promotions'))
+		this.ordersDropdown = Selector('a').withText(createRegExp('orders'))
+		this.salesOrdersLink = Selector('a').withText(
+			createRegExp('sales orders')
 		)
 	}
 
@@ -78,6 +86,18 @@ class AdminHeaderPage {
 	async selectAllProducts() {
 		await t.click(this.productsDropdown)
 		await t.click(this.allProductsLink)
+		await loadingHelper.waitForLoadingBar()
+	}
+
+	async selectPromotionsLink() {
+		await t.click(this.productsDropdown)
+		await t.click(this.promotionsLink)
+		await loadingHelper.waitForLoadingBar()
+	}
+
+	async selectSalesOrdersLink() {
+		await t.click(this.ordersDropdown)
+		await t.click(this.salesOrdersLink)
 		await loadingHelper.waitForLoadingBar()
 	}
 }

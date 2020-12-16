@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
@@ -83,6 +83,8 @@ namespace Marketplace.Models
 		public CurrencySymbol? Currency { get; set; } = null;
         public bool? ArtworkRequired { get; set; } = false;
         public bool PromotionEligible { get; set; }
+        public bool FreeShipping { get; set; }
+        public string FreeShippingMessage { get; set; }
     }
 
 	[JsonConverter(typeof(StringEnumConverter))]

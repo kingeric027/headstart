@@ -1,20 +1,22 @@
 export interface Filter {
-  name: string;
-  path: string;
-  nestedDataPath?: string;
-  dataKey?: string;
-  sourceType: string;
-  source: string;
-  filterValues: any[];
+  name: string
+  path: string
+  nestedDataPath?: string
+  dataKey?: string
+  sourceType: string
+  source: string
+  filterValues: any[]
 }
 
-export let buyerLocation: Filter[] = [
-  { name: 'Buyer', 
-    path: 'BuyerID', 
-    dataKey: 'ID', 
-    sourceType: 'oc', 
-    source: 'ocBuyerService', 
-    filterValues: [] },
+export const buyerLocation: Filter[] = [
+  {
+    name: 'Buyer',
+    path: 'BuyerID',
+    dataKey: 'ID',
+    sourceType: 'oc',
+    source: 'ocBuyerService',
+    filterValues: [],
+  },
   {
     name: 'Country',
     path: 'Country',
@@ -31,9 +33,9 @@ export let buyerLocation: Filter[] = [
     source: 'GeographyConfig',
     filterValues: [],
   },
-];
+]
 
-export let salesOrderDetail: Filter[] = [
+export const salesOrderDetail: Filter[] = [
   {
     name: 'Order Status',
     path: 'Status',
@@ -47,10 +49,18 @@ export let salesOrderDetail: Filter[] = [
     sourceType: 'model',
     source: 'OrderType',
     filterValues: [],
-  }
-];
+  },
+  {
+    name: 'Country',
+    path: 'Country',
+    dataKey: 'abbreviation',
+    sourceType: 'model',
+    source: 'GeographyConfig',
+    filterValues: [],
+  },
+]
 
-export let purchaseOrderDetail: Filter[] = [
+export const purchaseOrderDetail: Filter[] = [
   {
     name: 'Order Status',
     path: 'Status',
@@ -64,10 +74,10 @@ export let purchaseOrderDetail: Filter[] = [
     sourceType: 'model',
     source: 'OrderType',
     filterValues: [],
-  }
-];
+  },
+]
 
-export let lineItemDetail: Filter[] = [
+export const lineItemDetail: Filter[] = [
   {
     name: 'Order Status',
     path: 'Status',
@@ -81,5 +91,13 @@ export let lineItemDetail: Filter[] = [
     sourceType: 'model',
     source: 'OrderType',
     filterValues: [],
-  }
-];
+  },
+  {
+    name: 'Country',
+    path: 'Country',
+    dataKey: 'abbreviation',
+    sourceType: 'model',
+    source: 'GeographyConfig',
+    filterValues: [],
+  },
+]

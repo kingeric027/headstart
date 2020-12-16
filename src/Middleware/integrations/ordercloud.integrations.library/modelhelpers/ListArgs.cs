@@ -48,7 +48,7 @@ namespace ordercloud.integrations.library
         public IList<string> SortBy { get; set; } = new List<string>();
         public int Page { get; set; }
         public int PageSize { get; set; }
-        public IList<ListFilter> Filters { get; set; }
+        public IList<ListFilter> Filters { get; set; } = new List<ListFilter>();
 
         public void ValidateAndNormalize()
         {

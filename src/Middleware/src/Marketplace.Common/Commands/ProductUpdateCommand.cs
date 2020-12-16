@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Models;
+using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Common.Services;
 using Marketplace.Models;
@@ -10,7 +10,6 @@ using NPOI.OpenXmlFormats;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using ordercloud.integrations.library;
-using OrderCloud.AzureStorage;
 using OrderCloud.SDK;
 using SendGrid.Helpers.Mail;
 using System;
@@ -35,21 +34,25 @@ namespace Marketplace.Common.Commands
         private readonly ResourceHistoryQuery<ProductHistory> _productQuery;
         private readonly ResourceHistoryQuery<PriceScheduleHistory> _priceScheduleQuery;
         private readonly IOrderCloudClient _oc;
-        private readonly BlobService _blob;
         private readonly CloudBlobContainer _container;
         private readonly ISendgridService _sendgridService;
         public ProductUpdateCommand(
             IOrderCloudClient oc,
             ResourceHistoryQuery<ProductHistory> productQuery,
             ResourceHistoryQuery<PriceScheduleHistory> priceScheduleQuery,
-            BlobService blob, 
+            AppSettings settings, 
             ISendgridService sendGrid)
         {
+            var blobService = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
+            {
+                ConnectionString = settings.BlobSettings.ConnectionString,
+                Container = "productupdates",
+                AccessType = BlobContainerPublicAccessType.Off
+            });
             _productQuery = productQuery;
             _priceScheduleQuery = priceScheduleQuery;
             _oc = oc;
-            _blob = blob;
-            _container = _blob.BlobClient.GetContainerReference("productupdates");
+            _container = blobService.Container;
             _sendgridService = sendGrid;
     }
 
@@ -142,9 +145,9 @@ namespace Marketplace.Common.Commands
                 {
                     Supplier = product.OwnerID,
                     ProductID = product.ID,
-                    ProductAction = Enum.GetName(typeof(ActionType), productUpdateRecord?.Action),
+                    ProductAction = productUpdateRecord != null ? Enum.GetName(typeof(ActionType), productUpdateRecord?.Action) : null,
                     DefaultPriceScheduleID = updatedPriceSchedule?.ID,
-                    DefaultPriceScheduleAction = Enum.GetName(typeof(ActionType), priceScheduleUpdateRecord?.Action),
+                    DefaultPriceScheduleAction = priceScheduleUpdateRecord !=null ? Enum.GetName(typeof(ActionType), priceScheduleUpdateRecord?.Action) : null,
 
                 };
 
@@ -180,10 +183,10 @@ namespace Marketplace.Common.Commands
                 }
                 if (updatedPriceSchedule?.PriceBreaks != oldPriceSchedule?.PriceBreaks)
                 {
-                    var updatedBreaks = updatedPriceSchedule.PriceBreaks.Select(p => JsonConvert.SerializeObject(p)).ToList();
-                    var oldBreaks = oldPriceSchedule.PriceBreaks.Select(p => JsonConvert.SerializeObject(p)).ToList();
-                    updateData.NewPriceBreak = String.Join(",", updatedBreaks);
-                    updateData.OldPriceBreak = String.Join(",", oldBreaks);
+                    var updatedBreaks = updatedPriceSchedule.PriceBreaks?.Select(p => JsonConvert.SerializeObject(p))?.ToList();
+                    var oldBreaks = oldPriceSchedule?.PriceBreaks?.Select(p => JsonConvert.SerializeObject(p))?.ToList();
+                    updateData.NewPriceBreak = updatedBreaks == null ? null : String.Join(",", updatedBreaks);
+                    updateData.OldPriceBreak = oldBreaks == null ? null : String.Join(",", oldBreaks);
                 }
                 dataToSend.Add(updateData);
             }

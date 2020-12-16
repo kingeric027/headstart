@@ -27,10 +27,18 @@ namespace DataMigrations
 			var config = builder.Build();
 			config.Bind(settings);
 
-			var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName, settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
-
-			//var cosmosConfig = new CosmosConfig("marketplace-database-test",
-				//"https://localhost:8081", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
+			var cosmosConfig = new CosmosConfig(
+				settings.CosmosSettings.DatabaseName,
+				settings.CosmosSettings.EndpointUri,
+				settings.CosmosSettings.PrimaryKey,
+				settings.CosmosSettings.RequestTimeoutInSeconds,
+				settings.CosmosSettings.MaxConnectionLimit,
+				settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
+				settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
+				settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
+				settings.CosmosSettings.MaxRequestsPerTcpConnection,
+				settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+			);
 
 			_provider = services
 				.AddSingleton(settings)

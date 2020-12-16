@@ -9,7 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using Marketplace.Common;
-using Marketplace.Common.Commands.SupplierSync;
+using Marketplace.Common.Commands;
+using Marketplace.Common.Services.CMS.Models;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using NPOI.HSSF.UserModel;
@@ -17,7 +18,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NSubstitute;
 using NUnit.Framework;
-using ordercloud.integrations.cms;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -186,7 +187,8 @@ namespace Orchestration.Tests
                 TaxCategory = Guid.NewGuid().ToString(),
                 TaxCode = Guid.NewGuid().ToString(),
                 TaxDescription = Guid.NewGuid().ToString(),
-                UnitOfMeasureQuantity = random.Next(1, 5)
+                UnitOfMeasureQuantity = random.Next(1, 5),
+                SizeTier = SizeTier.A
             };
         }
 
@@ -261,11 +263,10 @@ namespace Orchestration.Tests
         }
 
         [TestCase("TemplateSheets.xlsx")]
-        [TestCase("TemplateExcel.xlsx")]
         public async Task Test(string fileName)
         {
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Orchestration.Tests.TemplateTests.{fileName}");
-            var file = Substitute.For<IFormFile>();
+            using var stream = File.Open($"TemplateTests/{fileName}", FileMode.Open);
+            IFormFile file = Substitute.For<IFormFile>();
             file.OpenReadStream().Returns(stream);
             var command = new ProductTemplateCommand(Substitute.For<AppSettings>());
             var parsed = await command.ParseProductTemplate(file, new VerifiedUserContext(new ClaimsPrincipal()));

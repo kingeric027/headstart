@@ -69,22 +69,34 @@ namespace ordercloud.integrations.smartystreets
 		public async Task<BuyerAddressValidation> ValidateAddress(BuyerAddress address)
 		{
 			var response = new BuyerAddressValidation(address);
-			var lookup = BuyerAddressMapper.MapToUSStreetLookup(address);
-			var candidate = await _service.ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
-			if (candidate.Count > 0)
-			{
-				response.ValidAddress = BuyerAddressMapper.Map(candidate[0], address);
-				response.GapBetweenRawAndValid = candidate[0].Analysis.DpvFootnotes;
+			if (address.Country == "US")
+            {
+				var lookup = BuyerAddressMapper.MapToUSStreetLookup(address);
+				var candidate = await _service.ValidateSingleUSAddress(lookup); // Always seems to return 1 or 0 candidates
+				if (candidate.Count > 0)
+				{
+					response.ValidAddress = BuyerAddressMapper.Map(candidate[0], address);
+					response.GapBetweenRawAndValid = candidate[0].Analysis.DpvFootnotes;
+				}
+				else
+				{
+					// no valid address found
+					var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
+					if (NoAddressSuggestions(suggestions)) throw new InvalidBuyerAddressException(response);
+					response.SuggestedAddresses = BuyerAddressMapper.Map(suggestions, address);
+				}
+				if (!response.ValidAddressFound) throw new InvalidBuyerAddressException(response);
+            } else
+            {
+				response.ValidAddress = address;
 			}
-			else
-			{
-				// no valid address found
-				var suggestions = await _service.USAutoCompletePro($"{address.Street1} {address.Street2}");
-				response.SuggestedAddresses = BuyerAddressMapper.Map(suggestions, address);
-			}
-			if (!response.ValidAddressFound) throw new InvalidBuyerAddressException(response);
 			return response;
 		}
+
+		private bool NoAddressSuggestions(AutoCompleteResponse suggestions)
+        {
+			return (suggestions == null || suggestions.suggestions == null || suggestions.suggestions.Count == 0);
+        }
 
 		#region Ordercloud Routes
 		// ME endpoints

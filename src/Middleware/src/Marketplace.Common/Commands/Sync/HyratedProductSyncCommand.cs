@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using Marketplace.Common.Queries;
 using OrderCloud.SDK;
 using Marketplace.Models;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Commands

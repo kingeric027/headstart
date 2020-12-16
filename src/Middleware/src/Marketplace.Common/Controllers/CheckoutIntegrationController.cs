@@ -25,7 +25,9 @@ namespace Marketplace.Common.Controllers
 			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
 
-		[Route("ordercalculate")]
+        
+
+        [Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
 		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)
@@ -53,7 +55,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("ordersubmit/retry/zoho/{orderID}"), OrderCloudIntegrationsAuth(ApiRole.IntegrationEventAdmin)]
         public async Task<OrderSubmitResponse> RetryOrderSubmit(string orderID)
         {
-            var retry = await _postSubmitCommand.HandleZohoRetry(orderID, this.VerifiedUserContext);
+            var retry = await _postSubmitCommand.HandleZohoRetry(orderID);
             return retry;
         }
 

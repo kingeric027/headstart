@@ -6,6 +6,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Newtonsoft.Json;
+using Flurl.Http.Configuration;
+using LazyCache;
 
 namespace ordercloud.integrations.exchangerates
 {
@@ -19,28 +22,27 @@ namespace ordercloud.integrations.exchangerates
             OrderCloudIntegrationsExchangeRate rates);
 
         Task<double?> ConvertCurrency(CurrencySymbol from, CurrencySymbol to, double value);
+        Task Update();
     }
 
     public class ExchangeRatesCommand : IExchangeRatesCommand
     {
         private readonly IOrderCloudIntegrationsExchangeRatesClient _client;
         private readonly IOrderCloudIntegrationsBlobService _blob;
+        private readonly IAppCache _cache;
 
-        public ExchangeRatesCommand() : this(new BlobServiceConfig())
+        public ExchangeRatesCommand(BlobServiceConfig config, IFlurlClientFactory flurlFactory, IAppCache cache)
         {
-            _client = new OrderCloudIntegrationsExchangeRatesClient();
-        }
-
-        public ExchangeRatesCommand(BlobServiceConfig config)
-        {
-            _client = new OrderCloudIntegrationsExchangeRatesClient();
+            _client = new OrderCloudIntegrationsExchangeRatesClient(flurlFactory);
             _blob = new OrderCloudIntegrationsBlobService(config);
+            _cache = cache;
         }
 
-        public ExchangeRatesCommand(IOrderCloudIntegrationsBlobService blob)
+        public ExchangeRatesCommand(IOrderCloudIntegrationsBlobService blob, IFlurlClientFactory flurlFactory, IAppCache cache)
         {
-            _client = new OrderCloudIntegrationsExchangeRatesClient();
+            _client = new OrderCloudIntegrationsExchangeRatesClient(flurlFactory);
             _blob = blob;
+            _cache = cache;
         }
 
         /// <summary>
@@ -51,7 +53,10 @@ namespace ordercloud.integrations.exchangerates
         /// <returns></returns>
         public async Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbol currency)
         {
-            var rates = await _blob.Get<OrderCloudIntegrationsExchangeRate>($"{currency}.json");
+
+            var rates = await _cache.GetOrAddAsync($"exchangerates_{currency}", () => {
+                return _blob.Get<OrderCloudIntegrationsExchangeRate>($"{currency}.json");
+            }, TimeSpan.FromHours(1));
             return Filter(rateArgs, rates);
         }
 
@@ -147,5 +152,16 @@ namespace ordercloud.integrations.exchangerates
                 return 1;
             return t.Value == 0 ? 1 : t.Value;
         }
+
+        public async Task Update()
+        {
+            var list = await GetRateList();
+            await Throttler.RunAsync(list.Items, 100, 10, async rate =>
+            {
+                var rates = await Get(rate.Currency);
+                await _blob.Save($"{rate.Currency}.json", JsonConvert.SerializeObject(rates));
+            });
+        }
+
     }
 }

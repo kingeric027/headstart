@@ -1,8 +1,8 @@
-import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
-import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component';
-import { User } from '@ordercloud/angular-sdk';
-import { Router, ActivatedRoute } from '@angular/router';
-import { SellerUserService } from '@app-seller/seller-users/seller-user.service';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
+import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
+import { User } from '@ordercloud/angular-sdk'
+import { Router, ActivatedRoute } from '@angular/router'
+import { SellerUserService } from '@app-seller/seller-users/seller-user.service'
 @Component({
   selector: 'app-seller-user-table',
   templateUrl: './seller-user-table.component.html',
@@ -16,6 +16,6 @@ export class SellerUserTableComponent extends ResourceCrudComponent<User> {
     activatedroute: ActivatedRoute,
     ngZone: NgZone
   ) {
-    super(changeDetectorRef, sellerUserService, router, activatedroute, ngZone);
+    super(changeDetectorRef, sellerUserService, router, activatedroute, ngZone)
   }
 }

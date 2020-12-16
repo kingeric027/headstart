@@ -223,7 +223,7 @@ body > [uib-modal-window]:not([modal-render]) {
   margin-top: 0.5rem;
   display: block;
   position: relative;
-  padding-left: 35px;
+  padding-left: 25px;
   margin-bottom: 12px;
   font-size: 14px;
   -webkit-user-select: none;
@@ -563,4 +563,8 @@ body > [uib-modal-window]:not([modal-render]) {
   &>fa-icon {
       color: lighten(#032a43, 55%);
   }
+}
+
+.vertical-align-middle {
+  vertical-align: middle !important;
 }
