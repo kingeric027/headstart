@@ -481,10 +481,9 @@
             </div>
             <div>
               <button
-                *ngIf="areChanges"
                 class="btn btn-primary"
                 type="submit"
-                [disabled]="resourceForm?.status === 'INVALID' || dataIsSaving"
+                [disabled]="!areChanges || resourceForm?.status === 'INVALID' || dataIsSaving"
                 (click)="handleSave()"
               >
                 {{ getSaveBtnText() }}
