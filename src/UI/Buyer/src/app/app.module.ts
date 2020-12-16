@@ -180,7 +180,10 @@ import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/
 import { Configuration, SdkConfiguration } from 'ordercloud-javascript-sdk'
 import { AppConfig, OrdercloudEnv } from './shopper-context'
 import { Configuration as MktpConfiguration } from '@ordercloud/headstart-sdk'
-import { MeListAddressResolver, MeListBuyerLocationResolver } from './resolves/me.resolve'
+import {
+  MeListAddressResolver,
+  MeListBuyerLocationResolver,
+} from './resolves/me.resolve'
 import { MeProductResolver } from './resolves/me.product.resolve'
 import { ChiliTemplateResolver } from './resolves/chili-template.resolve'
 import { AuthService } from './services/auth/auth.service'
@@ -201,7 +204,7 @@ import { RouteService } from './services/route/route.service'
 import { ShopperContextService } from './services/shopper-context/shopper-context.service'
 import { TempSdk } from './services/temp-sdk/temp-sdk.service'
 import { TokenHelperService } from './services/token-helper/token-helper.service'
-import { CMSConfiguration } from './services/cms-api/cms-utils'
+import { CMSConfiguration } from '@ordercloud/cms-sdk'
 
 export function HttpLoaderFactory(
   http: HttpClient,
@@ -425,7 +428,7 @@ export class AppModule {
       baseApiUrl: this.appConfig.middlewareUrl,
     })
     CMSConfiguration.Set({
-      baseApiUrl: this.appConfig.cmsUrl
+      baseApiUrl: this.appConfig.cmsUrl,
     })
     Configuration.Set(this.getOrdercloudSDKConfig(appConfig))
     translate.setDefaultLang('en')
