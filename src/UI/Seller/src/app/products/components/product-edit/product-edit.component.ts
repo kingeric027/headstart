@@ -69,7 +69,7 @@ import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Component({
   selector: 'app-product-edit',
