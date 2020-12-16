@@ -514,11 +514,11 @@ namespace Marketplace.Common.Services
         {
             return new QuoteOrderTemplateData()
             {
-                FirstName = order.FromUser.FirstName,
-                LastName = order.FromUser.LastName,
-                Phone = order.xp.QuoteOrderInfo.Phone,
-                Email = order.FromUser.Email,
-                Location = order.xp.QuoteOrderInfo.BuyerLocation,
+                FirstName = order.xp?.QuoteOrderInfo?.FirstName,
+                LastName = order.xp?.QuoteOrderInfo?.LastName,
+                Phone = order.xp?.QuoteOrderInfo?.Phone,
+                Email = order.xp?.QuoteOrderInfo?.Email,
+                Location = order.xp?.QuoteOrderInfo?.BuyerLocation,
                 ProductID = lineItems.FirstOrDefault().Product.ID,
                 ProductName = lineItems.FirstOrDefault().Product.Name,
                 Order = order,

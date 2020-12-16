@@ -572,12 +572,54 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           superProduct.Product.ID
         )
       this.refreshProductData(superProduct)
+      this.createMonitoredProductDocument(superProduct)
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`)
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false
       throw ex
     }
+  }
+  async createMonitoredProductDocument(superProduct: SuperMarketplaceProduct) {
+    const mySupplier = await this.currentUserService.getMySupplier()
+    const myContext = await this.currentUserService.getUserContext()
+    const document = {
+      Supplier: {
+        ID: mySupplier?.ID,
+        Name: mySupplier?.Name,
+      },
+      Product: {
+        ID: superProduct?.Product?.ID,
+        Name: superProduct?.Product?.Name,
+        FieldModified: 'Product Created',
+        PreviousValue: null,
+        CurrentValue: superProduct.Product.Name,
+      },
+      Status: NotificationStatus.SUBMITTED,
+      History: {
+        ModifiedBy: {
+          ID: myContext?.Me?.ID,
+          Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`,
+        },
+        ReviewedBy: { ID: '', Name: '' },
+        DateModified: new Date().toISOString(),
+        // TODO: Figure out how to get the API to accept a null value...
+        DateReviewed: new Date().toISOString(),
+      },
+    }
+    const headers = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+    }
+    // TODO: Replace with the SDK
+    const updatedProduct = await this.http
+      .post<SuperMarketplaceProduct>(
+        `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified`,
+        document,
+        headers
+      )
+      .toPromise()
   }
 
   async updateProduct(): Promise<void> {
