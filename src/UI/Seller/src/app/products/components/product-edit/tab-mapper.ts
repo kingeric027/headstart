@@ -1,5 +1,5 @@
 export function setProductEditTab(section: string): number {
-  return ProductEditTabMapper[section];
+  return ProductEditTabMapper[section]
 }
 
 export const ProductEditTabMapper = {
@@ -10,7 +10,7 @@ export const ProductEditTabMapper = {
   filters: 4,
   variants: 5,
   'images-and-documents': 6,
-};
+}
 
 export const TabIndexMapper = {
   1: 'catalog-assignments',
@@ -19,4 +19,4 @@ export const TabIndexMapper = {
   4: 'filters',
   5: 'variants',
   6: 'images-and-documents',
-};
+}

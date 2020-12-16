@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Common;
-using Marketplace.Common.Commands.SupplierSync;
 using Marketplace.Common.Helpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
+using Marketplace.Common.Commands;
 
 namespace Marketplace.Orchestration
 {
@@ -31,7 +31,7 @@ namespace Marketplace.Orchestration
 
         [FunctionName("UploadProductTemplate")]
         public async Task<IActionResult> UploadProductTemplate(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "{supplierId}")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST", Route = "templateupload/{supplierId}")]
             HttpRequest req, string supplierId, ILogger log)
         {
             var user = await _token.Authorize(req, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });

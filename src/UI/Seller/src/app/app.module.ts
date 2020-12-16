@@ -1,42 +1,57 @@
 // angular core
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ErrorHandler, Inject } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { BrowserModule } from '@angular/platform-browser'
+import { NgModule, ErrorHandler, Inject } from '@angular/core'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { HttpClientModule, HttpClient } from '@angular/common/http'
 
 // 3rd party
-import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk';
-import { OcSDKConfig } from '@app-seller/config/ordercloud-sdk.config';
-import { CookieModule } from 'ngx-cookie';
-import { ToastrModule } from 'ngx-toastr';
-import { NgProgressModule } from '@ngx-progressbar/core';
-import { NgProgressHttpModule } from '@ngx-progressbar/http';
-import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { OrderCloudModule, Configuration } from '@ordercloud/angular-sdk'
+import { OcSDKConfig } from '@app-seller/config/ordercloud-sdk.config'
+import { CookieModule } from 'ngx-cookie'
+import { ToastrModule } from 'ngx-toastr'
+import { NgProgressModule } from '@ngx-progressbar/core'
+import { NgProgressHttpModule } from '@ngx-progressbar/http'
+import {
+  TranslateModule,
+  TranslateLoader,
+  TranslateService,
+} from '@ngx-translate/core'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
 // app modules
-import { SharedModule } from '@app-seller/shared';
-import { AppRoutingModule } from '@app-seller/app-routing.module';
-import { LayoutModule } from '@app-seller/layout/layout.module';
-import { AuthModule } from '@app-seller/auth';
+import { SharedModule } from '@app-seller/shared'
+import { AppRoutingModule } from '@app-seller/app-routing.module'
+import { LayoutModule } from '@app-seller/layout/layout.module'
+import { AuthModule } from '@app-seller/auth'
 
 // app component
-import { AppComponent } from '@app-seller/app.component';
+import { AppComponent } from '@app-seller/app.component'
 
 // interceptors
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AutoAppendTokenInterceptor } from '@app-seller/auth';
-import { RefreshTokenInterceptor } from '@app-seller/auth';
-import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http'
+import { AutoAppendTokenInterceptor } from '@app-seller/auth'
+import { RefreshTokenInterceptor } from '@app-seller/auth'
+import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-interceptor'
 
 // error handler config
-import { AppErrorHandler } from './config/error-handling.config';
-import { Configuration as HeadstartConfiguration } from '@ordercloud/headstart-sdk';
-import { Configuration as OcConfiguration, SdkConfiguration } from 'ordercloud-javascript-sdk';
-import { applicationConfiguration, AppConfig, ocAppConfig } from './config/app.config';
+import { AppErrorHandler } from './config/error-handling.config'
+import { Configuration as HeadstartConfiguration } from '@ordercloud/headstart-sdk'
+import {
+  Configuration as OcConfiguration,
+  SdkConfiguration,
+} from 'ordercloud-javascript-sdk'
+import {
+  applicationConfiguration,
+  AppConfig,
+  ocAppConfig,
+} from './config/app.config'
+import { CMSConfiguration } from './shared/services/cms-api/cms-utils'
 
-export function HttpLoaderFactory(http: HttpClient, ocAppConfig: AppConfig): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, ocAppConfig.translateBlobUrl);
+export function HttpLoaderFactory(
+  http: HttpClient,
+  ocAppConfig: AppConfig
+): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, ocAppConfig.translateBlobUrl)
 }
 export enum OrdercloudEnv {
   Production = 'Production',
@@ -98,21 +113,29 @@ export enum OrdercloudEnv {
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(@Inject(applicationConfiguration) private appConfig: AppConfig, public translate: TranslateService) {
-    translate.setDefaultLang('en');
+  constructor(
+    @Inject(applicationConfiguration) private appConfig: AppConfig,
+    public translate: TranslateService
+  ) {
+    translate.setDefaultLang('en')
     HeadstartConfiguration.Set({
       baseApiUrl: this.appConfig.middlewareUrl,
-    });
-    OcConfiguration.Set(this.getOrdercloudSDKConfig(appConfig));
+    })
+    CMSConfiguration.Set({
+      baseApiUrl: this.appConfig.cmsUrl,
+    })
+    OcConfiguration.Set(this.getOrdercloudSDKConfig(appConfig))
   }
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
-    const version = config.orderCloudApiVersion;
-    const apiUrl = config.orderCloudApiUrl;
+    const version = config.orderCloudApiVersion
+    const apiUrl = config.orderCloudApiUrl
     return {
       baseApiUrl: `${apiUrl}/${version}`,
       baseAuthUrl: `${apiUrl}/oauth/token`,
       clientID: config.clientID,
-      cookieOptions: { prefix: config.appname.replace(/ /g, '_').toLowerCase() },
-    };
+      cookieOptions: {
+        prefix: config.appname.replace(/ /g, '_').toLowerCase(),
+      },
+    }
   }
 }

@@ -38,6 +38,29 @@ export async function getSupplier(supplierName: string, clientAuth: string) {
 	if (supplier.Name.includes('AutomationVendor_')) return supplier
 }
 
+export async function getAutomationSuppliers(clientAuth: string) {
+	const searchResponse = await OrderCloudSDK.Suppliers.List(
+		{
+			search: 'AutomationVendor_',
+			searchOn: 'Name',
+		},
+		{ accessToken: clientAuth }
+	)
+
+	return searchResponse.Items
+}
+
+export async function deleteAutomationSuppliers(
+	suppliers: OrderCloudSDK.Supplier[],
+	clientAuth: string
+) {
+	for await (const supplier of suppliers) {
+		if (supplier.Name.includes('AutomationVendor_')) {
+			await deleteSupplier(supplier.ID, clientAuth)
+		}
+	}
+}
+
 export async function getSupplierWithID(
 	supplierID: string,
 	clientAuth: string
@@ -67,7 +90,7 @@ export async function createSupplier(clientAuth: string) {
 			Currency: 'USD',
 			Description: '',
 			Images: [],
-			ProductTypes: ['Standard'],
+			ProductTypes: ['Standard', 'Quote', 'PurchaseOrder'],
 			SupportContact: {
 				Name: '',
 				Email: '',

@@ -18,6 +18,7 @@ import { t } from 'testcafe'
 import { setHeadstartSDKUrl } from './headstart-sdk-helper'
 import { createCreditCard } from '../api-utils.ts/credit-card-util'
 import { deleteOrdersForUser } from '../api-utils.ts/order-util'
+import loadingHelper from './loading-helper'
 
 export async function adminClientSetup() {
 	await axiosSetup()
@@ -77,8 +78,7 @@ const adminRoles: ApiRole[] = [
 
 export function setStagingUrl() {
 	const config: SdkConfiguration = {
-		baseApiUrl: 'https://stagingapi.ordercloud.io/v1',
-		baseAuthUrl: 'https://stagingapi.ordercloud.io/oauth/token',
+		baseApiUrl: 'https://stagingapi.ordercloud.io',
 	}
 	Configuration.Set(config)
 }
@@ -108,15 +108,17 @@ export async function baseTestCleanup(
 	await deleteUser(userID, buyerID, authToken)
 }
 
-export async function buyerTestSetup(authToken: string) {
+export async function buyerTestSetup(authToken: string, country?: string) {
 	await t.maximizeWindow()
-	const user: OrderCloudSDK.User = await createUser(authToken, '0005')
+	const user: OrderCloudSDK.User = await createUser(authToken, '0005', country)
 
 	await authBuyerBrowser(user)
 
 	await createCreditCard(t.ctx.userAuth, user.FirstName, user.LastName)
 
 	await t.navigateTo(`${testConfig.buyerAppUrl}home`)
+
+	await loadingHelper.waitForLoadingBar()
 
 	return user
 }

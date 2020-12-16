@@ -223,7 +223,7 @@ body > [uib-modal-window]:not([modal-render]) {
   margin-top: 0.5rem;
   display: block;
   position: relative;
-  padding-left: 35px;
+  padding-left: 25px;
   margin-bottom: 12px;
   font-size: 14px;
   -webkit-user-select: none;
@@ -549,4 +549,22 @@ body > [uib-modal-window]:not([modal-render]) {
 
 .text-uppercase {
   kerning: 0.05rem;
+}
+
+.headstart-alert {
+  display: flex;
+  align-items: center;
+  border-radius: 0.15rem;
+  background-color: lighten(#032a43, 83%);
+  border-left: 5px solid var(--primary);
+  padding: 1.25rem 0.75rem;
+  color: var(--primary);
+  font-weight: bolder;
+  &>fa-icon {
+      color: lighten(#032a43, 55%);
+  }
+}
+
+.vertical-align-middle {
+  vertical-align: middle !important;
 }

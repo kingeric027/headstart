@@ -31,7 +31,7 @@ class UserDetailsPage {
 		)
 		this.confirmButton = Selector('button').withText(createRegExp('confirm'))
 		this.countryDropdown = Selector('#Country')
-		this.locationAssignments = Selector('user-group-assignments')
+		this.locationAssignments = Selector('user-group-assignments').find('tr')
 	}
 
 	async createDefaultVendorUser() {
@@ -54,9 +54,14 @@ class UserDetailsPage {
 		return email
 	}
 
-	async createVendorUser(email: string, firstName: string, lastName: string) {
+	async createVendorUser(
+		userName: string,
+		email: string,
+		firstName: string,
+		lastName: string
+	) {
 		await t.click(this.activeToggle)
-		await t.typeText(this.usernameField, email)
+		await t.typeText(this.usernameField, userName)
 		await t.typeText(this.emailField, email)
 		await t.typeText(this.firstNameField, firstName)
 		await t.typeText(this.lastNameField, lastName)
@@ -122,7 +127,7 @@ class UserDetailsPage {
 
 		await t.click(this.createButton)
 
-		await loadingHelper.waitForTwoLoadingBars()
+		await loadingHelper.waitForLoadingBar()
 
 		return email
 	}

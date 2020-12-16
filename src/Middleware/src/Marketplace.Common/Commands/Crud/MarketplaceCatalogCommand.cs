@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Marketplace.Models;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
@@ -129,15 +130,14 @@ namespace Marketplace.Common.Commands.Crud
 		{
 			try
 			{
-				var addedAssignments = newAssignments.Where(newAssignment => !oldAssignments.Contains(newAssignment)).ToList();
-				var deletedAssignments = oldAssignments.Where(oldAssignment => !newAssignments.Contains(oldAssignment)).ToList();
+				var addedAssignments = oldAssignments == null ? newAssignments : newAssignments.Where(newAssignment => !oldAssignments.Contains(newAssignment)).ToList();
+				var deletedAssignments = oldAssignments == null ? new List<string>() : oldAssignments.Where(oldAssignment => !newAssignments.Contains(oldAssignment)).ToList();
 
-				var users = await _oc.Users.ListAsync(buyerID, userGroupID: locationID, pageSize: 100);
+				var users = await ListAllAsync.List((page) => _oc.Users.ListAsync<MarketplaceUser>(buyerID, userGroupID: locationID, page: page, pageSize: 100));
 				if (addedAssignments.Count() > 0)
 				{
-					var userCatalogAssignments = await Throttler.RunAsync(users.Items, 100, 4, user =>
+					var userCatalogAssignments = await Throttler.RunAsync(users, 100, 4, user =>
 					{
-						// todo > 100
 						return GetUserCatalogAssignments(buyerID, user.ID);
 					});
 					await AssignUsersWhoDontHaveAssignmentForAddedAssignments(buyerID, locationID, addedAssignments, userCatalogAssignments.ToList());
@@ -145,14 +145,17 @@ namespace Marketplace.Common.Commands.Crud
 
 				if(deletedAssignments.Count() > 0)
 				{
-					// todo more than 100 locations
-					var locations = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(buyerID, opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100));
-					var locationUserAssignments = await Throttler.RunAsync(locations.Items, 100, 5, location =>
+					var locations = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(buyerID, opts => {
+							opts.Page(page);
+							opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100);
+						}
+					));
+					var locationUserAssignments = await Throttler.RunAsync(locations, 100, 5, location =>
 					{
 						return _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: location.ID, pageSize: 100);
 
 					});
-					await UnassignUsersWhoDontHaveAssignmentsToCatalogsFromOtherLocations(buyerID, locationID, deletedAssignments, users.Items.ToList(), locations.Items.ToList(), locationUserAssignments.SelectMany(u => u.Items.ToList()).ToList());
+					await UnassignUsersWhoDontHaveAssignmentsToCatalogsFromOtherLocations(buyerID, locationID, deletedAssignments, users.ToList(), locations.ToList(), locationUserAssignments.SelectMany(u => u.Items.ToList()).ToList());
 				}
 			} catch (Exception ex)
 			{
@@ -183,7 +186,7 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogsFromOtherLocations(string buyerID, string locationID, List<string> deletedAssignments, List<User> users, List<MarketplaceLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
+		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogsFromOtherLocations(string buyerID, string locationID, List<string> deletedAssignments, List<MarketplaceUser> users, List<MarketplaceLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
 		{
 			await Throttler.RunAsync(deletedAssignments, 100, 5, deletedAssignment =>
 			{
@@ -191,7 +194,7 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogFromOtherLocations(string buyerID, string locationID, string deletedAssignment, List<User> users, List<MarketplaceLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
+		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogFromOtherLocations(string buyerID, string locationID, string deletedAssignment, List<MarketplaceUser> users, List<MarketplaceLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
 		{
 			var locationsWithAssignmentToDeletedCatalog = locations.Where(location => location.xp.CatalogAssignments != null && location.xp.CatalogAssignments.Contains(deletedAssignment) && location.ID != locationID).ToList();
 			//var usersWhoNeedAssignmentDeleted = users.Where(user => !userGroupAssignments.Any(userGroupAssignment => locationsWithAssignmentToDeletedCatalog.Any(location => userGroupAssignment.UserGroupID))

@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using ordercloud.integrations.library;
 using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models.Extended;
+using Marketplace.Common.Services.ShippingIntegration.Models;
+using ordercloud.integrations.cardconnect;
 
 namespace Marketplace.Common.Controllers
 {
@@ -18,11 +20,21 @@ namespace Marketplace.Common.Controllers
     {
         
         private readonly IOrderCommand _command;
+        private readonly IOrderSubmitCommand _orderSubmitCommand;
         private readonly ILineItemCommand _lineItemCommand;
-        public OrderController(IOrderCommand command, ILineItemCommand lineItemCommand, AppSettings settings) : base(settings)
+        public OrderController(IOrderCommand command, ILineItemCommand lineItemCommand, AppSettings settings, IOrderSubmitCommand orderSubmitCommand) : base(settings)
         {
             _command = command;
             _lineItemCommand = lineItemCommand;
+            _orderSubmitCommand = orderSubmitCommand;
+        }
+
+        [DocName("Submit Order")]
+        [DocComments("Performs validation, submits credit card payment and finally submits order via OrderCloud")]
+        [HttpPost, Route("{direction}/{orderID}/submit"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+        public async Task<MarketplaceOrder> Submit(OrderDirection direction, string orderID, [FromBody] OrderCloudIntegrationsCreditCardPayment payment)
+        {
+            return await _orderSubmitCommand.SubmitOrderAsync(orderID, direction, payment, VerifiedUserContext);
         }
 
         [DocName("POST Acknowledge Quote Order")]
@@ -34,7 +46,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("location/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<ListPage<Order>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
+        public async Task<ListPage<MarketplaceOrder>> ListLocationOrders(string locationID, ListArgs<MarketplaceOrder> listArgs)
         {
             return await _command.ListOrdersForLocation(locationID, listArgs, VerifiedUserContext);
         }
@@ -64,7 +76,7 @@ namespace Marketplace.Common.Controllers
         [HttpDelete, Route("{orderID}/lineitems/{lineItemID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task DeleteLineItem(string orderID, string lineItemID)
         {
-            await _lineItemCommand.DeleteLineItem(orderID, lineItemID);
+            await _lineItemCommand.DeleteLineItem(orderID, lineItemID, VerifiedUserContext);
         }
 
         [DocName("Apply a promotion to an order")]

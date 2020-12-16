@@ -1,15 +1,15 @@
-import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper';
-import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper';
+import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper'
+import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper'
 
 export interface SummaryResourceInfoPaths {
-  toPrimaryHeader: string;
-  toSecondaryHeader: string;
-  toImage: string;
-  toExpandable: boolean;
+  toPrimaryHeader: string
+  toSecondaryHeader: string
+  toImage: string
+  toExpandable: boolean
 }
 
 export interface SummaryResourceInfoPathsDictionary {
-  [resourceType: string]: SummaryResourceInfoPaths;
+  [resourceType: string]: SummaryResourceInfoPaths
 }
 
 export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDictionary = {
@@ -115,43 +115,43 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
     toImage: '',
     toExpandable: false,
   },
-};
+}
 
 export interface ResourceColumnConfiguration {
-  path: string;
-  header: string;
-  type: string;
-  sortable: boolean;
-  queryRestriction?: string;
+  path: string
+  header: string
+  type: string
+  sortable: boolean
+  queryRestriction?: string
 }
 
 export interface ResourceConfiguration {
-  fields: ResourceColumnConfiguration[];
-  imgPath?: string;
+  fields: ResourceColumnConfiguration[]
+  imgPath?: string
 }
 
 export interface ResourceCell {
-  type: string;
-  value: any;
+  type: string
+  value: any
 }
 
 export interface ResourceRow {
-  resource: any;
-  cells: ResourceCell[];
-  imgPath?: string;
+  resource: any
+  cells: ResourceCell[]
+  imgPath?: string
 }
 
 export interface ResourceConfigurationDictionary {
-  [resourceType: string]: ResourceConfiguration;
+  [resourceType: string]: ResourceConfiguration
 }
 
-export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE';
-export const BOOLEAN = 'BOOLEAN';
-export const BASIC_STRING = 'BASIC_STRING';
-export const DATE_TIME = 'DATE_TIME';
-export const CURRENCY = 'CURRENCY';
-export const COPY_OBJECT = 'COPY_OBJECT';
-export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON';
+export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE'
+export const BOOLEAN = 'BOOLEAN'
+export const BASIC_STRING = 'BASIC_STRING'
+export const DATE_TIME = 'DATE_TIME'
+export const CURRENCY = 'CURRENCY'
+export const COPY_OBJECT = 'COPY_OBJECT'
+export const IMPERSONATE_BUTTON = 'IMPERSONATE_BUTTON'
 
 export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
   products: {
@@ -391,6 +391,13 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         sortable: true,
       },
       {
+        path: 'FromCompanyID',
+        header: 'ADMIN.HEADERS.FROM_COMPANY_ID',
+        type: BASIC_STRING,
+        sortable: true,
+        queryRestriction: 'OrderDirection=Incoming',
+      },
+      {
         path: 'ID',
         header: 'ADMIN.HEADERS.ID',
         type: BASIC_STRING,
@@ -533,4 +540,4 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
     ],
     imgPath: '',
   },
-};
+}

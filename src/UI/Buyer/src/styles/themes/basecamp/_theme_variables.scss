@@ -1,0 +1,59 @@
+// --------------------------------------------------------------------------------------
+// This file should include variable overrides as well as custom variables
+//
+// we've included a subset of common bootstrap variables you might want to override
+// to start you off. want to see the full list of bootstrap variables?
+// check out node_modules/bootstrap/variables.scss
+// --------------------------------------------------------------------------------------
+
+$blue:              #1c3f65;
+$indigo:            #0824f5;    // intense blue
+$purple:            #83167B; 
+$pink:              #e83e8c;
+$red:               #fe0701;    // intense red
+$orange:            #FE7601;
+$yellow:            #ffc107;
+$cyan:              #94a8cd;
+$green:             #78B700;
+
+$white:             #fff;
+$gray-100:          #F6F6F6;
+$gray-200:          #E8E8E8;
+$gray-300:          #D8D9D9;
+$gray-400:          #C8C9CA;
+$gray-500:          #B1B2B3;
+$gray-600:          #636466;    // iron-gray; 
+$gray-700:          #474849;
+$gray-800:          #353638;
+$gray-900:          #222224;
+$black:             #000;
+
+$primary:            $indigo;
+$secondary:          $gray-600;
+$success:            $green;
+$info:               $cyan;
+$warning:            $yellow;
+$danger:             $red;
+$light:              $gray-200;
+$medium:             $gray-500;
+$dark:               $gray-800;
+
+// .img-thumbnail
+$thumbnail-border-color:      $light;
+$thumbnail-border-width:      .5px;
+$thumbnail-box-shadow:        0 .125rem .25rem rgba($black, .075); // this is $box-shadow-sm
+$thumbnail-border-radius:     unset;
+$thumbnail-padding:           unset;
+
+// Typography
+
+@import '_typography.scss';
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,900;1,400;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
+
+
+$font-family-sans-serif:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-base:            'Sequel Sans Book Body', 'Nunito Sans', $font-family-sans-serif;
+
+$font-size-base:              .9rem; // Yes, this should scare you. But 'Sequel Sans Book Body' is a larger/bulkier typeface that looks better a bit smaller. So for this app only, I'm bumping the root font-size down.
+$h1-font-size:                $font-size-base * 2.5;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Marketplace.Common;
 using Marketplace.Common.Commands;
@@ -7,12 +7,12 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Queries;
 using Marketplace.Orchestration;
 using Flurl.Http;
-using Marketplace.Common.Commands.SupplierSync;
 using Microsoft.Extensions.DependencyInjection;
-using ordercloud.integrations.cms;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using ordercloud.integrations.freightpop;
+using Marketplace.Common.Services;
+using Flurl.Http.Configuration;
+using Marketplace.Common.Services.CMS;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Marketplace.Orchestration
@@ -28,34 +28,42 @@ namespace Marketplace.Orchestration
                 .InjectAzureFunctionSettings<AppSettings>(connectionString)
                 .BindSettings<AppSettings>();
 
-            var cosmosConfig = new CosmosConfig(settings.CosmosSettings.DatabaseName,
-                settings.CosmosSettings.EndpointUri, settings.CosmosSettings.PrimaryKey);
-            var cmsConfig = new CMSConfig()
-            {
-                BaseUrl = settings.EnvironmentSettings.BaseUrl,
-                BlobStorageHostUrl = settings.BlobSettings.HostUrl,
-                BlobStorageConnectionString = settings.BlobSettings.ConnectionString
-            };
+            var cosmosConfig = new CosmosConfig(
+                settings.CosmosSettings.DatabaseName,
+                settings.CosmosSettings.EndpointUri,
+                settings.CosmosSettings.PrimaryKey,
+                settings.CosmosSettings.RequestTimeoutInSeconds,
+                settings.CosmosSettings.MaxConnectionLimit,
+                settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
+                settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
+                settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
+                settings.CosmosSettings.MaxRequestsPerTcpConnection,
+                settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+            );
             builder.Services
-                .InjectCosmosStore<AssetQuery, AssetDO>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
+                .AddLazyCache()
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<AssetContainerQuery, AssetContainerDO>(cosmosConfig)
-                .InjectCosmosStore<AssetedResourceQuery, AssetedResourceDO>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
+                .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<IOrderCloudIntegrationsFunctionToken>()
-                .Inject<IFlurlClient>()
+                .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = settings.CMSSettings.BaseUrl }))
                 .InjectOrderCloud<IOrderCloudClient>(new OrderCloudClientConfig()
                 {
-                    ApiUrl = settings.OrderCloudSettings.ApiUrl
+                    ApiUrl = settings.OrderCloudSettings.ApiUrl,
+                    AuthUrl = settings.OrderCloudSettings.ApiUrl,
+                    ClientId = settings.OrderCloudSettings.ClientID,
+                    ClientSecret = settings.OrderCloudSettings.ClientSecret,
+                    Roles = new[]
+                    {
+                        ApiRole.FullAccess
+                    }
                 })
-                .AddSingleton<CMSConfig>(x => cmsConfig)
-                .Inject<IAssetQuery>()
-                .Inject<IAssetedResourceQuery>()
-                .Inject<IBlobStorage>()
+                .AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>()
                 .Inject<IOrchestrationCommand>()
                 .Inject<ISupplierSyncCommand>()
                 .Inject<ISyncCommand>()
-                .Inject<IProductTemplateCommand>();
+                .Inject<IProductTemplateCommand>()
+                .Inject<ISendgridService>();
         }
     }
 }

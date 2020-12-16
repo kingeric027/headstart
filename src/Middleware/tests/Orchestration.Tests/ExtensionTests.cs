@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Marketplace.Common.Commands.SupplierSync;
 using NUnit.Framework;
 using Marketplace.Common.Extensions;
 using Marketplace.Common.Models;
@@ -41,11 +40,6 @@ namespace Orchestration.Tests
         {
             get
             {
-                yield return new TestCaseData(RecordType.HydratedProduct,
-                    new TemplateHydratedProduct()
-                    {
-                        Product = new TemplateProduct() {ID = "id"}
-                    });
                 yield return new TestCaseData(RecordType.Product, new MarketplaceProduct()
                 {
                     ID = "id"

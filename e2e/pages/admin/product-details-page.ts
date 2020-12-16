@@ -33,6 +33,7 @@ class ProductDetailsPage {
 		this.skuField = Selector('#ID')
 		this.activeToggle = Selector('label')
 			.withText(createRegExp('active'))
+			.parent()
 			.find('span')
 		this.quantityPerUnitField = Selector('#UnitOfMeasureQty')
 		this.unitOfMeasureField = Selector('#UnitOfMeasureUnit')
@@ -56,7 +57,7 @@ class ProductDetailsPage {
 		this.buyerList = Selector('.list-group-item')
 	}
 
-	async createDefaultProduct() {
+	async createDefaultStandardProduct() {
 		const productName = `AutomationProduct_${randomString(5)}`
 		await t.typeText(this.nameField, productName)
 		await t.typeText(this.quantityPerUnitField, '1')
@@ -88,8 +89,54 @@ class ProductDetailsPage {
 		return productName
 	}
 
+	async createDefaultActiveStandardProduct() {
+		const productName = `AutomationProduct_${randomString(5)}`
+		await t.typeText(this.nameField, productName)
+		await t.click(this.activeToggle)
+		await t.typeText(this.quantityPerUnitField, '1')
+		await t.typeText(this.unitOfMeasureField, 'Unit')
+		await scrollIntoView('#TaxCodeCategory')
+		await t.click(this.taxCategoryDropdown)
+		await t.click(this.taxCategoryOptions.withText(createRegExp('freight')))
+		await t.click(this.taxCodeDropdown)
+		await t.click(
+			this.taxCodeOptions.withText(
+				createRegExp('delivery by company vehicle')
+			)
+		)
+		await t.click(this.shipAddressDropdown)
+		await t.click(
+			this.shipAddressOptions.withText(createRegExp('automation'))
+		)
+		await t.typeText(this.productWeightField, '5')
+		await t.click(this.sizeTierDropdown)
+		await t.click(
+			this.sizeTierOptions.withText(createRegExp('2 - 5 units will fit'))
+		)
+		await t.click(this.pricingTab)
+		await t.typeText(this.priceField, '5')
+		await clickLeftOfElement(this.priceField)
+		await t.click(this.createButton)
+		await loadingHelper.waitForLoadingBar()
+
+		return productName
+	}
+
+	async createDefaultQuoteProduct() {
+		const productName = `AutomationProduct_${randomString(5)}`
+		await t.typeText(this.nameField, productName)
+		await t.typeText(this.quantityPerUnitField, '1')
+		await t.typeText(this.unitOfMeasureField, 'Unit')
+		await scrollIntoView(`button[type="submit"]`)
+		await t.click(this.createButton)
+		await loadingHelper.waitForLoadingBar()
+
+		return productName
+	}
+
 	async createProduct(name: string, warehouse: string) {
 		await t.typeText(this.nameField, name)
+		await t.click(this.activeToggle)
 		await t.typeText(this.quantityPerUnitField, '1')
 		await t.typeText(this.unitOfMeasureField, 'Unit')
 		await scrollIntoView('#TaxCodeCategory')
@@ -147,6 +194,23 @@ class ProductDetailsPage {
 			.find('label')
 		await t.click(thisCatalog)
 		await t.click(Selector('button').withText(createRegExp('save')))
+		await loadingHelper.waitForLoadingBar()
+	}
+	async editBuyerVisibilityForView(buyerID: string, buyerCatalog: string) {
+		const buyerIndex = await this.getBuyerIndex(buyerID)
+		await scrollIntoView(`.list-group-item:nth-of-type(${buyerIndex})`)
+		const thisBuyer = this.buyerList.withText(createRegExp(buyerID))
+		const editButton = thisBuyer.find('button').withText(createRegExp('edit'))
+		await t.click(editButton)
+		await loadingHelper.waitForLoadingBar()
+
+		const thisCatalog = Selector('tr')
+			.withText(createRegExp(buyerCatalog))
+			.find('label')
+		await t.click(thisCatalog)
+		await scrollIntoView(`button[type="submit"]`)
+		await t.click(Selector('button').withText(createRegExp('save')))
+
 		await loadingHelper.waitForLoadingBar()
 	}
 }

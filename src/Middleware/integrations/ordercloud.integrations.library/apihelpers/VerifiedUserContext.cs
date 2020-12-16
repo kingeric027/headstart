@@ -14,14 +14,23 @@ namespace ordercloud.integrations.library
     {
         public ClaimsPrincipal Principal { get; set; }
         private JwtSecurityToken _token { get; set; }
+        private IOrderCloudClient _oc { get; set;}
 
-        public VerifiedUserContext() { }
+        public VerifiedUserContext(IOrderCloudClient oc) {
+            _oc = oc;
+        }
 
+        /// <summary>
+        /// This method is not for regular use. If you are attempting to use it for any reason consult the project lead
+        /// If you need the context of an authenticated user ensure you're using a valid OrderCloudIntegrationsAuth attribute
+        /// and reference the VerifiedUserContext from the BaseController
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public async Task<VerifiedUserContext> Define(OrderCloudClientConfig config)
         {
-            var _oc = new OrderCloudClient(config);
             var auth = await _oc.AuthenticateAsync();
-            var user = await new OrderCloudClientWithContext(auth.AccessToken).GetMeWithSellerID(auth.AccessToken);
+            var user = await _oc.Me.GetAsync();
             var jwt = new JwtSecurityToken(auth.AccessToken);
 
             var cid = new ClaimsIdentity("OrderCloudIntegrations");
@@ -88,7 +97,7 @@ namespace ordercloud.integrations.library
 
         public string AccessToken
         {
-            get { return Principal.Claims.First(c => c.Type == "accesstoken").Value; }
+            get { return Principal.Claims.First(c => c.Type == "accesstoken")?.Value; }
             set => AccessToken = value;
         }
 
@@ -106,7 +115,7 @@ namespace ordercloud.integrations.library
         {
             get
             {
-                return _token.Payload.FirstOrDefault(t => t.Key == "exp").Value.ToString().UnixToDateTime();
+                return _token.Payload.FirstOrDefault(t => t.Key == "exp").Value.ToString().UnixToDateTimeUTC();
             }
         }
     }

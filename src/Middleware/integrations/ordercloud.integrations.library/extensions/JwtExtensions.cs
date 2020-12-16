@@ -21,8 +21,8 @@ namespace ordercloud.integrations.library.extensions
 
 		public static string GetClientID(this JwtSecurityToken jwt) => jwt.GetClaim("cid");
 
-		public static DateTime GetExpiresUTC(this JwtSecurityToken jwt) => jwt.GetClaim("exp").UnixToDateTime();
+		public static DateTime GetExpiresUTC(this JwtSecurityToken jwt) => jwt.GetClaim("exp").UnixToDateTimeUTC();
 
-		public static DateTime GetNotValidBeforeUTC(this JwtSecurityToken jwt) => jwt.GetClaim("nbf").UnixToDateTime();
+		public static DateTime GetNotValidBeforeUTC(this JwtSecurityToken jwt) => jwt.GetClaim("nbf").UnixToDateTimeUTC();
 	}
 }

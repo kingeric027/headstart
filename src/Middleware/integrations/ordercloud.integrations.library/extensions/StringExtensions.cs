@@ -8,10 +8,10 @@ namespace ordercloud.integrations.library
 {
     public static class StringExtensions
     {
-        public static DateTime UnixToDateTime(this string unix)
+        public static DateTime UnixToDateTimeUTC(this string unix)
         {
             var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            return dtDateTime.AddSeconds(int.Parse(unix)).ToLocalTime();
+            return dtDateTime.AddSeconds(int.Parse(unix));
         }
 
         public static string JoinString<T>(this IEnumerable<T> items, string separator)

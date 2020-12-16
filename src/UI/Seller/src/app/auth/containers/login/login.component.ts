@@ -1,10 +1,13 @@
 // angular
-import { Component, OnInit, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { AppConfig, applicationConfiguration } from '@app-seller/config/app.config';
-import { ToastrService } from 'ngx-toastr';
+import { Component, OnInit, Inject } from '@angular/core'
+import { FormBuilder, FormGroup } from '@angular/forms'
+import { Router } from '@angular/router'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import {
+  AppConfig,
+  applicationConfiguration,
+} from '@app-seller/config/app.config'
+import { ToastrService } from 'ngx-toastr'
 
 @Component({
   selector: 'auth-login',
@@ -12,8 +15,8 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  form: FormGroup;
-  isAnon: boolean;
+  form: FormGroup
+  isAnon: boolean
 
   constructor(
     private currentUserService: CurrentUserService,
@@ -28,7 +31,7 @@ export class LoginComponent implements OnInit {
       username: '',
       password: '',
       rememberMe: false,
-    });
+    })
   }
 
   async onSubmit() {
@@ -37,10 +40,10 @@ export class LoginComponent implements OnInit {
         this.form.get('username').value,
         this.form.get('password').value,
         this.form.get('rememberMe').value
-      );
+      )
     } catch {
-      this.toasterService.error('Invalid Login Credentials');
+      this.toasterService.error('Invalid Login Credentials')
     }
-    this.router.navigateByUrl('/home');
+    this.router.navigateByUrl('/home')
   }
 }

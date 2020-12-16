@@ -1,6 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { ReportTemplate } from '@ordercloud/headstart-sdk';
-import { FormGroup } from '@angular/forms';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core'
+import { ReportTemplate } from '@ordercloud/headstart-sdk'
+import { FormGroup } from '@angular/forms'
 
 @Component({
   selector: 'reports-selection-component',
@@ -9,51 +16,61 @@ import { FormGroup } from '@angular/forms';
 })
 export class ReportsSelectionComponent {
   @Input()
-  reportTypes: any[];
+  reportTypes: any[]
   @Input()
-  reportTemplates: ReportTemplate[];
+  reportTemplates: ReportTemplate[]
   @Input()
-  reportSelectionForm: FormGroup;
+  reportSelectionForm: FormGroup
   @Input()
-  displayHeaders: string[];
+  displayHeaders: string[]
   @Input()
-  adHocFilters: string[];
+  adHocFilters: string[]
   @Output()
-  handleReportTypeSelection = new EventEmitter<string>();
+  handleReportTypeSelection = new EventEmitter<string>()
   @Output()
-  handleReportTemplateSelection = new EventEmitter<string>();
+  handleReportTemplateSelection = new EventEmitter<string>()
   @Output()
-  handleReportAdHocFiltersSelection = new EventEmitter<any>();
-  selectedTemplate: ReportTemplate = {};
-  showDetails = false;
-  filterEntries: string[][];
+  handleReportAdHocFiltersSelection = new EventEmitter<any>()
+  selectedTemplate: ReportTemplate = {}
+  showDetails = false
+  filterEntries: string[][]
 
   constructor() {}
 
   updateReportType(event: string): void {
-    this.handleReportTypeSelection.emit(event);
+    this.handleReportTypeSelection.emit(event)
   }
 
   updateReportTemplate(event: string): void {
-    this.handleReportTemplateSelection.emit(event);
-    this.selectedTemplate = this.reportTemplates.find(template => template.TemplateID === event);
-    this.filterEntries = Object.entries(this.selectedTemplate.Filters);
+    this.handleReportTemplateSelection.emit(event)
+    this.selectedTemplate = this.reportTemplates.find(
+      (template) => template.TemplateID === event
+    )
+    this.filterEntries = Object.entries(this.selectedTemplate.Filters)
   }
 
   updateReportAdHocFilters(event: string, filter: string): void {
-    let filterSelection = { event: event, filter: filter };
-    this.handleReportAdHocFiltersSelection.emit(filterSelection);
+    const filterSelection = { event, filter }
+    this.handleReportAdHocFiltersSelection.emit(filterSelection)
   }
 
   toggleShowDetails(): void {
-    this.showDetails = !this.showDetails;
+    this.showDetails = !this.showDetails
   }
 
   getDetailsDisplayVerb(): string {
-    return this.showDetails ? 'Hide' : 'Show';
+    return this.showDetails ? 'Hide' : 'Show'
   }
 
   getFilterType(filter: string): string {
-    if (filter.includes('Date')) return 'date';
+    if (filter.includes('Date')) return 'date'
+    if (filter.includes('Time')) return 'time'
+  }
+
+  getFilterNameDisplay(filter: string): string {
+    return (
+      filter.match(/[A-Z][a-z]+|[0-9]+/g).join(' ') +
+      (filter.includes('Time') ? ' (Optional)' : '')
+    )
   }
 }

@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Threading.Tasks;
+using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
 using NUnit.Framework;
 using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.library;
 
 namespace CardConnect.Tests
 {
@@ -21,7 +21,7 @@ namespace CardConnect.Tests
                 Authorization = "",
                 Site = "fts-uat",
                 BaseUrl = "cardconnect.com"
-            });
+            }, new PerBaseUrlFlurlClientFactory());
         }
 
         [TearDown]
@@ -60,6 +60,7 @@ namespace CardConnect.Tests
         [TestCase(@"{'respstat': 'A', 'respcode': '0', 'cvvresp': 'M', 'avsresp': 'X'}", ResponseStatus.Approved)]
         [TestCase(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'X'}", ResponseStatus.Approved)]
         [TestCase(@"{'respstat': 'A', 'respcode': '000', 'cvvresp': 'M', 'avsresp': 'X'}", ResponseStatus.Approved)]
+        [TestCase(@"{'respstat': 'A', 'respcode': '0', 'cvvresp': 'N', 'avsresp': 'Z'}", ResponseStatus.Approved)]
         public async Task auth_success_attempt_test(string body, ResponseStatus result)
         {
             _http.RespondWith(body);
@@ -71,7 +72,7 @@ namespace CardConnect.Tests
         public void auth_failure_attempt_tests(string body)
         {
             _http.RespondWith(body);
-            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
+            var ex = Assert.ThrowsAsync<CreditCardIntegrationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
         }
 
         [Test]
@@ -88,7 +89,7 @@ namespace CardConnect.Tests
         }
     }
 
-    public class ResponseCodeFactory
+    public static class ResponseCodeFactory
     {
         public static IEnumerable FailCases
         {
@@ -96,12 +97,15 @@ namespace CardConnect.Tests
             {
                 yield return new TestCaseData(@"{'respstat': 'B', 'respcode': 'NU', 'cvvresp': 'M', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '05', 'cvvresp': 'M', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'N', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'P', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'U', 'avsresp': 'Y'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'N'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'A'}");
-                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'Z'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'N', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '00', 'cvvresp': 'P', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '101', 'cvvresp': 'U', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'C', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'N'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'M', 'avsresp': 'A'}");
+                yield return new TestCaseData(@"{'respstat': 'B', 'respcode': '00', 'cvvresp': 'M', 'avsresp': 'Z'}");
+                yield return new TestCaseData(@"{'respstat': 'B', 'respcode': '100', 'cvvresp': 'M', 'avsresp': 'Z'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'P', 'avsresp': 'Y'}");
+                yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '500', 'cvvresp': 'P', 'avsresp': 'Y'}");
             }
         }
     }

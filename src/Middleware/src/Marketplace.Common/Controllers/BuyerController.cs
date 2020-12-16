@@ -26,7 +26,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
         public async Task<SuperMarketplaceBuyer> Create([FromBody] SuperMarketplaceBuyer buyer)
         {
-            return await _command.Create(buyer, VerifiedUserContext.AccessToken);
+            return await _command.Create(buyer, VerifiedUserContext);
         }
 
         [DocName("PUT Marketplace Buyer")]

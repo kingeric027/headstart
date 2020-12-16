@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 using Flurl.Http;
-using ordercloud.integrations.library;
+using Flurl.Http.Configuration;
 using OrderCloud.SDK;
 
 namespace ordercloud.integrations.cardconnect
@@ -9,6 +10,7 @@ namespace ordercloud.integrations.cardconnect
     {
         Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request);
         Task<CardConnectAuthorizationResponse> AuthWithoutCapture(CardConnectAuthorizationRequest request);
+        Task<CardConnectAuthorizationResponse> AuthWithCapture(CardConnectAuthorizationRequest request);
     }
 
     public class OrderCloudIntegrationsCardConnectConfig 
@@ -16,6 +18,10 @@ namespace ordercloud.integrations.cardconnect
         public string Site { get; set; }
         public string BaseUrl { get; set; }
         public string Authorization { get; set; }
+        public string AuthorizationCad { get; set; } // we need a separate merchant account for canadian currency
+        public string UsdMerchantID { get; set; }
+        public string CadMerchantID { get; set; }
+        public string EurMerchantID { get; set; }
     }
 
     public class OrderCloudIntegrationsCardConnectService : IOrderCloudIntegrationsCardConnectService
@@ -23,22 +29,15 @@ namespace ordercloud.integrations.cardconnect
         private readonly IFlurlClient _flurl;
         public OrderCloudIntegrationsCardConnectConfig Config { get; }
 
-        public OrderCloudIntegrationsCardConnectService() : this(new OrderCloudIntegrationsCardConnectConfig())
-        {
-        }
-
-        public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config)
+        public OrderCloudIntegrationsCardConnectService(OrderCloudIntegrationsCardConnectConfig config, IFlurlClientFactory flurlFactory)
         {
             Config = config;
-            _flurl = new FlurlClient
-            {
-                BaseUrl = $"https://{Config.Site}.{Config.BaseUrl}/"
-            };
+            _flurl = flurlFactory.Get($"https://{Config.Site}.{Config.BaseUrl}/");
         }
 
-        private IFlurlRequest Request(string resource)
+        private IFlurlRequest Request(string resource, string currency = null)
         {
-            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {Config.Authorization}");
+            return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : Config.AuthorizationCad)}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)
@@ -48,61 +47,32 @@ namespace ordercloud.integrations.cardconnect
 
         public async Task<CardConnectAuthorizationResponse> AuthWithoutCapture(CardConnectAuthorizationRequest request)
         {
+            return await PostAuthorizationAsync(request);
+        }
+
+        public async Task<CardConnectAuthorizationResponse> AuthWithCapture(CardConnectAuthorizationRequest request)
+        {
+            request.capture = "Y";
+            return await PostAuthorizationAsync(request);
+        }
+
+        private async Task<CardConnectAuthorizationResponse> PostAuthorizationAsync(CardConnectAuthorizationRequest request)
+        {
             var attempt = await this
-                .Request("cardconnect/rest/auth")
+                .Request("cardconnect/rest/auth", request.currency)
                 .PutJsonAsync(request)
                 .ReceiveJson<CardConnectAuthorizationResponse>();
 
-            // Each payment processor has a unique set of response codes. Generally, a processor response code(respcode) beginning with "00" or "000" is a successful authorization request; any other code is a decline.  
-            // https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
-            if (!PassedAVSCheck(attempt))
+            if (attempt.WasSuccessful())
             {
-                throw new OrderCloudIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"Billing address on credit card incorrect",
-                    ErrorCode = attempt.respcode
-                });
+                return attempt;
             }
-            else if (!PassedCvvCheck(attempt, request))
+            throw new CreditCardIntegrationException(new ApiError()
             {
-                throw new OrderCloudIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"CVV Validation Failure",
-                    ErrorCode = attempt.respcode
-                });
-            }
-            else if (!WasSuccessful(attempt))
-            {
-                throw new OrderCloudIntegrationException(new ApiError()
-                {
-                    Data = attempt,
-                    Message = $"{attempt.respstat.ToResponseStatus()} : {attempt.resptext}",
-                    ErrorCode = attempt.respcode
-                });
-            }
-            return attempt;
-
-        }
-
-        private static bool WasSuccessful(CardConnectAuthorizationResponse attempt)
-        {
-            return attempt.respstat == "A" && (attempt.respcode == "0" || attempt.respcode == "00" || attempt.respcode == "000");
-        }
-
-        private static bool PassedCvvCheck(CardConnectAuthorizationResponse attempt, CardConnectAuthorizationRequest request)
-        {
-            if (request.cvv2 == null && (attempt.cvvresp == "P" || attempt.cvvresp == null)) 
-                return true;
-            return (attempt.cvvresp != null &&
-                    attempt.cvvresp != "N" && attempt.cvvresp != "P" && attempt.cvvresp != "U");
-        }
-
-        private static bool PassedAVSCheck(CardConnectAuthorizationResponse attempt)
-        {
-            return (attempt.avsresp != null &&
-                    (attempt.avsresp != "N" && attempt.avsresp != "A" && attempt.avsresp != "Z"));
+                Data = attempt,
+                Message = attempt.resptext, // response codes: https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
+                ErrorCode = attempt.respcode
+            }, attempt);
         }
     }
 }

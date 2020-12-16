@@ -42,6 +42,15 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPMeProductAdmin,
                     }
                 },
+                 new MarketplaceUserType {
+                    UserGroupName = "Report Reader",
+                    UserGroupType = UserGroupType.UserPermissions,
+                    UserGroupIDSuffix = "ReportReader",
+                    CustomRoles = new List<CustomRole>
+                    {
+                        CustomRole.MPReportReader,
+                    }
+                },
             };
                 
         }

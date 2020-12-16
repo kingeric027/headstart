@@ -10,8 +10,8 @@ namespace Marketplace.Common.Services.Zoho.Resources
     {
         Task<ZohoContactList> ListAsync(params ZohoFilter[] filters);
         Task<TZohoContactList> ListAsync<TZohoContactList>(params ZohoFilter[] filters) where TZohoContactList : ZohoContactList;
-        Task<ZohoContact> GetAsync(string id);
-        Task<TZohoContact> GetAsync<TZohoContact>(string id) where TZohoContact : ZohoContact;
+        Task<ZohoSingleContact> GetAsync(string id);
+        Task<TZohoContact> GetAsync<TZohoContact>(string id) where TZohoContact : ZohoSingleContact;
         Task<ZohoContact> SaveAsync(ZohoContact contact);
         Task<TZohoContact> SaveAsync<TZohoContact>(TZohoContact contact) where TZohoContact : ZohoContact;
         Task<ZohoContact> CreateAsync(ZohoContact contact);
@@ -28,9 +28,9 @@ namespace Marketplace.Common.Services.Zoho.Resources
                 .SetQueryParams(filters?.Select(f => new KeyValuePair<string, object>(f.Key, f.Value)))
                 .GetJsonAsync<TZohoContactList>();
 
-        public Task<ZohoContact> GetAsync(string id) => GetAsync<ZohoContact>(id);
+        public Task<ZohoSingleContact> GetAsync(string id) => GetAsync<ZohoSingleContact>(id);
         
-        public Task<TZohoContact> GetAsync<TZohoContact>(string id) where TZohoContact : ZohoContact =>
+        public Task<TZohoContact> GetAsync<TZohoContact>(string id) where TZohoContact : ZohoSingleContact =>
             Get(id).GetJsonAsync<TZohoContact>();
         
         public Task<ZohoContact> SaveAsync(ZohoContact contact) => SaveAsync<ZohoContact>(contact);

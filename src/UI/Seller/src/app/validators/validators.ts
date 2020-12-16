@@ -1,8 +1,14 @@
-import { AbstractControl, ValidationErrors, ValidatorFn, ControlContainer, FormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
+  ControlContainer,
+  FormGroup,
+} from '@angular/forms'
 import {
   areAllCategoriesComplete,
   areDuplicateCategories,
-} from '@app-seller/suppliers/components/category-select/supplier-category-select.component';
+} from '@app-seller/suppliers/components/category-select/supplier-category-select.component'
 
 export const ErrorDictionary = {
   name: "Name can only contain characters Aa-Zz 0-9 - ' .",
@@ -23,120 +29,140 @@ export const ErrorDictionary = {
     'Descriptions can only be 1000 characters. Remember the character count includes HTML formatting text.',
   supplierCategoryError: 'Supplier category selections are invalid',
   supplierProductTypeError: 'Please select at least one product type',
-};
+}
 
 // only alphanumic and space . '
-export function ValidateName(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[a-zA-Z0-9-.'\\s]*$/.test(control.value);
+export function ValidateName(
+  control: AbstractControl
+): ValidationErrors | null {
+  const isValid = /^[a-zA-Z0-9-.'\\s]*$/.test(control.value)
   if (!control.value || isValid) {
-    return null;
+    return null
   }
-  return { name: true };
+  return { name: true }
 }
 
 // max 20 chars, numbers and -
-export function ValidatePhone(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[0-9-]{0,20}$/.test(control.value);
+export function ValidatePhone(
+  control: AbstractControl
+): ValidationErrors | null {
+  const isValid = /^[0-9-]{0,20}$/.test(control.value)
   if (!control.value || isValid) {
-    return null;
+    return null
   }
-  return { phone: true };
+  return { phone: true }
 }
 
 // contains @ and . with text surrounding
-export function ValidateEmail(control: AbstractControl): ValidationErrors | null {
+export function ValidateEmail(
+  control: AbstractControl
+): ValidationErrors | null {
   // longest TLD currently in existence is 24 characters
-  const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(control.value);
+  const isValid = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,24}$/.test(control.value)
   if (!control.value || isValid) {
-    return null;
+    return null
   }
-  return { email: true };
+  return { email: true }
 }
 
 // mm-dd-yyyy, all numbers
-export function ValidateDate(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.test(control.value);
+export function ValidateDate(
+  control: AbstractControl
+): ValidationErrors | null {
+  const isValid = /^[0-9]{2}-[0-9]{2}-[0-9]{4}$/.test(control.value)
   if (!control.value || isValid) {
-    return null;
+    return null
   }
-  return { date: true };
+  return { date: true }
 }
 
-export function ValidateCAZip(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] ?\d[A-Z]\d)$/g.test(control.value);
+export function ValidateCAZip(
+  control: AbstractControl
+): ValidationErrors | null {
+  const isValid = /^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] ?\d[A-Z]\d)$/g.test(
+    control.value
+  )
   if (!control.value || isValid) {
-    return null;
+    return null
   }
-  return { zip: true };
+  return { zip: true }
 }
 
-export function ValidateUSZip(control: AbstractControl): ValidationErrors | null {
-  const isValid = /^[0-9]{5}(?:-[0-9]{4})?$/.test(control.value);
+export function ValidateUSZip(
+  control: AbstractControl
+): ValidationErrors | null {
+  const isValid = /^[0-9]{5}(?:-[0-9]{4})?$/.test(control.value)
   if (!control.value || isValid) {
-    return null;
+    return null
   }
-  return { zip: true };
+  return { zip: true }
 }
 
 // password must include one number, one letter and have min length of 8
-export function ValidateStrongPassword(control: AbstractControl): ValidationErrors | null {
-  const hasNumber = /[0-9]/.test(control.value); // TODO - boil these 3 checks into one regex
-  const hasLetter = /[a-zA-Z]/.test(control.value);
-  const hasMinLength = control.value && control.value.length >= 8;
+export function ValidateStrongPassword(
+  control: AbstractControl
+): ValidationErrors | null {
+  const hasNumber = /[0-9]/.test(control.value) // TODO - boil these 3 checks into one regex
+  const hasLetter = /[a-zA-Z]/.test(control.value)
+  const hasMinLength = control.value && control.value.length >= 8
   if (!control.value) {
-    return null;
+    return null
   }
   if (hasNumber && hasLetter && hasMinLength) {
-    return null;
+    return null
   }
-  return { strongPassword: true };
+  return { strongPassword: true }
 }
 
 export function ValidateFieldMatches(fieldToMatch: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    if (!control.parent) return null;
-    const passwordControl = control.parent.controls[fieldToMatch];
+    if (!control.parent) return null
+    const passwordControl = control.parent.controls[fieldToMatch]
     // only validate if both fields have been touched
     if (passwordControl.pristine || control.pristine) {
-      return null;
+      return null
     }
     if (passwordControl.value === control.value) {
-      return null;
+      return null
     }
-    return { ocMatchFields: true };
-  };
+    return { ocMatchFields: true }
+  }
 }
 
-export const ValidateMinMax: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
-  const min = control.get('MinQuantity');
-  const max = control.get('MaxQuantity');
+export const ValidateMinMax: ValidatorFn = (
+  control: FormGroup
+): ValidationErrors | null => {
+  const min = control.get('MinQuantity')
+  const max = control.get('MaxQuantity')
   if (min.value <= max.value) {
     if (min.errors) {
-      min.setErrors(null);
-      min.setValue(min.value);
+      min.setErrors(null)
+      min.setValue(min.value)
     }
     if (max.errors) {
-      max.setErrors(null);
-      max.setValue(max.value);
+      max.setErrors(null)
+      max.setValue(max.value)
     }
-    return null;
+    return null
   } else if (min.value > max.value && max.value !== null) {
-    min.setErrors({ minGreaterThanMax: true });
-    max.setErrors({ maxLessThanMin: true });
-    return null;
+    min.setErrors({ minGreaterThanMax: true })
+    max.setErrors({ maxLessThanMin: true })
+    return null
   }
-  return null;
-};
+  return null
+}
 
 /**
  * Our date inputs use ngbDatepicker but also allow freeform entry.
  * We need to validate the free form entry strings which are converted to date objects
  */
 
-export function DateValidator(control: AbstractControl): ValidationErrors | null {
+export function DateValidator(
+  control: AbstractControl
+): ValidationErrors | null {
   // only validate if both fields have been touched
   if (control.value == null || control.value === '') {
-    return null;
+    return null
   }
 
   if (
@@ -145,33 +171,41 @@ export function DateValidator(control: AbstractControl): ValidationErrors | null
     // validate that the year is also within reasonable range
     control.value.getFullYear().toString().length === 4
   ) {
-    return null;
+    return null
   }
 
-  return { DateError: true };
+  return { DateError: true }
 }
 
-export function ValidateRichTextDescription(control: AbstractControl): ValidationErrors | null {
-  return control.value && control.value.length >= 2000 ? { richTextFormatError: true } : null;
+export function ValidateRichTextDescription(
+  control: AbstractControl
+): ValidationErrors | null {
+  return control.value && control.value.length >= 2000
+    ? { richTextFormatError: true }
+    : null
 }
 
-export function ValidateSupplierCategorySelection(control: AbstractControl): ValidationErrors | null {
+export function ValidateSupplierCategorySelection(
+  control: AbstractControl
+): ValidationErrors | null {
   const isValidResource =
-    control.value?.length > 0 && areAllCategoriesComplete(control.value) && !areDuplicateCategories(control.value);
-  return isValidResource ? null : { SupplierCategoryError: true };
+    control.value?.length > 0 &&
+    areAllCategoriesComplete(control.value) &&
+    !areDuplicateCategories(control.value)
+  return isValidResource ? null : { SupplierCategoryError: true }
 }
 
 export function RequireCheckboxesToBeChecked(minRequired = 1): ValidatorFn {
   return function validate(formGroup: FormGroup): ValidationErrors | null {
-    let checked = 0;
+    let checked = 0
 
-    Object.keys(formGroup.controls).forEach(key => {
-      const control = formGroup.controls[key];
+    Object.keys(formGroup.controls).forEach((key) => {
+      const control = formGroup.controls[key]
 
       if (control.value === true) {
-        checked++;
+        checked++
       }
-    });
-    return checked < minRequired ? { supplierProductTypeError: true } : null;
-  };
+    })
+    return checked < minRequired ? { supplierProductTypeError: true } : null
+  }
 }

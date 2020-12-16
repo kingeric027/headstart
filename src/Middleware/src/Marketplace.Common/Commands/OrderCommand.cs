@@ -10,13 +10,15 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
 using Marketplace.Models.Extended;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Marketplace.Common.Services.ShippingIntegration.Models;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
     public interface IOrderCommand
     {
         Task<Order> AcknowledgeQuoteOrder(string orderID);
-        Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
+        Task<ListPage<MarketplaceOrder>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
         Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
@@ -27,28 +29,43 @@ namespace Marketplace.Common.Commands
     public class OrderCommand : IOrderCommand
     {
         private readonly IOrderCloudClient _oc;
-		private readonly IExchangeRatesCommand _exchangeRates;
-        private readonly ISendgridService _sendgridService;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
-        private readonly IMeProductCommand _meProductCommand;
         private readonly IPromotionCommand _promotionCommand;
         
-        public OrderCommand(IExchangeRatesCommand exchangeRates, ILocationPermissionCommand locationPermissionCommand, ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
+        public OrderCommand(
+            ILocationPermissionCommand locationPermissionCommand,
+            IOrderCloudClient oc,
+            IPromotionCommand promotionCommand
+            )
         {
 			_oc = oc;
-            _sendgridService = sendgridService;
             _locationPermissionCommand = locationPermissionCommand;
-			_exchangeRates = exchangeRates;
-            _meProductCommand = meProductCommand;
             _promotionCommand = promotionCommand;
 		}
 
         public async Task<Order> AcknowledgeQuoteOrder(string orderID)
         {
-            int index = orderID.IndexOf("-");
-            string buyerOrderID = orderID.Substring(0, index);
-            await _oc.Orders.CompleteAsync(OrderDirection.Incoming, buyerOrderID);
-            return await _oc.Orders.CompleteAsync(OrderDirection.Outgoing, orderID);
+            var orderPatch = new PartialOrder()
+            {
+                xp = new
+                {
+                    SubmittedOrderStatus = SubmittedOrderStatus.Completed
+                }
+            };
+            //  Need to complete sales and purchase order and patch the xp.SubmittedStatus of both orders            
+            var salesOrderID = orderID.Split('-')[0];
+            var completeSalesOrder = _oc.Orders.CompleteAsync(OrderDirection.Incoming, salesOrderID);
+            var patchSalesOrder = _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, salesOrderID, orderPatch);
+            var completedSalesOrder = await completeSalesOrder;
+            var patchedSalesOrder = await patchSalesOrder;
+
+            var purchaseOrderID = $"{salesOrderID}-{patchedSalesOrder?.xp?.SupplierIDs?.FirstOrDefault()}";
+            var completePurchaseOrder = _oc.Orders.CompleteAsync(OrderDirection.Outgoing, purchaseOrderID);
+            var patchPurchaseOrder = _oc.Orders.PatchAsync(OrderDirection.Outgoing, purchaseOrderID, orderPatch);
+            var completedPurchaseOrder = await completePurchaseOrder;
+            var patchedPurchaseOrder = await patchPurchaseOrder;
+
+            return orderID == salesOrderID ? patchedSalesOrder : patchedPurchaseOrder;
         }
        
         public async Task PatchOrderRequiresApprovalStatus(string orderID)
@@ -62,7 +79,7 @@ namespace Marketplace.Common.Commands
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
         }
 
-        public async Task<ListPage<Order>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<MarketplaceOrder>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
         {
             await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
             if(listArgs.Filters == null)
@@ -73,10 +90,11 @@ namespace Marketplace.Common.Commands
             {
                 QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
             });
-            return await _oc.Orders.ListAsync(OrderDirection.Incoming,
+            return await _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Incoming,
                 page: listArgs.Page,
                 pageSize: listArgs.PageSize,
                 search: listArgs.Search,
+                sortBy: listArgs.SortBy.FirstOrDefault(),
                 filters: listArgs.ToFilterString());
         }
 
@@ -85,19 +103,18 @@ namespace Marketplace.Common.Commands
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
-            // todo support >100 
-            var lineItems =  _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, pageSize: 100);
+            var lineItems = ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, page: page, pageSize: 100));
             var promotions = _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
             var payments = _oc.Payments.ListAsync(OrderDirection.Incoming, order.ID, pageSize: 100);
             var approvals = _oc.Orders.ListApprovalsAsync(OrderDirection.Incoming, orderID, pageSize: 100);
-			return new OrderDetails
+            return new OrderDetails
             {
                 Order = order,
-                LineItems = (await lineItems).Items,
+                LineItems = (await lineItems),
                 Promotions = (await promotions).Items,
                 Payments = (await payments).Items,
                 Approvals = (await approvals).Items
-			};
+            };
         }
 
         public async Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
@@ -105,10 +122,9 @@ namespace Marketplace.Common.Commands
             var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
-            // todo support >100 and figure out how to make these calls in parallel and 
-            var lineItems = await _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID);
+            var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, page: page, pageSize: 100));
             var shipments = await _oc.Orders.ListShipmentsAsync<MarketplaceShipmentWithItems>(OrderDirection.Incoming, orderID);
-            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.Items.ToList()));
+            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.ToList()));
             return shipmentsWithItems.ToList();
         }
 

@@ -1,39 +1,53 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectorRef,
+} from '@angular/core'
 import {
   SupplierCategoryConfig,
   SupplierCategoryConfigFilters,
-} from '../suppliers/supplier-table/supplier-table.component';
-import { FormControl } from '@angular/forms';
-import { SupplierFilterConfigDocument } from '@ordercloud/headstart-sdk';
+} from '../suppliers/supplier-table/supplier-table.component'
+import { FormControl } from '@angular/forms'
+import { SupplierFilterConfigDocument } from '@ordercloud/headstart-sdk'
 
 interface SupplierCategorySelection {
-  ServiceCategory: string;
-  VendorLevel: string;
+  ServiceCategory: string
+  VendorLevel: string
 }
 
-export const areAllCategoriesComplete = (categorySelections: SupplierCategorySelection[]): boolean => {
-  return !categorySelections?.some(category => {
-    return !category.ServiceCategory || !category.VendorLevel;
-  });
-};
+export const areAllCategoriesComplete = (
+  categorySelections: SupplierCategorySelection[]
+): boolean => {
+  return !categorySelections?.some((category) => {
+    return !category.ServiceCategory || !category.VendorLevel
+  })
+}
 
-export const areDuplicateCategories = (categorySelections: SupplierCategorySelection[]): boolean => {
-  return categorySelections?.some(selection => isADuplicateCategory(selection, categorySelections));
-};
+export const areDuplicateCategories = (
+  categorySelections: SupplierCategorySelection[]
+): boolean => {
+  return categorySelections?.some((selection) =>
+    isADuplicateCategory(selection, categorySelections)
+  )
+}
 
 export const isADuplicateCategory = (
   categorySelection: SupplierCategorySelection,
   categorySelections: SupplierCategorySelection[]
 ): boolean => {
   const categorySelectionsFlat = categorySelections.map(
-    selection => `${selection.ServiceCategory}${selection.VendorLevel}`
-  );
+    (selection) => `${selection.ServiceCategory}${selection.VendorLevel}`
+  )
   return (
     categorySelectionsFlat.filter(
-      selectionFlat => selectionFlat === `${categorySelection.ServiceCategory}${categorySelection.VendorLevel}`
+      (selectionFlat) =>
+        selectionFlat ===
+        `${categorySelection.ServiceCategory}${categorySelection.VendorLevel}`
     ).length > 1
-  );
-};
+  )
+}
 
 export const isSecondDuplicateCategory = (
   categorySelection: SupplierCategorySelection,
@@ -41,13 +55,13 @@ export const isSecondDuplicateCategory = (
   index: number
 ): boolean => {
   const categorySelectionsFlat = categorySelections.map(
-    selection => `${selection.ServiceCategory}${selection.VendorLevel}`
-  );
+    (selection) => `${selection.ServiceCategory}${selection.VendorLevel}`
+  )
   const indexOfFirstAppearanceOfCategory = categorySelectionsFlat.indexOf(
     `${categorySelection.ServiceCategory}${categorySelection.VendorLevel}`
-  );
-  return indexOfFirstAppearanceOfCategory < index;
-};
+  )
+  return indexOfFirstAppearanceOfCategory < index
+}
 
 @Component({
   selector: 'supplier-category-select-component',
@@ -55,77 +69,106 @@ export const isSecondDuplicateCategory = (
   styleUrls: ['./supplier-category-select.component.scss'],
 })
 export class SupplierCategorySelectComponent {
-  canAddAnotherCategory = true;
-  _categorySelectionsControl: FormControl;
-  _categorySelections: SupplierCategorySelection[];
+  canAddAnotherCategory = true
+  _categorySelectionsControl: FormControl
+  _categorySelections: SupplierCategorySelection[]
 
-  _vendorLevelConfig: SupplierCategoryConfigFilters;
-  _serviceCatagoryConfig: SupplierCategoryConfigFilters;
-  _categoriesDisabled: boolean;
+  _vendorLevelConfig: SupplierCategoryConfigFilters
+  _serviceCatagoryConfig: SupplierCategoryConfigFilters
+  _categoriesDisabled: boolean
 
-  isSecondDuplicateCategory = isSecondDuplicateCategory;
-  areNoCategories = false;
+  isSecondDuplicateCategory = isSecondDuplicateCategory
+  areNoCategories = false
 
   @Input()
   set categorySelectionsControl(value: FormControl) {
-    this.updateCategoryValidation(value.value);
-    this._categorySelectionsControl = value;
-    this._categorySelections = value.value;
-    this._categoriesDisabled = value.status === 'DISABLED';
-    this._categorySelectionsControl.valueChanges.subscribe(categorySelections => {
-      this._categorySelections = categorySelections;
-      this._categoriesDisabled = categorySelections.status === 'DISABLED';
-      this.updateCategoryValidation(categorySelections);
-    });
+    this.updateCategoryValidation(value.value)
+    this._categorySelectionsControl = value
+    this._categorySelections = value.value
+    this._categoriesDisabled = value.status === 'DISABLED'
+    this._categorySelectionsControl.valueChanges.subscribe(
+      (categorySelections) => {
+        this._categorySelections = categorySelections
+        this._categoriesDisabled = categorySelections.status === 'DISABLED'
+        this.updateCategoryValidation(categorySelections)
+      }
+    )
   }
   @Input()
   set filterConfig(value: SupplierCategoryConfig) {
     if (value?.Filters) {
-      this._vendorLevelConfig = value.Filters.find(filter => filter.Display === 'Vendor Level');
-      this._serviceCatagoryConfig = this.getSortedCategories(value);
+      this._vendorLevelConfig = value.Filters.find(
+        (filter) => filter.Display === 'Vendor Level'
+      )
+      this._serviceCatagoryConfig = this.getSortedCategories(value)
     }
   }
   @Output()
-  selectionsChanged = new EventEmitter();
+  selectionsChanged = new EventEmitter()
 
   removeCategory(index: number): void {
-    const newCategorySelection = JSON.parse(JSON.stringify(this._categorySelections));
-    newCategorySelection.splice(index, 1);
-    this.updateCategory(newCategorySelection);
+    const newCategorySelection = JSON.parse(
+      JSON.stringify(this._categorySelections)
+    )
+    newCategorySelection.splice(index, 1)
+    this.updateCategory(newCategorySelection)
   }
 
   addCategory(): void {
-    if (this._serviceCatagoryConfig?.Items?.length > 0 && this._vendorLevelConfig?.Items?.length > 0) {
-      const newCategorySelection = [...(this._categorySelections || []), { ServiceCategory: this._serviceCatagoryConfig.Items[0].Text, VendorLevel: this._vendorLevelConfig.Items[0].Text }];
-      this.updateCategory(newCategorySelection);
+    if (
+      !this._serviceCatagoryConfig?.Items?.length ||
+      !this._vendorLevelConfig?.Items?.length
+    ) {
+      throw new Error(
+        'Application not configured with categories. Please contact an admin'
+      )
     }
+    const newCategorySelection = [
+      ...(this._categorySelections || []),
+      {
+        ServiceCategory: this._serviceCatagoryConfig.Items[0].Text,
+        VendorLevel: this._vendorLevelConfig.Items[0].Text,
+      },
+    ]
+    this.updateCategory(newCategorySelection)
   }
 
-  getSortedCategories(supplierCategoryConfig: SupplierCategoryConfig): SupplierCategoryConfigFilters {
-    let result: SupplierCategoryConfigFilters;
+  getSortedCategories(
+    supplierCategoryConfig: SupplierCategoryConfig
+  ): SupplierCategoryConfigFilters {
+    let result: SupplierCategoryConfigFilters
 
     if (supplierCategoryConfig?.Filters?.length > 0) {
-      result = supplierCategoryConfig.Filters.find(filter => filter.Display === 'Service Category');
-      result?.Items?.sort((a, b) => a.Text.toLowerCase() > b.Text.toLowerCase() ? 1 : -1)
+      result = supplierCategoryConfig.Filters.find(
+        (filter) => filter.Display === 'Service Category'
+      )
+      result?.Items?.sort((a, b) =>
+        a.Text.toLowerCase() > b.Text.toLowerCase() ? 1 : -1
+      )
     }
 
-    return result;
+    return result
   }
 
   makeSelection(event: any, field: string, index: number): void {
-    const newCategorySelection = this._categorySelections;
-    newCategorySelection[index][field] = event.target.value;
-    this.updateCategory(newCategorySelection);
+    const newCategorySelection = this._categorySelections
+    newCategorySelection[index][field] = event.target.value
+    this.updateCategory(newCategorySelection)
   }
 
   updateCategory(newCategorySelection: SupplierCategorySelection[]) {
-    this.updateCategoryValidation(newCategorySelection);
-    this.selectionsChanged.emit({ field: 'xp.Categories', value: newCategorySelection });
-    this._categorySelectionsControl.setValue(newCategorySelection);
+    this.updateCategoryValidation(newCategorySelection)
+    this.selectionsChanged.emit({
+      field: 'xp.Categories',
+      value: newCategorySelection,
+    })
+    this._categorySelectionsControl.setValue(newCategorySelection)
   }
 
-  updateCategoryValidation(newCategorySelection: SupplierCategorySelection[]): void {
-    this.areNoCategories = !newCategorySelection?.length;
-    this.canAddAnotherCategory = areAllCategoriesComplete(newCategorySelection);
+  updateCategoryValidation(
+    newCategorySelection: SupplierCategorySelection[]
+  ): void {
+    this.areNoCategories = !newCategorySelection?.length
+    this.canAddAnotherCategory = areAllCategoriesComplete(newCategorySelection)
   }
 }

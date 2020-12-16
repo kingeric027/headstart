@@ -82,13 +82,6 @@ namespace Marketplace.Common.Exceptions
         PatchGeneralError,
         GetGeneralError,
         AuthenticateSupplierError,
-        FreightPopAuthenticateError,
-        GetOrdersNeedingShipmentError,
-        GetShipmentSyncOrders,
-        GetShipmentDetailsForShipmentSyncOrders,
-        CreateShipmentsInOrderCloudIfNeeded,
-        GetFreightPopShipments,
         NoRelatedOrderCloudOrderFound,
-        ShipmentOrderIDParsingError
     }
 }

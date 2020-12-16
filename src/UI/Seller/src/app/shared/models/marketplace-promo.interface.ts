@@ -1,16 +1,17 @@
 export interface PromotionXp {
-  Type?: MarketplacePromoType;
-  Value?: number;
-  AppliesTo?: MarketplacePromoEligibility;
-  Supplier?: string;
-  Automatic?: boolean;
-  MinReq?: MarketplacePromoMinRequirement;
-  MaxShipCost?: number;
+  Type?: MarketplacePromoType
+  Value?: number
+  AppliesTo?: MarketplacePromoEligibility
+  SKUs?: string[]
+  Supplier?: string
+  Automatic?: boolean
+  MinReq?: MarketplacePromoMinRequirement
+  MaxShipCost?: number
 }
 
 export interface MarketplacePromoMinRequirement {
-  Type?: MinRequirementType;
-  Int?: number;
+  Type?: MinRequirementType
+  Int?: number
 }
 
 export enum MarketplacePromoType {
@@ -22,6 +23,7 @@ export enum MarketplacePromoType {
 export enum MarketplacePromoEligibility {
   EntireOrder = 'EntireOrder',
   SpecificSupplier = 'SpecificSupplier',
+  SpecificSKUs = 'SpecificSKUs',
 }
 
 export enum MinRequirementType {

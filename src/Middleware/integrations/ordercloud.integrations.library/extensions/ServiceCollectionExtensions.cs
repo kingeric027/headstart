@@ -36,13 +36,13 @@ namespace ordercloud.integrations.library
                 select new { iface, impl };
 
             foreach (var m in mappings)
-                services.AddTransient(m.iface, m.impl);
+                services.AddSingleton(m.iface, m.impl);
 
             return services;
         }
         public static IServiceCollection InjectOrderCloud<T>(this IServiceCollection services, OrderCloudClientConfig config)
         {
-            services.AddTransient<IOrderCloudClient>(provider => new OrderCloudClient(config));
+            services.AddSingleton<IOrderCloudClient>(provider => new OrderCloudClient(config));
             return services;
         }
 
@@ -54,7 +54,14 @@ namespace ordercloud.integrations.library
                 new ConnectionPolicy
                 {
                     ConnectionProtocol = Protocol.Tcp,
-                    ConnectionMode = ConnectionMode.Direct
+                    ConnectionMode = ConnectionMode.Direct,
+                    RequestTimeout = config.RequestTimeout,
+                    MaxConnectionLimit = config.MaxConnectionLimit,
+                    IdleTcpConnectionTimeout = config.IdleTcpConnectionTimeout,
+                    OpenTcpConnectionTimeout = config.OpenTcpConnectionTimeoutInSeconds,
+                    MaxTcpConnectionsPerEndpoint = config.MaxTcpConnectionsPerEndpoint,
+                    MaxRequestsPerTcpConnection = config.MaxRequestsPerTcpConnection,
+                    EnableTcpConnectionEndpointRediscovery = config.EnableTcpConnectionEndpointRediscovery
                 }, defaultCollectionThroughput: 400)
             {
                 UniqueKeyPolicy = new UniqueKeyPolicy()

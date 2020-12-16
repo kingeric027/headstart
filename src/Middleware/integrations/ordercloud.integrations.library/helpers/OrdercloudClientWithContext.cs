@@ -37,22 +37,5 @@ namespace ordercloud.integrations.library
                 ExpiresUtc = tokenExpiresUTC
             };
         }
-
-        // TODO - delete once a new OC SDK is published with MeUser.Seller.ID
-        public async Task<MeUserWithSellerID> GetMeWithSellerID(string token)
-        {
-                return await $"{Config.ApiUrl}/v1/me".WithOAuthBearerToken(token).GetJsonAsync<MeUserWithSellerID>();
-        }
-    }
-
-    // TODO - delete once a new OC SDK is published with MeUser.Seller.ID
-    public class MeUserWithSellerID : MeUser
-    {
-        public Seller Seller { get; set; }
-    }
-
-    public class Seller
-    {
-        public string ID { get; set; }
     }
 }

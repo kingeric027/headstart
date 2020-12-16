@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { FormGroup } from '@angular/forms'
 
 @Component({
   selector: 'reports-processing-component',
@@ -8,43 +8,45 @@ import { FormGroup } from '@angular/forms';
 })
 export class ReportsProcessingComponent {
   @Input()
-  selectedTemplateID: string;
+  selectedTemplateID: string
   @Input()
-  reportDownloading: boolean;
+  reportDownloading: boolean
   @Input()
-  fetchingPreview: boolean;
+  fetchingPreview: boolean
   @Input()
-  reportSelectionForm: FormGroup;
+  reportSelectionForm: FormGroup
   @Input()
-  adHocFilters: string[];
+  adHocFilters: string[]
   @Output()
-  handlePreviewReport = new EventEmitter<any>();
+  handlePreviewReport = new EventEmitter<any>()
   @Output()
-  handleDownloadReport = new EventEmitter<string>();
+  handleDownloadReport = new EventEmitter<string>()
 
   constructor() {}
 
   previewReport(selectedTemplateID: string): void {
-    const reportRequestBody = this.retrieveReportRequestBody(selectedTemplateID);
-    this.handlePreviewReport.emit(reportRequestBody);
+    const reportRequestBody = this.retrieveReportRequestBody(selectedTemplateID)
+    this.handlePreviewReport.emit(reportRequestBody)
   }
 
   downloadReport(selectedTemplateID: string): void {
-    const reportRequestBody = this.retrieveReportRequestBody(selectedTemplateID);
-    this.handleDownloadReport.emit(reportRequestBody);
+    const reportRequestBody = this.retrieveReportRequestBody(selectedTemplateID)
+    this.handleDownloadReport.emit(reportRequestBody)
   }
 
   retrieveReportRequestBody(selectedTemplateID: string): any {
-    let adHocFilterValues: any[] = [];
+    const filterDictionary = new Object()
     if (this.adHocFilters?.length) {
-      this.adHocFilters.forEach(filter => {
-        adHocFilterValues.push(this.reportSelectionForm.controls[filter].value);
-      });
+      this.adHocFilters.forEach((filter) => {
+        filterDictionary[filter] = this.reportSelectionForm.controls[
+          filter
+        ].value
+      })
     }
     const reportRequestBody = {
-      selectedTemplateID: selectedTemplateID,
-      adHocFilterValues: adHocFilterValues,
-    };
-    return reportRequestBody;
+      selectedTemplateID,
+      filterDictionary,
+    }
+    return reportRequestBody
   }
 }

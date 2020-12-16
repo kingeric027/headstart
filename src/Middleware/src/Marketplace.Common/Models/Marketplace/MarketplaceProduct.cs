@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models.Attributes;
 using Marketplace.Models.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using ordercloud.integrations.cms;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -81,6 +82,9 @@ namespace Marketplace.Models
 		[JsonConverter(typeof(StringEnumConverter))]
 		public CurrencySymbol? Currency { get; set; } = null;
         public bool? ArtworkRequired { get; set; } = false;
+        public bool PromotionEligible { get; set; }
+        public bool FreeShipping { get; set; }
+        public string FreeShippingMessage { get; set; }
     }
 
 	[JsonConverter(typeof(StringEnumConverter))]
@@ -91,33 +95,6 @@ namespace Marketplace.Models
 		PurchaseOrder,
         Kit
 	}
-
-    // measured in how many of the product fit in a 22x22x22 box
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum SizeTier
-    {
-        // ships alone
-        G,
-        
-        //2-5
-        A,
-
-        // 5-15
-        B,
-
-        //15-49
-        C,
-
-        //50-99
-        D,
-
-        // 100-999
-        E,
-
-        // 1000+
-        F
-
-    }
 
     [SwaggerModel]
     public class MarketplaceVariantXp

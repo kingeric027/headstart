@@ -44,7 +44,17 @@ namespace Marketplace.Common.Models
         //Only properties that are nested and being used as filters need to be setup here with their relative path and their full path.
         public static readonly Dictionary<string, string> NestedLocations = new Dictionary<string, string>
         {
-            { "OrderType", "xp.OrderType" }
+            { "OrderType", "xp.OrderType" },
+            { "Country", "xp.ShippingAddress.Country" }
         };
+    }
+
+    [SwaggerModel]
+    public class ReportAdHocFilters
+    {
+        public string LowDate { get; set; }
+        public string HighDate { get; set; }
+        public string LowTime { get; set; }
+        public string HighTime { get; set; }
     }
 }

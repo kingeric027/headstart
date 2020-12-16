@@ -1,28 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using Marketplace.Common.Extensions;
+using Marketplace.Common.Helpers;
+using Marketplace.Common.Services.CMS;
+using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models;
-using ordercloud.integrations.cms;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
+
 
 namespace Marketplace.Common.Commands.Crud
 {
 	public interface IMarketplaceProductCommand
 	{
-		Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user);
-		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user);
+		Task<SuperMarketplaceProduct> Get(string id, string token);
+		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, string token);
 		Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
-		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, VerifiedUserContext user);
-		Task Delete(string id, VerifiedUserContext user);
-		Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user);
-		Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user);
-		Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
-		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, VerifiedUserContext user);
-		Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user);
-		Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user);
+		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, string token);
+		Task Delete(string id, string token);
+		Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, string token);
+		Task DeletePricingOverride(string id, string buyerID, string token);
+		Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, string token);
+		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, string token);
+		Task<List<Asset>> GetProductImages(string productID, string token);
+		Task<List<Asset>> GetProductAttachments(string productID, string token);
+		Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user);
 	}
 
 	public class DefaultOptionSpecAssignment
@@ -33,23 +39,25 @@ namespace Marketplace.Common.Commands.Crud
 	public class MarketplaceProductCommand : IMarketplaceProductCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IAssetedResourceQuery _assetedResources;
-		private readonly IAssetQuery _assets;
-		public MarketplaceProductCommand(AppSettings settings, IAssetedResourceQuery assetedResources, IAssetQuery assets, IOrderCloudClient elevatedOc)
+		private readonly ICMSClient _cms;
+		private readonly AppSettings _settings;
+		private readonly ISupplierApiClientHelper _apiClientHelper;
+		public MarketplaceProductCommand(AppSettings settings, ICMSClient cms, IOrderCloudClient elevatedOc, ISupplierApiClientHelper apiClientHelper)
 		{
-			_assetedResources = assetedResources;
-			_assets = assets;
+			_cms = cms;
 			_oc = elevatedOc;
+			_settings = settings;
+			_apiClientHelper = apiClientHelper;
 		}
 
-		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, VerifiedUserContext user)
+		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, string token)
 		{
 			var priceScheduleID = $"{id}-{buyerID}";
 			var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(priceScheduleID);
 			return priceSchedule;
 		}
-		
-		public async Task DeletePricingOverride(string id, string buyerID, VerifiedUserContext user)
+
+		public async Task DeletePricingOverride(string id, string buyerID, string token)
 		{
 			/* must remove the price schedule from the visibility assignments
 			* deleting a price schedule with active visibility assignments removes the visbility
@@ -60,7 +68,7 @@ namespace Marketplace.Common.Commands.Crud
 			await _oc.PriceSchedules.DeleteAsync(priceScheduleID);
 		}
 
-		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, VerifiedUserContext user)
+		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, string token)
 		{
 			/* must add the price schedule to the visibility assignments */
 			var priceScheduleID = $"{id}-{buyerID}";
@@ -69,8 +77,8 @@ namespace Marketplace.Common.Commands.Crud
 			await AddPriceScheduleAssignmentToProductCatalogAssignments(id, buyerID, priceScheduleID);
 			return newPriceSchedule;
 		}
-		
-		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, VerifiedUserContext user)
+
+		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, string token)
 		{
 			var priceScheduleID = $"{id}-{buyerID}";
 			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(priceScheduleID, priceSchedule);
@@ -107,35 +115,35 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		public async Task<List<Asset>> GetProductImages(string productID, VerifiedUserContext user)
+		public async Task<List<Asset>> GetProductImages(string productID, string token)
 		{
-			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
+			var assets = await _cms.Assets.ListAssets(ResourceType.Products, productID, new ListArgsPageOnly() { PageSize = 100 }, token);
 			var images = assets.Items.Where(a => a.Type == AssetType.Image).ToList();
 			return images;
 		}
-		public async Task<List<Asset>> GetProductAttachments(string productID, VerifiedUserContext user)
+		public async Task<List<Asset>> GetProductAttachments(string productID, string token)
 		{
-			var assets = await _assetedResources.ListAssets(new Resource(ResourceType.Products, productID), new ListArgsPageOnly() { PageSize = 100 }, user);
-			var attachments = assets.Items.Where(a => a.Type == AssetType.Attachment).ToList();
+			var assets = await _cms.Assets.ListAssets(ResourceType.Products, productID, new ListArgsPageOnly() { PageSize = 100 }, token);
+			var attachments = assets.Items.Where(a => a.Title == "Product_Attachment").ToList();
 			return attachments;
 		}
 
-		public async Task<SuperMarketplaceProduct> Get(string id, VerifiedUserContext user)
+		public async Task<SuperMarketplaceProduct> Get(string id, string token)
 		{
-			var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, user.AccessToken);
+			var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, token);
 			// Get the price schedule, if it exists, if not - send empty price schedule
 			var _priceSchedule = new PriceSchedule();
 			try
-            {
-				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, user.AccessToken); 
-            } catch
-            {
+			{
+				_priceSchedule = await _oc.PriceSchedules.GetAsync<PriceSchedule>(_product.ID, token);
+			} catch
+			{
 				_priceSchedule = new PriceSchedule();
-            }
-			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, user.AccessToken);
-			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, user.AccessToken);
-			var _images = GetProductImages(id, user);
-			var _attachments =  GetProductAttachments(id, user);
+			}
+			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, token);
+			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, token);
+			var _images = GetProductImages(id, token);
+			var _attachments = GetProductAttachments(id, token);
 			try
 			{
 				return new SuperMarketplaceProduct
@@ -153,22 +161,24 @@ namespace Marketplace.Common.Commands.Crud
 			}
 		}
 
-		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, VerifiedUserContext user)
+		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, string token)
 		{
 			var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
 				filters: args.ToFilterString(),
 				search: args.Search,
+				searchType: SearchType.ExactPhrasePrefix,
+				sortBy: args.SortBy.FirstOrDefault(),
 				pageSize: args.PageSize,
 				page: args.Page,
-				accessToken: user.AccessToken);
+				accessToken: token);
 			var _superProductsList = new List<SuperMarketplaceProduct> { };
 			await Throttler.RunAsync(_productsList.Items, 100, 10, async product =>
 			{
-				var priceSchedule = _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, user.AccessToken);
-				var _specs = _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-				var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, user.AccessToken);
-				var _images = GetProductImages(product.ID, user);
-				var _attachments = GetProductAttachments(product.ID, user);
+				var priceSchedule = _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, token);
+				var _specs = _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, token);
+				var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, token);
+				var _images = GetProductImages(product.ID, token);
+				var _attachments = GetProductAttachments(product.ID, token);
 				_superProductsList.Add(new SuperMarketplaceProduct
 				{
 					Product = product,
@@ -207,14 +217,11 @@ namespace Marketplace.Common.Commands.Crud
 			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
 			// Create Price Schedule
 			PriceSchedule _priceSchedule = null;
-			// If the superProduct has a price schedule, create
-			if (superProduct.PriceSchedule != null)
-            {
-				superProduct.PriceSchedule.ID = superProduct.Product.ID;
-				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
-				superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
-            }
-        	// Create Product
+			//All products must have a price schedule for orders to be submitted.  The front end provides a default Price of $0 for quote products that don't have one.
+			superProduct.PriceSchedule.ID = superProduct.Product.ID;
+			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
+			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
 			var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
@@ -228,7 +235,7 @@ namespace Marketplace.Common.Commands.Crud
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
 				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
 			});
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
@@ -246,14 +253,16 @@ namespace Marketplace.Common.Commands.Crud
 			};
 		}
 
-		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, VerifiedUserContext user)
+		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, string token)
 		{
+			// Update the Product itself
+			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, token);
 			// Two spec lists to compare (requestSpecs and existingSpecs)
 			IList<Spec> requestSpecs = superProduct.Specs.ToList();
-			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: user.AccessToken)).Items.ToList();
+			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: token)).Items.ToList();
 			// Two variant lists to compare (requestVariants and existingVariants)
 			IList<MarketplaceVariant> requestVariants = superProduct.Variants;
-			IList<Variant> existingVariants = (await _oc.Products.ListVariantsAsync(id, pageSize: 100, accessToken: user.AccessToken)).Items.ToList();
+			IList<Variant> existingVariants = (await _oc.Products.ListVariantsAsync(id, pageSize: 100, accessToken: token)).Items.ToList();
 			// Calculate differences in specs - specs to add, and specs to delete
 			var specsToAdd = requestSpecs.Where(s => !existingSpecs.Any(s2 => s2.ID == s.ID)).ToList();
 			var specsToDelete = existingSpecs.Where(s => !requestSpecs.Any(s2 => s2.ID == s.ID)).ToList();
@@ -264,8 +273,8 @@ namespace Marketplace.Common.Commands.Crud
 				{
 					if (rSpec.ID == eSpec.ID)
 					{
-						await Throttler.RunAsync(rSpec.Options.Where(rso => !eSpec.Options.Any(eso => eso.ID == rso.ID)), 100, 5, o => _oc.Specs.CreateOptionAsync(rSpec.ID, o, accessToken: user.AccessToken));
-						await Throttler.RunAsync(eSpec.Options.Where(eso => !rSpec.Options.Any(rso => rso.ID == eso.ID)), 100, 5, o => _oc.Specs.DeleteOptionAsync(rSpec.ID, o.ID, accessToken: user.AccessToken));
+						await Throttler.RunAsync(rSpec.Options.Where(rso => !eSpec.Options.Any(eso => eso.ID == rso.ID)), 100, 5, o => _oc.Specs.CreateOptionAsync(rSpec.ID, o, accessToken: token));
+						await Throttler.RunAsync(eSpec.Options.Where(eso => !rSpec.Options.Any(rso => rso.ID == eso.ID)), 100, 5, o => _oc.Specs.DeleteOptionAsync(rSpec.ID, o.ID, accessToken: token));
 					}
 				};
 			};
@@ -275,50 +284,58 @@ namespace Marketplace.Common.Commands.Crud
 			{
 				defaultSpecOptions.Add(new DefaultOptionSpecAssignment { SpecID = s.ID, OptionID = s.DefaultOptionID });
 				s.DefaultOptionID = null;
-				return _oc.Specs.SaveAsync<Spec>(s.ID, s, accessToken: user.AccessToken);
+				return _oc.Specs.SaveAsync<Spec>(s.ID, s, accessToken: token);
 			});
-			await Throttler.RunAsync(specsToDelete, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken));
+			await Throttler.RunAsync(specsToDelete, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: token));
 			// Add spec options for new specs
 			foreach (var spec in specsToAdd)
 			{
-				await Throttler.RunAsync(spec.Options, 100, 5, o => _oc.Specs.CreateOptionAsync(spec.ID, o, accessToken: user.AccessToken));
+				await Throttler.RunAsync(spec.Options, 100, 5, o => _oc.Specs.CreateOptionAsync(spec.ID, o, accessToken: token));
 			}
 			// Patch Specs with requested DefaultOptionID
-			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: user.AccessToken));
+			await Throttler.RunAsync(defaultSpecOptions, 100, 10, a => _oc.Specs.PatchAsync(a.SpecID, new PartialSpec { DefaultOptionID = a.OptionID }, accessToken: token));
 			// Make assignments for the new specs
-			await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = s.ID }, accessToken: user.AccessToken));
+			await Throttler.RunAsync(specsToAdd, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = id, SpecID = s.ID }, accessToken: token));
+			HandleSpecOptionChanges(requestSpecs, existingSpecs, token);
 			// Check if Variants differ
 			var variantsAdded = requestVariants.Any(v => !existingVariants.Any(v2 => v2.ID == v.ID));
 			var variantsRemoved = existingVariants.Any(v => !requestVariants.Any(v2 => v2.ID == v.ID));
+			bool hasVariantChange = false;
+
+			foreach(Variant variant in requestVariants)
+            {
+				var currVariant = existingVariants.Where(v => v.ID == variant.ID);
+				if (currVariant == null || currVariant.Count() < 1) { continue; }
+				hasVariantChange = HasVariantChange(variant, currVariant.First());
+				if (hasVariantChange) { break; }
+            }
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.
-			if (variantsAdded || variantsRemoved || requestVariants.Any(v => v.xp.NewID != null))
+			if (variantsAdded || variantsRemoved || hasVariantChange || requestVariants.Any(v => v.xp.NewID != null))
 			{
 				// Re-generate Variants
-				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: user.AccessToken);
+				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: token);
 				// Patch NEW variants with the User Specified ID (Name,ID), and correct xp values (SKU)
 				await Throttler.RunAsync(superProduct.Variants, 100, 5, v =>
 				{
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
-					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp }, accessToken: user.AccessToken);
+					return _oc.Products.PatchVariantAsync(id, $"{superProduct.Product.ID}-{v.xp.SpecCombo}", new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Active = v.Active, Inventory = v.Inventory }, accessToken: token);
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
 			PriceSchedule _priceSchedule = null;
 			if (superProduct.PriceSchedule != null)
-            {
-				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, user.AccessToken);
-            }
-			// Update the Product itself
-			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, user.AccessToken);
+			{
+				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, token);
+			}
 			// List Variants
-			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: user.AccessToken);
+			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: token);
 			// List Product Specs
-			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
+			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: token);
 			// List Product Images
-			var _images = await GetProductImages(_updatedProduct.ID, user);
+			var _images = await GetProductImages(_updatedProduct.ID, token);
 			// List Product Attachments
-			var _attachments = await GetProductAttachments(_updatedProduct.ID, user);
+			var _attachments = await GetProductAttachments(_updatedProduct.ID, token);
 			return new SuperMarketplaceProduct
 			{
 				Product = _updatedProduct,
@@ -330,21 +347,120 @@ namespace Marketplace.Common.Commands.Crud
 			};
 		}
 
-		public async Task Delete(string id, VerifiedUserContext user)
+        private bool HasVariantChange(Variant variant, Variant currVariant)
+        {
+            if (variant.Active != currVariant.Active) { return true; }
+			if (variant.Description != currVariant.Description) { return true; }
+			if (variant.Name != currVariant.Name) { return true; }
+			if (variant.ShipHeight != currVariant.ShipHeight) { return true; }
+			if (variant.ShipLength != currVariant.ShipLength) { return true; }
+			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
+			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
+			if (variant.Inventory != currVariant.Inventory) { return true; }
+
+			return false;
+		}
+
+		private async void HandleSpecOptionChanges(IList<Spec> requestSpecs, IList<Spec> existingSpecs, string token)
+        {
+			var requestSpecOptions = new Dictionary<string, List<SpecOption>>();
+			var existingSpecOptions = new List<SpecOption>();
+			foreach (Spec requestSpec in requestSpecs)
+			{
+				List<SpecOption> specOpts = new List<SpecOption>();
+				foreach (SpecOption requestSpecOption in requestSpec.Options)
+				{
+					specOpts.Add(requestSpecOption);
+				}
+				requestSpecOptions.Add(requestSpec.ID, specOpts);
+			}
+			foreach (Spec existingSpec in existingSpecs)
+            {
+				foreach (SpecOption existingSpecOption in existingSpec.Options)
+                {
+					existingSpecOptions.Add(existingSpecOption);
+				}
+            }
+			foreach (var spec in requestSpecOptions)
+			{
+				IList<SpecOption> changedSpecOptions = ChangedSpecOptions(spec.Value, existingSpecOptions);
+				await Throttler.RunAsync(changedSpecOptions, 100, 5, option => _oc.Specs.SaveOptionAsync(spec.Key, option.ID, option, token));
+			}
+		}
+
+        private IList<SpecOption> ChangedSpecOptions(List<SpecOption> requestOptions, List<SpecOption> existingOptions)
+        {
+            return requestOptions.FindAll(requestOption => OptionHasChanges(requestOption, existingOptions));
+        }
+
+        private bool OptionHasChanges(SpecOption requestOption, List<SpecOption> currentOptions)
+        {
+			var matchingOption = currentOptions.Find(currentOption => currentOption.ID == requestOption.ID);
+			if (matchingOption == null) { return false; };
+			if (matchingOption.PriceMarkup != requestOption.PriceMarkup) { return true; };
+			if (matchingOption.IsOpenText != requestOption.IsOpenText) { return true; };
+			if (matchingOption.ListOrder != requestOption.ListOrder) { return true; };
+			if (matchingOption.PriceMarkupType != requestOption.PriceMarkupType) { return true; };
+
+			return false;
+        }
+
+        public async Task Delete(string id, string token)
 		{
 			var product = await _oc.Products.GetAsync(id); // This is temporary to accommodate bad data where product.ID != product.DefaultPriceScheduleID
-			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: user.AccessToken);
-			var _images = await GetProductImages(id, user);
-			var _attachments = await GetProductAttachments(id, user);
+			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: token);
+			var _images = await GetProductImages(id, token);
+			var _attachments = await GetProductAttachments(id, token);
 			// Delete specs images and attachments associated with the requested product
 			await Task.WhenAll(
 				_oc.PriceSchedules.DeleteAsync(product.DefaultPriceScheduleID),
-				Throttler.RunAsync(_images, 100, 5, i => _assets.Delete(i.ID, user)),
-				Throttler.RunAsync(_attachments, 100, 5, i => _assets.Delete(i.ID, user)),
-				Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: user.AccessToken)),
-				_oc.Products.DeleteAsync(id, user.AccessToken)
+				Throttler.RunAsync(_images, 100, 5, i => _cms.Assets.Delete(i.ID, token)),
+				Throttler.RunAsync(_attachments, 100, 5, i => _cms.Assets.Delete(i.ID, token)),
+				Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: token)),
+				_oc.Products.DeleteAsync(id, token)
 			);
 		}
+
+		public async Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user)
+		{
+			
+			ApiClient supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
+			if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}"); }
+			var configToUse = new OrderCloudClientConfig
+			{
+				ApiUrl = user.ApiUrl,
+				AuthUrl = user.AuthUrl,
+				ClientId = supplierClient.ID,
+				ClientSecret = supplierClient.ClientSecret,
+				GrantType = GrantType.ClientCredentials,
+				Roles = new[]
+						   {
+								 ApiRole.SupplierAdmin,
+								 ApiRole.ProductAdmin
+							},
+
+			};
+			var ocClient = new OrderCloudClient(configToUse);
+			await ocClient.AuthenticateAsync();
+			var token = ocClient.TokenResponse.AccessToken;
+
+			//Format the facet data to change for request body
+			var facetDataFormatted = new ExpandoObject();
+			var facetDataFormattedCollection = (ICollection<KeyValuePair<string, object>>) facetDataFormatted;
+			foreach (var kvp in facets)
+            {
+				facetDataFormattedCollection.Add(kvp);
+            }
+			dynamic facetDataFormattedDynamic = facetDataFormatted;
+
+			//Update the product with a supplier token
+			var updatedProduct = await ocClient.Products.PatchAsync(
+				id,
+				new PartialProduct() {  xp = new { Facets = facetDataFormattedDynamic }},
+				accessToken: token
+				);
+            return updatedProduct;
+        }
 
 		private async Task<string> GetSupplierNameForXpFacet(string supplierID, string accessToken)
 		{

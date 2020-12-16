@@ -1,8 +1,8 @@
 // angular
-import { NgModule, ModuleWithProviders } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgModule, ModuleWithProviders } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { HttpClientModule } from '@angular/common/http'
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import {
   NgbPaginationModule,
   NgbTabsetModule,
@@ -12,48 +12,53 @@ import {
   NgbDatepickerModule,
   NgbTooltipModule,
   NgbProgressbarModule,
-} from '@ng-bootstrap/ng-bootstrap';
+  NgbCollapseModule,
+} from '@ng-bootstrap/ng-bootstrap'
 
 // 3rd party UI
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 
-import { SharedRoutingModule } from '@app-seller/shared/shared-routing.module';
-import { SearchComponent } from '@app-seller/shared/components/search/search.component';
-import { SortColumnComponent } from '@app-seller/shared/components/sort-column/sort-column.component';
-import { CarouselSlideDisplayComponent } from '@app-seller/shared/components/carousel-slide-display/carousel-slide-display.component';
-import { UserFormComponent } from '@app-seller/shared/components/user-form/user-form.component';
-import { AddressFormComponent } from '@app-seller/shared/components/address-form/address-form.component';
-import { CategoryFormComponent } from './components/category-form/category-form.component';
-import { CategoryDetailsComponent } from './components/category-details/category-details.component';
-import { AddressSuggestionComponent } from './components/address-suggestion/address-suggestion.component';
-import { ProductImagesComponent } from './components/product-images/product-images.component';
-import { ProductFormComponent } from './components/products-form/product-form.component';
-import { ResourceTableComponent } from './components/resource-table/resource-table.component';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component';
-import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component';
-import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component';
-import { ReturnForm } from './components/return-form/return-form.component';
-import { ResourceEditComponent } from './components/resource-edit/resource-edit.component';
-import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component';
-import { QuillModule } from 'ngx-quill';
-import { ReactiveQuillComponent } from './components/reactive-quill-editor/reactive-quill-editor.component';
-import { FormControlErrorDirective } from './directives/form-control-errors.directive';
-import { RequestStatus } from './components/request-status/request-status.component';
-import { DragDirective } from './directives/dragDrop.directive';
-import { ConfirmModal } from './components/confirm-modal/confirm-modal.component';
-import { PhoneFormatPipe } from './pipes/phone-format.pipe';
-import { YesNoFormatPipe } from './pipes/yes-no-format.pipe';
-import { SafeHTMLPipe } from './pipes/safe-html.pipe';
-import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component';
-import { LocationIDInputDirective } from './directives/location-id-input.directive';
-import { ActionMenuComponent } from './components/action-menu/action-menu.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { CmsAdminModule } from '@ordercloud/angular-cms-components';
-import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component';
-import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component';
-import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component';
-import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component';
+import { SharedRoutingModule } from '@app-seller/shared/shared-routing.module'
+import { SearchComponent } from '@app-seller/shared/components/search/search.component'
+import { SortColumnComponent } from '@app-seller/shared/components/sort-column/sort-column.component'
+import { CarouselSlideDisplayComponent } from '@app-seller/shared/components/carousel-slide-display/carousel-slide-display.component'
+import { UserFormComponent } from '@app-seller/shared/components/user-form/user-form.component'
+import { AddressFormComponent } from '@app-seller/shared/components/address-form/address-form.component'
+import { CategoryFormComponent } from './components/category-form/category-form.component'
+import { CategoryDetailsComponent } from './components/category-details/category-details.component'
+import { AddressSuggestionComponent } from './components/address-suggestion/address-suggestion.component'
+import { ProductImagesComponent } from './components/product-images/product-images.component'
+import { ProductFormComponent } from './components/products-form/product-form.component'
+import { ResourceTableComponent } from './components/resource-table/resource-table.component'
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar'
+import { ResourceSelectDropdown } from './components/resource-select-dropdown/resource-select-dropdown.component'
+import { SummaryResourceDisplay } from './components/summary-resource-display/summary-resource-display.component'
+import { DeleteConfirmModal } from './components/delete-confirm-modal/delete-confirm-modal.component'
+import { ReturnForm } from './components/return-form/return-form.component'
+import { ResourceEditComponent } from './components/resource-edit/resource-edit.component'
+import { FullResourceTableComponent } from './components/full-resource-table/full-resource-table.component'
+import { QuillModule } from 'ngx-quill'
+import { ReactiveQuillComponent } from './components/reactive-quill-editor/reactive-quill-editor.component'
+import { FormControlErrorDirective } from './directives/form-control-errors.directive'
+import { RequestStatus } from './components/request-status/request-status.component'
+import { DragDirective } from './directives/dragDrop.directive'
+import { ConfirmModal } from './components/confirm-modal/confirm-modal.component'
+import { PhoneFormatPipe } from './pipes/phone-format.pipe'
+import { YesNoFormatPipe } from './pipes/yes-no-format.pipe'
+import { SafeHTMLPipe } from './pipes/safe-html.pipe'
+import { UserGroupAssignments } from './components/user-group-assignments/user-group-assignments.component'
+import { LocationIDInputDirective } from './directives/location-id-input.directive'
+import { ActionMenuComponent } from './components/action-menu/action-menu.component'
+import { TranslateModule } from '@ngx-translate/core'
+import { CmsAdminModule } from '@ordercloud/angular-cms-components'
+import { ResourceBreadcrumbsComponent } from './components/resource-breadcrumbs/resource-breadcrumbs.component'
+import { ProductVisibilityAssignments } from './components/buyer-visibility/product-visibility-assignments/product-visibility-assignments.component'
+import { BuyerVisibilityConfiguration } from './components/buyer-visibility/buyer-visibility-configuration/buyer-visibility-configuration.component'
+import { ProductCategoryAssignment } from './components/buyer-visibility/product-category-assignment/product-category-assignment.component'
+import { VariablePrintConfiguration } from './components/buyer-visibility/variable-print-configuration/variable-print-configuration.component'
+import { ChiliPublishConfiguration } from './components/buyer-visibility/chili-publish-configuration/chili-publish-configuration.componant'
+import { ResourceListMeta } from './components/resource-list-meta/resource-list-meta.component'
+import { ProductNameWithSpecsPipe } from './pipes/product-name-with-specs.pipe'
 
 @NgModule({
   imports: [
@@ -75,6 +80,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     NgbDatepickerModule,
     NgbTooltipModule,
     NgbProgressbarModule,
+    NgbCollapseModule,
 
     // Quill
     QuillModule.forRoot(),
@@ -94,6 +100,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     NgbTabsetModule,
     NgbDropdownModule,
     NgbProgressbarModule,
+    NgbCollapseModule,
 
     // OrderCloud CMS Components
     CmsAdminModule,
@@ -124,6 +131,7 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     PhoneFormatPipe,
     YesNoFormatPipe,
     SafeHTMLPipe,
+    ProductNameWithSpecsPipe,
     ActionMenuComponent,
     ConfirmModal,
     UserGroupAssignments,
@@ -132,6 +140,9 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
+    VariablePrintConfiguration,
+    ChiliPublishConfiguration,
+    ResourceListMeta,
   ],
   declarations: [
     SearchComponent,
@@ -162,11 +173,15 @@ import { ProductCategoryAssignment } from './components/buyer-visibility/product
     ProductVisibilityAssignments,
     BuyerVisibilityConfiguration,
     ProductCategoryAssignment,
+    VariablePrintConfiguration,
+    ChiliPublishConfiguration,
+    ResourceListMeta,
     // Pipes
     PhoneFormatPipe,
     YesNoFormatPipe,
     ResourceBreadcrumbsComponent,
     SafeHTMLPipe,
+    ProductNameWithSpecsPipe,
   ],
 })
 export class SharedModule {
@@ -174,6 +189,6 @@ export class SharedModule {
     return {
       ngModule: SharedModule,
       providers: [],
-    };
+    }
   }
 }

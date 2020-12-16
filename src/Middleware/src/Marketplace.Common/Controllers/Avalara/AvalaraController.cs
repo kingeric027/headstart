@@ -53,24 +53,24 @@ namespace Marketplace.Common.Controllers.Avalara
 		}
 
 		[DocName("Get tax exeption certificate details")]
-		[HttpGet, Route("{companyID}/certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<TaxCertificate> GetCertificate(int companyID, string locationID)
+		[HttpGet, Route("certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<TaxCertificate> GetCertificate(string locationID)
 		{
-			return await _resaleCertCommand.GetAsync(companyID, locationID, VerifiedUserContext);
+			return await _resaleCertCommand.GetAsync(locationID, VerifiedUserContext);
 		}
 
 		[DocName("Create tax exeption certificate")]
-		[HttpPost, Route("{companyID}/certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<TaxCertificate> CreateCertificate(int companyID, string locationID, [FromBody] TaxCertificate cert)
+		[HttpPost, Route("certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<TaxCertificate> CreateCertificate(string locationID, [FromBody] TaxCertificate cert)
 		{
-			return await _resaleCertCommand.CreateAsync(companyID, locationID, cert, VerifiedUserContext);
+			return await _resaleCertCommand.CreateAsync(locationID, cert, VerifiedUserContext);
 		}
 
 		[DocName("Update tax exeption certificate")]
-		[HttpPut, Route("{companyID}/certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<TaxCertificate> UpdateCertificate(int companyID, string locationID, [FromBody] TaxCertificate cert)
+		[HttpPut, Route("certificate/{locationID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		public async Task<TaxCertificate> UpdateCertificate(string locationID, [FromBody] TaxCertificate cert)
 		{
-			return await _resaleCertCommand.UpdateAsync(companyID, locationID, cert, VerifiedUserContext);
+			return await _resaleCertCommand.UpdateAsync(locationID, cert, VerifiedUserContext);
 		}
 	}
 }

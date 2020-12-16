@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 using Marketplace.Models.Misc;
 using ordercloud.integrations.library;
 using System.Linq;
+using System.Dynamic;
+using System;
+using Marketplace.Common.Services.CMS;
 
 namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceBuyerCommand
     {
-        Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, string token);
+        Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false);
         Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null);
         Task<SuperMarketplaceBuyer> Update(string buyerID, SuperMarketplaceBuyer buyer, string token);
     }
@@ -23,10 +26,10 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = oc;
         }
-        public async Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer superBuyer, string token)
+        public async Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer superBuyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
-            var createdBuyer = await CreateBuyerAndRelatedFunctionalResources(superBuyer.Buyer, token);
-            var createdMarkup = await CreateMarkup(superBuyer.Markup, createdBuyer.ID, token);
+            var createdBuyer = await CreateBuyerAndRelatedFunctionalResources(superBuyer.Buyer, user, isSeedingEnvironment);
+            var createdMarkup = await CreateMarkup(superBuyer.Markup, createdBuyer.ID, user.AccessToken);
             return new SuperMarketplaceBuyer()
             {
                 Buyer = createdBuyer,
@@ -67,11 +70,12 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        public async Task<MarketplaceBuyer> CreateBuyerAndRelatedFunctionalResources(MarketplaceBuyer buyer, string token)
+        public async Task<MarketplaceBuyer> CreateBuyerAndRelatedFunctionalResources(MarketplaceBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
+            var token = isSeedingEnvironment ? user.AccessToken : null;
             buyer.ID = "{buyerIncrementor}";
             buyer.Active = true;
-            var ocBuyer = await _oc.Buyers.CreateAsync(buyer, token);
+            var ocBuyer = await _oc.Buyers.CreateAsync(buyer, user.AccessToken);
             buyer.ID = ocBuyer.ID;
             var ocBuyerID = ocBuyer.ID;
 
@@ -80,10 +84,10 @@ namespace Marketplace.Common.Commands
             {
                 BuyerID = ocBuyerID,
                 SecurityProfileID = CustomRole.MPBaseBuyer.ToString()
-            });
+            }, token);
 
             // list message senders
-            var msList = await _oc.MessageSenders.ListAsync();
+            var msList = await _oc.MessageSenders.ListAsync(accessToken: token);
             // create message sender assignment
             var assignmentList = msList.Items.Select(ms =>
             {
@@ -93,10 +97,10 @@ namespace Marketplace.Common.Commands
                     BuyerID = ocBuyerID
                 };
             });
-            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a));
+            await Throttler.RunAsync(assignmentList, 100, 5, a => _oc.MessageSenders.SaveAssignmentAsync(a, token));
 
-            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" });
-            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" });
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-UserIncrementor", LastNumber = 0, LeftPaddingCount = 5, Name = "User Incrementor" }, token);
+            await _oc.Incrementors.CreateAsync(new Incrementor { ID = $"{ocBuyerID}-LocationIncrementor", LastNumber = 0, LeftPaddingCount = 4, Name = "Location Incrementor" }, token);
 
             await _oc.Catalogs.SaveAssignmentAsync(new CatalogAssignment()
             {
@@ -104,14 +108,14 @@ namespace Marketplace.Common.Commands
                 CatalogID = ocBuyer.ID,
                 ViewAllCategories = true,
                 ViewAllProducts = false
-            });
+            }, token);
             return buyer;
         }
 
         private async Task<BuyerMarkup> CreateMarkup(BuyerMarkup markup, string buyerID, string token)
         {
             // to move from xp to contentdocs, that logic will go here instead of a patch
-            var updatedBuyer = await _oc.Buyers.PatchAsync(buyerID, new PartialBuyer() { xp = new { MarkupPercent = markup.Percent } });
+            var updatedBuyer = await _oc.Buyers.PatchAsync(buyerID, new PartialBuyer() { xp = new { MarkupPercent = markup.Percent } }, token);
             return new BuyerMarkup()
             {
                 Percent = (int)updatedBuyer.xp.MarkupPercent

@@ -1,5 +1,5 @@
 module.exports = {
 	apiKey: process.env.APLITOOLS_API_KEY,
-	batchName: 'Headstart Buyer',
+	batchName: 'Headstart',
 	concurrency: 5,
 }
