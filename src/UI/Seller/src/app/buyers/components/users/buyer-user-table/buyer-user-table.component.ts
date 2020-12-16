@@ -16,6 +16,7 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
 
   constructor(
     private buyerUserService: BuyerUserService,
+    private buyerService: BuyerService, //used in <resource-table-component/>
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedroute: ActivatedRoute,
