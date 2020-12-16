@@ -111,9 +111,6 @@
                 <h6>
                   <span
                     >{{ li | productNameWithSpecs }}
-                    <span *ngIf="li.Variant?.xp?.SpecCombo"
-                      >({{ li.Variant.xp.SpecCombo }})</span
-                    >
                   </span>
                   <small class="text-muted d-block">{{
                     li.Variant?.ID || li.Product.ID
