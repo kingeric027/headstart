@@ -45,6 +45,7 @@ import {
 } from '@app-seller/orders/line-item-status.helper'
 import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { flatten as _flatten } from 'lodash'
 
 @Component({
   selector: 'app-order-shipments',
@@ -202,10 +203,38 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   async getLineItems(orderID: string): Promise<void> {
+    let lineItems: MarketplaceLineItem[] = []
+    const listOptions = {
+      page: 1,
+      pageSize: 20,
+    }
     const lineItemsResponse = await this.ocLineItemService
-      .List(this.orderDirection, orderID)
+      .List(this.orderDirection, orderID, listOptions)
       .toPromise()
-    this.lineItems = lineItemsResponse.Items as MarketplaceLineItem[]
+    lineItems = [
+      ...lineItems,
+      ...(lineItemsResponse.Items as MarketplaceLineItem[]),
+    ]
+    if (lineItemsResponse.Meta.TotalPages <= 1) {
+      this.lineItems = lineItems
+    } else {
+      let lineItemRequests = []
+      for (let page = 2; page <= lineItemsResponse.Meta.TotalPages; page++) {
+        listOptions.page = page
+        lineItemRequests = [
+          ...lineItemRequests,
+          this.ocLineItemService
+            .List(this.orderDirection, orderID, listOptions)
+            .toPromise(),
+        ]
+      }
+      console.log('line item requests', lineItemRequests)
+      return await Promise.all(lineItemRequests).then((response) => {
+        lineItems = [...lineItems, ..._flatten(response.map((r) => r.Items))]
+        console.log('line items', lineItems)
+        this.lineItems = lineItems
+      })
+    }
   }
 
   async patchLineItems(): Promise<void> {
@@ -356,6 +385,7 @@ export class OrderShipmentsComponent implements OnChanges {
         httpOptions
       )
       .toPromise()
+    console.log('posted shipment', postedShipment)
     this.isSaving = false
     this.createOrViewShipmentEvent.emit(false)
     this.shipmentCreated.emit()
