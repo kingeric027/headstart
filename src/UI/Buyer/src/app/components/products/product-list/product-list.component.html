@@ -125,7 +125,9 @@
         [rows]="4"
       >
       </ocm-loading-layout>
-      <div *ngIf="products && products.Items.length > 0">
+      <div
+        *ngIf="!isProductListLoading && products && products.Items.length > 0"
+      >
         <div class="row align-items-stretch">
           <ocm-product-card
             *ngFor="let product of products.Items; let i = index"

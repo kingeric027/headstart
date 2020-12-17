@@ -13,7 +13,7 @@ import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { getPsHeight } from '@app-seller/shared/services/dom.helper'
 import { BatchProcessResult } from './shipment-upload.interface'
 import { NgxSpinnerService } from 'ngx-spinner'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Component({
   selector: 'upload-shipments',

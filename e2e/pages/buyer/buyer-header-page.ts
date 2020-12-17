@@ -109,6 +109,10 @@ class BuyerHeaderPage {
 		await loadingHelper.waitForLoadingBar()
 	}
 
+	async clearSearchText() {
+		await t.click(this.searchBar).pressKey('ctrl+a delete')
+	}
+
 	async clickCartButton() {
 		await t.click(this.cartButton)
 	}

@@ -21,7 +21,7 @@ import {
   OrderCloudUserType,
 } from '@app-seller/shared/models/ordercloud-user.types'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 export const TokenRefreshAttemptNotPossible =
   'Token refresh attempt not possible'

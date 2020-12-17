@@ -37,7 +37,7 @@ import { AppAuthService } from '@app-seller/auth'
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import { BehaviorSubject } from 'rxjs'
 import { Products } from 'ordercloud-javascript-sdk'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Component({
   selector: 'product-variations-component',

@@ -9,10 +9,10 @@ export const environment: Environment = {
   marketplaceID: 'DEMO_TEST',
   baseUrl: 'https://headstartdemo-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://headstartdemo-middleware-test.azurewebsites.net',
-  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net', 
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
-  instrumentationKey: '731925bd-018c-447e-8ba5-06b432d708c8',
+  instrumentationKey: '4133d3cf-ae7a-43d1-a16b-172aee7cff6f',
   translateBlobUrl:
     'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',
   sellerID: 'Headstart_Demo_Test',

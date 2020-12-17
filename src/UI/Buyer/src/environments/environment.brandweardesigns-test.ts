@@ -9,10 +9,10 @@ export const environment: Environment = {
   marketplaceID: 'BW_TEST',
   baseUrl: 'https://brandweardesigns-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://brandweardesigns-middleware-test.azurewebsites.net',
-  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
-  instrumentationKey: '0b1879d3-d708-49cb-bd48-7363be74a837',
+  instrumentationKey: '4133d3cf-ae7a-43d1-a16b-172aee7cff6f',
   translateBlobUrl:
     'https://stbrandweartest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'BRANDWEARDESIGNS_TEST',

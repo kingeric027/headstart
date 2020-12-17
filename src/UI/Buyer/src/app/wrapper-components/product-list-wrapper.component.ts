@@ -37,6 +37,7 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
       try {
         this.products = await this.context.productFilters.listProducts()
       } finally {
+        window.scroll(0, 0)
         this.isProductListLoading = false
       }
     } else {

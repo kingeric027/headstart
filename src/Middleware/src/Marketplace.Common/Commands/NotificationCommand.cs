@@ -45,14 +45,29 @@ namespace Marketplace.Common.Commands
             document.Doc = notification;
             document.ID = CosmosInteropID.New();
             // Create notifictaion in the cms
-            await _cms.Documents.Create("MonitoredProductFieldModifiedNotification", document, user.AccessToken);
+            await _cms.Documents.Create("MonitoredProductFieldModifiedNotification", document, await GetAdminToken());
             // Assign the notification to the product
-            await _cms.Documents.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user.AccessToken);
+            // TODO: this doesn't work because need to own thing being assigned to AND have DocumentAdmin and we don't want to give suppliers DocumentAdmin
+            // await _cms.Documents.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user.AccessToken);
             return await _productCommand.Get(_product.ID, user.AccessToken);
         }
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
-            var product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+            MarketplaceProduct product = null;
+            try
+            {
+                product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+
+            }
+            catch (OrderCloudException ex)
+            {
+                //Product was deleted after it was updated. Delete orphaned notification 
+               if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
+                {
+                    await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                    return new SuperMarketplaceProduct();
+                }
+            }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
                 var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
@@ -76,11 +91,28 @@ namespace Marketplace.Common.Commands
                 await ocClient.AuthenticateAsync();
                 var token = ocClient.TokenResponse.AccessToken;
                 product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, token);
+
+                //Delete document after acceptance
+                await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
             }
-            await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+            else
+            {
+                await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+            }
             var superProduct = await _productCommand.Get(productID, user.AccessToken);
             superProduct.Product = product;
             return superProduct;
+        }
+
+        private async Task<string> GetAdminToken()
+        {
+            var adminOcToken = _oc.TokenResponse?.AccessToken;
+            if (adminOcToken == null || DateTime.UtcNow > _oc.TokenResponse.ExpiresUtc)
+            {
+                await _oc.AuthenticateAsync();
+                adminOcToken = _oc.TokenResponse.AccessToken;
+            }
+            return adminOcToken;
         }
     }
 }

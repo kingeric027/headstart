@@ -196,14 +196,14 @@
   <span
     placement="right"
     [ngbTooltip]="
-      !termsAccepted ? 'You must accept the PO terms before continuing' : ''
+      !_termsAccepted ? 'You must accept the PO terms before continuing' : ''
     "
     [openDelay]="200"
   >
     <button
       type="submit"
       class="btn btn-sm btn-secondary mt-2"
-      [disabled]="!cardForm.valid || !termsAccepted"
+      [disabled]="!cardForm.valid || !_termsAccepted"
     >
       {{ submitText }}
     </button>

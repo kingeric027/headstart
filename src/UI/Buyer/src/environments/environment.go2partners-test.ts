@@ -9,10 +9,10 @@ export const environment: Environment = {
   marketplaceID: 'GO2_TEST',
   baseUrl: 'https://go2partners-buyer-ui-test.azurewebsites.net/',
   middlewareUrl: 'https://go2partners-middleware-test.azurewebsites.net',
-  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
   creditCardIframeUrl:
     'https://fts-uat.cardconnect.com/itoke/ajax-tokenizer.html',
-  instrumentationKey: '38f23bfa-b9af-4670-8441-4376ced20620',
+  instrumentationKey: '4133d3cf-ae7a-43d1-a16b-172aee7cff6f',
   translateBlobUrl:
     'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',
   sellerID: 'GO2PARTNERS_TEST',
