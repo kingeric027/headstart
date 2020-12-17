@@ -45,9 +45,10 @@ namespace Marketplace.Common.Commands
             document.Doc = notification;
             document.ID = CosmosInteropID.New();
             // Create notifictaion in the cms
-            await _cms.Documents.Create("MonitoredProductFieldModifiedNotification", document, user.AccessToken);
+            await _cms.Documents.Create("MonitoredProductFieldModifiedNotification", document, await GetAdminToken());
             // Assign the notification to the product
-            await _cms.Documents.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user.AccessToken);
+            // TODO: this doesn't work because need to own thing being assigned to AND have DocumentAdmin and we don't want to give suppliers DocumentAdmin
+            // await _cms.Documents.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user.AccessToken);
             return await _productCommand.Get(_product.ID, user.AccessToken);
         }
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
@@ -101,6 +102,17 @@ namespace Marketplace.Common.Commands
             var superProduct = await _productCommand.Get(productID, user.AccessToken);
             superProduct.Product = product;
             return superProduct;
+        }
+
+        private async Task<string> GetAdminToken()
+        {
+            var adminOcToken = _oc.TokenResponse?.AccessToken;
+            if (adminOcToken == null || DateTime.UtcNow > _oc.TokenResponse.ExpiresUtc)
+            {
+                await _oc.AuthenticateAsync();
+                adminOcToken = _oc.TokenResponse.AccessToken;
+            }
+            return adminOcToken;
         }
     }
 }
