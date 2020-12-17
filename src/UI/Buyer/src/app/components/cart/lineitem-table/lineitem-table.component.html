@@ -498,21 +498,21 @@
               </div>
             </div>
           </div>
+          <div class="col-sm-12 mt-3">
+            <textarea
+              *ngIf="!readOnly || li?.xp?.SupplierComments"
+              [attr.readonly]="readOnly || isQtyChanging(li.ID) ? '' : null"
+              type="text"
+              [ngModel]="li.xp.SupplierComments"
+              maxlength="500"
+              placeholder="Comments for this specific item (optional)"
+              class="form-control"
+              (change)="changeComments(li.ID, $event.target.value)"
+            ></textarea>
+          </div>
         </div>
       </div>
       <!-- line item: End -->
-    </div>
-    <div class="col-12 mb-3" *ngIf="showKitDetails">
-      <textarea
-        *ngIf="!readOnly || (kit && kit[0]?.xp?.SupplierComments)"
-        [attr.readonly]="readOnly || isQtyChanging(kit[0].ID) ? '' : null"
-        type="text"
-        [ngModel]="kit[0]?.xp?.SupplierComments"
-        maxlength="500"
-        placeholder="Comments (optional)"
-        class="form-control"
-        (change)="changeComments(kit[0].ID, $event.target.value)"
-      ></textarea>
     </div>
     <div *ngIf="showKitDetails" class="col-md">
       <button

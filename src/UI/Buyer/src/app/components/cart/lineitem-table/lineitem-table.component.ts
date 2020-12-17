@@ -160,14 +160,14 @@ export class OCMLineitemTable implements OnInit {
   }
 
   hasReturnInfo(): boolean {
-    return this._lineItems.some((li) => !!li.xp?.LineItemReturnInfo)
+    return this._lineItems.some((li) => !!(li.xp as any)?.LineItemReturnInfo)
   }
 
   hasCancelInfo(): boolean {
-    return this._lineItems.some((li) => !!li.xp?.LineItemCancelInfo)
+    return this._lineItems.some((li) => !!(li.xp as any)?.LineItemCancelInfo)
   }
 
   getReturnReason(reasonCode: string): string {
-    return CancelReturnReason[reasonCode]
+    return CancelReturnReason[reasonCode] as string
   }
 }
