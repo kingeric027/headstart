@@ -17,6 +17,7 @@ using ordercloud.integrations.library;
 using Marketplace.Models.Extended;
 using Npoi.Mapper;
 using ordercloud.integrations.library.helpers;
+using Marketplace.Common.Constants;
 
 namespace Marketplace.Common.Commands
 {
@@ -413,7 +414,7 @@ namespace Marketplace.Common.Commands
             if(orderWorksheet.ShipEstimateResponse.HttpStatusCode != 200)
                 throw new Exception(orderWorksheet.ShipEstimateResponse.UnhandledErrorBody);
 
-            if(orderWorksheet.ShipEstimateResponse.ShipEstimates.Any(s => s.SelectedShipMethodID == "NO_SHIPPING_RATES"))
+            if(orderWorksheet.ShipEstimateResponse.ShipEstimates.Any(s => s.SelectedShipMethodID == ShippingConstants.NoRatesID))
                 throw new Exception("No shipping rates could be determined - fallback shipping rate of $20 3-day was used");
 
             await Task.CompletedTask;
