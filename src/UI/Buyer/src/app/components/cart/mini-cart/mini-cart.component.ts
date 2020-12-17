@@ -30,9 +30,22 @@ export class OCMMiniCart implements OnInit {
     this.navigate.emit()
   }
 
-  toProductDetails(productID: string): void {
-    this.context.router.toProductDetails(productID)
-    this.navigate.emit()
+  toProductDetails(
+    productID: string,
+    configurationID: string,
+    documentID: string
+  ): void {
+    if (configurationID && documentID) {
+      this.context.router.toChiliConfigEdit(
+        productID,
+        configurationID,
+        documentID
+      )
+      this.navigate.emit()
+    } else {
+      this.context.router.toProductDetails(productID)
+      this.navigate.emit()
+    }
   }
 
   toCheckout(): void {

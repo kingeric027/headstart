@@ -103,8 +103,20 @@ export class OCMLineitemTable implements OnInit {
     this.context.order.cart.removeMany(kit)
   }
 
-  toProductDetails(productID: string): void {
-    this.context.router.toProductDetails(productID)
+  toProductDetails(
+    productID: string,
+    configurationID: string,
+    documentID: string
+  ): void {
+    if (configurationID && documentID) {
+      this.context.router.toChiliConfigEdit(
+        productID,
+        configurationID,
+        documentID
+      )
+    } else {
+      this.context.router.toProductDetails(productID)
+    }
   }
 
   async changeQuantity(
