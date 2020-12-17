@@ -90,7 +90,7 @@ namespace Marketplace.Common.Commands
             shipResponse.ShipEstimates = UpdateFreeShippingRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.FreeShippingTransitDays);
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
-            shipResponse.ShipEstimates = ApplyFlatRateShipping(worksheet, shipResponse.ShipEstimates, _settings.OrderCloudSettings.MedlineSupplierID, "100");
+            shipResponse.ShipEstimates = ApplyFlatRateShipping(worksheet, shipResponse.ShipEstimates, _settings.OrderCloudSettings.MedlineSupplierID, _settings.OrderCloudSettings.LaliciousSupplierID);
             
             return shipResponse;
         }
@@ -186,17 +186,17 @@ namespace Marketplace.Common.Commands
 
             return result;
         }
-
-        public static IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> estimates, string medlineSupplierID, string laliciousSupplierID)
+        #nullable enable
+        public static IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> estimates, string medlineSupplierID, string? laliciousSupplierID)
         {
             var result = estimates.Select(estimate => ApplyFlatRateShippingOnEstimate(estimate, orderWorksheet, medlineSupplierID, laliciousSupplierID)).ToList();
             return result;
         }
 
-        public static MarketplaceShipEstimate ApplyFlatRateShippingOnEstimate(MarketplaceShipEstimate estimate, MarketplaceOrderWorksheet orderWorksheet, string medlineSupplierID, string laliciousSupplierID)
+        public static MarketplaceShipEstimate ApplyFlatRateShippingOnEstimate(MarketplaceShipEstimate estimate, MarketplaceOrderWorksheet orderWorksheet, string medlineSupplierID, string? laliciousSupplierID)
         {
             var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
-            if (supplierID == laliciousSupplierID)
+            if (laliciousSupplierID != null && supplierID == laliciousSupplierID)
             {
                 estimate.ShipMethods = estimate.ShipMethods
                                        .Where(method => method.Name.Contains("GROUND"))
