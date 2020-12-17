@@ -25,10 +25,17 @@ namespace Marketplace.Common.Controllers
 
         [DocName("GET SupplierCategoryConfig")]
         [HttpGet, Route("/supplierfilterconfig"), OrderCloudIntegrationsAuth(ApiRole.Shopper, ApiRole.SupplierReader)]
-        public async Task<ListPage<Document<SupplierFilterConfig>>> Get()
+        public async Task<ListPage<SupplierFilterConfigDocument>> Get()
         {
             var config = await _cms.Documents.List("SupplierFilterConfig", new ListArgs<Document<SupplierFilterConfig>>(), VerifiedUserContext.AccessToken);
-            return config.Reserialize<ListPage<Document<SupplierFilterConfig>>>();
+            return config.Reserialize<ListPage<SupplierFilterConfigDocument>>();
         }
+    }
+
+    [SwaggerModel]
+    // swagger generator can't handle composite models so alias into one
+    public class SupplierFilterConfigDocument: Document<SupplierFilterConfig>
+    {
+
     }
 }

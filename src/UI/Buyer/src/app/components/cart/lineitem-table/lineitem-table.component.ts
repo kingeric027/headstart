@@ -38,7 +38,7 @@ export class OCMLineitemTable implements OnInit {
   productsInKit: MarketplaceKitProduct[] = []
   updatingLiIDs: string[] = []
   _groupByKits: boolean
-  _lineItems = []
+  _lineItems: MarketplaceLineItem[] = []
   _orderCurrency: string
   showKitDetails = true
   constructor(
@@ -55,7 +55,7 @@ export class OCMLineitemTable implements OnInit {
     }
     this.liGroupedByShipFrom = this.groupLineItemsByShipFrom(this._lineItems)
     this.liGroupedByKit = this.groupLineItemsByKitID(this._lineItems)
-    this.setSupplierInfo(this.liGroupedByShipFrom)
+    void this.setSupplierInfo(this.liGroupedByShipFrom)
   }
 
   ngOnInit(): void {
@@ -95,12 +95,12 @@ export class OCMLineitemTable implements OnInit {
     )
   }
 
-  removeLineItem(lineItemID: string): void {
-    this.context.order.cart.remove(lineItemID)
+  async removeLineItem(lineItemID: string): Promise<void> {
+    await this.context.order.cart.remove(lineItemID)
   }
 
-  removeKit(kit: any): void {
-    this.context.order.cart.removeMany(kit)
+  async removeKit(kit: MarketplaceLineItem[]): Promise<void> {
+    await this.context.order.cart.removeMany(kit)
   }
 
   toProductDetails(productID: string): void {
@@ -115,14 +115,29 @@ export class OCMLineitemTable implements OnInit {
       const li = this.getLineItem(lineItemID)
       li.Quantity = event.qty
       const { ProductID, Specs, Quantity, xp } = li
+
+      try {
+        // ACTIVATE SPINNER/DISABLE INPUT IF QTY BEING UPDATED
+        this.updatingLiIDs.push(lineItemID)
+        await this.context.order.cart.setQuantity({
+          ProductID,
+          Specs,
+          Quantity,
+          xp,
+        })
+      } finally {
+        // REMOVE SPINNER/ENABLE INPUT IF QTY NO LONGER BEING UPDATED
+        this.updatingLiIDs.splice(this.updatingLiIDs.indexOf(lineItemID), 1)
+      }
+    }
+  }
+
+  async changeComments(lineItemID: string, comments: string): Promise<void> {
+    try {
       // ACTIVATE SPINNER/DISABLE INPUT IF QTY BEING UPDATED
       this.updatingLiIDs.push(lineItemID)
-      await this.context.order.cart.setQuantity({
-        ProductID,
-        Specs,
-        Quantity,
-        xp,
-      })
+      await this.context.order.cart.addSupplierComments(lineItemID, comments)
+    } finally {
       // REMOVE SPINNER/ENABLE INPUT IF QTY NO LONGER BEING UPDATED
       this.updatingLiIDs.splice(this.updatingLiIDs.indexOf(lineItemID), 1)
     }
@@ -145,14 +160,14 @@ export class OCMLineitemTable implements OnInit {
   }
 
   hasReturnInfo(): boolean {
-    return this._lineItems.some((li) => !!li.xp?.LineItemReturnInfo)
+    return this._lineItems.some((li) => !!(li.xp as any)?.LineItemReturnInfo)
   }
 
   hasCancelInfo(): boolean {
-    return this._lineItems.some((li) => !!li.xp?.LineItemCancelInfo)
+    return this._lineItems.some((li) => !!(li.xp as any)?.LineItemCancelInfo)
   }
 
   getReturnReason(reasonCode: string): string {
-    return CancelReturnReason[reasonCode]
+    return CancelReturnReason[reasonCode] as string
   }
 }
