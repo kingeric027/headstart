@@ -203,7 +203,7 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   async getLineItems(orderID: string): Promise<void> {
-    let lineItems: MarketplaceLineItem[] = []
+    let allOrderLineItems: MarketplaceLineItem[] = []
     const listOptions = {
       page: 1,
       pageSize: 100,
@@ -211,12 +211,12 @@ export class OrderShipmentsComponent implements OnChanges {
     const lineItemsResponse = await this.ocLineItemService
       .List(this.orderDirection, orderID, listOptions)
       .toPromise()
-    lineItems = [
-      ...lineItems,
+    allOrderLineItems = [
+      ...allOrderLineItems,
       ...(lineItemsResponse.Items as MarketplaceLineItem[]),
     ]
     if (lineItemsResponse.Meta.TotalPages <= 1) {
-      this.lineItems = lineItems
+      this.lineItems = allOrderLineItems
     } else {
       let lineItemRequests = []
       for (let page = 2; page <= lineItemsResponse.Meta.TotalPages; page++) {
@@ -229,8 +229,8 @@ export class OrderShipmentsComponent implements OnChanges {
         ]
       }
       return await Promise.all(lineItemRequests).then((response) => {
-        lineItems = [...lineItems, ..._flatten(response.map((r) => r.Items))]
-        this.lineItems = lineItems
+        allOrderLineItems = [...allOrderLineItems, ..._flatten(response.map((r) => r.Items))]
+        this.lineItems = allOrderLineItems
       })
     }
   }
