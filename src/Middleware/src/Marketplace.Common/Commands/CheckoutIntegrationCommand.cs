@@ -263,11 +263,11 @@ namespace Marketplace.Common.Commands
         {
             foreach (var shipEstimate in estimates)
             {
-                if (shipEstimate.ID == ShippingConstants.FreeShippingID)
+                if (shipEstimate.ID.StartsWith(ShippingConstants.FreeShippingID))
                 {
                     foreach (var method in shipEstimate.ShipMethods)
                     {
-                        method.ID = ShippingConstants.FreeShippingID;
+                        method.ID = shipEstimate.ID;
                         method.Cost = 0;
                         method.EstimatedTransitDays = freeShippingTransitDays;
                     }
