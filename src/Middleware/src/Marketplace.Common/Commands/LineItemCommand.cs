@@ -13,7 +13,6 @@ using SendGrid.Helpers.Mail;
 using Marketplace.Common.Extensions;
 using System.Net;
 using ordercloud.integrations.library.helpers;
-using System.Diagnostics;
 
 namespace Marketplace.Common.Commands
 {
