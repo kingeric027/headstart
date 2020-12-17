@@ -228,10 +228,8 @@ export class OrderShipmentsComponent implements OnChanges {
             .toPromise(),
         ]
       }
-      console.log('line item requests', lineItemRequests)
       return await Promise.all(lineItemRequests).then((response) => {
         lineItems = [...lineItems, ..._flatten(response.map((r) => r.Items))]
-        console.log('line items', lineItems)
         this.lineItems = lineItems
       })
     }
@@ -330,13 +328,20 @@ export class OrderShipmentsComponent implements OnChanges {
     this.shipAllItems = !this.shipAllItems
     if (this.shipAllItems) {
       this.lineItems.forEach((item) => {
-        this.shipmentForm.patchValue({
-          LineItemData: {
-            [item.ID]: {
-              Quantity: item.Quantity - item.QuantityShipped,
+        const quantityToShip =
+          item.Quantity -
+          item.QuantityShipped -
+          item.xp.StatusByQuantity['Backordered'] -
+          item.xp.StatusByQuantity['Canceled']
+        if (quantityToShip) {
+          this.shipmentForm.patchValue({
+            LineItemData: {
+              [item.ID]: {
+                Quantity: quantityToShip,
+              },
             },
-          },
-        })
+          })
+        }
       })
     }
   }
@@ -385,7 +390,6 @@ export class OrderShipmentsComponent implements OnChanges {
         httpOptions
       )
       .toPromise()
-    console.log('posted shipment', postedShipment)
     this.isSaving = false
     this.createOrViewShipmentEvent.emit(false)
     this.shipmentCreated.emit()
