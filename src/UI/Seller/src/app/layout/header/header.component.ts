@@ -21,7 +21,7 @@ import { getHeaderConfig, MPRoute } from './header.config'
 import { AppAuthService } from '@app-seller/auth'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { environment } from 'src/environments/environment'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Component({
   selector: 'layout-header',
