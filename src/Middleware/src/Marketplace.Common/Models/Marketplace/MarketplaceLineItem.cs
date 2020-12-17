@@ -28,6 +28,7 @@ namespace Marketplace.Models.Models.Marketplace
 
         // needed for Line Item Detail Report
         public string ShipMethod { get; set; }
+        public string SupplierComments { get; set; } // xp.Comments is already being used as ship comments for SEB
     }
 
     [SwaggerModel]

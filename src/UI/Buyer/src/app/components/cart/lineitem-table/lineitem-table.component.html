@@ -249,6 +249,18 @@
               </div>
             </div>
           </div>
+          <div class="col-md-12">
+            <textarea
+              *ngIf="!readOnly || li?.xp?.SupplierComments"
+              [attr.readonly]="readOnly || isQtyChanging(li.ID) ? '' : null"
+              type="text"
+              [ngModel]="li?.xp?.SupplierComments"
+              maxlength="500"
+              placeholder="Comments for this specific item (optional)"
+              class="form-control"
+              (change)="changeComments(li.ID, $event.target.value)"
+            ></textarea>
+          </div>
         </div>
         <button
           class="btn btn-remove wobble"
@@ -293,7 +305,6 @@
           }}</a>
         </div>
       </div>
-      <ng-content></ng-content>
     </div>
     <div class="card-body pt-sm-2" *ngIf="showKitDetails">
       <!-- Line Item Labels: Start -->
@@ -487,14 +498,27 @@
               </div>
             </div>
           </div>
+          <div class="col-sm-12 mt-3">
+            <textarea
+              *ngIf="!readOnly || li?.xp?.SupplierComments"
+              [attr.readonly]="readOnly || isQtyChanging(li.ID) ? '' : null"
+              type="text"
+              [ngModel]="li.xp.SupplierComments"
+              maxlength="500"
+              placeholder="Comments for this specific item (optional)"
+              class="form-control"
+              (change)="changeComments(li.ID, $event.target.value)"
+            ></textarea>
+          </div>
         </div>
       </div>
       <!-- line item: End -->
     </div>
-    <div *ngIf="showKitDetails" class="col-md text-right">
+    <div *ngIf="showKitDetails" class="col-md">
       <button
         class="btn btn-remove wobble"
         type="button"
+        style="position: relative"
         *ngIf="!readOnly"
         (click)="removeKit(kit)"
         translate
