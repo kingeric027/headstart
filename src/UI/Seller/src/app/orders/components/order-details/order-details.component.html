@@ -160,10 +160,10 @@
       <strong>Comments: </strong> {{ _order.xp?.QuoteOrderInfo?.Comments }}
     </div>
     <div
-      *ngIf="!isQuoteOrder(_order) && _order?.Comments"
+      *ngIf="!isQuoteOrder(_order) && _buyerOrder?.Comments"
       class="alert alert-secondary small mt-3"
     >
-      <strong>Comments: </strong> {{ _order.Comments }}
+      <strong>Comments: </strong> {{ _buyerOrder.Comments }}
     </div>
     <!-- Shipment Info -->
     <app-order-shipments
