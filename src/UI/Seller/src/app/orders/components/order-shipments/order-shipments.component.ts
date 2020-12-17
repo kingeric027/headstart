@@ -206,7 +206,7 @@ export class OrderShipmentsComponent implements OnChanges {
     let lineItems: MarketplaceLineItem[] = []
     const listOptions = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
     }
     const lineItemsResponse = await this.ocLineItemService
       .List(this.orderDirection, orderID, listOptions)
