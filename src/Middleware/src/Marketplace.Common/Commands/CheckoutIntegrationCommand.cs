@@ -198,6 +198,7 @@ namespace Marketplace.Common.Commands
             var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
             if (laliciousSupplierID != null && supplierID == laliciousSupplierID)
             {
+                // lalicious only wants ground shipping https://four51.atlassian.net/browse/SEB-1345
                 estimate.ShipMethods = estimate.ShipMethods
                                        .Where(method => method.Name.Contains("GROUND"))
                                        .ToList();
