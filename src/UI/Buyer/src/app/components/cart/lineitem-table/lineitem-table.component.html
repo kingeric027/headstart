@@ -91,7 +91,7 @@
           <div class="col-md-6" *ngIf="li">
             <div class="row align-items-sm-center">
               <div class="col-md-3 col-sm-6 pr-md-3">
-                <a class="d-block" (click)="toProductDetails(li.Product.ID)">
+                <a class="d-block" (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)">
                   <img
                     class="img-thumbnail w-100"
                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
@@ -101,7 +101,7 @@
               </div>
               <div class="col-md-9 col-sm-6">
                 <a
-                  (click)="toProductDetails(li.Product.ID)"
+                  (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)"
                   class="text-dark font-weight-medium line-height-1"
                 >
                   {{ li | productNameWithSpecs }}
@@ -359,7 +359,7 @@
           <div class="col-sm-6" *ngIf="li">
             <div class="row align-items-sm-center no-gutters">
               <div class="col-md-3 col-sm-6 pr-md-3">
-                <a class="d-block" (click)="toProductDetails(li.Product.ID)">
+                <a class="d-block" (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)">
                   <img
                     class="img-thumbnail w-100"
                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
@@ -369,7 +369,7 @@
               </div>
               <div class="col-md-9 col-sm-6">
                 <a
-                  (click)="toProductDetails(li.Product.ID)"
+                  (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)"
                   class="text-dark font-weight-medium line-height-1"
                   >{{ li | productNameWithSpecs }}</a
                 >
