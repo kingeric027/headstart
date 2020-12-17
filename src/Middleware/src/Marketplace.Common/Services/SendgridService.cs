@@ -113,7 +113,11 @@ namespace Marketplace.Common.Services
 
         private List<object> CreateTemplateProductList(List<MarketplaceLineItem> lineItems, LineItemStatusChanges lineItemStatusChanges)
         {
-            return lineItems.Select(lineItem =>
+            //  first get line items that actually had a change
+            var changedLiIds = lineItemStatusChanges.Changes.Where(change => change.Quantity > 0).Select(change => change.ID);
+            var changedLineItems = lineItems.Where(li => changedLiIds.Contains(li.ID));
+            //  now map to template data
+            return changedLineItems.Select(lineItem =>
             {
                 var lineItemStatusChange = lineItemStatusChanges.Changes.First(li => li.ID == lineItem.ID);
                 return MapToTemplateProduct(lineItem, lineItemStatusChange);
