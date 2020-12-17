@@ -355,7 +355,7 @@ export abstract class ResourceCrudService<ResourceType> {
   }
 
   searchBy(searchTerm: string): void {
-    this.patchFilterState({ search: searchTerm || undefined, searchType: 'ExactPhrasePrefix'})
+    this.patchFilterState({ search: searchTerm || undefined, searchType: searchTerm ? 'ExactPhrasePrefix' : undefined})
   }
 
   addFilters(newFilters: ListArgs): void {
@@ -433,8 +433,8 @@ export abstract class ResourceCrudService<ResourceType> {
 
   // Handle URL updates
   private readFromUrlQueryParams(params: Params): void {
-    const { sortBy, search, OrderDirection, ...filters } = params
-    this.optionsSubject.next({ sortBy, search, filters, OrderDirection })
+    const { sortBy, search, searchType, OrderDirection, ...filters } = params
+    this.optionsSubject.next({ sortBy, search, searchType, filters, OrderDirection })
   }
 
   private async listWithStatusIndicator(
