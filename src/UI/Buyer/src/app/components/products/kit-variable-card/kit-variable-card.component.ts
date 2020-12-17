@@ -55,7 +55,7 @@ export class OCMKitVariableCard {
     this.userCurrency = this.context.currentUser.get().Currency
     this.imageUrl =
       this._productKitDetails.Images && this._productKitDetails.Images.length
-        ? `${appSettings.middlewareUrl}/assets/${appSettings.sellerID}/products/${this._productKitDetails.Product.ID}/thumbnail?size=S`
+        ? `${appSettings.cmsUrl}/assets/${appSettings.sellerID}/products/${this._productKitDetails.Product.ID}/thumbnail?size=S`
         : 'http://placehold.it/60x60'
   }
 
