@@ -115,7 +115,7 @@ namespace Marketplace.Common.Services
         {
             //  first get line items that actually had a change
             var changedLiIds = lineItemStatusChanges.Changes.Where(change => change.Quantity > 0).Select(change => change.ID);
-            var changedLineItems = lineItems.Where(li => changedLiIds.Contains(li.ID));
+            var changedLineItems = changedLiIds.Select(i => lineItems.Single(l => l.ID == i));
             //  now map to template data
             return changedLineItems.Select(lineItem =>
             {
