@@ -54,6 +54,7 @@ namespace Marketplace.Common.Commands
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
             MarketplaceProduct product = null;
+            var token = await GetAdminToken();
             try
             {
                 product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
@@ -64,42 +65,22 @@ namespace Marketplace.Common.Commands
                 //Product was deleted after it was updated. Delete orphaned notification 
                if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
                 {
-                    await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                    await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, token);
                     return new SuperMarketplaceProduct();
                 }
             }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
-                if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
-
-                var configToUse = new OrderCloudClientConfig
-                {
-                    ApiUrl = user.ApiUrl,
-                    AuthUrl = user.AuthUrl,
-                    ClientId = supplierClient.ID,
-                    ClientSecret = supplierClient.ClientSecret,
-                    GrantType = GrantType.ClientCredentials,
-                    Roles = new[]
-                               {
-                                     ApiRole.SupplierAdmin,
-                                     ApiRole.ProductAdmin
-                                },
-
-                };
-                var ocClient = new OrderCloudClient(configToUse);
-                await ocClient.AuthenticateAsync();
-                var token = ocClient.TokenResponse.AccessToken;
-                product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, token);
+                product = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, user.AccessToken);
 
                 //Delete document after acceptance
-                await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, token);
             }
             else
             {
-                await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+                await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, token);
             }
-            var superProduct = await _productCommand.Get(productID, user.AccessToken);
+            var superProduct = await _productCommand.Get(productID, token);
             superProduct.Product = product;
             return superProduct;
         }
