@@ -219,7 +219,17 @@ namespace Marketplace.Common.Commands.Crud
 			PriceSchedule _priceSchedule = null;
 			//All products must have a price schedule for orders to be submitted.  The front end provides a default Price of $0 for quote products that don't have one.
 			superProduct.PriceSchedule.ID = superProduct.Product.ID;
-			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			try
+            {
+				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			}
+			catch (OrderCloudException ex)
+			{
+				if (ex.HttpStatus == System.Net.HttpStatusCode.Conflict)
+                {
+					throw new Exception($"Product SKU {superProduct.PriceSchedule.ID} already exists.  Please try a different SKU.");
+				}
+			}
 			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
 			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);

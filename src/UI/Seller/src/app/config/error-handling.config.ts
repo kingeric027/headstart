@@ -56,6 +56,9 @@ export class AppErrorHandler extends ErrorHandler {
       // display user friendly error
       message = 'Your session has expired. Please log in.'
     }
+    if (ex?.response?.data?.Data) {
+      message = ex.response.data.Data
+    }
     this.toastrService.error(message, 'Error', { onActivateTick: true })
   }
 

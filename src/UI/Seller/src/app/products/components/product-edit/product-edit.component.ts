@@ -60,7 +60,10 @@ import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload'
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
-import { ValidateMinMax } from '../../../validators/validators'
+import {
+  ValidateMinMax,
+  ValidateNoSpecialCharactersAndSpaces,
+} from '../../../validators/validators'
 import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper'
 import { takeWhile } from 'rxjs/operators'
 import { SizerTiersDescriptionMap } from './size-tier.constants'
@@ -282,7 +285,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             Validators.required,
             Validators.maxLength(100),
           ]),
-          ID: new FormControl(superMarketplaceProduct.Product.ID),
+          ID: new FormControl(
+            superMarketplaceProduct.Product.ID,
+            ValidateNoSpecialCharactersAndSpaces
+          ),
           Description: new FormControl(
             superMarketplaceProduct.Product.Description,
             Validators.maxLength(2000)
@@ -388,6 +394,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       )
       this.setInventoryValidator()
       this.setVariantLevelTrackingDisabledSubscription()
+      this.setSizeTierValidator()
       this.setNonRequiredFields()
       this.setResourceType()
     }
@@ -432,6 +439,27 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           variantLevelTrackingControl.disable()
         }
       })
+  }
+
+  setSizeTierValidator(): void {
+    const sizeTier = this.productForm.get('SizeTier')
+    const shipLength = this.productForm.get('ShipLength')
+    const shipHeight = this.productForm.get('ShipHeight')
+    const shipWidth = this.productForm.get('ShipWidth')
+    sizeTier.valueChanges.subscribe((sizeTier) => {
+      if (sizeTier === 'G') {
+        shipLength.setValidators([Validators.required])
+        shipHeight.setValidators([Validators.required])
+        shipWidth.setValidators([Validators.required])
+      } else {
+        shipLength.setValidators(null)
+        shipHeight.setValidators(null)
+        shipWidth.setValidators(null)
+      }
+      shipLength.updateValueAndValidity()
+      shipHeight.updateValueAndValidity()
+      shipWidth.updateValueAndValidity()
+    })
   }
 
   setNonRequiredFields(): void {
