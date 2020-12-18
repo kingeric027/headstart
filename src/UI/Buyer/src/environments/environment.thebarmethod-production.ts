@@ -1,11 +1,8 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-
-import { Environment } from './environment.interface'
+import { AppConfig } from './environment.interfaces'
 import bmTheme from '../styles/themes/bar-method/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: AppConfig = {
   hostedApp: true,
   appname: 'The Bar Method',
   clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',

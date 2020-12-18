@@ -1,12 +1,8 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
-// The list of file replacements can be found in `angular.json`.
-
-import { Environment } from './environment.interface'
+import { AppConfig } from './environment.interfaces'
 import wtcTheme from '../styles/themes/waxing-the-city/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: AppConfig = {
   hostedApp: true,
   appname: 'Marketplace Test',
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
