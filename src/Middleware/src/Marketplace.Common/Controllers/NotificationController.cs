@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Crud;
@@ -38,5 +39,11 @@ namespace Marketplace.Common.Controllers
 			return await _command.UpdateMonitoredSuperProductNotificationStatus(document, document.Doc.Supplier.ID, document.Doc.Product.ID, VerifiedUserContext);
 		}
 
+		[DocName("GET Monitored Product Field Modified")]
+		[HttpPost, Route("monitored-product-notification"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+		public async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationStatus([FromBody] SuperMarketplaceProduct product)
+		{
+			return await _command.ReadMonitoredSuperProductNotificationList(product, VerifiedUserContext);
+		}
 	}
 }
