@@ -1,11 +1,8 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-
-import { Environment } from './environment.interface'
+import { AppConfig } from './environment.interfaces'
 import bcfTheme from '../styles/themes/basecamp/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: AppConfig = {
   hostedApp: true,
   appname: 'Basecamp Fitness',
   clientID: '0045BB67-84CC-42BD-9FA7-009875628F7C',

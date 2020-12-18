@@ -1,11 +1,8 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-
-import { Environment } from './environment.interface'
+import { AppConfig } from './environment.interfaces'
 import afTheme from '../styles/themes/anytime-fitness/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: AppConfig = {
   hostedApp: true,
   appname: 'Anytime Fitness',
   clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
