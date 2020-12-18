@@ -82,6 +82,7 @@ namespace Marketplace.Common
         public string SEBDistributionSupplierID { get; set; }
         public string FirstChoiceSupplierID { get; set; }
         public string MedlineSupplierID { get; set; }
+        public string LaliciousSupplierID { get; set; }
         public string IncrementorPrefix { get; set; }
     }
 
@@ -90,6 +91,7 @@ namespace Marketplace.Common
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }
+        public int CompanyID { get; set; }
 	}
 
     public class ChiliPublishSettings

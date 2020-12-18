@@ -68,7 +68,6 @@ namespace Marketplace.Common.Commands
                     { "UserEmail", user.Email }
                 };
             _telemetry.TrackException(e, customProperties);
-            Console.WriteLine(_telemetry);
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)

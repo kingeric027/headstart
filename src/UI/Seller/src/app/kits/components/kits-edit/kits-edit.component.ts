@@ -25,7 +25,7 @@ import { Location } from '@angular/common'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { Buyer, OcBuyerService } from '@ordercloud/angular-sdk'
 import { TabIndexMapper } from './tab-mapper'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 @Component({
   selector: 'app-kits-edit',
   templateUrl: './kits-edit.component.html',

@@ -11,18 +11,23 @@ import {
   ChiliSpec,
   ChiliConfig,
   ChiliTemplate,
+  MeChiliTemplate,
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
 import { ModalState } from 'src/app/models/modal-state.class'
 import { SpecFormService } from '../spec-form/spec-form.service'
-import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
+import {
+  SuperMarketplaceProduct,
+  MarketplaceMeProduct,
+} from '@ordercloud/headstart-sdk'
 import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
 import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from '../product-details/product-detail.service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
-import { ContactSupplierBody, CurrentUser, MarketplaceMeProduct } from 'src/app/shopper-context'
+import { ContactSupplierBody, CurrentUser } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { RouteConfigLoadEnd } from '@angular/router'
 
 declare let SetVariableValue: any
 declare let saveDocument: any
@@ -72,7 +77,7 @@ export class OCMProductChiliConfig implements OnInit {
   isInactiveVariant: boolean
   _disabledVariants: MarketplaceVariant[]
   variantInventory: number
-  chiliTemplate: ChiliTemplate
+  chiliTemplate: MeChiliTemplate
   showSpecs = false
   frameSrc: SafeResourceUrl
   lineImage = ''
@@ -83,6 +88,7 @@ export class OCMProductChiliConfig implements OnInit {
   editor
   frameWindow
   variant: MarketplaceVariant
+  lineItems: MarketplaceLineItem[] = []
 
   constructor(
     private specFormService: SpecFormService,
@@ -91,7 +97,7 @@ export class OCMProductChiliConfig implements OnInit {
     private productDetailService: ProductDetailService
   ) {}
 
-  @Input() set template(chiliTemplate: ChiliTemplate) {
+  @Input() set template(chiliTemplate: MeChiliTemplate) {
     this.chiliTemplate = chiliTemplate
     this._superProduct = chiliTemplate.Product
     this._product = chiliTemplate.Product.Product
@@ -158,6 +164,7 @@ export class OCMProductChiliConfig implements OnInit {
 
   ngOnInit(): void {
     this.calculatePrice()
+    this.lineItems = this.context.order.cart.get().Items
     this.currentUser = this.context.currentUser.get()
     this.userCurrency = this.currentUser.Currency
     this.context.currentUser.onChange(
@@ -243,6 +250,14 @@ export class OCMProductChiliConfig implements OnInit {
   async addToCart(): Promise<void> {
     this.isAddingToCart = true
     try {
+      //Loop through cart.  If ChiliTemplateID is on a line item remove it before adding the revised document.
+      if (this.lineItems.length > 0) {
+        this.lineItems.forEach(async (line) => {
+          if (line.xp.DocumentID === this.chiliTemplate.ChiliTemplateID) {
+            await this.context.order.cart.remove(line.ID)
+          }
+        })
+      }
       await this.context.order.cart.add({
         ProductID: this._product.ID,
         Quantity: this.quantity,
@@ -250,6 +265,8 @@ export class OCMProductChiliConfig implements OnInit {
         xp: {
           PrintArtworkURL: this.pdfSrc,
           ImageUrl: this.lineImage,
+          ConfigurationID: this.chiliTemplate.ChiliConfigID,
+          DocumentID: this.currentDocID,
         },
       })
     } finally {

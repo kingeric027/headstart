@@ -46,20 +46,35 @@ export class CartService {
     // order is well defined, line item can be added
     this.onAdd.next(lineItem)
     if (!_isUndefined(this.order.DateCreated)) {
-      const lineItems = this.state.lineItems.Items
-      const liWithSameProduct = lineItems.find(
-        (li) =>
-          li.ProductID === lineItem.ProductID &&
-          li?.xp?.KitProductID === lineItem?.xp?.KitProductID
-      )
       const isPrintProduct = lineItem.xp.PrintArtworkURL
-      if (
-        !isPrintProduct &&
-        liWithSameProduct &&
-        this.hasSameSpecs(lineItem, liWithSameProduct)
-      ) {
-        // combine any line items that have the same productID/specs into one line item
-        lineItem.Quantity += liWithSameProduct.Quantity
+      // Handle quantity changes for non-print products
+      if (!isPrintProduct) {
+        const lineItems = this.state.lineItems.Items
+        if (lineItem?.xp?.KitProductID) {
+          // Kit product line item quantity changes
+          const kitLiWithSameProduct = lineItems.find(
+            (li) =>
+              li.ProductID === lineItem.ProductID &&
+              li?.xp?.KitProductID === lineItem?.xp?.KitProductID
+          )
+          if (
+            kitLiWithSameProduct &&
+            this.hasSameSpecs(lineItem, kitLiWithSameProduct)
+          ) {
+            // combine any line items that have the same productID/specs into one line item
+            lineItem.Quantity += kitLiWithSameProduct.Quantity
+          }
+        } else {
+          // Non-kit product line item quantity changes
+          const lineItemWithMatchingSpecs = lineItems.find(
+            (li) =>
+              li.ProductID === lineItem.ProductID &&
+              this.hasSameSpecs(lineItem, li)
+          )
+          if (lineItemWithMatchingSpecs) {
+            lineItem.Quantity += lineItemWithMatchingSpecs.Quantity
+          }
+        }
       }
       return await this.upsertLineItem(lineItem)
     }
@@ -93,6 +108,29 @@ export class CartService {
   ): Promise<MarketplaceLineItem> {
     try {
       return await this.upsertLineItem(lineItem)
+    } finally {
+      await this.state.reset()
+    }
+  }
+
+  async addSupplierComments(
+    lineItemID: string,
+    comments: string
+  ): Promise<MarketplaceLineItem> {
+    try {
+      const lineToUpdate = this.state.lineItems.Items.find(
+        (li) => li.ID === lineItemID
+      )
+      lineToUpdate.xp.SupplierComments = comments
+
+      // only include properties seller can edit (exclude private addresses)
+      const { ProductID, Specs, Quantity, xp } = lineToUpdate
+      return await this.upsertLineItem({
+        ProductID,
+        Specs,
+        Quantity,
+        xp,
+      })
     } finally {
       await this.state.reset()
     }

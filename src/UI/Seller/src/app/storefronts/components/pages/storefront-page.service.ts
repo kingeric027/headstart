@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
-import { JDocument, HeadStartSDK, ListPage } from '@ordercloud/headstart-sdk'
+import { JDocument, ListPage } from '@ordercloud/headstart-sdk'
 import { STOREFRONTS_SUB_RESOURCE_LIST } from '../storefronts/storefronts.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { ocAppConfig } from '@app-seller/config/app.config'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 // TODO - this service is only relevent if you're already on the storefronts details page. How can we enforce/inidcate that?
 @Injectable({

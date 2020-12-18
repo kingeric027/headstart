@@ -89,10 +89,19 @@ namespace Marketplace.Common.Services.CMS
 				return new { key = param.Item1, value = param.Item2 };
 			});
 
-			var sortBy = string.Join(",", args.SortBy); 
+			var queryParams = new Dictionary<string, string>()
+			{
+				{ "search", args.Search },
+				{ "page", args.Page.ToString() },
+				{ "pageSize", args.PageSize.ToString() }
+			};
+			if(args.SortBy.Any())
+            {
+				queryParams.Add("sortBy", string.Join(",", args.SortBy));
+			}
 
 			return await BuildRequest(token, pathSegments)
-				.SetQueryParams(new { search = args.Search, searchOn = args.SearchOn, sortBy, page = args.Page, pageSize = args.PageSize })
+				.SetQueryParams(queryParams)
 				.SetQueryParams(filters)
 				.GetJsonAsync<ListPage<T>>();
 		}

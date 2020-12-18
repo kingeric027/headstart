@@ -8,6 +8,7 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using Newtonsoft.Json;
 using Flurl.Http.Configuration;
+using LazyCache;
 
 namespace ordercloud.integrations.exchangerates
 {
@@ -28,18 +29,20 @@ namespace ordercloud.integrations.exchangerates
     {
         private readonly IOrderCloudIntegrationsExchangeRatesClient _client;
         private readonly IOrderCloudIntegrationsBlobService _blob;
+        private readonly IAppCache _cache;
 
-
-        public ExchangeRatesCommand(BlobServiceConfig config, IFlurlClientFactory flurlFactory)
+        public ExchangeRatesCommand(BlobServiceConfig config, IFlurlClientFactory flurlFactory, IAppCache cache)
         {
             _client = new OrderCloudIntegrationsExchangeRatesClient(flurlFactory);
             _blob = new OrderCloudIntegrationsBlobService(config);
+            _cache = cache;
         }
 
-        public ExchangeRatesCommand(IOrderCloudIntegrationsBlobService blob, IFlurlClientFactory flurlFactory)
+        public ExchangeRatesCommand(IOrderCloudIntegrationsBlobService blob, IFlurlClientFactory flurlFactory, IAppCache cache)
         {
             _client = new OrderCloudIntegrationsExchangeRatesClient(flurlFactory);
             _blob = blob;
+            _cache = cache;
         }
 
         /// <summary>
@@ -50,7 +53,10 @@ namespace ordercloud.integrations.exchangerates
         /// <returns></returns>
         public async Task<ListPage<OrderCloudIntegrationsConversionRate>> Get(ListArgs<OrderCloudIntegrationsConversionRate> rateArgs, CurrencySymbol currency)
         {
-            var rates = await _blob.Get<OrderCloudIntegrationsExchangeRate>($"{currency}.json");
+
+            var rates = await _cache.GetOrAddAsync($"exchangerates_{currency}", () => {
+                return _blob.Get<OrderCloudIntegrationsExchangeRate>($"{currency}.json");
+            }, TimeSpan.FromHours(1));
             return Filter(rateArgs, rates);
         }
 

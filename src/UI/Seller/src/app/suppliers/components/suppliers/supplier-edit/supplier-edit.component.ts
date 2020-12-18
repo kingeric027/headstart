@@ -47,7 +47,7 @@ import { ToastrService } from 'ngx-toastr'
 import { User, OcSupplierUserService, Buyer } from '@ordercloud/angular-sdk'
 import { Buyers } from 'ordercloud-javascript-sdk'
 import { Router } from '@angular/router'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',

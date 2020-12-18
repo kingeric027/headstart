@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ordercloud.integrations.library;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Marketplace.Common.Services.CMS.Models
 {
+	[SwaggerModel]
 	public class History
 	{
 		public DateTimeOffset DateCreated { get; set; }

@@ -29,7 +29,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() selectedVariant: MarketplaceVariant
   @Input() variantInventory?: number
   @Input() variantID: string
-
+  @Input() isAddingToCart: boolean
   @Input() existingQty: number
   @Input() gridTotalQty?: number
   @Input() gridDisplay? = false
@@ -79,6 +79,8 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     }
     if (this.product && this.priceSchedule)
       this.init(this.product, this.priceSchedule)
+    if (!this.isAddingToCart) 
+      this.validateQty(this.getDefaultQty())
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
@@ -138,6 +140,10 @@ export class OCMQuantityInput implements OnInit, OnChanges {
         ?.Items?.filter((i) => i.ProductID === this.product?.ID)
         ?.find((p) => p.Variant?.ID === this.selectedVariant?.ID)
       if (productInCart) {
+        if (qty + productInCart.Quantity > this.max) {
+          this.errorMsg = `The maximum is ${this.max} and your cart has ${productInCart.Quantity}.`
+          return false
+        }
         qty = qty + productInCart.Quantity
       }
     }

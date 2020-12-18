@@ -16,8 +16,6 @@ export const ocAppConfig: AppConfig = {
   ordercloudEnv: environment.ordercloudEnv,
   theme: environment.theme,
   anonymousShoppingEnabled: false,
-  avalaraCompanyId:
-    environment.ordercloudEnv === OrdercloudEnv.Production ? 902271 : 280411,
   instrumentationKey: environment.instrumentationKey,
   scope: [
     'MeAddressAdmin',
@@ -45,6 +43,6 @@ export const ocAppConfig: AppConfig = {
     'MPLocationAddressAdmin',
     'MPLocationResaleCertAdmin',
 
-    'DocumentReader', // might be able to get rid of this if we assign to buyer, talk to team first
+    'DocumentReader',
   ] as ApiRole[],
 }

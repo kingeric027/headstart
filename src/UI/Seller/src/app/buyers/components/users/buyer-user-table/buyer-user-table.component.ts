@@ -16,10 +16,10 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
 
   constructor(
     private buyerUserService: BuyerUserService,
+    private buyerService: BuyerService, //used in <resource-table-component/>
     changeDetectorRef: ChangeDetectorRef,
     router: Router,
     activatedroute: ActivatedRoute,
-    private buyerService: BuyerService,
     ngZone: NgZone
   ) {
     super(changeDetectorRef, buyerUserService, router, activatedroute, ngZone)
@@ -67,5 +67,10 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
       [],
       assignmentsToMake.length > 0
     )
+  }
+
+  updateResource($event: any): void {
+    this.resourceForm = $event
+    this.updatedResource = $event.value
   }
 }
