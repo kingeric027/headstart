@@ -65,6 +65,14 @@ export class OCMProductList implements OnChanges, OnInit, OnDestroy {
     this.context.productFilters.filterByCategory(categoryID)
   }
 
+  // retrieveShipFromAddressData(): void {
+  //   Object.keys(this.shipFromSources).forEach((supplierId) => {
+  //     this.shipFromSources[supplierId].forEach(shipFromAddressId => { // suppliers can have multiple shipping addresses
+  //       this.supplierFilterService.getSupplierAddress(supplierId, shipFromAddressId)
+  //     });
+  //   })
+  // }
+
   ngOnDestroy(): void {
     this.alive = false
   }
