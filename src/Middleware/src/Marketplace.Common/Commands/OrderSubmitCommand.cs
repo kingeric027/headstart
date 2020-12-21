@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace Marketplace.Common.Commands
 {
@@ -58,17 +59,17 @@ namespace Marketplace.Common.Commands
 
         private void LogError(Exception e, string orderID, MarketplaceOrderWorksheet worksheet, VerifiedUserContext user)
         {
-            // track exception in app insights
-            // to find go to Transaction Search > Event Type = Exception > Filter by any of these custom properties
+            // track in app insights
+            // to find go to Transaction Search > Event Type = Event > Filter by any of these custom properties or event name "Order.Submit.PaymentCaptureOrderFailed"
             var customProperties = new Dictionary<string, string>
                 {
-                    { "ErrorCode", "Order.Submit.PaymentCaptureOrderFailed" },
                     { "Message", "Payment was captured but order was not submitted" },
                     { "OrderID", orderID },
                     { "BuyerID", worksheet.Order.FromCompanyID },
-                    { "UserEmail", user.Email }
+                    { "UserEmail", user.Email },
+                    { "ErrorResponse", JsonConvert.SerializeObject(e)}
                 };
-            _telemetry.TrackException(e, customProperties);
+            _telemetry.TrackEvent("Order.Submit.PaymentCaptureOrderFailed", customProperties);
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)
