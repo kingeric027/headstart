@@ -10,6 +10,7 @@ using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 
@@ -369,8 +370,8 @@ namespace Marketplace.Common.Commands.Crud
 					ApplyShipping = updated.ApplyShipping,
 					ApplyTax = updated.ApplyTax
 				};
-				var relatedPriceSchedules = await _oc.PriceSchedules.ListAsync(search: initial.ID);
-				var priceSchedulesToUpdate = relatedPriceSchedules.Items.Where(p => p.ID.StartsWith(updated.ID) && p.ID != updated.ID);
+				var relatedPriceSchedules = await ListAllAsync.List((page) => _oc.PriceSchedules.ListAsync(search: initial.ID, page: page, pageSize: 100));
+				var priceSchedulesToUpdate = relatedPriceSchedules.Where(p => p.ID.StartsWith(updated.ID) && p.ID != updated.ID);
 				await Throttler.RunAsync(priceSchedulesToUpdate, 100, 5, p =>
 				{
 					return _oc.PriceSchedules.PatchAsync(p.ID, patch, token);
