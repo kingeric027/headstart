@@ -60,7 +60,10 @@ import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload'
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
-import { ValidateMinMax } from '../../../validators/validators'
+import {
+  ValidateMinMax,
+  ValidateNoSpecialCharactersAndSpaces,
+} from '../../../validators/validators'
 import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper'
 import { takeWhile } from 'rxjs/operators'
 import { SizerTiersDescriptionMap } from './size-tier.constants'
@@ -70,6 +73,8 @@ import {
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { ToastrService } from 'ngx-toastr'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-product-edit',
@@ -124,6 +129,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   shippingAddress: any
   productVariations: any
   variantsValid = true
+  specsValid = true
   editSpecs = false
   fileType: string
   imageFiles: FileHandle[] = []
@@ -140,6 +146,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   active: number
   alive = true
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[]
+  sizeTierSubscription: Subscription
+  inventoryValidatorSubscription: Subscription
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -155,6 +163,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private toastrService: ToastrService,
     private http: HttpClient,
     private ocTokenService: OcTokenService
   ) {}
@@ -282,7 +291,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             Validators.required,
             Validators.maxLength(100),
           ]),
-          ID: new FormControl(superMarketplaceProduct.Product.ID),
+          ID: new FormControl(
+            superMarketplaceProduct.Product.ID,
+            ValidateNoSpecialCharactersAndSpaces
+          ),
           Description: new FormControl(
             superMarketplaceProduct.Product.Description,
             Validators.maxLength(2000)
@@ -388,6 +400,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       )
       this.setInventoryValidator()
       this.setVariantLevelTrackingDisabledSubscription()
+      this.setSizeTierValidators()
       this.setNonRequiredFields()
       this.setResourceType()
     }
@@ -398,10 +411,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const variantLevelTrackingControl = this.productForm.get(
       'VariantLevelTracking'
     )
-    this.productForm
+    this.inventoryValidatorSubscription = this.productForm
       .get('InventoryEnabled')
-      .valueChanges.pipe(takeWhile(() => this.alive))
-      .subscribe((inventory) => {
+      .valueChanges.subscribe((inventory) => {
         if (inventory && variantLevelTrackingControl.value === false) {
           quantityControl.setValidators([
             Validators.required,
@@ -432,6 +444,30 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           variantLevelTrackingControl.disable()
         }
       })
+  }
+
+  setSizeTierValidators(): void {
+    const sizeTier = this.productForm.get('SizeTier')
+    const shipLength = this.productForm.get('ShipLength')
+    const shipHeight = this.productForm.get('ShipHeight')
+    const shipWidth = this.productForm.get('ShipWidth')
+    this.sizeTierSubscription = sizeTier.valueChanges.subscribe((sizeTier) => {
+      if (sizeTier === 'G') {
+        shipLength.setValidators([Validators.required])
+        shipHeight.setValidators([Validators.required])
+        shipWidth.setValidators([Validators.required])
+      } else {
+        shipLength.setValidators(null)
+        shipLength.setValue(null)
+        shipHeight.setValidators(null)
+        shipHeight.setValue(null)
+        shipWidth.setValidators(null)
+        shipWidth.setValue(null)
+      }
+      shipLength.updateValueAndValidity()
+      shipHeight.updateValueAndValidity()
+      shipWidth.updateValueAndValidity()
+    })
   }
 
   setNonRequiredFields(): void {
@@ -578,6 +614,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false
+      const message = ex?.response?.data?.Data
+      if (message) {
+        this.toastrService.error(message, 'Error', { onActivateTick: true })
+      }
       throw ex
     }
   }
@@ -1095,8 +1135,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges()
   }
 
-  validateVariants(e): void {
+  validateVariants(e: boolean): void {
     this.variantsValid = e
+  }
+
+  validateSpecs(e: boolean): void {
+    this.specsValid = e
   }
 
   shouldIsResaleBeChecked(): boolean {
@@ -1115,5 +1159,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.alive = false
+    this.sizeTierSubscription.unsubscribe()
+    this.inventoryValidatorSubscription.unsubscribe()
   }
 }
