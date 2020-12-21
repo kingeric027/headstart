@@ -99,7 +99,7 @@ export class ProductPricingComponent {
       UseCumulativeQuantity: value?.PriceSchedule?.UseCumulativeQuantity,
       ApplyTax: value?.PriceSchedule?.ApplyTax,
       ApplyShipping: value?.PriceSchedule?.ApplyShipping,
-      RestrictedQuantity: value?.PriceSchedule?.ApplyShipping,
+      RestrictedQuantity: value?.PriceSchedule?.RestrictedQuantity,
       MinQuantity: value?.PriceSchedule?.MinQuantity,
       MaxQuantity: value?.PriceSchedule?.MaxQuantity,
       PriceBreaks: [
