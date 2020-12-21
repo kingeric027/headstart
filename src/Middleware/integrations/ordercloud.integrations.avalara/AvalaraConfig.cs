@@ -12,6 +12,5 @@ namespace ordercloud.integrations.avalara
 		public string LicenseKey { get; set; }
 		public int CompanyID { get; set; }
 		public string CompanyCode { get; set; }
-		public string HostUrl { get; set; } // TODO - this will not work as part of a re-usable integration.
 	}
 }

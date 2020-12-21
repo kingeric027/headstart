@@ -72,8 +72,7 @@ namespace Marketplace.API
 				AccountID = _settings.AvalaraSettings.AccountID,
 				LicenseKey = _settings.AvalaraSettings.LicenseKey,
 				CompanyCode = _settings.AvalaraSettings.CompanyCode,
-                CompanyID = _settings.AvalaraSettings.CompanyID,
-				HostUrl = _settings.EnvironmentSettings.BaseUrl
+                CompanyID = _settings.AvalaraSettings.CompanyID
 			};
             var tecraConfig = _settings.TecraSettings;
             tecraConfig.BlobStorageHostUrl = _settings.BlobSettings.HostUrl;

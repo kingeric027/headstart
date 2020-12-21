@@ -89,6 +89,7 @@ namespace Marketplace.Common
         public string SEBDistributionSupplierID { get; set; }
         public string FirstChoiceSupplierID { get; set; }
         public string MedlineSupplierID { get; set; }
+        public string LaliciousSupplierID { get; set; }
         public string IncrementorPrefix { get; set; }
         public OrdercloudDataConfig DataConfig { get; set; } = new OrdercloudDataConfig();
     }

@@ -1,12 +1,8 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --configuration=qa` replaces `environment.ts` with `environment.qa.ts`.
-// The list of file replacements can be found in `angular.json`.
-
-import { Environment } from './environment.interface'
+import { EnvironmentConfig } from './environment.interfaces'
 import wtcTheme from '../styles/themes/waxing-the-city/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'Marketplace Test',
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
@@ -25,12 +21,3 @@ export const environment: Environment = {
   theme: wtcTheme,
   instrumentationKey: '4133d3cf-ae7a-43d1-a16b-172aee7cff6f',
 }
-
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

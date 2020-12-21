@@ -572,7 +572,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           superProduct.Product.ID
         )
       this.refreshProductData(superProduct)
-      this.createMonitoredProductDocument(superProduct)
+      //TODO: Add back in once CMS is working
+      //this.createMonitoredProductDocument(superProduct)
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`)
       this.dataIsSaving = false
     } catch (ex) {
@@ -840,7 +841,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       File: file.File,
       FileName: file.Filename,
     } as AssetUpload
-    const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(
+    const newAsset: Asset = await ContentManagementClient.Assets.Upload(
       asset,
       accessToken
     )

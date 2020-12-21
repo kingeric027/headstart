@@ -45,6 +45,7 @@ import {
 } from '@app-seller/orders/line-item-status.helper'
 import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { flatten as _flatten } from 'lodash'
 
 @Component({
   selector: 'app-order-shipments',
@@ -202,10 +203,36 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   async getLineItems(orderID: string): Promise<void> {
+    let allOrderLineItems: MarketplaceLineItem[] = []
+    const listOptions = {
+      page: 1,
+      pageSize: 100,
+    }
     const lineItemsResponse = await this.ocLineItemService
-      .List(this.orderDirection, orderID)
+      .List(this.orderDirection, orderID, listOptions)
       .toPromise()
-    this.lineItems = lineItemsResponse.Items as MarketplaceLineItem[]
+    allOrderLineItems = [
+      ...allOrderLineItems,
+      ...(lineItemsResponse.Items as MarketplaceLineItem[]),
+    ]
+    if (lineItemsResponse.Meta.TotalPages <= 1) {
+      this.lineItems = allOrderLineItems
+    } else {
+      let lineItemRequests = []
+      for (let page = 2; page <= lineItemsResponse.Meta.TotalPages; page++) {
+        listOptions.page = page
+        lineItemRequests = [
+          ...lineItemRequests,
+          this.ocLineItemService
+            .List(this.orderDirection, orderID, listOptions)
+            .toPromise(),
+        ]
+      }
+      return await Promise.all(lineItemRequests).then((response) => {
+        allOrderLineItems = [...allOrderLineItems, ..._flatten(response.map((r) => r.Items))]
+        this.lineItems = allOrderLineItems
+      })
+    }
   }
 
   async patchLineItems(): Promise<void> {
@@ -301,13 +328,20 @@ export class OrderShipmentsComponent implements OnChanges {
     this.shipAllItems = !this.shipAllItems
     if (this.shipAllItems) {
       this.lineItems.forEach((item) => {
-        this.shipmentForm.patchValue({
-          LineItemData: {
-            [item.ID]: {
-              Quantity: item.Quantity - item.QuantityShipped,
+        const quantityToShip =
+          item.Quantity -
+          item.QuantityShipped -
+          item.xp.StatusByQuantity['Backordered'] -
+          item.xp.StatusByQuantity['Canceled']
+        if (quantityToShip) {
+          this.shipmentForm.patchValue({
+            LineItemData: {
+              [item.ID]: {
+                Quantity: quantityToShip,
+              },
             },
-          },
-        })
+          })
+        }
       })
     }
   }

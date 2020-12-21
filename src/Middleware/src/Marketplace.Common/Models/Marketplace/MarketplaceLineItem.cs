@@ -9,13 +9,17 @@ namespace Marketplace.Models.Models.Marketplace
 	public class MarketplaceLineItem : LineItem<LineItemXp, MarketplaceLineItemProduct, LineItemVariant, MarketplaceAddressBuyer, MarketplaceAddressSupplier> { }
 
     [SwaggerModel]
-	public class LineItemXp 
+	public class LineItemXp
     {
         public Dictionary<LineItemStatus, int> StatusByQuantity { get; set; }
         public List<LineItemClaim> Returns { get; set; }
         public List<LineItemClaim> Cancelations { get; set; }
         public string ImageUrl { get; set; }
+
+        // chili specific fields
         public string PrintArtworkURL { get; set; }
+        public string ConfigurationID { get; set; }
+        public string DocumentID { get; set; }
 
         // kit specific fields
         public string KitProductImageUrl { get; set; }
@@ -24,6 +28,7 @@ namespace Marketplace.Models.Models.Marketplace
 
         // needed for Line Item Detail Report
         public string ShipMethod { get; set; }
+        public string SupplierComments { get; set; } // xp.Comments is already being used as ship comments for SEB
     }
 
     [SwaggerModel]

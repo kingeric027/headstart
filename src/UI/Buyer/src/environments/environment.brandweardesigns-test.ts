@@ -1,8 +1,8 @@
-import { Environment } from './environment.interface'
+import { EnvironmentConfig } from './environment.interfaces'
 import theme from '../styles/themes/brandweardesigns/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'BRANDWEAR Designs',
   clientID: '2F33BE12-D914-419C-B3D0-41AEFB72BE93',
