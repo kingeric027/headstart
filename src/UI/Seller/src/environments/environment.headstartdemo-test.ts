@@ -1,11 +1,11 @@
-import { Environment } from './environment.interface'
+import { EnvironmentConfig } from './environment.interfaces'
 
-export const environment: Environment = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'Headstart_Demo_Test',
   clientID: 'FF151BA7-0207-4134-8A7D-52235BEE4E7A',
   middlewareUrl: 'https://headstartdemo-middleware-test.azurewebsites.net',
-  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
   appname: 'Headstart Demo Admin',
   translateBlobUrl:
     'https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/',

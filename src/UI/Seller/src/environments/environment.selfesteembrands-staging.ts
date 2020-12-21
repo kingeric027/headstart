@@ -2,8 +2,8 @@
 // The build system defaults to the dev environment which uses `environment.ts`, but if you do
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.'
 
-import { Environment } from './environment.interface'
-export const environment: Environment = {
+import { EnvironmentConfig } from './environment.interfaces'
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   clientID: 'C1D92C43-C7AF-467B-B3DF-D4751D70CAE6',
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
