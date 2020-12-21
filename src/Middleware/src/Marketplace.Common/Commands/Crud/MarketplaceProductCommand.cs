@@ -324,21 +324,27 @@ namespace Marketplace.Common.Commands.Crud
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
+			var tasks = new List<Task>();
 			Task<PriceSchedule> _priceScheduleReq = null;
-			if (superProduct.PriceSchedule != null)
-			{
-				_priceScheduleReq = updateRelatedPriceSchedules(superProduct.PriceSchedule, token);
-			}
-			// List Variants
-			var _variantsReq = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: token);
+            if (superProduct.PriceSchedule != null)
+            {
+                _priceScheduleReq = UpdateRelatedPriceSchedules(superProduct.PriceSchedule, token);
+                tasks.Add(_priceScheduleReq);
+            }
+            // List Variants
+            var _variantsReq = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: token);
+			tasks.Add(_variantsReq);
 			// List Product Specs
 			var _specsReq = _oc.Products.ListSpecsAsync<Spec>(id, accessToken: token);
+			tasks.Add(_specsReq);
 			// List Product Images
 			var _imagesReq = GetProductImages(_updatedProduct.ID, token);
+			tasks.Add(_imagesReq);
 			// List Product Attachments
 			var _attachmentsReq = GetProductAttachments(_updatedProduct.ID, token);
+			tasks.Add(_attachmentsReq);
 
-			await Task.WhenAll(_variantsReq, _specsReq, _imagesReq, _attachmentsReq, _priceScheduleReq);
+			await Task.WhenAll(tasks);
 
 			return new SuperMarketplaceProduct
 			{
@@ -351,7 +357,7 @@ namespace Marketplace.Common.Commands.Crud
 			};
 		}
 
-		private async Task<PriceSchedule> updateRelatedPriceSchedules(PriceSchedule updated, string token)
+		private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
         {
 			var initial = await _oc.PriceSchedules.GetAsync(updated.ID);
 			if (initial.MaxQuantity != updated.MaxQuantity ||
