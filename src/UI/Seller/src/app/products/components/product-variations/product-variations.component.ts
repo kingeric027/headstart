@@ -439,6 +439,9 @@ export class ProductVariations implements OnChanges {
         ID: `${this.superProductEditable.Product.ID}-${opt.ID}`,
         Name: `${this.superProductEditable.Product.ID} ${opt.Value}`,
         Active: true,
+        Inventory: {
+          QuantityAvailable: 0,
+        },
         xp: {
           SpecCombo: `${opt.ID}`,
           SpecValues: [
@@ -461,6 +464,9 @@ export class ProductVariations implements OnChanges {
           ID: `${variant.ID}-${opt.ID}`,
           Name: `${variant.Name} ${opt.Value}`,
           Active: true,
+          Inventory: {
+            QuantityAvailable: 0,
+          },
           xp: {
             SpecCombo: `${variant.xp.SpecCombo}-${opt.ID}`,
             SpecValues: [
