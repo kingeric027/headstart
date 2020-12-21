@@ -237,7 +237,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }),
     }
     const productModifiedNotifications = await this.http
-      .post<SuperMarketplaceProduct>(
+      .post<ListPage<SuperMarketplaceProduct>>(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
         superProduct,
         headers

@@ -58,17 +58,46 @@ namespace Marketplace.Common.Commands
         {
             var token = await GetAdminToken();
             ListArgs<Document<MonitoredProductFieldModifiedNotification>> args;
+            var queryParams = new Tuple<string, string>("ID", $"{product.Product.ID}_*");
+
+            ListPage<Document<MonitoredProductFieldModifiedNotification>> document;
 
             args = new ListArgs<Document<MonitoredProductFieldModifiedNotification>>()
             {
-                Search = $"{product.Product.ID}",
-                SearchOn = "ID,Name",
                 PageSize = 100
             };
+            args.Filters.Add(new ListFilter()
+            {
+                QueryParams = new List<Tuple<string, string>> { queryParams }
+            });
 
-            var document = await _cms.Documents.List(_documentSchemaID, args, token);
+            document = await GetDocumentsByPageAsync(args, token);
 
             return document;
+        }
+
+        private async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> GetDocumentsByPageAsync(ListArgs<Document<MonitoredProductFieldModifiedNotification>> args, string token)
+        {
+            ListPage<Document<MonitoredProductFieldModifiedNotification>> result = new ListPage<Document<MonitoredProductFieldModifiedNotification>>();
+
+            result.Items = new List<Document<MonitoredProductFieldModifiedNotification>>();
+            //Get first 3 pages to make sure no notifications are missing
+            for (int pageNumber=1; pageNumber <= 2; pageNumber++)
+            {
+                args.Page = pageNumber;
+                var documentForPage = await _cms.Documents.List(_documentSchemaID, args, token);
+
+                if (documentForPage.Items.Count > 0)
+                {
+                    ((List<Document<MonitoredProductFieldModifiedNotification>>)result.Items).AddRange(documentForPage.Items);
+                    if (pageNumber == 1)
+                    {
+                        //Get meta for first item batch
+                        result.Meta = documentForPage.Meta;
+                    }
+                }
+            }
+            return result;
         }
 
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
@@ -90,8 +119,41 @@ namespace Marketplace.Common.Commands
                 }
             }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
-            {   
-                product = await _oc.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, user.AccessToken);
+            {
+                    var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
+                    if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
+
+                    var configToUse = new OrderCloudClientConfig
+                    {
+                        ApiUrl = user.ApiUrl,
+                        AuthUrl = user.AuthUrl,
+                        ClientId = supplierClient.ID,
+                        ClientSecret = supplierClient.ClientSecret,
+                        GrantType = GrantType.ClientCredentials,
+                        Roles = new[]
+                                   {
+                                     ApiRole.SupplierAdmin,
+                                     ApiRole.ProductAdmin
+                                },
+
+                    };
+                var ocClient = new OrderCloudClient(configToUse);
+                await ocClient.AuthenticateAsync();
+                var supplierToken = ocClient.TokenResponse.AccessToken;
+
+                try
+                {
+                    product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, supplierToken);
+
+                }
+                catch (OrderCloudException ex)
+                {
+                    if (ex?.Errors?[0]?.Data != null)
+                    {
+                        throw new Exception($"Unable to re-activate product: {ex?.Errors?[0]?.Message}: {ex?.Errors?[0]?.Data.ToJRaw()}");
+                    }
+                    throw new Exception($"Unable to re-activate product: {ex?.Errors?.ToJRaw()}");
+                }
 
                 //Delete document after acceptance
                 await _cms.Documents.Delete(_documentSchemaID, document.ID, token);
