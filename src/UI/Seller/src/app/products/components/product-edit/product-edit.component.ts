@@ -449,23 +449,25 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const shipLength = this.productForm.get('ShipLength')
     const shipHeight = this.productForm.get('ShipHeight')
     const shipWidth = this.productForm.get('ShipWidth')
-    sizeTier.valueChanges.subscribe((sizeTier) => {
-      if (sizeTier === 'G') {
-        shipLength.setValidators([Validators.required])
-        shipHeight.setValidators([Validators.required])
-        shipWidth.setValidators([Validators.required])
-      } else {
-        shipLength.setValidators(null)
-        shipLength.setValue(null)
-        shipHeight.setValidators(null)
-        shipHeight.setValue(null)
-        shipWidth.setValidators(null)
-        shipWidth.setValue(null)
-      }
-      shipLength.updateValueAndValidity()
-      shipHeight.updateValueAndValidity()
-      shipWidth.updateValueAndValidity()
-    })
+    sizeTier.valueChanges
+      .pipe(takeWhile(() => this.alive))
+      .subscribe((sizeTier) => {
+        if (sizeTier === 'G') {
+          shipLength.setValidators([Validators.required])
+          shipHeight.setValidators([Validators.required])
+          shipWidth.setValidators([Validators.required])
+        } else {
+          shipLength.setValidators(null)
+          shipLength.setValue(null)
+          shipHeight.setValidators(null)
+          shipHeight.setValue(null)
+          shipWidth.setValidators(null)
+          shipWidth.setValue(null)
+        }
+        shipLength.updateValueAndValidity()
+        shipHeight.updateValueAndValidity()
+        shipWidth.updateValueAndValidity()
+      })
   }
 
   setNonRequiredFields(): void {
@@ -613,8 +615,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     } catch (ex) {
       this.dataIsSaving = false
       const message = ex?.response?.data?.Data
-      if (message)
+      if (message) {
         this.toastrService.error(message, 'Error', { onActivateTick: true })
+      }
       throw ex
     }
   }
