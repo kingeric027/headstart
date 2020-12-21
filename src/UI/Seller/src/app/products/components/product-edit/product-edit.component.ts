@@ -73,6 +73,7 @@ import {
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { ToastrService } from 'ngx-toastr'
 
 @Component({
   selector: 'app-product-edit',
@@ -159,6 +160,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private toastrService: ToastrService,
     private http: HttpClient,
     private ocTokenService: OcTokenService
   ) {}
@@ -610,6 +612,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false
+      const message = ex?.response?.data?.Data
+      if (message)
+        this.toastrService.error(message, 'Error', { onActivateTick: true })
       throw ex
     }
   }
