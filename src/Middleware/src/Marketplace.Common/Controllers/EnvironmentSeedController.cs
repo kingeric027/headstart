@@ -4,6 +4,7 @@ using Marketplace.Common.Commands;
 using Marketplace.Common.Helpers;
 using Marketplace.Models.Misc;
 using Marketplace.Common.Services.DevCenter.Models;
+using ordercloud.integrations.library;
 
 namespace Marketplace.Common.Controllers
 {
@@ -22,7 +23,7 @@ namespace Marketplace.Common.Controllers
             await _command.Seed(seed, this.VerifiedUserContext);
         }
 
-		[HttpPost, Route("post-staging-restore")] // TODO - add webhook auth
+		[HttpPost, Route("post-staging-restore"), OrderCloudWebhookAuth]
 		public async Task PostStagingRestore()
 		{
 			await _command.PostStagingRestore();
