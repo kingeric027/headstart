@@ -1156,6 +1156,7 @@
               updateEditableProductWithVariationChanges($event)
             "
             (variantsValidated)="validateVariants($event)"
+            (specsValidated)="validateSpecs($event)"
           >
           </product-variations-component>
         </ng-template>
@@ -1436,13 +1437,19 @@
       <p *ngIf="!variantsValid" class="text-danger" translate>
         ADMIN.PRODUCT_EDIT.VARIATION_ISSUES
       </p>
+      <p *ngIf="!specsValid" class="text-danger" translate>
+        ADMIN.PRODUCT_EDIT.SPEC_ISSUES
+      </p>
       <div>
         <button
           *ngIf="areChanges"
           class="btn btn-primary"
           type="submit"
           [disabled]="
-            productForm?.status === 'INVALID' || !variantsValid || dataIsSaving
+            productForm?.status === 'INVALID' ||
+            !variantsValid ||
+            !specsValid ||
+            dataIsSaving
           "
           (click)="handleSave()"
         >

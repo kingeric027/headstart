@@ -127,6 +127,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   shippingAddress: any
   productVariations: any
   variantsValid = true
+  specsValid = true
   editSpecs = false
   fileType: string
   imageFiles: FileHandle[] = []
@@ -394,7 +395,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       )
       this.setInventoryValidator()
       this.setVariantLevelTrackingDisabledSubscription()
-      this.setSizeTierValidator()
+      this.setSizeTierValidators()
       this.setNonRequiredFields()
       this.setResourceType()
     }
@@ -441,7 +442,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       })
   }
 
-  setSizeTierValidator(): void {
+  setSizeTierValidators(): void {
     const sizeTier = this.productForm.get('SizeTier')
     const shipLength = this.productForm.get('ShipLength')
     const shipHeight = this.productForm.get('ShipHeight')
@@ -453,8 +454,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         shipWidth.setValidators([Validators.required])
       } else {
         shipLength.setValidators(null)
+        shipLength.setValue(null)
         shipHeight.setValidators(null)
+        shipHeight.setValue(null)
         shipWidth.setValidators(null)
+        shipWidth.setValue(null)
       }
       shipLength.updateValueAndValidity()
       shipHeight.updateValueAndValidity()
@@ -1123,8 +1127,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges()
   }
 
-  validateVariants(e): void {
+  validateVariants(e: boolean): void {
     this.variantsValid = e
+  }
+
+  validateSpecs(e: boolean): void {
+    this.specsValid = e
   }
 
   shouldIsResaleBeChecked(): boolean {

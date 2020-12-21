@@ -91,6 +91,7 @@ export class ProductVariations implements OnChanges {
   productVariationsChanged = new EventEmitter<SuperMarketplaceProduct>()
   @Output() skuUpdated = new EventEmitter<SuperMarketplaceProduct>()
   @Output() variantsValidated = new EventEmitter<boolean>()
+  @Output() specsValidated = new EventEmitter<boolean>()
   superProductEditable: SuperMarketplaceProduct
   superProductStatic: SuperMarketplaceProduct
   variants: BehaviorSubject<MarketplaceVariant[]>
@@ -99,6 +100,7 @@ export class ProductVariations implements OnChanges {
   areSpecChanges = false
   definesVariant = false
   variantsValid = true
+  specOptionsExistOnSpec = true
   editSpecs = false
   faTrash = faTrash
   faCog = faCog
@@ -159,6 +161,16 @@ export class ProductVariations implements OnChanges {
     this.areSpecChanges =
       JSON.stringify(this.superProductEditable?.Specs) !==
       JSON.stringify(this.superProductStatic?.Specs)
+    if (this.areSpecChanges) {
+      this.specOptionsExistOnSpec = this.hasSpecOptions()
+    }
+    this.specsValidated.emit(this.specOptionsExistOnSpec)
+  }
+
+  hasSpecOptions(): boolean {
+    return this.superProductEditable?.Specs?.every(
+      (spec) => spec?.Options?.length
+    )
   }
 
   shouldDefinesVariantBeChecked(): boolean {
