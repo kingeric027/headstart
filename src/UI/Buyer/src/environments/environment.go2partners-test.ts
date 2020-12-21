@@ -1,8 +1,8 @@
-import { AppConfig } from './environment.interfaces'
+import { EnvironmentConfig } from './environment.interfaces'
 import theme from '../styles/themes/go2partners/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: AppConfig = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'GO2 Partners',
   clientID: 'B1FEB16F-9E3E-4534-88FE-F3AE29941986',

@@ -1,8 +1,8 @@
-import { AppConfig } from './environment.interfaces'
+import { EnvironmentConfig } from './environment.interfaces'
 import theme from '../styles/themes/fastsigns/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: AppConfig = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'FASTSIGNS',
   clientID: '3B7CD2F7-36D8-4DC4-9616-0CB1C86C9FB3',

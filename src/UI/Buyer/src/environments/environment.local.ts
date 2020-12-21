@@ -1,4 +1,4 @@
-import { Brand, Environment, AppConfig } from './environment.interfaces'
+import { Brand, Environment, EnvironmentConfig } from './environment.interfaces'
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
@@ -44,7 +44,10 @@ const apps = {
   },
 }
 
-const target: AppConfig = apps[sebEnvironment][brand]
+// for easier debugging in development mode, ignores zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+import 'zone.js/dist/zone-error'
+
+const target: EnvironmentConfig = apps[sebEnvironment][brand]
 target.hostedApp = false
 target.instrumentationKey = ''
 if (useLocalMiddleware) {
