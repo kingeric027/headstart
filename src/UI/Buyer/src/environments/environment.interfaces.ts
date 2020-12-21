@@ -1,6 +1,6 @@
 import { OrdercloudEnv, Theme } from 'src/app/shopper-context'
 
-export interface AppConfig {
+export interface EnvironmentConfig {
   hostedApp: boolean
   appname: string
   clientID: string

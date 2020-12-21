@@ -1,11 +1,11 @@
-import { Environment } from './environment.interface'
+import { EnvironmentConfig } from './environment.interfaces'
 
-export const environment: Environment = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'GO2PARTNERS_TEST',
   clientID: '1C414E48-B027-4C6D-85CF-873723EB7A70',
   middlewareUrl: 'https://go2partners-middleware-test.azurewebsites.net',
-  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',  
+  cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
   appname: 'GO2 Partners Admin',
   translateBlobUrl:
     'https://stgo2partnerstest.blob.core.windows.net/ngx-translate/i18n/',

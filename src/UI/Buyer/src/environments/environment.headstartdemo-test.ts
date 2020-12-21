@@ -1,8 +1,8 @@
-import { AppConfig } from './environment.interfaces'
+import { EnvironmentConfig } from './environment.interfaces'
 import theme from '../styles/themes/headstartdemo/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: AppConfig = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'Headstart Demo',
   clientID: 'A482C18B-527B-4BA1-A2E9-0E7C65C2E39F',

@@ -1,8 +1,8 @@
-import { AppConfig } from './environment.interfaces'
+import { EnvironmentConfig } from './environment.interfaces'
 import bmTheme from '../styles/themes/bar-method/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: AppConfig = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'The Bar Method',
   clientID: 'CF547B04-1826-427D-9940-824805F0ECA0',
@@ -20,12 +20,3 @@ export const environment: AppConfig = {
   theme: bmTheme,
   instrumentationKey: '419a0c62-a800-4d19-882b-b61007e69cdb',
 }
-/*
-
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

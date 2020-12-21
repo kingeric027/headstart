@@ -2,10 +2,10 @@
 // The build system defaults to the dev environment which uses `environment.ts`, but if you do
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 
-import { Environment } from './environment.interface'
+import { EnvironmentConfig } from './environment.interfaces'
 
 // TODO: Change oc integration middleware url to staging URL when one exists
-export const environment: Environment = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'pPOiukEUHkSGrBmAIjdReQ',
   clientID: 'C1D92C43-C7AF-467B-B3DF-D4751D70CAE6',
