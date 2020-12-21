@@ -74,6 +74,7 @@ import {
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { ToastrService } from 'ngx-toastr'
+import { Observable, Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-product-edit',
@@ -145,6 +146,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   active: number
   alive = true
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[]
+  sizeTierSubscription: Subscription
+  inventoryValidatorSubscription: Subscription
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -408,10 +411,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const variantLevelTrackingControl = this.productForm.get(
       'VariantLevelTracking'
     )
-    this.productForm
+    this.inventoryValidatorSubscription = this.productForm
       .get('InventoryEnabled')
-      .valueChanges.pipe(takeWhile(() => this.alive))
-      .subscribe((inventory) => {
+      .valueChanges.subscribe((inventory) => {
         if (inventory && variantLevelTrackingControl.value === false) {
           quantityControl.setValidators([
             Validators.required,
@@ -449,25 +451,23 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const shipLength = this.productForm.get('ShipLength')
     const shipHeight = this.productForm.get('ShipHeight')
     const shipWidth = this.productForm.get('ShipWidth')
-    sizeTier.valueChanges
-      .pipe(takeWhile(() => this.alive))
-      .subscribe((sizeTier) => {
-        if (sizeTier === 'G') {
-          shipLength.setValidators([Validators.required])
-          shipHeight.setValidators([Validators.required])
-          shipWidth.setValidators([Validators.required])
-        } else {
-          shipLength.setValidators(null)
-          shipLength.setValue(null)
-          shipHeight.setValidators(null)
-          shipHeight.setValue(null)
-          shipWidth.setValidators(null)
-          shipWidth.setValue(null)
-        }
-        shipLength.updateValueAndValidity()
-        shipHeight.updateValueAndValidity()
-        shipWidth.updateValueAndValidity()
-      })
+    this.sizeTierSubscription = sizeTier.valueChanges.subscribe((sizeTier) => {
+      if (sizeTier === 'G') {
+        shipLength.setValidators([Validators.required])
+        shipHeight.setValidators([Validators.required])
+        shipWidth.setValidators([Validators.required])
+      } else {
+        shipLength.setValidators(null)
+        shipLength.setValue(null)
+        shipHeight.setValidators(null)
+        shipHeight.setValue(null)
+        shipWidth.setValidators(null)
+        shipWidth.setValue(null)
+      }
+      shipLength.updateValueAndValidity()
+      shipHeight.updateValueAndValidity()
+      shipWidth.updateValueAndValidity()
+    })
   }
 
   setNonRequiredFields(): void {
@@ -1159,5 +1159,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.alive = false
+    this.sizeTierSubscription.unsubscribe()
+    this.inventoryValidatorSubscription.unsubscribe()
   }
 }
