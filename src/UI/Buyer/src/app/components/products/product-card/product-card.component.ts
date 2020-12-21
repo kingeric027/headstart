@@ -18,6 +18,7 @@ export class OCMProductCard {
   _product: MarketplaceMeProduct = {
     PriceSchedule: {} as PriceSchedule,
   }
+  _shipFromSources: any = {}
   _price: number
   _userCurrency: string
   quantity: number
@@ -44,6 +45,10 @@ export class OCMProductCard {
   @Input() set isFavorite(value: boolean) {
     this._isFavorite = value
     this.cdr.detectChanges() // TODO - remove. Solve another way.
+  }
+
+  @Input() set shipFromSources(value: any) {
+    this._shipFromSources = value
   }
 
   async addToCart(): Promise<void> {
@@ -105,5 +110,15 @@ export class OCMProductCard {
   setQuantity(event: any): void {
     this.quantity = event.qty
     this.qtyValid = event.valid
+  }
+
+  isCanadianShipFromAddress(): boolean {
+    const supplierID = this._product.DefaultSupplierID
+    const addressID = this._product.ShipFromAddressID
+    if (!this._shipFromSources[supplierID]) return false
+    const shipFromAddress = this._shipFromSources[supplierID].find(
+      (address) => address.ID == addressID
+    )
+    return shipFromAddress && shipFromAddress.Country === 'CA'
   }
 }

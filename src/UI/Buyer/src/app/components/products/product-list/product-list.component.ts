@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges } from '@angular/core'
+import { Component, Input, OnInit, OnDestroy } from '@angular/core'
 import { ListFacet, Category, ListPage } from 'ordercloud-javascript-sdk'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper'
@@ -11,9 +11,9 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class OCMProductList implements OnChanges, OnInit, OnDestroy {
+export class OCMProductList implements OnInit, OnDestroy {
   @Input() products: ListPage<MarketplaceMeProduct>
-  @Input() shipFromSources: {}
+  @Input() shipFromSources: any
   @Input() isProductListLoading: boolean
   alive = true
   facets: ListFacet[]
@@ -26,10 +26,6 @@ export class OCMProductList implements OnChanges, OnInit, OnDestroy {
   searchTermForProducts = ''
 
   constructor(private context: ShopperContextService) {}
-
-  ngOnChanges(): void {
-    console.log(this.shipFromSources)
-  }
 
   ngOnInit(): void {
     this.context.productFilters.activeFiltersSubject
@@ -64,14 +60,6 @@ export class OCMProductList implements OnChanges, OnInit, OnDestroy {
   setActiveCategory(categoryID: string): void {
     this.context.productFilters.filterByCategory(categoryID)
   }
-
-  // retrieveShipFromAddressData(): void {
-  //   Object.keys(this.shipFromSources).forEach((supplierId) => {
-  //     this.shipFromSources[supplierId].forEach(shipFromAddressId => { // suppliers can have multiple shipping addresses
-  //       this.supplierFilterService.getSupplierAddress(supplierId, shipFromAddressId)
-  //     });
-  //   })
-  // }
 
   ngOnDestroy(): void {
     this.alive = false

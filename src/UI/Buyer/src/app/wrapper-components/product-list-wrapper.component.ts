@@ -23,7 +23,7 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
   isProductListLoading = true
 
   constructor(
-    public context: ShopperContextService, 
+    public context: ShopperContextService,
     private supplierFilterService: SupplierFilterService
   ) {}
 
@@ -43,24 +43,45 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
     if (user?.UserGroups?.length) {
       try {
         this.products = await this.context.productFilters.listProducts()
-        let sourceIds = {} 
-        this.products.Items.forEach(p => {
+        let sourceIds = {}
+        this.products.Items.forEach((p) => {
           if (!p.DefaultSupplierID || !p.ShipFromAddressID) return
           const source = sourceIds[p.DefaultSupplierID]
           if (!source) {
             sourceIds[p.DefaultSupplierID] = [p.ShipFromAddressID]
           } else {
-            sourceIds[p.DefaultSupplierID] = _uniq([...source, p.ShipFromAddressID])
+            sourceIds[p.DefaultSupplierID] = _uniq([
+              ...source,
+              p.ShipFromAddressID,
+            ])
           }
         })
-        // TODO: check for existing IDs to prevent duplicate calls
-        Object.keys(sourceIds).forEach(async supplierId => {
-          sourceIds[supplierId].forEach(async addressId => { // suppliers can have multiple addresses
-            this.shipFromSources[supplierId] = [await this.supplierFilterService.getSupplierAddress(supplierId, addressId)]
+        Object.keys(sourceIds).forEach(async (supplierId) => {
+          sourceIds[supplierId].forEach(async (addressId) => {
+            if (!this.shipFromSources[supplierId]) {
+              this.shipFromSources[supplierId] = [
+                await this.supplierFilterService.getSupplierAddress(
+                  supplierId,
+                  addressId
+                ),
+              ]
+            } else if (
+              !this.shipFromSources[supplierId].find(
+                (address) => address.ID === addressId
+              )
+            ) {
+              // suppliers can have multiple addresses
+              this.shipFromSources[supplierId] = [
+                ...this.shipFromSources[supplierId],
+                await this.supplierFilterService.getSupplierAddress(
+                  supplierId,
+                  addressId
+                ),
+              ]
+            }
           })
         })
       } finally {
-        console.log(this.shipFromSources);
         window.scroll(0, 0)
         this.isProductListLoading = false
       }
