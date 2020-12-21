@@ -111,7 +111,7 @@ namespace Marketplace.Common.Commands
             catch (OrderCloudException ex)
             {
                 //Product was deleted after it was updated. Delete orphaned notification 
-               if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
+                if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
                 {
                     await _cms.Documents.Delete(_documentSchemaID, document.ID, token);
                     return new SuperMarketplaceProduct();
@@ -119,31 +119,25 @@ namespace Marketplace.Common.Commands
             }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)
             {
-                    var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
-                    if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
+                var supplierClient = await _apiClientHelper.GetSupplierApiClient(supplierID, user.AccessToken);
+                if (supplierClient == null) { throw new Exception($"Default supplier client not found. SupplierID: {supplierID}, ProductID: {productID}"); }
 
-                    var configToUse = new OrderCloudClientConfig
-                    {
-                        ApiUrl = user.ApiUrl,
-                        AuthUrl = user.AuthUrl,
-                        ClientId = supplierClient.ID,
-                        ClientSecret = supplierClient.ClientSecret,
-                        GrantType = GrantType.ClientCredentials,
-                        Roles = new[]
-                                   {
+                var configToUse = new OrderCloudClientConfig
+                {
+                    ApiUrl = user.ApiUrl,
+                    AuthUrl = user.AuthUrl,
+                    ClientId = supplierClient.ID,
+                    ClientSecret = supplierClient.ClientSecret,
+                    GrantType = GrantType.ClientCredentials,
+                    Roles = new[]
+                               {
                                      ApiRole.SupplierAdmin,
                                      ApiRole.ProductAdmin
                                 },
-
-                    };
-                var ocClient = new OrderCloudClient(configToUse);
-                await ocClient.AuthenticateAsync();
-                var supplierToken = ocClient.TokenResponse.AccessToken;
-
+                };
                 try
                 {
-                    product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, supplierToken);
-
+                    await ClientHelper.RunAction(configToUse, x => x.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }));
                 }
                 catch (OrderCloudException ex)
                 {
