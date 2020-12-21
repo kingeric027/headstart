@@ -74,7 +74,7 @@ import {
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { ToastrService } from 'ngx-toastr'
-import { Observable, Subscription } from 'rxjs'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-product-edit',
