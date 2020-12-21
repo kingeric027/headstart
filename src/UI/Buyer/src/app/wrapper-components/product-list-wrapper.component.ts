@@ -53,21 +53,14 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
             sourceIds[p.DefaultSupplierID] = _uniq([...source, p.ShipFromAddressID])
           }
         })
-        /**
-         *           if (!p.DefaultSupplierID || !p.ShipFromAddressID) return;
-          const source = this.shipFromSources[p.DefaultSupplierID]
-          if (!source) {
-            this.shipFromSources[p.DefaultSupplierID] = [await this.supplierFilterService.getSupplierAddress(p.DefaultSupplierID, p.ShipFromAddressID)]
-          } else if (this.shipFromSources[p.DefaultSupplierID].map(address => address.ID).indexOf(p.ShipFromAddressID) < 0) {
-            this.shipFromSources[p.DefaultSupplierID] = _uniqBy(
-              [
-                ...this.shipFromSources[p.DefaultSupplierID], 
-                await this.supplierFilterService.getSupplierAddress(p.DefaultSupplierID, p.ShipFromAddressID)
-              ], 
-              'ID')
-          }
-         */
+        // TODO: check for existing IDs to prevent duplicate calls
+        Object.keys(sourceIds).forEach(async supplierId => {
+          sourceIds[supplierId].forEach(async addressId => { // suppliers can have multiple addresses
+            this.shipFromSources[supplierId] = [await this.supplierFilterService.getSupplierAddress(supplierId, addressId)]
+          })
+        })
       } finally {
+        console.log(this.shipFromSources);
         window.scroll(0, 0)
         this.isProductListLoading = false
       }
