@@ -56,29 +56,18 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
             ])
           }
         })
-        Object.keys(sourceIds).forEach(async (supplierId) => {
+        Object.keys(sourceIds).forEach((supplierId) => {
           sourceIds[supplierId].forEach(async (addressId) => {
-            if (!this.shipFromSources[supplierId]) {
-              this.shipFromSources[supplierId] = [
-                await this.supplierFilterService.getSupplierAddress(
-                  supplierId,
-                  addressId
-                ),
-              ]
-            } else if (
-              !this.shipFromSources[supplierId].find(
-                (address) => address.ID === addressId
-              )
-            ) {
-              // suppliers can have multiple addresses
-              this.shipFromSources[supplierId] = [
-                ...this.shipFromSources[supplierId],
-                await this.supplierFilterService.getSupplierAddress(
-                  supplierId,
-                  addressId
-                ),
-              ]
-            }
+            if (!this.shipFromSources[supplierId])
+              this.shipFromSources[supplierId] = []
+            const address = await this.supplierFilterService.getSupplierAddress(
+              supplierId,
+              addressId
+            )
+            this.shipFromSources[supplierId] = [
+              ...this.shipFromSources[supplierId],
+              address,
+            ]
           })
         })
       } finally {
