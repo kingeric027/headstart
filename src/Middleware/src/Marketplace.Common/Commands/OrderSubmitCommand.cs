@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Services.ShippingIntegration.Models;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
+using System.Net;
 
 namespace Marketplace.Common.Commands
 {
@@ -149,7 +150,7 @@ namespace Marketplace.Common.Commands
         {
             // retries three times, waits two seconds in-between failures
             return Policy
-                .Handle<Exception>()
+                .Handle<OrderCloudException>(e => e.HttpStatus == HttpStatusCode.InternalServerError || e.HttpStatus == HttpStatusCode.RequestTimeout)
                 .WaitAndRetryAsync(new[] {
                     TimeSpan.FromSeconds(2),
                     TimeSpan.FromSeconds(2),
