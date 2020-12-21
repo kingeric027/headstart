@@ -60,8 +60,6 @@ namespace Marketplace.Common.Commands
             ListArgs<Document<MonitoredProductFieldModifiedNotification>> args;
             var queryParams = new Tuple<string, string>("ID", $"{product.Product.ID}_*");
 
-            ListPage<Document<MonitoredProductFieldModifiedNotification>> document;
-
             args = new ListArgs<Document<MonitoredProductFieldModifiedNotification>>()
             {
                 PageSize = 100
@@ -71,18 +69,19 @@ namespace Marketplace.Common.Commands
                 QueryParams = new List<Tuple<string, string>> { queryParams }
             });
 
-            document = await GetDocumentsByPageAsync(args, token);
+            var document = await GetDocumentsByPageAsync(args, token);
 
             return document;
         }
 
         private async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> GetDocumentsByPageAsync(ListArgs<Document<MonitoredProductFieldModifiedNotification>> args, string token)
         {
-            ListPage<Document<MonitoredProductFieldModifiedNotification>> result = new ListPage<Document<MonitoredProductFieldModifiedNotification>>();
+            var result = new ListPage<Document<MonitoredProductFieldModifiedNotification>>();
 
             result.Items = new List<Document<MonitoredProductFieldModifiedNotification>>();
-            //Get first 3 pages to make sure no notifications are missing
-            for (int pageNumber=1; pageNumber <= 2; pageNumber++)
+
+            //Get first 2 pages to make sure no notifications are missing
+            for (int pageNumber = 1; pageNumber <= 2; pageNumber++)
             {
                 args.Page = pageNumber;
                 var documentForPage = await _cms.Documents.List(_documentSchemaID, args, token);
