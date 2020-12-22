@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs'
 import { Router, Params, ActivatedRoute } from '@angular/router'
 import { transform as _transform, pickBy as _pickBy } from 'lodash'
 import { SupplierFilters } from '../../shopper-context'
-import { Suppliers, Supplier, Sortable } from 'ordercloud-javascript-sdk'
+import { Suppliers, Supplier, Sortable, Address, SupplierAddresses } from 'ordercloud-javascript-sdk'
 import { ListPage } from '@ordercloud/headstart-sdk'
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
@@ -49,6 +49,10 @@ export class SupplierFilterService {
       sortBy: sortBy ? sortBy : 'Name',
       filters: this.createFilters(allFilters, supplierID),
     })
+  }
+
+  async getSupplierAddress(supplierId, shipFromId): Promise<Address> {
+    return await SupplierAddresses.Get(supplierId, shipFromId)
   }
 
   setNonURLFilter(key: string, value: string): void {

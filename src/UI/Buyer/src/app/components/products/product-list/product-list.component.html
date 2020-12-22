@@ -133,6 +133,7 @@
             *ngFor="let product of products.Items; let i = index"
             class="col-md-6 col-lg-4 d-flex"
             [product]="product"
+            [shipFromSources]="shipFromSources"
             [isFavorite]="isFavorite(product.ID)"
           >
           </ocm-product-card>
