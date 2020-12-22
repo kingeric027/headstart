@@ -20,7 +20,7 @@
       />
     </figure>
     <div
-      *ngIf="_product?.xp?.Currency == 'CAD'"
+      *ngIf="isCanadianShipFromAddress()"
       class="chip chip-xs bg-white shadow position-absolute"
     >
       <svg
