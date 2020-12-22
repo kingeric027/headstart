@@ -95,7 +95,6 @@ namespace Common.Services.AnytimeDashboard
 			return await GetAsync<AFGetStaffResponse>(resource, null);
 		}
 
-
 		private async Task<AFToken> RequestToken(object formEncodedBody)
 		{
 			return await $"{_settings.AnytimeDashboardSettings.ApiUrl}/token"

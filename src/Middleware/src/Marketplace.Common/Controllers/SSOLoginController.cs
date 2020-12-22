@@ -2,16 +2,18 @@
 using Marketplace.Common.Commands;
 using Marketplace.Common.Mappers;
 using Marketplace.Common.Models;
+using Marketplace.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Common.Controllers
 {
+	[MarketplaceSection.Marketplace(ListOrder = 1)]
 	[Route("api")]
-	public class SSOLoginController : Controller
+	public class SSOLoginController : BaseController
 	{
 		private readonly ISSOLoginCommand _command;
 
-		public SSOLoginController(ISSOLoginCommand command)
+		public SSOLoginController(ISSOLoginCommand command, AppSettings settings) : base(settings)
 		{
 			_command = command;
 		}
