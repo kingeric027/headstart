@@ -1,14 +1,6 @@
 ﻿namespace ordercloud.integrations.cardconnect
 {
-    public abstract class CardConnectResponse
-    {
-        public string respcode { get; set; }
-        public string respproc { get; set; }
-        public string respstat { get; set; }
-        public string resptext { get; set; }
-    }
-
-    public class CardConnectAuthorizationRequest
+   public class CardConnectAuthorizationRequest
     {
         public string merchid { get; set; }
         public string orderid { get; set; }
@@ -31,7 +23,7 @@
         //public string bin { get; set; }
     }
 
-    public class CardConnectAuthorizationResponse : CardConnectResponse
+    public class CardConnectAuthorizationResponse
     {
         public string token { get; set; }
         public string account { get; set; }
@@ -41,13 +33,17 @@
         public string merchid { get; set; }
         public string avsresp { get; set; }
         public string cvvresp { get; set; }
-        public string authcode { get; set; }
         public string signature { get; set; }
         public string bintype { get; set; }
         public string commcard { get; set; }
         public string emv { get; set; }
         public BinInfo binInfo { get; set; }
         public dynamic receipt { get; set; }
+        public string authcode { get; set; }
+        public string respcode { get; set; }
+        public string respproc { get; set; }
+        public string respstat { get; set; }
+        public string resptext { get; set; }
     }
 
     public class BinInfo

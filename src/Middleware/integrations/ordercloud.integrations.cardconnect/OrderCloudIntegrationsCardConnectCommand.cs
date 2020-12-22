@@ -64,7 +64,7 @@ namespace ordercloud.integrations.cardconnect
                 ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment {Accepted = true, Amount = ccAmount});
                 return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, call));
             }
-            catch (CreditCardIntegrationException ex)
+            catch (CreditCardAuthorizationException ex)
             {
                 ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment { Accepted = false, Amount = ccAmount });
                 await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, ex.Response));

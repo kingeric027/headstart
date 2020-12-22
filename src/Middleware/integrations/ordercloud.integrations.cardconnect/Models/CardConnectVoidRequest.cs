@@ -8,13 +8,17 @@
         public decimal? amount { get; set; } = 0M;
     }
 
-    public class CardConnectVoidResponse : CardConnectResponse
+    public class CardConnectVoidResponse
     {
         public string merchid { get; set; }
         public decimal? amount { get; set; }
         public string orderId { get; set; }
         public string retref { get; set; }
         public string authcode { get; set; }
+        public string respcode { get; set; }
+        public string respproc { get; set; }
+        public string respstat { get; set; }
+        public string resptext { get; set; }
     }
 
 }

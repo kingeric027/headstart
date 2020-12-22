@@ -68,7 +68,7 @@ namespace ordercloud.integrations.cardconnect
             {
                 return attempt;
             }
-            throw new CreditCardIntegrationException(new ApiError()
+            throw new CreditCardVoidException(new ApiError()
             {
                 Data = attempt,
                 Message = attempt.resptext, // response codes: https://developer.cardconnect.com/cardconnect-api?lang=json#void-service-url
@@ -87,7 +87,7 @@ namespace ordercloud.integrations.cardconnect
             {
                 return attempt;
             }
-            throw new CreditCardIntegrationException(new ApiError()
+            throw new CreditCardAuthorizationException(new ApiError()
             {
                 Data = attempt,
                 Message = attempt.resptext, // response codes: https://developer.cardconnect.com/assets/developer/assets/authResp_2-11-19.txt
