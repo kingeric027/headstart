@@ -44,6 +44,7 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
       try {
         this.products = await this.context.productFilters.listProducts()
         let sourceIds = {}
+        // gather supplier IDs and unique shipFromAddress IDs per supplier
         this.products.Items.forEach((p) => {
           if (!p.DefaultSupplierID || !p.ShipFromAddressID) return
           const source = sourceIds[p.DefaultSupplierID]
