@@ -124,14 +124,23 @@ namespace Marketplace.Common.Commands
 			var searchText = args.Search ?? "";
 			var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
 			var sortBy = args.SortBy.FirstOrDefault();
-			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
+			var meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
+			if(!(bool)(meProducts?.Items?.Any()))
+            {
+				meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.AnyTerm, sortBy: sortBy, accessToken: user.AccessToken);
+				if (!(bool)(meProducts?.Items?.Any()))
+                {
+					//if no products after retry search, avoid making extra calls for pricing details
+					return meProducts;
+                }
+			}
+
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = GetExchangeRates(user);
-			await Task.WhenAll(meProductsRequest, defaultMarkupMultiplierRequest, exchangeRatesRequest);
+			await Task.WhenAll(defaultMarkupMultiplierRequest, exchangeRatesRequest);
 				
-			var meProducts = await meProductsRequest;
-			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-			var exchangeRates = await exchangeRatesRequest;
+			var defaultMarkupMultiplier = defaultMarkupMultiplierRequest.Result;
+			var exchangeRates = exchangeRatesRequest.Result;
 
 			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
 
