@@ -227,11 +227,32 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async refreshProductData(
     superProduct: SuperMarketplaceProduct
   ): Promise<void> {
-    const productModifiedNotifications = await ContentManagementClient.Documents.ListDocuments(
-      'MonitoredProductFieldModifiedNotification',
-      'Products',
-      superProduct?.Product?.ID
-    )
+    // const productModifiedNotifications = await ContentManagementClient.Documents.List(
+    //   'MonitoredProductFieldModifiedNotification',
+    //   {
+    //     pageSize: 100,
+    //     //filters: { ID: superProduct?.Product?.ID },
+    //   }
+    // )
+
+    // const productModifiedNotifications = await ContentManagementClient.Documents.ListDocuments(
+    //   'MonitoredProductFieldModifiedNotification',
+    //   'Products',
+    //   `${superProduct?.Product?.ID}*`
+    // )
+    const headers = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+    }
+    const productModifiedNotifications = await this.http
+      .post<ListPage<SuperMarketplaceProduct>>(
+        `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
+        superProduct,
+        headers
+      )
+      .toPromise()
+
     this.productInReviewNotifications = productModifiedNotifications?.Items.filter(
       (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
     )
@@ -609,7 +630,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         )
       this.refreshProductData(superProduct)
       //TODO: Add back in once CMS is working
-      //this.createMonitoredProductDocument(superProduct)
+      this.createMonitoredProductDocument(superProduct)
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`)
       this.dataIsSaving = false
     } catch (ex) {

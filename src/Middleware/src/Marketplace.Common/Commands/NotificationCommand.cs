@@ -20,6 +20,7 @@ namespace Marketplace.Common.Commands
     {
         Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user);
         Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user);
+        Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationList(SuperMarketplaceProduct product, VerifiedUserContext user);
     }
     public class NotificationCommand : INotificationCommand
     {
@@ -28,6 +29,7 @@ namespace Marketplace.Common.Commands
         private readonly ICMSClient _cms;
         private readonly IMarketplaceProductCommand _productCommand;
         private readonly ISupplierApiClientHelper _apiClientHelper;
+        private readonly string _documentSchemaID = "MonitoredProductFieldModifiedNotification";
 
         public NotificationCommand(IOrderCloudClient oc, AppSettings settings, ICMSClient cms, IMarketplaceProductCommand productCommand, ISupplierApiClientHelper apiClientHelper)
         {
@@ -39,21 +41,68 @@ namespace Marketplace.Common.Commands
         }
         public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
         {
-            // Make the Product.Active = false;
+            if (notification == null || notification?.Product == null) { throw new Exception("Unable to process notification with no product"); }
             var _product = await _oc.Products.PatchAsync(notification.Product.ID, new PartialProduct { Active = false }, user.AccessToken);
             var document = new Document<MonitoredProductFieldModifiedNotification>();
             document.Doc = notification;
-            document.ID = CosmosInteropID.New();
+            document.ID = $"{notification.Product.ID}_{CosmosInteropID.New()}";
             // Create notifictaion in the cms
-            await _cms.Documents.Create("MonitoredProductFieldModifiedNotification", document, await GetAdminToken());
+            await _cms.Documents.Create(_documentSchemaID, document, await GetAdminToken());
             // Assign the notification to the product
             // TODO: this doesn't work because need to own thing being assigned to AND have DocumentAdmin and we don't want to give suppliers DocumentAdmin
             // await _cms.Documents.SaveAssignment("MonitoredProductFieldModifiedNotification", new DocumentAssignment() { DocumentID = document.ID, ResourceType = ResourceType.Products, ResourceID = _product.ID }, user.AccessToken);
             return await _productCommand.Get(_product.ID, user.AccessToken);
         }
+
+        public async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationList(SuperMarketplaceProduct product, VerifiedUserContext user)
+        {
+            var token = await GetAdminToken();
+            ListArgs<Document<MonitoredProductFieldModifiedNotification>> args;
+            var queryParams = new Tuple<string, string>("ID", $"{product.Product.ID}_*");
+
+            args = new ListArgs<Document<MonitoredProductFieldModifiedNotification>>()
+            {
+                PageSize = 100
+            };
+            args.Filters.Add(new ListFilter()
+            {
+                QueryParams = new List<Tuple<string, string>> { queryParams }
+            });
+
+            var document = await GetDocumentsByPageAsync(args, token);
+
+            return document;
+        }
+
+        private async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> GetDocumentsByPageAsync(ListArgs<Document<MonitoredProductFieldModifiedNotification>> args, string token)
+        {
+            var result = new ListPage<Document<MonitoredProductFieldModifiedNotification>>();
+
+            result.Items = new List<Document<MonitoredProductFieldModifiedNotification>>();
+
+            //Get first 2 pages to make sure no notifications are missing
+            for (int pageNumber = 1; pageNumber <= 2; pageNumber++)
+            {
+                args.Page = pageNumber;
+                var documentForPage = await _cms.Documents.List(_documentSchemaID, args, token);
+
+                if (documentForPage.Items.Count > 0)
+                {
+                    ((List<Document<MonitoredProductFieldModifiedNotification>>)result.Items).AddRange(documentForPage.Items);
+                    if (pageNumber == 1)
+                    {
+                        //Get meta for first item batch
+                        result.Meta = documentForPage.Meta;
+                    }
+                }
+            }
+            return result;
+        }
+
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
             MarketplaceProduct product = null;
+            var token = await GetAdminToken();
             try
             {
                 product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
@@ -62,9 +111,9 @@ namespace Marketplace.Common.Commands
             catch (OrderCloudException ex)
             {
                 //Product was deleted after it was updated. Delete orphaned notification 
-               if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
+                if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
                 {
-                    await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                    await _cms.Documents.Delete(_documentSchemaID, document.ID, token);
                     return new SuperMarketplaceProduct();
                 }
             }
@@ -85,21 +134,28 @@ namespace Marketplace.Common.Commands
                                      ApiRole.SupplierAdmin,
                                      ApiRole.ProductAdmin
                                 },
-
                 };
-                var ocClient = new OrderCloudClient(configToUse);
-                await ocClient.AuthenticateAsync();
-                var token = ocClient.TokenResponse.AccessToken;
-                product = await ocClient.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }, token);
+                try
+                {
+                    await ClientHelper.RunAction(configToUse, x => x.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }));
+                }
+                catch (OrderCloudException ex)
+                {
+                    if (ex?.Errors?[0]?.Data != null)
+                    {
+                        throw new Exception($"Unable to re-activate product: {ex?.Errors?[0]?.Message}: {ex?.Errors?[0]?.Data.ToJRaw()}");
+                    }
+                    throw new Exception($"Unable to re-activate product: {ex?.Errors?.ToJRaw()}");
+                }
 
                 //Delete document after acceptance
-                await _cms.Documents.Delete("MonitoredProductFieldModifiedNotification", document.ID, user.AccessToken);
+                await _cms.Documents.Delete(_documentSchemaID, document.ID, token);
             }
             else
             {
-                await _cms.Documents.Save("MonitoredProductFieldModifiedNotification", document.ID, document, user.AccessToken);
+                await _cms.Documents.Save(_documentSchemaID, document.ID, document, token);
             }
-            var superProduct = await _productCommand.Get(productID, user.AccessToken);
+            var superProduct = await _productCommand.Get(productID, token);
             superProduct.Product = product;
             return superProduct;
         }
