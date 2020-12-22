@@ -330,6 +330,10 @@ namespace Marketplace.Common.Commands.Crud
 				{
 					v.ID = v.xp.NewID ?? v.ID;
 					v.Name = v.xp.NewID ?? v.ID;
+					if (superProduct.Product.Inventory.VariantLevelTracking && v.Inventory == null)
+					{
+						v.Inventory = new PartialVariantInventory { QuantityAvailable = 0 };
+					}
 					if (superProduct.Product?.Inventory == null)
 					{
 						//If Inventory doesn't exist on the product, don't patch variants with inventory either.
