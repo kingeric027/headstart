@@ -8,15 +8,15 @@ namespace ordercloud.integrations.cardconnect
     public class CreditCardIntegrationException : Exception
     {
         public ApiError ApiError { get; }
-        public CardConnectAuthorizationResponse Response { get; }
+        public CardConnectResponse Response { get; }
 
-        public CreditCardIntegrationException(ApiError error, CardConnectAuthorizationResponse response)
+        public CreditCardIntegrationException(ApiError error, CardConnectResponse response)
         {
             ApiError = error;
             Response = response;
         }
 
-        public CreditCardIntegrationException(string errorCode, string message, CardConnectAuthorizationResponse data)
+        public CreditCardIntegrationException(string errorCode, string message, CardConnectResponse data)
         {
             ApiError = new ApiError()
             {

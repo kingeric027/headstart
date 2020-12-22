@@ -11,6 +11,7 @@ namespace ordercloud.integrations.cardconnect
         Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request);
         Task<CardConnectAuthorizationResponse> AuthWithoutCapture(CardConnectAuthorizationRequest request);
         Task<CardConnectAuthorizationResponse> AuthWithCapture(CardConnectAuthorizationRequest request);
+        Task<CardConnectVoidResponse> VoidAuthorization(CardConnectVoidRequest request);
     }
 
     public class OrderCloudIntegrationsCardConnectConfig 
@@ -54,6 +55,25 @@ namespace ordercloud.integrations.cardconnect
         {
             request.capture = "Y";
             return await PostAuthorizationAsync(request);
+        }
+
+        public async Task<CardConnectVoidResponse> VoidAuthorization(CardConnectVoidRequest request)
+        {
+            var attempt = await this
+                .Request("cardconnect/rest/void")
+                .PutJsonAsync(request)
+                .ReceiveJson<CardConnectVoidResponse>();
+
+            if (attempt.WasSuccessful())
+            {
+                return attempt;
+            }
+            throw new CreditCardIntegrationException(new ApiError()
+            {
+                Data = attempt,
+                Message = attempt.resptext, // response codes: https://developer.cardconnect.com/cardconnect-api?lang=json#void-service-url
+                ErrorCode = attempt.respcode
+            }, attempt);
         }
 
         private async Task<CardConnectAuthorizationResponse> PostAuthorizationAsync(CardConnectAuthorizationRequest request)

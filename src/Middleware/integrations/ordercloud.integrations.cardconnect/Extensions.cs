@@ -18,6 +18,12 @@ namespace ordercloud.integrations.cardconnect
             return (payment.CreditCardDetails == null || payment.CVV != null) && (!cc.Editable || payment.CVV != null);
         }
 
+        public static bool WasSuccessful(this CardConnectVoidResponse attempt)
+        {
+            // If the void is successful, the authcode will contain REVERS. If transaction is not found or an error occurs:
+            return attempt.authcode == "REVERS";
+        }
+
         public static bool WasSuccessful(this CardConnectAuthorizationResponse attempt)
         {
             return attempt.respstat == "A" && (attempt.respcode == "0" || attempt.respcode == "00" || attempt.respcode == "000");
