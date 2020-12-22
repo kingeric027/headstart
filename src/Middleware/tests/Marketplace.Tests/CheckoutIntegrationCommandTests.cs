@@ -213,7 +213,74 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027", null);
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(method1.Cost, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+
+        [Test]
+        public void flatrateshipping_ignore_supplier_not_lalicious()
+        {
+            // should not transform ship methods if the supplier isn't lalicious
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 20,
+                SupplierID = "012"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 89
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", "100");
+            var methods = result[0].ShipMethods;
+
+            Assert.AreEqual(1, methods.Count());
+            Assert.AreEqual(method1.Cost, methods[0].Cost);
+            Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        [Test]
+        public void flatrateshipping_when_supplier_is_lalicious()
+        {
+            // should transform ship methods if the supplier is lalicious
+            var shipItem1 = new ShipEstimateItem
+            {
+                LineItemID = "Line1"
+            };
+            var line1 = new MarketplaceLineItem
+            {
+                ID = "Line1",
+                LineSubtotal = 20,
+                SupplierID = "100"
+            };
+            var method1 = new MarketplaceShipMethod
+            {
+                Name = "FEDEX_GROUND",
+                EstimatedTransitDays = 3,
+                Cost = 89
+            };
+            var method2 = new MarketplaceShipMethod
+            {
+                Name = "NEXT_DAY",
+                EstimatedTransitDays = 1,
+                Cost = 150
+            };
+            var worksheet = BuildOrderWorksheet(line1);
+            var estimates = BuildEstimates(new[] { method1, method2 }, new[] { shipItem1 });
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", "100");
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -244,7 +311,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -275,7 +342,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -306,7 +373,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -347,7 +414,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1, line2);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1, shipItem2 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -378,12 +445,17 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
             Assert.AreEqual(FLAT_RATE_SECOND_TIER, methods[0].Cost);
             Assert.AreEqual(method1.Name, methods[0].Name);
+        }
+
+        private IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet worksheet, List<MarketplaceShipEstimate> estimates, string medlineSupplierID, string laliciousSupplierID)
+        {
+            return CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, medlineSupplierID, laliciousSupplierID);
         }
 
         [Test]
@@ -419,7 +491,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1, line2);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1, shipItem2 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -468,7 +540,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1, line2);
             var estimates = BuildEstimates(new[] { method1, method2 }, new[] { shipItem1, shipItem2 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(1, methods.Count());
@@ -516,7 +588,7 @@ namespace Marketplace.Tests
             };
             var worksheet = BuildOrderWorksheet(line1, line2);
             var estimates = BuildEstimates(new[] { method1, method2 }, new[] { shipItem1, shipItem2 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
             var methods = result[0].ShipMethods;
 
             Assert.AreEqual(2, methods.Count());
@@ -579,7 +651,7 @@ namespace Marketplace.Tests
             var worksheet = BuildOrderWorksheet(line1, line2, line3, line4);
             var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
             estimates.AddRange(BuildEstimates(new[] { method2 }, new[] { shipitem2 }));
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027");
+            var result = ApplyFlatRateShipping(worksheet, estimates, "027", null);
 
             Assert.AreEqual(2, result.Count());
             // compare first shipment item from first estimate (no changes because its not medline supplier)

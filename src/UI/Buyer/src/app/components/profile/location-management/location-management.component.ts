@@ -102,6 +102,6 @@ export class OCMLocationManagement {
   }
 
   hasCertificate(): boolean {
-    return this.certificate !== null && this.certificate !== undefined
+    return this.certificate.FileName !== null && this.certificate.FileName !== undefined
   }
 }

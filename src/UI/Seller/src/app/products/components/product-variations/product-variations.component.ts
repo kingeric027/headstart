@@ -37,7 +37,7 @@ import { AppAuthService } from '@app-seller/auth'
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import { BehaviorSubject } from 'rxjs'
 import { Products } from 'ordercloud-javascript-sdk'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Component({
   selector: 'product-variations-component',
@@ -91,6 +91,7 @@ export class ProductVariations implements OnChanges {
   productVariationsChanged = new EventEmitter<SuperMarketplaceProduct>()
   @Output() skuUpdated = new EventEmitter<SuperMarketplaceProduct>()
   @Output() variantsValidated = new EventEmitter<boolean>()
+  @Output() specsValidated = new EventEmitter<boolean>()
   superProductEditable: SuperMarketplaceProduct
   superProductStatic: SuperMarketplaceProduct
   variants: BehaviorSubject<MarketplaceVariant[]>
@@ -99,6 +100,7 @@ export class ProductVariations implements OnChanges {
   areSpecChanges = false
   definesVariant = false
   variantsValid = true
+  specOptionsExistOnSpec = true
   editSpecs = false
   faTrash = faTrash
   faCog = faCog
@@ -159,6 +161,16 @@ export class ProductVariations implements OnChanges {
     this.areSpecChanges =
       JSON.stringify(this.superProductEditable?.Specs) !==
       JSON.stringify(this.superProductStatic?.Specs)
+    if (this.areSpecChanges) {
+      this.specOptionsExistOnSpec = this.hasSpecOptions()
+    }
+    this.specsValidated.emit(this.specOptionsExistOnSpec)
+  }
+
+  hasSpecOptions(): boolean {
+    return this.superProductEditable?.Specs?.every(
+      (spec) => spec?.Options?.length
+    )
   }
 
   shouldDefinesVariantBeChecked(): boolean {
@@ -427,6 +439,9 @@ export class ProductVariations implements OnChanges {
         ID: `${this.superProductEditable.Product.ID}-${opt.ID}`,
         Name: `${this.superProductEditable.Product.ID} ${opt.Value}`,
         Active: true,
+        Inventory: {
+          QuantityAvailable: 0,
+        },
         xp: {
           SpecCombo: `${opt.ID}`,
           SpecValues: [
@@ -449,6 +464,9 @@ export class ProductVariations implements OnChanges {
           ID: `${variant.ID}-${opt.ID}`,
           Name: `${variant.Name} ${opt.Value}`,
           Active: true,
+          Inventory: {
+            QuantityAvailable: 0,
+          },
           xp: {
             SpecCombo: `${variant.xp.SpecCombo}-${opt.ID}`,
             SpecValues: [

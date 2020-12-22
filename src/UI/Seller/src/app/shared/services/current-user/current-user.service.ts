@@ -13,16 +13,13 @@ import {
   applicationConfiguration,
   AppConfig,
 } from '@app-seller/config/app.config'
-import {
-  AppAuthService,
-  TokenRefreshAttemptNotPossible,
-} from '@app-seller/auth/services/app-auth.service'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { AppStateService } from '../app-state/app-state.service'
 import { UserContext } from '@app-seller/config/user-context'
 import { HeadStartSDK, Asset } from '@ordercloud/headstart-sdk'
 import { Tokens } from 'ordercloud-javascript-sdk'
 import { BehaviorSubject } from 'rxjs'
-import { ContentManagementClient } from '../cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Injectable({
   providedIn: 'root',

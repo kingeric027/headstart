@@ -1,7 +1,5 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core'
 import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper'
-import { FormControl, FormGroup } from '@angular/forms'
-import { OrderPromotion } from 'ordercloud-javascript-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -11,10 +9,8 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
 export class OCMOrderSummary implements OnInit, OnChanges {
   @Input() orderSummaryMeta: OrderSummaryMeta
   @Input() currentPanel: string
+  _orderSummaryMeta: OrderSummaryMeta
   _orderCurrency: string
-  _orderPromos: OrderPromotion[]
-  promoCode = ''
-  shippingAndTaxOverrideText: string
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
@@ -22,6 +18,6 @@ export class OCMOrderSummary implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    this.shippingAndTaxOverrideText = this.orderSummaryMeta.ShippingAndTaxOverrideText
+    this._orderSummaryMeta = this.orderSummaryMeta
   }
 }

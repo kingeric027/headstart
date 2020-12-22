@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core'
-import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { AppConfig } from '../../shopper-context'
-import { ContentManagementClient } from '../cms-api/cms-api'
-import { JDocument } from '../cms-api/cms-models'
+import { ContentManagementClient, JDocument } from '@ordercloud/cms-sdk'
 
 @Injectable({
   providedIn: 'root',

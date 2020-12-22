@@ -36,7 +36,7 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { AppAuthService } from '@app-seller/auth'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
 export interface SupplierCategoryConfigFilters {
   Display: string
   Path: string

@@ -107,10 +107,10 @@ namespace ordercloud.integrations.easypost
 			var firstLi = lineItems.First();
 			return new ShipEstimate
 			{
-				ID = FreeShipping,
+				ID = FreeShipping + $"_{firstLi.SupplierID}",
 				ShipMethods = new List<ShipMethod> {
 					new ShipMethod {
-						ID = FreeShipping,
+						ID = FreeShipping + $"_{firstLi.SupplierID}",
 						Cost = 0,
 						Name = "FREE",
 						EstimatedTransitDays = 1 // Can be overwritten by app settings

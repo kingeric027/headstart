@@ -113,7 +113,11 @@ namespace Marketplace.Common.Services
 
         private List<object> CreateTemplateProductList(List<MarketplaceLineItem> lineItems, LineItemStatusChanges lineItemStatusChanges)
         {
-            return lineItems.Select(lineItem =>
+            //  first get line items that actually had a change
+            var changedLiIds = lineItemStatusChanges.Changes.Where(change => change.Quantity > 0).Select(change => change.ID);
+            var changedLineItems = changedLiIds.Select(i => lineItems.Single(l => l.ID == i));
+            //  now map to template data
+            return changedLineItems.Select(lineItem =>
             {
                 var lineItemStatusChange = lineItemStatusChanges.Changes.First(li => li.ID == lineItem.ID);
                 return MapToTemplateProduct(lineItem, lineItemStatusChange);
@@ -514,11 +518,11 @@ namespace Marketplace.Common.Services
         {
             return new QuoteOrderTemplateData()
             {
-                FirstName = order.FromUser.FirstName,
-                LastName = order.FromUser.LastName,
-                Phone = order.xp.QuoteOrderInfo.Phone,
-                Email = order.FromUser.Email,
-                Location = order.xp.QuoteOrderInfo.BuyerLocation,
+                FirstName = order.xp?.QuoteOrderInfo?.FirstName,
+                LastName = order.xp?.QuoteOrderInfo?.LastName,
+                Phone = order.xp?.QuoteOrderInfo?.Phone,
+                Email = order.xp?.QuoteOrderInfo?.Email,
+                Location = order.xp?.QuoteOrderInfo?.BuyerLocation,
                 ProductID = lineItems.FirstOrDefault().Product.ID,
                 ProductName = lineItems.FirstOrDefault().Product.Name,
                 Order = order,

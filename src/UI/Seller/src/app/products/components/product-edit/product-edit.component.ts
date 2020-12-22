@@ -60,7 +60,10 @@ import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload'
 import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
-import { ValidateMinMax } from '../../../validators/validators'
+import {
+  ValidateMinMax,
+  ValidateNoSpecialCharactersAndSpaces,
+} from '../../../validators/validators'
 import { getProductMediumImageUrl } from '@app-seller/products/product-image.helper'
 import { takeWhile } from 'rxjs/operators'
 import { SizerTiersDescriptionMap } from './size-tier.constants'
@@ -69,7 +72,9 @@ import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
-import { ContentManagementClient } from '@app-seller/shared/services/cms-api/cms-api'
+import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { ToastrService } from 'ngx-toastr'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-product-edit',
@@ -124,6 +129,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   shippingAddress: any
   productVariations: any
   variantsValid = true
+  specsValid = true
   editSpecs = false
   fileType: string
   imageFiles: FileHandle[] = []
@@ -140,6 +146,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   active: number
   alive = true
   productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[]
+  sizeTierSubscription: Subscription
+  inventoryValidatorSubscription: Subscription
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -155,6 +163,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
+    private toastrService: ToastrService,
     private http: HttpClient,
     private ocTokenService: OcTokenService
   ) {}
@@ -218,11 +227,19 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async refreshProductData(
     superProduct: SuperMarketplaceProduct
   ): Promise<void> {
-    const productModifiedNotifications = await ContentManagementClient.Documents.ListDocuments(
-      'MonitoredProductFieldModifiedNotification',
-      'Products',
-      superProduct?.Product?.ID
-    )
+    const headers = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+    }
+    const productModifiedNotifications = await this.http
+      .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
+        `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
+        superProduct,
+        headers
+      )
+      .toPromise()
+
     this.productInReviewNotifications = productModifiedNotifications?.Items.filter(
       (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
     )
@@ -282,7 +299,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
             Validators.required,
             Validators.maxLength(100),
           ]),
-          ID: new FormControl(superMarketplaceProduct.Product.ID),
+          ID: new FormControl(
+            superMarketplaceProduct.Product.ID,
+            ValidateNoSpecialCharactersAndSpaces
+          ),
           Description: new FormControl(
             superMarketplaceProduct.Product.Description,
             Validators.maxLength(2000)
@@ -388,6 +408,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       )
       this.setInventoryValidator()
       this.setVariantLevelTrackingDisabledSubscription()
+      this.setSizeTierValidators()
       this.setNonRequiredFields()
       this.setResourceType()
     }
@@ -398,10 +419,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const variantLevelTrackingControl = this.productForm.get(
       'VariantLevelTracking'
     )
-    this.productForm
+    this.inventoryValidatorSubscription = this.productForm
       .get('InventoryEnabled')
-      .valueChanges.pipe(takeWhile(() => this.alive))
-      .subscribe((inventory) => {
+      .valueChanges.subscribe((inventory) => {
         if (inventory && variantLevelTrackingControl.value === false) {
           quantityControl.setValidators([
             Validators.required,
@@ -432,6 +452,30 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           variantLevelTrackingControl.disable()
         }
       })
+  }
+
+  setSizeTierValidators(): void {
+    const sizeTier = this.productForm.get('SizeTier')
+    const shipLength = this.productForm.get('ShipLength')
+    const shipHeight = this.productForm.get('ShipHeight')
+    const shipWidth = this.productForm.get('ShipWidth')
+    this.sizeTierSubscription = sizeTier.valueChanges.subscribe((sizeTier) => {
+      if (sizeTier === 'G') {
+        shipLength.setValidators([Validators.required])
+        shipHeight.setValidators([Validators.required])
+        shipWidth.setValidators([Validators.required])
+      } else {
+        shipLength.setValidators(null)
+        shipLength.setValue(null)
+        shipHeight.setValidators(null)
+        shipHeight.setValue(null)
+        shipWidth.setValidators(null)
+        shipWidth.setValue(null)
+      }
+      shipLength.updateValueAndValidity()
+      shipHeight.updateValueAndValidity()
+      shipWidth.updateValueAndValidity()
+    })
   }
 
   setNonRequiredFields(): void {
@@ -572,12 +616,59 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           superProduct.Product.ID
         )
       this.refreshProductData(superProduct)
+      //TODO: Add back in once CMS is working
+      this.createMonitoredProductDocument(superProduct)
       this.router.navigateByUrl(`/products/${superProduct.Product.ID}`)
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false
+      const message = ex?.response?.data?.Data
+      if (message) {
+        this.toastrService.error(message, 'Error', { onActivateTick: true })
+      }
       throw ex
     }
+  }
+  async createMonitoredProductDocument(superProduct: SuperMarketplaceProduct) {
+    const mySupplier = await this.currentUserService.getMySupplier()
+    const myContext = await this.currentUserService.getUserContext()
+    const document = {
+      Supplier: {
+        ID: mySupplier?.ID,
+        Name: mySupplier?.Name,
+      },
+      Product: {
+        ID: superProduct?.Product?.ID,
+        Name: superProduct?.Product?.Name,
+        FieldModified: 'Product Created',
+        PreviousValue: null,
+        CurrentValue: superProduct.Product.Name,
+      },
+      Status: NotificationStatus.SUBMITTED,
+      History: {
+        ModifiedBy: {
+          ID: myContext?.Me?.ID,
+          Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`,
+        },
+        ReviewedBy: { ID: '', Name: '' },
+        DateModified: new Date().toISOString(),
+        // TODO: Figure out how to get the API to accept a null value...
+        DateReviewed: new Date().toISOString(),
+      },
+    }
+    const headers = {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
+      }),
+    }
+    // TODO: Replace with the SDK
+    const updatedProduct = await this.http
+      .post<SuperMarketplaceProduct>(
+        `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified`,
+        document,
+        headers
+      )
+      .toPromise()
   }
 
   async updateProduct(): Promise<void> {
@@ -798,7 +889,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       File: file.File,
       FileName: file.Filename,
     } as AssetUpload
-    const newAsset: Asset = await HeadStartSDK.Upload.UploadAsset(
+    const newAsset: Asset = await ContentManagementClient.Assets.Upload(
       asset,
       accessToken
     )
@@ -1052,8 +1143,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges()
   }
 
-  validateVariants(e): void {
+  validateVariants(e: boolean): void {
     this.variantsValid = e
+  }
+
+  validateSpecs(e: boolean): void {
+    this.specsValid = e
   }
 
   shouldIsResaleBeChecked(): boolean {
@@ -1072,5 +1167,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.alive = false
+    this.sizeTierSubscription.unsubscribe()
+    this.inventoryValidatorSubscription.unsubscribe()
   }
 }

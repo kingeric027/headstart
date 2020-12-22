@@ -10,6 +10,7 @@ using Marketplace.Common.Services.CMS.Models;
 using Marketplace.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 
@@ -219,7 +220,17 @@ namespace Marketplace.Common.Commands.Crud
 			PriceSchedule _priceSchedule = null;
 			//All products must have a price schedule for orders to be submitted.  The front end provides a default Price of $0 for quote products that don't have one.
 			superProduct.PriceSchedule.ID = superProduct.Product.ID;
-			_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			try
+            {
+				_priceSchedule = await _oc.PriceSchedules.CreateAsync<PriceSchedule>(superProduct.PriceSchedule, user.AccessToken);
+			}
+			catch (OrderCloudException ex)
+			{
+				if (ex.HttpStatus == System.Net.HttpStatusCode.Conflict)
+                {
+					throw new Exception($"Product SKU {superProduct.PriceSchedule.ID} already exists.  Please try a different SKU.");
+				}
+			}
 			superProduct.Product.DefaultPriceScheduleID = _priceSchedule.ID;
 			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
@@ -323,28 +334,67 @@ namespace Marketplace.Common.Commands.Crud
 				});
 			};
 			// If applicable, update OR create the Product PriceSchedule
-			PriceSchedule _priceSchedule = null;
-			if (superProduct.PriceSchedule != null)
-			{
-				_priceSchedule = await _oc.PriceSchedules.SaveAsync<PriceSchedule>(superProduct.PriceSchedule.ID, superProduct.PriceSchedule, token);
-			}
-			// List Variants
-			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: token);
+			var tasks = new List<Task>();
+			Task<PriceSchedule> _priceScheduleReq = null;
+            if (superProduct.PriceSchedule != null)
+            {
+                _priceScheduleReq = UpdateRelatedPriceSchedules(superProduct.PriceSchedule, token);
+                tasks.Add(_priceScheduleReq);
+            }
+            // List Variants
+            var _variantsReq = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: token);
+			tasks.Add(_variantsReq);
 			// List Product Specs
-			var _specs = await _oc.Products.ListSpecsAsync<Spec>(id, accessToken: token);
+			var _specsReq = _oc.Products.ListSpecsAsync<Spec>(id, accessToken: token);
+			tasks.Add(_specsReq);
 			// List Product Images
-			var _images = await GetProductImages(_updatedProduct.ID, token);
+			var _imagesReq = GetProductImages(_updatedProduct.ID, token);
+			tasks.Add(_imagesReq);
 			// List Product Attachments
-			var _attachments = await GetProductAttachments(_updatedProduct.ID, token);
+			var _attachmentsReq = GetProductAttachments(_updatedProduct.ID, token);
+			tasks.Add(_attachmentsReq);
+
+			await Task.WhenAll(tasks);
+
 			return new SuperMarketplaceProduct
 			{
 				Product = _updatedProduct,
-				PriceSchedule = _priceSchedule,
-				Specs = _specs.Items,
-				Variants = _variants.Items,
-				Images = _images,
-				Attachments = _attachments
+				PriceSchedule = _priceScheduleReq?.Result,
+				Specs = _specsReq?.Result?.Items,
+				Variants = _variantsReq?.Result?.Items,
+				Images = _imagesReq?.Result,
+				Attachments = _attachmentsReq?.Result
 			};
+		}
+
+		private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
+        {
+			var initial = await _oc.PriceSchedules.GetAsync(updated.ID);
+			if (initial.MaxQuantity != updated.MaxQuantity ||
+				initial.MinQuantity != updated.MinQuantity ||
+				initial.UseCumulativeQuantity != updated.UseCumulativeQuantity || 
+				initial.RestrictedQuantity != updated.RestrictedQuantity || 
+				initial.ApplyShipping != updated.ApplyShipping || 
+				initial.ApplyTax != updated.ApplyTax)
+            {
+				var patch = new PartialPriceSchedule()
+				{
+					MinQuantity = updated.MinQuantity,
+					MaxQuantity = updated.MaxQuantity,
+					UseCumulativeQuantity = updated.UseCumulativeQuantity,
+					RestrictedQuantity = updated.RestrictedQuantity,
+					ApplyShipping = updated.ApplyShipping,
+					ApplyTax = updated.ApplyTax
+				};
+				var relatedPriceSchedules = await ListAllAsync.List((page) => _oc.PriceSchedules.ListAsync(search: initial.ID, page: page, pageSize: 100));
+				var priceSchedulesToUpdate = relatedPriceSchedules.Where(p => p.ID.StartsWith(updated.ID) && p.ID != updated.ID);
+				await Throttler.RunAsync(priceSchedulesToUpdate, 100, 5, p =>
+				{
+					return _oc.PriceSchedules.PatchAsync(p.ID, patch, token);
+				});
+            }
+			return await _oc.PriceSchedules.SaveAsync<PriceSchedule>(updated.ID, updated, token);
+
 		}
 
         private bool HasVariantChange(Variant variant, Variant currVariant)

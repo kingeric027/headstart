@@ -68,12 +68,24 @@ export class RouteService {
   }
 
   setPageTitle(titleString?: string) {
-    const title = titleString ? this.appConfig.appname + ': ' + titleString : this.appConfig.appname;
-    this.titleService.setTitle(title);
+    const title = titleString
+      ? this.appConfig.appname + ': ' + titleString
+      : this.appConfig.appname
+    this.titleService.setTitle(title)
   }
 
   toProductDetails(productID: string): void {
     this.router.navigateByUrl(`/products/${productID}`)
+  }
+
+  toChiliConfigEdit(
+    productID: string,
+    configurationID: string,
+    documentID: string
+  ): void {
+    this.router.navigateByUrl(
+      `/products/${productID}/${configurationID}/${documentID}`
+    )
   }
 
   toProductList(options: ProductFilters = {}): void {

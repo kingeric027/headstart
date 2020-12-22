@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { get as _get } from 'lodash'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
-import { Router } from '@angular/router'
 import { UserGroupAssignment, User } from '@ordercloud/angular-sdk'
 import { BuyerUserService } from '../buyer-user.service'
 import { ValidateEmail } from '@app-seller/validators/validators'
@@ -9,6 +8,7 @@ import {
   SupportedCountries,
   GeographyConfig,
 } from '@app-seller/shared/models/supported-countries.interface'
+import { AppFormErrorService } from '@app-seller/shared'
 @Component({
   selector: 'app-buyer-user-edit',
   templateUrl: './buyer-user-edit.component.html',
@@ -23,7 +23,7 @@ export class BuyerUserEditComponent {
     this.createBuyerUserForm(buyerUser)
   }
   @Output()
-  updateResource = new EventEmitter<any>()
+  updateResource = new EventEmitter<FormGroup>()
   @Output()
   userGroupAssignments = new EventEmitter<UserGroupAssignment[]>()
   isCreatingNew: boolean
@@ -31,26 +31,24 @@ export class BuyerUserEditComponent {
   selectedResource: User
   countryOptions: SupportedCountries[]
   isUserAssignedToGroups: boolean
-  constructor(public buyerUserService: BuyerUserService) {
+  constructor(public buyerUserService: BuyerUserService, public appFormErrorService: AppFormErrorService) {
     this.isCreatingNew = this.buyerUserService.checkIfCreatingNew()
     this.countryOptions = GeographyConfig.getCountries()
   }
 
   createBuyerUserForm(user: User) {
     this.resourceForm = new FormGroup({
-      Active: new FormControl(user.Active),
+      Active: new FormControl(user.Active || false),
       Username: new FormControl(user.Username, Validators.required),
       FirstName: new FormControl(user.FirstName, Validators.required),
       LastName: new FormControl(user.LastName, Validators.required),
       Email: new FormControl(user.Email, [Validators.required, ValidateEmail]),
       Country: new FormControl(user.xp?.Country, Validators.required),
-    })
+    });
   }
 
-  updateResourceFromEvent(event: any, field: string): void {
-    field === 'Active'
-      ? this.updateResource.emit({ value: event.target.checked, field })
-      : this.updateResource.emit({ value: event.target.value, field })
+  updateResourceFromEvent(): void {
+    this.updateResource.emit(this.resourceForm)
   }
 
   addUserGroupAssignments(event): void {
@@ -66,4 +64,8 @@ export class BuyerUserEditComponent {
       this.resourceForm.controls.Country.enable()
     }
   }
+
+  hasValidEmailError = (): boolean => 
+    this.appFormErrorService.hasInvalidIdError(this.resourceForm.get('Email'))
+  
 }

@@ -228,7 +228,7 @@ export class ResourceTableComponent
         this.resourceOptions = options
         this.searchTerm = (options && options.search) || ''
         this.activeFilterCount = options.filters
-          ? Object.keys(options.filters).length
+          ? Object.keys(options.filters).filter(k => k !== 'searchType').length
           : 0
         this.setFilterForm()
         this.changeDetectorRef.detectChanges()
@@ -450,7 +450,7 @@ export class ResourceTableComponent
     this._ocService.clearAllFilters()
     this.toDate = ''
     this.fromDate = ''
-    this.filterForm.reset()
+    this.filterForm?.reset()
   }
 
   isBoolean(value: any): boolean {

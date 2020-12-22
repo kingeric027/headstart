@@ -45,7 +45,7 @@ import {
   AppConfig,
   ocAppConfig,
 } from './config/app.config'
-import { CMSConfiguration } from './shared/services/cms-api/cms-utils'
+import { CMSConfiguration } from '@ordercloud/cms-sdk'
 
 export function HttpLoaderFactory(
   http: HttpClient,
