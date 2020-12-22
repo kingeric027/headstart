@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -61,6 +61,7 @@ namespace ordercloud.integrations.cardconnect
             try
             {
                 var call = await _cardConnect.AuthWithCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
+                var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
                 ocPayment = await _oc.Payments.PatchAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, new PartialPayment {Accepted = true, Amount = ccAmount});
                 return await _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, ocPayment.ID, CardConnectMapper.Map(order, ocPayment, call));
             }
