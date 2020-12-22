@@ -45,7 +45,7 @@ namespace Marketplace.Common.Commands
             if (worksheet.LineItems.Any(li => li.Product.xp.ProductType != ProductType.PurchaseOrder))
             {
                 payment.OrderID = incrementedOrderID;
-                await _card.AuthorizePayment(payment, user, GetMerchantID(payment)); // authorize AND capture payments (SEB specific, in general use case we'd auth before submit and capture on shipment)
+                await _card.AuthorizePayment(payment, user, GetMerchantID(payment));
             }
             try
             {
