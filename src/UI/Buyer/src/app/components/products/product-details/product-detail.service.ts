@@ -55,7 +55,7 @@ export class ProductDetailService {
     }, startingBreak)
 
     // Take into account markups if they are applied which can increase price
-    return specs.Markup
+    return specs?.Markup
       ? (selectedBreak.Price + specs.Markup) * quantity
       : selectedBreak.Price * quantity
   }

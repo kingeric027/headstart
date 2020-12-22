@@ -143,7 +143,7 @@ export class OCMGridSpecForm {
         ? candidate
         : current
     }, startingBreak)
-    return specs.Markup
+    return specs?.Markup
       ? selectedBreak.Price + specs.Markup
       : selectedBreak.Price
   }
