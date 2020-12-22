@@ -443,7 +443,7 @@ export abstract class ResourceCrudService<ResourceType> {
     options: Options,
     orderDirection = ''
   ): Promise<ListPage<ResourceType>> {
-    let isRetry=false;
+    let isRetry = false
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options))
       const args = await this.createListArgs([options], orderDirection)
