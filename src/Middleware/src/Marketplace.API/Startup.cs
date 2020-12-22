@@ -108,6 +108,7 @@ namespace Marketplace.API
                 .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
                 .Inject<IOrderCommand>()
+                .Inject<IPaymentCommand>()
                 .Inject<IOrderSubmitCommand>()
                 .Inject<IEnvironmentSeedCommand>()
                 .Inject<IMarketplaceProductCommand>()

@@ -33,6 +33,8 @@ import { AxiosError } from 'axios'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { TempSdk } from 'src/app/services/temp-sdk/temp-sdk.service'
+import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
 
 interface CheckoutSection {
   id: string
@@ -88,7 +90,8 @@ export class OCMCheckout implements OnInit {
   constructor(
     private context: ShopperContextService,
     private spinner: NgxSpinnerService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private tempSdk: TempSdk
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -149,45 +152,58 @@ export class OCMCheckout implements OnInit {
     this.toSection('shippingAddress')
   }
 
+  buildCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Payment {
+      return {
+        Amount: amount,
+        DateCreated: new Date().toDateString(),
+        Accepted: false,
+        Type: 'CreditCard',
+        CreditCardID: card.ID,
+        xp: {
+          partialAccountNumber: card.PartialAccountNumber,
+          cardType: card.CardType
+        }
+      }
+    }
+
+    buildPOPayment(amount: number): Payment {
+      return {
+        Amount: amount,
+        DateCreated: new Date().toDateString(),
+        Type: 'PurchaseOrder',
+      }
+    }
+
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.initLoadingIndicator('paymentLoading')
-    // TODO - is delete still needed? There used to be an OC bug with multiple payments on an order.
-    await this.checkout.deleteExistingPayments()
+    var payments: Payment[] = [];
     this.selectedCard = output
-    if (output.SavedCard) {
-      await this.checkout.createSavedCCPayment(
-        output.SavedCard,
-        this.orderSummaryMeta.CreditCardTotal
-      )
-      delete this.selectedCard.NewCard
-    } else {
+    if(!output.SavedCard) {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
-      // await this.context.currentOrder.createOneTimeCCPayment(output.newCard);
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(
         output.NewCard
       )
       this.isNewCard = true
-      await this.checkout.createSavedCCPayment(
-        this.selectedCard.SavedCard,
-        this.orderSummaryMeta.CreditCardTotal
-      )
+      payments.push(this.buildCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal))
+    } else {
+      payments.push(this.buildCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal))
+      delete this.selectedCard.SavedCard;
     }
     if (this.orderSummaryMeta.POLineItemCount) {
-      await this.checkout.createPurchaseOrderPayment(
-        this.orderSummaryMeta.POTotal
-      )
+      payments.push(this.buildPOPayment(this.orderSummaryMeta.POTotal))
     }
+    await this.tempSdk.createOrUpdatePayment(this.order.ID, payments);
     this.payments = await this.checkout.listPayments()
     this.destoryLoadingIndicator('confirm')
   }
 
   async onAcknowledgePurchaseOrder(): Promise<void> {
-    // TODO - is this still needed? There used to be an OC bug with multiple payments on an order.
-    await this.checkout.deleteExistingPayments()
-    await this.checkout.createPurchaseOrderPayment(
-      this.orderSummaryMeta.POTotal
-    )
+    //  Function that is used when there are no credit cards. Just PO acknowledgement
+    const payments = [
+      this.buildPOPayment(this.orderSummaryMeta.POTotal)
+    ]
+    await this.tempSdk.createOrUpdatePayment(this.order.ID, payments)
     this.payments = await this.checkout.listPayments()
     this.toSection('confirm')
   }

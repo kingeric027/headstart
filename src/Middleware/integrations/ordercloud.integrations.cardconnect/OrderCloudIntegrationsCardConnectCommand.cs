@@ -57,10 +57,19 @@ namespace ordercloud.integrations.cardconnect
 
 			var ccAmount = GetAmountToCharge(orderWorksheet);
 
-			var ocPayment = await _oc.Payments.GetAsync<Payment>(OrderDirection.Incoming, payment.OrderID, payment.PaymentID);
+			var ocPayments = (await _oc.Payments.ListAsync<Payment>(OrderDirection.Incoming, payment.OrderID, filters: new { Type = "CreditCard" })).Items;
+			var ocPayment = ocPayments.Any() ? ocPayments[0] : null;
+			if(ocPayment == null)
+            {
+				throw new OrderCloudIntegrationException(new ApiError
+				{
+					ErrorCode = "MissingCreditCardPayment",
+					Message = "Order is missing credit card payment"
+				});
+            }
             try
             {
-				if(ocPayment.Accepted == true)
+				if(ocPayment?.Accepted == true)
                 {
 					return ocPayment;
                 }

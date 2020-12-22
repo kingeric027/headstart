@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk'
+import { ListPageWithFacets, Payment, Tokens } from 'ordercloud-javascript-sdk'
 import {
   ListArgs,
   MarketplaceOrder,
@@ -97,6 +97,16 @@ export class TempSdk {
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/applypromotions`
     return await this.http
       .post<MarketplaceOrder>(url, { headers: this.buildHeaders() })
+      .toPromise()
+  }
+
+  async createOrUpdatePayment(
+    orderId: string,
+    payments: Payment[]
+  ): Promise<any> {
+    const url = `${this.appConfig.middlewareUrl}/payments/${orderId}/update`
+    return await this.http
+      .put(url, { Payments: payments }, { headers: this.buildHeaders() })
       .toPromise()
   }
 }
