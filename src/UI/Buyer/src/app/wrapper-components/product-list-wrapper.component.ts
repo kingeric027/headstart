@@ -5,6 +5,7 @@ import { MarketplaceMeProduct } from '../shopper-context'
 import { ListPage } from 'ordercloud-javascript-sdk'
 import { uniq as _uniq } from 'lodash'
 import { SupplierFilterService } from '../services/supplier-filter/supplier-filter.service'
+import { ShipFromSourcesDic } from '../models/ship-from-sources.interface'
 
 @Component({
   template: `
@@ -18,7 +19,7 @@ import { SupplierFilterService } from '../services/supplier-filter/supplier-filt
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {
   products: ListPage<MarketplaceMeProduct>
-  shipFromSources: any = {}
+  shipFromSources: ShipFromSourcesDic = {}
   alive = true
   isProductListLoading = true
 

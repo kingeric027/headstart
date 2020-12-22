@@ -5,9 +5,10 @@ import {
   ChangeDetectorRef,
 } from '@angular/core'
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers'
-import { PriceSchedule } from 'ordercloud-javascript-sdk'
+import { Address, PriceSchedule } from 'ordercloud-javascript-sdk'
 import { MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { ShipFromSourcesDic } from 'src/app/models/ship-from-sources.interface'
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
@@ -18,7 +19,7 @@ export class OCMProductCard {
   _product: MarketplaceMeProduct = {
     PriceSchedule: {} as PriceSchedule,
   }
-  _shipFromSources: any = {}
+  _shipFromSources: ShipFromSourcesDic = {}
   _price: number
   _userCurrency: string
   quantity: number
@@ -47,7 +48,7 @@ export class OCMProductCard {
     this.cdr.detectChanges() // TODO - remove. Solve another way.
   }
 
-  @Input() set shipFromSources(value: any) {
+  @Input() set shipFromSources(value: ShipFromSourcesDic) {
     this._shipFromSources = value
   }
 
@@ -115,7 +116,9 @@ export class OCMProductCard {
   isCanadianShipFromAddress(): boolean {
     const supplierID = this._product.DefaultSupplierID
     const addressID = this._product.ShipFromAddressID
-    if (!this._shipFromSources[supplierID]) return false
+    if (!this._shipFromSources[supplierID]) {
+      return false
+    }
     const shipFromAddress = this._shipFromSources[supplierID].find(
       (address) => address.ID == addressID
     )

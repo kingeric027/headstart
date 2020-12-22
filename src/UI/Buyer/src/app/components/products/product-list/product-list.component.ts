@@ -1,11 +1,17 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core'
-import { ListFacet, Category, ListPage } from 'ordercloud-javascript-sdk'
+import {
+  ListFacet,
+  Category,
+  ListPage,
+  Address,
+} from 'ordercloud-javascript-sdk'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper'
 import { takeWhile } from 'rxjs/operators'
 import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk'
 import { MarketplaceMeProduct, ProductFilters } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { ShipFromSourcesDic } from 'src/app/models/ship-from-sources.interface'
 
 @Component({
   templateUrl: './product-list.component.html',
@@ -13,7 +19,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
 })
 export class OCMProductList implements OnInit, OnDestroy {
   @Input() products: ListPage<MarketplaceMeProduct>
-  @Input() shipFromSources: any
+  @Input() shipFromSources: ShipFromSourcesDic
   @Input() isProductListLoading: boolean
   alive = true
   facets: ListFacet[]
