@@ -68,11 +68,27 @@ namespace CardConnect.Tests
             Assert.That(call.respstat.ToResponseStatus() == result);
         }
 
-        [Test, TestCaseSource(typeof(ResponseCodeFactory), nameof(ResponseCodeFactory.FailCases))]
+        [Test, TestCaseSource(typeof(ResponseCodeFactory), nameof(ResponseCodeFactory.AuthFailCases))]
         public void auth_failure_attempt_tests(string body)
         {
             _http.RespondWith(body);
-            var ex = Assert.ThrowsAsync<CreditCardIntegrationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
+            var ex = Assert.ThrowsAsync<CreditCardAuthorizationException>(() => _service.AuthWithoutCapture(new CardConnectAuthorizationRequest() { cvv2 = "112" }));
+        }
+
+        [Test]
+        [TestCase(@"{'respstat': 'A', 'respcode': '0', 'authcode': 'REVERS'}", ResponseStatus.Approved)]
+        public async Task void_success_attempt_test(string body, ResponseStatus result)
+        {
+            _http.RespondWith(body);
+            var call = await _service.VoidAuthorization(new CardConnectVoidRequest());
+            Assert.IsTrue(call.WasSuccessful());
+        }
+
+        [Test, TestCaseSource(typeof(ResponseCodeFactory), nameof(ResponseCodeFactory.VoidFailCases))]
+        public void void_failure_attempt_tests(string body)
+        {
+            _http.RespondWith(body);
+            var ex = Assert.ThrowsAsync<CreditCardVoidException>(() => _service.VoidAuthorization(new CardConnectVoidRequest() { }));
         }
 
         [Test]
@@ -91,7 +107,7 @@ namespace CardConnect.Tests
 
     public static class ResponseCodeFactory
     {
-        public static IEnumerable FailCases
+        public static IEnumerable AuthFailCases
         {
             get
             {
@@ -106,6 +122,15 @@ namespace CardConnect.Tests
                 yield return new TestCaseData(@"{'respstat': 'B', 'respcode': '100', 'cvvresp': 'M', 'avsresp': 'Z'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '101', 'cvvresp': 'P', 'avsresp': 'Y'}");
                 yield return new TestCaseData(@"{'respstat': 'A', 'respcode': '500', 'cvvresp': 'P', 'avsresp': 'Y'}");
+            }
+        }
+
+        public static IEnumerable VoidFailCases
+        {
+            get
+            {
+                yield return new TestCaseData(@"{'respproc': 'PPS', 'respstat': 'A'}");
+                yield return new TestCaseData(@"{'respproc': 'PPS', 'respstat': 'C'}");
             }
         }
     }

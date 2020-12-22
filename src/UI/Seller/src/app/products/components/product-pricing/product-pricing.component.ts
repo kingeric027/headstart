@@ -35,24 +35,11 @@ export class ProductPricingComponent {
   isRequired: boolean
   @Input()
   set superMarketplaceProductStatic(value: SuperMarketplaceProduct) {
-    this.superProduct = value
-    if (
-      value.Product?.xp?.ProductType === 'Quote' &&
-      value.PriceSchedule.PriceBreaks === null
-    ) {
-      this.superProduct.PriceSchedule.PriceBreaks = [
-        { Price: null, Quantity: null },
-      ]
-    }
-    if (value) {
-      this.supplierPriceSchedule = JSON.parse(
-        JSON.stringify(value.PriceSchedule)
-      )
-      if (this.readonly) {
-        this.setUpBuyers()
-        this.setUpExchangeRate()
-        this.buyerMarkedUpSupplierPrices = this.getBuyerDisplayOfSupplierPriceSchedule()
-      }
+    this.setData(value);
+    if (value && this.readonly) {
+      this.setUpBuyers()
+      this.setUpExchangeRate()
+      this.buyerMarkedUpSupplierPrices = this.getBuyerDisplayOfSupplierPriceSchedule()
     }
   }
 
@@ -73,19 +60,10 @@ export class ProductPricingComponent {
   isUsingPriceOverride = false
   areChangesToBuyerVisibility = false
 
-  emptyPriceSchedule = {
-    UseCumulativeQuantity: true,
-    PriceBreaks: [
-      {
-        Price: 0,
-        Quantity: 1,
-      },
-    ],
-  } as PriceSchedule
-
+  emptyPriceSchedule
   isSavedOverride = false
-  overridePriceScheduleEditable = this.emptyPriceSchedule
-  overridePriceScheduleStatic = this.emptyPriceSchedule
+  overridePriceScheduleEditable
+  overridePriceScheduleStatic
 
   constructor(
     private toasterService: ToastrService,
@@ -93,6 +71,45 @@ export class ProductPricingComponent {
     private catalogsTempService: CatalogsTempService,
     private buyerTempService: BuyerTempService
   ) {}
+
+  setData(value: SuperMarketplaceProduct): void {
+    this.superProduct = value
+    if (
+      value.Product?.xp?.ProductType === 'Quote' &&
+      value.PriceSchedule.PriceBreaks === null
+    ) {
+      this.superProduct.PriceSchedule.PriceBreaks = [
+        { Price: null, Quantity: null },
+      ]
+    }
+    this.buildEmptyPriceSchedule(value);
+    this.isSavedOverride = false
+    this.overridePriceScheduleEditable = this.emptyPriceSchedule
+    this.overridePriceScheduleStatic = this.emptyPriceSchedule
+
+    if(value) {
+      this.supplierPriceSchedule = JSON.parse(
+        JSON.stringify(value?.PriceSchedule)
+      )
+    }
+  }
+
+  buildEmptyPriceSchedule(value: SuperMarketplaceProduct): void {
+    this.emptyPriceSchedule = {
+      UseCumulativeQuantity: value?.PriceSchedule?.UseCumulativeQuantity,
+      ApplyTax: value?.PriceSchedule?.ApplyTax,
+      ApplyShipping: value?.PriceSchedule?.ApplyShipping,
+      RestrictedQuantity: value?.PriceSchedule?.RestrictedQuantity,
+      MinQuantity: value?.PriceSchedule?.MinQuantity,
+      MaxQuantity: value?.PriceSchedule?.MaxQuantity,
+      PriceBreaks: [
+        {
+          Price: 0,
+          Quantity: 1,
+        },
+      ]
+    } as PriceSchedule;
+  }
 
   async setUpExchangeRate(): Promise<void> {
     if (this.supplierCurrency !== this.sellerCurrency) {

@@ -1,11 +1,8 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-
-import { Environment } from './environment.interface'
+import { EnvironmentConfig } from './environment.interfaces'
 import afTheme from '../styles/themes/anytime-fitness/theme-config'
 import { OrdercloudEnv } from 'src/app/shopper-context'
 
-export const environment: Environment = {
+export const environment: EnvironmentConfig = {
   hostedApp: true,
   appname: 'Anytime Fitness',
   clientID: 'F18AE28D-FFA4-4A5A-9C69-A1FBC71DCD3D',
@@ -22,12 +19,3 @@ export const environment: Environment = {
   theme: afTheme,
   instrumentationKey: '419a0c62-a800-4d19-882b-b61007e69cdb',
 }
-/*
-
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
