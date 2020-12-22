@@ -59,16 +59,24 @@ export class ProductListWrapperComponent implements OnInit, OnDestroy {
         })
         Object.keys(sourceIds).forEach((supplierId) => {
           sourceIds[supplierId].forEach(async (addressId) => {
-            if (!this.shipFromSources[supplierId])
+            if (!this.shipFromSources[supplierId]) {
               this.shipFromSources[supplierId] = []
-            const address = await this.supplierFilterService.getSupplierAddress(
-              supplierId,
-              addressId
-            )
-            this.shipFromSources[supplierId] = [
-              ...this.shipFromSources[supplierId],
-              address,
-            ]
+            }
+            if (
+              !this.shipFromSources[supplierId].length ||
+              this.shipFromSources[supplierId]
+                .map((address) => address.ID)
+                .indexOf(addressId) < 0
+            ) {
+              const address = await this.supplierFilterService.getSupplierAddress(
+                supplierId,
+                addressId
+              )
+              this.shipFromSources[supplierId] = [
+                ...this.shipFromSources[supplierId],
+                address,
+              ]
+            }
           })
         })
       } finally {
