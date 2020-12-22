@@ -145,7 +145,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   availableSizeTiers = SizerTiersDescriptionMap
   active: number
   alive = true
-  productInReviewNotifications: SuperMarketplaceProduct[]
+  productInReviewNotifications: MonitoredProductFieldModifiedNotificationDocument[]
   sizeTierSubscription: Subscription
   inventoryValidatorSubscription: Subscription
 
@@ -233,14 +233,16 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }),
     }
     const productModifiedNotifications = await this.http
-      .post<ListPage<SuperMarketplaceProduct>>(
+      .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
         superProduct,
         headers
       )
       .toPromise()
 
-    this.productInReviewNotifications = productModifiedNotifications?.Items
+    this.productInReviewNotifications = productModifiedNotifications?.Items.filter(
+      (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
+    )
     // If a seller, and not editing the product, grab the currency from the product xp.
     this.supplierCurrency = this._exchangeRates?.find(
       (r) => r.Currency === superProduct?.Product?.xp?.Currency
