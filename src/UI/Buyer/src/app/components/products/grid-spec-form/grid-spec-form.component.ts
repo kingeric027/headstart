@@ -119,8 +119,8 @@ export class OCMGridSpecForm {
       return acc + curr
     })
     this.qtyValid = this.validateQuantity(this.lineItems)
-    this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs[0])
-    this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs[0])
+    this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs)
+    this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs)
     this.totalPrice = this.getTotalPrice()
   }
 
@@ -135,7 +135,7 @@ export class OCMGridSpecForm {
       : this.totalQty !== 0
   }
 
-  getUnitPrice(qty: number, specs: GridSpecOption): number {
+  getUnitPrice(qty: number, specs: GridSpecOption[]): number {
     if (!this.priceBreaks?.length) return
     const startingBreak = _minBy(this.priceBreaks, 'Quantity')
     const selectedBreak = this.priceBreaks.reduce((current, candidate) => {
@@ -143,12 +143,12 @@ export class OCMGridSpecForm {
         ? candidate
         : current
     }, startingBreak)
-    return specs?.Markup
-      ? selectedBreak.Price + specs.Markup
-      : selectedBreak.Price
+    let totalMarkup = 0
+    specs.forEach((spec) => (totalMarkup += spec.Markup))
+    return selectedBreak.Price + totalMarkup
   }
 
-  getLineTotal(qty: number, specs: GridSpecOption): number {
+  getLineTotal(qty: number, specs: GridSpecOption[]): number {
     if (qty > 0) {
       if (this.priceBreaks?.length) {
         const basePrice = qty * this.priceBreaks[0].Price
