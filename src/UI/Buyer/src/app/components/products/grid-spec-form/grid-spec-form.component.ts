@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
+  MarketplaceLineItem,
   PriceSchedule,
   SuperMarketplaceProduct,
 } from '@ordercloud/headstart-sdk'
@@ -21,7 +22,7 @@ export class OCMGridSpecForm {
   _superProduct: SuperMarketplaceProduct
   product: MarketplaceMeProduct
   specOptions: string[]
-  lineItems: any[] = []
+  lineItems: MarketplaceLineItem[] = []
   lineTotals: number[] = []
   unitPrices: number[] = []
   totalPrice = 0
@@ -37,7 +38,7 @@ export class OCMGridSpecForm {
     private specFormService: SpecFormService,
     private context: ShopperContextService,
     private productDetailService: ProductDetailService
-  ) { }
+  ) {}
 
   @Input() set superProduct(value: SuperMarketplaceProduct) {
     this._superProduct = value
@@ -128,11 +129,25 @@ export class OCMGridSpecForm {
     this.errorMsg = event
   }
 
-  validateQuantity(lineItems: any): boolean {
-    return this.totalQty >= lineItems[0].Product.PriceSchedule.MinQty &&
-      lineItems[0].Product.PriceSchedule.MaxQuantity !== null
-      ? this.totalQty <= lineItems[0].Product.PriceSchedule.MaxQuantity
-      : this.totalQty !== 0
+  validateQuantity(lineItems: MarketplaceLineItem[]): boolean {
+    if (this.priceSchedule.UseCumulativeQuantity) {
+      return this.totalQty >= lineItems[0].Product.PriceSchedule.MinQuantity &&
+        lineItems[0].Product.PriceSchedule.MaxQuantity !== null
+        ? this.totalQty <= lineItems[0].Product.PriceSchedule.MaxQuantity
+        : this.totalQty !== 0
+    } else {
+      const allItemsHonorQtyRules = lineItems.every(
+        (li: MarketplaceLineItem) => {
+          return (
+            li.Quantity === 0 ||
+            (li.Quantity >= li.Product.PriceSchedule.MinQuantity &&
+              (li.Product.PriceSchedule.MaxQuantity === null ||
+                li.Quantity <= li.Product.PriceSchedule.MaxQuantity))
+          )
+        }
+      )
+      return allItemsHonorQtyRules
+    }
   }
 
   getUnitPrice(qty: number, specs: GridSpecOption[]): number {
