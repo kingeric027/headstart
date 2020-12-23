@@ -37,10 +37,10 @@ export const buyerLocation: Filter[] = [
 
 export const salesOrderDetail: Filter[] = [
   {
-    name: 'Order Status',
-    path: 'Status',
+    name: 'Submitted Order Status',
+    path: 'SubmittedOrderStatus',
     sourceType: 'model',
-    source: 'OrderStatus',
+    source: 'SubmittedOrderStatus',
     filterValues: [],
   },
   {
@@ -62,10 +62,10 @@ export const salesOrderDetail: Filter[] = [
 
 export const purchaseOrderDetail: Filter[] = [
   {
-    name: 'Order Status',
-    path: 'Status',
+    name: 'Submitted Order Status',
+    path: 'SubmittedOrderStatus',
     sourceType: 'model',
-    source: 'OrderStatus',
+    source: 'SubmittedOrderStatus',
     filterValues: [],
   },
   {
@@ -79,10 +79,10 @@ export const purchaseOrderDetail: Filter[] = [
 
 export const lineItemDetail: Filter[] = [
   {
-    name: 'Order Status',
-    path: 'Status',
+    name: 'Submitted Order Status',
+    path: 'SubmittedOrderStatus',
     sourceType: 'model',
-    source: 'OrderStatus',
+    source: 'SubmittedOrderStatus',
     filterValues: [],
   },
   {
