@@ -1070,7 +1070,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     superMarketplaceProduct.PriceSchedule.ID =
       superMarketplaceProduct.Product.ID
     superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`
-    // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer.
+    // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer'.
     if (superMarketplaceProduct.PriceSchedule.Name.length > 100) {
       superMarketplaceProduct.PriceSchedule.Name = superMarketplaceProduct.PriceSchedule.Name.slice(
         0,
@@ -1095,7 +1095,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       superMarketplaceProduct.PriceSchedule.ID =
         superMarketplaceProduct.Product.ID
       superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`
-      // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer.
+      // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer'.
       if (superMarketplaceProduct.PriceSchedule.Name.length > 100) {
         superMarketplaceProduct.PriceSchedule.Name = superMarketplaceProduct.PriceSchedule.Name.slice(
           0,
