@@ -75,6 +75,7 @@
       [existingQty]="null"
       [product]="_product"
       [priceSchedule]="_product.PriceSchedule"
+      [isAddingToCart]="isAddingToCart"
       (qtyChange)="setQuantity($event.detail)"
     >
     </ocm-quantity-input>
