@@ -10,7 +10,6 @@ using Marketplace.Common.Exceptions;
 using Marketplace.Common.Models.Marketplace;
 using Marketplace.Models;
 using Marketplace.Common.Services;
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
@@ -18,6 +17,7 @@ using Marketplace.Models.Extended;
 using Npoi.Mapper;
 using ordercloud.integrations.library.helpers;
 using Marketplace.Common.Constants;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Commands
 {

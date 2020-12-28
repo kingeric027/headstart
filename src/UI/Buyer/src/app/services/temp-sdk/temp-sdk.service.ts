@@ -99,14 +99,4 @@ export class TempSdk {
       .post<MarketplaceOrder>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
-
-  async createOrUpdatePayment(
-    orderId: string,
-    payments: Payment[]
-  ): Promise<any> {
-    const url = `${this.appConfig.middlewareUrl}/payments/${orderId}/update`
-    return await this.http
-      .put(url, { Payments: payments }, { headers: this.buildHeaders() })
-      .toPromise()
-  }
 }

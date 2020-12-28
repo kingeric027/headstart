@@ -1,4 +1,3 @@
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
@@ -14,6 +13,8 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using System.Net;
 using Newtonsoft.Json;
+using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Commands
 {
@@ -25,15 +26,13 @@ namespace Marketplace.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
-        private readonly IOrderCloudIntegrationsCardConnectCommand _card;
-        private readonly TelemetryClient _telemetry;
+        private readonly ICreditCardCommand _card;
 
-        public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card, TelemetryClient telemetry)
+        public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, ICreditCardCommand card)
         {
             _oc = oc;
             _settings = settings;
             _card = card;
-            _telemetry = telemetry;
         }
 
         public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
@@ -47,29 +46,7 @@ namespace Marketplace.Common.Commands
                 payment.OrderID = incrementedOrderID;
                 await _card.AuthorizePayment(payment, user, GetMerchantID(payment));
             }
-            try
-            {
-                return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, user.AccessToken));
-            } catch(Exception e)
-            {
-                LogError(e, incrementedOrderID, worksheet, user);
-                throw e;
-            }
-        }
-
-        private void LogError(Exception e, string orderID, MarketplaceOrderWorksheet worksheet, VerifiedUserContext user)
-        {
-            // track in app insights
-            // to find go to Transaction Search > Event Type = Event > Filter by any of these custom properties or event name "Order.Submit.PaymentCaptureOrderFailed"
-            var customProperties = new Dictionary<string, string>
-                {
-                    { "Message", "Payment was captured but order was not submitted" },
-                    { "OrderID", orderID },
-                    { "BuyerID", worksheet.Order.FromCompanyID },
-                    { "UserEmail", user.Email },
-                    { "ErrorResponse", JsonConvert.SerializeObject(e)}
-                };
-            _telemetry.TrackEvent("Order.Submit.PaymentCaptureOrderFailed", customProperties);
+            return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, user.AccessToken));
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)

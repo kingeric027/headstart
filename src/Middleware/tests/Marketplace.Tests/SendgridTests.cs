@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
 using Marketplace.Models;
 using Marketplace.Common;
@@ -21,6 +20,8 @@ using System.Dynamic;
 using NSubstitute.Extensions;
 using AutoFixture;
 using SendGrid;
+using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Tests
 {

@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services;
 using NUnit.Framework;
@@ -26,7 +26,7 @@ namespace Marketplace.Tests
     {
         private IOrderCloudClient _oc;
         private AppSettings _settings;
-        private IOrderCloudIntegrationsCardConnectCommand _card;
+        private ICreditCardCommand _card;
         private IOrderSubmitCommand _sut;
 
         [SetUp]
@@ -44,7 +44,7 @@ namespace Marketplace.Tests
             {
                 IncrementorPrefix = "SEB"
             };
-            _card = Substitute.For<IOrderCloudIntegrationsCardConnectCommand>();
+            _card = Substitute.For<ICreditCardCommand>();
             _card.AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), Arg.Any<string>())
                     .Returns(Task.FromResult(new Payment { }));
 

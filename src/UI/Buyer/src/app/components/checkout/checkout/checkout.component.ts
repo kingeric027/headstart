@@ -12,7 +12,9 @@ import {
 import {
   MarketplaceOrder,
   MarketplaceLineItem,
+  MarketplacePayment,
   OrderCloudIntegrationsCreditCardPayment,
+  HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
 import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component'
 import {
@@ -30,10 +32,8 @@ import {
   ErrorCodes,
 } from 'src/app/services/error-constants'
 import { AxiosError } from 'axios'
-import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { TempSdk } from 'src/app/services/temp-sdk/temp-sdk.service'
 import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
 
 interface CheckoutSection {
@@ -90,8 +90,7 @@ export class OCMCheckout implements OnInit {
   constructor(
     private context: ShopperContextService,
     private spinner: NgxSpinnerService,
-    private toastrService: ToastrService,
-    private tempSdk: TempSdk
+    private toastrService: ToastrService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -152,58 +151,66 @@ export class OCMCheckout implements OnInit {
     this.toSection('shippingAddress')
   }
 
-  buildCCPayment(card: MarketplaceBuyerCreditCard, amount: number): Payment {
-      return {
-        Amount: amount,
-        DateCreated: new Date().toDateString(),
-        Accepted: false,
-        Type: 'CreditCard',
-        CreditCardID: card.ID,
-        xp: {
-          partialAccountNumber: card.PartialAccountNumber,
-          cardType: card.CardType
-        }
-      }
+  buildCCPayment(card: MarketplaceBuyerCreditCard): Payment {
+    // amount gets calculated in middleware
+    return {
+      DateCreated: new Date().toDateString(),
+      Accepted: false,
+      Type: 'CreditCard',
+      CreditCardID: card.ID,
+      xp: {
+        // any additions to the xp model must be updated in c# MarketplacePaymentModel or won't show up
+        partialAccountNumber: card.PartialAccountNumber,
+        cardType: card.CardType,
+      },
     }
+  }
 
-    buildPOPayment(amount: number): Payment {
-      return {
-        Amount: amount,
-        DateCreated: new Date().toDateString(),
-        Type: 'PurchaseOrder',
-      }
+  buildPOPayment(): Payment {
+    // amount gets calculated in middleware
+    return {
+      DateCreated: new Date().toDateString(),
+      Type: 'PurchaseOrder',
     }
+  }
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.initLoadingIndicator('paymentLoading')
-    var payments: Payment[] = [];
+    const payments: MarketplacePayment[] = []
     this.selectedCard = output
-    if(!output.SavedCard) {
+    if (!output.SavedCard) {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
       // so for now I always save any credit card in OC.
       this.selectedCard.SavedCard = await this.context.currentUser.cards.Save(
         output.NewCard
       )
       this.isNewCard = true
-      payments.push(this.buildCCPayment(this.selectedCard.SavedCard, this.orderSummaryMeta.CreditCardTotal))
+      payments.push(this.buildCCPayment(this.selectedCard.SavedCard))
     } else {
-      payments.push(this.buildCCPayment(output.SavedCard, this.orderSummaryMeta.CreditCardTotal))
-      delete this.selectedCard.SavedCard;
+      payments.push(this.buildCCPayment(output.SavedCard))
+      delete this.selectedCard.NewCard
     }
     if (this.orderSummaryMeta.POLineItemCount) {
-      payments.push(this.buildPOPayment(this.orderSummaryMeta.POTotal))
+      payments.push(this.buildPOPayment())
     }
-    await this.tempSdk.createOrUpdatePayment(this.order.ID, payments);
-    this.payments = await this.checkout.listPayments()
-    this.destoryLoadingIndicator('confirm')
+    try {
+      await HeadStartSDK.Payments.SavePayments(this.order.ID, {
+        Payments: payments,
+      })
+      this.payments = await this.checkout.listPayments()
+      this.destoryLoadingIndicator('confirm')
+    } catch (exception) {
+      this.setValidation('payment', false)
+      await this.handleSubmitError(exception)
+    }
   }
 
   async onAcknowledgePurchaseOrder(): Promise<void> {
     //  Function that is used when there are no credit cards. Just PO acknowledgement
-    const payments = [
-      this.buildPOPayment(this.orderSummaryMeta.POTotal)
-    ]
-    await this.tempSdk.createOrUpdatePayment(this.order.ID, payments)
+    const payments = [this.buildPOPayment()]
+    await HeadStartSDK.Payments.SavePayments(this.order.ID, {
+      Payments: payments,
+    })
     this.payments = await this.checkout.listPayments()
     this.toSection('confirm')
   }
@@ -248,6 +255,10 @@ export class OCMCheckout implements OnInit {
       error.ErrorCode === ErrorCodes.OrderSubmit.OrderCloudValidationError
     ) {
       this.handleOrderCloudValidationError(error)
+    } else if (
+      error.ErrorCode === ErrorCodes.Payment.FailedToVoidAuthorization
+    ) {
+      this.handleVoidAuthorizationError()
     } else if (error.ErrorCode.includes('CreditCardAuth.')) {
       await this.handleCreditcardError(error)
     } else if (error.ErrorCode == ErrorCodes.InternalServerError) {
@@ -280,6 +291,14 @@ export class OCMCheckout implements OnInit {
         }
       }
     })
+  }
+
+  handleVoidAuthorizationError(): void {
+    // We tried to void an authorization on an order and it failed, will require manual intervention from support
+    // we email as well as log the error in application insights
+    this.currentPanel = 'payment'
+    this.paymentError =
+      'Critical error occurred. Please contact support and avoid submitting order again until you have been helped'
   }
 
   async handleCreditcardError(error: MiddlewareError): Promise<void> {
