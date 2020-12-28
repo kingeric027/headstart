@@ -1069,7 +1069,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency
     superMarketplaceProduct.PriceSchedule.ID =
       superMarketplaceProduct.Product.ID
-    superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`
+    // Maximum price schedule name is 75 characters, and pre-pended 'Default_Marketplace_Buyer' is 25.  Slice name if more than 75 characters.
+    superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name.slice(
+      0,
+      75
+    )}`
     if (superMarketplaceProduct.Product.xp.Tax.Category === null)
       superMarketplaceProduct.Product.xp.Tax = null
     if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null)
@@ -1087,7 +1091,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     ) {
       superMarketplaceProduct.PriceSchedule.ID =
         superMarketplaceProduct.Product.ID
-      superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`
+      // Maximum price schedule name is 75 characters, and pre-pended 'Default_Marketplace_Buyer' is 25.  Slice name if more than 75 characters.
+      superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name.slice(
+        0,
+        75
+      )}`
     }
     if (superMarketplaceProduct.PriceSchedule.PriceBreaks.length === 0)
       superMarketplaceProduct.PriceSchedule = null
