@@ -39,11 +39,12 @@ namespace Marketplace.Common.Models
         public List<string> BuyerID { get; set; }
         public List<string> Country { get; set; }
         public List<string> State { get; set; }
-        public List<string> Status { get; set; }
+        public List<string> SubmittedOrderStatus { get; set; }
         public List<string> OrderType { get; set; }
         //Only properties that are nested and being used as filters need to be setup here with their relative path and their full path.
         public static readonly Dictionary<string, string> NestedLocations = new Dictionary<string, string>
         {
+            { "SubmittedOrderStatus", "xp.SubmittedOrderStatus" },
             { "OrderType", "xp.OrderType" },
             { "Country", "xp.ShippingAddress.Country" }
         };

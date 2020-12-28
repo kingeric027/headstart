@@ -120,16 +120,16 @@ export class ReportsComponent implements OnInit {
     switch (this.selectedReportType) {
       case 'BuyerLocation':
         column = buyerLocation.find((c) => c.path === header)
-        return column.value
+        return column?.value
       case 'SalesOrderDetail':
         column = salesOrderDetail.find((c) => c.path === header)
-        return column.value
+        return column?.value
       case 'PurchaseOrderDetail':
         column = purchaseOrderDetail.find((c) => c.path === header)
-        return column.value
+        return column?.value
       case 'LineItemDetail':
         column = lineItemDetail.find((c) => c.path === header)
-        return column.value
+        return column?.value
     }
   }
 }
