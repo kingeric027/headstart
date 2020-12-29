@@ -13,7 +13,7 @@ import {
 import { ToastrService } from 'ngx-toastr'
 import { AppAuthService } from '@app-seller/auth'
 import { get as _get } from 'lodash'
-import { JDocument } from '@ordercloud/headstart-sdk'
+import { JDocument } from '@ordercloud/cms-sdk'
 
 @Component({
   selector: 'account-notifications',
