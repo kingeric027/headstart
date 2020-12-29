@@ -60,7 +60,7 @@ namespace Marketplace.Common.Commands
             else if(existingPayment.CreditCardID == requestedPayment.CreditCardID && existingPayment.Amount == paymentAmount)
             {
                 // do nothing, payment doesnt need updating
-                await Task.CompletedTask;
+                return;
             }
             else if (existingPayment.CreditCardID == requestedPayment.CreditCardID)
             {
