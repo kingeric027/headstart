@@ -42,7 +42,7 @@ namespace Marketplace.Tests
 		public void Setup()
 		{
 			_cardConnect = Substitute.For<IOrderCloudIntegrationsCardConnectService>();
-			_cardConnect.VoidAuthorization(Arg.Is<CardConnectVoidRequest>(r => r.merchid == merchantID && r.retref == validretref))
+			_cardConnect.VoidAuthorization(Arg.Is<CardConnectVoidRequest>(r => r.merchid == merchantID))
 				.Returns(Task.FromResult(new CardConnectVoidResponse { }));
             _cardConnect.AuthWithoutCapture(Arg.Any<CardConnectAuthorizationRequest>())
                 .Returns(Task.FromResult(new CardConnectAuthorizationResponse { authcode = "REVERS" }));
@@ -63,8 +63,6 @@ namespace Marketplace.Tests
 
 			_sebExchangeRates = Substitute.For<ISebExchangeRatesService>();
 			_supportAlerts = Substitute.For<ISupportAlertService>();
-			//_supportAlerts.VoidAuthorizationFailed(Arg.Any<MarketplacePayment>(), transactionID, Arg.Any<MarketplaceOrder>(), Arg.Any<CreditCardVoidException>())
-			//	.Returns(Task.FromResult(0));
 			_settings = Substitute.For<AppSettings>();
 			_settings.CardConnectSettings.CadMerchantID = merchantID;
 
@@ -142,6 +140,72 @@ namespace Marketplace.Tests
 			await _cardConnect.Received().AuthWithoutCapture(Arg.Any<CardConnectAuthorizationRequest>());
 			await _oc.Payments.Received().PatchAsync<MarketplacePayment>(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PartialPayment>(p => p.Accepted == true && p.Amount == ccTotal));
 			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID,paymentID, Arg.Any<PaymentTransaction>());
+		}
+
+		[Test]
+		public async Task should_handle_existing_voids()
+		{
+			// in a scenario where a void has already been processed on the payment
+			// we want to make sure to only try to void the last successful transaction of type "CreditCard"
+
+			var paymentTotal = 30; // credit card total is 38
+
+			// Arrange
+			var payment1transactions = new List<MarketplacePaymentTransaction>()
+			{
+				new MarketplacePaymentTransaction
+				{
+					ID = "authattempt1",
+					Succeeded = true,
+					Type = "CreditCard",
+					xp = new TransactionXP
+					{
+						CardConnectResponse = new CardConnectAuthorizationResponse
+						{
+							retref = "retref1"
+						}
+					}
+				},
+				new MarketplacePaymentTransaction
+				{
+					ID = "voidattempt1",
+					Succeeded = true,
+					Type = "CreditCardVoidAuthorization",
+					xp = new TransactionXP
+					{
+						CardConnectResponse = new CardConnectAuthorizationResponse
+						{
+							retref = "retref2"
+						}
+					}
+				},
+				new MarketplacePaymentTransaction
+				{
+					ID = "authattempt2",
+					Type = "CreditCard",
+					Succeeded = true,
+					xp = new TransactionXP
+					{
+						CardConnectResponse = new CardConnectAuthorizationResponse
+						{
+							retref = "retref3"
+						}
+					}
+				}
+			};
+			_oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, orderID, filters: Arg.Is<object>(f => (string)f == "Type=CreditCard"))
+				.Returns(PaymentMocks.PaymentList(MockCCPayment(paymentTotal, true, payment1transactions)));
+			var payment = ValidIntegrationsPayment();
+
+			// Act
+			await _sut.AuthorizePayment(payment, userToken, merchantID);
+
+			// Assert
+			await _cardConnect.Received().VoidAuthorization(Arg.Is<CardConnectVoidRequest>(x => x.retref == "retref3" && x.merchid == merchantID));
+			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PaymentTransaction>(x => x.Amount == paymentTotal));
+			await _cardConnect.Received().AuthWithoutCapture(Arg.Any<CardConnectAuthorizationRequest>());
+			await _oc.Payments.Received().PatchAsync<MarketplacePayment>(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PartialPayment>(p => p.Accepted == true && p.Amount == ccTotal));
+			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID, paymentID, Arg.Any<PaymentTransaction>());
 		}
 
 		[Test]
