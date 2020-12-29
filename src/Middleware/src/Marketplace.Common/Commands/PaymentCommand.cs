@@ -55,6 +55,7 @@ namespace Marketplace.Common.Commands
             if (existingPayment == null)
             {
                 requestedPayment.Amount = paymentAmount;
+                requestedPayment.Accepted = false;
                 await _oc.Payments.CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, worksheet.Order.ID, requestedPayment, userToken); // need user token because admins cant see personal credit cards
             }
             else if(existingPayment.CreditCardID == requestedPayment.CreditCardID && existingPayment.Amount == paymentAmount)
@@ -67,6 +68,7 @@ namespace Marketplace.Common.Commands
                 await _ccCommand.VoidPaymentAsync(existingPayment, worksheet.Order, userToken);
                 await _oc.Payments.PatchAsync<MarketplacePayment>(OrderDirection.Incoming, worksheet.Order.ID, existingPayment.ID, new PartialPayment
                 {
+                    Accepted = false,
                     Amount = paymentAmount,
                     xp = requestedPayment.xp
                 });
@@ -76,6 +78,7 @@ namespace Marketplace.Common.Commands
                 // we need to delete payment because you can't have payments totaling more than order total and you can't set payments to $0
                 await DeleteCreditCardPaymentAsync(existingPayment, worksheet.Order, userToken);
                 requestedPayment.Amount = paymentAmount;
+                requestedPayment.Accepted = false;
                 await _oc.Payments.CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, worksheet.Order.ID, requestedPayment, userToken); // need user token because admins cant see personal credit cards
             }
         }

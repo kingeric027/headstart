@@ -88,7 +88,7 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID && p.Type == PaymentType.CreditCard && p.Amount == mockedCreditCardTotal), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID && p.Type == PaymentType.CreditCard && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Marketplace.Tests
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
             await _ccCommand.Received().VoidPaymentAsync(Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID), Arg.Is<MarketplaceOrder>(o => o.ID == mockOrderID), mockUserToken);
-            await _oc.Payments.Received().PatchAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID, mockCCPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedCreditCardTotal));
+            await _oc.Payments.Received().PatchAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID, mockCCPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedCreditCardTotal && p.Accepted == false));
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace Marketplace.Tests
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockCCPaymentID);
             await _ccCommand.Received().VoidPaymentAsync(Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID), Arg.Is<MarketplaceOrder>(o => o.ID == mockOrderID), mockUserToken);
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
         [Test]
@@ -160,7 +160,7 @@ namespace Marketplace.Tests
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockCCPaymentID);
             await _ccCommand.Received().VoidPaymentAsync(Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID), Arg.Is<MarketplaceOrder>(o => o.ID == mockOrderID), mockUserToken);
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
         [Test]
