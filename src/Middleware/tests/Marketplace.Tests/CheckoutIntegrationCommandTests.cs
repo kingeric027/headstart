@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models.Models.Marketplace;
 using System.Linq;
+using Marketplace.Common.Models.Marketplace;
 
 namespace Marketplace.Tests
 {

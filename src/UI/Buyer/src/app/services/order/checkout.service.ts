@@ -24,6 +24,7 @@ import {
   OrderCloudIntegrationsCreditCardPayment,
 } from '@ordercloud/headstart-sdk'
 import { max } from 'lodash'
+import { TempSdk } from '../temp-sdk/temp-sdk.service'
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +32,8 @@ import { max } from 'lodash'
 export class CheckoutService {
   constructor(
     private paymentHelper: PaymentHelperService,
-    private state: OrderStateService
+    private state: OrderStateService,
+    private TempSdk: TempSdk
   ) {}
 
   async appendPaymentMethodToOrderXp(
@@ -120,33 +122,6 @@ export class CheckoutService {
     return await this.paymentHelper.ListPaymentsOnOrder(this.order.ID)
   }
 
-  async createSavedCCPayment(
-    card: MarketplaceBuyerCreditCard,
-    amount: number
-  ): Promise<Payment> {
-    return await this.createCCPayment(
-      card?.PartialAccountNumber,
-      card.CardType,
-      card.ID,
-      amount
-    )
-  }
-
-  async createOneTimeCCPayment(
-    card: OrderCloudIntegrationsCreditCardToken,
-    amount: number
-  ): Promise<Payment> {
-    // This slice() is sooo crucial. Otherwise we would be storing creditcard numbers in xp.
-    // Which would be really really bad.
-    const partialAccountNum = card.AccountNumber.slice(-4)
-    return await this.createCCPayment(
-      partialAccountNum,
-      card.CardType,
-      null,
-      amount
-    )
-  }
-
   // Integration Methods
   // order cloud sandbox service methods, to be replaced by updated sdk in the future
   async estimateShipping(): Promise<OrderWorksheet> {
@@ -229,43 +204,6 @@ export class CheckoutService {
     )
     this.order = orderCalculation.Order
     return this.order
-  }
-
-  async createPurchaseOrderPayment(amount: number): Promise<Payment> {
-    const payment: Payment = {
-      Amount: amount,
-      DateCreated: new Date().toDateString(),
-      Type: 'PurchaseOrder',
-    }
-    return await Payments.Create('Outgoing', this.order.ID, payment)
-  }
-
-  async deleteExistingPayments(): Promise<any[]> {
-    const payments = await Payments.List('Outgoing', this.order.ID)
-    const deleteAll = payments.Items.map((payment) =>
-      Payments.Delete('Outgoing', this.order.ID, payment.ID)
-    )
-    return Promise.all(deleteAll)
-  }
-
-  private async createCCPayment(
-    partialAccountNum: string,
-    cardType: string,
-    creditCardID: string,
-    amount: number
-  ): Promise<Payment> {
-    const payment: Payment = {
-      Amount: amount,
-      DateCreated: new Date().toDateString(),
-      Accepted: false,
-      Type: 'CreditCard',
-      CreditCardID: creditCardID,
-      xp: {
-        partialAccountNumber: partialAccountNum,
-        cardType,
-      },
-    }
-    return await Payments.Create('Outgoing', this.order.ID, payment)
   }
 
   private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {

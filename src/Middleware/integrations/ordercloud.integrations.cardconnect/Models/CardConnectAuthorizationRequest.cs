@@ -1,4 +1,6 @@
-﻿namespace ordercloud.integrations.cardconnect
+﻿using ordercloud.integrations.library;
+
+namespace ordercloud.integrations.cardconnect
 {
    public class CardConnectAuthorizationRequest
     {
@@ -23,6 +25,7 @@
         //public string bin { get; set; }
     }
 
+    [SwaggerModel]
     public class CardConnectAuthorizationResponse
     {
         public string token { get; set; }
@@ -46,6 +49,7 @@
         public string resptext { get; set; }
     }
 
+    [SwaggerModel]
     public class BinInfo
     {
         public string country { get; set; }

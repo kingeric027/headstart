@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Zoho;
 using Marketplace.Common.Services;
 using NUnit.Framework;
@@ -26,7 +26,7 @@ namespace Marketplace.Tests
     {
         private IOrderCloudClient _oc;
         private AppSettings _settings;
-        private IOrderCloudIntegrationsCardConnectCommand _card;
+        private ICreditCardCommand _card;
         private IOrderSubmitCommand _sut;
 
         [SetUp]
@@ -44,18 +44,14 @@ namespace Marketplace.Tests
             {
                 IncrementorPrefix = "SEB"
             };
-            _card = Substitute.For<IOrderCloudIntegrationsCardConnectCommand>();
-            _card.AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), Arg.Any<string>())
+            _card = Substitute.For<ICreditCardCommand>();
+            _card.AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", Arg.Any<string>())
                     .Returns(Task.FromResult(new Payment { }));
 
             _oc.Orders.PatchAsync(OrderDirection.Incoming, "mockOrderID", Arg.Any<PartialOrder>()).Returns(Task.FromResult(new Order { ID = "SEB12345" }));
             _oc.AuthenticateAsync().Returns(Task.FromResult(new TokenResponse { AccessToken = "mockToken" }));
             _oc.Orders.SubmitAsync<MarketplaceOrder>(Arg.Any<OrderDirection>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Task.FromResult(new MarketplaceOrder { ID = "submittedorderid" }));
-            var telemetry = new TelemetryClient(new TelemetryConfiguration
-            {
-                TelemetryChannel = Substitute.For<ITelemetryChannel>()
-            });
-            _sut = new OrderSubmitCommand(_oc, _settings, _card, telemetry); // sut is subject under test
+            _sut = new OrderSubmitCommand(_oc, _settings, _card); // sut is subject under test
         }
 
         [Test]
@@ -68,7 +64,7 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(async () => await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, TestHelpers.MockUserContext()));
+            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(async () => await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, "mockUserToken"));
 
             // Assert
             Assert.AreEqual("OrderSubmit.AlreadySubmitted", ex.ApiError.ErrorCode);
@@ -98,7 +94,7 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(async () => await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, TestHelpers.MockUserContext()));
+            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(async () => await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, "mockUserToken"));
 
             // Assert
             Assert.AreEqual("OrderSubmit.MissingShippingSelections", ex.ApiError.ErrorCode);
@@ -137,7 +133,7 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(async () => await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Outgoing, null, TestHelpers.MockUserContext()));
+            var ex = Assert.ThrowsAsync<OrderCloudIntegrationException>(async () => await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Outgoing, null, "mockUserToken"));
 
             // Assert
             Assert.AreEqual("OrderSubmit.MissingPayment", ex.ApiError.ErrorCode);
@@ -178,7 +174,7 @@ namespace Marketplace.Tests
 
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), "mockUserToken");
 
             // Assert
             await _oc.Orders.DidNotReceive().PatchAsync(OrderDirection.Incoming, "mockOrderID", Arg.Any<PartialOrder>());
@@ -219,7 +215,7 @@ namespace Marketplace.Tests
 
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), "mockUserToken");
 
             // Assert
             await _oc.Orders.DidNotReceive().PatchAsync(OrderDirection.Incoming, "mockOrderID", Arg.Any<PartialOrder>());
@@ -258,7 +254,7 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), "mockUserToken");
 
             // Assert
             await _oc.Orders.Received().PatchAsync(OrderDirection.Incoming, "mockOrderID", Arg.Any<PartialOrder>());
@@ -297,10 +293,10 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), "mockUserToken");
 
             // Assert
-            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), Arg.Any<string>());
+            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", Arg.Any<string>());
         }
 
         [Test]
@@ -336,10 +332,10 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), "mockUserToken");
 
             // Assert
-            await _card.DidNotReceive().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), Arg.Any<string>());
+            await _card.DidNotReceive().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", Arg.Any<string>());
         }
 
 
@@ -376,10 +372,10 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { Currency = "USD" }, TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { Currency = "USD" }, "mockUserToken");
 
             // Assert
-            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), "mockUsdMerchantID");
+            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", "mockUsdMerchantID");
         }
 
         [Test]
@@ -415,10 +411,10 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { Currency = "CAD" }, TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { Currency = "CAD" }, "mockUserToken");
 
             // Assert
-            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), "mockCadMerchantID");
+            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", "mockCadMerchantID");
         }
 
         [Test]
@@ -456,10 +452,10 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { Currency = "MXN" }, TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID",  OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { Currency = "MXN" }, "mockUserToken");
 
             // Assert
-            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), Arg.Any<VerifiedUserContext>(), "mockEurMerchantID");
+            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", "mockEurMerchantID");
         }
 
         [Test]
@@ -497,7 +493,7 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, "mockUserToken");
 
             // Assert
             await _oc.Orders.Received().SubmitAsync<MarketplaceOrder>(OrderDirection.Outgoing, Arg.Any<string>(), Arg.Any<string>());
@@ -538,7 +534,7 @@ namespace Marketplace.Tests
             }));
 
             // Act
-            await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Incoming, new OrderCloudIntegrationsCreditCardPayment { }, TestHelpers.MockUserContext());
+            await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Incoming, new OrderCloudIntegrationsCreditCardPayment { }, "mockUserToken");
 
             // Assert
             await _oc.Orders.Received().SubmitAsync<MarketplaceOrder>(OrderDirection.Incoming, Arg.Any<string>(), Arg.Any<string>());

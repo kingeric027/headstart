@@ -34,7 +34,7 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("{direction}/{orderID}/submit"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<MarketplaceOrder> Submit(OrderDirection direction, string orderID, [FromBody] OrderCloudIntegrationsCreditCardPayment payment)
         {
-            return await _orderSubmitCommand.SubmitOrderAsync(orderID, direction, payment, VerifiedUserContext);
+            return await _orderSubmitCommand.SubmitOrderAsync(orderID, direction, payment, VerifiedUserContext.AccessToken);
         }
 
         [DocName("POST Acknowledge Quote Order")]
