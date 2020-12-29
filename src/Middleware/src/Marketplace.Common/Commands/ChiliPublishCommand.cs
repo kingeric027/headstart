@@ -61,6 +61,8 @@ namespace Marketplace.Common.Commands
     {
         [Required]
         public ChiliSpecUI UI { get; set; } = new ChiliSpecUI();
+        public int SpecFormOrder { get; set; }
+        public string Label { get; set; }
     }
 
     [SwaggerModel]
