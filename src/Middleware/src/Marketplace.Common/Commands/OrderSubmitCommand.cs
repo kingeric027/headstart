@@ -46,7 +46,7 @@ namespace Marketplace.Common.Commands
                 payment.OrderID = incrementedOrderID;
                 await _card.AuthorizePayment(payment, userToken, GetMerchantID(payment));
             }
-            return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, userToken));
+            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, userToken));
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)
@@ -124,7 +124,7 @@ namespace Marketplace.Common.Commands
             return merchantID;
         }
 
-        private AsyncRetryPolicy RetryUpToThreeTimes()
+        private AsyncRetryPolicy WithRetry()
         {
             // retries three times, waits two seconds in-between failures
             return Policy
