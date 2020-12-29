@@ -118,6 +118,7 @@ namespace Marketplace.Tests
 				{
 					ID = transactionID,
 					Succeeded = true,
+					Type = "CreditCard",
 					xp = new TransactionXP
                     {
 						CardConnectResponse = new CardConnectAuthorizationResponse
@@ -257,8 +258,8 @@ namespace Marketplace.Tests
 		[Test]
 		public async Task should_handle_failed_auth_void()
 		{
-			// this gives us full insight into transaction history
-			// as well as sets Accepted to false
+			// creates a new transaction when auth fails which
+			// gives us full insight into transaction history as well as sets Accepted to false
 
 			var paymentTotal = 30; // credit card total is 38
 
@@ -269,6 +270,7 @@ namespace Marketplace.Tests
 				{
 					ID = transactionID,
 					Succeeded = true,
+					Type = "CreditCard",
 					xp = new TransactionXP
 					{
 						CardConnectResponse = new CardConnectAuthorizationResponse
