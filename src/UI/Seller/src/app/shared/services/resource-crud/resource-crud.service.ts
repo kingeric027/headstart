@@ -454,7 +454,7 @@ export abstract class ResourceCrudService<ResourceType> {
         resourceResponse = await this.list(args)
       }
       const successStatus = this.getSucessStatus(options, resourceResponse);
-      if(!isRetry && this.primaryResourceLevel !== 'kitproducts' && this.primaryResourceLevel !== 'orders' && successStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS') {
+      if(!isRetry && this.primaryResourceLevel === 'products' && successStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS') {
         isRetry = true
         const retryOptions: Options = {...options, searchType: 'AnyTerm'}
         let retryResourceResponse = await this.list([retryOptions])
