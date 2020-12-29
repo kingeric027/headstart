@@ -88,7 +88,7 @@ namespace ordercloud.integrations.cardconnect
                 ResultCode = response.authcode,
                 ResultMessage = response.resptext,
                 Succeeded = response.WasSuccessful(),
-                Type = payment.Type.ToString(),
+                Type = "CreditCard",
                 xp = new
                 {
                     CardConnectResponse = response
@@ -106,7 +106,7 @@ namespace ordercloud.integrations.cardconnect
                 ResultCode = response.authcode,
                 ResultMessage = response.resptext,
                 Succeeded = response.WasSuccessful(),
-                Type = payment.Type.ToString(),
+                Type = "CreditCardVoidAuthorization",
                 xp = new
                 {
                     CardConnectResponse = response
