@@ -259,10 +259,12 @@ export class OCMCheckout implements OnInit {
       error.ErrorCode === ErrorCodes.Payment.FailedToVoidAuthorization
     ) {
       this.handleVoidAuthorizationError()
-    } else if (error.ErrorCode.includes('CreditCardAuth.')) {
+    } else if (error.ErrorCode?.includes('CreditCardAuth.')) {
       await this.handleCreditcardError(error)
     } else if (error.ErrorCode == ErrorCodes.InternalServerError) {
       throw new Error(error.Message)
+    } else {
+      throw new Error(error as any)
     }
   }
 
