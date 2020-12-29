@@ -13,7 +13,6 @@ namespace ordercloud.integrations.library
     {
         public static IWebHostBuilder CreateWebHostBuilder<TStartup, TAppSettings>(string[] args) where TStartup : class where TAppSettings : class, new() =>
             WebHost.CreateDefaultBuilder(args)
-                .UseDefaultServiceProvider(options => options.ValidateScopes = false)
                 .UseStartup<TStartup>()
                 .UseIISIntegration()
 
@@ -25,7 +24,6 @@ namespace ordercloud.integrations.library
 
         public static IWebHostBuilder CreateWebHostBuilder<TStartup, TAppSettings>(string[] args, string appSettingsConnectionString) where TStartup : class where TAppSettings : class, new() =>
             WebHost.CreateDefaultBuilder(args)
-                .UseDefaultServiceProvider(options => options.ValidateScopes = false)
                 .ConfigureAppConfiguration((context, config) =>
                 {
                     config.AddAzureAppConfiguration(appSettingsConnectionString);

@@ -11,7 +11,6 @@ import {
 import {
   ReportsTemplateService,
   ReportTemplate,
-  ReportType,
 } from '@app-seller/shared/services/middleware-api/reports-template.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { FormGroup } from '@angular/forms'
@@ -29,12 +28,9 @@ import {
   Filter,
 } from '../models/filters'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
-import { OcBuyerService, OrderStatus } from '@ordercloud/angular-sdk'
+import { OcBuyerService } from '@ordercloud/angular-sdk'
 import { cloneDeep } from 'lodash'
-import {
-  SupportedCountries,
-  GeographyConfig,
-} from '@app-seller/shared/models/supported-countries.interface'
+import { GeographyConfig } from '@app-seller/shared/models/supported-countries.interface'
 import { AppGeographyService } from '@app-seller/shared'
 import { OrderType } from '@app-seller/shared/models/MarketPlaceOrder.interface'
 
@@ -146,15 +142,8 @@ export class TemplateEditComponent implements OnChanges {
           if (filter.name === 'Order Type') {
             filter.filterValues = Object.values(OrderType)
           }
-          if (filter.name === 'Order Status') {
-            filter.filterValues = [
-              'Unsubmitted',
-              'AwaitingApproval',
-              'Declined',
-              'Open',
-              'Completed',
-              'Canceled',
-            ]
+          if (filter.name === 'Submitted Order Status') {
+            filter.filterValues = ['Open', 'Completed', 'Canceled']
           }
       }
     }
@@ -212,12 +201,10 @@ export class TemplateEditComponent implements OnChanges {
   toggleIncludeAllValues(includeAll: boolean, filter: Filter): void {
     if (includeAll) {
       const i = this.filterChipsToDisplay.indexOf(filter)
-      this.filterChipsToDisplay.splice(i, 1)
-      const filterValues = this.filters.find((f) => f.path === filter.path)
-        .filterValues
-      this.updatedResource.Filters[filter.path] = filterValues.map((value) => {
-        return filter.dataKey ? value[filter.dataKey] : filter
-      })
+      this.filterChipsToDisplay = this.filterChipsToDisplay.filter(
+        (chipGrouping) => chipGrouping !== this.filterChipsToDisplay[i]
+      )
+      this.updatedResource.Filters[filter.path] = []
       this.resourceForm.controls.Filters.setValue(this.updatedResource.Filters)
       this.updateResource.emit({
         value: this.updatedResource.Filters,
