@@ -31,7 +31,7 @@ export class OCMGridSpecForm {
   priceBreaks: PriceBreak[]
   price: number
   percentSavings: number
-  totalQty: number
+  totalQtyToAdd: number
   qtyValid = false
   errorMsg = ''
   constructor(
@@ -116,7 +116,7 @@ export class OCMGridSpecForm {
     else this.lineItems[i] = item
     const liQuantities = []
     this.lineItems.forEach((li) => liQuantities.push(li.Quantity))
-    this.totalQty = liQuantities.reduce((acc, curr) => {
+    this.totalQtyToAdd = liQuantities.reduce((acc, curr) => {
       return acc + curr
     })
     this.qtyValid = this.validateQuantity(this.lineItems)
@@ -130,12 +130,32 @@ export class OCMGridSpecForm {
   }
 
   validateQuantity(lineItems: MarketplaceLineItem[]): boolean {
+    const lineItemsOfCurrentProductInCart: MarketplaceLineItem[] = this.context.order.cart
+      .get()
+      ?.Items?.filter((i) => i.ProductID === this.product?.ID)
+    let qtyInCart = 0
+    // When users can mix and match variants when evaluating quantity
     if (this.priceSchedule.UseCumulativeQuantity) {
-      return this.totalQty >= lineItems[0].Product.PriceSchedule.MinQuantity &&
-        lineItems[0].Product.PriceSchedule.MaxQuantity !== null
-        ? this.totalQty <= lineItems[0].Product.PriceSchedule.MaxQuantity
-        : this.totalQty !== 0
+      // When users have not hit the minimum quantity
+      lineItemsOfCurrentProductInCart.forEach(
+        (li: MarketplaceLineItem) => (qtyInCart += li.Quantity)
+      )
+      if (
+        this.totalQtyToAdd + qtyInCart <
+        lineItems[0].Product.PriceSchedule.MinQuantity
+      ) {
+        return false
+      }
+      // When users have exceeded the maximum quantity
+      if (
+        lineItems[0].Product.PriceSchedule.MaxQuantity !== null &&
+        this.totalQtyToAdd + qtyInCart >
+        lineItems[0].Product.PriceSchedule.MaxQuantity
+      ) {
+        return false
+      }
     } else {
+      // When quantity must be evaluated variant-by-variant
       const allItemsHonorQtyRules = lineItems.every(
         (li: MarketplaceLineItem) => {
           return (
@@ -148,6 +168,7 @@ export class OCMGridSpecForm {
       )
       return allItemsHonorQtyRules
     }
+    return true
   }
 
   getUnitPrice(qty: number, specs: GridSpecOption[]): number {
