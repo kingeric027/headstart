@@ -37,30 +37,34 @@ namespace Marketplace.Common.Commands
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             var existingPayments = (await _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, orderID)).Items;
-            await DeletePaymentsNoLongerNeededAsync(requestedPayments, existingPayments, worksheet.Order, userToken);
+            existingPayments =  await DeleteStalePaymentsAsync(requestedPayments, existingPayments, worksheet.Order, userToken);
 
             foreach(var requestedPayment in requestedPayments)
             {
                 var existingPayment = existingPayments.FirstOrDefault(p => p.Type == requestedPayment.Type);
-                if(requestedPayment.Type == PaymentType.CreditCard) { await UpdateCreditCardPaymentAsync(requestedPayment, existingPayment, worksheet, userToken); }
+                if(requestedPayment.Type == PaymentType.CreditCard) { await UpdateCCPaymentAsync(requestedPayment, existingPayment, worksheet, userToken); }
                 if(requestedPayment.Type == PaymentType.PurchaseOrder) { await UpdatePoPaymentAsync(requestedPayment, existingPayment, worksheet); }
             }
 
             return (await _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, orderID)).Items;
         }
 
-        private async Task UpdateCreditCardPaymentAsync(MarketplacePayment requestedPayment, MarketplacePayment existingPayment, MarketplaceOrderWorksheet worksheet, string userToken)
+        private async Task UpdateCCPaymentAsync(MarketplacePayment requestedPayment, MarketplacePayment existingPayment, MarketplaceOrderWorksheet worksheet, string userToken)
         {
             var paymentAmount = _orderCalc.GetCreditCardTotal(worksheet);
             if (existingPayment == null)
             {
                 requestedPayment.Amount = paymentAmount;
-                await _oc.Payments.CreateAsync(OrderDirection.Outgoing, worksheet.Order.ID, requestedPayment, userToken); // need user token because admins cant see personal credit cards
+                await _oc.Payments.CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, worksheet.Order.ID, requestedPayment, userToken); // need user token because admins cant see personal credit cards
+            }
+            else if(existingPayment.CreditCardID == requestedPayment.CreditCardID && existingPayment.Amount == paymentAmount)
+            {
+                // do nothing, payment doesnt need updating
             }
             else if (existingPayment.CreditCardID == requestedPayment.CreditCardID)
             {
                 await _ccCommand.VoidPaymentAsync(existingPayment, worksheet.Order, userToken);
-                await _oc.Payments.PatchAsync(OrderDirection.Incoming, worksheet.Order.ID, existingPayment.ID, new PartialPayment
+                await _oc.Payments.PatchAsync<MarketplacePayment>(OrderDirection.Incoming, worksheet.Order.ID, existingPayment.ID, new PartialPayment
                 {
                     Amount = paymentAmount,
                     xp = requestedPayment.xp
@@ -71,7 +75,7 @@ namespace Marketplace.Common.Commands
                 // we need to delete payment because you can't have payments totaling more than order total and you can't set payments to $0
                 await DeleteCreditCardPaymentAsync(existingPayment, worksheet.Order, userToken);
                 requestedPayment.Amount = paymentAmount;
-                await _oc.Payments.CreateAsync(OrderDirection.Outgoing, worksheet.Order.ID, requestedPayment, userToken); // need user token because admins cant see personal credit cards
+                await _oc.Payments.CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, worksheet.Order.ID, requestedPayment, userToken); // need user token because admins cant see personal credit cards
             }
         }
 
@@ -81,11 +85,11 @@ namespace Marketplace.Common.Commands
             if (existingPayment == null)
             {
                 requestedPayment.Amount = paymentAmount;
-                await _oc.Payments.CreateAsync(OrderDirection.Incoming, worksheet.Order.ID, requestedPayment);
+                await _oc.Payments.CreateAsync<MarketplacePayment>(OrderDirection.Incoming, worksheet.Order.ID, requestedPayment);
             }
             else
             {
-                await _oc.Payments.PatchAsync(OrderDirection.Incoming, worksheet.Order.ID, existingPayment.ID, new PartialPayment
+                await _oc.Payments.PatchAsync<MarketplacePayment>(OrderDirection.Incoming, worksheet.Order.ID, existingPayment.ID, new PartialPayment
                 {
                     Amount = paymentAmount
                 });
@@ -99,25 +103,28 @@ namespace Marketplace.Common.Commands
         }
 
 
-        private async Task DeletePaymentsNoLongerNeededAsync(IList<MarketplacePayment> requestedPayments, IList<MarketplacePayment> existingPayments, MarketplaceOrder order, string userToken)
+        private async Task<IList<MarketplacePayment>> DeleteStalePaymentsAsync(IList<MarketplacePayment> requestedPayments, IList<MarketplacePayment> existingPayments, MarketplaceOrder order, string userToken)
         {
             // requestedPayments represents the payments that should be on the order
             // if there are any existing payments not reflected in requestedPayments then they should be deleted
-            foreach (var existingPayment in existingPayments)
+            foreach (var existingPayment in existingPayments.ToList())
             {
                 if (!requestedPayments.Any(p => p.Type == existingPayment.Type))
                 {
-
                     if (existingPayment.Type == PaymentType.PurchaseOrder)
                     {
                         await _oc.Payments.DeleteAsync(OrderDirection.Incoming, order.ID, existingPayment.ID);
+                        existingPayments.Remove(existingPayment);
                     }
                     if (existingPayment.Type == PaymentType.CreditCard)
                     {
                         await DeleteCreditCardPaymentAsync(existingPayment, order, userToken);
+                        existingPayments.Remove(existingPayment);
                     }
                 }
             }
+            return existingPayments;
+
         }
     };
 }

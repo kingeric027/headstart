@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IOrderSubmitCommand
     {
-        Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user);
+        Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken);
     }
     public class OrderSubmitCommand : IOrderSubmitCommand
     {
@@ -35,7 +35,7 @@ namespace Marketplace.Common.Commands
             _card = card;
         }
 
-        public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
+        public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             await ValidateOrderAsync(worksheet, payment);
@@ -44,9 +44,9 @@ namespace Marketplace.Common.Commands
             if (worksheet.LineItems.Any(li => li.Product.xp.ProductType != ProductType.PurchaseOrder))
             {
                 payment.OrderID = incrementedOrderID;
-                await _card.AuthorizePayment(payment, user, GetMerchantID(payment));
+                await _card.AuthorizePayment(payment, userToken, GetMerchantID(payment));
             }
-            return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, user.AccessToken));
+            return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, userToken));
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)

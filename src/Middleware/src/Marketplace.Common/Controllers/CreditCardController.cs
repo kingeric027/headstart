@@ -31,7 +31,7 @@ namespace Marketplace.Common.Controllers.CardConnect
             else
                 merchantID = _settings.CardConnectSettings.EurMerchantID;
                 
-            return await _card.AuthorizePayment(payment, VerifiedUserContext, merchantID);
+            return await _card.AuthorizePayment(payment, VerifiedUserContext.AccessToken, merchantID);
         }
     }
 

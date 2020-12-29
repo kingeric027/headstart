@@ -15,7 +15,7 @@ namespace ordercloud.integrations.cardconnect
 	{
 		Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
-		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user, string merchantID);
+		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, string userToken, string merchantID);
 		Task VoidPaymentAsync(MarketplacePayment payment, MarketplaceOrder order, string userToken);
 
 	}
@@ -60,14 +60,14 @@ namespace ordercloud.integrations.cardconnect
 
 		public async Task<Payment> AuthorizePayment(
 			OrderCloudIntegrationsCreditCardPayment payment,
-            VerifiedUserContext user,
+            string userToken,
 			string merchantID
 		)
 		{
 			Require.That((payment.CreditCardID != null) || (payment.CreditCardDetails != null),
 				new ErrorCode("CreditCard.CreditCardAuth", 400, "Request must include either CreditCardDetails or CreditCardID"));
 
-			var cc = await GetMeCardDetails(payment, user);
+			var cc = await GetMeCardDetails(payment, userToken);
 
 			Require.That(payment.IsValidCvv(cc), new ErrorCode("CreditCardAuth.InvalidCvv", 400, "CVV is required for Credit Card Payment"));
 			Require.That(cc.Token != null, new ErrorCode("CreditCardAuth.InvalidToken", 400, "Credit card must have valid authorization token"));
@@ -80,13 +80,14 @@ namespace ordercloud.integrations.cardconnect
 
 			var ccAmount = _orderCalc.GetCreditCardTotal(orderWorksheet);
 
-			var ocPayments = (await _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, payment.OrderID, filters: new { Type = "CreditCard" })).Items;
+			var ocPaymentsList = (await _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, payment.OrderID, filters: "Type=CreditCard" ));
+			var ocPayments = ocPaymentsList.Items;
 			var ocPayment = ocPayments.Any() ? ocPayments[0] : null;
 			if(ocPayment == null)
             {
 				throw new OrderCloudIntegrationException(new ApiError
 				{
-					ErrorCode = "MissingCreditCardPayment",
+					ErrorCode = "Payment.MissingCreditCardPayment",
 					Message = "Order is missing credit card payment"
 				});
             }
@@ -99,7 +100,7 @@ namespace ordercloud.integrations.cardconnect
 						return ocPayment;
                     } else
                     {
-						await VoidPaymentAsync(ocPayment, order, user.AccessToken);
+						await VoidPaymentAsync(ocPayment, order, userToken);
                     }
                 }
                 var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
@@ -164,16 +165,16 @@ namespace ordercloud.integrations.cardconnect
 				return _settings.CardConnectSettings.EurMerchantID;
 		}
 
-		private async Task<BuyerCreditCard> GetMeCardDetails(OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
+		private async Task<CardConnectBuyerCreditCard> GetMeCardDetails(OrderCloudIntegrationsCreditCardPayment payment, string userToken)
 		{
 			if (payment.CreditCardID != null)
 			{
-				return await _oc.Me.GetCreditCardAsync<BuyerCreditCard>(payment.CreditCardID, user.AccessToken);
+				return await _oc.Me.GetCreditCardAsync<CardConnectBuyerCreditCard>(payment.CreditCardID, userToken);
 			}
 			return await MeTokenize(payment.CreditCardDetails);
 		}
 
-		private async Task<BuyerCreditCard> MeTokenize(OrderCloudIntegrationsCreditCardToken card)
+		private async Task<CardConnectBuyerCreditCard> MeTokenize(OrderCloudIntegrationsCreditCardToken card)
 		{
 			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
 			return BuyerCreditCardMapper.Map(card, auth);
