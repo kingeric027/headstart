@@ -11,9 +11,9 @@ namespace Marketplace.Common.Controllers.CardConnect
     [MarketplaceSection.Integration(ListOrder = 2)]
     public class MePaymentController : BaseController
     {
-        private readonly IOrderCloudIntegrationsCardConnectCommand _card;
+        private readonly ICreditCardCommand _card;
         private readonly AppSettings _settings;
-        public MePaymentController(AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card) : base(settings)
+        public MePaymentController(AppSettings settings, ICreditCardCommand card) : base(settings)
         {
             _card = card;
             _settings = settings;
@@ -31,7 +31,7 @@ namespace Marketplace.Common.Controllers.CardConnect
             else
                 merchantID = _settings.CardConnectSettings.EurMerchantID;
                 
-            return await _card.AuthorizePayment(payment, VerifiedUserContext, merchantID);
+            return await _card.AuthorizePayment(payment, VerifiedUserContext.AccessToken, merchantID);
         }
     }
 
@@ -39,8 +39,8 @@ namespace Marketplace.Common.Controllers.CardConnect
     [MarketplaceSection.Integration(ListOrder = 3)]
     public class MeCreditCardAuthorizationController : BaseController
     {
-        private readonly IOrderCloudIntegrationsCardConnectCommand _card;
-        public MeCreditCardAuthorizationController(AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card) : base(settings)
+        private readonly ICreditCardCommand _card;
+        public MeCreditCardAuthorizationController(AppSettings settings, ICreditCardCommand card) : base(settings)
         {
             _card = card;
         }
@@ -55,10 +55,10 @@ namespace Marketplace.Common.Controllers.CardConnect
 
     [DocComments("\"Integration\" represents Credit Card Tokenization for Marketplace")]
     [MarketplaceSection.Integration(ListOrder = 4)]
-    public class CreditCardAuthorizationController : BaseController
+    public class CreditCardController : BaseController
     {
-        private readonly IOrderCloudIntegrationsCardConnectCommand _card;
-        public CreditCardAuthorizationController(AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card) : base(settings)
+        private readonly ICreditCardCommand _card;
+        public CreditCardController(AppSettings settings, ICreditCardCommand card) : base(settings)
         {
             _card = card;
         }

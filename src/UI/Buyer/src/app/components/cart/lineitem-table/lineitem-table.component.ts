@@ -41,6 +41,7 @@ export class OCMLineitemTable implements OnInit {
   _lineItems: MarketplaceLineItem[] = []
   _orderCurrency: string
   showKitDetails = true
+  showComments: Record<string, string> = {}
   constructor(
     private context: ShopperContextService,
     private spinner: NgxSpinnerService,
