@@ -13,6 +13,7 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using Marketplace.Common.Services.CMS;
 using Marketplace.Common.Services.CMS.Models;
+using ordercloud.integrations.library.helpers;
 
 namespace Marketplace.Common.Commands
 {
@@ -31,7 +32,7 @@ namespace Marketplace.Common.Commands
 		private readonly ICMSClient _cms;
 
 		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
-		private readonly string _buyerLocalApiClientName = "Default Marketplace Buyer UI LOCAL"; // used for pointing integration events to the ngrok url
+		private readonly string _buyerLocalApiClientName = "Default HeadStart Buyer UI LOCAL"; // used for pointing integration events to the ngrok url
 		private readonly string _sellerApiClientName = "Default HeadStart Admin UI";
 		private readonly string _integrationsApiClientName = "Middleware Integrations";
 		private readonly string _sellerUserName = "Default_Admin";
@@ -59,20 +60,20 @@ namespace Marketplace.Common.Commands
 			await VerifyOrgExists(seed.SellerOrgID, devUserContext.AccessToken);
 			var orgToken = await _dev.GetOrgToken(seed.SellerOrgID, devUserContext.AccessToken);
 
-            await CreateDefaultSellerUser(orgToken);
-            await CreateApiClients(orgToken);
-            await CreateSecurityProfiles(seed, orgToken);
-            await AssignSecurityProfiles(seed, orgToken);
+			await CreateDefaultSellerUser(orgToken);
+			await CreateApiClients(orgToken);
+			await CreateSecurityProfiles(seed, orgToken);
+			await AssignSecurityProfiles(seed, orgToken);
 
-            var apiClients = await GetApiClients(orgToken);
-            await CreateWebhooks(apiClients.BuyerUiApiClient.ID, apiClients.AdminUiApiClient.ID, orgToken);
-            await CreateMessageSenders(orgToken);
-            await CreateIncrementors(orgToken); // must be before CreateBuyers
-            
-            var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
+			var apiClients = await GetApiClients(orgToken);
+			await CreateWebhooks(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.AdminUiApiClient.ID, orgToken);
+			await CreateMessageSenders(orgToken);
+			await CreateIncrementors(orgToken); // must be before CreateBuyers
+
+			var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
 			await CreateBuyers(seed, userContext);
 			await CreateXPIndices(orgToken);
-			await CreateAndAssignIntegrationEvents(apiClients.BuyerUiApiClient.ID, apiClients.BuyerLocalUiApiClient.ID, orgToken);
+			await CreateAndAssignIntegrationEvents(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.BuyerLocalUiApiClient.ID, orgToken);
 			await CreateSuppliers(userContext, seed, orgToken);
             await CreateContentDocSchemas(userContext);
             await CreateDefaultContentDocs(userContext);
@@ -95,19 +96,23 @@ namespace Marketplace.Common.Commands
         }
 
 		public async Task PostStagingRestore()
-		{	
+		{
 			var token = (await _oc.AuthenticateAsync()).AccessToken;
 			var apiClients = await GetApiClients(token);
+			var storefrontClientIDs = await GetStoreFrontClientIDs(token);
 
 			var deleteMS = DeleteAllMessageSenders(token);
 			var deleteWH = DeleteAllWebhooks(token);
-			var deleteIE = DeleteAllIntegrationEvents(apiClients.BuyerUiApiClient.ID, token);
+			var deleteIE = DeleteAllIntegrationEvents(token);
 			await Task.WhenAll(deleteMS, deleteWH, deleteIE);
 
+			// recreate with environment specific data
 			var createMS = CreateMessageSenders(token);
-			var createWH = CreateWebhooks(apiClients.BuyerUiApiClient.ID, apiClients.AdminUiApiClient.ID, token);
-			var createIE = CreateAndAssignIntegrationEvents(apiClients.BuyerUiApiClient.ID, apiClients.BuyerLocalUiApiClient.ID, token);
-			await Task.WhenAll(createMS, createWH, createIE);
+			var createWH = CreateWebhooks(storefrontClientIDs, apiClients.AdminUiApiClient.ID, token);
+			var createIE = CreateAndAssignIntegrationEvents(storefrontClientIDs,  apiClients.BuyerLocalUiApiClient.ID, token);
+			var shutOffSupplierEmails = ShutOffSupplierEmailsAsync(token); // shut off email notifications for all suppliers
+
+			await Task.WhenAll(createMS, createWH, createIE, shutOffSupplierEmails);
 		}
 
 
@@ -346,11 +351,12 @@ namespace Marketplace.Common.Commands
 
 		private async Task<ApiClientIDs> GetApiClients(string token)
 		{
-			var list = await _oc.ApiClients.ListAsync(pageSize: 100, accessToken: token);
-			var adminUIApiClient = list.Items.First(a => a.AppName == _sellerApiClientName);
-			var buyerUIApiClient = list.Items.First(a => a.AppName == _buyerApiClientName);
-			var buyerLocalUIApiClient = list.Items.First(a => a.AppName == _buyerLocalApiClientName);
-			var middlewareApiClient = list.Items.First(a => a.AppName == _integrationsApiClientName);
+			var list = await ListAllAsync.List(page => _oc.ApiClients.ListAsync(page: page, pageSize: 100, accessToken: token));
+			var appNames = list.Select(x => x.AppName);
+			var adminUIApiClient = list.First(a => a.AppName == _sellerApiClientName);
+			var buyerUIApiClient = list.First(a => a.AppName == _buyerApiClientName);
+			var buyerLocalUIApiClient = list.First(a => a.AppName == _buyerLocalApiClientName);
+			var middlewareApiClient = list.First(a => a.AppName == _integrationsApiClientName);
 			return new ApiClientIDs()
 			{
 				AdminUiApiClient = adminUIApiClient,
@@ -358,6 +364,12 @@ namespace Marketplace.Common.Commands
 				BuyerLocalUiApiClient = buyerLocalUIApiClient,
 				MiddlewareApiClient = middlewareApiClient
 			};
+		}
+
+		private async Task<string[]> GetStoreFrontClientIDs(string token)
+        {
+			var list = await ListAllAsync.List(page => _oc.ApiClients.ListAsync(page: page, pageSize: 100, filters: new { AppName = "Storefront - *" }, accessToken: token));
+			return list.Select(client => client.ID).ToArray();
 		}
 
 		public class ApiClientIDs
@@ -424,13 +436,13 @@ namespace Marketplace.Common.Commands
 
 		private async Task CreateMessageSenders(string accessToken)
 		{
-			foreach (var messageSender in DefaultMessageSenders)
+			foreach (var messageSender in DefaultMessageSenders())
 			{
 				messageSender.URL = $"{_settings.EnvironmentSettings.BaseUrl}{messageSender.URL}";
 				await _oc.MessageSenders.CreateAsync(messageSender, accessToken);
 			}
 		}
-		private async Task CreateAndAssignIntegrationEvents(string buyerUiApiClientID, string buyerLocalUiApiClientID, string token)
+		private async Task CreateAndAssignIntegrationEvents(string[] buyerClientIDs, string localBuyerClientID, string token)
 		{
 			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
 			{
@@ -442,7 +454,7 @@ namespace Marketplace.Common.Commands
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
-					ExcludePOProductsFromShipping = true,
+					ExcludePOProductsFromShipping = false,
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
@@ -456,12 +468,21 @@ namespace Marketplace.Common.Commands
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
-					ExcludePOProductsFromShipping = true,
+					ExcludePOProductsFromShipping = false,
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
-			await _oc.ApiClients.PatchAsync(buyerUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckout" }, token);
-			await _oc.ApiClients.PatchAsync(buyerLocalUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
+
+			await _oc.ApiClients.PatchAsync(localBuyerClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
+			await Throttler.RunAsync(buyerClientIDs, 500, 20, clientID =>
+				_oc.ApiClients.PatchAsync(clientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckout" }, token));
+		}
+
+		private async Task ShutOffSupplierEmailsAsync(string token)
+        {
+			var allSuppliers = await ListAllAsync.List(page => _oc.Suppliers.ListAsync<MarketplaceSupplier>(page: page, pageSize: 100));
+			await Throttler.RunAsync(allSuppliers, 500, 20, supplier =>
+				_oc.Suppliers.PatchAsync(supplier.ID, new PartialSupplier { xp = new { NotificationRcpts = new string[] { } } }, token));
 		}
 
 		public async Task CreateSecurityProfiles(EnvironmentSeed seed, string accessToken)
@@ -488,27 +509,31 @@ namespace Marketplace.Common.Commands
 
 		public async Task DeleteAllWebhooks(string token)
 		{
-			var webhooks = await _oc.Webhooks.ListAsync(pageSize: 100, accessToken: token);
-			await Throttler.RunAsync(webhooks.Items, 500, 20, webhook => 
-				_oc.Webhooks.DeleteAsync(webhook.ID, token));
+			var webhooks = await ListAllAsync.List(page => _oc.Webhooks.ListAsync(page: page, pageSize: 100, accessToken: token));
+			await Throttler.RunAsync(webhooks, 500, 20, webhook => 
+				_oc.Webhooks.DeleteAsync(webhook.ID, accessToken: token));
 		}
 
 		public async Task DeleteAllMessageSenders(string token)
 		{
-			var messageSenders = await _oc.MessageSenders.ListAsync(pageSize: 100, accessToken: token);
-			await Throttler.RunAsync(messageSenders.Items, 500, 20, messageSender =>
-				_oc.MessageSenders.DeleteAsync(messageSender.ID, token));
+			var messageSenders = await ListAllAsync.List(page => _oc.MessageSenders.ListAsync(page: page, pageSize: 100, accessToken: token));
+			await Throttler.RunAsync(messageSenders, 500, 20, messageSender =>
+				_oc.MessageSenders.DeleteAsync(messageSender.ID, accessToken: token));
 		}
 
-		public async Task DeleteAllIntegrationEvents(string buyerUiApiClientID, string token)
+		public async Task DeleteAllIntegrationEvents(string token)
 		{
-			await _oc.ApiClients.PatchAsync(buyerUiApiClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = null }, token);
-			var integrationEvents = await _oc.IntegrationEvents.ListAsync(pageSize: 100, accessToken: token);
-			await Throttler.RunAsync(integrationEvents.Items, 500, 20, integrationEvent =>
-				_oc.IntegrationEvents.DeleteAsync(integrationEvent.ID, token));
+			// can't delete integration event if its referenced by an api client so first patch it to null
+			var apiClientsWithIntegrationEvent = await ListAllAsync.List(page => _oc.ApiClients.ListAsync(page: page, pageSize: 100, filters: new { OrderCheckoutIntegrationEventID = "*" } ,accessToken: token));
+			await Throttler.RunAsync(apiClientsWithIntegrationEvent, 500, 20, apiClient =>
+				_oc.ApiClients.PatchAsync(apiClient.ID, new PartialApiClient { OrderCheckoutIntegrationEventID = null }, accessToken: token));
+
+			var integrationEvents = await ListAllAsync.List(page => _oc.IntegrationEvents.ListAsync(page: page, pageSize: 100, accessToken: token));
+			await Throttler.RunAsync(integrationEvents, 500, 20, integrationEvent =>
+				_oc.IntegrationEvents.DeleteAsync(integrationEvent.ID, accessToken: token));
 		}
 
-		private async Task CreateWebhooks(string buyerUiApiClientID, string adminUiApiClientID, string accessToken)
+		private async Task CreateWebhooks(string[] buyerClientIDs, string adminUiApiClientID, string token)
 		{
 			var DefaultWebhooks = new List<Webhook>() {
 			new Webhook() {
@@ -557,7 +582,7 @@ namespace Marketplace.Common.Commands
 			  {
 				new WebhookRoute() { Route = "v1/buyers/{buyerID}/users", Verb = "POST" }
 			  },
-			  ApiClientIDs = new [] { buyerUiApiClientID, adminUiApiClientID }
+			  ApiClientIDs = new [] { adminUiApiClientID }.Concat(buyerClientIDs).ToArray()
 			},
 			new Webhook() {
 			  Name = "Product Created",
@@ -612,45 +637,46 @@ namespace Marketplace.Common.Commands
 			{
 				webhook.Url = $"{_settings.EnvironmentSettings.BaseUrl}{webhook.Url}";
 				webhook.HashKey = _settings.OrderCloudSettings.WebhookHashKey;
-				await _oc.Webhooks.CreateAsync(webhook, accessToken);
+				await _oc.Webhooks.CreateAsync(webhook, accessToken: token);
 			}
 		}
 
-		static readonly List<MessageSender> DefaultMessageSenders = new List<MessageSender>() 
-		{
-			new MessageSender()
-			{
-				Name = "Password Reset",
-				MessageTypes = new[] { MessageType.ForgottenPassword },
-				URL = "/passwordreset",
-				SharedKey = "wkaWSxPBBAABaxEp", // Where does this come from? Should it live somewhere else?
-				xp = new { 
-						MessageTypeConfig = new {
-							MessageType = "ForgottenPassword",
-							FromEmail = "noreply@ordercloud.io",
-							Subject = "Here is the link to reset your password",
-							TemplateName = "ForgottenPassword",
-							MainContent = "ForgottenPassword"
-						}
+		private List<MessageSender> DefaultMessageSenders() {
+			return new List<MessageSender>() {
+				new MessageSender()
+				{
+					Name = "Password Reset",
+					MessageTypes = new[] { MessageType.ForgottenPassword },
+					URL = "/passwordreset",
+					SharedKey = _settings.OrderCloudSettings.WebhookHashKey,
+					xp = new {
+							MessageTypeConfig = new {
+								MessageType = "ForgottenPassword",
+								FromEmail = "noreply@ordercloud.io",
+								Subject = "Here is the link to reset your password",
+								TemplateName = "ForgottenPassword",
+								MainContent = "ForgottenPassword"
+							}
+					}
+				},
+				new MessageSender()
+				{
+					Name = "New User Registration",
+					MessageTypes = new[] { MessageType.NewUserInvitation },
+					URL = "/newuser",
+					SharedKey = _settings.OrderCloudSettings.WebhookHashKey,
+					xp = new {
+							MessageTypeConfig = new {
+								MessageType = "NewUserInvitation",
+								FromEmail = "noreply@ordercloud.io",
+								Subject = "New User Registration",
+								TemplateName = "ForgottenPassword",
+								MainContent = "NewUserInvitation"
+							}
+					}
 				}
-			},
-			new MessageSender()
-			{
-				Name = "New User Registration",
-				MessageTypes = new[] { MessageType.NewUserInvitation },
-				URL = "/newuser",
-				SharedKey = "wkaWSxPBBAABaxEp", // Where does this come from? Should it live somewhere else?
-				xp = new {
-						MessageTypeConfig = new {
-							MessageType = "NewUserInvitation",
-							FromEmail = "noreply@ordercloud.io",
-							Subject = "New User Registration",
-							TemplateName = "ForgottenPassword",
-							MainContent = "NewUserInvitation"
-						}
-				}
-			}
-		};
+			};
+		}
 
 		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
 			

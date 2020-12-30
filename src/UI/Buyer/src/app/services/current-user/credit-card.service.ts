@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Me, ListPage, BuyerCreditCard } from 'ordercloud-javascript-sdk'
+import { Me, ListPage } from 'ordercloud-javascript-sdk'
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk'
 import { MarketplaceBuyerCreditCard } from '../../shopper-context'
 
@@ -11,7 +11,7 @@ export class CreditCardService {
 
   async Save(
     card: OrderCloudIntegrationsCreditCardToken
-  ): Promise<BuyerCreditCard> {
+  ): Promise<MarketplaceBuyerCreditCard> {
     const cardType = this.getCardType(card.AccountNumber)
     const partialAcctNumber = this.getPartialAccountNumber(card.AccountNumber)
     return await Me.CreateCreditCard({

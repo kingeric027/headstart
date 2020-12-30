@@ -147,6 +147,12 @@
                           'ADMIN.PRODUCT_EDIT.ENTER_NAME' | translate
                         }}"
                       />
+                      <small
+                        class="text-danger"
+                        *ngIf="productForm.controls.Name.value?.length === 100"
+                        translate
+                        >ADMIN.PRODUCT_EDIT.NAME_MAX_LENGTH</small
+                      >
                     </div>
                     <div [hidden]="isCreatingNew" class="form-group col-md-6">
                       <label for="ProductType" translate
@@ -1150,6 +1156,7 @@
               updateEditableProductWithVariationChanges($event)
             "
             (variantsValidated)="validateVariants($event)"
+            (specsValidated)="validateSpecs($event)"
           >
           </product-variations-component>
         </ng-template>
@@ -1430,13 +1437,19 @@
       <p *ngIf="!variantsValid" class="text-danger" translate>
         ADMIN.PRODUCT_EDIT.VARIATION_ISSUES
       </p>
+      <p *ngIf="!specsValid" class="text-danger" translate>
+        ADMIN.PRODUCT_EDIT.SPEC_ISSUES
+      </p>
       <div>
         <button
           *ngIf="areChanges"
           class="btn btn-primary"
           type="submit"
           [disabled]="
-            productForm?.status === 'INVALID' || !variantsValid || dataIsSaving
+            productForm?.status === 'INVALID' ||
+            !variantsValid ||
+            !specsValid ||
+            dataIsSaving
           "
           (click)="handleSave()"
         >

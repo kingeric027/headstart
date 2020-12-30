@@ -93,16 +93,18 @@ export abstract class ResourceCrudService<ResourceType> {
       const {
         sortBy,
         search,
+        searchType,
         filters,
         OrderDirection,
       } = this.optionsSubject.value
-      let options: ListArgs = {
+      let options: Options = {
         page: pageNumber,
         // allows a list call to pass in a search term that will not appear in the query params
         search: searchText || search,
         sortBy,
         pageSize: this.itemsPerPage,
         filters,
+        searchType
       }
       options = this.addIntrinsicListArgs(options)
       const resourceResponse = await this.listWithStatusIndicator(
@@ -441,6 +443,7 @@ export abstract class ResourceCrudService<ResourceType> {
     options: Options,
     orderDirection = ''
   ): Promise<ListPage<ResourceType>> {
+    let isRetry = false
     try {
       this.resourceRequestStatus.next(this.getFetchStatus(options))
       const args = await this.createListArgs([options], orderDirection)
@@ -450,8 +453,18 @@ export abstract class ResourceCrudService<ResourceType> {
       } else {
         resourceResponse = await this.list(args)
       }
+      const successStatus = this.getSucessStatus(options, resourceResponse);
+      if(!isRetry && this.primaryResourceLevel === 'products' && successStatus === 'SUCCESSFUL_NO_ITEMS_WITH_FILTERS') {
+        isRetry = true
+        const retryOptions: Options = {...options, searchType: 'AnyTerm'}
+        let retryResourceResponse = await this.list([retryOptions])
+        this.resourceRequestStatus.next(
+          this.getSucessStatus(retryOptions, retryResourceResponse)
+        )
+        return retryResourceResponse
+      }
       this.resourceRequestStatus.next(
-        this.getSucessStatus(options, resourceResponse)
+        successStatus
       )
       return resourceResponse
     } catch (error) {

@@ -16,12 +16,8 @@ import { UserContext } from '@app-seller/config/user-context'
 import { MeUser } from '@ordercloud/angular-sdk'
 import { FormGroup, FormControl } from '@angular/forms'
 import { isEqual as _isEqual, set as _set, get as _get } from 'lodash'
-import {
-  HeadStartSDK,
-  Asset,
-  AssetUpload,
-  JDocument,
-} from '@ordercloud/headstart-sdk'
+import { HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk'
+import { JDocument } from '@ordercloud/cms-sdk'
 import { AppAuthService } from '@app-seller/auth'
 import { NotificationStatus } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
