@@ -38,7 +38,7 @@ namespace Marketplace.Common.Commands
         public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
-            await ValidateOrderAsync(worksheet, payment);
+            //await ValidateOrderAsync(worksheet, payment); // TODO: Uncomment this, commenting out so Edmund can test
 
             var incrementedOrderID = await IncrementOrderAsync(worksheet);
             if (worksheet.LineItems.Any(li => li.Product.xp.ProductType != ProductType.PurchaseOrder))
