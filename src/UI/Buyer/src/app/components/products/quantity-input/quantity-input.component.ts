@@ -33,8 +33,8 @@ export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() existingQty: number
   @Input() gridDisplay? = false
   @Input() isQtyChanging
+  @Input() resetGridQtyFields
   @Output() qtyChange = new EventEmitter<QtyChangeEvent>()
-  @Output() gridErrorMsg = new EventEmitter<string>()
   // TODO - replace with real product info
   form: FormGroup
   isQtyRestricted = false
@@ -78,7 +78,12 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     }
     if (this.product && this.priceSchedule)
       this.init(this.product, this.priceSchedule)
-    if (!this.isAddingToCart) this.validateQty(this.getDefaultQty())
+    if (!this.isAddingToCart && !this.gridDisplay) {
+      this.validateQty(this.getDefaultQty())
+    }
+    if (this.resetGridQtyFields) {
+      this.form.reset()
+    }
   }
 
   init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
@@ -148,23 +153,19 @@ export class OCMQuantityInput implements OnInit, OnChanges {
         qty = qty + productInCart.Quantity
       }
     }
-    if (!this.gridDisplay && isNaN(qty)) {
+    if (isNaN(qty)) {
       this.errorMsg = 'Please Enter a Quantity'
-      if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg)
       return false
     }
-    if ((!this.gridDisplay && qty < this.min) || qty > this.max) {
+    if (qty < this.min || qty > this.max) {
       this.errorMsg = `Please order a quantity between ${this.min}-${this.max}.`
-      if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg)
       return false
     }
-    if (!this.gridDisplay && qty > this.inventory) {
+    if (qty > this.inventory) {
       this.errorMsg = `Only ${this.inventory} available in inventory.`
-      if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg)
       return false
     }
     this.errorMsg = ''
-    if (this.gridDisplay) this.gridErrorMsg.emit(this.errorMsg)
     return true
   }
 
