@@ -161,9 +161,7 @@ export class OCMGridSpecForm {
         this.totalQtyToAdd + qtyInCart >
           lineItems[0].Product.PriceSchedule.MaxQuantity
       ) {
-        this.errorMsg = `Maximum quantity reached.  ${qtyInCart} in cart, only ${
-          lineItems[0].Product.PriceSchedule.MaxQuantity - qtyInCart
-        } more of any product option may be added.`
+        this.errorMsg = `Maximum quantity reached (${lineItems[0].Product.PriceSchedule.MaxQuantity}).  ${qtyInCart} currently in cart.`
         return false
       }
     } else {
@@ -198,9 +196,7 @@ export class OCMGridSpecForm {
           li.Quantity !== null &&
           li.Quantity + qtyInCart > li.Product.PriceSchedule.MaxQuantity
         ) {
-          this.errorMsg = `Maximum quantity reached.  ${qtyInCart} in cart, only ${
-            li.Product.PriceSchedule.MaxQuantity - qtyInCart
-          } more of this product option may be added.`
+          this.errorMsg = `Maximum quantity reached (${li.Product.PriceSchedule.MaxQuantity}).  ${qtyInCart} currently in cart.`
           return false
         }
       }
@@ -236,7 +232,7 @@ export class OCMGridSpecForm {
           this.totalQtyToAdd <
           0
       ) {
-        this.errorMsg = `Not enough inventory.  ${inventoryInCart} currently in cart, only ${
+        this.errorMsg = `Sorry, but there is not enough inventory for the amount you are trying to add.  You have ${inventoryInCart} currently in your cart, but only ${
           this._superProduct.Product.Inventory?.QuantityAvailable -
           inventoryInCart
         } more of all total product options may be added.`
@@ -277,9 +273,9 @@ export class OCMGridSpecForm {
               li.Quantity <
             0
           ) {
-            this.errorMsg = `Not enough inventory.  ${
+            this.errorMsg = `Sorry, but there is not enough inventory for the amount you are trying to add.  You have ${
               matchingLineItemInCart.Quantity
-            } currently in cart, only ${
+            } currently in your cart, but only ${
               matchingVariant.Inventory.QuantityAvailable -
               matchingLineItemInCart.Quantity
             } more of this product option may be added.`
@@ -287,7 +283,7 @@ export class OCMGridSpecForm {
           }
         } else {
           if (matchingVariant.Inventory.QuantityAvailable - li.Quantity < 0) {
-            this.errorMsg = `Not enough inventory.  Only ${matchingVariant.Inventory.QuantityAvailable} of this product option may be added.`
+            this.errorMsg = `Sorry, but there is not enough inventory for the amount you are trying to add.  Only ${matchingVariant.Inventory.QuantityAvailable} of this product option may be added.`
             return false
           }
         }
