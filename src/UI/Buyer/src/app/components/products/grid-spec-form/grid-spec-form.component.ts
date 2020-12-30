@@ -168,8 +168,6 @@ export class OCMGridSpecForm {
       }
     } else {
       // When quantity must be evaluated variant-by-variant
-
-      // TO-DO: Line item variants to add + matching variant in cart must meet the minimum for that product
       for (const li of lineItems) {
         qtyInCart = 0
         const liSpecs = li.Specs.map((spec) => spec.Value)
@@ -190,7 +188,6 @@ export class OCMGridSpecForm {
           li.Quantity !== null &&
           li.Quantity + qtyInCart < li.Product.PriceSchedule.MinQuantity
         ) {
-          console.log('what is li quantity?', li.Quantity)
           this.errorMsg = `Minimum quantity not reached.  ${qtyInCart} in cart, ${
             li.Product.PriceSchedule.MinQuantity - qtyInCart
           } of this product option are needed.`
