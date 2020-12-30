@@ -268,7 +268,9 @@
             <a
               class="mt-1"
               href=""
-              *ngIf="!showComments[li.ID] && !li?.xp?.SupplierComments"
+              *ngIf="
+                !showComments[li.ID] && !li?.xp?.SupplierComments && !readOnly
+              "
               (click)="showComments[li.ID] = true"
             >
               <small>Add comments to this item</small>

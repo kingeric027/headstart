@@ -126,12 +126,15 @@ namespace ordercloud.integrations.cardconnect
 
 		public async Task VoidPaymentAsync(MarketplacePayment payment, MarketplaceOrder order, string userToken)
         {
-			var transactionID = payment.Transactions?.FirstOrDefault(t => t.Succeeded)?.ID;
+			var transactionID = "";
 			try
 			{
 				if (payment.Accepted == true)
 				{
-					var transaction = payment.Transactions.FirstOrDefault(t => t.Succeeded);
+					var transaction = payment.Transactions
+										.Where(x => x.Type == "CreditCard")
+										.OrderBy(x => x.DateExecuted)
+										.LastOrDefault(t => t.Succeeded);
 					var retref = transaction?.xp?.CardConnectResponse?.retref;
 					if (retref != null)
 					{
