@@ -69,6 +69,7 @@ namespace Marketplace.Common
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string OrgID { get; set; }
+        public bool PerformOrderSubmitTasks { get; set; }
     }
 
 	public class OrderCloudSettings
