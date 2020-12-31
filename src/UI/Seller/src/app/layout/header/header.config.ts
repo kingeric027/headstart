@@ -302,6 +302,13 @@ const MySupplerUsers = {
   route: '/my-supplier/users',
 }
 
+const Support = {
+  // TODO: check that this encompasses either all suppliers or all sellers
+  rolesWithAccess: [MPRoles.MPMeSupplierAdmin, MPRoles.MPSellerAdmin],
+  title: 'Support',
+  route: '/support'
+}
+
 const AllNavGroupings: MPRoute[] = [
   ProductNavGrouping,
   SupplierOrderNavGrouping,
@@ -314,6 +321,7 @@ const AllNavGroupings: MPRoute[] = [
   MySupplierProfile,
   MySupplierLocations,
   MySupplerUsers,
+  Support
 ]
 
 export const getHeaderConfig = (
