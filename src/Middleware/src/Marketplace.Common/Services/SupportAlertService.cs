@@ -15,6 +15,8 @@ namespace Marketplace.Common.Services
     public interface ISupportAlertService
     {
         Task VoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex);
+
+        Task EmailGeneralSupportQueue();
     }
 
     // use this service to alert support of critical failures
@@ -84,6 +86,23 @@ namespace Marketplace.Common.Services
                 toList.Add(new EmailAddress { Email = email });
             }
             await _sendgrid.SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, toList, SUPPORT_TEMPLATE_ID, templateData);
+        }
+
+        public async Task EmailGeneralSupportQueue()
+        {
+            var templateData = new EmailTemplate()
+            {
+                Data = new
+                {
+                    FirstName = "test user"
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = "Need help now",
+                    DynamicText = "what I need help with"
+                }
+            };
+            await _sendgrid.SendSingleTemplateEmail("to_emailaddress", "from_emailaddress", "templateID", templateData);
         }
     }
 }
