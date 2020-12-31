@@ -1,1 +1,99 @@
-<p>case-submission works!</p>
+<resource-breadcrumbs-component></resource-breadcrumbs-component>
+<div class="container-fluid">
+  <div class="py-3">
+    <h1 class="resource-name mb-0" translate>Submit a Case for Support</h1>
+  </div>
+  <form
+    [formGroup]="caseSubmissionForm"
+    (ngSubmit)="sendCaseSubmission()"
+    name="CaseSubmissionForm"
+    autocomplete="off"
+    novalidate
+  >
+    <div class="row pt-3">
+      <div class="col-md-8 form-group">
+        <div class="card py-2 px-3 mt-3 bg-white">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="firstName">First Name</label>
+              <input
+                id="firstName"
+                formControlName="FirstName"
+                type="text"
+                class="form-control"
+                placeholder="First Name"
+                autofocus
+              />
+            </div>
+            <div class="form-group col-md-6">
+              <label for="lastName">Last Name</label>
+              <input
+                id="lastName"
+                formControlName="LastName"
+                type="text"
+                class="form-control"
+                placeholder="Last Name"
+                autofocus
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="email">Email Address</label>
+              <input
+                id="email"
+                formControlName="EmailAddress"
+                type="text"
+                class="form-control"
+                placeholder="Email Address"
+                autofocus
+              />
+            </div>
+            <div class="form-group col-md-6">
+              <label for="vendor">Vendor Name</label>
+              <input
+                id="vendor"
+                formControlName="Vendor Name"
+                type="text"
+                class="form-control"
+                placeholder="Vendor Name"
+                autofocus
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="subject">Subject</label>
+              <select
+                type="dropdown"
+                class="form-control"
+                formControlName="Subject"
+                id="subject"
+                aria-describedby="Subject"
+              >
+                <option [ngValue]="null" disabled>Select a Subject...</option>
+                <option
+                  *ngFor="let subject of subjectOptions"
+                  [ngValue]="subject"
+                >
+                  {{ subject }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-10">
+              <label for="message">Message</label>
+              <textarea
+                type="text"
+                class="form-control"
+                formControlName="Message"
+                placeholder="Please describe your question/issue here"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
