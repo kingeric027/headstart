@@ -10,6 +10,7 @@
       formControlName="quantity"
       class="form-control text-center"
       placeholder="0"
+      [attr.min]="0"
       [attr.max]="getMaxQty()"
       [attr.disabled]="disabled ? '' : null"
       style="min-width: 55px"
