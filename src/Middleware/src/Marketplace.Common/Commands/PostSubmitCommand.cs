@@ -35,14 +35,23 @@ namespace Marketplace.Common.Commands
         private readonly IAvalaraCommand _avalara;
         private readonly ISendgridService _sendgridService;
         private readonly ILineItemCommand _lineItemCommand;
+        private readonly AppSettings _settings;
 
-        public PostSubmitCommand(ISendgridService sendgridService, IAvalaraCommand avatax, IOrderCloudClient oc, IZohoCommand zoho, ILineItemCommand lineItemCommand)
+        public PostSubmitCommand(
+            ISendgridService sendgridService,
+            IAvalaraCommand avatax,
+            IOrderCloudClient oc,
+            IZohoCommand zoho,
+            ILineItemCommand lineItemCommand,
+            AppSettings settings
+        )
         {
             _oc = oc;
             _avalara = avatax;
             _zoho = zoho;
             _sendgridService = sendgridService;
             _lineItemCommand = lineItemCommand;
+            _settings = settings;
         }
 
         public async Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user)
@@ -147,7 +156,7 @@ namespace Marketplace.Common.Commands
             });
 
             // STEP 3: Zoho orders
-            results.Add(await this.PerformZohoTasks(orderWorksheet, supplierOrders));
+            if(_settings.ZohoSettings.PerformOrderSubmitTasks) { results.Add(await this.PerformZohoTasks(orderWorksheet, supplierOrders)); }
 
             // STEP 4: Validate shipping
             var shipping = await ProcessActivityCall(
