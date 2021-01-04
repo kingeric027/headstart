@@ -20,7 +20,7 @@
       />
     </figure>
     <div
-      *ngIf="_product?.xp?.Currency == 'CAD'"
+      *ngIf="isCanadianShipFromAddress()"
       class="chip chip-xs bg-white shadow position-absolute"
     >
       <svg
@@ -75,6 +75,7 @@
       [existingQty]="null"
       [product]="_product"
       [priceSchedule]="_product.PriceSchedule"
+      [isAddingToCart]="isAddingToCart"
       (qtyChange)="setQuantity($event.detail)"
     >
     </ocm-quantity-input>

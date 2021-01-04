@@ -12,11 +12,10 @@
       <td>
         <ocm-quantity-input
           [existingQty]="null"
-          [gridTotalQty]="totalQty"
           [gridDisplay]="true"
           [product]="product"
           [priceSchedule]="priceSchedule"
-          (gridErrorMsg)="getErrorMsg($event.detail)"
+          [resetGridQtyFields]="resetGridQtyFields"
           (qtyChange)="changeQuantity(specOptions[i], $event.detail)"
         ></ocm-quantity-input>
       </td>

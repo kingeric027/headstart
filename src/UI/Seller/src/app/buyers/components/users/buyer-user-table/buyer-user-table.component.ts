@@ -70,7 +70,12 @@ export class BuyerUserTableComponent extends ResourceCrudComponent<User> {
   }
 
   updateResource($event: any): void {
+    const buyerUserForm = {
+      ...$event.value,
+      ID: this.updatedResource.ID,
+      xp: { Country: $event.value.Country },
+    }
     this.resourceForm = $event
-    this.updatedResource = $event.value
+    this.updatedResource = buyerUserForm
   }
 }

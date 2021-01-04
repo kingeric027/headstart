@@ -1,11 +1,5 @@
 import { Injectable } from '@angular/core'
-import {
-  Orders,
-  LineItems,
-  Me,
-  Spec,
-  LineItemSpec,
-} from 'ordercloud-javascript-sdk'
+import { Orders, LineItems, Me, LineItemSpec } from 'ordercloud-javascript-sdk'
 import { Subject } from 'rxjs'
 import { OrderStateService } from './order-state.service'
 import { isUndefined as _isUndefined } from 'lodash'
@@ -16,7 +10,6 @@ import {
   ListPage,
 } from '@ordercloud/headstart-sdk'
 import { CheckoutService } from './checkout.service'
-import { TempSdk } from '../temp-sdk/temp-sdk.service'
 import { listAll } from '../listAll'
 
 @Injectable({
@@ -179,11 +172,13 @@ export class CartService {
   }
 
   async empty(): Promise<void> {
-    const ID = this.order.ID
-    this.lineItems = this.state.DefaultLineItems
-    Object.assign(this.order, this.calculateOrder())
     try {
-      await Orders.Delete('Outgoing', ID)
+      // don't delete order, we need to keep so we can preserve
+      // stuff like payment transaction history, instead delete line items on order
+      const requests = this.lineItems.Items.map((li) =>
+        LineItems.Delete('Outgoing', this.order.ID, li.ID)
+      )
+      await Promise.all(requests)
     } finally {
       await this.state.reset()
     }

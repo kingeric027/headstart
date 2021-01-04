@@ -26,25 +26,25 @@ namespace Marketplace.Common.Commands
 	{
 		private readonly IOrderCloudClient _oc;
 		private readonly IMarketplaceBuyerCommand _marketplaceBuyerCommand;
-		private readonly IExchangeRatesCommand _exchangeRatesCommand;
 		private readonly IMarketplaceProductCommand _marketplaceProductCommand;
 		private readonly ISendgridService _sendgridService;
 		private readonly IAppCache _cache;
+		private readonly ISebExchangeRatesService _sebExchangeRates;
 		public MeProductCommand(
 			IOrderCloudClient elevatedOc, 
 			IMarketplaceBuyerCommand marketplaceBuyerCommand,
-			IExchangeRatesCommand exchangeRatesCommand,
 			IMarketplaceProductCommand marketplaceProductCommand,
 			ISendgridService sendgridService,
-			IAppCache cache
+			IAppCache cache,
+			ISebExchangeRatesService sebExchangeRates
 		)
 		{
 			_oc = elevatedOc;
 			_marketplaceBuyerCommand = marketplaceBuyerCommand;
-			_exchangeRatesCommand = exchangeRatesCommand;
 			_marketplaceProductCommand = marketplaceProductCommand;
 			_sendgridService = sendgridService;
 			_cache = cache;
+			_sebExchangeRates = sebExchangeRates;
 		}
 		public async Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
 		{
@@ -68,7 +68,7 @@ namespace Marketplace.Common.Commands
 		private async Task<SuperMarketplaceMeProduct> ApplyBuyerPricing(SuperMarketplaceMeProduct superMarketplaceProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = GetExchangeRates(user);
+			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
 
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
 			var exchangeRates = await exchangeRatesRequest;
@@ -85,7 +85,7 @@ namespace Marketplace.Common.Commands
 		public async Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = GetExchangeRates(user);
+			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
 
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
 			var exchangeRates = await exchangeRatesRequest;
@@ -124,14 +124,23 @@ namespace Marketplace.Common.Commands
 			var searchText = args.Search ?? "";
 			var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
 			var sortBy = args.SortBy.FirstOrDefault();
-			var meProductsRequest = _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
+			var meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
+			if(!(bool)(meProducts?.Items?.Any()))
+            {
+				meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.AnyTerm, sortBy: sortBy, accessToken: user.AccessToken);
+				if (!(bool)(meProducts?.Items?.Any()))
+                {
+					//if no products after retry search, avoid making extra calls for pricing details
+					return meProducts;
+                }
+			}
+
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = GetExchangeRates(user);
-			await Task.WhenAll(meProductsRequest, defaultMarkupMultiplierRequest, exchangeRatesRequest);
+			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
+			await Task.WhenAll(defaultMarkupMultiplierRequest, exchangeRatesRequest);
 				
-			var meProducts = await meProductsRequest;
-			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-			var exchangeRates = await exchangeRatesRequest;
+			var defaultMarkupMultiplier = defaultMarkupMultiplierRequest.Result;
+			var exchangeRates = exchangeRatesRequest.Result;
 
 			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
 
@@ -195,19 +204,5 @@ namespace Marketplace.Common.Commands
 			var markupMultiplier = markupPercent + 1;
 			return markupMultiplier;
 		}
-
-		private async Task<List<OrderCloudIntegrationsConversionRate>> GetExchangeRates(VerifiedUserContext user)
-		{
-			var buyerUserGroups = await _oc.Me.ListUserGroupsAsync<MarketplaceLocationUserGroup>(opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation"), user.AccessToken);
-			var currency = buyerUserGroups.Items.FirstOrDefault(u => u.xp.Currency != null)?.xp?.Currency;
-			Require.That(currency != null, new ErrorCode("Exchange Rate Error", 400, "Exchange Rate Not Defined For User"));
-
-			// ideally shouldn't need to do this, to get around problem with optional type
-			CurrencySymbol currencyRequired = currency.Reserialize<CurrencySymbol>();
-			var exchangeRates = await _exchangeRatesCommand.Get(new ListArgs<OrderCloudIntegrationsConversionRate>() { }, currencyRequired);
-
-			return exchangeRates.Items.ToList();
-		}
-		
 	}
 }

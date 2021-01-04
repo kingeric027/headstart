@@ -91,7 +91,16 @@
           <div class="col-md-6" *ngIf="li">
             <div class="row align-items-sm-center">
               <div class="col-md-3 col-sm-6 pr-md-3">
-                <a class="d-block" (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)">
+                <a
+                  class="d-block"
+                  (click)="
+                    toProductDetails(
+                      li.Product.ID,
+                      li.xp.ConfigurationID,
+                      li.xp.DocumentID
+                    )
+                  "
+                >
                   <img
                     class="img-thumbnail w-100"
                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
@@ -101,7 +110,13 @@
               </div>
               <div class="col-md-9 col-sm-6">
                 <a
-                  (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)"
+                  (click)="
+                    toProductDetails(
+                      li.Product.ID,
+                      li.xp.ConfigurationID,
+                      li.xp.DocumentID
+                    )
+                  "
                   class="text-dark font-weight-medium line-height-1"
                 >
                   {{ li | productNameWithSpecs }}
@@ -249,9 +264,18 @@
               </div>
             </div>
           </div>
-          <div class="col-md-12">
+          <div class="col-md-12" *ngIf="showComments">
+            <a
+              class="mt-1"
+              *ngIf="
+                !showComments[li.ID] && !li?.xp?.SupplierComments && !readOnly
+              "
+              (click)="showComments[li.ID] = true"
+            >
+              <small>Add comments to this item</small>
+            </a>
             <textarea
-              *ngIf="!readOnly || li?.xp?.SupplierComments"
+              *ngIf="showComments[li.ID] || li?.xp?.SupplierComments"
               [attr.readonly]="readOnly || isQtyChanging(li.ID) ? '' : null"
               type="text"
               [ngModel]="li?.xp?.SupplierComments"
@@ -359,7 +383,16 @@
           <div class="col-sm-6" *ngIf="li">
             <div class="row align-items-sm-center no-gutters">
               <div class="col-md-3 col-sm-6 pr-md-3">
-                <a class="d-block" (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)">
+                <a
+                  class="d-block"
+                  (click)="
+                    toProductDetails(
+                      li.Product.ID,
+                      li.xp.ConfigurationID,
+                      li.xp.DocumentID
+                    )
+                  "
+                >
                   <img
                     class="img-thumbnail w-100"
                     [src]="li.xp?.ImageUrl || getImageUrl(li.ID)"
@@ -369,7 +402,13 @@
               </div>
               <div class="col-md-9 col-sm-6">
                 <a
-                  (click)="toProductDetails(li.Product.ID, li.xp.ConfigurationID, li.xp.DocumentID)"
+                  (click)="
+                    toProductDetails(
+                      li.Product.ID,
+                      li.xp.ConfigurationID,
+                      li.xp.DocumentID
+                    )
+                  "
                   class="text-dark font-weight-medium line-height-1"
                   >{{ li | productNameWithSpecs }}</a
                 >

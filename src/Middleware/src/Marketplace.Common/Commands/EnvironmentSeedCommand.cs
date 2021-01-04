@@ -454,7 +454,7 @@ namespace Marketplace.Common.Commands
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
-					ExcludePOProductsFromShipping = true,
+					ExcludePOProductsFromShipping = false,
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);
@@ -468,7 +468,7 @@ namespace Marketplace.Common.Commands
 				HashKey = _settings.OrderCloudSettings.WebhookHashKey,
 				ConfigData = new
 				{
-					ExcludePOProductsFromShipping = true,
+					ExcludePOProductsFromShipping = false,
 					ExcludePOProductsFromTax = true,
 				}
 			}, token);

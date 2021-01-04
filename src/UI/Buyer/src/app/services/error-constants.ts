@@ -29,6 +29,9 @@ export const ErrorCodes = {
     CannotSubmitWithUnaccceptedPayments:
       'Order.CannotSubmitWithUnaccceptedPayments',
   },
+  Payment: {
+    FailedToVoidAuthorization: 'Payment.FailedToVoidAuthorization',
+  },
   Inventory: {
     Insufficient: 'Inventory.Insufficient',
   },
