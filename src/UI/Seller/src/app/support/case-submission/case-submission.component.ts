@@ -1,8 +1,7 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive';
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
 import { MeUser } from '@ordercloud/angular-sdk';
 import { takeWhile } from 'rxjs/operators';
