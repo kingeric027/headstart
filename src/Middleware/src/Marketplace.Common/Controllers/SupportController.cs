@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
@@ -20,9 +24,10 @@ namespace Marketplace.Common.Controllers
         private static ICheckoutIntegrationCommand _checkoutIntegrationCommand;
         private static IPostSubmitCommand _postSubmitCommand;
         private static IZohoCommand _zoho;
+        private readonly ISupportAlertService _supportAlertService;
         private readonly IOrderCloudClient _oc;
 
-        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc) : base(settings)
+        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc, ISupportAlertService supportAlertService) : base(settings)
         {
             _checkoutIntegrationCommand = checkoutIntegrationCommand;
             _postSubmitCommand = postSubmitCommand;
@@ -80,11 +85,30 @@ namespace Marketplace.Common.Controllers
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             return await _postSubmitCommand.HandleBuyerOrderSubmit(worksheet);
         }
+
+        [HttpPost, Route("submitcase")]
+        public async Task SendSupportRequest([FromForm]CaseModel newCase)
+        {
+            Console.WriteLine("HELLO!");
+            //await _supportAlertService.EmailGeneralSupportQueue();
+        }
     }
 
     public class ShipmentTestModel
     {
         public MarketplaceOrder Order { get; set; }
         public List<MarketplaceLineItem> LineItems { get; set; }
+    }
+
+    // TODO: move this
+    public class CaseModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Vendor { get; set; }
+        public string Subject { get; set; }
+        public string Message { get; set; }
+        public IFormFile File { get; set; }
     }
 }
