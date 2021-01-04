@@ -85,7 +85,9 @@ namespace Common.Services
 					foreach (var act in fired)
 					{
 						if (!act.Recurring)
+						{
 							_actions.Remove(act);
+						}
 					}
 
 					_tasks.RemoveAll(t => t.IsCompleted);

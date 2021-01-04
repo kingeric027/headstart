@@ -9,6 +9,7 @@ using Marketplace.Common.Models;
 using Marketplace.Common.Services.WazingDashboard;
 using Microsoft.Extensions.Logging;
 using ordercloud.integrations.library;
+using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
@@ -84,9 +85,14 @@ namespace Marketplace.Common.Commands
 		}
 
 		private async Task ProcessLocation(SyncLocation location)
-		{
-			try
+		{	
+			try 
 			{
+				if (location == null) 
+				{ 
+					LogError("", "Location is null");
+					return;
+				}
 				if (!location.ShouldSync)
 				{
 					LogSkip(location.Address.ID, "Location is inactivated in source data.");
@@ -108,7 +114,10 @@ namespace Marketplace.Common.Commands
 				var newUsers = users.Where(u => !AlreadySyncedUserIDs.Contains(u.ID));
 				var catalogIDs = _franchise.GetOrderCloudCatalogsIDs(location);
 				await SaveLocation(_franchise.BuyerID, location, users, newUsers, catalogIDs);
-				foreach (var user in newUsers) AlreadySyncedUserIDs.Add(user.ID);
+				foreach (var user in newUsers)
+				{
+					AlreadySyncedUserIDs.Add(user.ID);
+				}
 				LogSuccess(location.Address.ID);
 			}
 			catch (FlurlHttpException ex)
@@ -143,8 +152,8 @@ namespace Marketplace.Common.Commands
 			// TODO - don't just PUT all users.
 			await Throttler.RunAsync(newUsers, 100, 8, user => _oc.Users.SaveAsync(buyerID, user.ID, user));
 			// Update User-Location Assignments
-			var userIDsCurrentlyAssigned = (await ListAllUserGroupAssignments(buyerID, location.Address.ID))
-												.Select(a => a.UserID);
+			var allUserGroups = await ListAllAsync.List(page => _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: location.Address.ID, page: page, pageSize: 100));
+			var userIDsCurrentlyAssigned = allUserGroups.Select(a => a.UserID);
 			var usersToAssign = users.Where(u => !userIDsCurrentlyAssigned.Contains(u.ID));
 			var userIDsToUnAssign = userIDsCurrentlyAssigned.Except(users.Select(u => u.ID));
 			await Throttler.RunAsync(usersToAssign, 100, 8,
@@ -181,23 +190,6 @@ namespace Marketplace.Common.Commands
 				return false;
 			}
 		}
-
-		private async Task<List<UserGroupAssignment>> ListAllUserGroupAssignments(string buyerID, string userGroupID)
-		{
-			var pageSize = 100;
-			var page = 1;
-			bool done;
-			var allAssignments = new List<UserGroupAssignment>();
-			do
-			{
-				var assignments = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: userGroupID, page: page, pageSize: pageSize);
-				allAssignments.AddRange(assignments.Items);
-				done = assignments.Meta.TotalCount == allAssignments.Count;
-				page++;
-			} while (!done);
-			return allAssignments;
-		}
-
 
 		private void LogError(string locationID, string message = "")
 		{

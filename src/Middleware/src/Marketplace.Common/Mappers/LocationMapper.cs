@@ -16,6 +16,7 @@ namespace Marketplace.Common.Mappers
 	{
 		public static SyncLocation MapToLocation(string buyerID, WTCStudio studio)
 		{
+			if (studio == null) { return null; }
 			var country = Geography.GetCountry(studio.country);
 			var currency = Geography.GetCurrency(country);
 			var ID = $"{buyerID}-{studio.locationNumber}";
@@ -62,6 +63,7 @@ namespace Marketplace.Common.Mappers
 
 		public static SyncLocation MapToLocation(string buyerID, AFClub club)
 		{
+			if (club == null) { return null; }
 			var ID = $"{buyerID}-A{club.id}";
 			var country = Geography.GetCountry(club.address.country);
 			var currency = Geography.GetCurrency(country);
@@ -110,6 +112,7 @@ namespace Marketplace.Common.Mappers
 		// Set only the fields that the sync should overwrite in a patch
 		public static PartialAddress ToPartial(this MarketplaceAddressBuyer address)
 		{
+			if (address == null) { return null; }
 			return new PartialAddress()
 			{
 				ID = address.ID,

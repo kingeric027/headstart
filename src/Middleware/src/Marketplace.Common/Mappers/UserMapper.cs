@@ -15,6 +15,7 @@ namespace Marketplace.Common.Mappers
 	{
 		public static SyncUser MapToUser(string buyerID, MarketplaceBuyerLocation location, AFStaff staff)
 		{
+			if (staff == null || location == null) { return null; }
 			return new SyncUser()
 			{
 				ShouldSync = true,
@@ -34,6 +35,7 @@ namespace Marketplace.Common.Mappers
 
 		public static SyncUser MapToUser(string buyerID, AFGetStaffResponse staff)
 		{
+			if (staff == null) { return null; }
 			return new SyncUser()
 			{
 				ShouldSync = true,
@@ -53,6 +55,7 @@ namespace Marketplace.Common.Mappers
 
 		public static SyncUser MapToUser(string buyerID, WTCStaff staff)
 		{
+			if (staff == null) { return null; }
 			return new SyncUser()
 			{
 				ShouldSync = staff.userType == "Manager" || staff.userType == "Owner" || staff.userType == "Corporate",

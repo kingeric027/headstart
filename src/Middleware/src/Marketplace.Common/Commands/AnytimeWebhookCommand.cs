@@ -32,10 +32,10 @@ namespace Marketplace.Common.Commands
 
 		private Task ChooseHandlerFunction(Notification notification)
 		{
-			if (notification.Channel == "Club" && notification.Action == "Update")
+			if (notification.Channel == NotificationChannel.Club && notification.Action == NotificationAction.Update)
 			{
 				return UpdateClub(notification.GetData<AFClub>());
-			} else if (notification.Channel == "Club" && notification.Action == "Delete") 
+			} else if (notification.Channel == NotificationChannel.Club && notification.Action == NotificationAction.Delete) 
 			{
 				return DeleteClub(notification.GetData<AFClub>());
 			}
