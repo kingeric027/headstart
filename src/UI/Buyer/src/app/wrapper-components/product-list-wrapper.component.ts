@@ -5,7 +5,7 @@ import { MarketplaceMeProduct } from '../shopper-context'
 import { ListPage } from 'ordercloud-javascript-sdk'
 import { uniq as _uniq } from 'lodash'
 import { SupplierFilterService } from '../services/supplier-filter/supplier-filter.service'
-import { ShipFromSourcesDic } from '../models/ship-from-sources.interface'
+import { ShipFromSourcesDic } from '../models/product.types'
 
 @Component({
   template: `

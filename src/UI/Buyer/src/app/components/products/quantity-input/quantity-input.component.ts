@@ -13,11 +13,7 @@ import { Router } from '@angular/router'
 import { HeadStartSDK, MarketplaceVariant } from '@ordercloud/headstart-sdk'
 import { MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-
-export interface QtyChangeEvent {
-  qty: number
-  valid: boolean
-}
+import { QtyChangeEvent } from 'src/app/models/product.types'
 
 @Component({
   templateUrl: './quantity-input.component.html',

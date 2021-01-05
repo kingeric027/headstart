@@ -1,13 +1,4 @@
-export interface CountryDefinition {
-  label: string
-  abbreviation: string
-}
-
-export interface StateDefinition {
-  label: string
-  abbreviation: string
-  country: string
-}
+import { CountryDefinition, StateDefinition } from "../models/config.types"
 
 // @dynamic
 export class GeographyConfig {

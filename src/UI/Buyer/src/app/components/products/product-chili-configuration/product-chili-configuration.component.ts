@@ -20,14 +20,13 @@ import {
   SuperMarketplaceProduct,
   MarketplaceMeProduct,
 } from '@ordercloud/headstart-sdk'
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from '../product-details/product-detail.service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { ContactSupplierBody, CurrentUser } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { RouteConfigLoadEnd } from '@angular/router'
+import { QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
 
 declare let SetVariableValue: any
 declare let saveDocument: any

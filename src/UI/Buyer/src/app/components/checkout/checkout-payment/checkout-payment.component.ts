@@ -24,14 +24,10 @@ import { uniqBy as _uniqBy } from 'lodash'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
+import { SelectedCreditCard } from 'src/app/models/credit-card.types'
+import { IGroupedOrderPromo } from 'src/app/models/checkout.types'
 
-interface IGroupedOrderPromo {
-  [id: string]: IOrderPromotionDisplay
-}
-interface IOrderPromotionDisplay {
-  OrderPromotions: OrderPromotion[]
-  DiscountTotal: number
-}
+
 @Component({
   templateUrl: './checkout-payment.component.html',
   styleUrls: ['./checkout-payment.component.scss'],
@@ -132,8 +128,4 @@ export class OCMCheckoutPayment implements OnInit, OnChanges {
     this.continue.emit()
   }
 }
-export interface SelectedCreditCard {
-  SavedCard?: MarketplaceBuyerCreditCard
-  NewCard?: OrderCloudIntegrationsCreditCardToken
-  CVV: string
-}
+

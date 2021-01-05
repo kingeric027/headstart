@@ -16,6 +16,7 @@ import {
   MarketplaceAddressBuyer,
   MarketplaceProduct,
 } from '@ordercloud/headstart-sdk'
+import { OrderStatus } from './models/order.types'
 
 // todo replace with sdk
 export interface SupplierFilterConfigDocument extends Document {
@@ -120,43 +121,6 @@ export const PermissionTypes: PermissionType[] = [
   { UserGroupSuffix: 'AddressAdmin', DisplayText: 'Address Admin' },
 ]
 
-export interface OrderFilters {
-  page?: number
-  sortBy?: Sortable<'Me.ListOrders'>
-  search?: string
-  showOnlyFavorites?: boolean
-  status?: OrderStatus
-  /**
-   * mm-dd-yyyy
-   */
-  fromDate?: string
-  /**
-   * mm-dd-yyyy
-   */
-  toDate?: string
-  location?: string
-}
-
-export enum OrderAddressType {
-  Billing = 'Billing',
-  Shipping = 'Shipping',
-}
-
-export enum OrderStatus {
-  AllSubmitted = '!Unsubmitted',
-  AwaitingApproval = 'AwaitingApproval',
-  ChangesRequested = 'ChangesRequested',
-  Open = 'Open',
-  Completed = 'Completed',
-  Canceled = 'Canceled',
-}
-
-export enum OrderViewContext {
-  MyOrders = 'MyOrders',
-  Approve = 'Approve',
-  Location = 'Location',
-}
-
 export enum ShippingStatus {
   Shipped = 'Shipped',
   PartiallyShipped = 'PartiallyShipped',
@@ -182,18 +146,7 @@ export enum LineItemStatus {
   ReturnRequested = 'ReturnRequested',
 }
 
-export interface CreditCard {
-  CardholderName: string
-  CardNumber: string
-  ExpirationDate: string
-  SecurityCode: string
-  ID?: string
-}
 
-export interface OrderReorderResponse {
-  ValidLi: Array<LineItem>
-  InvalidLi: Array<LineItem>
-}
 
 /**
  * LineItem with the full product details. Currently used in the cart page only.
@@ -334,11 +287,7 @@ export enum OrderType {
 // a corresponding model in the C# product
 export type MarketplaceMeProduct = BuyerProduct<ProductXp>
 
-export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>
 
-export interface CreditCardXP {
-  CCBillingAddress: Address
-}
 
 // TODO - remove when sdk has enum types
 export type CurrenySymbol =

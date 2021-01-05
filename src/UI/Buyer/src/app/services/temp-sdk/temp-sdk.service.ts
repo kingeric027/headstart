@@ -15,11 +15,6 @@ import {
 import { ListPage } from '@ordercloud/headstart-sdk'
 
 // WHOPLE FILE TO BE REPLACED BY SDK
-
-interface MarketplaceCatalogAssignmentRequest {
-  CatalogIDs: string[]
-}
-
 @Injectable({
   providedIn: 'root',
 })

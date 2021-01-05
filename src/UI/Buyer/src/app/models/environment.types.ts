@@ -34,3 +34,4 @@ export enum Environment {
   'STAGING' = 'STAGING',
   'PRODUCTION' = 'PRODUCTION',
 }
+

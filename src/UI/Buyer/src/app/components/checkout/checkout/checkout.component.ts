@@ -16,7 +16,6 @@ import {
   OrderCloudIntegrationsCreditCardPayment,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
-import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component'
 import {
   getOrderSummaryMeta,
   OrderSummaryMeta,
@@ -35,11 +34,10 @@ import { AxiosError } from 'axios'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
+import { CheckoutSection } from 'src/app/models/checkout.types'
+import { SelectedCreditCard } from 'src/app/models/credit-card.types'
 
-interface CheckoutSection {
-  id: string
-  valid: boolean
-}
+
 
 @Component({
   templateUrl: './checkout.component.html',

@@ -10,10 +10,9 @@ import {
   KitVariantSelection,
   ProductSelectionEvent,
 } from 'src/app/models/product-selection-event.interface'
+import { QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { ProductDetailService } from '../product-details/product-detail.service'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
 import { SpecFormService } from '../spec-form/spec-form.service'
 
 @Component({
