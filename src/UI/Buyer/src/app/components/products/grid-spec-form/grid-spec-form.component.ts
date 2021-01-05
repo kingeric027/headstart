@@ -22,7 +22,7 @@ export class OCMGridSpecForm {
   _superProduct: SuperMarketplaceProduct
   product: MarketplaceMeProduct
   specOptions: string[]
-  lineItems: MarketplaceLineItem[] = []
+  lineItems: any[] = []
   lineTotals: number[] = []
   unitPrices: number[] = []
   totalPrice = 0
@@ -126,7 +126,7 @@ export class OCMGridSpecForm {
     this.totalPrice = this.getTotalPrice()
   }
 
-  validateQuantity(lineItems: MarketplaceLineItem[]): boolean {
+  validateQuantity(lineItems: any[]): boolean {
     this.resetGridQtyFields = false
     this.errorMsg = ''
     const lineItemsOfCurrentProductInCart: MarketplaceLineItem[] = this.context.order.cart
