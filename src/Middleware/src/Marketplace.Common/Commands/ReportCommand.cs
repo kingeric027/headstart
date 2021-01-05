@@ -187,28 +187,34 @@ namespace Marketplace.Common.Commands
                     filteredOrders.Add(order);
                 }
             }
-            // If headers include shipping address info, get that data from first available line item of each order
+            // If headers include shipping address info, run check that they have Shipping Address data
+            // Orders before 01/2021 may not have this on Order XP.
             if (template.Headers.Any(header => header.Contains("xp.ShippingAddress")))
             {
                 foreach (var order in filteredOrders)
                 {
-                    var lineItems = await _oc.LineItems.ListAsync(
+                    // If orders do not have shipping address data, pull that from the first line item.
+                    // Orders after 01/2021 should have this information on Order XP already.
+                    if (order.xp.ShippingAddress == null)
+                    {
+                        var lineItems = await _oc.LineItems.ListAsync(
                         orderDirection,
                         order.ID,
                         pageSize: 1,
                         accessToken: verifiedUser.AccessToken
                         );
-                    order.xp.ShippingAddress = new MarketplaceAddressBuyer()
-                    {
-                        FirstName = lineItems.Items[0].ShippingAddress.FirstName,
-                        LastName = lineItems.Items[0].ShippingAddress.LastName,
-                        Street1 = lineItems.Items[0].ShippingAddress.Street1,
-                        Street2 = lineItems.Items[0].ShippingAddress.Street2,
-                        City = lineItems.Items[0].ShippingAddress.City,
-                        State = lineItems.Items[0].ShippingAddress.State,
-                        Zip = lineItems.Items[0].ShippingAddress.Zip,
-                        Country = lineItems.Items[0].ShippingAddress.Country,
-                    };
+                        order.xp.ShippingAddress = new MarketplaceAddressBuyer()
+                        {
+                            FirstName = lineItems.Items[0].ShippingAddress.FirstName,
+                            LastName = lineItems.Items[0].ShippingAddress.LastName,
+                            Street1 = lineItems.Items[0].ShippingAddress.Street1,
+                            Street2 = lineItems.Items[0].ShippingAddress.Street2,
+                            City = lineItems.Items[0].ShippingAddress.City,
+                            State = lineItems.Items[0].ShippingAddress.State,
+                            Zip = lineItems.Items[0].ShippingAddress.Zip,
+                            Country = lineItems.Items[0].ShippingAddress.Country,
+                        };
+                    }
                 }
             }
             return filteredOrders;
