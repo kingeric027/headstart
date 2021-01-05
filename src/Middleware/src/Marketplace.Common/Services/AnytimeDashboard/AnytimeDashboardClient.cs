@@ -97,11 +97,17 @@ namespace Common.Services.AnytimeDashboard
 
 		private async Task<AFToken> RequestToken(object formEncodedBody)
 		{
-			return await $"{_settings.AnytimeDashboardSettings.ApiUrl}/token"
-				.WithHeader("SEB-Api-Token", _settings.AnytimeDashboardSettings.ApiToken)
-				.WithHeader("Content-Type", "application/x-www-form-urlencoded")
-				.PostUrlEncodedAsync(formEncodedBody)
-				.ReceiveJson<AFToken>();
+			try
+			{
+				return await $"{_settings.AnytimeDashboardSettings.ApiUrl}/token"
+					.WithHeader("SEB-Api-Token", _settings.AnytimeDashboardSettings.ApiToken)
+					.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+					.PostUrlEncodedAsync(formEncodedBody)
+					.ReceiveJson<AFToken>();
+			} catch (FlurlHttpException ex)
+			{
+				throw await BuildException(ex);
+			}
 		}
 
 		public async Task<AFCredentials> GetUserDetails(string userBearerToken)
@@ -128,10 +134,17 @@ namespace Common.Services.AnytimeDashboard
 		private async Task<T> GetAsync<T>(string resource, string overrideToken)
 		{
 			var token = overrideToken ?? await GetToken();
-			return await $"{_settings.AnytimeDashboardSettings.ApiUrl}{resource}"
-				.WithHeader("Authorization", $"Bearer {token}")
-				.WithHeader("SEB-Api-Token", _settings.AnytimeDashboardSettings.ApiToken)
-				.GetJsonAsync<T>();
+			try 
+			{ 
+				return await $"{_settings.AnytimeDashboardSettings.ApiUrl}{resource}"
+					.WithHeader("Authorization", $"Bearer {token}")
+					.WithHeader("SEB-Api-Token", _settings.AnytimeDashboardSettings.ApiToken)
+					.GetJsonAsync<T>();
+			}
+			catch (FlurlHttpException ex)
+			{
+				throw await BuildException(ex);
+			}
 		}
 
 		private async Task<string> GetToken()
@@ -185,5 +198,11 @@ namespace Common.Services.AnytimeDashboard
 			return UserMapper.MapToAuthFields(BuyerID, credentials);
 		}
 
+		private async Task<FranchiseAPIException> BuildException(FlurlHttpException ex)
+		{
+			var content = ex.Call?.Response?.Content;
+			var message = content != null ? await content.ReadAsStringAsync() : ex.Message;
+			return new FranchiseAPIException(message, ex);
+		}
 	}
 }

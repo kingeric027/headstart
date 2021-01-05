@@ -120,11 +120,9 @@ namespace Marketplace.Common.Commands
 				}
 				LogSuccess(location.Address.ID);
 			}
-			catch (FlurlHttpException ex)
+			catch (FranchiseAPIException ex)
 			{
-				var content = ex.Call?.Response?.Content;
-				var response = content != null ? await content.ReadAsStringAsync() : ex.Message;
-				LogError(location.Address.ID, $"{ex.Message}. Response: { response }");
+				LogError(location.Address.ID, ex.Message);
 			}
 			catch (OrderCloudException ex)
 			{

@@ -77,23 +77,29 @@ namespace Marketplace.Common.Services.WazingDashboard
 						code_verifier = _settings.WaxDashboardSettings.CodeVerifier,
 						code = authCode
 					}).ReceiveJson<WTCToken>();
-			}catch (Exception e)
+			} catch (FlurlHttpException ex)
 			{
-				throw e;
+				throw await BuildException(ex);
 			}
 		}
 
 		private async Task<WTCToken> RequestTokenWithClientCreds()
 		{
-			return await $"{_settings.WaxDashboardSettings.AuthUrl}/connect/token"
-				.WithHeader("Content-Type", "application/x-www-form-urlencoded")
-				.PostUrlEncodedAsync(new
-				{
-					grant_type = "client_credentials",
-					client_id = _settings.WaxDashboardSettings.M2MClientID,
-					client_secret = _settings.WaxDashboardSettings.M2MClientSecret
-				})
-				.ReceiveJson<WTCToken>();
+			try
+			{
+				return await $"{_settings.WaxDashboardSettings.AuthUrl}/connect/token"
+					.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+					.PostUrlEncodedAsync(new
+					{
+						grant_type = "client_credentials",
+						client_id = _settings.WaxDashboardSettings.M2MClientID,
+						client_secret = _settings.WaxDashboardSettings.M2MClientSecret
+					})
+					.ReceiveJson<WTCToken>();
+			} catch (FlurlHttpException ex)
+			{
+				throw await BuildException(ex);
+			}
 		}
 
 		public async Task<WTCList<WTCStudio>> ListStudiosAsync()
@@ -120,10 +126,16 @@ namespace Marketplace.Common.Services.WazingDashboard
 		private async Task<T> GetAsync<T>(string resource)
 		{
 			var token = await GetToken();
-			return await $"{_settings.WaxDashboardSettings.ApiUrl}{resource}"
-				.WithHeader("Authorization", $"Bearer {token}")
-				.WithHeader("ClientID", _settings.WaxDashboardSettings.M2MClientID)
-				.GetJsonAsync<T>();
+			try
+			{
+				return await $"{_settings.WaxDashboardSettings.ApiUrl}{resource}"
+					.WithHeader("Authorization", $"Bearer {token}")
+					.WithHeader("ClientID", _settings.WaxDashboardSettings.M2MClientID)
+					.GetJsonAsync<T>();
+			} catch (FlurlHttpException ex)
+			{
+				throw await BuildException(ex);
+			}
 		}
 
 		private async Task<string> GetToken()
@@ -166,6 +178,13 @@ namespace Marketplace.Common.Services.WazingDashboard
 			var studios = await ListStudiosAsync();
 			var locations = studios.items.Select(s => LocationMapper.MapToLocation(BuyerID, s));
 			await Throttler.RunAsync(locations, 100, 8, proccessLocation);
+		}
+
+		private async Task<FranchiseAPIException> BuildException(FlurlHttpException ex)
+		{
+			var content = ex.Call?.Response?.Content;
+			var message = content != null ? await content.ReadAsStringAsync() : ex.Message;
+			return new FranchiseAPIException(message, ex);
 		}
 	}
 }

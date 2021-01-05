@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Services.AnytimeDashboard;
+using Flurl.Http;
 using Marketplace.Common.Mappers;
 using Marketplace.Common.Services.WazingDashboard;
 using Marketplace.Models;
@@ -40,6 +41,10 @@ namespace Marketplace.Common.Models
 		List<string> GetOrderCloudCatalogsIDs(SyncLocation location);
 		Task<SSOAuthFields> AuthenticateWithCode(string code);
 		string BuildAuthorizeUrl(string redirectHost, string state);
+	}
 
+	public class FranchiseAPIException : FlurlHttpException
+	{
+		public FranchiseAPIException(string message, FlurlHttpException ex) : base(ex.Call, $"{ex.Message}. Body: {message}", ex.InnerException) { }
 	}
 }
