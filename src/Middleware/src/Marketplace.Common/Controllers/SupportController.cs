@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Marketplace.Common.Commands;
 using Marketplace.Common.Commands.Zoho;
+using Marketplace.Common.Models.Misc;
 using Marketplace.Common.Services;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
@@ -33,6 +34,7 @@ namespace Marketplace.Common.Controllers
             _postSubmitCommand = postSubmitCommand;
             _zoho = zoho;
             _oc = oc;
+            _supportAlertService = supportAlertService;
         }
 
         [HttpGet, Route("shipping")]
@@ -87,10 +89,9 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpPost, Route("submitcase")]
-        public async Task SendSupportRequest([FromForm]CaseModel newCase)
+        public async Task SendSupportRequest([FromForm]SupportCase supportCase)
         {
-            Console.WriteLine("HELLO!");
-            //await _supportAlertService.EmailGeneralSupportQueue();
+            await _supportAlertService.EmailGeneralSupportQueue(supportCase);
         }
     }
 
@@ -98,17 +99,5 @@ namespace Marketplace.Common.Controllers
     {
         public MarketplaceOrder Order { get; set; }
         public List<MarketplaceLineItem> LineItems { get; set; }
-    }
-
-    // TODO: move this
-    public class CaseModel
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Vendor { get; set; }
-        public string Subject { get; set; }
-        public string Message { get; set; }
-        public IFormFile File { get; set; }
     }
 }
