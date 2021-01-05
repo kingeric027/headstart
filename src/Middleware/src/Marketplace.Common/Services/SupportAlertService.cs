@@ -1,4 +1,5 @@
 ﻿using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Models.Misc;
 using Marketplace.Models;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
@@ -16,7 +17,7 @@ namespace Marketplace.Common.Services
     {
         Task VoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex);
 
-        Task EmailGeneralSupportQueue();
+        Task EmailGeneralSupportQueue(SupportCase supportCase);
     }
 
     // use this service to alert support of critical failures
@@ -88,21 +89,44 @@ namespace Marketplace.Common.Services
             await _sendgrid.SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, toList, SUPPORT_TEMPLATE_ID, templateData);
         }
 
-        public async Task EmailGeneralSupportQueue()
+        public async Task EmailGeneralSupportQueue(SupportCase supportCase)
         {
             var templateData = new EmailTemplate()
             {
                 Data = new
                 {
-                    FirstName = "test user"
+                    DynamicPropertyName1 = "FirstName",
+                    DynamicPropertyValue1 = supportCase.FirstName,
+                    DynamicPropertyName2 = "LastName",
+                    DynamicPropertyValue2 = supportCase.LastName,
+                    DynamicPropertyName3 = "Email",
+                    DynamicPropertyValue3 = supportCase.Email,
+                    DynamicPropertyName4 = "Vendor",
+                    DynamicPropertyValue4 = supportCase.Vendor,
                 },
                 Message = new EmailDisplayText()
                 {
-                    EmailSubject = "Need help now",
-                    DynamicText = "what I need help with"
+                    EmailSubject = supportCase.Subject,
+                    DynamicText = supportCase.Message
                 }
             };
-            await _sendgrid.SendSingleTemplateEmail("to_emailaddress", "from_emailaddress", "templateID", templateData);
+            var recipient = DetermineRecipient(supportCase.Subject);
+            await _sendgrid.SendSingleTemplateEmailSingleRcptAttachment(_settings.SendgridSettings.FromEmail, recipient, SUPPORT_TEMPLATE_ID, templateData, supportCase.File);
+        }
+
+        private string DetermineRecipient(string subject)
+        {
+            switch (subject.ToLower())
+            {
+                case "general":
+                    return "sebvendorsupport@four51.com";
+                case "report an error/bug":
+                    return "sebvendorsupport@four51.com";
+                case "payment, billing, or refunds":
+                    return "accounting@sebvendorportal.com";
+                default:
+                    return "sebvendorsupport@four51.com";
+            }
         }
     }
 }
