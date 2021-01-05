@@ -372,16 +372,16 @@ namespace Marketplace.Common.Commands
                         // ShippingAddress needed for Purchase Order Detail Report
                         ShippingAddress = new MarketplaceAddressBuyer()
                         {
-                            ID = buyerOrder.Order.xp.ShippingAddress.ID,
-                            CompanyName = buyerOrder.Order.xp.ShippingAddress.CompanyName,
-                            FirstName = buyerOrder.Order.xp.ShippingAddress.FirstName,
-                            LastName = buyerOrder.Order.xp.ShippingAddress.LastName,
-                            Street1 = buyerOrder.Order.xp.ShippingAddress.Street1,
-                            Street2 = buyerOrder.Order.xp.ShippingAddress.Street2,
-                            City = buyerOrder.Order.xp.ShippingAddress.City,
-                            State = buyerOrder.Order.xp.ShippingAddress.State,
-                            Zip = buyerOrder.Order.xp.ShippingAddress.Zip,
-                            Country = buyerOrder.Order.xp.ShippingAddress.Country,
+                            ID = buyerOrder?.Order?.xp?.ShippingAddress?.ID,
+                            CompanyName = buyerOrder?.Order?.xp?.ShippingAddress?.CompanyName,
+                            FirstName = buyerOrder?.Order?.xp?.ShippingAddress?.FirstName,
+                            LastName = buyerOrder?.Order?.xp?.ShippingAddress?.LastName,
+                            Street1 = buyerOrder?.Order?.xp?.ShippingAddress?.Street1,
+                            Street2 = buyerOrder?.Order?.xp?.ShippingAddress?.Street2,
+                            City = buyerOrder?.Order?.xp?.ShippingAddress?.City,
+                            State = buyerOrder?.Order?.xp?.ShippingAddress?.State,
+                            Zip = buyerOrder?.Order?.xp?.ShippingAddress?.Zip,
+                            Country = buyerOrder?.Order?.xp?.ShippingAddress?.Country,
                         }
             }
                 };
