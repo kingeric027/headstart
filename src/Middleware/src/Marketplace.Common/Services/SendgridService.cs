@@ -12,6 +12,7 @@ using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using Marketplace.Models.Misc;
 using Marketplace.Models.Models.Marketplace;
+using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
@@ -27,6 +28,7 @@ namespace Marketplace.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
+        Task SendSingleTemplateEmailSingleRcptAttachment(string from, string to, string templateID, object templateData, IFormFile fileReference);
         Task SendOrderSubmitEmail(MarketplaceOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
@@ -92,6 +94,18 @@ namespace Marketplace.Common.Services
             using (var stream = await fileReference.OpenReadAsync())
             {
                 await msg.AddAttachmentAsync(fileName, stream);
+            }
+            await _client.SendEmailAsync(msg);
+        }
+
+        public async Task SendSingleTemplateEmailSingleRcptAttachment(string from, string to, string templateID, object templateData, IFormFile fileReference)
+        {
+            var fromEmail = new EmailAddress(from);
+            var toEmail = new EmailAddress(to);
+            var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
+            using (var stream = fileReference.OpenReadStream())
+            {
+                await msg.AddAttachmentAsync(fileReference.FileName, stream);
             }
             await _client.SendEmailAsync(msg);
         }
