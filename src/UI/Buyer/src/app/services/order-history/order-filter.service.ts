@@ -1,16 +1,9 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { Router, Params, ActivatedRoute } from '@angular/router'
-import {
-  OrderStatus,
-  OrderFilters,
-  OrderViewContext,
-  AppConfig,
-} from '../../shopper-context'
 import { CurrentUserService } from '../current-user/current-user.service'
 import { Me, Sortable, Tokens } from 'ordercloud-javascript-sdk'
 import { filter } from 'rxjs/operators'
-import { RouteService } from '../route/route.service'
 import {
   HeadStartSDK,
   ListPage,
@@ -18,6 +11,8 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
+import { AppConfig } from 'src/app/models/environment.types'
+import { OrderFilters, OrderViewContext, MarketplaceOrderStatus } from 'src/app/models/order.types'
 
 @Injectable({
   providedIn: 'root',
@@ -88,7 +83,7 @@ export class OrderFilterService {
     this.patchFilterState({ showOnlyFavorites, page: undefined })
   }
 
-  filterByStatus(status: OrderStatus): void {
+  filterByStatus(status: MarketplaceOrderStatus): void {
     this.patchFilterState({ status: status || undefined, page: undefined })
   }
 
@@ -233,11 +228,11 @@ export class OrderFilterService {
   }
 
   private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {
-    if (status === OrderStatus.ChangesRequested) {
+    if (status === MarketplaceOrderStatus.ChangesRequested) {
       listOptions.filters.DateDeclined = '*'
     } else if (
-      status === OrderStatus.AwaitingApproval ||
-      status === OrderStatus.AllSubmitted
+      status === MarketplaceOrderStatus.AwaitingApproval ||
+      status === MarketplaceOrderStatus.AllSubmitted
     ) {
       listOptions.filters.Status = status
     } else {

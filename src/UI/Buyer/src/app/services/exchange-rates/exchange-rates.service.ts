@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { ListPage, HeadStartSDK } from '@ordercloud/headstart-sdk'
-import { ExchangeRates } from '../../shopper-context'
 import { CurrentUserService } from '../current-user/current-user.service'
+import ExchangeRates from '@ordercloud/headstart-sdk/dist/api/ExchangeRates'
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class ExchangeRatesService {
 
   async reset(): Promise<void> {
     const me = this.currentUser.get()
-    this.exchangeRates = await HeadStartSDK.ExchangeRates.Get(me.Currency)
+    this.exchangeRates = (await HeadStartSDK.ExchangeRates.Get(me.Currency))
   }
 
   private get exchangeRates(): ListPage<ExchangeRates> {

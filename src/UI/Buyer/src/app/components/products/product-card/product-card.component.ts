@@ -5,10 +5,10 @@ import {
   ChangeDetectorRef,
 } from '@angular/core'
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers'
-import { Address, PriceSchedule } from 'ordercloud-javascript-sdk'
+import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
-import { ShipFromSourcesDic } from 'src/app/models/product.types'
+import { ShipFromSourcesDic } from 'src/app/models/shipping.types'
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],

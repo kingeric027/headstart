@@ -6,7 +6,7 @@ import {
 } from 'src/app/services/purchase-order.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { OrderSummaryMeta } from 'src/app/models/order.types'
-import { LineItemWithProduct } from 'src/app/models/product.types'
+import { LineItemWithProduct } from 'src/app/models/line-item.types'
 
 @Component({
   templateUrl: './cart.component.html',

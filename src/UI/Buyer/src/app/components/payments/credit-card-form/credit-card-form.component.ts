@@ -13,8 +13,7 @@ import { GeographyConfig } from 'src/app/config/geography.class'
 import { faCcMastercard, faCcVisa } from '@fortawesome/free-brands-svg-icons'
 import { getZip } from 'src/app/services/zip-validator.helper'
 import { TypedFormGroup } from 'ngx-forms-typed'
-import { ComponentChanges } from 'src/app/models/component-changes.interface'
-import { CreditCard, CreditCardFormOutput } from 'src/app/models/credit-card.types'
+import { ComponentChanges, CreditCard, CreditCardFormOutput } from 'src/app/models/credit-card.types'
 
 @Component({
   templateUrl: './credit-card-form.component.html',

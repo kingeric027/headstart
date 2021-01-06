@@ -1,18 +1,16 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { ListPageWithFacets, Payment, Tokens } from 'ordercloud-javascript-sdk'
+import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk'
 import {
   ListArgs,
   MarketplaceOrder,
   MarketplaceKitProduct,
   SuperMarketplaceMeProduct,
-} from '@ordercloud/headstart-sdk'
-import {
-  AppConfig,
-  MarketplaceMeProduct,
   SupplierFilterConfigDocument,
-} from '../../shopper-context'
+  MarketplaceMeProduct,
+} from '@ordercloud/headstart-sdk'
 import { ListPage } from '@ordercloud/headstart-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 @Injectable({

@@ -1,6 +1,5 @@
-import { EnvironmentConfig } from './environment.interfaces'
+import { EnvironmentConfig, OrdercloudEnv } from 'src/app/models/environment.types'
 import theme from '../styles/themes/headstartdemo/theme-config'
-import { OrdercloudEnv } from 'src/app/shopper-context'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,

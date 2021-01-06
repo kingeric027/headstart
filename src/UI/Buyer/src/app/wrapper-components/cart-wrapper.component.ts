@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core'
-import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context'
 import {
   MarketplaceOrder,
   ListPage,
   MarketplaceLineItem,
+  MarketplaceMeProduct,
 } from '@ordercloud/headstart-sdk'
 import { Me, Orders, OrderPromotion } from 'ordercloud-javascript-sdk'
+import { LineItemWithProduct } from '../models/line-item.types'
 import { CurrentOrderService } from '../services/order/order.service'
 import { PromoService } from '../services/order/promo.service'
 

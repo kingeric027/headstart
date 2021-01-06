@@ -18,13 +18,10 @@ import {
 } from '@ordercloud/headstart-sdk'
 import {
   getOrderSummaryMeta,
-  OrderSummaryMeta,
 } from 'src/app/services/purchase-order.helper'
 import { NgxSpinnerService } from 'ngx-spinner'
-import { ModalState } from 'src/app/models/modal-state.class'
 import { ToastrService } from 'ngx-toastr'
 import {
-  MiddlewareError,
   extractMiddlewareError,
   isInventoryError,
   getPaymentError,
@@ -33,9 +30,11 @@ import {
 import { AxiosError } from 'axios'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
 import { CheckoutSection } from 'src/app/models/checkout.types'
-import { SelectedCreditCard } from 'src/app/models/credit-card.types'
+import { MarketplaceBuyerCreditCard, SelectedCreditCard } from 'src/app/models/credit-card.types'
+import { OrderSummaryMeta } from 'src/app/models/order.types'
+import { ModalState } from 'src/app/models/shared.types'
+import { MiddlewareError } from 'src/app/models/error.types'
 
 
 

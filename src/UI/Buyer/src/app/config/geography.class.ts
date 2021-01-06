@@ -1,4 +1,5 @@
-import { CountryDefinition, StateDefinition } from "../models/config.types"
+import { CountryDefinition, StateDefinition } from "../models/shared.types"
+
 
 // @dynamic
 export class GeographyConfig {

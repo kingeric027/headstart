@@ -10,8 +10,7 @@ import {
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import { Router } from '@angular/router'
-import { HeadStartSDK, MarketplaceVariant } from '@ordercloud/headstart-sdk'
-import { MarketplaceMeProduct } from 'src/app/shopper-context'
+import { HeadStartSDK, MarketplaceMeProduct, MarketplaceVariant } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { QtyChangeEvent } from 'src/app/models/product.types'
 

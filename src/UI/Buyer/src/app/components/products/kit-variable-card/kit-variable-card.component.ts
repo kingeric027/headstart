@@ -9,8 +9,7 @@ import {
   MarketplaceMeKitProduct,
   MeProductInKit,
 } from '@ordercloud/headstart-sdk'
-import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface'
-import { ProductSelectionEvent } from 'src/app/models/product-selection-event.interface'
+import { LineItemToAdd, ProductSelectionEvent } from 'src/app/models/product.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({

@@ -6,13 +6,13 @@ import {
   Tokens,
 } from 'ordercloud-javascript-sdk'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { AppConfig } from '../../shopper-context'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import {
   MarketplaceUser,
   ListPage,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

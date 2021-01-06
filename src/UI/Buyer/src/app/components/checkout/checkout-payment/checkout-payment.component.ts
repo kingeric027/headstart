@@ -12,10 +12,8 @@ import {
   OrderPromotion,
 } from 'ordercloud-javascript-sdk'
 import {
-  OrderCloudIntegrationsCreditCardToken,
   MarketplaceOrder,
 } from '@ordercloud/headstart-sdk'
-import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper'
 import { FormGroup, FormControl } from '@angular/forms'
 import { groupBy as _groupBy } from 'lodash'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
@@ -23,9 +21,9 @@ import { ToastrService } from 'ngx-toastr'
 import { uniqBy as _uniqBy } from 'lodash'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
 import { SelectedCreditCard } from 'src/app/models/credit-card.types'
 import { IGroupedOrderPromo } from 'src/app/models/checkout.types'
+import { OrderSummaryMeta } from 'src/app/models/order.types'
 
 
 @Component({

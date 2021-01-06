@@ -2,21 +2,16 @@ import { Injectable } from '@angular/core'
 import { Router, NavigationEnd } from '@angular/router'
 import { ProductFilterService } from '../product-filter/product-filter.service'
 import { filter, map } from 'rxjs/operators'
-import {
-  ProductFilters,
-  OrderFilters,
-  SupplierFilters,
-  OrderStatus,
-  OrderViewContext,
-  AppConfig,
-} from '../../shopper-context'
 import { OrderFilterService } from '../order-history/order-filter.service'
 import { ProfileRoutes } from './profile-routing.config'
 import { OrderRoutes } from './order-routing.config'
-import { RouteConfig } from './route-config'
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service'
 import { TokenHelperService } from '../token-helper/token-helper.service'
 import { Title } from '@angular/platform-browser'
+import { AppConfig } from 'src/app/models/environment.types'
+import { RouteConfig } from 'src/app/models/shared.types'
+import { OrderFilters, MarketplaceOrderStatus } from 'src/app/models/order.types'
+import { ProductFilters, SupplierFilters } from 'src/app/models/filter-config.types'
 
 @Injectable({
   providedIn: 'root',
@@ -144,7 +139,7 @@ export class RouteService {
   toMyOrders(options: OrderFilters = {}): void {
     // routing directly to unsubmitted orders
     if (!options.status) {
-      options.status = OrderStatus.AllSubmitted
+      options.status = MarketplaceOrderStatus.AllSubmitted
     }
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options)
     this.router.navigate(['/orders'], { queryParams })
@@ -153,7 +148,7 @@ export class RouteService {
   toOrdersByLocation(options: OrderFilters = {}): void {
     // routing directly to unsubmitted orders
     if (!options.status) {
-      options.status = OrderStatus.AllSubmitted
+      options.status = MarketplaceOrderStatus.AllSubmitted
     }
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options)
     this.router.navigate(['/orders/location'], { queryParams })
