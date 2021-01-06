@@ -303,7 +303,8 @@ const MySupplerUsers = {
 }
 
 const Support = {
-  rolesWithAccess: [MPRoles.MPMeSupplierAdmin, MPRoles.MPSellerAdmin],
+  rolesWithAccess: [],
+  orderCloudUserTypesWithAccess: [SUPPLIER, SELLER],
   title: 'Submit a Case',
   route: '/support'
 }
@@ -354,9 +355,13 @@ const filterOutNavGroupings = (
 ): MPRoute[] => {
   return navGroupings.filter((navGrouping) => {
     return (
-      navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) &&
+      (navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) || 
+        !navGrouping.rolesWithAccess.length
+      ) 
+      &&
       (!navGrouping.orderCloudUserTypesWithAccess ||
-        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType))
+        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType)
+      )
     )
   })
 }
