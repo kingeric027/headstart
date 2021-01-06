@@ -32,6 +32,9 @@ namespace Marketplace.Common
         public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
         public FlurlSettings FlurlSettings { get; set; } = new FlurlSettings();
         public CMSSettings CMSSettings { get; set; } = new CMSSettings();
+        public AnytimeDashboardSettings AnytimeDashboardSettings { get; set; } = new AnytimeDashboardSettings();
+        public WaxDashboardSettings WaxDashboardSettings { get; set; } = new WaxDashboardSettings();
+
     }
 
     public class CMSSettings
@@ -48,7 +51,11 @@ namespace Marketplace.Common
     public class EnvironmentSettings
     {
         public string BaseUrl { get; set; }
-	}
+        public string AFStorefrontBaseUrl { get; set; }
+        public string AFStorefrontClientID { get; set; }
+        public string WTCStorefrontBaseUrl { get; set; }
+        public string WTCStorefrontClientID { get; set; }
+    }
 
     public class ApplicationInsightsSettings
     {
@@ -69,6 +76,7 @@ namespace Marketplace.Common
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string OrgID { get; set; }
+        public bool PerformOrderSubmitTasks { get; set; }
     }
 
 	public class OrderCloudSettings
@@ -84,6 +92,19 @@ namespace Marketplace.Common
         public string MedlineSupplierID { get; set; }
         public string LaliciousSupplierID { get; set; }
         public string IncrementorPrefix { get; set; }
+        public OrdercloudDataConfig DataConfig { get; set; } = new OrdercloudDataConfig();
+    }
+
+    public class OrdercloudDataConfig
+    {
+        public string AfAllLocationsCatalogID { get; set; }
+        public string AfCAOnlyCatalogID { get; set; }
+        public string AfUSOnlyCatalogID { get; set; }
+        public string WtcAllLocationsCatalogID { get; set; }
+        public string WtcWestCatalogID { get; set; }
+        public string WtcEastCatalogID { get; set; }
+        public string AfBuyerID { get; set; }
+        public string WtcBuyerID { get; set; }
     }
 
 	public class AvalaraSettings
@@ -121,5 +142,27 @@ namespace Marketplace.Common
     public class FlurlSettings
     {
         public int TimeoutInSeconds { get; set; }
+    }
+
+    public class AnytimeDashboardSettings
+    {
+        public string ApiUrl { get; set; }
+        public string AuthUrl { get; set; }
+        // Username and password are in here because it seems we cannot get a client-grant token with the secret?
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string ApiToken { get; set; }
+        public string ClientSecret { get; set; }
+    }
+
+    public class WaxDashboardSettings
+    {
+        public string ApiUrl { get; set; }
+        public string AuthUrl { get; set; }
+        public string UserClientID { get; set; } // "Four51 User" clientID. Used for SSO. 
+        public string M2MClientID { get; set; } // "Machine to Machine" clientID. Used to query the api. 
+        public string UserClientSecret { get; set; }
+        public string M2MClientSecret { get; set; }
+        public string CodeVerifier { get; set; } // A random string that get hashed an used to confirm the sender
     }
 }

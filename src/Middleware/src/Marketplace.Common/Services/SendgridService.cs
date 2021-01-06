@@ -341,6 +341,23 @@ namespace Marketplace.Common.Services
                         Data = GetOrderTemplateData(supplierOrderWorksheet.Order, supplierOrderWorksheet.LineItems),
                         Message = OrderSubmitEmailConstants.GetOrderSubmitText(orderWorksheet.Order.ID, supplierOrderWorksheet.Order.FromUser.FirstName, supplierOrderWorksheet.Order.FromUser.LastName, VerifiedUserType.supplier)
                     };
+
+                    // SEB-Specific Data
+                    ((OrderTemplateData)supplierTemplateData.Data).BillTo = new Address()
+                    {
+                        CompanyName = "SEB Vendor Portal - BES",
+                        Street1 = "8646 Eagle Creek Circle",
+                        Street2 = "Suite 107",
+                        City = "Savage",
+                        State = "MN",
+                        Zip = "55378",
+                        Phone = "877-771-9123",
+                        xp =
+                        {
+                            Email = "accounting@sebvendorportal.com"
+                        }
+                    };
+
                     var supplierTos = new List<EmailAddress>();
                     foreach (var rcpt in supplier.xp.NotificationRcpts)
                     {
@@ -483,6 +500,7 @@ namespace Marketplace.Common.Services
                     ProductID = lineItem.ProductID,
                     Quantity = lineItem.Quantity,
                     LineTotal = lineItem.LineTotal,
+                    SpecCombo = GetSpecCombo(lineItem.Specs)
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
@@ -504,6 +522,7 @@ namespace Marketplace.Common.Services
                     State = order.BillingAddress?.State,
                     Zip = order.BillingAddress?.Zip
                 },
+                BillTo = null,
                 Products = productsList,
                 Subtotal =order.Subtotal,
                 TaxCost = order.TaxCost,
@@ -512,6 +531,16 @@ namespace Marketplace.Common.Services
                 Total = order.Total,
                 Currency = currencyString
             };
+        }
+
+        private string GetSpecCombo (IList<LineItemSpec> specs)
+        {
+            if (specs == null || !specs.Any())
+            {
+                return null;
+            }
+            string specCombo = "(" + string.Join(", ", specs.Select(spec => spec.Value).ToArray()) + ")";
+            return specCombo;
         }
 
         private QuoteOrderTemplateData GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)

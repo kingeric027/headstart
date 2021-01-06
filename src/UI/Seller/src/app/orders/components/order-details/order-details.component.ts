@@ -62,6 +62,7 @@ export class OrderDetailsComponent {
   faUser = faUserAlt
   _order: Order = {}
   _buyerOrder: Order = {}
+  _supplierOrder: Order = {}
   _lineItems: MarketplaceLineItem[] = []
   _payments: Payment[] = []
   images: any[] = []
@@ -205,7 +206,8 @@ export class OrderDetailsComponent {
     if (this.isSupplierOrder(order.ID)) {
       const orderData = await this.middleware.getSupplierData(order.ID)
       this._buyerOrder = orderData.BuyerOrder.Order
-      this._lineItems = orderData.SupplierOrder.LineItems;
+      this._supplierOrder = orderData.SupplierOrder.Order
+      this._lineItems = orderData.SupplierOrder.LineItems
     } else {
       this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)
