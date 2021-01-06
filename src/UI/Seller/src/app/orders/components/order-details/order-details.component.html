@@ -59,13 +59,18 @@
         </div>
         <div class="ml-2" *ngIf="!isQuoteOrder(_order)">
           <p class="h5 mb-0 text-capitalize font-weight-bold">
-            {{ _buyerOrder?.FromUser?.FirstName }} {{ _buyerOrder?.FromUser?.LastName }}
+            {{ _buyerOrder?.FromUser?.FirstName }}
+            {{ _buyerOrder?.FromUser?.LastName }}
           </p>
           <p class="mb-0" *ngIf="_buyerOrder?.FromUser?.Phone">
             {{ _buyerOrder?.FromUser?.Phone | tel }}
           </p>
           <p class="mb-0" *ngIf="_buyerOrder?.FromUser?.Email">
             {{ _buyerOrder?.FromUser?.Email }}
+          </p>
+          <p class="mb-0" *ngIf="_buyerOrder?.BillingAddress?.xp?.LocationID">
+            <span class="font-weight-bold">Location ID</span><span>: </span>
+            {{_buyerOrder?.BillingAddress?.xp?.LocationID}}
           </p>
         </div>
         <div class="ml-2" *ngIf="isQuoteOrder(_order)">
@@ -81,10 +86,39 @@
           </p>
           <p class="mb-0" *ngIf="_order.xp?.QuoteOrderInfo?.BuyerLocation">
             {{ _order.xp?.QuoteOrderInfo?.BuyerLocation }}
-          </p> 
+          </p>
+          <p class="mb-0" *ngIf="_buyerOrder?.BillingAddress?.xp?.LocationID">
+            <span class="font-weight-bold">Location ID</span><span>: </span>
+            {{_buyerOrder?.BillingAddress?.xp?.LocationID}}
+          </p>
         </div>
       </div>
       <div class="d-flex justify-content-end align-items-start">
+        <div
+          *ngIf="_supplierOrder?.FromUser && !isQuoteOrder(_order)"
+          class="mr-3"
+        >
+          <small class="font-weight-bolder text-muted text-uppercase d-block"
+            >Bill To</small
+          >
+          <small class="mb-0 text-capitalize d-block font-weight-bold"
+            >{{ _supplierOrder.FromUser?.FirstName }}
+            {{ _supplierOrder.FromUser?.LastName }}</small
+          >
+
+          <!-- SEB-Specific Address Information -->
+          <small class="mb-0 text-capitalize d-block"
+            >8646 Eagle Creek Circle, Suite 107</small
+          >
+          <small class="mb-0 text-capitalize d-block">Savage, MN 55378</small>
+
+          <small class="mb-0 d-block">{{
+            _supplierOrder.FromUser?.Email
+          }}</small>
+          <small class="mb-0 d-block">{{
+            _supplierOrder.FromUser?.Phone | tel
+          }}</small>
+        </div>
         <div *ngIf="_lineItems[0]?.ShippingAddress && !isQuoteOrder(_order)">
           <small class="font-weight-bolder text-muted text-uppercase d-block"
             >Ship To</small

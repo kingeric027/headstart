@@ -227,18 +227,23 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async refreshProductData(
     superProduct: SuperMarketplaceProduct
   ): Promise<void> {
+    let productModifiedNotifications: ListPage<MonitoredProductFieldModifiedNotificationDocument>
     const headers = {
       headers: new HttpHeaders({
         Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
       }),
     }
-    const productModifiedNotifications = await this.http
-      .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
-        `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
-        superProduct,
-        headers
-      )
-      .toPromise()
+    try {
+      productModifiedNotifications = await this.http
+        .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
+          `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
+          superProduct,
+          headers
+        )
+        .toPromise()
+    } catch (error) {
+      console.log(error)
+    }
 
     this.productInReviewNotifications = productModifiedNotifications?.Items.filter(
       (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED

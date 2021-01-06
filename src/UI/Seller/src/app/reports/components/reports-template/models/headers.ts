@@ -153,16 +153,16 @@ export const lineItemDetail = [
   { value: 'Billing Country', path: 'MarketplaceOrder.BillingAddress.Country' },
   {
     value: 'Billing Number',
-    path: 'MarketplaceOrder.BillingAddress.xp.BillingNumber',
+    path: 'MarketplaceLineItem.ShippingAddress.xp.BillingNumber',
   },
   {
     value: 'Club Number',
-    path: 'MarketplaceOrder.BillingAddress.xp.LocationID',
+    path: 'MarketplaceLineItem.ShippingAddress.xp.LocationID',
   },
   { value: 'User ID', path: 'MarketplaceOrder.FromUser.ID' },
   { value: 'Username', path: 'MarketplaceOrder.FromUser.Username' },
   { value: 'First Name', path: 'MarketplaceOrder.FromUser.FirstName' },
   { value: 'Last Name', path: 'MarketplaceOrder.FromUser.LastName' },
-  { value: 'Email', path: 'MarketplaceOrder.FromUser.Email' },
+  { value: 'Email', path: 'MarketplaceLineItem.ShippingAddress.xp.Email' },
   { value: 'Phone', path: 'MarketplaceOrder.FromUser.Phone' },
 ]

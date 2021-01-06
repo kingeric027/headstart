@@ -47,7 +47,7 @@ export function ValidateName(
 export function ValidateNoSpecialCharactersAndSpaces(
   control: AbstractControl
 ): ValidationErrors | null {
-  const isValid = /^[a-zA-Z0-9]*$/.test(control.value)
+  const isValid = /^[a-zA-Z0-9_-]*$/.test(control.value)
   if (!control.value || isValid) {
     return null
   }

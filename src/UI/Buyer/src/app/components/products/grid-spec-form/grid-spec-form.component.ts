@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
+  MarketplaceLineItem,
   PriceSchedule,
   SuperMarketplaceProduct,
 } from '@ordercloud/headstart-sdk'
@@ -30,14 +31,15 @@ export class OCMGridSpecForm {
   priceBreaks: PriceBreak[]
   price: number
   percentSavings: number
-  totalQty: number
+  totalQtyToAdd: number
   qtyValid = false
+  resetGridQtyFields = false
   errorMsg = ''
   constructor(
     private specFormService: SpecFormService,
     private context: ShopperContextService,
     private productDetailService: ProductDetailService
-  ) { }
+  ) {}
 
   @Input() set superProduct(value: SuperMarketplaceProduct) {
     this._superProduct = value
@@ -115,27 +117,182 @@ export class OCMGridSpecForm {
     else this.lineItems[i] = item
     const liQuantities = []
     this.lineItems.forEach((li) => liQuantities.push(li.Quantity))
-    this.totalQty = liQuantities.reduce((acc, curr) => {
+    this.totalQtyToAdd = liQuantities.reduce((acc, curr) => {
       return acc + curr
     })
     this.qtyValid = this.validateQuantity(this.lineItems)
-    this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs[0])
-    this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs[0])
+    this.lineTotals[indexOfSpec] = this.getLineTotal(event.qty, item.Specs)
+    this.unitPrices[indexOfSpec] = this.getUnitPrice(event.qty, item.Specs)
     this.totalPrice = this.getTotalPrice()
   }
 
-  getErrorMsg(event: any) {
-    this.errorMsg = event
+  validateQuantity(lineItems: any[]): boolean {
+    this.resetGridQtyFields = false
+    this.errorMsg = ''
+    const lineItemsOfCurrentProductInCart: MarketplaceLineItem[] = this.context.order.cart
+      .get()
+      ?.Items?.filter((i) => i.ProductID === this.product?.ID)
+    const isInventoryAvailable = this.checkIfInventoryIsAvailable(
+      lineItems,
+      lineItemsOfCurrentProductInCart
+    )
+    if (!isInventoryAvailable) {
+      return false
+    }
+    let qtyInCart = 0
+    // When users can mix and match variants when evaluating quantity
+    if (this.priceSchedule.UseCumulativeQuantity) {
+      // When users have not reached the minimum quantity
+      lineItemsOfCurrentProductInCart.forEach(
+        (li: MarketplaceLineItem) => (qtyInCart += li.Quantity)
+      )
+      if (
+        this.totalQtyToAdd + qtyInCart <
+        lineItems[0].Product.PriceSchedule.MinQuantity
+      ) {
+        this.errorMsg = `Minimum quantity not reached.  ${qtyInCart} in cart, ${
+          lineItems[0].Product.PriceSchedule.MinQuantity - qtyInCart
+        } of any product option are needed.`
+        return false
+      }
+      // When users have exceeded the maximum quantity
+      if (
+        lineItems[0].Product.PriceSchedule.MaxQuantity !== null &&
+        this.totalQtyToAdd + qtyInCart >
+          lineItems[0].Product.PriceSchedule.MaxQuantity
+      ) {
+        this.errorMsg = `Maximum quantity reached (${lineItems[0].Product.PriceSchedule.MaxQuantity}).  ${qtyInCart} currently in cart.`
+        return false
+      }
+    } else {
+      // When quantity must be evaluated variant-by-variant
+      for (const li of lineItems) {
+        qtyInCart = 0
+        const liSpecs = li.Specs.map((spec) => spec.Value)
+        const matchingLineItem = lineItemsOfCurrentProductInCart.find(
+          (li: MarketplaceLineItem) => {
+            const specs = li.Specs.map((spec) => spec.Value)
+            return (
+              specs.length === liSpecs.length &&
+              specs.every((spec) => liSpecs.includes(spec))
+            )
+          }
+        )
+        if (matchingLineItem) {
+          qtyInCart = matchingLineItem.Quantity
+        }
+        if (
+          li.Quantity !== 0 &&
+          li.Quantity !== null &&
+          li.Quantity + qtyInCart < li.Product.PriceSchedule.MinQuantity
+        ) {
+          this.errorMsg = `Minimum quantity not reached.  ${qtyInCart} in cart, ${
+            li.Product.PriceSchedule.MinQuantity - qtyInCart
+          } of this product option are needed.`
+          return false
+        }
+        if (
+          li.Quantity !== 0 &&
+          li.Quantity !== null &&
+          li.Quantity + qtyInCart > li.Product.PriceSchedule.MaxQuantity
+        ) {
+          this.errorMsg = `Maximum quantity reached (${li.Product.PriceSchedule.MaxQuantity}).  ${qtyInCart} currently in cart.`
+          return false
+        }
+      }
+    }
+    return true
   }
 
-  validateQuantity(lineItems: any): boolean {
-    return this.totalQty >= lineItems[0].Product.PriceSchedule.MinQty &&
-      lineItems[0].Product.PriceSchedule.MaxQuantity !== null
-      ? this.totalQty <= lineItems[0].Product.PriceSchedule.MaxQuantity
-      : this.totalQty !== 0
+  checkIfInventoryIsAvailable(
+    lineItems: MarketplaceLineItem[],
+    lineItemsOfCurrentProductInCart: MarketplaceLineItem[]
+  ): boolean {
+    // If not tracking inventory, return true
+    if (
+      this._superProduct.Product.Inventory === null ||
+      !this._superProduct.Product.Inventory?.Enabled
+    ) {
+      return true
+    }
+
+    // If tracking inventory, but not at a variant level, compare Quantity Available to amount currently in cart and about to add to cart
+    if (
+      this._superProduct.Product.Inventory?.Enabled &&
+      !this._superProduct.Product.Inventory?.VariantLevelTracking
+    ) {
+      let inventoryInCart = 0
+      lineItemsOfCurrentProductInCart.forEach(
+        (li) => (inventoryInCart += li.Quantity)
+      )
+      if (
+        this._superProduct.Product.Inventory?.QuantityAvailable !== null &&
+        this._superProduct.Product.Inventory?.QuantityAvailable -
+          inventoryInCart -
+          this.totalQtyToAdd <
+          0
+      ) {
+        this.errorMsg = `Sorry, but there is not enough inventory for the amount you are trying to add.  You have ${inventoryInCart} currently in your cart, but only ${
+          this._superProduct.Product.Inventory?.QuantityAvailable -
+          inventoryInCart
+        } more of all total product options may be added.`
+        return false
+      }
+    }
+
+    // If tracking inventory at a variant level, ensure line items in cart and about to be added do not exceed quantities available
+    if (
+      this._superProduct.Product.Inventory?.Enabled &&
+      this._superProduct.Product.Inventory?.VariantLevelTracking
+    ) {
+      for (const li of lineItems) {
+        const liSpecs = li.Specs.map((spec) => spec.Value)
+        const matchingVariant = this._superProduct.Variants.find((variant) => {
+          const variantSpecs = variant.Specs.map((spec) => spec.Value)
+          return (
+            variantSpecs.length === liSpecs.length &&
+            variantSpecs.every((spec) => liSpecs.includes(spec))
+          )
+        })
+        if (matchingVariant.Inventory?.QuantityAvailable === null) {
+          return false
+        }
+        const matchingLineItemInCart = lineItemsOfCurrentProductInCart.find(
+          (liInCart) => {
+            const liInCartSpecs = liInCart.Specs.map((spec) => spec.Value)
+            return (
+              liInCartSpecs.length === liSpecs.length &&
+              liInCartSpecs.every((spec) => liSpecs.includes(spec))
+            )
+          }
+        )
+        if (matchingLineItemInCart) {
+          if (
+            matchingVariant.Inventory.QuantityAvailable -
+              matchingLineItemInCart.Quantity -
+              li.Quantity <
+            0
+          ) {
+            this.errorMsg = `Sorry, but there is not enough inventory for the amount you are trying to add.  You have ${
+              matchingLineItemInCart.Quantity
+            } currently in your cart, but only ${
+              matchingVariant.Inventory.QuantityAvailable -
+              matchingLineItemInCart.Quantity
+            } more of this product option may be added.`
+            return false
+          }
+        } else {
+          if (matchingVariant.Inventory.QuantityAvailable - li.Quantity < 0) {
+            this.errorMsg = `Sorry, but there is not enough inventory for the amount you are trying to add.  Only ${matchingVariant.Inventory.QuantityAvailable} of this product option may be added.`
+            return false
+          }
+        }
+      }
+    }
+    return true
   }
 
-  getUnitPrice(qty: number, specs: GridSpecOption): number {
+  getUnitPrice(qty: number, specs: GridSpecOption[]): number {
     if (!this.priceBreaks?.length) return
     const startingBreak = _minBy(this.priceBreaks, 'Quantity')
     const selectedBreak = this.priceBreaks.reduce((current, candidate) => {
@@ -143,12 +300,12 @@ export class OCMGridSpecForm {
         ? candidate
         : current
     }, startingBreak)
-    return specs.Markup
-      ? selectedBreak.Price + specs.Markup
-      : selectedBreak.Price
+    let totalMarkup = 0
+    specs.forEach((spec) => (totalMarkup += spec.Markup))
+    return selectedBreak.Price + totalMarkup
   }
 
-  getLineTotal(qty: number, specs: GridSpecOption): number {
+  getLineTotal(qty: number, specs: GridSpecOption[]): number {
     if (qty > 0) {
       if (this.priceBreaks?.length) {
         const basePrice = qty * this.priceBreaks[0].Price
@@ -171,6 +328,7 @@ export class OCMGridSpecForm {
     try {
       this.isAddingToCart = true
       await this.context.order.cart.addMany(lineItems)
+      this.resetGridQtyFields = true
     } catch (ex) {
       this.isAddingToCart = false
       throw ex
