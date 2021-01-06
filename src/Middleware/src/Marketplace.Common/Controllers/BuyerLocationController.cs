@@ -29,7 +29,7 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID)
         {
-            return await _buyerLocationCommand.Get(buyerID, buyerLocationID, VerifiedUserContext);
+            return await _buyerLocationCommand.Get(buyerID, buyerLocationID, VerifiedUserContext.AccessToken);
         }
 
         [DocName("POST a Buyer Location")]
@@ -38,21 +38,21 @@ namespace Marketplace.Common.Controllers
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
             var ocAuth = await _oc.AuthenticateAsync();
-            return await _buyerLocationCommand.Create(buyerID, buyerLocation, VerifiedUserContext, ocAuth.AccessToken);
+            return await _buyerLocationCommand.Create(buyerID, buyerLocation, ocAuth.AccessToken);
         }
 
         [DocName("PUT a Buyer Location")]
         [HttpPut, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, [FromBody] MarketplaceBuyerLocation buyerLocation)
         {
-            return await _buyerLocationCommand.Save(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext);
+            return await _buyerLocationCommand.Save(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext.AccessToken);
         }
 
         [DocName("Delete a Buyer Location")]
         [HttpDelete, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
         public async Task Delete(string buyerID, string buyerLocationID)
         {
-            await _buyerLocationCommand.Delete(buyerID, buyerLocationID, VerifiedUserContext);
+            await _buyerLocationCommand.Delete(buyerID, buyerLocationID, VerifiedUserContext.AccessToken);
         }
 
         [DocName("GET List of location permission user groups")]

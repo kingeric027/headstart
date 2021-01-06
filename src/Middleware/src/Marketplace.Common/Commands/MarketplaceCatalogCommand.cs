@@ -14,7 +14,7 @@ namespace Marketplace.Common.Commands.Crud
 		Task<ListPage<MarketplaceCatalog>> List(string buyerID, ListArgs<MarketplaceCatalog> args, VerifiedUserContext user);
 		Task<MarketplaceCatalog> Post(string buyerID, MarketplaceCatalog catalog, VerifiedUserContext user);
 		Task<ListPage<MarketplaceCatalogAssignment>> GetAssignments(string buyerID, string locationID, VerifiedUserContext user);
-		Task SetAssignments(string buyerID, string locationID, List<string> assignments, VerifiedUserContext user);
+		Task SetAssignments(string buyerID, string locationID, List<string> assignments, string token);
 		Task<MarketplaceCatalog> Get(string buyerID, string catalogID, VerifiedUserContext user);
 		Task<MarketplaceCatalog> Put(string buyerID, string catalogID, MarketplaceCatalog catalog, VerifiedUserContext user);
 		Task Delete(string buyerID, string catalogID, VerifiedUserContext user);
@@ -71,10 +71,10 @@ namespace Marketplace.Common.Commands.Crud
 			return catalogAssignments.ToListPage(page: 1, pageSize: 100);
 		}
 
-		public async Task SetAssignments(string buyerID, string locationID, List<string> newAssignments, VerifiedUserContext user)
+		public async Task SetAssignments(string buyerID, string locationID, List<string> newAssignments, string token)
 		{
-			var locationPrePatch = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, locationID, user.AccessToken);
-			await _oc.UserGroups.PatchAsync(buyerID, locationID, new PartialUserGroup() { xp = new { CatalogAssignments = newAssignments } }, user.AccessToken);
+			var locationPrePatch = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, locationID, token);
+			await _oc.UserGroups.PatchAsync(buyerID, locationID, new PartialUserGroup() { xp = new { CatalogAssignments = newAssignments } }, token);
 
 			// todo consider moving this out of the req res flow with webhooks or queue or something to prevent lengthy call
 			await UpdateUserCatalogAssignmentsForLocation(buyerID, locationID, locationPrePatch.xp.CatalogAssignments, newAssignments);
