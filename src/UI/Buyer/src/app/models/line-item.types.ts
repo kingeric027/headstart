@@ -1,3 +1,4 @@
+import { MarketplaceMeProduct } from "@ordercloud/headstart-sdk";
 import { Address, BuyerProduct, LineItem, Supplier } from "ordercloud-javascript-sdk";
 
 export interface LineItemGroupSupplier {
@@ -20,6 +21,6 @@ export interface LineItemGroupSupplier {
  * LineItem with the full product details. Currently used in the cart page only.
  */
 export interface LineItemWithProduct extends LineItem {
-    Product?: BuyerProduct
+    Product?: MarketplaceMeProduct
   }
   

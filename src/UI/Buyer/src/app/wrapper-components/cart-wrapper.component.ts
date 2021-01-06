@@ -41,7 +41,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   setLineItems = async (
-    items: ListPage<MarketplaceLineItem>
+    items: ListPage<LineItemWithProduct>
   ): Promise<void> => {
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
