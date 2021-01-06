@@ -37,6 +37,8 @@ using SendGrid;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
 using Marketplace.Common.Services.CMS;
+using Common.Services.AnytimeDashboard;
+using Marketplace.Common.Services.WazingDashboard;
 
 namespace Marketplace.API
 {
@@ -100,6 +102,11 @@ namespace Marketplace.API
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
+                .Inject<ISSOLoginCommand>()
+                .Inject<IAnytimeWebhookCommand>()
+                .Inject<IAnytimeDashboardClient>()
+                .Inject<IWaxDashboardClient>()
+                .AddTransient<ISyncOrgCommand, SyncOrgCommand>()
                 .Inject<IDevCenterService>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()

@@ -3,6 +3,7 @@ import { EnvironmentConfig } from './environment.interfaces'
 export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'GO2PARTNERS_TEST',
+  sellerName: 'GO2Partners Seller',
   clientID: '1C414E48-B027-4C6D-85CF-873723EB7A70',
   middlewareUrl: 'https://go2partners-middleware-test.azurewebsites.net',
   cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',

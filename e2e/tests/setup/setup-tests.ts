@@ -47,6 +47,7 @@ test('Setup Create Vendor User', async t => {
 	)
 	await minorResourcePage.clickCreateButton()
 	await userDetailsPage.createVendorUser(
+		'robertspeedwagon',
 		'robertspeedwagon@mailinator.com',
 		'Robert',
 		'Speedwagon'
@@ -59,7 +60,7 @@ test('Setup Create Vendor User', async t => {
 	)
 
 	const userID = await setupGetSupplierUserID(
-		'robertspeedwagon@mailinator.com',
+		'robertspeedwagon',
 		supplierID,
 		t.fixtureCtx.clientAuth
 	)
@@ -85,7 +86,7 @@ test('Setup Vendor Warehouse', async t => {
 })
 
 test.before(async t => {
-	await vendorTestSetup('robertspeedwagon@mailinator.com', 'fails345')
+	await vendorTestSetup('robertspeedwagon', 'fails345')
 })('Setup Product', async t => {
 	await adminHeaderPage.selectAllProducts()
 	await mainResourcePage.clickCreateNewStandardProduct()

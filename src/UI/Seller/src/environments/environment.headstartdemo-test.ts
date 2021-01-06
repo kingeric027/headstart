@@ -3,6 +3,7 @@ import { EnvironmentConfig } from './environment.interfaces'
 export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'Headstart_Demo_Test',
+  sellerName: 'SEB Seller',
   clientID: 'FF151BA7-0207-4134-8A7D-52235BEE4E7A',
   middlewareUrl: 'https://headstartdemo-middleware-test.azurewebsites.net',
   cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
