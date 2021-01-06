@@ -42,7 +42,7 @@ export class ProductDetailService {
 
   getGridLineItemPrice(
     priceBreaks: PriceBreak[],
-    specs: GridSpecOption,
+    specs: GridSpecOption[],
     quantity: number
   ): number {
     if (!priceBreaks?.length) return
@@ -53,11 +53,11 @@ export class ProductDetailService {
         ? candidate
         : current
     }, startingBreak)
+    let totalMarkup = 0
+    specs.forEach((spec) => (totalMarkup += spec.Markup))
 
     // Take into account markups if they are applied which can increase price
-    return specs.Markup
-      ? (selectedBreak.Price + specs.Markup) * quantity
-      : selectedBreak.Price * quantity
+    return (selectedBreak.Price + totalMarkup) * quantity
   }
 
   getPercentSavings(actualPrice: number, basePrice: number): number {

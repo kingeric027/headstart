@@ -1,4 +1,3 @@
-﻿using Marketplace.Common.Services.ShippingIntegration.Models;
 using Marketplace.Models;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
@@ -12,29 +11,31 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
+using System.Net;
+using Newtonsoft.Json;
+using Marketplace.Common.Models.Marketplace;
+using Marketplace.Common.Services.ShippingIntegration.Models;
 
 namespace Marketplace.Common.Commands
 {
     public interface IOrderSubmitCommand
     {
-        Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user);
+        Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken);
     }
     public class OrderSubmitCommand : IOrderSubmitCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
-        private readonly IOrderCloudIntegrationsCardConnectCommand _card;
-        private readonly TelemetryClient _telemetry;
+        private readonly ICreditCardCommand _card;
 
-        public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, IOrderCloudIntegrationsCardConnectCommand card, TelemetryClient telemetry)
+        public OrderSubmitCommand(IOrderCloudClient oc, AppSettings settings, ICreditCardCommand card)
         {
             _oc = oc;
             _settings = settings;
             _card = card;
-            _telemetry = telemetry;
         }
 
-        public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, VerifiedUserContext user)
+        public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
             await ValidateOrderAsync(worksheet, payment);
@@ -43,31 +44,9 @@ namespace Marketplace.Common.Commands
             if (worksheet.LineItems.Any(li => li.Product.xp.ProductType != ProductType.PurchaseOrder))
             {
                 payment.OrderID = incrementedOrderID;
-                await _card.AuthorizePayment(payment, user, GetMerchantID(payment)); // authorize AND capture payments (SEB specific, in general use case we'd auth before submit and capture on shipment)
+                await _card.AuthorizePayment(payment, userToken, GetMerchantID(payment));
             }
-            try
-            {
-                return await RetryUpToThreeTimes().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, user.AccessToken));
-            } catch(Exception e)
-            {
-                LogError(e, incrementedOrderID, worksheet, user);
-                throw e;
-            }
-        }
-
-        private void LogError(Exception e, string orderID, MarketplaceOrderWorksheet worksheet, VerifiedUserContext user)
-        {
-            // track exception in app insights
-            // to find go to Transaction Search > Event Type = Exception > Filter by any of these custom properties
-            var customProperties = new Dictionary<string, string>
-                {
-                    { "ErrorCode", "Order.Submit.PaymentCaptureOrderFailed" },
-                    { "Message", "Payment was captured but order was not submitted" },
-                    { "OrderID", orderID },
-                    { "BuyerID", worksheet.Order.FromCompanyID },
-                    { "UserEmail", user.Email }
-                };
-            _telemetry.TrackException(e, customProperties);
+            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, userToken));
         }
 
         private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)
@@ -145,11 +124,11 @@ namespace Marketplace.Common.Commands
             return merchantID;
         }
 
-        private AsyncRetryPolicy RetryUpToThreeTimes()
+        private AsyncRetryPolicy WithRetry()
         {
             // retries three times, waits two seconds in-between failures
             return Policy
-                .Handle<Exception>()
+                .Handle<OrderCloudException>(e => e.HttpStatus == HttpStatusCode.InternalServerError || e.HttpStatus == HttpStatusCode.RequestTimeout)
                 .WaitAndRetryAsync(new[] {
                     TimeSpan.FromSeconds(2),
                     TimeSpan.FromSeconds(2),

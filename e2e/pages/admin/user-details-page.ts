@@ -54,9 +54,14 @@ class UserDetailsPage {
 		return email
 	}
 
-	async createVendorUser(email: string, firstName: string, lastName: string) {
+	async createVendorUser(
+		userName: string,
+		email: string,
+		firstName: string,
+		lastName: string
+	) {
 		await t.click(this.activeToggle)
-		await t.typeText(this.usernameField, email)
+		await t.typeText(this.usernameField, userName)
 		await t.typeText(this.emailField, email)
 		await t.typeText(this.firstNameField, firstName)
 		await t.typeText(this.lastNameField, lastName)

@@ -4,11 +4,7 @@ import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
-import {
-  JDocument,
-  PriceBreak,
-  SuperMarketplaceProduct,
-} from '@ordercloud/headstart-sdk'
+import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
 import {
   AppConfig,
   applicationConfiguration,

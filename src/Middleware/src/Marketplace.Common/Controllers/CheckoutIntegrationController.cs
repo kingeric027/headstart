@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Marketplace.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;

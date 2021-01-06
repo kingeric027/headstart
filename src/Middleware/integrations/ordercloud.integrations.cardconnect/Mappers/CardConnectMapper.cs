@@ -79,7 +79,7 @@ namespace ordercloud.integrations.cardconnect
             return req;
         }
 
-        public static PaymentTransaction Map(Order order, Payment payment, CardConnectAuthorizationResponse response)
+        public static PaymentTransaction Map(Payment payment, CardConnectAuthorizationResponse response)
         {
             var t = new PaymentTransaction()
             {
@@ -88,7 +88,29 @@ namespace ordercloud.integrations.cardconnect
                 ResultCode = response.authcode,
                 ResultMessage = response.resptext,
                 Succeeded = response.WasSuccessful(),
-                Type = payment.Type.ToString()
+                Type = "CreditCard",
+                xp = new
+                {
+                    CardConnectResponse = response
+                }
+            };
+            return t;
+        }
+
+        public static PaymentTransaction Map(Payment payment, CardConnectVoidResponse response)
+        {
+            var t = new PaymentTransaction()
+            {
+                Amount = payment.Amount,
+                DateExecuted = DateTime.Now,
+                ResultCode = response.authcode,
+                ResultMessage = response.resptext,
+                Succeeded = response.WasSuccessful(),
+                Type = "CreditCardVoidAuthorization",
+                xp = new
+                {
+                    CardConnectResponse = response
+                }
             };
             return t;
         }

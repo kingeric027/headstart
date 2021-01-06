@@ -29,6 +29,8 @@ export const ErrorDictionary = {
     'Descriptions can only be 1000 characters. Remember the character count includes HTML formatting text.',
   supplierCategoryError: 'Supplier category selections are invalid',
   supplierProductTypeError: 'Please select at least one product type',
+  noSpecialCharactersAndSpaces:
+    'Please enter a value with no special characters ($, #, %, !, ?, *, etc.) or spaces.',
 }
 
 // only alphanumic and space . '
@@ -40,6 +42,16 @@ export function ValidateName(
     return null
   }
   return { name: true }
+}
+
+export function ValidateNoSpecialCharactersAndSpaces(
+  control: AbstractControl
+): ValidationErrors | null {
+  const isValid = /^[a-zA-Z0-9_-]*$/.test(control.value)
+  if (!control.value || isValid) {
+    return null
+  }
+  return { noSpecialCharactersAndSpaces: true }
 }
 
 // max 20 chars, numbers and -

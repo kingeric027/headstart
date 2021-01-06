@@ -76,6 +76,7 @@ namespace Marketplace.Common
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public string OrgID { get; set; }
+        public bool PerformOrderSubmitTasks { get; set; }
     }
 
 	public class OrderCloudSettings
@@ -135,6 +136,7 @@ namespace Marketplace.Common
     {
         public string ApiKey { get; set; }
         public string FromEmail { get; set; }
+        public string SupportEmails { get; set; } // comma delimited list of emails that should be contacted when critical failures occur
     }
 
     public class FlurlSettings
