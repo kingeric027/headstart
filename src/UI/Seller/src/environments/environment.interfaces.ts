@@ -1,6 +1,7 @@
 export interface EnvironmentConfig {
   hostedApp: boolean
   sellerID: string
+  sellerName: string
   clientID: string
   middlewareUrl: string
   cmsUrl: string

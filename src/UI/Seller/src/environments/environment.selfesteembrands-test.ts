@@ -25,6 +25,7 @@ export const environment: EnvironmentConfig = {
     },
   },
   sellerID: 'rQYR6T6ZTEqVrgv8x_ei0g',
+  sellerName: 'SEB Seller',
   clientID: '06C93629-FE9A-4EC5-9652-C0F059B5CC7C',
   middlewareUrl: 'https://middleware-api-test.sebvendorportal.com',
   cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',
