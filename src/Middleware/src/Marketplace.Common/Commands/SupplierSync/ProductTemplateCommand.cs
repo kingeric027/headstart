@@ -165,7 +165,7 @@ namespace Marketplace.Common.Commands
 
 
     [SwaggerModel]
-    public class TemplateProductFlat : IMarketplaceObject
+    public class TemplateProductFlat : IHSObject
     {
         [OrderCloud.SDK.Required]
         [RegularExpression("^[a-zA-Z0-9-_]*$", ErrorMessage = "IDs must have at least 8 characters and no more than 100, are required and can only contain characters Aa-Zz, 0-9, -, and _")]

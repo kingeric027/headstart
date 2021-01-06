@@ -22,49 +22,49 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Buyer")]
         [HttpPost, Route("buyer"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceBuyer> PostBuyer([FromBody] MarketplaceBuyer obj)
+        public async Task<HSBuyer> PostBuyer([FromBody] HSBuyer obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, obj.ID);
         }
 
         [DocName("POST User")]
         [HttpPost, Route("{buyerId}/user"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceUser> PostUser([FromBody] MarketplaceUser obj, string buyerId)
+        public async Task<HSUser> PostUser([FromBody] HSUser obj, string buyerId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
         [DocName("POST UserGroup")]
         [HttpPost, Route("{buyerId}/usergroup"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceUserGroup> PostUserGroup([FromBody] MarketplaceUserGroup obj, string buyerId)
+        public async Task<HSUserGroup> PostUserGroup([FromBody] HSUserGroup obj, string buyerId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
         [DocName("POST UserGroupAssignment")]
         [HttpPost, Route("{buyerId}/usergroupassignment"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceUserGroupAssignment> PostUserGroupAssignment([FromBody] MarketplaceUserGroupAssignment obj, string buyerId)
+        public async Task<HSUserGroupAssignment> PostUserGroupAssignment([FromBody] HSUserGroupAssignment obj, string buyerId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
         [DocName("POST Address")]
         [HttpPost, Route("{buyerId}/address"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceAddressBuyer> PostAddress([FromBody] MarketplaceAddressBuyer obj, string buyerId)
+        public async Task<HSAddressBuyer> PostAddress([FromBody] HSAddressBuyer obj, string buyerId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
         [DocName("POST AddressAssignment")]
         [HttpPost, Route("{buyerId}/addressassignment"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceAddressAssignment> PostAddressAssignment([FromBody] MarketplaceAddressAssignment obj, string buyerId)
+        public async Task<HSAddressAssignment> PostAddressAssignment([FromBody] HSAddressAssignment obj, string buyerId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }
 
         [DocName("POST CostCenter")]
         [HttpPost, Route("{buyerId}/costcenter"), OrderCloudIntegrationsAuth()]
-        public async Task<MarketplaceCostCenter> PostCostCenter([FromBody] MarketplaceCostCenter obj, string buyerId)
+        public async Task<HSCostCenter> PostCostCenter([FromBody] HSCostCenter obj, string buyerId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, buyerId);
         }

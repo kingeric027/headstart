@@ -10,6 +10,6 @@ namespace Marketplace.Common.Models
     [SwaggerModel]
     public class PaymentUpdateRequest
     {
-        public List<MarketplacePayment> Payments { get; set; }
+        public List<HSPayment> Payments { get; set; }
     }
 }

@@ -6,15 +6,15 @@ using System.Collections.Generic;
 namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
     [SwaggerModel]
-    public class SuperShipment
+    public class SuperHSShipment
     {
-        public MarketplaceShipment Shipment { get; set; }
+        public HSShipment Shipment { get; set; }
         public List<ShipmentItem> ShipmentItems { get; set; }
     }
 
     // these are in the common namespace so that we can reference the FreightPop model
     [SwaggerModel]
-    public class MarketplaceShipment : Shipment<ShipmentXp, MarketplaceAddressSupplier, MarketplaceAddressBuyer>
+    public class HSShipment : Shipment<ShipmentXp, HSAddressSupplier, HSAddressBuyer>
     {
     }
 
@@ -28,13 +28,13 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
     }
 
     [SwaggerModel]
-    public class MarketplaceShipmentWithItems : Shipment
+    public class HSShipmentWithItems : Shipment
     {
-        public List<MarketplaceShipmentItemWithLineItem> ShipmentItems { get; set; }
+        public List<HSShipmentItemWithLineItem> ShipmentItems { get; set; }
     }
 
     [SwaggerModel]
-    public class MarketplaceShipmentItemWithLineItem : ShipmentItem
+    public class HSShipmentItemWithLineItem : ShipmentItem
     {
         public LineItem LineItem { get; set; }
     }

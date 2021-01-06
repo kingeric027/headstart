@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceProduct>();
+            var obj = wi.Current.ToObject<HSProduct>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceProduct>(OrchestrationSerializer.Serializer); ;
+            var obj = wi.Current.ToObject<HSProduct>(OrchestrationSerializer.Serializer); ;
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = wi.Diff.ToObject<PartialMarketplaceProduct>(OrchestrationSerializer.Serializer);
+            var obj = wi.Diff.ToObject<PartialHSProduct>(OrchestrationSerializer.Serializer);
             try
             {
                 var response = await _oc.Products.PatchAsync(wi.RecordId, obj, wi.Token);

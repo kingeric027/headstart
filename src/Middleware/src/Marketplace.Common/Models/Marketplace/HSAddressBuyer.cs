@@ -6,11 +6,11 @@ using ordercloud.integrations.library;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceAddressBuyer : Address<BuyerAddressXP>, IMarketplaceObject
+    public class HSAddressBuyer : Address<BuyerAddressXP>, IHSObject
     {
     }
     [SwaggerModel]
-    public class MarketplaceAddressMeBuyer : BuyerAddress<BuyerAddressXP>, IMarketplaceObject
+    public class MarketplaceAddressMeBuyer : BuyerAddress<BuyerAddressXP>, IHSObject
     {
     }
 

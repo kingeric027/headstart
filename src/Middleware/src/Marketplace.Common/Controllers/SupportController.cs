@@ -33,10 +33,10 @@ namespace Marketplace.Common.Controllers
         [HttpGet, Route("shipping")]
         public async Task<ShipEstimateResponse> GetShippingRates([FromBody] ShipmentTestModel model)
         {
-            var payload = new MarketplaceOrderCalculatePayload()
+            var payload = new HSOrderCalculatePayload()
             {
                 ConfigData = null,
-                OrderWorksheet = new MarketplaceOrderWorksheet()
+                OrderWorksheet = new HSOrderWorksheet()
                 {
                     Order = model.Order,
                     LineItems = model.LineItems
@@ -77,14 +77,14 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("postordersubmit/{orderID}"), OrderCloudIntegrationsAuth]
         public async Task<OrderSubmitResponse> ManuallyRunPostOrderSubmit(string orderID)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
             return await _postSubmitCommand.HandleBuyerOrderSubmit(worksheet);
         }
     }
 
     public class ShipmentTestModel
     {
-        public MarketplaceOrder Order { get; set; }
-        public List<MarketplaceLineItem> LineItems { get; set; }
+        public HSOrder Order { get; set; }
+        public List<HSLineItem> LineItems { get; set; }
     }
 }

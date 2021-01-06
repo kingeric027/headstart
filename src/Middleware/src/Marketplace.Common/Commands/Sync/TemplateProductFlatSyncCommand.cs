@@ -38,7 +38,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID ??= wi.RecordId;
-                var priceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(obj.ID, new MarketplacePriceSchedule()
+                var priceSchedule = await _oc.PriceSchedules.SaveAsync<HSPriceSchedule>(obj.ID, new HSPriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -53,7 +53,7 @@ namespace Marketplace.Common.Commands
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
                 }, _user.AccessToken);
-                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(obj.ID, new MarketplaceProduct()
+                var product = await _oc.Products.SaveAsync<HSProduct>(obj.ID, new HSProduct()
                 {
                     Active = true,
                     AutoForward = false,
@@ -154,7 +154,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID ??= wi.RecordId;
-                var priceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(obj.ID, new MarketplacePriceSchedule()
+                var priceSchedule = await _oc.PriceSchedules.SaveAsync<HSPriceSchedule>(obj.ID, new HSPriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -167,7 +167,7 @@ namespace Marketplace.Common.Commands
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
                 }, _user.AccessToken);
-                var product = await _oc.Products.SaveAsync<MarketplaceProduct>(obj.ID, new MarketplaceProduct()
+                var product = await _oc.Products.SaveAsync<HSProduct>(obj.ID, new HSProduct()
                 {
                     Active = true,
                     AutoForward = false,
@@ -261,7 +261,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private static TemplateProductFlat Map(MarketplaceProduct product, MarketplacePriceSchedule priceSchedule, Asset asset = null)
+        private static TemplateProductFlat Map(HSProduct product, HSPriceSchedule priceSchedule, Asset asset = null)
         {
             return new TemplateProductFlat
             {
@@ -305,7 +305,7 @@ namespace Marketplace.Common.Commands
             try
             {
                 obj.ID ??= wi.RecordId;
-                var priceSchedule = await _oc.PriceSchedules.PatchAsync<MarketplacePriceSchedule>(obj.ID, new PartialPriceSchedule()
+                var priceSchedule = await _oc.PriceSchedules.PatchAsync<HSPriceSchedule>(obj.ID, new PartialPriceSchedule()
                 {
                     ID = obj.ID,
                     ApplyShipping = obj.ApplyShipping,
@@ -318,7 +318,7 @@ namespace Marketplace.Common.Commands
                     RestrictedQuantity = obj.RestrictedQuantity,
                     UseCumulativeQuantity = obj.UseCumulativeQuantity
                 }, _user.AccessToken);
-                var product = await _oc.Products.PatchAsync<MarketplaceProduct>(obj.ID, new PartialProduct()
+                var product = await _oc.Products.PatchAsync<HSProduct>(obj.ID, new PartialProduct()
                 {
                     Active = true,
                     AutoForward = false,
@@ -422,8 +422,8 @@ namespace Marketplace.Common.Commands
             _user ??= await _token.Authorize(wi.Token, new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin });
             try
             {
-                var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
-                var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
+                var product = await _oc.Products.GetAsync<HSProduct>(wi.RecordId, wi.Token);
+                var priceSchedule = await _oc.PriceSchedules.GetAsync<HSPriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
                 var assn = await _cms.Assets.ListAssets(ResourceType.Products, product.ID, new ListArgsPageOnly() { PageSize = 1 } , wi.Token);
                 Asset image = null;
                 if (assn.Items.Count > 0)

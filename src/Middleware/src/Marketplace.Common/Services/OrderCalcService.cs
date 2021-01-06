@@ -14,8 +14,8 @@ namespace Marketplace.Common.Services
 {
     public interface IOrderCalcService
     {
-        decimal GetCreditCardTotal(MarketplaceOrderWorksheet worksheet);
-        decimal GetPurchaseOrderTotal(MarketplaceOrderWorksheet worksheet);
+        decimal GetCreditCardTotal(HSOrderWorksheet worksheet);
+        decimal GetPurchaseOrderTotal(HSOrderWorksheet worksheet);
     }
 
     public class OrderCalcService : IOrderCalcService
@@ -26,13 +26,13 @@ namespace Marketplace.Common.Services
             _oc = oc;
         }
 
-        public decimal GetCreditCardTotal(MarketplaceOrderWorksheet worksheet)
+        public decimal GetCreditCardTotal(HSOrderWorksheet worksheet)
         {
             var purchaseOrderTotal = GetPurchaseOrderTotal(worksheet);
             return worksheet.Order.Total - purchaseOrderTotal;
         }
 
-        public decimal GetPurchaseOrderTotal(MarketplaceOrderWorksheet worksheet)
+        public decimal GetPurchaseOrderTotal(HSOrderWorksheet worksheet)
         {
             return worksheet.LineItems
                 .Where(li => li.Product.xp.ProductType == ProductType.PurchaseOrder)

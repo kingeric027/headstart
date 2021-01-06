@@ -8,10 +8,6 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Models.Marketplace
 {
-    public class MarketplaceOrderSubmitResponse : OrderSubmitResponse<OrderSubmitResponseXp>
-    {
-
-    }
 
     public class OrderSubmitResponseXp
     {

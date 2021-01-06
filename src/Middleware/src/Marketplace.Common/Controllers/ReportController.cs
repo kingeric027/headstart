@@ -39,7 +39,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("BuyerLocation/preview/{templateID}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID)
+        public async Task<List<HSAddressBuyer>> BuyerLocation(string templateID)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
             return await _reportDataCommand.BuyerLocation(templateID, VerifiedUserContext);
@@ -55,7 +55,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("SalesOrderDetail/preview/{templateID}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args)
+        public async Task<List<HSOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportAdmin);
             return await _reportDataCommand.SalesOrderDetail(templateID, args, VerifiedUserContext);
@@ -71,7 +71,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("PurchaseOrderDetail/preview/{templateID}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args)
+        public async Task<List<HSOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
             return await _reportDataCommand.PurchaseOrderDetail(templateID, args, VerifiedUserContext);
@@ -87,7 +87,7 @@ namespace Marketplace.Common.Controllers
         }
 
         [HttpGet, Route("LineItemDetail/preview/{templateID}"), OrderCloudIntegrationsAuth]
-        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args)
+        public async Task<List<HSLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args)
         {
             RequireOneOf(CustomRole.MPReportReader, CustomRole.MPReportAdmin);
             return await _reportDataCommand.LineItemDetail(templateID, args, VerifiedUserContext);

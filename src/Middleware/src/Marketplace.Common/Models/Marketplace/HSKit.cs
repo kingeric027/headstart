@@ -7,41 +7,41 @@ using System.Collections.Generic;
 namespace Marketplace.Common.Models.Marketplace
 {
     [SwaggerModel]
-    public class MarketplaceMeKitProduct
+    public class HSMeKitProduct
     {
         public string ID { get; set; }
         public string Name { get; set; }
-        public MarketplaceMeProduct Product { get; set; }
+        public HSMeProduct Product { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
-        public MeKitProduct ProductAssignments { get; set; }
+        public HSMeKitProductAssignment ProductAssignments { get; set; }
     }
 
     [SwaggerModel]
-    public class MarketplaceKitProduct
+    public class HSKitProduct
     {
         public string ID { get; set; }
         public string Name { get; set; }
         public Product Product { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
-        public KitProduct ProductAssignments { get; set; }
+        public HSKitProductAssignment ProductAssignments { get; set; }
     }
 
     [SwaggerModel]
-    public class KitProduct
+    public class HSKitProductAssignment
     {
-        public IList<ProductInKit> ProductsInKit { get; set; }
+        public IList<HSProductInKit> ProductsInKit { get; set; }
     }
 
     [SwaggerModel]
-    public class MeKitProduct
+    public class HSMeKitProductAssignment
     {
-        public IList<MeProductInKit> ProductsInKit { get; set; }
+        public IList<HSMeProductInKit> ProductsInKit { get; set; }
     }
 
     [SwaggerModel]
-    public class ProductInKit
+    public class HSProductInKit
     {
         public string ID { get; set; }
         public int? MinQty { get; set; }
@@ -51,13 +51,13 @@ namespace Marketplace.Common.Models.Marketplace
         public string SpecCombo { get; set; }
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
-        public MarketplaceProduct Product { get; set; }
+        public HSProduct Product { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
     }
 
     [SwaggerModel]
-    public class MeProductInKit
+    public class HSMeProductInKit
     {
         public string ID { get; set; }
         public int? MinQty { get; set; }
@@ -67,7 +67,7 @@ namespace Marketplace.Common.Models.Marketplace
         public string SpecCombo { get; set; }
         public IList<Variant> Variants { get; set; }
         public IList<Spec> Specs { get; set; }
-        public MarketplaceMeProduct Product { get; set; }
+        public HSMeProduct Product { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
     }

@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IOrderSubmitCommand
     {
-        Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken);
+        Task<HSOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken);
     }
     public class OrderSubmitCommand : IOrderSubmitCommand
     {
@@ -35,9 +35,9 @@ namespace Marketplace.Common.Commands
             _card = card;
         }
 
-        public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
+        public async Task<HSOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
             await ValidateOrderAsync(worksheet, payment);
 
             var incrementedOrderID = await IncrementOrderAsync(worksheet);
@@ -46,10 +46,10 @@ namespace Marketplace.Common.Commands
                 payment.OrderID = incrementedOrderID;
                 await _card.AuthorizePayment(payment, userToken, GetMerchantID(payment));
             }
-            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, userToken));
+            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<HSOrder>(direction, incrementedOrderID, userToken));
         }
 
-        private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)
+        private async Task ValidateOrderAsync(HSOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)
         {
             Require.That(
                 !worksheet.Order.IsSubmitted, 
@@ -91,7 +91,7 @@ namespace Marketplace.Common.Commands
             
         }
 
-        private async Task<string> IncrementOrderAsync(MarketplaceOrderWorksheet worksheet)
+        private async Task<string> IncrementOrderAsync(HSOrderWorksheet worksheet)
         {
             if (worksheet.Order.xp.IsResubmitting == true)
             {

@@ -14,7 +14,7 @@ namespace Marketplace.Common.Services
 {
     public interface ISupportAlertService
     {
-        Task VoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex);
+        Task VoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex);
     }
 
     // use this service to alert support of critical failures
@@ -31,13 +31,13 @@ namespace Marketplace.Common.Services
             _settings = settings;
         }
 
-        public async Task VoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex)
+        public async Task VoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex)
         {
             LogVoidAuthorizationFailed(payment, transactionID, order, ex);
             await EmailVoidAuthorizationFailedAsync(payment, transactionID, order, ex);
         }
 
-        public void LogVoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex)
+        public void LogVoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex)
         {
             // track in app insights
             // to find go to Transaction Search > Event Type = Event > Filter by any of these custom properties or event name "Payment.VoidAuthorizationFailed"
@@ -54,7 +54,7 @@ namespace Marketplace.Common.Services
             _telemetry.TrackEvent("Payment.VoidAuthorizationFailed", customProperties);
         }
 
-        public async Task EmailVoidAuthorizationFailedAsync(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex)
+        public async Task EmailVoidAuthorizationFailedAsync(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex)
         {
             var templateData = new EmailTemplate()
             {

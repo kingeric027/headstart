@@ -34,7 +34,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("LIST Super Product")]
 		[HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args)
+		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<HSProduct> args)
 		{
 			return await _command.List(args, VerifiedUserContext.AccessToken);
 		}
@@ -64,7 +64,7 @@ namespace Marketplace.Common.Controllers
 		// todo add auth for seller user
 		[DocName("GET Product pricing override")]
 		[HttpGet, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID)
+		public async Task<HSPriceSchedule> GetPricingOverride(string id, string buyerID)
 		{
 			return await _command.GetPricingOverride(id, buyerID, VerifiedUserContext.AccessToken);
 		}
@@ -72,7 +72,7 @@ namespace Marketplace.Common.Controllers
 		// todo add auth for seller user
 		[DocName("CREATE Product pricing override")]
 		[HttpPost, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
+		public async Task<HSPriceSchedule> CreatePricingOverride(string id, string buyerID, [FromBody] HSPriceSchedule priceSchedule)
 		{
 			return await _command.CreatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext.AccessToken);
 		}
@@ -80,7 +80,7 @@ namespace Marketplace.Common.Controllers
 		// todo add auth for seller user
 		[DocName("PUT Product pricing override")]
 		[HttpPut, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
+		public async Task<HSPriceSchedule> UpdatePricingOverride(string id, string buyerID, [FromBody] HSPriceSchedule priceSchedule)
 		{
 			return await _command.UpdatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext.AccessToken);
 		}

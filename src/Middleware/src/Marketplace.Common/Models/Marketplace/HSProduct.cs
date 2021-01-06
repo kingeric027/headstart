@@ -15,49 +15,49 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class SuperMarketplaceProduct : IMarketplaceObject
+    public class SuperHSProduct : IHSObject
     {
         public string ID { get; set; }
-        public MarketplaceProduct Product { get; set; }
+        public HSProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
-        public IList<MarketplaceVariant> Variants { get; set; }
+        public IList<HSVariant> Variants { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
     }
 
     [SwaggerModel]
-    public class SuperMarketplaceMeProduct : IMarketplaceObject
+    public class HSMarketplaceMeProduct : IHSObject
     {
         public string ID { get; set; }
-        public MarketplaceMeProduct Product { get; set; }
+        public HSMeProduct Product { get; set; }
         public PriceSchedule PriceSchedule { get; set; }
         public IList<Spec> Specs { get; set; }
-        public IList<MarketplaceVariant> Variants { get; set; }
+        public IList<HSVariant> Variants { get; set; }
         public IList<Asset> Images { get; set; }
         public IList<Asset> Attachments { get; set; }
     }
 
 
     [SwaggerModel]
-    public class PartialMarketplaceProduct : PartialProduct<ProductXp>
+    public class PartialHSProduct : PartialProduct<ProductXp>
     {
     }
     [SwaggerModel]
-    public class MarketplaceLineItemProduct : LineItemProduct<ProductXp> { }
+    public class HSLineItemProduct : LineItemProduct<ProductXp> { }
     [SwaggerModel]
-    public class MarketplaceProduct : Product<ProductXp>, IMarketplaceObject
+    public class HSProduct : Product<ProductXp>, IHSObject
     {
     }
 
     [SwaggerModel]
-    public class MarketplaceMeProduct: BuyerProduct<ProductXp, MarketplacePriceSchedule>
+    public class HSMeProduct: BuyerProduct<ProductXp, HSPriceSchedule>
     {
 
     }
 
     [SwaggerModel]
-	public class MarketplaceVariant : Variant<MarketplaceVariantXp> { }
+	public class HSVariant : Variant<HSVariantXp> { }
 
     [SwaggerModel]
 	public class ProductXp
@@ -97,15 +97,15 @@ namespace Marketplace.Models
 	}
 
     [SwaggerModel]
-    public class MarketplaceVariantXp
+    public class HSVariantXp
     {
         public string SpecCombo { get; set; }
-        public List<SpecValue> SpecValues { get; set; }
+        public List<HSSpecValue> SpecValues { get; set; }
         public string NewID { get; set; }
     }
 
     [SwaggerModel]
-    public class SpecValue
+    public class HSSpecValue
     {
         public string SpecName { get; set; }
         public string SpecOptionValue { get; set; }

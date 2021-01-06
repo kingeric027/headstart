@@ -31,7 +31,7 @@ namespace Marketplace.Common.Commands
         {
             await EnsureUserCanManageLocationResaleCert(locationID, verifiedUser);
             var buyerID = locationID.Split('-')[0];
-            var address = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, locationID);
+            var address = await _oc.Addresses.GetAsync<HSAddressBuyer>(buyerID, locationID);
             if(address.xp.AvalaraCertificateID != null)
             {
                 return await _avalara.GetCertificateAsync((int)address.xp.AvalaraCertificateID);
@@ -45,7 +45,7 @@ namespace Marketplace.Common.Commands
         {
             await EnsureUserCanManageLocationResaleCert(locationID, verifiedUser);
             var buyerID = locationID.Split('-')[0];
-            var address = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, locationID);
+            var address = await _oc.Addresses.GetAsync<HSAddressBuyer>(buyerID, locationID);
             var createdCert = await _avalara.CreateCertificateAsync(cert, address);
             var newAddressXP = new
             {
@@ -64,7 +64,7 @@ namespace Marketplace.Common.Commands
         {
             await EnsureUserCanManageLocationResaleCert(locationID, verifiedUser);
             var buyerID = locationID.Split('-')[0];
-            var address = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, locationID);
+            var address = await _oc.Addresses.GetAsync<HSAddressBuyer>(buyerID, locationID);
             Require.That(address.xp.AvalaraCertificateID == cert.ID, new ErrorCode("Insufficient Access", 403, $"User cannot modofiy this cert"));
             var updatedCert = await _avalara.UpdateCertificateAsync(cert.ID, cert, address);
             return updatedCert;

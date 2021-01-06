@@ -28,14 +28,14 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("GET Super Product")]
 		[HttpGet, Route("products/{productID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<SuperMarketplaceMeProduct> GetSuperProduct(string productID)
+		public async Task<HSMarketplaceMeProduct> GetSuperProduct(string productID)
 		{
 			return await _meProductCommand.Get(productID, VerifiedUserContext);
 		}
 
 		[DocName("LIST products")]
 		[HttpGet, Route("products"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<ListPageWithFacets<MarketplaceMeProduct>> ListMeProducts(ListArgs<MarketplaceMeProduct> args)
+		public async Task<ListPageWithFacets<HSMeProduct>> ListMeProducts(ListArgs<HSMeProduct> args)
 		{
 			return await _meProductCommand.List(args, VerifiedUserContext);
 		}
@@ -49,7 +49,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("GET Kit Product")]
 		[HttpGet, Route("kitproducts/{kitProductID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<MarketplaceMeKitProduct> GetMeKit(string kitProductID)
+		public async Task<HSMeKitProduct> GetMeKit(string kitProductID)
 		{
 			return await _kitProductCommand.GetMeKit(kitProductID, VerifiedUserContext);
 		}

@@ -35,17 +35,17 @@ namespace Marketplace.Tests
                 Substitute.For<AppSettings>()
             );
 
-            var mockMethods = new List<MarketplaceShipMethod>()
+            var mockMethods = new List<HSShipMethod>()
             {
-                new MarketplaceShipMethod() {Name = "FEDEX_GROUND"},
-                new MarketplaceShipMethod() {Name = "USPS Priority"},
-                new MarketplaceShipMethod() {Name = "UPS GROUND"}
+                new HSShipMethod() {Name = "FEDEX_GROUND"},
+                new HSShipMethod() {Name = "USPS Priority"},
+                new HSShipMethod() {Name = "UPS GROUND"}
             };
 
-            var mockNotFoundMethods = new List<MarketplaceShipMethod>()
+            var mockNotFoundMethods = new List<HSShipMethod>()
             {
-                new MarketplaceShipMethod() {Name = "USPS Priority"},
-                new MarketplaceShipMethod() {Name = "UPS GROUND"}
+                new HSShipMethod() {Name = "USPS Priority"},
+                new HSShipMethod() {Name = "UPS GROUND"}
             };
 
             var settings = new AppSettings()

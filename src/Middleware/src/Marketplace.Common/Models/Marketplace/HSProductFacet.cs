@@ -5,7 +5,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceProductFacet : ProductFacet<ProductFacetXp>, IMarketplaceObject
+    public class HSProductFacet : ProductFacet<ProductFacetXp>, IHSObject
     {
         
     }

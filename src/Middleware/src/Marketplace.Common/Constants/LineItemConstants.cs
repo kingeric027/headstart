@@ -8,7 +8,7 @@ namespace Marketplace.Common.Constants
 {
     public static class LineItemStatusConstants
     {
-        public static (SubmittedOrderStatus, ShippingStatus, ClaimStatus) GetOrderStatuses(List<MarketplaceLineItem> lineItems)
+        public static (SubmittedOrderStatus, ShippingStatus, ClaimStatus) GetOrderStatuses(List<HSLineItem> lineItems)
         {
             var orderStatusOccurances = new HashSet<SubmittedOrderStatus>();
             var shippingStatusOccurances = new HashSet<ShippingStatus>();

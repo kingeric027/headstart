@@ -13,7 +13,7 @@ using Marketplace.Models.Models.Marketplace;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceOrder : Order<OrderXp, MarketplaceUser, MarketplaceAddressBuyer>
+    public class HSOrder : Order<OrderXp, HSUser, HSAddressBuyer>
     {
     }
 
@@ -36,7 +36,7 @@ namespace Marketplace.Models
         public ShippingStatus ShippingStatus { get; set; }
         public ClaimStatus ClaimStatus { get; set; }
         public string PaymentMethod { get; set; }
-        public MarketplaceAddressBuyer ShippingAddress { get; set; }
+        public HSAddressBuyer ShippingAddress { get; set; }
         public List<ShipMethodSupplierView> SelectedShipMethodsSupplierView { get; set; }
         public bool? IsResubmitting { get; set; }
     }
@@ -60,7 +60,7 @@ namespace Marketplace.Models
     [SwaggerModel]
     public class OrderDetails
     {
-        public MarketplaceOrder Order { get; set; }
+        public HSOrder Order { get; set; }
         public IList<LineItem> LineItems { get; set; }
         public IList<OrderPromotion> Promotions { get; set; }
         public IList<Payment> Payments { get; set; }
@@ -84,28 +84,28 @@ namespace Marketplace.Models
     }
 
     [SwaggerModel]
-    public class MarketplaceSupplierOrderData
+    public class HSSupplierOrderData
     {
-        public MarketplaceOrderLineItemData SupplierOrder { get; set; }
-        public MarketplaceOrderLineItemData BuyerOrder { get; set; }
-        public MarketplaceShipEstimate ShipMethod { get; set; }
+        public HSOrderLineItemData SupplierOrder { get; set; }
+        public HSOrderLineItemData BuyerOrder { get; set; }
+        public HSShipEstimate ShipMethod { get; set; }
     }
 
     [SwaggerModel]
-    public class MarketplaceOrderLineItemData
+    public class HSOrderLineItemData
     {
-        public MarketplaceOrder Order { get; set; }
-        public List<MarketplaceLineItem> LineItems { get; set; }
+        public HSOrder Order { get; set; }
+        public List<HSLineItem> LineItems { get; set; }
     }
 
-    public class MarketplaceOrderSubmitPayload
+    public class HSOrderSubmitPayload
     {
-        public MarketplaceOrderSubmitPayloadResponse Response { get; set; }
+        public HSOrderSubmitPayloadResponse Response { get; set; }
     }
     
-    public class MarketplaceOrderSubmitPayloadResponse
+    public class HSOrderSubmitPayloadResponse
     {
-        public MarketplaceOrder Body { get; set; }
+        public HSOrder Body { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

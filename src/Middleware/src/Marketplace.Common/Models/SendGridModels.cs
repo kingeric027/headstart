@@ -53,7 +53,7 @@ namespace Marketplace.Common.Models
             public string Location { get; set; }
             public string ProductID { get; set; }
             public string ProductName { get; set; }
-            public MarketplaceOrder Order { get; set; }
+            public HSOrder Order { get; set; }
         }
 
     }

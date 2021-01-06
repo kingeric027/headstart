@@ -8,10 +8,10 @@ namespace Marketplace.Common.Constants
 {
     public static class SEBUserTypes
     {
-        public static List<MarketplaceUserType> Supplier() {
-            return new List<MarketplaceUserType>()
+        public static List<HSUserType> Supplier() {
+            return new List<HSUserType>()
             {
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Order Admin",
                     UserGroupType = UserGroupType.UserPermissions,
                     UserGroupIDSuffix = "OrderAdmin",
@@ -21,7 +21,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPShipmentAdmin,
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Account Admin",
                     UserGroupType = UserGroupType.UserPermissions,
                     UserGroupIDSuffix = "AccountAdmin",
@@ -33,7 +33,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPMeSupplierAdmin
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Product Admin",
                     UserGroupType = UserGroupType.UserPermissions,
                     UserGroupIDSuffix = "ProductAdmin",
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPMeProductAdmin,
                     }
                 },
-                 new MarketplaceUserType {
+                 new HSUserType {
                     UserGroupName = "Report Reader",
                     UserGroupType = UserGroupType.UserPermissions,
                     UserGroupIDSuffix = "ReportReader",
@@ -55,11 +55,11 @@ namespace Marketplace.Common.Constants
                 
         }
 
-        public static List<MarketplaceUserType> BuyerLocation()
+        public static List<HSUserType> BuyerLocation()
         {
-            return new List<MarketplaceUserType>()
+            return new List<HSUserType>()
             {
-                 new MarketplaceUserType {
+                 new HSUserType {
                     UserGroupName = "Location Permission Admin",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.PermissionAdmin.ToString(),
@@ -68,7 +68,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPLocationPermissionAdmin,
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Location Order Approver",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.OrderApprover.ToString(),
@@ -77,7 +77,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPLocationOrderApprover,
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Location Needs Approval",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.NeedsApproval.ToString(),
@@ -86,7 +86,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPLocationNeedsApproval,
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "View All Location Orders",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.ViewAllOrders.ToString(),
@@ -95,7 +95,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPLocationViewAllOrders,
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Credit Card Admin",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.CreditCardAdmin.ToString(),
@@ -104,7 +104,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPLocationCreditCardAdmin,
                     }
                 },
-                new MarketplaceUserType {
+                new HSUserType {
                     UserGroupName = "Address Admin",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.AddressAdmin.ToString(),
@@ -113,7 +113,7 @@ namespace Marketplace.Common.Constants
                         CustomRole.MPLocationAddressAdmin,
                     }
                 },
-                   new MarketplaceUserType {
+                   new HSUserType {
                     UserGroupName = "Resale Cert Admin",
                     UserGroupType = UserGroupType.LocationPermissions,
                     UserGroupIDSuffix = UserGroupSuffix.ResaleCertAdmin.ToString(),

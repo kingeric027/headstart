@@ -30,7 +30,7 @@ namespace Marketplace.Common.Controllers
         [DocName("Save payments")]
         [DocComments("Creates or updates payments as needed for this order")]
         [HttpPut, Route("{orderID}/update"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<IList<MarketplacePayment>> SavePayments(string orderID, [FromBody] PaymentUpdateRequest request)
+        public async Task<IList<HSPayment>> SavePayments(string orderID, [FromBody] PaymentUpdateRequest request)
         {
             return await _command.SavePayments(orderID, request.Payments, VerifiedUserContext.AccessToken);
         }

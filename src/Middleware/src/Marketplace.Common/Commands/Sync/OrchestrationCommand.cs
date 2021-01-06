@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IMarketplaceObject;
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IHSObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
@@ -55,7 +55,7 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IMarketplaceObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IHSObject
         {
             try
             {

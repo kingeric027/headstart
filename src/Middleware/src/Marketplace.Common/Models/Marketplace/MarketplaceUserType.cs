@@ -6,7 +6,7 @@ using ordercloud.integrations.library;
 namespace Marketplace.Models.Misc
 {
     [SwaggerModel]
-	public class MarketplaceUserType
+	public class HSUserType
 	{
 		public string UserGroupIDSuffix { get; set; }
 		public string UserGroupName { get; set; }

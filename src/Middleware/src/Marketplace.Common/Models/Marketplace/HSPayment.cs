@@ -8,13 +8,13 @@ using System.Text;
 namespace Marketplace.Common.Models.Marketplace
 {
     [SwaggerModel]
-    public class MarketplacePayment : Payment<PaymentXP, MarketplacePaymentTransaction>
+    public class HSPayment : Payment<PaymentXP, HSPaymentTransaction>
     {
 
     }
 
     [SwaggerModel]
-    public class MarketplacePaymentTransaction: PaymentTransaction<TransactionXP>
+    public class HSPaymentTransaction: PaymentTransaction<TransactionXP>
     {
 
     }

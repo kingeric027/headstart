@@ -10,7 +10,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Models.Models.Marketplace
 {
     [SwaggerModel]
-    public class MarketplaceSupplier : Supplier<SupplierXp>, IMarketplaceObject
+    public class HSSupplier : Supplier<SupplierXp>, IHSObject
     {
     }
 

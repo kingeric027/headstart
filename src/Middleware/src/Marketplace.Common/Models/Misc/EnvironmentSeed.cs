@@ -16,8 +16,8 @@ namespace Marketplace.Models.Misc
 		// the org will need to be created first in order to be seeded
 		public string SellerOrgID { get; set; }
 		[Required]
-		public List<MarketplaceSupplier> Suppliers { get; set; }
+		public List<HSSupplier> Suppliers { get; set; }
 		[Required]
-		public List<MarketplaceBuyer> Buyers { get; set; }
+		public List<HSBuyer> Buyers { get; set; }
 	}
 }

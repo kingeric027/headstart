@@ -5,18 +5,18 @@ using System.Collections.Generic;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceCatalog : UserGroup<CatalogXp>, IMarketplaceObject
+    public class HSCatalog : UserGroup<CatalogXp>, IHSObject
     {
     }
 
     [SwaggerModel]
-    public class PartialMarketplaceCatalog : PartialUserGroup<CatalogXp>
+    public class PartialHSCatalog : PartialUserGroup<CatalogXp>
     {
     }
 
     // potentially use this for the api later
     [SwaggerModel]
-    public class MarketplaceCatalogAssignment : IMarketplaceObject
+    public class HSCatalogAssignment : IHSObject
     {
         // ID not used but to get marketplaceobject extension working for now
         public string ID { get; set; }
@@ -25,7 +25,7 @@ namespace Marketplace.Models
     }
 
     [SwaggerModel]
-    public class MarketplaceCatalogAssignmentRequest
+    public class HSCatalogAssignmentRequest
     {
         public List<string> CatalogIDs { get; set;}
     }

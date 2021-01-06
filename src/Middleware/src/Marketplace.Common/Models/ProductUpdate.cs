@@ -26,7 +26,7 @@ namespace Marketplace.Common.Models
         public string ResourceID { get; set; }
         public ActionType Action { get; set; }
 
-        public MarketplaceProduct Resource { get; set; }
+        public HSProduct Resource { get; set; }
         public DateTime DateLastUpdated { get; set; }
     }
 

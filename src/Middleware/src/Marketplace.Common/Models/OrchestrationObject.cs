@@ -10,7 +10,7 @@ namespace Marketplace.Common.Models
         string ClientId { get; set; }
     }
 
-    public class OrchestrationObject<T> : IOrchestrationObject<T> where T : IMarketplaceObject
+    public class OrchestrationObject<T> : IOrchestrationObject<T> where T : IHSObject
     {
         [Required]
         [RegularExpression("^[a-zA-Z0-9-_]*$", ErrorMessage = "IDs must have at least 8 characters and no more than 100, are required and can only contain characters Aa-Zz, 0-9, -, and _")]
@@ -19,6 +19,6 @@ namespace Marketplace.Common.Models
         public string ID { get; set; }
         public string Token { get; set; }
         public string ClientId { get; set; }
-        public IMarketplaceObject Model { get; set; }
+        public IHSObject Model { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace Marketplace.Common.Commands
             {
                 obj.ID = wi.RecordId;
                 var ps = await _oc.PriceSchedules.CreateAsync(obj.PriceSchedule, wi.Token);
-                var product = await _oc.Products.CreateAsync<MarketplaceProduct>(obj.Product, wi.Token);
+                var product = await _oc.Products.CreateAsync<HSProduct>(obj.Product, wi.Token);
                await _oc.Products.SaveAssignmentAsync(new ProductAssignment()
                 {
                     ProductID = product.ID,
@@ -47,9 +47,9 @@ namespace Marketplace.Common.Commands
                 // attempt to generate variants if option is set
                 if (specs.Any(s => s.DefinesVariant))
                 {
-                    await _oc.Products.GenerateVariantsAsync<MarketplaceProduct>(product.ID, true, wi.Token);
+                    await _oc.Products.GenerateVariantsAsync<HSProduct>(product.ID, true, wi.Token);
                 }
-                var variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, wi.Token);
+                var variants = await _oc.Products.ListVariantsAsync<HSVariant>(product.ID, null, null, null, 1, 100, null, wi.Token);
                 //var _images = GetProductImages(id, user);
                 //var _attachments = GetProductAttachments(id, user);
                 return JObject.FromObject(new SuperMarketplaceProduct
@@ -146,10 +146,10 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var product = await _oc.Products.GetAsync<MarketplaceProduct>(wi.RecordId, wi.Token);
+                var product = await _oc.Products.GetAsync<HSProduct>(wi.RecordId, wi.Token);
                 var priceSchedule = _oc.PriceSchedules.GetAsync<PriceSchedule>(product.DefaultPriceScheduleID, wi.Token);
                 var specs = _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, wi.Token);
-                var variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, wi.Token);
+                var variants = _oc.Products.ListVariantsAsync<HSVariant>(product.ID, null, null, null, 1, 100, null, wi.Token);
                 //var _images = GetProductImages(id, user);
                 //var _attachments = GetProductAttachments(id, user);
                 return JObject.FromObject(new SuperMarketplaceProduct

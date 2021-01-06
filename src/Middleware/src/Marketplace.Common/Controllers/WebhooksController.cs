@@ -33,7 +33,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("productcreated")]
         [OrderCloudWebhookAuth]
-        public async void HandleProductCreation([FromBody] MarketplaceProductCreatePayload payload)
+        public async void HandleProductCreation([FromBody] HSProductCreatePayload payload)
         {
             var update = new ProductHistory()
             {
@@ -46,7 +46,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("productupdated")]
         [OrderCloudWebhookAuth]
-        public async void HandleProductUpdate([FromBody] MarketplaceProductUpdatePayload payload)
+        public async void HandleProductUpdate([FromBody] HSProductUpdatePayload payload)
         {
             Console.WriteLine(payload);
             var update = new ProductHistory()

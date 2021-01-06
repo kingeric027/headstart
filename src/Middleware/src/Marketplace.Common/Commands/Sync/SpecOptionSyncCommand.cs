@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpecOption>();
+            var obj = wi.Current.ToObject<HSSpecOption>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpecOption>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<HSSpecOption>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -112,7 +112,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.Specs.GetOptionAsync(wi.Current.ToObject<MarketplaceSpecOption>().xp.SpecID, wi.RecordId, wi.Token);
+                var response = await _oc.Specs.GetOptionAsync(wi.Current.ToObject<HSSpecOption>().xp.SpecID, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

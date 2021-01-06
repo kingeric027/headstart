@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceUser>();
+            var obj = wi.Current.ToObject<HSUser>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceUser>();
+            var obj = JObject.FromObject(wi.Current).ToObject<HSUser>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;

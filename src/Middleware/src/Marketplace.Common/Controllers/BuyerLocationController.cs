@@ -27,14 +27,14 @@ namespace Marketplace.Common.Controllers
 
         [DocName("GET a Buyer Location")]
         [HttpGet, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID)
+        public async Task<HSBuyerLocation> Get(string buyerID, string buyerLocationID)
         {
             return await _buyerLocationCommand.Get(buyerID, buyerLocationID, VerifiedUserContext);
         }
 
         [DocName("POST a Buyer Location")]
         [HttpPost, Route("{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task<MarketplaceBuyerLocation> Create(string buyerID, [FromBody] MarketplaceBuyerLocation buyerLocation)
+        public async Task<HSBuyerLocation> Create(string buyerID, [FromBody] HSBuyerLocation buyerLocation)
         {
             // ocAuth is the token for the organization that is specified in the AppSettings
             var ocAuth = await _oc.AuthenticateAsync();
@@ -43,7 +43,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("PUT a Buyer Location")]
         [HttpPut, Route("{buyerID}/{buyerLocationID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin, ApiRole.AddressAdmin)]
-        public async Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, [FromBody] MarketplaceBuyerLocation buyerLocation)
+        public async Task<HSBuyerLocation> Save(string buyerID, string buyerLocationID, [FromBody] HSBuyerLocation buyerLocation)
         {
             return await _buyerLocationCommand.Save(buyerID, buyerLocationID, buyerLocation, VerifiedUserContext);
         }
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("LIST orders for a specific location as a buyer, ensures user has access to location orders")]
         [HttpGet, Route("{buyerID}/{buyerLocationID}/users"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-        public async Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string buyerLocationID, ListArgs<MarketplaceOrder> listArgs)
+        public async Task<ListPage<HSUser>> ListLocationUsers(string buyerID, string buyerLocationID, ListArgs<HSOrder> listArgs)
         {
             return await _locationPermissionCommand.ListLocationUsers(buyerID, buyerLocationID, VerifiedUserContext);
         }
@@ -114,14 +114,14 @@ namespace Marketplace.Common.Controllers
 
         [DocName("LIST user groups for home country")]
         [HttpGet, Route("{buyerID}/usergroups/{userID}"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID)
+        public async Task<ListPage<HSLocationUserGroup>> ListUserGroupsByCountry(ListArgs<HSLocationUserGroup> args, string buyerID, string userID)
         {
             return await _locationPermissionCommand.ListUserGroupsByCountry(args, buyerID, userID, VerifiedUserContext);
         }
 
         [DocName("LIST user groups for new user")]
         [HttpGet, Route("{buyerID}/{homeCountry}/usergroups"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry)
+        public async Task<ListPage<HSLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<HSLocationUserGroup> args, string buyerID, string homeCountry)
         {
             return await _locationPermissionCommand.ListUserGroupsForNewUser(args, buyerID, homeCountry, VerifiedUserContext);
         }

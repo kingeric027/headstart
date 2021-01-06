@@ -23,7 +23,7 @@ namespace Marketplace.Common.Commands
 {
     public interface IPostSubmitCommand
     {
-        Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet order);
+        Task<OrderSubmitResponse> HandleBuyerOrderSubmit(HSOrderWorksheet order);
         Task<OrderSubmitResponse> HandleZohoRetry(string orderID);
         Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user);
     }
@@ -56,7 +56,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<OrderSubmitResponse> HandleShippingValidate(string orderID, VerifiedUserContext user)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
             return await CreateOrderSubmitResponse(
                 new List<ProcessResult>() { new ProcessResult()
                 {
@@ -66,21 +66,21 @@ namespace Marketplace.Common.Commands
                         "Validate Shipping",
                         ValidateShipping(worksheet)) }
                 }},
-                new List<MarketplaceOrder> { worksheet.Order });
+                new List<HSOrder> { worksheet.Order });
         }
 
         public async Task<OrderSubmitResponse> HandleZohoRetry(string orderID)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
-            var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Outgoing,
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
+            var supplierOrders = await Throttler.RunAsync(worksheet.LineItems.GroupBy(g => g.SupplierID).Select(s => s.Key), 100, 10, item => _oc.Orders.GetAsync<HSOrder>(OrderDirection.Outgoing,
                 $"{worksheet.Order.ID}-{item}"));
 
             return await CreateOrderSubmitResponse(
                 new List<ProcessResult>() { await this.PerformZohoTasks(worksheet, supplierOrders) }, 
-                new List<MarketplaceOrder> { worksheet.Order });
+                new List<HSOrder> { worksheet.Order });
         }
 
-        private async Task<ProcessResult> PerformZohoTasks(MarketplaceOrderWorksheet worksheet, IList<MarketplaceOrder> supplierOrders)
+        private async Task<ProcessResult> PerformZohoTasks(HSOrderWorksheet worksheet, IList<HSOrder> supplierOrders)
         {
             var (salesAction, zohoSalesOrder) = await ProcessActivityCall(
                 ProcessType.Accounting,
@@ -103,7 +103,7 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(MarketplaceOrderWorksheet orderWorksheet)
+        public async Task<OrderSubmitResponse> HandleBuyerOrderSubmit(HSOrderWorksheet orderWorksheet)
         {
             var results = new List<ProcessResult>();
 
@@ -116,17 +116,17 @@ namespace Marketplace.Common.Commands
             });
             // step 1 failed. we don't want to attempt the integrations. return error for further action
             if (activities.Any(a => !a.Success))
-                return await CreateOrderSubmitResponse(results, new List<MarketplaceOrder> { orderWorksheet.Order });
+                return await CreateOrderSubmitResponse(results, new List<HSOrder> { orderWorksheet.Order });
             
             // STEP 2 (integrations)
             var integrations = await HandleIntegrations(supplierOrders, buyerOrder);
             results.AddRange(integrations);
 
             // STEP 3: return OrderSubmitResponse
-            return await CreateOrderSubmitResponse(results, new List<MarketplaceOrder> { orderWorksheet.Order });
+            return await CreateOrderSubmitResponse(results, new List<HSOrder> { orderWorksheet.Order });
         }
 
-        private async Task<List<ProcessResult>> HandleIntegrations(List<MarketplaceOrder> supplierOrders, MarketplaceOrderWorksheet orderWorksheet)
+        private async Task<List<ProcessResult>> HandleIntegrations(List<HSOrder> supplierOrders, HSOrderWorksheet orderWorksheet)
         {
             // STEP 1: SendGrid notifications
             var results = new List<ProcessResult>();
@@ -172,7 +172,7 @@ namespace Marketplace.Common.Commands
             return results;
         }
         
-        private async Task<OrderSubmitResponse> CreateOrderSubmitResponse(List<ProcessResult> processResults, List<MarketplaceOrder> ordersRelatingToProcess)
+        private async Task<OrderSubmitResponse> CreateOrderSubmitResponse(List<ProcessResult> processResults, List<HSOrder> ordersRelatingToProcess)
         {
             try
             {
@@ -209,7 +209,7 @@ namespace Marketplace.Common.Commands
             }
         }
         
-        private async Task UpdateOrderNeedingAttention(IList<MarketplaceOrder> orders, bool isError)
+        private async Task UpdateOrderNeedingAttention(IList<HSOrder> orders, bool isError)
         {
             var partialOrder = new PartialOrder() { xp = new { NeedsAttention = isError } };
 
@@ -313,7 +313,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async Task<Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet, List<ProcessResultAction>>> HandlingForwarding(MarketplaceOrderWorksheet orderWorksheet)
+        private async Task<Tuple<List<HSOrder>, HSOrderWorksheet, List<ProcessResultAction>>> HandlingForwarding(HSOrderWorksheet orderWorksheet)
         {
             var activities = new List<ProcessResultAction>();
             // forwarding
@@ -337,15 +337,15 @@ namespace Marketplace.Common.Commands
             var (getAction, marketplaceOrderWorksheet) = await ProcessActivityCall(
                 ProcessType.Forwarding, 
                 "Get Updated Order Worksheet",
-                _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderWorksheet.Order.ID));
+                _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderWorksheet.Order.ID));
             activities.Add(getAction);
 
-            return await Task.FromResult(new Tuple<List<MarketplaceOrder>, MarketplaceOrderWorksheet, List<ProcessResultAction>>(marketplaceOrders, marketplaceOrderWorksheet, activities));
+            return await Task.FromResult(new Tuple<List<HSOrder>, HSOrderWorksheet, List<ProcessResultAction>>(marketplaceOrders, marketplaceOrderWorksheet, activities));
         }
 
-        public  async Task<List<MarketplaceOrder>> CreateOrderRelationshipsAndTransferXP(MarketplaceOrderWorksheet buyerOrder, List<Order> supplierOrders)
+        public  async Task<List<HSOrder>> CreateOrderRelationshipsAndTransferXP(HSOrderWorksheet buyerOrder, List<Order> supplierOrders)
         {
-            var updatedSupplierOrders = new List<MarketplaceOrder>();
+            var updatedSupplierOrders = new List<HSOrder>();
             var supplierIDs = new List<string>();
             var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, buyerOrder.Order.ID, page: page, pageSize: 100));
             var shipFromAddressIDs = lineItems.DistinctBy(li => li.ShipFromAddressID).Select(li => li.ShipFromAddressID).ToList();
@@ -354,7 +354,7 @@ namespace Marketplace.Common.Commands
             {
                 supplierIDs.Add(supplierOrder.ToCompanyID);
                 var shipFromAddressIDsForSupplierOrder = shipFromAddressIDs.Where(addressID => addressID != null && addressID.Contains(supplierOrder.ToCompanyID)).ToList();
-                var supplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierOrder.ToCompanyID);
+                var supplier = await _oc.Suppliers.GetAsync<HSSupplier>(supplierOrder.ToCompanyID);
                 var suppliersShipEstimates = buyerOrder.ShipEstimateResponse?.ShipEstimates?.Where(se => se.xp.SupplierID == supplier.ID);
                 var supplierOrderPatch = new PartialOrder() {
                     ID = $"{buyerOrder.Order.ID}-{supplierOrder.ToCompanyID}",
@@ -371,7 +371,7 @@ namespace Marketplace.Common.Commands
                         SelectedShipMethodsSupplierView = suppliersShipEstimates != null ? MapSelectedShipMethod(suppliersShipEstimates) : null
                     }
                 };
-                var updatedSupplierOrder = await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
+                var updatedSupplierOrder = await _oc.Orders.PatchAsync<HSOrder>(OrderDirection.Outgoing, supplierOrder.ID, supplierOrderPatch);
                 var supplierLineItems = lineItems.Where(li => li.SupplierID == supplier.ID).ToList();
                 await SaveShipMethodByLineItem(supplierLineItems, supplierOrderPatch.xp.SelectedShipMethodsSupplierView, buyerOrder.Order.ID);
                 updatedSupplierOrders.Add(updatedSupplierOrder);
@@ -393,7 +393,7 @@ namespace Marketplace.Common.Commands
             return updatedSupplierOrders;
         }
 
-        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<MarketplaceShipEstimate> shipEstimates)
+        private List<ShipMethodSupplierView> MapSelectedShipMethod(IEnumerable<HSShipEstimate> shipEstimates)
 		{
             var selectedShipMethods = shipEstimates.Select(shipEstimate =>
             {
@@ -411,14 +411,14 @@ namespace Marketplace.Common.Commands
         private async Task HandleTaxTransactionCreationAsync(OrderWorksheet orderWorksheet)
         {
             var transaction = await _avalara.CreateTransactionAsync(orderWorksheet);
-            await _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
+            await _oc.Orders.PatchAsync<HSOrder>(OrderDirection.Incoming, orderWorksheet.Order.ID, new PartialOrder()
             {
                 TaxCost = transaction.totalTax ?? 0,  // Set this again just to make sure we have the most up to date info
                 xp = new { AvalaraTaxTransactionCode = transaction.code }
             });
         }
 
-        private static async Task ValidateShipping(MarketplaceOrderWorksheet orderWorksheet)
+        private static async Task ValidateShipping(HSOrderWorksheet orderWorksheet)
         {
             if(orderWorksheet.ShipEstimateResponse.HttpStatusCode != 200)
                 throw new Exception(orderWorksheet.ShipEstimateResponse.UnhandledErrorBody);

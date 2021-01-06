@@ -20,7 +20,7 @@ namespace Marketplace.Common.Controllers
 		[Route("shippingrates")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
-		public async Task<ShipEstimateResponse> GetShippingRates([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)
+		public async Task<ShipEstimateResponse> GetShippingRates([FromBody] HSOrderCalculatePayload orderCalculatePayload)
 		{
 			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
@@ -30,7 +30,7 @@ namespace Marketplace.Common.Controllers
         [Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
-		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] MarketplaceOrderCalculatePayload orderCalculatePayload)
+		public async Task<OrderCalculateResponse> CalculateOrder([FromBody] HSOrderCalculatePayload orderCalculatePayload)
 		{
 			var orderCalculationResponse = await _checkoutIntegrationCommand.CalculateOrder(orderCalculatePayload);
 			return orderCalculationResponse;
@@ -46,7 +46,7 @@ namespace Marketplace.Common.Controllers
 
 		[HttpPost, Route("ordersubmit")]
 		[OrderCloudWebhookAuth]
-		public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] MarketplaceOrderCalculatePayload payload)
+		public async Task<OrderSubmitResponse> HandleOrderSubmit([FromBody] HSOrderCalculatePayload payload)
 		{
 			var response = await _postSubmitCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
 			return response;
@@ -61,7 +61,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("orderapproved")]
 		[OrderCloudWebhookAuth]
-		public async Task<OrderSubmitResponse> HandleOrderApproved([FromBody] MarketplaceOrderCalculatePayload payload)
+		public async Task<OrderSubmitResponse> HandleOrderApproved([FromBody] HSOrderCalculatePayload payload)
 		{
 			var response = await _postSubmitCommand.HandleBuyerOrderSubmit(payload.OrderWorksheet);
 			return response;

@@ -4,7 +4,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceCostCenter : CostCenter<CostCenterXp>, IMarketplaceObject
+    public class HSCostCenter : CostCenter<CostCenterXp>, IHSObject
     {
         
     }

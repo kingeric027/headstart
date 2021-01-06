@@ -4,7 +4,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceSpecOption : SpecOption<SpecOptionXp>, IMarketplaceObject
+    public class HSSpecOption : SpecOption<SpecOptionXp>, IHSObject
     {
     }
 

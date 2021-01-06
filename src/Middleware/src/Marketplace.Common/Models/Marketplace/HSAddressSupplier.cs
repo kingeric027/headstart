@@ -5,7 +5,7 @@ using ordercloud.integrations.library;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceAddressSupplier : Address<SupplierAddressXP>, IMarketplaceObject
+    public class HSAddressSupplier : Address<SupplierAddressXP>, IHSObject
     {
     }
 

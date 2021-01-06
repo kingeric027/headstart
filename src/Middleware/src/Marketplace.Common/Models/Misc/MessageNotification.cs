@@ -19,10 +19,10 @@ namespace Marketplace.Models.Misc
 
     public class OrderSubmitEventBody
     {
-        public MarketplaceOrder Order { get; set; }
+        public HSOrder Order { get; set; }
         public List<OrderApproval> Approvals { get; set; }
-        public List<MarketplaceLineItem> LineItems { get; set; }
-        public List<MarketplaceProduct> Products { get; set; }
+        public List<HSLineItem> LineItems { get; set; }
+        public List<HSProduct> Products { get; set; }
     }
     public class PasswordResetEventBody
     {
@@ -48,7 +48,7 @@ namespace Marketplace.Models.Misc
 
     public class ContactSupplierBody
     {
-        public MarketplaceProduct Product { get; set; }
+        public HSProduct Product { get; set; }
         public BuyerRequestForInfo BuyerRequest { get; set; }
 
     }

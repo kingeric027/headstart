@@ -82,10 +82,10 @@ namespace Marketplace.Tests
         public async Task TestOrderSubmitEmail()
         {
             var orderWorksheet = GetOrderWorksheet();
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier1ID}").Returns(GetSupplierWorksheet(TestConstants.supplier1ID, TestConstants.lineItem1ID, TestConstants.lineItem1Total));
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier2ID}").Returns(GetSupplierWorksheet(TestConstants.supplier2ID, TestConstants.lineItem2ID, TestConstants.lineItem2Total));
-            _oc.Suppliers.ListAsync<MarketplaceSupplier>(Arg.Any<string>()).ReturnsForAnyArgs(Task.FromResult(GetSupplierList()));
-            _oc.AdminUsers.ListAsync<MarketplaceSellerUser>().ReturnsForAnyArgs(Task.FromResult(GetSellerUserList()));
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier1ID}").Returns(GetSupplierWorksheet(TestConstants.supplier1ID, TestConstants.lineItem1ID, TestConstants.lineItem1Total));
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Outgoing, $"{TestConstants.orderID}-{TestConstants.supplier2ID}").Returns(GetSupplierWorksheet(TestConstants.supplier2ID, TestConstants.lineItem2ID, TestConstants.lineItem2Total));
+            _oc.Suppliers.ListAsync<HSSupplier>(Arg.Any<string>()).ReturnsForAnyArgs(Task.FromResult(GetSupplierList()));
+            _oc.AdminUsers.ListAsync<HSSellerUser>().ReturnsForAnyArgs(Task.FromResult(GetSellerUserList()));
             var _commandSub = Substitute.ForPartsOf<SendgridService>(_settings, _oc, _sendGridClient);
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmailMultipleRcpts(default, default, default, default)).DoNotCallBase();
             _commandSub.Configure().WhenForAnyArgs(x => x.SendSingleTemplateEmail(default, default, default, default)).DoNotCallBase();
@@ -146,7 +146,7 @@ namespace Marketplace.Tests
         }
 
 
-        private MarketplaceOrderWorksheet GetOrderWorksheet()
+        private HSOrderWorksheet GetOrderWorksheet()
         {
             Fixture fixture = new Fixture();
 
@@ -179,19 +179,19 @@ namespace Marketplace.Tests
             TaxResponse.lines = lines;
             OrderCalculateXp.TaxResponse = TaxResponse;
 
-            return new MarketplaceOrderWorksheet()
+            return new HSOrderWorksheet()
             {
-                Order = new MarketplaceOrder()
+                Order = new HSOrder()
                 {
                     ID = TestConstants.orderID,
-                    FromUser = new MarketplaceUser()
+                    FromUser = new HSUser()
                     {
                         FirstName = "john",
                         LastName = "johnson",
                         Email = TestConstants.buyerEmail
                     },
                     BillingAddressID = "testbillingaddressid",
-                    BillingAddress = fixture.Create<MarketplaceAddressBuyer>(),
+                    BillingAddress = fixture.Create<HSAddressBuyer>(),
                     xp = new OrderXp()
                     {
                         OrderType = OrderType.Standard,
@@ -204,65 +204,65 @@ namespace Marketplace.Tests
                     },
                     DateSubmitted = new DateTimeOffset()
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem()
+                    new HSLineItem()
                     {
                         ID = TestConstants.lineItem1ID,
                         ProductID = TestConstants.product1ID,
                         Quantity=1,
                         LineTotal = TestConstants.lineItem1Total,
-                        Product = new MarketplaceLineItemProduct()
+                        Product = new HSLineItemProduct()
                         {
                             Name=TestConstants.product1Name
                         },
-                        ShippingAddress = fixture.Create<MarketplaceAddressBuyer>(),
+                        ShippingAddress = fixture.Create<HSAddressBuyer>(),
                         xp = fixture.Create<LineItemXp>(),
                     },
-                    new MarketplaceLineItem()
+                    new HSLineItem()
                     {
                         ID = TestConstants.lineItem2ID,
                         ProductID = TestConstants.product2ID,
                         Quantity=1,
                         LineTotal = TestConstants.lineItem2Total,
-                        Product = new MarketplaceLineItemProduct()
+                        Product = new HSLineItemProduct()
                         {
                             Name=TestConstants.product2Name
                         },
-                        ShippingAddress = fixture.Create<MarketplaceAddressBuyer>(),
+                        ShippingAddress = fixture.Create<HSAddressBuyer>(),
                         xp = fixture.Create<LineItemXp>()
                     }
                 },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse()
+                ShipEstimateResponse = new HSShipEstimateResponse()
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate()
+                        new HSShipEstimate()
                         {
                             SelectedShipMethodID=TestConstants.selectedShipMethod1ID,
                             xp = shipEstimatexp1,
-                            ShipMethods = new List<MarketplaceShipMethod>()
+                            ShipMethods = new List<HSShipMethod>()
                             {
-                                new MarketplaceShipMethod()
+                                new HSShipMethod()
                                 {
                                     ID=TestConstants.selectedShipMethod1ID,
                                     Cost=TestConstants.selectedShipMethod1Cost
                                 },
-                                fixture.Create<MarketplaceShipMethod>()
+                                fixture.Create<HSShipMethod>()
                             }
                         },
-                        new MarketplaceShipEstimate()
+                        new HSShipEstimate()
                         {
                             SelectedShipMethodID=TestConstants.selectedShipMethod2ID,
                             xp = shipEstimatexp2,
-                            ShipMethods = new List<MarketplaceShipMethod>()
+                            ShipMethods = new List<HSShipMethod>()
                             {
-                                new MarketplaceShipMethod()
+                                new HSShipMethod()
                                 {
                                     ID=TestConstants.selectedShipMethod2ID,
                                     Cost=TestConstants.selectedShipMethod2Cost
                                 },
-                                fixture.Create<MarketplaceShipMethod>()
+                                fixture.Create<HSShipMethod>()
                             }
                         }
                     }
@@ -274,42 +274,42 @@ namespace Marketplace.Tests
             };
         }
 
-        private MarketplaceOrderWorksheet GetSupplierWorksheet(string supplierID, string lineItemID, decimal total)
+        private HSOrderWorksheet GetSupplierWorksheet(string supplierID, string lineItemID, decimal total)
         {
             Fixture fixture = new Fixture();
-            return new MarketplaceOrderWorksheet()
+            return new HSOrderWorksheet()
             {
-                Order = new MarketplaceOrder()
+                Order = new HSOrder()
                 {
                     ID = $"{TestConstants.orderID}-{supplierID}",
                     Total = total
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem()
+                    new HSLineItem()
                     {
                         ID = lineItemID,
                         Quantity =1,
                         LineTotal=total,
                         ProductID = lineItemID == TestConstants.lineItem1ID ? TestConstants.product1ID : TestConstants.product2ID,
-                        Product = new MarketplaceLineItemProduct()
+                        Product = new HSLineItemProduct()
                         {
                             Name = lineItemID == TestConstants.lineItem1ID ? TestConstants.product1Name : TestConstants.product2Name
                         },
                         xp = fixture.Create<LineItemXp>(),
-                        ShippingAddress = fixture.Create<MarketplaceAddressBuyer>()
+                        ShippingAddress = fixture.Create<HSAddressBuyer>()
                     }
                 }
             };
         }
 
-        private ListPage<MarketplaceSupplier> GetSupplierList()
+        private ListPage<HSSupplier> GetSupplierList()
         {
-            return new ListPage<MarketplaceSupplier>()
+            return new ListPage<HSSupplier>()
             {
-                Items = new List<MarketplaceSupplier>()
+                Items = new List<HSSupplier>()
                 {
-                    new MarketplaceSupplier()
+                    new HSSupplier()
                     {
                         ID = TestConstants.supplier1ID,
                         xp = new SupplierXp()
@@ -317,7 +317,7 @@ namespace Marketplace.Tests
                             NotificationRcpts = TestConstants.supplier1NotificationRcpts.ToList()
                         }
                     },
-                    new MarketplaceSupplier()
+                    new HSSupplier()
                     {
                         ID = TestConstants.supplier2ID,
                         xp = new SupplierXp()
@@ -329,13 +329,13 @@ namespace Marketplace.Tests
             };
         }
 
-        private ListPage<MarketplaceSellerUser> GetSellerUserList()
+        private ListPage<HSSellerUser> GetSellerUserList()
         {
-            return new ListPage<MarketplaceSellerUser>()
+            return new ListPage<HSSellerUser>()
             {
-                Items = new List<MarketplaceSellerUser>()
+                Items = new List<HSSellerUser>()
                 {
-                    new MarketplaceSellerUser()
+                    new HSSellerUser()
                     {
                         ID="selleruser1",
                         Email=TestConstants.sellerUser1email,
@@ -345,7 +345,7 @@ namespace Marketplace.Tests
                             AddtlRcpts = TestConstants.sellerUser1AdditionalRcpts.ToList()
                         }
                     },
-                    new MarketplaceSellerUser()
+                    new HSSellerUser()
                     {
                         ID="selleruser1",
                         Email=TestConstants.selleruser2email,

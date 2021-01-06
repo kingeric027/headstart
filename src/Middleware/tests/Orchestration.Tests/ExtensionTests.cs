@@ -14,7 +14,7 @@ namespace Orchestration.Tests
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
-        public void build_path<T>(RecordType type, T obj) where T : IMarketplaceObject
+        public void build_path<T>(RecordType type, T obj) where T : IHSObject
         {
             var model = new OrchestrationObject<T>()
             {
@@ -28,7 +28,7 @@ namespace Orchestration.Tests
         }
 
         [Test, TestCaseSource(typeof(TypeFactory), nameof(TypeFactory.TestCases))]
-        public void test_type_deriver<T>(RecordType type, T obj) where T : IMarketplaceObject
+        public void test_type_deriver<T>(RecordType type, T obj) where T : IHSObject
         {
             Assert.AreEqual(type, obj.Type());
         }
@@ -40,55 +40,55 @@ namespace Orchestration.Tests
         {
             get
             {
-                yield return new TestCaseData(RecordType.Product, new MarketplaceProduct()
+                yield return new TestCaseData(RecordType.Product, new HSProduct()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.ProductFacet, new MarketplaceProductFacet()
+                yield return new TestCaseData(RecordType.ProductFacet, new HSProductFacet()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.SpecProductAssignment, new MarketplaceSpecProductAssignment()
+                yield return new TestCaseData(RecordType.SpecProductAssignment, new HSSpecProductAssignment()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.PriceSchedule, new MarketplacePriceSchedule()
+                yield return new TestCaseData(RecordType.PriceSchedule, new HSPriceSchedule()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Spec, new MarketplaceSpec()
+                yield return new TestCaseData(RecordType.Spec, new HSSpec()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.SpecOption, new MarketplaceSpecOption()
+                yield return new TestCaseData(RecordType.SpecOption, new HSSpecOption()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Buyer, new MarketplaceBuyer()
+                yield return new TestCaseData(RecordType.Buyer, new HSBuyer()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.User, new MarketplaceUser()
+                yield return new TestCaseData(RecordType.User, new HSUser()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.UserGroup, new MarketplaceUserGroup()
+                yield return new TestCaseData(RecordType.UserGroup, new HSUserGroup()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.UserGroupAssignment, new MarketplaceUserGroupAssignment()
+                yield return new TestCaseData(RecordType.UserGroupAssignment, new HSUserGroupAssignment()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.CostCenter, new MarketplaceCostCenter()
+                yield return new TestCaseData(RecordType.CostCenter, new HSCostCenter()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.Address, new MarketplaceAddressBuyer()
+                yield return new TestCaseData(RecordType.Address, new HSAddressBuyer()
                 {
                     ID = "id"
                 });
-                yield return new TestCaseData(RecordType.AddressAssignment, new MarketplaceAddressAssignment()
+                yield return new TestCaseData(RecordType.AddressAssignment, new HSAddressAssignment()
                 {
                     ID = "id"
                 });

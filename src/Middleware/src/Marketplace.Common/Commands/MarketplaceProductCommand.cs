@@ -19,14 +19,14 @@ namespace Marketplace.Common.Commands.Crud
 	public interface IMarketplaceProductCommand
 	{
 		Task<SuperMarketplaceProduct> Get(string id, string token);
-		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, string token);
+		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<HSProduct> args, string token);
 		Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
 		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, string token);
 		Task Delete(string id, string token);
-		Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, string token);
+		Task<HSPriceSchedule> GetPricingOverride(string id, string buyerID, string token);
 		Task DeletePricingOverride(string id, string buyerID, string token);
-		Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, string token);
-		Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule pricingOverride, string token);
+		Task<HSPriceSchedule> UpdatePricingOverride(string id, string buyerID, HSPriceSchedule pricingOverride, string token);
+		Task<HSPriceSchedule> CreatePricingOverride(string id, string buyerID, HSPriceSchedule pricingOverride, string token);
 		Task<List<Asset>> GetProductImages(string productID, string token);
 		Task<List<Asset>> GetProductAttachments(string productID, string token);
 		Task<Product> FilterOptionOverride(string id, string supplierID, IDictionary<string, object> facets, VerifiedUserContext user);
@@ -51,10 +51,10 @@ namespace Marketplace.Common.Commands.Crud
 			_apiClientHelper = apiClientHelper;
 		}
 
-		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID, string token)
+		public async Task<HSPriceSchedule> GetPricingOverride(string id, string buyerID, string token)
 		{
 			var priceScheduleID = $"{id}-{buyerID}";
-			var priceSchedule = await _oc.PriceSchedules.GetAsync<MarketplacePriceSchedule>(priceScheduleID);
+			var priceSchedule = await _oc.PriceSchedules.GetAsync<HSPriceSchedule>(priceScheduleID);
 			return priceSchedule;
 		}
 
@@ -69,20 +69,20 @@ namespace Marketplace.Common.Commands.Crud
 			await _oc.PriceSchedules.DeleteAsync(priceScheduleID);
 		}
 
-		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, string token)
+		public async Task<HSPriceSchedule> CreatePricingOverride(string id, string buyerID, HSPriceSchedule priceSchedule, string token)
 		{
 			/* must add the price schedule to the visibility assignments */
 			var priceScheduleID = $"{id}-{buyerID}";
 			priceSchedule.ID = priceScheduleID;
-			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(priceScheduleID, priceSchedule);
+			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<HSPriceSchedule>(priceScheduleID, priceSchedule);
 			await AddPriceScheduleAssignmentToProductCatalogAssignments(id, buyerID, priceScheduleID);
 			return newPriceSchedule;
 		}
 
-		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, MarketplacePriceSchedule priceSchedule, string token)
+		public async Task<HSPriceSchedule> UpdatePricingOverride(string id, string buyerID, HSPriceSchedule priceSchedule, string token)
 		{
 			var priceScheduleID = $"{id}-{buyerID}";
-			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<MarketplacePriceSchedule>(priceScheduleID, priceSchedule);
+			var newPriceSchedule = await _oc.PriceSchedules.SaveAsync<HSPriceSchedule>(priceScheduleID, priceSchedule);
 			return newPriceSchedule;
 		}
 
@@ -131,7 +131,7 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task<SuperMarketplaceProduct> Get(string id, string token)
 		{
-			var _product = await _oc.Products.GetAsync<MarketplaceProduct>(id, token);
+			var _product = await _oc.Products.GetAsync<HSProduct>(id, token);
 			// Get the price schedule, if it exists, if not - send empty price schedule
 			var _priceSchedule = new PriceSchedule();
 			try
@@ -143,7 +143,7 @@ namespace Marketplace.Common.Commands.Crud
 				_priceSchedule = new PriceSchedule();
 			}
 			var _specs = _oc.Products.ListSpecsAsync(id, null, null, null, 1, 100, null, token);
-			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null, token);
+			var _variants = _oc.Products.ListVariantsAsync<HSVariant>(id, null, null, null, 1, 100, null, token);
 			var _images = GetProductImages(id, token);
 			var _attachments = GetProductAttachments(id, token);
 			try
@@ -164,9 +164,9 @@ namespace Marketplace.Common.Commands.Crud
 			}
 		}
 
-		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args, string token)
+		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<HSProduct> args, string token)
 		{
-			var _productsList = await _oc.Products.ListAsync<MarketplaceProduct>(
+			var _productsList = await _oc.Products.ListAsync<HSProduct>(
 				filters: args.ToFilterString(),
 				search: args.Search,
 				searchType: SearchType.ExactPhrasePrefix,
@@ -179,7 +179,7 @@ namespace Marketplace.Common.Commands.Crud
 			{
 				var priceSchedule = _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, token);
 				var _specs = _oc.Products.ListSpecsAsync(product.ID, null, null, null, 1, 100, null, token);
-				var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(product.ID, null, null, null, 1, 100, null, token);
+				var _variants = _oc.Products.ListVariantsAsync<HSVariant>(product.ID, null, null, null, 1, 100, null, token);
 				var _images = GetProductImages(product.ID, token);
 				var _attachments = GetProductAttachments(product.ID, token);
 				_superProductsList.Add(new SuperMarketplaceProduct
@@ -237,7 +237,7 @@ namespace Marketplace.Common.Commands.Crud
 			// Create Product
 			var supplierName = await GetSupplierNameForXpFacet(user.SupplierID, user.AccessToken);
 			superProduct.Product.xp.Facets.Add("supplier", new List<string>() { supplierName });
-			var _product = await _oc.Products.CreateAsync<MarketplaceProduct>(superProduct.Product, user.AccessToken);
+			var _product = await _oc.Products.CreateAsync<HSProduct>(superProduct.Product, user.AccessToken);
 			// Make Spec Product Assignments
 			await Throttler.RunAsync(superProduct.Specs, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = _product.ID, SpecID = s.ID }, accessToken: user.AccessToken));
 			// Generate Variants
@@ -251,7 +251,7 @@ namespace Marketplace.Common.Commands.Crud
 				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
 			});
 			// List Variants
-			var _variants = await _oc.Products.ListVariantsAsync<MarketplaceVariant>(_product.ID, accessToken: user.AccessToken);
+			var _variants = await _oc.Products.ListVariantsAsync<HSVariant>(_product.ID, accessToken: user.AccessToken);
 			// List Product Specs
 			var _specs = await _oc.Products.ListSpecsAsync<Spec>(_product.ID, accessToken: user.AccessToken);
 			// Return the SuperProduct
@@ -269,12 +269,12 @@ namespace Marketplace.Common.Commands.Crud
 		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, string token)
 		{
 			// Update the Product itself
-			var _updatedProduct = await _oc.Products.SaveAsync<MarketplaceProduct>(superProduct.Product.ID, superProduct.Product, token);
+			var _updatedProduct = await _oc.Products.SaveAsync<HSProduct>(superProduct.Product.ID, superProduct.Product, token);
 			// Two spec lists to compare (requestSpecs and existingSpecs)
 			IList<Spec> requestSpecs = superProduct.Specs.ToList();
 			IList<Spec> existingSpecs = (await _oc.Products.ListSpecsAsync(id, accessToken: token)).Items.ToList();
 			// Two variant lists to compare (requestVariants and existingVariants)
-			IList<MarketplaceVariant> requestVariants = superProduct.Variants;
+			IList<HSVariant> requestVariants = superProduct.Variants;
 			IList<Variant> existingVariants = (await _oc.Products.ListVariantsAsync(id, pageSize: 100, accessToken: token)).Items.ToList();
 			// Calculate differences in specs - specs to add, and specs to delete
 			var specsToAdd = requestSpecs.Where(s => !existingSpecs.Any(s2 => s2.ID == s.ID)).ToList();
@@ -356,7 +356,7 @@ namespace Marketplace.Common.Commands.Crud
 				tasks.Add(_priceScheduleReq);
 			}
 			// List Variants
-			var _variantsReq = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, pageSize: 100, accessToken: token);
+			var _variantsReq = _oc.Products.ListVariantsAsync<HSVariant>(id, pageSize: 100, accessToken: token);
 			tasks.Add(_variantsReq);
 			// List Product Specs
 			var _specsReq = _oc.Products.ListSpecsAsync<Spec>(id, accessToken: token);

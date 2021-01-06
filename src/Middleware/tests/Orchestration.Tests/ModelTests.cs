@@ -40,7 +40,7 @@ namespace Orchestration.Tests
         [Test]
         public void ensure_base_orchestration_object_id_required()
         {
-            var obj = typeof(IMarketplaceObject);
+            var obj = typeof(IHSObject);
             var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => obj.IsAssignableFrom(p));

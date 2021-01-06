@@ -101,11 +101,11 @@ namespace Marketplace.Common.Commands
 
         public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
-            MarketplaceProduct product = null;
+            HSProduct product = null;
             var token = await GetAdminToken();
             try
             {
-                product = await _oc.Products.GetAsync<MarketplaceProduct>(productID);
+                product = await _oc.Products.GetAsync<HSProduct>(productID);
 
             }
             catch (OrderCloudException ex)
@@ -137,7 +137,7 @@ namespace Marketplace.Common.Commands
                 };
                 try
                 {
-                    await ClientHelper.RunAction(configToUse, x => x.Products.PatchAsync<MarketplaceProduct>(productID, new PartialProduct() { Active = true }));
+                    await ClientHelper.RunAction(configToUse, x => x.Products.PatchAsync<HSProduct>(productID, new PartialProduct() { Active = true }));
                 }
                 catch (OrderCloudException ex)
                 {

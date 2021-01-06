@@ -4,14 +4,14 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class SuperMarketplaceBuyer
+    public class SuperHSBuyer
     {
-        public MarketplaceBuyer Buyer { get; set; }
+        public HSBuyer Buyer { get; set; }
         public BuyerMarkup Markup { get; set; }
     }
 
     [SwaggerModel]
-    public class MarketplaceBuyer : Buyer<BuyerXp>, IMarketplaceObject
+    public class HSBuyer : Buyer<BuyerXp>, IHSObject
     {
         
     }

@@ -48,63 +48,63 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST Catalog")]
         [HttpPost, Route("catalog"), OrderCloudIntegrationsAuth(ApiRole.CatalogAdmin)]
-        public async Task<MarketplaceCatalog> PostCatalog([FromBody] MarketplaceCatalog obj)
+        public async Task<HSCatalog> PostCatalog([FromBody] HSCatalog obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Product")]
         [HttpPost, Route("product"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceProduct> PostProduct([FromBody] MarketplaceProduct obj)
+        public async Task<HSProduct> PostProduct([FromBody] HSProduct obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Product Facet")]
         [HttpPost, Route("productfacet"), OrderCloudIntegrationsAuth(ApiRole.ProductFacetAdmin)]
-        public async Task<MarketplaceProductFacet> PostProductFacet([FromBody] MarketplaceProductFacet obj)
+        public async Task<HSProductFacet> PostProductFacet([FromBody] HSProductFacet obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Price Schedule")]
         [HttpPost, Route("priceschedule"), OrderCloudIntegrationsAuth(ApiRole.PriceScheduleAdmin)]
-        public async Task<MarketplacePriceSchedule> PostPriceSchedule([FromBody] MarketplacePriceSchedule obj)
+        public async Task<HSPriceSchedule> PostPriceSchedule([FromBody] HSPriceSchedule obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Product Assignment")]
         [HttpPost, Route("productassignment"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceProductAssignment> PostProductAssignment([FromBody] MarketplaceProductAssignment obj)
+        public async Task<HSProductAssignment> PostProductAssignment([FromBody] HSProductAssignment obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Spec")]
         [HttpPost, Route("spec"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceSpec> PostSpec([FromBody] MarketplaceSpec obj)
+        public async Task<HSSpec> PostSpec([FromBody] HSSpec obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Spec Option")]
         [HttpPost, Route("specoption"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceSpecOption> PostSpecOption([FromBody] MarketplaceSpecOption obj)
+        public async Task<HSSpecOption> PostSpecOption([FromBody] HSSpecOption obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Spec Product Assignment")]
         [HttpPost, Route("specproductassignment"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<MarketplaceSpecProductAssignment> PostSpecProductAssignment([FromBody] MarketplaceSpecProductAssignment obj, string clientId)
+        public async Task<HSSpecProductAssignment> PostSpecProductAssignment([FromBody] HSSpecProductAssignment obj, string clientId)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }
 
         [DocName("POST Catalog Product Assignment")]
         [HttpPost, Route("catalogproductassignment"), OrderCloudIntegrationsAuth(ApiRole.CatalogAdmin)]
-        public async Task<MarketplaceCatalogAssignment> PostCatalogProductAssignment([FromBody] MarketplaceCatalogAssignment obj)
+        public async Task<HSCatalogAssignment> PostCatalogProductAssignment([FromBody] HSCatalogAssignment obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }

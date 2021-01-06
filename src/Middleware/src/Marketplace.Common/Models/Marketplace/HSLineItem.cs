@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Marketplace.Models.Models.Marketplace
 {
     [SwaggerModel]
-	public class MarketplaceLineItem : LineItem<LineItemXp, MarketplaceLineItemProduct, LineItemVariant, MarketplaceAddressBuyer, MarketplaceAddressSupplier> { }
+	public class HSLineItem : LineItem<LineItemXp, HSLineItemProduct, LineItemVariant, HSAddressBuyer, HSAddressSupplier> { }
 
     [SwaggerModel]
 	public class LineItemXp

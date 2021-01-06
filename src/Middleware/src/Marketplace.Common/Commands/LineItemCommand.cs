@@ -18,11 +18,11 @@ namespace Marketplace.Common.Commands
 {
     public interface ILineItemCommand
     {
-        Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem li, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
-        Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
+        Task<HSLineItem> UpsertLineItem(string orderID, HSLineItem li, VerifiedUserContext verifiedUser);
+        Task<List<HSLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
+        Task<List<HSLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
         Task DeleteLineItem(string orderID, string lineItemID, VerifiedUserContext verifiedUser);
-        Task<decimal> ValidateLineItemUnitCost(string orderID, SuperMarketplaceMeProduct product, List<MarketplaceLineItem> existingLineItems, MarketplaceLineItem li);
+        Task<decimal> ValidateLineItemUnitCost(string orderID, HSMarketplaceMeProduct product, List<HSLineItem> existingLineItems, HSLineItem li);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -42,9 +42,9 @@ namespace Marketplace.Common.Commands
         }
 
         // used on post order submit
-        public async Task<List<MarketplaceLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID)
+        public async Task<List<HSLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID)
         {
-            var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID, page: page, pageSize: 100));
+            var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(OrderDirection.Incoming, buyerOrderID, page: page, pageSize: 100));
             var updatedLineItems = await Throttler.RunAsync(lineItems, 100, 5, li =>
             {
                 var partial = new PartialLineItem()
@@ -65,7 +65,7 @@ namespace Marketplace.Common.Commands
                         Cancelations = new List<LineItemClaim>()
                     }
                 };
-                return _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID, li.ID, partial);
+                return _oc.LineItems.PatchAsync<HSLineItem>(OrderDirection.Incoming, buyerOrderID, li.ID, partial);
             });
             return updatedLineItems.ToList();
         }
@@ -75,24 +75,24 @@ namespace Marketplace.Common.Commands
         /// </summary>
 
         // all line item status changes should go through here
-        public async Task<List<MarketplaceLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null)
+        public async Task<List<HSLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null)
         {
             var userType = verifiedUser?.UsrType ?? "noUser";
             var verifiedUserType = userType.Reserialize<VerifiedUserType>();
             
             var buyerOrderID = orderID.Split('-')[0];
-            var previousLineItemsStates = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID, page: page, pageSize: 100));
+            var previousLineItemsStates = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(OrderDirection.Incoming, buyerOrderID, page: page, pageSize: 100));
 
             ValidateLineItemStatusChange(previousLineItemsStates.ToList(), lineItemStatusChanges, verifiedUserType);
             var updatedLineItems = await Throttler.RunAsync(lineItemStatusChanges.Changes, 100, 5, (lineItemStatusChange) =>
             {
                 var newPartialLineItem = BuildNewPartialLineItem(lineItemStatusChange, previousLineItemsStates.ToList(), lineItemStatusChanges.Status);
                // if there is no verified user passed in it has been called from somewhere else in the code base and will be done with the client grant access
-               return verifiedUser != null ? _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<MarketplaceLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem);
+               return verifiedUser != null ? _oc.LineItems.PatchAsync<HSLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem, verifiedUser.AccessToken) : _oc.LineItems.PatchAsync<HSLineItem>(orderDirection, orderID, lineItemStatusChange.ID, newPartialLineItem);
             });
 
-            var buyerOrder = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, buyerOrderID);
-            var allLineItemsForOrder = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Incoming, buyerOrderID, page: page, pageSize: 100));
+            var buyerOrder = await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, buyerOrderID);
+            var allLineItemsForOrder = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(OrderDirection.Incoming, buyerOrderID, page: page, pageSize: 100));
             var lineItemsChanged = allLineItemsForOrder.Where(li => lineItemStatusChanges.Changes.Select(li => li.ID).Contains(li.ID)).ToList();
             var supplierIDsRelatingToChange = lineItemsChanged.Select(li => li.SupplierID).Distinct().ToList();
             var relatedSupplierOrderIDs = supplierIDsRelatingToChange.Select(supplierID => $"{buyerOrderID}-{supplierID}").ToList();
@@ -106,7 +106,7 @@ namespace Marketplace.Common.Commands
             return updatedLineItems.ToList();
         }
 
-        private async Task SyncOrderStatuses(MarketplaceOrder buyerOrder, List<string> relatedSupplierOrderIDs, List<MarketplaceLineItem> allOrderLineItems)
+        private async Task SyncOrderStatuses(HSOrder buyerOrder, List<string> relatedSupplierOrderIDs, List<HSLineItem> allOrderLineItems)
         {
             await SyncOrderStatus(OrderDirection.Incoming, buyerOrder.ID, allOrderLineItems);
 
@@ -117,7 +117,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private async Task SyncOrderStatus(OrderDirection orderDirection, string orderID, List<MarketplaceLineItem> changedLineItems)
+        private async Task SyncOrderStatus(OrderDirection orderDirection, string orderID, List<HSLineItem> changedLineItems)
         {
             var (SubmittedOrderStatus, ShippingStatus, ClaimStatus) = LineItemStatusConstants.GetOrderStatuses(changedLineItems);
             var partialOrder = new PartialOrder()
@@ -132,7 +132,7 @@ namespace Marketplace.Common.Commands
             await _oc.Orders.PatchAsync(orderDirection, orderID, partialOrder);
         }
 
-        private PartialLineItem BuildNewPartialLineItem(LineItemStatusChange lineItemStatusChange, List<MarketplaceLineItem> previousLineItemStates, LineItemStatus newLineItemStatus)
+        private PartialLineItem BuildNewPartialLineItem(LineItemStatusChange lineItemStatusChange, List<HSLineItem> previousLineItemStates, LineItemStatus newLineItemStatus)
         {
             var existingLineItem = previousLineItemStates.First(li => li.ID == lineItemStatusChange.ID);
             var StatusByQuantity = BuildNewLineItemStatusByQuantity(lineItemStatusChange, existingLineItem, newLineItemStatus);
@@ -204,7 +204,7 @@ namespace Marketplace.Common.Commands
             return existinglineItemStatusChangeRequests;
         }
 
-        private Dictionary<LineItemStatus, int> BuildNewLineItemStatusByQuantity(LineItemStatusChange lineItemStatusChange, MarketplaceLineItem existingLineItem, LineItemStatus newLineItemStatus)
+        private Dictionary<LineItemStatus, int> BuildNewLineItemStatusByQuantity(LineItemStatusChange lineItemStatusChange, HSLineItem existingLineItem, LineItemStatus newLineItemStatus)
         {
             Dictionary<LineItemStatus, int> statusDictionary = existingLineItem.xp.StatusByQuantity;
             var quantitySetting = lineItemStatusChange.Quantity;
@@ -236,9 +236,9 @@ namespace Marketplace.Common.Commands
             return statusDictionary;
         }
 
-        private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, MarketplaceOrder buyerOrder, List<string> supplierIDsRelatedToChange, List<MarketplaceLineItem> lineItemsChanged, LineItemStatusChanges lineItemStatusChanges)
+        private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, HSOrder buyerOrder, List<string> supplierIDsRelatedToChange, List<HSLineItem> lineItemsChanged, LineItemStatusChanges lineItemStatusChanges)
         {
-            var suppliers = await Throttler.RunAsync(supplierIDsRelatedToChange, 100, 5, supplierID => _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID));
+            var suppliers = await Throttler.RunAsync(supplierIDsRelatedToChange, 100, 5, supplierID => _oc.Suppliers.GetAsync<HSSupplier>(supplierID));
 
             // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
             var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
@@ -260,7 +260,7 @@ namespace Marketplace.Common.Commands
                 }
                 else if (userType == VerifiedUserType.admin) {
                     // Loop over seller users, pull out THEIR boolean, as well as the List<string> of AddtlRcpts
-                    var sellerUsers = await _oc.AdminUsers.ListAsync<MarketplaceSellerUser>();
+                    var sellerUsers = await _oc.AdminUsers.ListAsync<HSSellerUser>();
                     var tos = new List<EmailAddress>();
                     foreach (var seller in sellerUsers.Items)
                     {
@@ -303,7 +303,7 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        private void ValidateLineItemStatusChange(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChanges lineItemStatusChanges, VerifiedUserType userType)
+        private void ValidateLineItemStatusChange(List<HSLineItem> previousLineItemStates, LineItemStatusChanges lineItemStatusChanges, VerifiedUserType userType)
         {
             /* need to validate 3 things on a lineitem status change
              * 
@@ -323,7 +323,7 @@ namespace Marketplace.Common.Commands
             Require.That(areCurrentQuantitiesToSupportChange, new ErrorCode("Invalid lineItem status change", 400, $"Current lineitem quantity statuses on the order are not sufficient to support the requested change"));
         }
 
-        public bool ValidateCurrentQuantities(List<MarketplaceLineItem> previousLineItemStates, LineItemStatusChange lineItemStatusChange, LineItemStatus lineItemStatusChangingTo)
+        public bool ValidateCurrentQuantities(List<HSLineItem> previousLineItemStates, LineItemStatusChange lineItemStatusChange, LineItemStatus lineItemStatusChangingTo)
         {
             var relatedLineItems = previousLineItemStates.Where(previousState => previousState.ID == lineItemStatusChange.ID);
             if (relatedLineItems.Count() != 1)
@@ -352,15 +352,15 @@ namespace Marketplace.Common.Commands
             return countCanBeChanged >= lineItemStatusChange.Quantity;
         }
 
-        public async Task<MarketplaceLineItem> UpsertLineItem(string orderID, MarketplaceLineItem liReq, VerifiedUserContext user)
+        public async Task<HSLineItem> UpsertLineItem(string orderID, HSLineItem liReq, VerifiedUserContext user)
         {
             // get me product with markedup prices correct currency and the existing line items in parellel
             var productRequest = _meProductCommand.Get(liReq.ProductID, user);
-            var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, filters: $"Product.ID={liReq.ProductID}",  accessToken: user.AccessToken));
+            var existingLineItemsRequest = ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, filters: $"Product.ID={liReq.ProductID}",  accessToken: user.AccessToken));
             var orderRequest = _oc.Orders.GetAsync(OrderDirection.Incoming, orderID);
             var existingLineItems = await existingLineItemsRequest;
             var product = await productRequest;
-            var li = new MarketplaceLineItem();
+            var li = new HSLineItem();
             var markedUpPrice = ValidateLineItemUnitCost(orderID, product, existingLineItems, liReq);
             liReq.UnitPrice = await markedUpPrice;
             var order = await orderRequest;
@@ -369,13 +369,13 @@ namespace Marketplace.Common.Commands
             liReq.xp.StatusByQuantity = LineItemStatusConstants.EmptyStatuses;
             liReq.xp.StatusByQuantity[LineItemStatus.Open] = liReq.Quantity;
 
-            var preExistingLi = ((List<MarketplaceLineItem>)existingLineItems).Find(eli => LineItemsMatch(eli, liReq));
+            var preExistingLi = ((List<HSLineItem>)existingLineItems).Find(eli => LineItemsMatch(eli, liReq));
             if (preExistingLi != null)
             {
-                li = await _oc.LineItems.SaveAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, preExistingLi.ID, liReq);
+                li = await _oc.LineItems.SaveAsync<HSLineItem>(OrderDirection.Incoming, orderID, preExistingLi.ID, liReq);
             } else
             {
-                li = await _oc.LineItems.CreateAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, liReq);
+                li = await _oc.LineItems.CreateAsync<HSLineItem>(OrderDirection.Incoming, orderID, liReq);
             }
             await _promotionCommand.AutoApplyPromotions(orderID);
             return li;
@@ -385,7 +385,7 @@ namespace Marketplace.Common.Commands
         {
             LineItem lineItem = await _oc.LineItems.GetAsync(OrderDirection.Incoming, orderID, lineItemID);
             await _oc.LineItems.DeleteAsync(OrderDirection.Incoming, orderID, lineItemID);
-            List<MarketplaceLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, filters: $"Product.ID={lineItem.ProductID}", accessToken: verifiedUser.AccessToken));
+            List<HSLineItem> existingLineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(OrderDirection.Outgoing, orderID, page: page, pageSize: 100, filters: $"Product.ID={lineItem.ProductID}", accessToken: verifiedUser.AccessToken));
             if (existingLineItems != null && existingLineItems.Count > 0)
             {
                 var product = await _meProductCommand.Get(lineItem.ProductID, verifiedUser);
@@ -394,20 +394,20 @@ namespace Marketplace.Common.Commands
             await _promotionCommand.AutoApplyPromotions(orderID);
         }
 
-        public async Task<decimal> ValidateLineItemUnitCost(string orderID, SuperMarketplaceMeProduct product, List<MarketplaceLineItem> existingLineItems, MarketplaceLineItem li)
+        public async Task<decimal> ValidateLineItemUnitCost(string orderID, HSMarketplaceMeProduct product, List<HSLineItem> existingLineItems, HSLineItem li)
         {
             
             if (product.PriceSchedule.UseCumulativeQuantity)
             {
                 int totalQuantity = li?.Quantity ?? 0;
-                foreach (MarketplaceLineItem lineItem in existingLineItems) {
+                foreach (HSLineItem lineItem in existingLineItems) {
                     if (li == null || !LineItemsMatch(li, lineItem))
                     {
                         totalQuantity += lineItem.Quantity;
                     }
                 }
                 decimal priceBasedOnQuantity = product.PriceSchedule.PriceBreaks.Last(priceBreak => priceBreak.Quantity <= totalQuantity).Price;
-                foreach (MarketplaceLineItem lineItem in existingLineItems)
+                foreach (HSLineItem lineItem in existingLineItems)
                 {
                     // Determine markup for all specs for this existing line item
                     decimal lineItemTotal = priceBasedOnQuantity + GetSpecMarkup(lineItem.Specs, product.Specs);
@@ -415,7 +415,7 @@ namespace Marketplace.Common.Commands
                    {
                        PartialLineItem lineItemToPatch = new PartialLineItem();
                        lineItemToPatch.UnitPrice = lineItemTotal;
-                       await _oc.LineItems.PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, orderID, lineItem.ID, lineItemToPatch);
+                       await _oc.LineItems.PatchAsync<HSLineItem>(OrderDirection.Incoming, orderID, lineItem.ID, lineItemToPatch);
                    }
                 }
 

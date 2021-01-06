@@ -12,9 +12,9 @@ namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceBuyerCommand
     {
-        Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false);
-        Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null);
-        Task<SuperMarketplaceBuyer> Update(string buyerID, SuperMarketplaceBuyer buyer, string token);
+        Task<SuperHSBuyer> Create(SuperHSBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false);
+        Task<SuperHSBuyer> Get(string buyerID, string token = null);
+        Task<SuperHSBuyer> Update(string buyerID, SuperHSBuyer buyer, string token);
     }
     public class MarketplaceBuyerCommand : IMarketplaceBuyerCommand
     {
@@ -26,34 +26,34 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = oc;
         }
-        public async Task<SuperMarketplaceBuyer> Create(SuperMarketplaceBuyer superBuyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
+        public async Task<SuperHSBuyer> Create(SuperHSBuyer superBuyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
             var createdBuyer = await CreateBuyerAndRelatedFunctionalResources(superBuyer.Buyer, user, isSeedingEnvironment);
             var createdMarkup = await CreateMarkup(superBuyer.Markup, createdBuyer.ID, user.AccessToken);
-            return new SuperMarketplaceBuyer()
+            return new SuperHSBuyer()
             {
                 Buyer = createdBuyer,
                 Markup = createdMarkup
             };
         }
 
-        public async Task<SuperMarketplaceBuyer> Update(string buyerID, SuperMarketplaceBuyer superBuyer, string token)
+        public async Task<SuperHSBuyer> Update(string buyerID, SuperHSBuyer superBuyer, string token)
         {
             // to prevent changing buyerIDs
             superBuyer.Buyer.ID = buyerID;
 
-            var updatedBuyer = await _oc.Buyers.SaveAsync<MarketplaceBuyer>(buyerID, superBuyer.Buyer, token);
+            var updatedBuyer = await _oc.Buyers.SaveAsync<HSBuyer>(buyerID, superBuyer.Buyer, token);
             var updatedMarkup = await UpdateMarkup(superBuyer.Markup, superBuyer.Buyer.ID, token);
-            return new SuperMarketplaceBuyer()
+            return new SuperHSBuyer()
             {
                 Buyer = updatedBuyer,
                 Markup = updatedMarkup
             };
         }
 
-        public async Task<SuperMarketplaceBuyer> Get(string buyerID, string token = null)
+        public async Task<SuperHSBuyer> Get(string buyerID, string token = null)
         {
-            var request = token != null ? _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID, token) : _oc.Buyers.GetAsync<MarketplaceBuyer>(buyerID);
+            var request = token != null ? _oc.Buyers.GetAsync<HSBuyer>(buyerID, token) : _oc.Buyers.GetAsync<HSBuyer>(buyerID);
             var buyer = await request;
 
             // to move into content docs logic
@@ -63,14 +63,14 @@ namespace Marketplace.Common.Commands
                 Percent = markupPercent
             };
 
-            return new SuperMarketplaceBuyer()
+            return new SuperHSBuyer()
             {
                 Buyer = buyer,
                 Markup = markup
             };
         }
 
-        public async Task<MarketplaceBuyer> CreateBuyerAndRelatedFunctionalResources(MarketplaceBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
+        public async Task<HSBuyer> CreateBuyerAndRelatedFunctionalResources(HSBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
             var token = isSeedingEnvironment ? user.AccessToken : null;
             buyer.ID = "{buyerIncrementor}";

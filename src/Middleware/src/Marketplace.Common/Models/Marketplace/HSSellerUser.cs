@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceSellerUser : User<SellerUserXp>, IMarketplaceObject
+    public class HSSellerUser : User<SellerUserXp>, IHSObject
     {
     }
 

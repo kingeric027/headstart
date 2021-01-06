@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpecProductAssignment>();
+            var obj = wi.Current.ToObject<HSSpecProductAssignment>();
             try
             {
                 await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);
@@ -61,7 +61,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceSpecProductAssignment>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<HSSpecProductAssignment>(OrchestrationSerializer.Serializer);
             try
             {
                 await _oc.Specs.SaveProductAssignmentAsync(obj, wi.Token);

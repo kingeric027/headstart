@@ -17,11 +17,11 @@ namespace Marketplace.Common.Commands.Crud
 {
     public interface IMarketplaceKitProductCommand
     {
-        Task<MarketplaceKitProduct> Get(string id, string token);
-        Task<MarketplaceMeKitProduct> GetMeKit(string id, VerifiedUserContext user);
-        Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, string token);
-        Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, string token);
-        Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, string token);
+        Task<HSKitProduct> Get(string id, string token);
+        Task<HSMeKitProduct> GetMeKit(string id, VerifiedUserContext user);
+        Task<ListPage<HSKitProduct>> List(ListArgs<Document<HSKitProductAssignment>> args, string token);
+        Task<HSKitProduct> Post(HSKitProduct kitProduct, string token);
+        Task<HSKitProduct> Put(string id, HSKitProduct kitProduct, string token);
         Task Delete(string id, string token);
         Task<List<Asset>> GetProductImages(string productID, string token);
         Task<List<Asset>> GetProductAttachments(string productID, string token);
@@ -57,14 +57,14 @@ namespace Marketplace.Common.Commands.Crud
             var attachments = assets.Items.Where(a => a.Title == "Product_Attachment").ToList();
             return attachments;
         }
-        public async Task<MarketplaceKitProduct> Get(string id, string token)
+        public async Task<HSKitProduct> Get(string id, string token)
         {
             var _product = await _oc.Products.GetAsync<Product>(id, token);
             var _images = GetProductImages(id, token);
             var _attachments = GetProductAttachments(id, token);
-            var _productAssignments = await _cms.Documents.Get<KitProduct>("KitProduct", _product.ID, token);
+            var _productAssignments = await _cms.Documents.Get<HSKitProductAssignment>("HSKitProductAssignment", _product.ID, token);
 
-            return new MarketplaceKitProduct
+            return new HSKitProduct
             {
                 ID = _product.ID,
                 Name = _product.Name,
@@ -74,13 +74,13 @@ namespace Marketplace.Common.Commands.Crud
                 ProductAssignments = await _getKitDetails(_productAssignments.Doc, token)
             };
         }
-        public async Task<MarketplaceMeKitProduct> GetMeKit(string id, VerifiedUserContext user)
+        public async Task<HSMeKitProduct> GetMeKit(string id, VerifiedUserContext user)
         {
-            var _product = await _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
+            var _product = await _oc.Me.GetProductAsync<HSMeProduct>(id, user.AccessToken);
             var _images = GetProductImages(id, user.AccessToken);
             var _attachments = GetProductAttachments(id, user.AccessToken);
-            var _productAssignments = await _cms.Documents.Get<MeKitProduct>("KitProduct", _product.ID, user.AccessToken);
-            var meKitProduct = new MarketplaceMeKitProduct
+            var _productAssignments = await _cms.Documents.Get<HSMeKitProductAssignment>("HSKitProductAssignment", _product.ID, user.AccessToken);
+            var meKitProduct = new HSMeKitProduct
             {
                 ID = _product.ID,
                 Name = _product.Name,
@@ -92,17 +92,17 @@ namespace Marketplace.Common.Commands.Crud
             return await _meProductCommand.ApplyBuyerPricing(meKitProduct, user);
         }
 
-        public async Task<ListPage<MarketplaceKitProduct>> List(ListArgs<Document<KitProduct>> args, string token)
+        public async Task<ListPage<HSKitProduct>> List(ListArgs<Document<HSKitProductAssignment>> args, string token)
         {
-            var _kitProducts = await _cms.Documents.List<KitProduct>("KitProduct", args, token);
-            var _kitProductList = new List<MarketplaceKitProduct>();
+            var _kitProducts = await _cms.Documents.List<HSKitProductAssignment>("HSKitProductAssignment", args, token);
+            var _kitProductList = new List<HSKitProduct>();
 
             await Throttler.RunAsync(_kitProducts.Items, 100, 10, async product =>
             {
                 var parentProduct = await _oc.Products.GetAsync(product.ID);
                 var _images = GetProductImages(product.ID, token);
                 var _attachments = GetProductAttachments(product.ID, token);
-                _kitProductList.Add(new MarketplaceKitProduct
+                _kitProductList.Add(new HSKitProduct
                 {
                     ID = parentProduct.ID,
                     Name = parentProduct.Name,
@@ -112,20 +112,20 @@ namespace Marketplace.Common.Commands.Crud
                     ProductAssignments = await _getKitDetails(product.Doc, token)
                 });
             });
-            return new ListPage<MarketplaceKitProduct>
+            return new ListPage<HSKitProduct>
             {
                 Meta = _kitProducts.Meta,
                 Items = _kitProductList
             };
         }
-        public async Task<MarketplaceKitProduct> Post(MarketplaceKitProduct kitProduct, string token)
+        public async Task<HSKitProduct> Post(HSKitProduct kitProduct, string token)
         {
             var _product = await _oc.Products.CreateAsync<Product>(kitProduct.Product, token);
-            var kitProductDoc = new Document<KitProduct>();
+            var kitProductDoc = new Document<HSKitProductAssignment>();
             kitProductDoc.ID = _product.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
-            var _productAssignments = await _cms.Documents.Create("KitProduct", kitProductDoc, token);
-            return new MarketplaceKitProduct
+            var _productAssignments = await _cms.Documents.Create("HSKitProductAssignment", kitProductDoc, token);
+            return new HSKitProduct
             {
                 ID = _product.ID,
                 Name = _product.Name,
@@ -136,16 +136,16 @@ namespace Marketplace.Common.Commands.Crud
             };
         }
 
-        public async Task<MarketplaceKitProduct> Put(string id, MarketplaceKitProduct kitProduct, string token)
+        public async Task<HSKitProduct> Put(string id, HSKitProduct kitProduct, string token)
         {
             var _updatedProduct = await _oc.Products.SaveAsync<Product>(kitProduct.Product.ID, kitProduct.Product, token);
-            var kitProductDoc = new Document<KitProduct>();
+            var kitProductDoc = new Document<HSKitProductAssignment>();
             kitProductDoc.ID = _updatedProduct.ID;
             kitProductDoc.Doc = kitProduct.ProductAssignments;
-            var _productAssignments = await _cms.Documents.Save<KitProduct>("KitProduct", _updatedProduct.ID, kitProductDoc, token);
+            var _productAssignments = await _cms.Documents.Save<HSKitProductAssignment>("HSKitProductAssignment", _updatedProduct.ID, kitProductDoc, token);
             var _images = await GetProductImages(_updatedProduct.ID, token);
             var _attachments = await GetProductAttachments(_updatedProduct.ID, token);
-            return new MarketplaceKitProduct
+            return new HSKitProduct
             {
                 ID = _updatedProduct.ID,
                 Name = _updatedProduct.Name,
@@ -156,7 +156,7 @@ namespace Marketplace.Common.Commands.Crud
             };
         }
 
-        public async Task<KitProduct> _getKitDetails(KitProduct kit, string token)
+        public async Task<HSKitProductAssignment> _getKitDetails(HSKitProductAssignment kit, string token)
         {
             
             // get product, specs, variants, and images for each product in the kit
@@ -164,7 +164,7 @@ namespace Marketplace.Common.Commands.Crud
             {
                 try
                 {
-                    var productRequest = _oc.Products.GetAsync<MarketplaceProduct>(p.ID);
+                    var productRequest = _oc.Products.GetAsync<HSProduct>(p.ID);
                     var specListRequest = ListAllAsync.List((page) => _oc.Products.ListSpecsAsync(p.ID, page: page, pageSize: 100));
                     var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
                     await Task.WhenAll(specListRequest, variantListRequest);
@@ -186,14 +186,14 @@ namespace Marketplace.Common.Commands.Crud
             return kit;
         }
 
-        public async Task<MeKitProduct> _getMeKitDetails(MeKitProduct kit, string token)
+        public async Task<HSMeKitProductAssignment> _getMeKitDetails(HSMeKitProductAssignment kit, string token)
         {
             // get product, specs, variants, and images for each product in the kit
             foreach (var p in kit.ProductsInKit)
             {
                 try
                 {
-                    var productRequest = _oc.Me.GetProductAsync<MarketplaceMeProduct>(p.ID, token);
+                    var productRequest = _oc.Me.GetProductAsync<HSMeProduct>(p.ID, token);
                     var specListRequest = ListAllAsync.List((page) => _oc.Products.ListSpecsAsync(p.ID, page: page, pageSize: 100));
                     var variantListRequest = ListAllAsync.List((page) => _oc.Products.ListVariantsAsync(p.ID, page: page, pageSize: 100));
                     await Task.WhenAll(specListRequest, variantListRequest);
@@ -247,7 +247,7 @@ namespace Marketplace.Common.Commands.Crud
             await Task.WhenAll(
                 Throttler.RunAsync(_images, 100, 5, i => _cms.Assets.Delete(i.ID, token)),
                 Throttler.RunAsync(_attachments, 100, 5, i => _cms.Assets.Delete(i.ID, token)),
-                _cms.Documents.Delete("KitProduct", product.ID, token),
+                _cms.Documents.Delete("HSKitProductAssignment", product.ID, token),
             _oc.Products.DeleteAsync(id, token)
             );
         }

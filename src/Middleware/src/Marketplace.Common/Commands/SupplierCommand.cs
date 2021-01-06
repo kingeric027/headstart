@@ -16,10 +16,10 @@ namespace Marketplace.Common.Commands
 {
     public interface IMarketplaceSupplierCommand
     {
-        Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false);
-        Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user);
-        Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user);
-        Task<MarketplaceSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user);
+        Task<HSSupplier> Create(HSSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false);
+        Task<HSSupplier> GetMySupplier(string supplierID, VerifiedUserContext user);
+        Task<HSSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user);
+        Task<HSSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user);
     }
     public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
     {
@@ -35,22 +35,22 @@ namespace Marketplace.Common.Commands
             _apiClientHelper = apiClientHelper;
             _supplierSync = supplierSync;
         }
-        public async Task<MarketplaceSupplier> GetMySupplier(string supplierID, VerifiedUserContext user)
+        public async Task<HSSupplier> GetMySupplier(string supplierID, VerifiedUserContext user)
         {
             Require.That(supplierID == user.SupplierID,
                 new ErrorCode("Unauthorized", 401, $"You are only authorized to view {user.SupplierID}."));
-            return await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
+            return await _oc.Suppliers.GetAsync<HSSupplier>(supplierID);
         }
 
-        public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user)
+        public async Task<HSSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user)
         {
             Require.That(user.UsrType == "admin" || supplierID == user.SupplierID, new ErrorCode("Unauthorized", 401, $"You are not authorized to update supplier {supplierID}"));
-            var currentSupplier = await _oc.Suppliers.GetAsync<MarketplaceSupplier>(supplierID);
-            var updatedSupplier = await _oc.Suppliers.PatchAsync<MarketplaceSupplier>(supplierID, supplier);
+            var currentSupplier = await _oc.Suppliers.GetAsync<HSSupplier>(supplierID);
+            var updatedSupplier = await _oc.Suppliers.PatchAsync<HSSupplier>(supplierID, supplier);
             // Update supplier products only on a name change
             if (currentSupplier.Name != supplier.Name || currentSupplier.xp.Currency.ToString() != supplier.xp.Currency.Value)
             {
-                var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<MarketplaceProduct>(
+                var productsToUpdate = await ListAllAsync.ListWithFacets((page) => _oc.Products.ListAsync<HSProduct>(
                 supplierID: supplierID,
                 page: page,
                 pageSize: 100,
@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands
             return updatedSupplier;
 
         }
-        public async Task<MarketplaceSupplier> Create(MarketplaceSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false)
+        public async Task<HSSupplier> Create(HSSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false)
         {
             var token = isSeedingEnvironment ? user.AccessToken : null;
 
@@ -197,10 +197,10 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<MarketplaceSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user)
+        public async Task<HSSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user)
         {
             var orderData = await _supplierSync.GetOrderAsync(supplierOrderID, user);
-            return (MarketplaceSupplierOrderData)orderData.ToObject(typeof(MarketplaceSupplierOrderData));
+            return (HSSupplierOrderData)orderData.ToObject(typeof(HSSupplierOrderData));
         }
     }
 }

@@ -9,31 +9,31 @@ namespace Marketplace.Tests.Mocks
 {
     public static class PaymentMocks
     {
-        public static List<MarketplacePayment> Payments(params MarketplacePayment[] payments)
+        public static List<HSPayment> Payments(params HSPayment[] payments)
         {
-            return new List<MarketplacePayment>(payments);
+            return new List<HSPayment>(payments);
         }
 
-        public static ListPage<MarketplacePayment> EmptyPaymentsList()
+        public static ListPage<HSPayment> EmptyPaymentsList()
         {
-            var items = new List<MarketplacePayment>();
-            return new ListPage<MarketplacePayment>
+            var items = new List<HSPayment>();
+            return new ListPage<HSPayment>
             {
                 Items = items
             };
         }
 
-        public static ListPage<MarketplacePayment> PaymentList(params MarketplacePayment[] payments)
+        public static ListPage<HSPayment> PaymentList(params HSPayment[] payments)
         {
-            return new ListPage<MarketplacePayment>
+            return new ListPage<HSPayment>
             {
-                Items = new List<MarketplacePayment>(payments)
+                Items = new List<HSPayment>(payments)
             };
         }
 
-        public static MarketplacePayment CCPayment(string creditCardID, decimal? amount = null, string id = "mockCCPaymentID", bool accepted = true)
+        public static HSPayment CCPayment(string creditCardID, decimal? amount = null, string id = "mockCCPaymentID", bool accepted = true)
         {
-            return new MarketplacePayment
+            return new HSPayment
             {
                 ID = id,
                 Type = PaymentType.CreditCard,
@@ -43,9 +43,9 @@ namespace Marketplace.Tests.Mocks
             };
         }
 
-        public static MarketplacePayment POPayment(decimal? amount = null, string id = "mockPoPaymentID")
+        public static HSPayment POPayment(decimal? amount = null, string id = "mockPoPaymentID")
         {
-            return new MarketplacePayment
+            return new HSPayment
             {
                 ID = id,
                 Type = PaymentType.PurchaseOrder,

@@ -4,7 +4,7 @@ using OrderCloud.SDK;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceUserGroupAssignment : UserGroupAssignment, IMarketplaceObject
+    public class HSProductAssignment : ProductAssignment, IHSObject
     {
         public string ID { get; set; }
     }

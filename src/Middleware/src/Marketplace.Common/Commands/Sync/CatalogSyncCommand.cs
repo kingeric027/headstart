@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceCatalog>();
+            var obj = wi.Current.ToObject<HSCatalog>();
             try
             {
                 obj.xp.Type = "Catalog";
@@ -62,10 +62,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceCatalog>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<HSCatalog>(OrchestrationSerializer.Serializer);
             try
             {
-                await _oc.UserGroups.SaveAsync<MarketplaceCatalog>(wi.ResourceId, wi.RecordId, obj, wi.Token);
+                await _oc.UserGroups.SaveAsync<HSCatalog>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
@@ -82,10 +82,10 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = wi.Diff.ToObject<PartialMarketplaceCatalog>(OrchestrationSerializer.Serializer);
+            var obj = wi.Diff.ToObject<PartialHSCatalog>(OrchestrationSerializer.Serializer);
             try
             {
-                await _oc.UserGroups.PatchAsync<MarketplaceCatalog>(wi.ResourceId, wi.RecordId, obj, wi.Token);
+                await _oc.UserGroups.PatchAsync<HSCatalog>(wi.ResourceId, wi.RecordId, obj, wi.Token);
                 return JObject.FromObject(obj);
             }
             catch (OrderCloudException ex)
@@ -109,7 +109,7 @@ namespace Marketplace.Common.Commands
         {
             try
             {
-                var response = await _oc.UserGroups.GetAsync<MarketplaceCatalog>(wi.ResourceId, wi.RecordId, wi.Token);
+                var response = await _oc.UserGroups.GetAsync<HSCatalog>(wi.ResourceId, wi.RecordId, wi.Token);
                 return JObject.FromObject(response);
             }
             catch (OrderCloudException ex)

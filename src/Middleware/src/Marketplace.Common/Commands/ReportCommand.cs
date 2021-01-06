@@ -17,10 +17,10 @@ namespace Marketplace.Common.Commands
     public interface IMarketplaceReportCommand
     {
         ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
+        Task<List<HSAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
+        Task<List<HSOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
+        Task<List<HSOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
+        Task<List<HSLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser);
         Task<List<ReportTemplate>> ListReportTemplatesByReportType(ReportTypeEnum reportType, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> PostReportTemplate(ReportTemplate reportTemplate, VerifiedUserContext verifiedUser);
         Task<ReportTemplate> GetReportTemplate(string id, VerifiedUserContext verifiedUser);
@@ -60,16 +60,16 @@ namespace Marketplace.Common.Commands
             return listPage;
         }
 
-        public async Task<List<MarketplaceAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser)
+        public async Task<List<HSAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser)
         {
             //Get stored template from Cosmos DB container
             var template = await _template.Get(templateID, verifiedUser);
-            var allBuyerLocations = new List<MarketplaceAddressBuyer>();
+            var allBuyerLocations = new List<HSAddressBuyer>();
 
             //Logic if no Buyer ID is supplied
             if (template.Filters.BuyerID.Count == 0)
             {
-                var buyers = await ListAllAsync.List((page) => _oc.Buyers.ListAsync<MarketplaceBuyer>(
+                var buyers = await ListAllAsync.List((page) => _oc.Buyers.ListAsync<HSBuyer>(
                     filters: null,
                     page: page,
                     pageSize: 100
@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands
             foreach (var buyerID in template.Filters.BuyerID)
             {
                 //For every buyer included in the template filters, grab all buyer locations (exceeding 100 maximum)
-                var buyerLocations = await ListAllAsync.List((page) => _oc.Addresses.ListAsync<MarketplaceAddressBuyer>(
+                var buyerLocations = await ListAllAsync.List((page) => _oc.Addresses.ListAsync<HSAddressBuyer>(
                     buyerID,
                     filters: null,
                     page: page,
@@ -105,7 +105,7 @@ namespace Marketplace.Common.Commands
                 }
             }
             //Filter through collected records, adding only those that pass the PassesFilters check.
-            var filteredBuyerLocations = new List<MarketplaceAddressBuyer>();
+            var filteredBuyerLocations = new List<HSAddressBuyer>();
             foreach (var location in allBuyerLocations)
             {
 
@@ -117,14 +117,14 @@ namespace Marketplace.Common.Commands
             return filteredBuyerLocations;
         }
 
-        public async Task<List<MarketplaceOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
+        public async Task<List<HSOrder>> SalesOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
         {
             var template = await _template.Get(templateID, verifiedUser);
             string dateLow = GetAdHocFilterValue(args, "DateLow");
             string timeLow = GetAdHocFilterValue(args, "TimeLow");
             string dateHigh = GetAdHocFilterValue(args, "DateHigh");
             string timeHigh = GetAdHocFilterValue(args, "TimeHigh");
-            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
                 OrderDirection.Incoming,
                 filters: $"from={dateLow}&to={dateHigh}",
                 page: page,
@@ -140,7 +140,7 @@ namespace Marketplace.Common.Commands
                     filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
                 }
             }
-            var filteredOrders = new List<MarketplaceOrder>();
+            var filteredOrders = new List<HSOrder>();
             foreach (var order in orders)
             {
 
@@ -153,7 +153,7 @@ namespace Marketplace.Common.Commands
             return filteredOrders;
         }
 
-        public async Task<List<MarketplaceOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
+        public async Task<List<HSOrder>> PurchaseOrderDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
         {
             var template = await _template.Get(templateID, verifiedUser);
             string dateLow = GetAdHocFilterValue(args, "DateLow");
@@ -161,7 +161,7 @@ namespace Marketplace.Common.Commands
             string dateHigh = GetAdHocFilterValue(args, "DateHigh");
             string timeHigh = GetAdHocFilterValue(args, "TimeHigh");
             var orderDirection = verifiedUser.UsrType == "admin" ? OrderDirection.Outgoing : OrderDirection.Incoming;
-            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
                 orderDirection,
                 filters: $"from={dateLow}&to={dateHigh}",
                 page: page,
@@ -178,7 +178,7 @@ namespace Marketplace.Common.Commands
                     filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
                 }
             }
-            var filteredOrders = new List<MarketplaceOrder>();
+            var filteredOrders = new List<HSOrder>();
             foreach (var order in orders)
             {
 
@@ -190,14 +190,14 @@ namespace Marketplace.Common.Commands
             return filteredOrders;
         }
 
-        public async Task<List<MarketplaceLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
+        public async Task<List<HSLineItemOrder>> LineItemDetail(string templateID, ListArgs<ReportAdHocFilters> args, VerifiedUserContext verifiedUser)
         {
             var template = await _template.Get(templateID, verifiedUser);
             string dateLow = GetAdHocFilterValue(args, "DateLow");
             string timeLow = GetAdHocFilterValue(args, "TimeLow");
             string dateHigh = GetAdHocFilterValue(args, "DateHigh");
             string timeHigh = GetAdHocFilterValue(args, "TimeHigh");
-            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<MarketplaceOrder>(
+            var orders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
                 OrderDirection.Incoming,
                 filters: $"from={dateLow}&to={dateHigh}",
                 page: page,
@@ -214,7 +214,7 @@ namespace Marketplace.Common.Commands
                     filtersToEvaluateMap.Add(property, (List<string>)property.GetValue(template.Filters));
                 }
             }
-            var filteredOrders = new List<MarketplaceOrder>();
+            var filteredOrders = new List<HSOrder>();
             foreach (var order in orders)
             {
 
@@ -223,11 +223,11 @@ namespace Marketplace.Common.Commands
                     filteredOrders.Add(order);
                 }
             }
-            var lineItemOrders = new List<MarketplaceLineItemOrder>();
+            var lineItemOrders = new List<HSLineItemOrder>();
             foreach (var order in filteredOrders)
             {
-                var lineItems = new List<MarketplaceLineItem>();
-                lineItems.AddRange(await ListAllAsync.List((page) => _oc.LineItems.ListAsync<MarketplaceLineItem>(
+                var lineItems = new List<HSLineItem>();
+                lineItems.AddRange(await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(
                     OrderDirection.Incoming,
                     order.ID,
                     page: page,
@@ -236,10 +236,10 @@ namespace Marketplace.Common.Commands
                     )));
                 foreach (var lineItem in lineItems)
                 {
-                    lineItemOrders.Add(new MarketplaceLineItemOrder()
+                    lineItemOrders.Add(new HSLineItemOrder()
                     {
-                        MarketplaceOrder = order,
-                        MarketplaceLineItem = lineItem
+                        HSOrder = order,
+                        HSLineItem = lineItem
                     });
                 }
             }
@@ -301,7 +301,7 @@ namespace Marketplace.Common.Commands
             return true;
         }
 
-        private bool PassesOrderTimeFilter(MarketplaceOrder order, string dateLow, string timeLow, string dateHigh, string timeHigh)
+        private bool PassesOrderTimeFilter(HSOrder order, string dateLow, string timeLow, string dateHigh, string timeHigh)
         {
             DateTime dt = DateTime.Parse(order.DateSubmitted.ToString());
             string date = dt.ToString("yyyy-MM-dd");

@@ -8,13 +8,13 @@ using System.Collections.Generic;
 namespace Marketplace.Models
 {
     [SwaggerModel]
-    public class MarketplaceBuyerLocation
+    public class HSBuyerLocation
     {
-        public MarketplaceLocationUserGroup UserGroup { get; set; }
-        public MarketplaceAddressBuyer Address { get; set; }
+        public HSLocationUserGroup UserGroup { get; set; }
+        public HSAddressBuyer Address { get; set; }
     }
     [SwaggerModel]
-    public class MarketplaceUserGroup : UserGroup<UserGroupXp>, IMarketplaceObject
+    public class HSUserGroup : UserGroup<UserGroupXp>, IHSObject
     {
     }
 
@@ -26,12 +26,12 @@ namespace Marketplace.Models
     }
 
     [SwaggerModel]
-    public class MarketplaceLocationUserGroup : UserGroup<MarketplaceLocationUserGroupXp>, IMarketplaceObject
+    public class HSLocationUserGroup : UserGroup<HSLocationUserGroupXp>, IHSObject
     {
     }
 
     [SwaggerModel]
-    public class MarketplaceLocationUserGroupXp
+    public class HSLocationUserGroupXp
     {
         public string Type { get; set; }
         public string Role { get; set; }

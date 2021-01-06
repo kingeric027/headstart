@@ -5,9 +5,9 @@ using ordercloud.integrations.library;
 namespace Marketplace.Common.Models.Marketplace
 {
     [SwaggerModel]
-    public class MarketplaceLineItemOrder
+    public class HSLineItemOrder
     {
-        public MarketplaceOrder MarketplaceOrder { get; set; }
-        public MarketplaceLineItem MarketplaceLineItem { get; set; }
+        public HSOrder HSOrder { get; set; }
+        public HSLineItem HSLineItem { get; set; }
     }
 }

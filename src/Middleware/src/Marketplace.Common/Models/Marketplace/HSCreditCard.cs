@@ -4,13 +4,13 @@ using OrderCloud.SDK;
 namespace Marketplace.Models.Models.Marketplace
 {
 	[SwaggerModel]
-	public class MarketplaceCreditCard: CreditCard<CreditCardXP>
+	public class HSCreditCard: CreditCard<CreditCardXP>
 	{
 
 	}
 
 	[SwaggerModel]
-	public class MarketplaceBuyerCreditCard : BuyerCreditCard<CreditCardXP>
+	public class HSBuyerCreditCard : BuyerCreditCard<CreditCardXP>
 	{
 
 	}

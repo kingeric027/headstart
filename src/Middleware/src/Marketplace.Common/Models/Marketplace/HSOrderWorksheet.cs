@@ -10,13 +10,13 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Services.ShippingIntegration.Models
 {
-	public class MarketplaceOrderWorksheet : OrderWorksheet<MarketplaceOrder, MarketplaceLineItem, MarketplaceShipEstimateResponse, OrderCalculateResponse, OrderSubmitResponse, OrderSubmitForApprovalResponse, OrderApprovedResponse>
+	public class HSOrderWorksheet : OrderWorksheet<HSOrder, HSLineItem, HSShipEstimateResponse, OrderCalculateResponse, OrderSubmitResponse, OrderSubmitForApprovalResponse, OrderApprovedResponse>
 	{
 	}
 
-	public class MarketplaceOrderCalculatePayload
+	public class HSOrderCalculatePayload
 	{
-		public MarketplaceOrderWorksheet OrderWorksheet { get; set; }
+		public HSOrderWorksheet OrderWorksheet { get; set; }
 		public CheckoutIntegrationConfiguration ConfigData { get; set; }
 
 	}
@@ -26,7 +26,7 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	[SwaggerModel]
 	public class ShipEstimateXP
 	{
-		public List<MarketplaceShipMethod> AllShipMethods { get; set; }
+		public List<HSShipMethod> AllShipMethods { get; set; }
 		public string SupplierID { get; set; }
 		public string ShipFromAddressID { get; set; }
 	}
@@ -47,12 +47,12 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 	}
 
 	[SwaggerModel]
-	public class MarketplaceShipMethod : ShipMethod<ShipMethodXP> { }
+	public class HSShipMethod : ShipMethod<ShipMethodXP> { }
 
 	[SwaggerModel]
-	public class MarketplaceShipEstimate : ShipEstimate<ShipEstimateXP, MarketplaceShipMethod> { }
+	public class HSShipEstimate : ShipEstimate<ShipEstimateXP, HSShipMethod> { }
 
-	public class MarketplaceShipEstimateResponse : ShipEstimateResponse<ShipEstimateResponseXP, MarketplaceShipEstimate> { }
+	public class HSShipEstimateResponse : ShipEstimateResponse<ShipEstimateResponseXP, HSShipEstimate> { }
 
 	public class CheckoutIntegrationConfiguration
 	{
@@ -60,9 +60,9 @@ namespace Marketplace.Common.Services.ShippingIntegration.Models
 		public bool ExcludePOProductsFromTax { get; set; }
 	}
 
-    public static class MarketplaceOrderWorksheetExtensions
+    public static class HSOrderWorksheetExtensions
     {
-        public static bool IsStandardOrder(this MarketplaceOrderWorksheet sheet)
+        public static bool IsStandardOrder(this HSOrderWorksheet sheet)
         {
 			return sheet.Order.xp == null || sheet.Order.xp.OrderType != OrderType.Quote;
 		}
