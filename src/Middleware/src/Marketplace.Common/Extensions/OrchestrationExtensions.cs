@@ -17,7 +17,7 @@ namespace Marketplace.Common.Extensions
         {
             switch (obj.GetType().Name)
             {
-                case nameof(SuperMarketplaceProduct):
+                case nameof(SuperHSProduct):
                     return RecordType.HydratedProduct;
                 case nameof(HSProduct):
                     return RecordType.Product;

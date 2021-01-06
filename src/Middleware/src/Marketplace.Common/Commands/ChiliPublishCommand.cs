@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
     [SwaggerModel]
     public class ChiliTemplate
     {
-        public SuperMarketplaceProduct Product { get; set; }
+        public SuperHSProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
         public string ChiliConfigID { get; set; }
@@ -293,10 +293,10 @@ namespace Marketplace.Common.Commands
         private readonly OrderCloudClientConfig _config;
         private readonly IOrderCloudClient _oc;
         private readonly IMeProductCommand _product;
-        private readonly IMarketplaceProductCommand _adminProduct;
+        private readonly IHSProductCommand _adminProduct;
         private readonly ChiliPublishConfigQuery _query;
 
-        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, IMarketplaceProductCommand adminProduct, ChiliPublishConfigQuery query)
+        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, IHSProductCommand adminProduct, ChiliPublishConfigQuery query)
         {
             _settings = settings;
             _product = product;

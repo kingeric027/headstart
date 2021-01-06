@@ -25,15 +25,15 @@ namespace Marketplace.Common.Commands
 	public class MeProductCommand : IMeProductCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IMarketplaceBuyerCommand _marketplaceBuyerCommand;
-		private readonly IMarketplaceProductCommand _marketplaceProductCommand;
+		private readonly IHSBuyerCommand _marketplaceBuyerCommand;
+		private readonly IHSProductCommand _marketplaceProductCommand;
 		private readonly ISendgridService _sendgridService;
 		private readonly IAppCache _cache;
 		private readonly ISebExchangeRatesService _sebExchangeRates;
 		public MeProductCommand(
 			IOrderCloudClient elevatedOc, 
-			IMarketplaceBuyerCommand marketplaceBuyerCommand,
-			IMarketplaceProductCommand marketplaceProductCommand,
+			IHSBuyerCommand marketplaceBuyerCommand,
+			IHSProductCommand marketplaceProductCommand,
 			ISendgridService sendgridService,
 			IAppCache cache,
 			ISebExchangeRatesService sebExchangeRates

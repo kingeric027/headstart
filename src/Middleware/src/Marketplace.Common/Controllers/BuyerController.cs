@@ -14,9 +14,9 @@ namespace Marketplace.Common.Controllers
     public class BuyerController : BaseController
     {
         
-        private readonly IMarketplaceBuyerCommand _command;
+        private readonly IHSBuyerCommand _command;
         private readonly IOrderCloudClient _oc;
-        public BuyerController(IMarketplaceBuyerCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
+        public BuyerController(IHSBuyerCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
         {
             _command = command;
             _oc = oc;

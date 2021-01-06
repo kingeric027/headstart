@@ -16,12 +16,12 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
 {
-	public interface IMarketplaceProductCommand
+	public interface IHSProductCommand
 	{
-		Task<SuperMarketplaceProduct> Get(string id, string token);
-		Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<HSProduct> args, string token);
-		Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct product, VerifiedUserContext user);
-		Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct product, string token);
+		Task<SuperHSProduct> Get(string id, string token);
+		Task<ListPage<SuperHSProduct>> List(ListArgs<HSProduct> args, string token);
+		Task<SuperHSProduct> Post(SuperHSProduct product, VerifiedUserContext user);
+		Task<SuperHSProduct> Put(string id, SuperHSProduct product, string token);
 		Task Delete(string id, string token);
 		Task<HSPriceSchedule> GetPricingOverride(string id, string buyerID, string token);
 		Task DeletePricingOverride(string id, string buyerID, string token);
@@ -37,13 +37,13 @@ namespace Marketplace.Common.Commands.Crud
 		public string SpecID { get; set; }
 		public string OptionID { get; set; }
 	}
-	public class MarketplaceProductCommand : IMarketplaceProductCommand
+	public class HSProductCommand : IHSProductCommand
 	{
 		private readonly IOrderCloudClient _oc;
 		private readonly ICMSClient _cms;
 		private readonly AppSettings _settings;
 		private readonly ISupplierApiClientHelper _apiClientHelper;
-		public MarketplaceProductCommand(AppSettings settings, ICMSClient cms, IOrderCloudClient elevatedOc, ISupplierApiClientHelper apiClientHelper)
+		public HSProductCommand(AppSettings settings, ICMSClient cms, IOrderCloudClient elevatedOc, ISupplierApiClientHelper apiClientHelper)
 		{
 			_cms = cms;
 			_oc = elevatedOc;
@@ -129,7 +129,7 @@ namespace Marketplace.Common.Commands.Crud
 			return attachments;
 		}
 
-		public async Task<SuperMarketplaceProduct> Get(string id, string token)
+		public async Task<SuperHSProduct> Get(string id, string token)
 		{
 			var _product = await _oc.Products.GetAsync<HSProduct>(id, token);
 			// Get the price schedule, if it exists, if not - send empty price schedule
@@ -148,7 +148,7 @@ namespace Marketplace.Common.Commands.Crud
 			var _attachments = GetProductAttachments(id, token);
 			try
 			{
-				return new SuperMarketplaceProduct
+				return new SuperHSProduct
 				{
 					Product = _product,
 					PriceSchedule = _priceSchedule,
@@ -164,7 +164,7 @@ namespace Marketplace.Common.Commands.Crud
 			}
 		}
 
-		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<HSProduct> args, string token)
+		public async Task<ListPage<SuperHSProduct>> List(ListArgs<HSProduct> args, string token)
 		{
 			var _productsList = await _oc.Products.ListAsync<HSProduct>(
 				filters: args.ToFilterString(),
@@ -174,7 +174,7 @@ namespace Marketplace.Common.Commands.Crud
 				pageSize: args.PageSize,
 				page: args.Page,
 				accessToken: token);
-			var _superProductsList = new List<SuperMarketplaceProduct> { };
+			var _superProductsList = new List<SuperHSProduct> { };
 			await Throttler.RunAsync(_productsList.Items, 100, 10, async product =>
 			{
 				var priceSchedule = _oc.PriceSchedules.GetAsync(product.DefaultPriceScheduleID, token);
@@ -182,7 +182,7 @@ namespace Marketplace.Common.Commands.Crud
 				var _variants = _oc.Products.ListVariantsAsync<HSVariant>(product.ID, null, null, null, 1, 100, null, token);
 				var _images = GetProductImages(product.ID, token);
 				var _attachments = GetProductAttachments(product.ID, token);
-				_superProductsList.Add(new SuperMarketplaceProduct
+				_superProductsList.Add(new SuperHSProduct
 				{
 					Product = product,
 					PriceSchedule = await priceSchedule,
@@ -192,14 +192,14 @@ namespace Marketplace.Common.Commands.Crud
 					Attachments = await _attachments
 				});
 			});
-			return new ListPage<SuperMarketplaceProduct>
+			return new ListPage<SuperHSProduct>
 			{
 				Meta = _productsList.Meta,
 				Items = _superProductsList
 			};
 		}
 
-		public async Task<SuperMarketplaceProduct> Post(SuperMarketplaceProduct superProduct, VerifiedUserContext user)
+		public async Task<SuperHSProduct> Post(SuperHSProduct superProduct, VerifiedUserContext user)
 		{
 			// Determine ID up front so price schedule ID can match
 			superProduct.Product.ID = superProduct.Product.ID ?? CosmosInteropID.New();
@@ -255,7 +255,7 @@ namespace Marketplace.Common.Commands.Crud
 			// List Product Specs
 			var _specs = await _oc.Products.ListSpecsAsync<Spec>(_product.ID, accessToken: user.AccessToken);
 			// Return the SuperProduct
-			return new SuperMarketplaceProduct
+			return new SuperHSProduct
 			{
 				Product = _product,
 				PriceSchedule = _priceSchedule,
@@ -266,7 +266,7 @@ namespace Marketplace.Common.Commands.Crud
 			};
 		}
 
-		public async Task<SuperMarketplaceProduct> Put(string id, SuperMarketplaceProduct superProduct, string token)
+		public async Task<SuperHSProduct> Put(string id, SuperHSProduct superProduct, string token)
 		{
 			// Update the Product itself
 			var _updatedProduct = await _oc.Products.SaveAsync<HSProduct>(superProduct.Product.ID, superProduct.Product, token);
@@ -370,7 +370,7 @@ namespace Marketplace.Common.Commands.Crud
 
 			await Task.WhenAll(tasks);
 
-			return new SuperMarketplaceProduct
+			return new SuperHSProduct
 			{
 				Product = _updatedProduct,
 				PriceSchedule = _priceScheduleReq?.Result,

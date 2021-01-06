@@ -19,8 +19,8 @@ namespace Marketplace.Common.Controllers
 	{
 
 		private readonly IMeProductCommand _meProductCommand;
-		private readonly IMarketplaceKitProductCommand _kitProductCommand;
-		public MeController(AppSettings settings, IMeProductCommand meProductCommand, IMarketplaceKitProductCommand kitProductCommand) : base(settings)
+		private readonly IHSKitProductCommand _kitProductCommand;
+		public MeController(AppSettings settings, IMeProductCommand meProductCommand, IHSKitProductCommand kitProductCommand) : base(settings)
 		{
 			_meProductCommand = meProductCommand;
 			_kitProductCommand = kitProductCommand;

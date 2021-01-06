@@ -19,36 +19,36 @@ namespace Marketplace.Common.Controllers
 	public class ProductController : BaseController
 	{
 
-		private readonly IMarketplaceProductCommand _command;
-		public ProductController(AppSettings settings, IMarketplaceProductCommand command) : base(settings)
+		private readonly IHSProductCommand _command;
+		public ProductController(AppSettings settings, IHSProductCommand command) : base(settings)
 		{
 			_command = command;
 		}
 
 		[DocName("GET Super Product")]
 		[HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-		public async Task<SuperMarketplaceProduct> Get(string id)
+		public async Task<SuperHSProduct> Get(string id)
 		{
 			return await _command.Get(id, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("LIST Super Product")]
 		[HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<HSProduct> args)
+		public async Task<ListPage<SuperHSProduct>> List(ListArgs<HSProduct> args)
 		{
 			return await _command.List(args, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("POST Super Product")]
 		[HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> Post([FromBody] SuperMarketplaceProduct obj)
+		public async Task<SuperHSProduct> Post([FromBody] SuperHSProduct obj)
 		{
 			return await _command.Post(obj, VerifiedUserContext);
 		}
 
 		[DocName("PUT Super Product")]
 		[HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> Put([FromBody] SuperMarketplaceProduct obj, string id)
+		public async Task<SuperHSProduct> Put([FromBody] SuperHSProduct obj, string id)
 		{
 			return await _command.Put(id, obj, this.VerifiedUserContext.AccessToken);
 		}

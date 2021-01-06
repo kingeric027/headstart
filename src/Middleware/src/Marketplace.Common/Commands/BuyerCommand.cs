@@ -10,18 +10,18 @@ using Marketplace.Common.Services.CMS;
 
 namespace Marketplace.Common.Commands
 {
-    public interface IMarketplaceBuyerCommand
+    public interface IHSBuyerCommand
     {
         Task<SuperHSBuyer> Create(SuperHSBuyer buyer, VerifiedUserContext user, bool isSeedingEnvironment = false);
         Task<SuperHSBuyer> Get(string buyerID, string token = null);
         Task<SuperHSBuyer> Update(string buyerID, SuperHSBuyer buyer, string token);
     }
-    public class MarketplaceBuyerCommand : IMarketplaceBuyerCommand
+    public class HSBuyerCommand : IHSBuyerCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
 
-        public MarketplaceBuyerCommand(AppSettings settings, IOrderCloudClient oc)
+        public HSBuyerCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _settings = settings;
             _oc = oc;

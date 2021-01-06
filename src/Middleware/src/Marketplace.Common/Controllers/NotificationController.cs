@@ -27,21 +27,21 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("POST Monitored Product Field Modified")]
 		[HttpPost, Route("monitored-product-field-modified"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification([FromBody] MonitoredProductFieldModifiedNotification notification)
+		public async Task<SuperHSProduct> CreateModifiedMonitoredSuperProductNotification([FromBody] MonitoredProductFieldModifiedNotification notification)
 		{
 			return await _command.CreateModifiedMonitoredSuperProductNotification(notification, VerifiedUserContext);
 		}
 
 		[DocName("PUT Monitored Product Field Modified")]
 		[HttpPut, Route("monitored-product-field-modified/{documentID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus([FromBody] Document<MonitoredProductFieldModifiedNotification> document)
+		public async Task<SuperHSProduct> UpdateMonitoredSuperProductNotificationStatus([FromBody] Document<MonitoredProductFieldModifiedNotification> document)
 		{
 			return await _command.UpdateMonitoredSuperProductNotificationStatus(document, document.Doc.Supplier.ID, document.Doc.Product.ID, VerifiedUserContext);
 		}
 
 		[DocName("GET Monitored Product Field Modified")]
 		[HttpPost, Route("monitored-product-notification"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationStatus([FromBody] SuperMarketplaceProduct product)
+		public async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationStatus([FromBody] SuperHSProduct product)
 		{
 			return await _command.ReadMonitoredSuperProductNotificationList(product, VerifiedUserContext);
 		}

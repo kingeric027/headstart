@@ -18,20 +18,20 @@ namespace Marketplace.Common.Commands
 {
     public interface INotificationCommand
     {
-        Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user);
-        Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user);
-        Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationList(SuperMarketplaceProduct product, VerifiedUserContext user);
+        Task<SuperHSProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user);
+        Task<SuperHSProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user);
+        Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationList(SuperHSProduct product, VerifiedUserContext user);
     }
     public class NotificationCommand : INotificationCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly AppSettings _settings;
         private readonly ICMSClient _cms;
-        private readonly IMarketplaceProductCommand _productCommand;
+        private readonly IHSProductCommand _productCommand;
         private readonly ISupplierApiClientHelper _apiClientHelper;
         private readonly string _documentSchemaID = "MonitoredProductFieldModifiedNotification";
 
-        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, ICMSClient cms, IMarketplaceProductCommand productCommand, ISupplierApiClientHelper apiClientHelper)
+        public NotificationCommand(IOrderCloudClient oc, AppSettings settings, ICMSClient cms, IHSProductCommand productCommand, ISupplierApiClientHelper apiClientHelper)
         {
             _oc = oc;
             _settings = settings;
@@ -39,7 +39,7 @@ namespace Marketplace.Common.Commands
             _productCommand = productCommand;
             _apiClientHelper = apiClientHelper;
         }
-        public async Task<SuperMarketplaceProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
+        public async Task<SuperHSProduct> CreateModifiedMonitoredSuperProductNotification(MonitoredProductFieldModifiedNotification notification, VerifiedUserContext user)
         {
             if (notification == null || notification?.Product == null) { throw new Exception("Unable to process notification with no product"); }
             var _product = await _oc.Products.PatchAsync(notification.Product.ID, new PartialProduct { Active = false }, user.AccessToken);
@@ -54,7 +54,7 @@ namespace Marketplace.Common.Commands
             return await _productCommand.Get(_product.ID, user.AccessToken);
         }
 
-        public async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationList(SuperMarketplaceProduct product, VerifiedUserContext user)
+        public async Task<ListPage<Document<MonitoredProductFieldModifiedNotification>>> ReadMonitoredSuperProductNotificationList(SuperHSProduct product, VerifiedUserContext user)
         {
             var token = await GetAdminToken();
             ListArgs<Document<MonitoredProductFieldModifiedNotification>> args;
@@ -99,7 +99,7 @@ namespace Marketplace.Common.Commands
             return result;
         }
 
-        public async Task<SuperMarketplaceProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
+        public async Task<SuperHSProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
             HSProduct product = null;
             var token = await GetAdminToken();
@@ -114,7 +114,7 @@ namespace Marketplace.Common.Commands
                 if (ex.HttpStatus == System.Net.HttpStatusCode.NotFound)
                 {
                     await _cms.Documents.Delete(_documentSchemaID, document.ID, token);
-                    return new SuperMarketplaceProduct();
+                    return new SuperHSProduct();
                 }
             }
             if (document.Doc.Status == NotificationStatus.ACCEPTED)

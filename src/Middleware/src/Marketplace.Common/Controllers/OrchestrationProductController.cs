@@ -41,7 +41,7 @@ namespace Marketplace.Common.Controllers
 
         [DocName("POST SuperProduct")]
         [HttpPost, Route("hydrated"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-        public async Task<SuperMarketplaceProduct> PostHydratedProduct([FromBody] SuperMarketplaceProduct obj)
+        public async Task<SuperHSProduct> PostHydratedProduct([FromBody] SuperHSProduct obj)
         {
             return await _command.SaveToQueue(obj, this.VerifiedUserContext, this.VerifiedUserContext.SupplierID);
         }

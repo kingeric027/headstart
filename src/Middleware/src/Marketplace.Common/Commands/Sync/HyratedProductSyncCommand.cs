@@ -24,7 +24,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<SuperMarketplaceProduct>();
+            var obj = wi.Current.ToObject<SuperHSProduct>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -52,7 +52,7 @@ namespace Marketplace.Common.Commands
                 var variants = await _oc.Products.ListVariantsAsync<HSVariant>(product.ID, null, null, null, 1, 100, null, wi.Token);
                 //var _images = GetProductImages(id, user);
                 //var _attachments = GetProductAttachments(id, user);
-                return JObject.FromObject(new SuperMarketplaceProduct
+                return JObject.FromObject(new SuperHSProduct
                 {
                     Product = product,
                     PriceSchedule = ps,
@@ -97,7 +97,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<SuperMarketplaceProduct>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<SuperHSProduct>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;
@@ -118,7 +118,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
-            var obj = wi.Diff.ToObject<SuperMarketplaceProduct>(OrchestrationSerializer.Serializer);
+            var obj = wi.Diff.ToObject<SuperHSProduct>(OrchestrationSerializer.Serializer);
             try
             {
                 //TODO: partial mapping
@@ -152,7 +152,7 @@ namespace Marketplace.Common.Commands
                 var variants = _oc.Products.ListVariantsAsync<HSVariant>(product.ID, null, null, null, 1, 100, null, wi.Token);
                 //var _images = GetProductImages(id, user);
                 //var _attachments = GetProductAttachments(id, user);
-                return JObject.FromObject(new SuperMarketplaceProduct
+                return JObject.FromObject(new SuperHSProduct
                 {
                     Product = product,
                     PriceSchedule = await priceSchedule,

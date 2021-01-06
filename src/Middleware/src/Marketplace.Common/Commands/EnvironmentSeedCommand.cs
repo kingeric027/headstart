@@ -28,7 +28,7 @@ namespace Marketplace.Common.Commands
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
-		private readonly IMarketplaceBuyerCommand _buyerCommand;
+		private readonly IHSBuyerCommand _buyerCommand;
 		private readonly ICMSClient _cms;
 
 		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
 			AppSettings settings,
 			IDevCenterService dev,
 			IMarketplaceSupplierCommand supplierCommand,
-			IMarketplaceBuyerCommand buyerCommand,
+			IHSBuyerCommand buyerCommand,
 			ICMSClient cms,
 			IOrderCloudClient oc
 		)

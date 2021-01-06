@@ -15,7 +15,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
 {
-    public interface IMarketplaceKitProductCommand
+    public interface IHSKitProductCommand
     {
         Task<HSKitProduct> Get(string id, string token);
         Task<HSMeKitProduct> GetMeKit(string id, VerifiedUserContext user);
@@ -27,13 +27,13 @@ namespace Marketplace.Common.Commands.Crud
         Task<List<Asset>> GetProductAttachments(string productID, string token);
     }
 
-    public class MarketplaceKitProductCommand : IMarketplaceKitProductCommand
+    public class HSKitProductCommand : IHSKitProductCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly ICMSClient _cms;
         private readonly IMeProductCommand _meProductCommand;
 
-        public MarketplaceKitProductCommand(
+        public HSKitProductCommand(
             AppSettings settings,
             ICMSClient cms,
             IOrderCloudClient elevatedOc,
