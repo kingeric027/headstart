@@ -35,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "exchangerates.tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "library.tests", "tests\library.tests\library.tests.csproj", "{3C0447C0-F5E2-4E43-939F-5FDC9A56B74E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Tests", "tests\Marketplace.Tests\Marketplace.Tests.csproj", "{CDC067B9-27B3-47B8-9E82-442D79156AE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Headstart.Tests", "tests\Marketplace.Tests\Headstart.Tests.csproj", "{CDC067B9-27B3-47B8-9E82-442D79156AE5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestration.Tests", "tests\Orchestration.Tests\Orchestration.Tests.csproj", "{AE99A3FF-0999-4F96-B7BD-4F367D3CE723}"
 EndProject
