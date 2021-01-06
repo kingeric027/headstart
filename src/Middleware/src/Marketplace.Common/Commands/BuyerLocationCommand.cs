@@ -66,10 +66,12 @@ namespace Marketplace.Common.Commands
             {
                 return buyerID + "-{" + buyerID + "-LocationIncrementor}";
             }
-            else
-            {
-                return buyerID + "-" + idInRequest.Replace("-", "_");
+            if (idInRequest.StartsWith(buyerID + "-"))
+			{
+                // prevents prefix duplication
+                return idInRequest;
             }
+            return buyerID + "-" + idInRequest.Replace("-", "_");
         }
 
         public async Task CreateUserGroupAndAssignments(string buyerID, string buyerLocationID, string token)

@@ -145,7 +145,7 @@ namespace Marketplace.Common.Commands
 			}
 			else
 			{
-				 await _locationCommand.Save(buyerID, location.Address.ID, location, _oc.TokenResponse.AccessToken);
+				 await _locationCommand.Create(buyerID, location, _oc.TokenResponse.AccessToken);
 			}
 			// TODO - don't just PUT all users.
 			await Throttler.RunAsync(newUsers, 100, 8, user => _oc.Users.SaveAsync(buyerID, user.ID, user));
