@@ -543,7 +543,7 @@ namespace Marketplace.Common.Services
             return specCombo;
         }
 
-        private QuoteOrderTemplateData GetQuoteOrderTemplateData(MarketplaceOrder order, IList<MarketplaceLineItem> lineItems)
+        private QuoteOrderTemplateData GetQuoteOrderTemplateData(HSOrder order, IList<HSLineItem> lineItems)
         {
             return new QuoteOrderTemplateData()
             {

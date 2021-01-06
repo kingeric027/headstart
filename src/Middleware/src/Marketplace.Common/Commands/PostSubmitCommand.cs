@@ -370,7 +370,7 @@ namespace Marketplace.Common.Commands
                         SubmittedOrderStatus = SubmittedOrderStatus.Open,
                         SelectedShipMethodsSupplierView = suppliersShipEstimates != null ? MapSelectedShipMethod(suppliersShipEstimates) : null,
                         // ShippingAddress needed for Purchase Order Detail Report
-                        ShippingAddress = new MarketplaceAddressBuyer()
+                        ShippingAddress = new HSAddressBuyer()
                         {
                             ID = buyerOrder?.Order?.xp?.ShippingAddress?.ID,
                             CompanyName = buyerOrder?.Order?.xp?.ShippingAddress?.CompanyName,

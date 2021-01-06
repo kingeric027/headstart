@@ -5,7 +5,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Mappers
 {
-	public class SyncLocation : MarketplaceBuyerLocation
+	public class SyncLocation : HSBuyerLocation
 	{
 		public string FranchiseeID { get; set; }
 		public bool ShouldSync { get; set; }
@@ -24,7 +24,7 @@ namespace Marketplace.Common.Mappers
 			{
 				FranchiseeID = studio.locationNumber,
 				ShouldSync = studio.status != "Inactive",
-				Address = new MarketplaceAddressBuyer()
+				Address = new HSAddressBuyer()
 				{
 					ID = ID,
 					Phone = studio.phoneNumber,
@@ -47,7 +47,7 @@ namespace Marketplace.Common.Mappers
 						PrimaryContactName = studio.primaryContactName
 					}
 				},
-				UserGroup = new MarketplaceLocationUserGroup()
+				UserGroup = new HSLocationUserGroup()
 				{
 					ID = ID,
 					Name = studio.locationName,
@@ -71,7 +71,7 @@ namespace Marketplace.Common.Mappers
 			{
 				FranchiseeID = club.id,
 				ShouldSync = !club.isDeleted,
-				Address = new MarketplaceAddressBuyer()
+				Address = new HSAddressBuyer()
 				{
 					ID = ID,
 					Phone = club.phoneNumber,
@@ -95,7 +95,7 @@ namespace Marketplace.Common.Mappers
 						PrimaryContactName = club.primaryContactName
 					}
 				},
-				UserGroup = new MarketplaceLocationUserGroup()
+				UserGroup = new HSLocationUserGroup()
 				{
 					ID = ID,
 					Name = club.name,
@@ -110,7 +110,7 @@ namespace Marketplace.Common.Mappers
 		}
 
 		// Set only the fields that the sync should overwrite in a patch
-		public static PartialAddress ToPartial(this MarketplaceAddressBuyer address)
+		public static PartialAddress ToPartial(this HSAddressBuyer address)
 		{
 			if (address == null) { return null; }
 			return new PartialAddress()

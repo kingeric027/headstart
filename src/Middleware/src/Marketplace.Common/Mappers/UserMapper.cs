@@ -5,7 +5,7 @@ using Marketplace.Models;
 
 namespace Marketplace.Common.Mappers
 {
-	public class SyncUser : MarketplaceUser
+	public class SyncUser : HSUser
 	{
 		public bool ShouldSync { get; set; }
 		public bool IsAdmin { get; set; }
@@ -13,7 +13,7 @@ namespace Marketplace.Common.Mappers
 
 	public static class UserMapper
 	{
-		public static SyncUser MapToUser(string buyerID, MarketplaceBuyerLocation location, AFStaff staff)
+		public static SyncUser MapToUser(string buyerID, HSBuyerLocation location, AFStaff staff)
 		{
 			if (staff == null || location == null) { return null; }
 			return new SyncUser()

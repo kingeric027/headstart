@@ -88,7 +88,7 @@ namespace Marketplace.Tests
                         {
                             FranchiseeID = "W15",                
                             ShouldSync = true,
-                            Address = new MarketplaceAddressBuyer()
+                            Address = new HSAddressBuyer()
                             {
                                 ID = "0005-W15",
                                 Phone = "(317) 759-2700",
@@ -111,11 +111,11 @@ namespace Marketplace.Tests
                                     PrimaryContactName = "Tony Black"
                                 }
                             },
-                            UserGroup = new MarketplaceLocationUserGroup()
+                            UserGroup = new HSLocationUserGroup()
                             {
                                 ID = "0005-W15",
                                 Name = "Indianapolis, IN",
-                                xp = new MarketplaceLocationUserGroupXp()
+                                xp = new HSLocationUserGroupXp()
                                 {
                                     Country = "US",
                                     Type = "BuyerLocation",
@@ -168,7 +168,7 @@ namespace Marketplace.Tests
                         {
                             FranchiseeID = "1084804",
                             ShouldSync = true,
-                            Address = new MarketplaceAddressBuyer()
+                            Address = new HSAddressBuyer()
                             {
                                 ID = "0006-A1084804",
                                 Phone = "(111) 111 - 4700",
@@ -191,11 +191,11 @@ namespace Marketplace.Tests
                                     PrimaryContactName = "Ryan Robinson"
                                 }
                             },
-                            UserGroup = new MarketplaceLocationUserGroup()
+                            UserGroup = new HSLocationUserGroup()
                             {
                                 ID = "0006-A1084804",
                                 Name = "Grand Island",
-                                xp = new MarketplaceLocationUserGroupXp()
+                                xp = new HSLocationUserGroupXp()
                                 {
                                     Country = "US",
                                     Type = "BuyerLocation",

@@ -29,7 +29,7 @@ namespace Marketplace.Tests
 		[TestCaseSource(typeof(UserFactory), nameof(UserFactory.AFUsers))]
 		public void map_anytime_staff_to_user(string buyerID, string country, AFStaff staff, SyncUser expectedUser)
 		{
-            var location = new MarketplaceBuyerLocation() { Address = new MarketplaceAddressBuyer() { Country = country } };
+            var location = new HSBuyerLocation() { Address = new HSAddressBuyer() { Country = country } };
             var user = UserMapper.MapToUser(buyerID, location, staff);
             assert_users_are_equal(expectedUser, user);
         }

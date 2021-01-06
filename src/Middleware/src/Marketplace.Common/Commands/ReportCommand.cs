@@ -203,7 +203,7 @@ namespace Marketplace.Common.Commands
                         pageSize: 1,
                         accessToken: verifiedUser.AccessToken
                         );
-                        order.xp.ShippingAddress = new MarketplaceAddressBuyer()
+                        order.xp.ShippingAddress = new HSAddressBuyer()
                         {
                             FirstName = lineItems.Items[0].ShippingAddress.FirstName,
                             LastName = lineItems.Items[0].ShippingAddress.LastName,
