@@ -24,6 +24,8 @@ import {
   TecraSpec,
 } from '../../../../shared/services/middleware-api/middleware-chili.service'
 import ChiliSpecOptions from '@ordercloud/headstart-sdk/dist/api/ChiliSpecOptions'
+import ChiliSpecs from '@ordercloud/headstart-sdk/dist/api/ChiliSpecs'
+import { Sortable } from 'sortablejs'
 
 @Component({
   selector: 'chili-publish-configuration-component',
@@ -57,6 +59,12 @@ export class ChiliPublishConfiguration implements OnInit {
   chiliTemplate: ChiliTemplate
   chiliTemplateID = ''
   showEditor = false
+  selectedSpecIndex: number = null
+  chiliSpecSortOrder: string[] = []
+  sortable = null
+  specOptionSortID = null
+  showLoadingIndicator = false
+  openingEditor = false
 
   @Input()
   set productID(value: string) {
@@ -243,16 +251,43 @@ export class ChiliPublishConfiguration implements OnInit {
     this.listChiliConfigs()
   }
   async editChiliTemplate(id: string): Promise<void> {
+    this.openingEditor = true
     this.chiliTemplateID = id
+    this.chiliSpecSortOrder = []
     this.chiliTemplate = await this.productService.getChiliTemplate(
       this.chiliTemplateID
     )
+    this.chiliTemplate.TemplateSpecs.forEach((ts) =>
+      this.chiliSpecSortOrder.push(ts.Name)
+    )
+    this.selectedSpecIndex = null
+    this.openingEditor = false
     this.showEditor = true
+    window.setTimeout(function () {
+      const el = document.getElementById('templateSpecs')
+      this.sortable = Sortable.create(el)
+    }, 500)
   }
+
+  async saveChiliSpec(spec: ChiliSpec): Promise<void> {
+    this.showLoadingIndicator = true
+    const newLabel = (document.getElementById(spec.ID + '_labelvalue') as any)
+      .value
+    const newDefaultValue = (document.getElementById(
+      spec.ID + '_defaultvalue'
+    ) as any).value
+
+    spec.DefaultValue = newDefaultValue ? newDefaultValue : spec.DefaultValue
+    spec.xp.Label = newLabel ? newLabel : spec.xp.Label
+    await HeadStartSDK.ChiliSpecs.Update(spec.ID, spec)
+    this.showLoadingIndicator = false
+  }
+
   async saveChiliSpecOption(
     option: ChiliSpecOption,
     spec: ChiliSpec
   ): Promise<void> {
+    this.showLoadingIndicator = true
     const newVal = (document.getElementById(option.ID + '_option') as any).value
     option.Value = newVal
     const updatedSpecOption = await this.productService.updateChiliSpecOption(
@@ -264,24 +299,115 @@ export class ChiliPublishConfiguration implements OnInit {
         o.Value = updatedSpecOption.Value
       }
     })
+    this.showLoadingIndicator = false
   }
-  async deleteChiliSpecOption(
-    option: ChiliSpecOption,
-    spec: ChiliSpec
-  ): Promise<void> {
-    await this.productService.deleteChiliSpecOption(spec.ID, option.ID)
-    this.chiliTemplate = await this.productService.getChiliTemplate(
-      this.chiliTemplateID
-    )
-  }
+
   async saveNewChiliSpecOption(spec: ChiliSpec): Promise<void> {
+    this.showLoadingIndicator = true
     const newOption: ChiliSpecOption = {
       Value: (document.getElementById(spec.ID + '_newOption') as any).value,
+      ListOrder: spec.Options.length + 1,
     }
     const updatedSpecOption = await this.productService.saveChiliSpecOption(
       spec.ID,
       newOption
     )
     spec.Options.push(updatedSpecOption)
+    this.showLoadingIndicator = false
+  }
+
+  showOptionsSortOrder(spec: ChiliSpec): void {
+    const el = document.getElementById(spec.ID + '_options')
+    this.sortable = Sortable.create(el)
+    this.specOptionSortID = spec.ID
+  }
+
+  async resetChiliConfig(): Promise<void> {
+    const updatedChiliConfig = this.chiliConfigs.find(
+      (c) => c.ChiliTemplateID == this.chiliTemplate.ChiliTemplateID
+    )
+
+    await HeadStartSDK.ChiliConfigs.Update(updatedChiliConfig)
+    this.chiliTemplate = await HeadStartSDK.ChiliTemplates.Get(
+      this.chiliTemplateID
+    )
+    this.specOptionSortID = null
+    this.showLoadingIndicator = false
+  }
+
+  async saveOptionsOrder(spec: ChiliSpec): Promise<void> {
+    this.showLoadingIndicator = true
+    const el = document.getElementById(spec.ID + '_options')
+    const sorted = Sortable.get(el)
+    const sortedArray: string[] = sorted.el.innerText.split('\n')
+    const requests = spec.Options.map((option) => {
+      const specFormIndex = sortedArray.indexOf(option.Value)
+      option.ListOrder = specFormIndex
+      return this.productService.updateChiliSpecOption(spec.ID, option)
+    })
+
+    await Promise.all(requests)
+    await this.resetChiliConfig()
+  }
+
+  async deleteChiliSpecOption(
+    option: ChiliSpecOption,
+    spec: ChiliSpec
+  ): Promise<void> {
+    this.showLoadingIndicator = true
+    await this.productService.deleteChiliSpecOption(spec.ID, option.ID)
+    this.chiliTemplate = await this.productService.getChiliTemplate(
+      this.chiliTemplateID
+    )
+    this.showLoadingIndicator = false
+  }
+
+  toggleTemplateSpec(index: number): void {
+    if (index === this.selectedSpecIndex) {
+      this.selectedSpecIndex = null
+    } else {
+      this.selectedSpecIndex = index
+    }
+  }
+
+  //reset list of spec ids saved to the chili template
+  updateSpecList(sortedArray: string[]): string[] {
+    const tempArray: string[] = []
+    sortedArray.forEach((s) => {
+      tempArray.push(
+        this.chiliTemplate.TemplateSpecs.find((ts) => ts.Name == s).ID
+      )
+    })
+    return tempArray
+  }
+  async resetChiliSpecs(sortedArray: string[]): Promise<void> {
+    const updatedSpecs = this.updateSpecList(sortedArray)
+
+    const updatedChiliConfig = this.chiliConfigs.find(
+      (c) => c.ChiliTemplateID == this.chiliTemplate.ChiliTemplateID
+    )
+
+    updatedChiliConfig.Specs = updatedSpecs
+    await HeadStartSDK.ChiliConfigs.Update(updatedChiliConfig)
+    this.chiliTemplate = await HeadStartSDK.ChiliTemplates.Get(
+      this.chiliTemplateID
+    )
+    this.selectedSpecIndex = null
+    this.showLoadingIndicator = false
+  }
+
+  async saveSortOrder(): Promise<void> {
+    this.showLoadingIndicator = true
+    const el = document.getElementById('templateSpecs')
+    const sorted = Sortable.get(el)
+    const sortedArray: string[] = sorted.el.innerText.split('\n')
+    const requests = this.chiliTemplate.TemplateSpecs.map((spec) => {
+      const specFormIndex = sortedArray.indexOf(spec.Name)
+      spec.xp.SpecFormOrder = specFormIndex
+      return HeadStartSDK.ChiliSpecs.Update(spec.ID, spec)
+    })
+
+    await Promise.all(requests)
+    await this.resetChiliSpecs(sortedArray)
   }
 }
