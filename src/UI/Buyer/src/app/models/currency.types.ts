@@ -1,4 +1,4 @@
-export interface ExchangeRates {
+export interface HeadstartExchangeRates {
   Currency: string
   Symbol: string
   Name: string

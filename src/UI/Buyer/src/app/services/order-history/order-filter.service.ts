@@ -12,7 +12,7 @@ import {
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { AppConfig } from 'src/app/models/environment.types'
-import { OrderFilters, OrderViewContext, MarketplaceOrderStatus } from 'src/app/models/order.types'
+import { OrderFilters, OrderViewContext, HeadstartOrderStatus } from 'src/app/models/order.types'
 
 @Injectable({
   providedIn: 'root',
@@ -83,7 +83,7 @@ export class OrderFilterService {
     this.patchFilterState({ showOnlyFavorites, page: undefined })
   }
 
-  filterByStatus(status: MarketplaceOrderStatus): void {
+  filterByStatus(status: HeadstartOrderStatus): void {
     this.patchFilterState({ status: status || undefined, page: undefined })
   }
 
@@ -228,11 +228,11 @@ export class OrderFilterService {
   }
 
   private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {
-    if (status === MarketplaceOrderStatus.ChangesRequested) {
+    if (status === HeadstartOrderStatus.ChangesRequested) {
       listOptions.filters.DateDeclined = '*'
     } else if (
-      status === MarketplaceOrderStatus.AwaitingApproval ||
-      status === MarketplaceOrderStatus.AllSubmitted
+      status === HeadstartOrderStatus.AwaitingApproval ||
+      status === HeadstartOrderStatus.AllSubmitted
     ) {
       listOptions.filters.Status = status
     } else {

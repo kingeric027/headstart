@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { takeWhile } from 'rxjs/operators'
-import { OrderFilters, MarketplaceOrderStatus } from 'src/app/models/order.types'
+import { OrderFilters, HeadstartOrderStatus } from 'src/app/models/order.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -16,9 +16,9 @@ export class OCMOrderStatusFilter implements OnInit, OnDestroy {
   constructor(private context: ShopperContextService) {}
 
   ngOnInit(): void {
-    this.statuses = Object.values(MarketplaceOrderStatus)
+    this.statuses = Object.values(HeadstartOrderStatus)
     this.form = new FormGroup({
-      status: new FormControl(MarketplaceOrderStatus.AllSubmitted),
+      status: new FormControl(HeadstartOrderStatus.AllSubmitted),
     })
     this.context.orderHistory.filters.activeFiltersSubject
       .pipe(takeWhile(() => this.alive))

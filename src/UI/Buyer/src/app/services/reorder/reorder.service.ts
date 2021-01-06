@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Me, Inventory, PriceSchedule } from 'ordercloud-javascript-sdk'
 import { partition as _partition } from 'lodash'
-import { MarketplaceLineItem, MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
+import { MarketplaceLineItem, MarketplaceMeProduct, MarketplacePriceSchedule } from '@ordercloud/headstart-sdk'
 import { TempSdk } from '../temp-sdk/temp-sdk.service'
 import { OrderReorderResponse } from 'src/app/models/order.types'
 
@@ -64,7 +64,7 @@ export class ReorderHelperService {
 
   private restrictedQuantitiesInvalidate(
     qty: number,
-    schedule: PriceSchedule
+    schedule: MarketplacePriceSchedule
   ): boolean {
     return (
       schedule.RestrictedQuantity &&

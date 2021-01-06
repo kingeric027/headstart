@@ -2,19 +2,20 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { ListPage, HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '../current-user/current-user.service'
-import ExchangeRates from '@ordercloud/headstart-sdk/dist/api/ExchangeRates'
+import { HeadstartExchangeRates } from 'src/app/models/currency.types'
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExchangeRatesService {
   private ratesSubject: BehaviorSubject<
-    ListPage<ExchangeRates>
-  > = new BehaviorSubject<ListPage<ExchangeRates>>(null)
+    ListPage<HeadstartExchangeRates>
+  > = new BehaviorSubject<ListPage<HeadstartExchangeRates>>(null)
 
   constructor(private currentUser: CurrentUserService) {}
 
-  Get(): ListPage<ExchangeRates> {
+  Get(): ListPage<HeadstartExchangeRates> {
     return this.exchangeRates
   }
 
@@ -23,11 +24,11 @@ export class ExchangeRatesService {
     this.exchangeRates = (await HeadStartSDK.ExchangeRates.Get(me.Currency))
   }
 
-  private get exchangeRates(): ListPage<ExchangeRates> {
+  private get exchangeRates(): ListPage<HeadstartExchangeRates> {
     return this.ratesSubject.value
   }
 
-  private set exchangeRates(value: ListPage<ExchangeRates>) {
+  private set exchangeRates(value: ListPage<HeadstartExchangeRates>) {
     this.ratesSubject.next(value)
   }
 }

@@ -10,7 +10,7 @@ import { TokenHelperService } from '../token-helper/token-helper.service'
 import { Title } from '@angular/platform-browser'
 import { AppConfig } from 'src/app/models/environment.types'
 import { RouteConfig } from 'src/app/models/shared.types'
-import { OrderFilters, MarketplaceOrderStatus } from 'src/app/models/order.types'
+import { OrderFilters, HeadstartOrderStatus } from 'src/app/models/order.types'
 import { ProductFilters, SupplierFilters } from 'src/app/models/filter-config.types'
 
 @Injectable({
@@ -139,7 +139,7 @@ export class RouteService {
   toMyOrders(options: OrderFilters = {}): void {
     // routing directly to unsubmitted orders
     if (!options.status) {
-      options.status = MarketplaceOrderStatus.AllSubmitted
+      options.status = HeadstartOrderStatus.AllSubmitted
     }
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options)
     this.router.navigate(['/orders'], { queryParams })
@@ -148,7 +148,7 @@ export class RouteService {
   toOrdersByLocation(options: OrderFilters = {}): void {
     // routing directly to unsubmitted orders
     if (!options.status) {
-      options.status = MarketplaceOrderStatus.AllSubmitted
+      options.status = HeadstartOrderStatus.AllSubmitted
     }
     const queryParams = this.orderFilterService.mapToUrlQueryParams(options)
     this.router.navigate(['/orders/location'], { queryParams })

@@ -34,7 +34,7 @@ export enum OrderAddressType {
   Shipping = 'Shipping',
 }
 
-export enum MarketplaceOrderStatus {
+export enum HeadstartOrderStatus {
   AllSubmitted = '!Unsubmitted',
   AwaitingApproval = 'AwaitingApproval',
   ChangesRequested = 'ChangesRequested',
@@ -48,7 +48,7 @@ export interface OrderFilters {
   sortBy?: Sortable<'Me.ListOrders'>
   search?: string
   showOnlyFavorites?: boolean
-  status?: MarketplaceOrderStatus
+  status?: HeadstartOrderStatus
   /**
    * mm-dd-yyyy
    */

@@ -63,7 +63,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   mapToLineItemsWithProduct(
-    lis: ListPage<MarketplaceLineItem>
+    lis: ListPage<LineItemWithProduct>
   ): ListPage<LineItemWithProduct> {
     const Items = lis.Items.map((li: LineItemWithProduct) => {
       const product = this.getCachedProduct(li.ProductID)
