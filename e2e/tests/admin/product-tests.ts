@@ -265,6 +265,7 @@ test
 	await adminHeaderPage.selectAllProducts()
 	await mainResourcePage.searchForResource(createdProductName)
 	await mainResourcePage.selectResource(createdProductName)
+	await productDetailsPage.clickacceptChangesButton()
 	await productDetailsPage.clickBuyerVisibilityTab()
 	await productDetailsPage.editBuyerVisibilityForView(
 		'0005',
