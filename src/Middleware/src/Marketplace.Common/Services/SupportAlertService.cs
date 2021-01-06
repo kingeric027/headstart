@@ -119,13 +119,13 @@ namespace Marketplace.Common.Services
             switch (subject.ToLower())
             {
                 case "general":
-                    return "sebvendorsupport@four51.com";
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
                 case "report an error/bug":
-                    return "sebvendorsupport@four51.com";
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
                 case "payment, billing, or refunds":
-                    return "accounting@sebvendorportal.com";
+                    return _settings.SendgridSettings.SEBBillingEmail;
                 default:
-                    return "sebvendorsupport@four51.com";
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
             }
         }
     }
