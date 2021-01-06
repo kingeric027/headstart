@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
+using Headstart.Common.Exceptions;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Queries;
+using Headstart.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class UserSyncCommand : SyncCommand, IWorkItemCommand
     {
@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceUser>();
+            var obj = wi.Current.ToObject<HSUser>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -66,7 +66,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = JObject.FromObject(wi.Current).ToObject<MarketplaceUser>();
+            var obj = JObject.FromObject(wi.Current).ToObject<HSUser>();
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;

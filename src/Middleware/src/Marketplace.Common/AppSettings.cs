@@ -7,7 +7,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.tecra;
 
-namespace Marketplace.Common
+namespace Headstart.Common
 {
 	public enum AppEnvironment { Qa, Demo, Prod }
 

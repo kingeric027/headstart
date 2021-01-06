@@ -17,13 +17,13 @@ import {
 // import { CookieService } from '@gorniv/ngx-universal';
 import { CookieService } from 'ngx-cookie'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { AppConfig } from '../../shopper-context'
 import { CurrentOrderService } from '../order/order.service'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { OrdersToApproveStateService } from '../order-history/order-to-approve-state.service'
 import { ApplicationInsightsService } from '../application-insights/application-insights.service'
 import { TokenHelperService } from '../token-helper/token-helper.service'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

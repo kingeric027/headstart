@@ -1,4 +1,4 @@
-import { RouteConfig } from './route-config'
+import { RouteConfig } from "src/app/models/shared.types";
 
 export const ProfileRoutes: RouteConfig[] = [
   {

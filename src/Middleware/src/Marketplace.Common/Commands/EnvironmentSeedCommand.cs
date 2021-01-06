@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Services.DevCenter;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Helpers;
+using Headstart.Common.Services.DevCenter;
+using Headstart.Models;
+using Headstart.Models.Misc;
+using Headstart.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Services.CMS;
-using Marketplace.Common.Services.CMS.Models;
+using Headstart.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
 using ordercloud.integrations.library.helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IEnvironmentSeedCommand
     {
@@ -28,7 +28,7 @@ namespace Marketplace.Common.Commands
 		private readonly AppSettings _settings;
 		private readonly IDevCenterService _dev;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
-		private readonly IMarketplaceBuyerCommand _buyerCommand;
+		private readonly IHSBuyerCommand _buyerCommand;
 		private readonly ICMSClient _cms;
 
 		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
@@ -42,7 +42,7 @@ namespace Marketplace.Common.Commands
 			AppSettings settings,
 			IDevCenterService dev,
 			IMarketplaceSupplierCommand supplierCommand,
-			IMarketplaceBuyerCommand buyerCommand,
+			IHSBuyerCommand buyerCommand,
 			ICMSClient cms,
 			IOrderCloudClient oc
 		)
@@ -149,7 +149,7 @@ namespace Marketplace.Common.Commands
 		}
 
 		private async Task CreateBuyers(EnvironmentSeed seed, VerifiedUserContext user) {
-			seed.Buyers.Add(new MarketplaceBuyer
+			seed.Buyers.Add(new HSBuyer
 			{
 				ID = "Default_HeadStart_Buyer",
 				Name = "Default HeadStart Buyer",
@@ -161,7 +161,7 @@ namespace Marketplace.Common.Commands
 			});
 			foreach (var buyer in seed.Buyers)
 			{
-				var superBuyer = new SuperMarketplaceBuyer()
+				var superBuyer = new SuperHSBuyer()
 				{
 					Buyer = buyer,
 					Markup = new BuyerMarkup() { Percent = 0 }
@@ -173,7 +173,7 @@ namespace Marketplace.Common.Commands
 		private async Task CreateSuppliers(VerifiedUserContext user, EnvironmentSeed seed, string token)
 		{
 			// Create Suppliers and necessary user groups and security profile assignments
-			foreach (MarketplaceSupplier supplier in seed.Suppliers)
+			foreach (HSSupplier supplier in seed.Suppliers)
 			{
 				await _supplierCommand.Create(supplier, user, isSeedingEnvironment: true);
 			}
@@ -203,7 +203,7 @@ namespace Marketplace.Common.Commands
         {
             var kitSchema = new DocSchema
             {
-                ID = "KitProduct",
+                ID = "HSKitProductAssignment",
 				RestrictedAssignmentTypes = new List<ResourceType> { },
 				Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/kitproduct.json"))
 			};
@@ -480,7 +480,7 @@ namespace Marketplace.Common.Commands
 
 		private async Task ShutOffSupplierEmailsAsync(string token)
         {
-			var allSuppliers = await ListAllAsync.List(page => _oc.Suppliers.ListAsync<MarketplaceSupplier>(page: page, pageSize: 100));
+			var allSuppliers = await ListAllAsync.List(page => _oc.Suppliers.ListAsync<HSSupplier>(page: page, pageSize: 100));
 			await Throttler.RunAsync(allSuppliers, 500, 20, supplier =>
 				_oc.Suppliers.PatchAsync(supplier.ID, new PartialSupplier { xp = new { NotificationRcpts = new string[] { } } }, token));
 		}
@@ -678,51 +678,51 @@ namespace Marketplace.Common.Commands
 			};
 		}
 
-		static readonly List<MarketplaceSecurityProfile> DefaultSecurityProfiles = new List<MarketplaceSecurityProfile>() {
+		static readonly List<HSSecurityProfile> DefaultSecurityProfiles = new List<HSSecurityProfile>() {
 			
 			// seller/supplier
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.ProductFacetReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.PriceScheduleReader, ApiRole.ProductFacetReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin, ApiRole.AdminAddressReader, ApiRole.PriceScheduleAdmin  } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionAdmin, Roles = new[] { ApiRole.PromotionAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPContentAdmin, CustomRoles = new[] { CustomRole.AssetAdmin, CustomRole.SchemaAdmin, CustomRole.DocumentAdmin, } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPPromotionReader, Roles = new[] { ApiRole.PromotionReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPStoreFrontAdmin, Roles = new[] { ApiRole.ProductFacetAdmin, ApiRole.ProductFacetReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCategoryAdmin, Roles = new[] { ApiRole.CategoryAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPCategoryReader, Roles = new[] { ApiRole.CategoryReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderAdmin, Roles = new[] { ApiRole.OrderAdmin, ApiRole.ShipmentReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPOrderReader, Roles = new[] { ApiRole.OrderReader, ApiRole.ShipmentAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPShipmentAdmin, Roles = new[] { ApiRole.OrderReader, ApiRole.ShipmentAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBuyerAdmin, Roles = new[] { ApiRole.BuyerAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin, ApiRole.AddressAdmin, ApiRole.CreditCardAdmin, ApiRole.ApprovalRuleAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBuyerReader, Roles = new[] { ApiRole.BuyerReader, ApiRole.BuyerUserReader, ApiRole.UserGroupReader, ApiRole.AddressReader, ApiRole.CreditCardReader, ApiRole.ApprovalRuleReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSellerAdmin, Roles = new[] { ApiRole.AdminUserAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSupplierAdmin, Roles = new[] { ApiRole.SupplierAdmin, ApiRole.SupplierUserAdmin, ApiRole.SupplierAddressAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAdmin, Roles = new[] {ApiRole.SupplierReader, ApiRole.SupplierAdmin }, CustomRoles = new[] { CustomRole.AssetAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAddressAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierAddressAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPMeSupplierUserAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPSupplierUserGroupAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserGroupAdmin } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportReader, CustomRoles = new[] { CustomRole.MPReportReader } },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPReportAdmin, CustomRoles = new[] { CustomRole.MPReportAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPMeProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.PriceScheduleAdmin, ApiRole.InventoryAdmin, ApiRole.ProductFacetReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPMeProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.PriceScheduleReader, ApiRole.ProductFacetReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPProductAdmin, Roles = new[] { ApiRole.ProductAdmin, ApiRole.CatalogAdmin, ApiRole.ProductAssignmentAdmin, ApiRole.ProductFacetAdmin, ApiRole.AdminAddressReader, ApiRole.PriceScheduleAdmin  } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPProductReader, Roles = new[] { ApiRole.ProductReader, ApiRole.CatalogReader, ApiRole.ProductFacetReader} },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPPromotionAdmin, Roles = new[] { ApiRole.PromotionAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPContentAdmin, CustomRoles = new[] { CustomRole.AssetAdmin, CustomRole.SchemaAdmin, CustomRole.DocumentAdmin, } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPPromotionReader, Roles = new[] { ApiRole.PromotionReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPStoreFrontAdmin, Roles = new[] { ApiRole.ProductFacetAdmin, ApiRole.ProductFacetReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPCategoryAdmin, Roles = new[] { ApiRole.CategoryAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPCategoryReader, Roles = new[] { ApiRole.CategoryReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPOrderAdmin, Roles = new[] { ApiRole.OrderAdmin, ApiRole.ShipmentReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPOrderReader, Roles = new[] { ApiRole.OrderReader, ApiRole.ShipmentAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPShipmentAdmin, Roles = new[] { ApiRole.OrderReader, ApiRole.ShipmentAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPBuyerAdmin, Roles = new[] { ApiRole.BuyerAdmin, ApiRole.BuyerUserAdmin, ApiRole.UserGroupAdmin, ApiRole.AddressAdmin, ApiRole.CreditCardAdmin, ApiRole.ApprovalRuleAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPBuyerReader, Roles = new[] { ApiRole.BuyerReader, ApiRole.BuyerUserReader, ApiRole.UserGroupReader, ApiRole.AddressReader, ApiRole.CreditCardReader, ApiRole.ApprovalRuleReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPSellerAdmin, Roles = new[] { ApiRole.AdminUserAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPSupplierAdmin, Roles = new[] { ApiRole.SupplierAdmin, ApiRole.SupplierUserAdmin, ApiRole.SupplierAddressAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAdmin, Roles = new[] {ApiRole.SupplierReader, ApiRole.SupplierAdmin }, CustomRoles = new[] { CustomRole.AssetAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPMeSupplierAddressAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierAddressAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPMeSupplierUserAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPSupplierUserGroupAdmin, Roles = new[] { ApiRole.SupplierReader, ApiRole.SupplierUserGroupAdmin } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPReportReader, CustomRoles = new[] { CustomRole.MPReportReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPReportAdmin, CustomRoles = new[] { CustomRole.MPReportAdmin } },
 			
 			// buyer
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPBaseBuyer, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
 			
 			// buyer impersonation - indicating the most roles a buyer user could have for impersonation purposes
-			new MarketplaceSecurityProfile() { CustomRoles = new[] {CustomRole.MPBaseBuyer, CustomRole.MPLocationOrderApprover, CustomRole.MPLocationViewAllOrders }, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
+			new HSSecurityProfile() { CustomRoles = new[] {CustomRole.MPBaseBuyer, CustomRole.MPLocationOrderApprover, CustomRole.MPLocationViewAllOrders }, Roles = new[] { ApiRole.MeAdmin, ApiRole.MeCreditCardAdmin, ApiRole.MeAddressAdmin, ApiRole.MeXpAdmin, ApiRole.ProductFacetReader, ApiRole.Shopper, ApiRole.SupplierAddressReader, ApiRole.SupplierReader } },
 
 			/* these roles don't do much, access to changing location information will be done through middleware calls that
 			*  confirm the user is in the location specific access user group. These roles will be assigned to the location 
 			*  specific user group and allow us to determine if a user has an admin role for at least one location through 
 			*  the users JWT
 			*/
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationPermissionAdmin },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationOrderApprover },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationNeedsApproval },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationViewAllOrders },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
-			new MarketplaceSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationPermissionAdmin },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationOrderApprover },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationNeedsApproval },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationViewAllOrders },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationCreditCardAdmin },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationAddressAdmin },
+			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
 		};
 
 		static readonly List<CustomRole> SellerMarketplaceRoles = new List<CustomRole>() {

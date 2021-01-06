@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { takeWhile } from 'rxjs/operators'
-import { ListPage } from '@ordercloud/headstart-sdk'
+import { ListPage, SupplierFilterConfig } from '@ordercloud/headstart-sdk'
 import { Supplier } from 'ordercloud-javascript-sdk'
-import { SupplierFilterConfig, BuyerAppFilterType } from '../shopper-context'
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service'
 import { TempSdk } from '../services/temp-sdk/temp-sdk.service'
+import { BuyerAppFilterType } from '../models/filter-config.types'
 
 @Component({
   template: `

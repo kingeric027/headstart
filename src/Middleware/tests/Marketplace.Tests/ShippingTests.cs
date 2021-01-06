@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Marketplace.Common;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common;
+using Headstart.Common.Commands;
+using Headstart.Common.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using NSubstitute;
 using NUnit.Framework;
 using ordercloud.integrations.avalara;
@@ -14,7 +14,7 @@ using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using OrderCloud.SDK;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class ShippingTests
     {
@@ -35,17 +35,17 @@ namespace Marketplace.Tests
                 Substitute.For<AppSettings>()
             );
 
-            var mockMethods = new List<MarketplaceShipMethod>()
+            var mockMethods = new List<HSShipMethod>()
             {
-                new MarketplaceShipMethod() {Name = "FEDEX_GROUND"},
-                new MarketplaceShipMethod() {Name = "USPS Priority"},
-                new MarketplaceShipMethod() {Name = "UPS GROUND"}
+                new HSShipMethod() {Name = "FEDEX_GROUND"},
+                new HSShipMethod() {Name = "USPS Priority"},
+                new HSShipMethod() {Name = "UPS GROUND"}
             };
 
-            var mockNotFoundMethods = new List<MarketplaceShipMethod>()
+            var mockNotFoundMethods = new List<HSShipMethod>()
             {
-                new MarketplaceShipMethod() {Name = "USPS Priority"},
-                new MarketplaceShipMethod() {Name = "UPS GROUND"}
+                new HSShipMethod() {Name = "USPS Priority"},
+                new HSShipMethod() {Name = "UPS GROUND"}
             };
 
             var settings = new AppSettings()

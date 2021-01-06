@@ -5,7 +5,7 @@ import { debounceTime, takeWhile } from 'rxjs/operators'
 import { DateValidator } from '../../../validators/validators'
 import { DatePipe } from '@angular/common'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderFilters } from 'src/app/shopper-context'
+import { OrderFilters } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-date-filter.component.html',

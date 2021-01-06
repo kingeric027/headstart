@@ -1,13 +1,5 @@
-export interface CountryDefinition {
-  label: string
-  abbreviation: string
-}
+import { CountryDefinition, StateDefinition } from "../models/shared.types"
 
-export interface StateDefinition {
-  label: string
-  abbreviation: string
-  country: string
-}
 
 // @dynamic
 export class GeographyConfig {

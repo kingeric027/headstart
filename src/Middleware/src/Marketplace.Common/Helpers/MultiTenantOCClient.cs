@@ -4,7 +4,7 @@ using System.Text;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Helpers
+namespace Headstart.Common.Helpers
 {
     /// <summary>A version of OrderCloudClient that takes all of its config data from an Ordercloud token.
     /// It can be used to support multi-tenancy because it can remove the need to save OC credentials in config settings.

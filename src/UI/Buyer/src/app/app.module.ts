@@ -178,7 +178,6 @@ import { OrderHistoryWrapperComponent } from './wrapper-components/order-history
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component'
 import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/product-chili-configuration-wrapper.component'
 import { Configuration, SdkConfiguration } from 'ordercloud-javascript-sdk'
-import { AppConfig, OrdercloudEnv } from './shopper-context'
 import { Configuration as MktpConfiguration } from '@ordercloud/headstart-sdk'
 import {
   MeListAddressResolver,
@@ -205,6 +204,7 @@ import { ShopperContextService } from './services/shopper-context/shopper-contex
 import { TempSdk } from './services/temp-sdk/temp-sdk.service'
 import { TokenHelperService } from './services/token-helper/token-helper.service'
 import { CMSConfiguration } from '@ordercloud/cms-sdk'
+import { AppConfig, OrdercloudEnv } from './models/environment.types'
 
 export function HttpLoaderFactory(
   http: HttpClient,

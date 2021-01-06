@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Marketplace.Common.Services.Zoho.Models
+namespace Headstart.Common.Services.Zoho.Models
 {
     public class ZohoListResponse
     {

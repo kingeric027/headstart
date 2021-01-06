@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Mappers
+namespace Headstart.Common.Mappers
 {
 	public static class Geography
 	{

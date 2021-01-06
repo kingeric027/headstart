@@ -5,13 +5,14 @@ import {
   MarketplaceKitProduct,
   MarketplaceLineItem,
 } from '@ordercloud/headstart-sdk'
-import { QtyChangeEvent } from '../../products/quantity-input/quantity-input.component'
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum'
 import { NgxSpinnerService } from 'ngx-spinner'
 import { ToastrService } from 'ngx-toastr'
-import { LineItemGroupSupplier, OrderType } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { OrderType } from 'src/app/models/order.types'
+import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
+import { QtyChangeEvent } from 'src/app/models/product.types'
 
 @Component({
   templateUrl: './lineitem-table.component.html',

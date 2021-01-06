@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, ResolveEnd, Router } from '@angular/router'
 import { ApplicationInsights } from '@microsoft/applicationinsights-web'
 import { Subscription } from 'rxjs'
 import { filter } from 'rxjs/operators'
-import { AppConfig } from '../../shopper-context'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

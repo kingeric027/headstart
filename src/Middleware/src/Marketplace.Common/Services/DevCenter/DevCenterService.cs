@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using Marketplace.Common.Services.DevCenter.Models;
+using Headstart.Common.Services.DevCenter.Models;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.DevCenter
+namespace Headstart.Common.Services.DevCenter
 {
     public interface IDevCenterService
     {

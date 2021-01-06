@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Constants;
-using Marketplace.Common.Extensions;
-using Marketplace.Common.Models;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Constants;
+using Headstart.Common.Extensions;
+using Headstart.Common.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.EntityFrameworkCore.Design;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
@@ -17,13 +17,13 @@ using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface ICheckoutIntegrationCommand
     {
-        Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload);
-        Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload);
-        Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
+        Task<ShipEstimateResponse> GetRatesAsync(HSOrderCalculatePayload orderCalculatePayload);
+        Task<HSOrderCalculateResponse> CalculateOrder(HSOrderCalculatePayload orderCalculatePayload);
+        Task<HSOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user);
         Task<ShipEstimateResponse> GetRatesAsync(string orderID);
     }
 
@@ -46,25 +46,25 @@ namespace Marketplace.Common.Commands
             _profiles = new SelfEsteemBrandsShippingProfiles(_settings);
         }
 
-        public async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderCalculatePayload orderCalculatePayload)
+        public async Task<ShipEstimateResponse> GetRatesAsync(HSOrderCalculatePayload orderCalculatePayload)
         {
             return await this.GetRatesAsync(orderCalculatePayload.OrderWorksheet, orderCalculatePayload.ConfigData);
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(string orderID)
         {
-            var order = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            var order = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
             return await this.GetRatesAsync(order);
         }
 
-        private async Task<ShipEstimateResponse> GetRatesAsync(MarketplaceOrderWorksheet worksheet, CheckoutIntegrationConfiguration config = null)
+        private async Task<ShipEstimateResponse> GetRatesAsync(HSOrderWorksheet worksheet, CheckoutIntegrationConfiguration config = null)
         {
             if (config != null && config.ExcludePOProductsFromShipping)
             {
                 worksheet.LineItems = worksheet.LineItems.Where(li => li.Product.xp.ProductType != ProductType.PurchaseOrder).ToList();
             }
             var groupedLineItems = worksheet.LineItems.GroupBy(li => new AddressPair { ShipFrom = li.ShipFromAddress, ShipTo = li.ShippingAddress }).ToList();
-            var shipResponse = (await _shippingService.GetRates(groupedLineItems, _profiles)).Reserialize<MarketplaceShipEstimateResponse>(); // include all accounts at this stage so we can save on order worksheet and analyze 
+            var shipResponse = (await _shippingService.GetRates(groupedLineItems, _profiles)).Reserialize<HSShipEstimateResponse>(); // include all accounts at this stage so we can save on order worksheet and analyze 
 
             // Certain suppliers use certain shipping accounts. This filters available rates based on those accounts.  
             for (var i = 0; i < groupedLineItems.Count; i++)
@@ -95,7 +95,7 @@ namespace Marketplace.Common.Commands
             return shipResponse;
         }
 
-        public IEnumerable<MarketplaceShipMethod> FilterMethodsBySupplierConfig(List<MarketplaceShipMethod> methods, EasyPostShippingProfile profile)
+        public IEnumerable<HSShipMethod> FilterMethodsBySupplierConfig(List<HSShipMethod> methods, EasyPostShippingProfile profile)
         {
             // will attempt to filter out by supplier method specs, but if there are filters and the result is none and there are valid methods still return the methods
             if (profile.AllowedServiceFilter.Count == 0) return methods;
@@ -103,14 +103,14 @@ namespace Marketplace.Common.Commands
             return filtered_methods.Any() ? filtered_methods : methods;
         }
 
-        public static IEnumerable<MarketplaceShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<MarketplaceShipMethod> methods)
+        public static IEnumerable<HSShipMethod> WhereRateIsCheapestOfItsKind(IEnumerable<HSShipMethod> methods)
 		{
             return methods
                 .GroupBy(method => method.EstimatedTransitDays)
                 .Select(kind => kind.OrderBy(method => method.Cost).First());
         }
 
-        private async Task<List<MarketplaceShipEstimate>> ConvertShippingRatesCurrency(IList<MarketplaceShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
+        private async Task<List<HSShipEstimate>> ConvertShippingRatesCurrency(IList<HSShipEstimate> shipEstimates, CurrencySymbol shipperCurrency, CurrencySymbol buyerCurrency)
 		{
             var rates = (await _exchangeRates.Get(buyerCurrency)).Rates;
             var conversionRate = rates.Find(r => r.Currency == shipperCurrency).Rate;
@@ -128,11 +128,11 @@ namespace Marketplace.Common.Commands
             }).ToList();
         }
 
-        private async Task<List<MarketplaceShipEstimate>> ApplyFreeShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> shipEstimates)
+        private async Task<List<HSShipEstimate>> ApplyFreeShipping(HSOrderWorksheet orderWorksheet, IList<HSShipEstimate> shipEstimates)
         {
             var supplierIDs = orderWorksheet.LineItems.Select(li => li.SupplierID);
-            var suppliers = await _oc.Suppliers.ListAsync<MarketplaceSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
-            var updatedEstimates = new List<MarketplaceShipEstimate>();
+            var suppliers = await _oc.Suppliers.ListAsync<HSSupplier>(filters: $"ID={string.Join("|", supplierIDs)}");
+            var updatedEstimates = new List<HSShipEstimate>();
 
             foreach(var estimate in shipEstimates)
             {
@@ -160,7 +160,7 @@ namespace Marketplace.Common.Commands
             return updatedEstimates;
         }
 
-        public static IList<MarketplaceShipEstimate> FilterSlowerRatesWithHighCost(IList<MarketplaceShipEstimate> estimates)
+        public static IList<HSShipEstimate> FilterSlowerRatesWithHighCost(IList<HSShipEstimate> estimates)
         {
             // filter out rate estimates with slower transit days and higher costs than faster transit days
             // ex: 3 days for $20 vs 1 day for $10. Filter out the 3 days option
@@ -168,7 +168,7 @@ namespace Marketplace.Common.Commands
             var result = estimates.Select(estimate =>
             {
                 var methodsList = estimate.ShipMethods.OrderBy(m => m.EstimatedTransitDays).ToList();
-                var filtered = new List<MarketplaceShipMethod>();
+                var filtered = new List<HSShipMethod>();
                 for (var i = methodsList.Count - 1; i >= 0; i--)
                 {
                     var method = methodsList[i];
@@ -187,13 +187,13 @@ namespace Marketplace.Common.Commands
             return result;
         }
         #nullable enable
-        public static IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet orderWorksheet, IList<MarketplaceShipEstimate> estimates, string medlineSupplierID, string? laliciousSupplierID)
+        public static IList<HSShipEstimate> ApplyFlatRateShipping(HSOrderWorksheet orderWorksheet, IList<HSShipEstimate> estimates, string medlineSupplierID, string? laliciousSupplierID)
         {
             var result = estimates.Select(estimate => ApplyFlatRateShippingOnEstimate(estimate, orderWorksheet, medlineSupplierID, laliciousSupplierID)).ToList();
             return result;
         }
 
-        public static MarketplaceShipEstimate ApplyFlatRateShippingOnEstimate(MarketplaceShipEstimate estimate, MarketplaceOrderWorksheet orderWorksheet, string medlineSupplierID, string? laliciousSupplierID)
+        public static HSShipEstimate ApplyFlatRateShippingOnEstimate(HSShipEstimate estimate, HSOrderWorksheet orderWorksheet, string medlineSupplierID, string? laliciousSupplierID)
         {
             var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
             if (laliciousSupplierID != null && supplierID == laliciousSupplierID)
@@ -226,7 +226,7 @@ namespace Marketplace.Common.Commands
             return estimate;
         }
 
-        public static MarketplaceShipMethod ApplyFlatRateShippingOnShipmethod(MarketplaceShipMethod method, decimal supplierSubTotal)
+        public static HSShipMethod ApplyFlatRateShippingOnShipmethod(HSShipMethod method, decimal supplierSubTotal)
         {
             if (supplierSubTotal > .01M && supplierSubTotal <= 499.99M)
             {
@@ -241,7 +241,7 @@ namespace Marketplace.Common.Commands
             return method;
         }
 
-        public static IList<MarketplaceShipEstimate> CheckForEmptyRates(IList<MarketplaceShipEstimate> estimates, decimal noRatesCost, int noRatesTransitDays)
+        public static IList<HSShipEstimate> CheckForEmptyRates(IList<HSShipEstimate> estimates, decimal noRatesCost, int noRatesTransitDays)
         {
             // if there are no rates for a set of line items then return a mocked response so user can check out
             // this order will additionally get marked as needing attention
@@ -250,9 +250,9 @@ namespace Marketplace.Common.Commands
             {
                 if (!shipEstimate.ShipMethods.Any())
                 {
-                    shipEstimate.ShipMethods = new List<MarketplaceShipMethod>()
+                    shipEstimate.ShipMethods = new List<HSShipMethod>()
                     {
-                        new MarketplaceShipMethod
+                        new HSShipMethod
                         {
                             ID = ShippingConstants.NoRatesID,
                             Name = "No shipping rates",
@@ -269,7 +269,7 @@ namespace Marketplace.Common.Commands
             return estimates;
         }
 
-        public static IList<MarketplaceShipEstimate> UpdateFreeShippingRates(IList<MarketplaceShipEstimate> estimates, int freeShippingTransitDays)
+        public static IList<HSShipEstimate> UpdateFreeShippingRates(IList<HSShipEstimate> estimates, int freeShippingTransitDays)
         {
             foreach (var shipEstimate in estimates)
             {
@@ -286,27 +286,27 @@ namespace Marketplace.Common.Commands
             return estimates;
         }
 
-        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user)
+        public async Task<HSOrderCalculateResponse> CalculateOrder(string orderID, VerifiedUserContext user)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
-            return await this.CalculateOrder(new MarketplaceOrderCalculatePayload()
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID, user.AccessToken);
+            return await this.CalculateOrder(new HSOrderCalculatePayload()
             {
                 ConfigData = null,
                 OrderWorksheet = worksheet
             });
         }
 
-        public async Task<MarketplaceOrderCalculateResponse> CalculateOrder(MarketplaceOrderCalculatePayload orderCalculatePayload)
+        public async Task<HSOrderCalculateResponse> CalculateOrder(HSOrderCalculatePayload orderCalculatePayload)
         {
             if(orderCalculatePayload.OrderWorksheet.Order.xp != null && orderCalculatePayload.OrderWorksheet.Order.xp.OrderType == OrderType.Quote)
             {
                 // quote orders do not have tax cost associated with them
-                return new MarketplaceOrderCalculateResponse();
+                return new HSOrderCalculateResponse();
             } else
             {
                 var totalTax = await _avalara.GetEstimateAsync(orderCalculatePayload.OrderWorksheet.Reserialize<OrderWorksheet>());
 
-                return new MarketplaceOrderCalculateResponse
+                return new HSOrderCalculateResponse
                 {
                     TaxTotal = totalTax.totalTax ?? 0,
                     xp = new OrderCalculateResponseXp()

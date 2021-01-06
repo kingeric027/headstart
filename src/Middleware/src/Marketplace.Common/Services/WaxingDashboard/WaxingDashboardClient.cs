@@ -1,9 +1,9 @@
 ﻿using Flurl;
 using Flurl.Http;
-using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+using Headstart.Common.Mappers;
+using Headstart.Common.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Marketplace.Common.Services.WazingDashboard
+namespace Headstart.Common.Services.WazingDashboard
 {
 	// The WTC API was custom built for Four51 and details about it were first shared 8/21/2020.
 	// The PDF in this folder has most of the details. 

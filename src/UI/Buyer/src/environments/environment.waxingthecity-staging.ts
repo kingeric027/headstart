@@ -1,6 +1,5 @@
-import { EnvironmentConfig } from './environment.interfaces'
+import { EnvironmentConfig, OrdercloudEnv } from 'src/app/models/environment.types'
 import wtcTheme from '../styles/themes/waxing-the-city/theme-config'
-import { OrdercloudEnv } from 'src/app/shopper-context'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,

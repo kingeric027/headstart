@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@angular/core'
 import { CanActivate, CanActivateChild, Router } from '@angular/router'
 import { DOCUMENT } from '@angular/common'
-import { Tokens } from 'ordercloud-javascript-sdk'
-import { AppConfig } from '../../shopper-context'
 import { AuthService } from 'src/app/services/auth/auth.service'
 import { TokenHelperService } from 'src/app/services/token-helper/token-helper.service'
+import { AppConfig } from 'src/app/models/environment.types'
+import { Tokens } from 'ordercloud-javascript-sdk'
 
 @Injectable({
   providedIn: 'root',

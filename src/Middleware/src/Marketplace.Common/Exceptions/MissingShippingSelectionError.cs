@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Marketplace.Models.Exceptions
+namespace Headstart.Models.Exceptions
 {
 	public class MissingShippingSelectionError
 	{

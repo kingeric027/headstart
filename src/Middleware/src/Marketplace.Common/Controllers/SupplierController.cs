@@ -1,13 +1,13 @@
-using Marketplace.Common.Commands;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Commands;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
     [MarketplaceSection.Marketplace(ListOrder = 2)]
@@ -23,16 +23,16 @@ namespace Marketplace.Common.Controllers
 			_oc = oc;
         }
 
-		[DocName("GET MarketplaceSupplier")]
+		[DocName("GET HSSupplier")]
 		[HttpGet, Route("me/{supplierID}"), OrderCloudIntegrationsAuth]
-		public async Task<MarketplaceSupplier> GetMySupplier(string supplierID)
+		public async Task<HSSupplier> GetMySupplier(string supplierID)
 		{
 			return await _command.GetMySupplier(supplierID, VerifiedUserContext);
 		}
 
 		[DocName("POST Marketplace Supplier")]
 		[HttpPost, OrderCloudIntegrationsAuth(ApiRole.SupplierAdmin)]
-		public async Task<MarketplaceSupplier> Create([FromBody] MarketplaceSupplier supplier)
+		public async Task<HSSupplier> Create([FromBody] HSSupplier supplier)
 		{
 			return await _command.Create(supplier, VerifiedUserContext);
 		}
@@ -48,14 +48,14 @@ namespace Marketplace.Common.Controllers
 		[DocName("PATCH Supplier")]
 		[DocIgnore] // PartialSupplier throws an openapi error?
 		[HttpPatch, Route("{supplierID}"), OrderCloudIntegrationsAuth]
-		public async Task<MarketplaceSupplier> UpdateSupplier(string supplierID, [FromBody] PartialSupplier supplier)
+		public async Task<HSSupplier> UpdateSupplier(string supplierID, [FromBody] PartialSupplier supplier)
 		{
 			return await _command.UpdateSupplier(supplierID, supplier, VerifiedUserContext);
 		}
 
 		[DocName("GET Supplier Order Details")]
 		[HttpGet, Route("orderdetails/{supplierOrderID}"), OrderCloudIntegrationsAuth(ApiRole.OrderAdmin, ApiRole.OrderReader)]
-		public async Task<MarketplaceSupplierOrderData> GetSupplierOrder(string supplierOrderID)
+		public async Task<HSSupplierOrderData> GetSupplierOrder(string supplierOrderID)
         {
 			return await _command.GetSupplierOrderData(supplierOrderID, VerifiedUserContext);
         }

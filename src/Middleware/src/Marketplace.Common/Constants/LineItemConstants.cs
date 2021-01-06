@@ -1,14 +1,14 @@
 using System.Collections.Generic;
-using Marketplace.Models.Extended;
-using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models;
+using Headstart.Models.Extended;
+using Headstart.Models.Models.Marketplace;
+using Headstart.Models;
 using System.Linq;
 
-namespace Marketplace.Common.Constants
+namespace Headstart.Common.Constants
 {
     public static class LineItemStatusConstants
     {
-        public static (SubmittedOrderStatus, ShippingStatus, ClaimStatus) GetOrderStatuses(List<MarketplaceLineItem> lineItems)
+        public static (SubmittedOrderStatus, ShippingStatus, ClaimStatus) GetOrderStatuses(List<HSLineItem> lineItems)
         {
             var orderStatusOccurances = new HashSet<SubmittedOrderStatus>();
             var shippingStatusOccurances = new HashSet<ShippingStatus>();

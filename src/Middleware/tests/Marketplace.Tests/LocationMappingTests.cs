@@ -1,16 +1,16 @@
-﻿using Marketplace.Common.Mappers;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Mappers;
+using Headstart.Common.Services.AnytimeDashboard.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 using NUnit.Framework;
 using ordercloud.integrations.exchangerates;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using static Marketplace.Common.Services.AnytimeDashboard.Models.AFClub;
+using static Headstart.Common.Services.AnytimeDashboard.Models.AFClub;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class LocationMappingTests
     {
@@ -88,7 +88,7 @@ namespace Marketplace.Tests
                         {
                             FranchiseeID = "W15",                
                             ShouldSync = true,
-                            Address = new MarketplaceAddressBuyer()
+                            Address = new HSAddressBuyer()
                             {
                                 ID = "0005-W15",
                                 Phone = "(317) 759-2700",
@@ -111,11 +111,11 @@ namespace Marketplace.Tests
                                     PrimaryContactName = "Tony Black"
                                 }
                             },
-                            UserGroup = new MarketplaceLocationUserGroup()
+                            UserGroup = new HSLocationUserGroup()
                             {
                                 ID = "0005-W15",
                                 Name = "Indianapolis, IN",
-                                xp = new MarketplaceLocationUserGroupXp()
+                                xp = new HSLocationUserGroupXp()
                                 {
                                     Country = "US",
                                     Type = "BuyerLocation",
@@ -168,7 +168,7 @@ namespace Marketplace.Tests
                         {
                             FranchiseeID = "1084804",
                             ShouldSync = true,
-                            Address = new MarketplaceAddressBuyer()
+                            Address = new HSAddressBuyer()
                             {
                                 ID = "0006-A1084804",
                                 Phone = "(111) 111 - 4700",
@@ -191,11 +191,11 @@ namespace Marketplace.Tests
                                     PrimaryContactName = "Ryan Robinson"
                                 }
                             },
-                            UserGroup = new MarketplaceLocationUserGroup()
+                            UserGroup = new HSLocationUserGroup()
                             {
                                 ID = "0006-A1084804",
                                 Name = "Grand Island",
-                                xp = new MarketplaceLocationUserGroupXp()
+                                xp = new HSLocationUserGroupXp()
                                 {
                                     Country = "US",
                                     Type = "BuyerLocation",

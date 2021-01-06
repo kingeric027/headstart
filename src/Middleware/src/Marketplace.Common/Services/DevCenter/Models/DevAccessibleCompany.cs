@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.DevCenter.Models
+namespace Headstart.Common.Services.DevCenter.Models
 {
     public class DevAccessibleCompany
     {

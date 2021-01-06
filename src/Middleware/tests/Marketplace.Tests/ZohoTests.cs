@@ -1078,7 +1078,7 @@
 //        public async Task Test()
 //        {
 //			// create buyer order
-//			var buyerOrder = await _ocBuyer.Orders.CreateAsync<MarketplaceOrder>(OrderDirection.Outgoing, new MarketplaceOrder()
+//			var buyerOrder = await _ocBuyer.Orders.CreateAsync<HSOrder>(OrderDirection.Outgoing, new HSOrder()
 //            {
 //				ID = "__testing__SEB",
 //				FromUserID = "0002-00001",
@@ -1087,7 +1087,7 @@
 //                ShippingCost = 322.18m,
 //				TaxCost = 0m
 //			});
-//            await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new MarketplaceLineItem()
+//            await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new HSLineItem()
 //            {
 //                ID = "X001",
 //                ProductID = "212769",
@@ -1096,7 +1096,7 @@
 //                ShippingAddressID = "0002-0003",
 //                SupplierID = "010"
 //            });
-//            await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new MarketplaceLineItem()
+//            await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new HSLineItem()
 //            {
 //                ID = "X002",
 //                ProductID = "212782",
@@ -1122,7 +1122,7 @@
 //                    }
 //                }
 //            });
-//            await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new MarketplaceLineItem()
+//            await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new HSLineItem()
 //            {
 //                ID = "X003",
 //                ProductID = "212782",
@@ -1148,7 +1148,7 @@
 //                    }
 //                }
 //            });
-//			await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new MarketplaceLineItem()
+//			await _ocBuyer.LineItems.CreateAsync(OrderDirection.Outgoing, buyerOrder.ID, new HSLineItem()
 //            {
 //                ID = "X004",
 //                ProductID = "212782",
@@ -1178,7 +1178,7 @@
 //			Assert.That(true);
 
 //    //        var command = new ZohoCommand(_zohoConfig, _ocConfig);
-//    //        var wk = JsonConvert.DeserializeObject<MarketplaceOrderWorksheet>(SEB_1001);
+//    //        var wk = JsonConvert.DeserializeObject<HSOrderWorksheet>(SEB_1001);
 //    //        try
 //    //        {
 //				//var zoho_salesorder = await command.CreateSalesOrder(wk);

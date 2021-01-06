@@ -1,7 +1,7 @@
 ﻿using NPOI.OpenXmlFormats.Dml;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class MonitoredProductFieldModifiedNotification

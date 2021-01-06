@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Common.Services.DevCenter.Models
+﻿namespace Headstart.Common.Services.DevCenter.Models
 {
     public class AdminCompany
     {

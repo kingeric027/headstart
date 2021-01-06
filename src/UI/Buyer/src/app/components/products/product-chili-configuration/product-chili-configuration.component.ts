@@ -10,24 +10,22 @@ import {
   MarketplaceVariant,
   ChiliSpec,
   ChiliConfig,
-  ChiliTemplate,
   MeChiliTemplate,
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
-import { ModalState } from 'src/app/models/modal-state.class'
 import { SpecFormService } from '../spec-form/spec-form.service'
 import {
   SuperMarketplaceProduct,
   MarketplaceMeProduct,
 } from '@ordercloud/headstart-sdk'
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from '../product-details/product-detail.service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
-import { ContactSupplierBody, CurrentUser } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { RouteConfigLoadEnd } from '@angular/router'
+import { QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { ContactSupplierBody } from 'src/app/models/buyer.types'
+import { ModalState } from 'src/app/models/shared.types'
 
 declare let SetVariableValue: any
 declare let saveDocument: any
