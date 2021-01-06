@@ -9,38 +9,39 @@ namespace Marketplace.Common.Mappers
 	{
         public static CurrencySymbol GetCurrency(string country)
         {
-            switch (country?.ToLower())
+            switch (country?.Trim(' ')?.ToLower())
             {
                 case "ca":
                 case "can":
                     return CurrencySymbol.CAD;
                 case "us":
                 case "usa":
-                default:
                     return CurrencySymbol.USD;
+                default:
+                    throw new Exception($"A currency for country with value <{country}> cannot be found");
 
             }
         }
 
         public static string GetCountry(string country)
         {
-            switch (country?.ToLower())
+            switch (country?.Trim(' ')?.ToLower())
             {
                 case "ca":
                 case "can":
                     return "CA";
                 case "us":
                 case "usa":
-                default:
                     return "US";
-
+                default:
+                    throw new Exception($"A country code cannot be detmined for <{country}>");
             }
         }
 
         // US and CA
         public static string GetStateAbreviationFromName(string state)
         {
-            switch (state?.ToUpper())
+            switch (state?.Trim(' ')?.ToUpper())
             {
                 case "ALABAMA": return "AL";
                 case "ALASKA": return "AK";
@@ -114,7 +115,8 @@ namespace Marketplace.Common.Mappers
                 case "QUEBEC": return "QC";
                 case "SASKATCHEWAN": return "SK";
                 case "YUKON": return "YT";
-                default: return state;
+                default: 
+                    throw new Exception($"A State code cannot be detmined for <{state}>");
             }
         }
     }

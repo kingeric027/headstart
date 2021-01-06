@@ -4,6 +4,7 @@ using Flurl.Http;
 using Marketplace.Common.Mappers;
 using Marketplace.Common.Services.WazingDashboard;
 using Marketplace.Models;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -44,7 +45,11 @@ namespace Marketplace.Common.Models
 	}
 
 	public class FranchiseAPIException : FlurlHttpException
-	{
-		public FranchiseAPIException(string message, FlurlHttpException ex) : base(ex.Call, $"{ex.Message}. Body: {message}", ex.InnerException) { }
+	{ 
+		public JObject Response { get; }
+		public FranchiseAPIException(string response, FlurlHttpException ex) : base(ex.Call, $"{ex.Message}. Body: {response}", ex.InnerException)
+		{
+			Response = JObject.Parse(response);
+		}
 	}
 }
