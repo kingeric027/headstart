@@ -9,7 +9,7 @@ using OrderCloud.SDK;
 
 namespace Marketplace.Common.Commands.Crud
 {
-	public interface IMarketplaceCatalogCommand
+	public interface IHSCatalogCommand
 	{
 		Task<ListPage<HSCatalog>> List(string buyerID, ListArgs<HSCatalog> args, VerifiedUserContext user);
 		Task<HSCatalog> Post(string buyerID, HSCatalog catalog, VerifiedUserContext user);
@@ -22,10 +22,10 @@ namespace Marketplace.Common.Commands.Crud
 		Task SyncUserCatalogAssignmentsForUserOnAddToLocation(string buyerID, string locationID, string userID);
 	}
 
-	public class MarketplaceCatalogCommand : IMarketplaceCatalogCommand
+	public class HSCatalogCommand : IHSCatalogCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		public MarketplaceCatalogCommand(AppSettings settings, IOrderCloudClient oc)
+		public HSCatalogCommand(AppSettings settings, IOrderCloudClient oc)
 		{
 			_oc = oc;
 		}

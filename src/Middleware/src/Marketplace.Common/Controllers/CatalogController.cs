@@ -15,8 +15,8 @@ namespace Marketplace.Common.Controllers
 	public class CatalogController : BaseController
 	{
 
-		private readonly IMarketplaceCatalogCommand _command;
-		public CatalogController(IMarketplaceCatalogCommand command, AppSettings settings) : base(settings)
+		private readonly IHSCatalogCommand _command;
+		public CatalogController(IHSCatalogCommand command, AppSettings settings) : base(settings)
 		{
 			_command = command;
 		}
