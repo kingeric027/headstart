@@ -51,7 +51,7 @@ namespace Marketplace.Common.Mappers
 				{
 					ID = ID,
 					Name = studio.locationName,
-					xp = new MarketplaceLocationUserGroupXp()
+					xp = new HSLocationUserGroupXp()
 					{
 						Country = country,
 						Type = "BuyerLocation",
@@ -99,7 +99,7 @@ namespace Marketplace.Common.Mappers
 				{
 					ID = ID,
 					Name = club.name,
-					xp = new MarketplaceLocationUserGroupXp()
+					xp = new HSLocationUserGroupXp()
 					{
 						Country = country,
 						Type = "BuyerLocation",
