@@ -305,7 +305,7 @@ const MySupplerUsers = {
 const Support = {
   // TODO: check that this encompasses either all suppliers or all sellers
   rolesWithAccess: [MPRoles.MPMeSupplierAdmin, MPRoles.MPSellerAdmin],
-  title: 'Support',
+  title: 'Submit a Case',
   route: '/support'
 }
 

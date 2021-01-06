@@ -45,9 +45,9 @@ export class CaseSubmissionComponent implements OnInit {
 
   setForm(): void {
     this.caseSubmissionForm = this.formBuilder.group({
-      FirstName: ['', Validators.required],
-      LastName: ['', Validators.required],
-      Email: ['', Validators.required],
+      FirstName: [this.user ? this.user.FirstName : '', Validators.required],
+      LastName: [this.user ? this.user.LastName : '', Validators.required],
+      Email: [this.user ? this.user.Email : '', Validators.required],
       Vendor: ['', Validators.required],
       Subject: [null, Validators.required],
       Message: ['', Validators.required],
