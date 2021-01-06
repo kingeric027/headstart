@@ -1,4 +1,4 @@
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -13,10 +13,10 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using System.Net;
 using Newtonsoft.Json;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IOrderSubmitCommand
     {

@@ -3,18 +3,18 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OrderCloud.SDK;
-using Marketplace.Models;
-using Marketplace.Common.Services;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Models;
+using Headstart.Common.Services;
+using Headstart.Models.Models.Marketplace;
 using ordercloud.integrations.library;
-using Marketplace.Models.Extended;
-using Marketplace.Common.Constants;
+using Headstart.Models.Extended;
+using Headstart.Common.Constants;
 using SendGrid.Helpers.Mail;
-using Marketplace.Common.Extensions;
+using Headstart.Common.Extensions;
 using System.Net;
 using ordercloud.integrations.library.helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface ILineItemCommand
     {

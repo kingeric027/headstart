@@ -1,6 +1,6 @@
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Services;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Zoho;
+using Headstart.Common.Services;
 using ordercloud.integrations.avalara;
 using OrderCloud.SDK;
 using NSubstitute;
@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models;
-using Marketplace.Common;
+using Headstart.Models.Models.Marketplace;
+using Headstart.Models;
+using Headstart.Common;
 using System.Security.Cryptography.X509Certificates;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -20,10 +20,10 @@ using System.Dynamic;
 using NSubstitute.Extensions;
 using AutoFixture;
 using SendGrid;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     class SendgridTests
     {

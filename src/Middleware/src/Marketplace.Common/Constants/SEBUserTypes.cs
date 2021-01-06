@@ -1,10 +1,10 @@
-using Marketplace.Common.Models;
+using Headstart.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Marketplace.Models.Misc;
+using Headstart.Models.Misc;
 
-namespace Marketplace.Common.Constants
+namespace Headstart.Common.Constants
 {
     public static class SEBUserTypes
     {

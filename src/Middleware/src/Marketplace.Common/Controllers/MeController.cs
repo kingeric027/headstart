@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Models;
+using Headstart.Models.Attributes;
+using Headstart.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[DocComments("Me and my stuff")]
 	[MarketplaceSection.Marketplace(ListOrder = 10)]

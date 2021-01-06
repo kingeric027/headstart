@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Models.Attributes;
+using Headstart.Common.Commands;
+using Headstart.Common.Models;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Orchestration Logs\" represents logs of orchestration activities")]
     [MarketplaceSection.Orchestration(ListOrder = 3)]

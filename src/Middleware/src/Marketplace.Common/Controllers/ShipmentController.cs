@@ -1,15 +1,15 @@
-﻿using Marketplace.Common.Commands;
+﻿using Headstart.Common.Commands;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
+using Headstart.Models.Attributes;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using Microsoft.AspNetCore.Http;
-using Marketplace.Common.Models.Misc;
+using Headstart.Common.Models.Misc;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Shipments\" for making shipments in seller app")]
     [MarketplaceSection.Marketplace(ListOrder = 2)]

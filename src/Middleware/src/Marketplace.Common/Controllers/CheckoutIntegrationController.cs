@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using Marketplace.Common.Commands;
+using Headstart.Common.Commands;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	public class CheckoutIntegrationController: BaseController
 	{

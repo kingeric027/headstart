@@ -1,11 +1,11 @@
-﻿using Marketplace.Common.Models.Marketplace;
+﻿using Headstart.Common.Models.Marketplace;
 using ordercloud.integrations.cardconnect;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Tests.Mocks
+namespace Headstart.Tests.Mocks
 {
     public static class PaymentMocks
     {

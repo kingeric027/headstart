@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut.Attributes;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Queries;
-using Marketplace.Models;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Queries;
+using Headstart.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     #region Models
     [SwaggerModel]

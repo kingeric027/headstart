@@ -2,14 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
+using Headstart.Common.Commands;
+using Headstart.Common.Models;
+using Headstart.Models;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Orchestration\" represents objects exposed for orchestration control")]
     [MarketplaceSection.Orchestration(ListOrder = 1)]

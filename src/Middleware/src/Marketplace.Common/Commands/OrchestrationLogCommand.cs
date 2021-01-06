@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IOrchestrationLogCommand
     {

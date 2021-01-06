@@ -4,17 +4,17 @@ using System.Text;
 using NUnit.Framework;
 using NSubstitute;
 using OrderCloud.SDK;
-using Marketplace.Common.Services;
+using Headstart.Common.Services;
 using ordercloud.integrations.cardconnect;
-using Marketplace.Common.Commands;
+using Headstart.Common.Commands;
 using System.Threading.Tasks;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models;
-using Marketplace.Tests.Mocks;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
+using Headstart.Models;
+using Headstart.Tests.Mocks;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     class PaymentCommandTests
     {

@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+﻿using Headstart.Common.Commands;
 using OrderCloud.SDK;
 using NSubstitute;
 using NUnit.Framework;
@@ -6,12 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
 using System.Linq;
-using Marketplace.Common.Models.Marketplace;
+using Headstart.Common.Models.Marketplace;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class CheckoutIntegrationCommandTests
     {

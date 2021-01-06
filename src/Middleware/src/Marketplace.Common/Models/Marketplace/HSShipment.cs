@@ -1,9 +1,9 @@
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 
-namespace Marketplace.Common.Services.ShippingIntegration.Models
+namespace Headstart.Common.Services.ShippingIntegration.Models
 {
     [SwaggerModel]
     public class SuperHSShipment

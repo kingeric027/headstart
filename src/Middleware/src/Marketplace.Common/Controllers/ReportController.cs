@@ -1,16 +1,16 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Models;
+﻿using Headstart.Common.Commands;
+using Headstart.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
-using Marketplace.Models.Attributes;
-using Marketplace.Common.Models;
-using Marketplace.Models.Misc;
-using Marketplace.Common.Models.Marketplace;
+using Headstart.Models.Attributes;
+using Headstart.Common.Models;
+using Headstart.Models.Misc;
+using Headstart.Common.Models.Marketplace;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Reports\" for generating and downloading reports in the Admin application")]
     [MarketplaceSection.Marketplace(ListOrder = 11)]

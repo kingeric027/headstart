@@ -1,9 +1,9 @@
-﻿using Marketplace.Models.Models.Marketplace;
+﻿using Headstart.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
     [SwaggerModel]
 	public class MessageNotification<EventBodyType>

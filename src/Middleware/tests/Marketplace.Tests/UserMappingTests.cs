@@ -1,14 +1,14 @@
-﻿using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Mappers;
+using Headstart.Common.Models;
+using Headstart.Common.Services.AnytimeDashboard.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 using NUnit.Framework;
 using ordercloud.integrations.exchangerates;
 using System;
 using System.Collections;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class UserMappingTests
     {

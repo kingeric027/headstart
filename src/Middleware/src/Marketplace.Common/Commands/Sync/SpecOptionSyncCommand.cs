@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
+using Headstart.Common.Exceptions;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Queries;
+using Headstart.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class SpecOptionSyncCommand : SyncCommand, IWorkItemCommand
     {

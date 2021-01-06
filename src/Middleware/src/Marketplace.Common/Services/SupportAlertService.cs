@@ -1,5 +1,5 @@
-﻿using Marketplace.Common.Models.Marketplace;
-using Marketplace.Models;
+﻿using Headstart.Common.Models.Marketplace;
+using Headstart.Models;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
 using ordercloud.integrations.cardconnect;
@@ -8,9 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using static Marketplace.Common.Models.SendGridModels;
+using static Headstart.Common.Models.SendGridModels;
 
-namespace Marketplace.Common.Services
+namespace Headstart.Common.Services
 {
     public interface ISupportAlertService
     {

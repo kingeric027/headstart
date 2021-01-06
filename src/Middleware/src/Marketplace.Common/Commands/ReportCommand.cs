@@ -1,18 +1,18 @@
-﻿using Marketplace.Models;
+﻿using Headstart.Models;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using System.Collections.Generic;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
 using System;
 using System.Linq;
 using System.Reflection;
 using ordercloud.integrations.library.helpers;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Models.Models.Marketplace;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IMarketplaceReportCommand
     {

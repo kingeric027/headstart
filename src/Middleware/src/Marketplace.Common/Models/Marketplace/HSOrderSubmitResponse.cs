@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Marketplace.Common.Exceptions;
+using Headstart.Common.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Models.Marketplace
+namespace Headstart.Common.Models.Marketplace
 {
 
     public class OrderSubmitResponseXp

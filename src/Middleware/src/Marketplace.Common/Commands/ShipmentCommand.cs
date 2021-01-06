@@ -1,6 +1,6 @@
-﻿using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Extended;
-using Marketplace.Models.Models.Marketplace;
+﻿using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Extended;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using ordercloud.integrations.library;
@@ -13,9 +13,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Misc = Marketplace.Common.Models.Misc;
+using Misc = Headstart.Common.Models.Misc;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class DocumentRowError
     {

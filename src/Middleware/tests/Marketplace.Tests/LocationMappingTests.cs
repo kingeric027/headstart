@@ -1,16 +1,16 @@
-﻿using Marketplace.Common.Mappers;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Mappers;
+using Headstart.Common.Services.AnytimeDashboard.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 using NUnit.Framework;
 using ordercloud.integrations.exchangerates;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using static Marketplace.Common.Services.AnytimeDashboard.Models.AFClub;
+using static Headstart.Common.Services.AnytimeDashboard.Models.AFClub;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class LocationMappingTests
     {

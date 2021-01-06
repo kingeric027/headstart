@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class SupplierFilterConfig

@@ -1,6 +1,6 @@
 using Cosmonaut;
 using Cosmonaut.Extensions;
-using Marketplace.Common.Models;
+using Headstart.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -14,7 +14,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Queries
+namespace Headstart.Common.Queries
 {
     public interface IResourceHistoryQuery<T> where T : class
     {

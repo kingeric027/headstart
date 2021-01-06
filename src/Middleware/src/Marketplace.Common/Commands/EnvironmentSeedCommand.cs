@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Services.DevCenter;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Helpers;
+using Headstart.Common.Services.DevCenter;
+using Headstart.Models;
+using Headstart.Models.Misc;
+using Headstart.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Services.CMS;
-using Marketplace.Common.Services.CMS.Models;
+using Headstart.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
 using ordercloud.integrations.library.helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IEnvironmentSeedCommand
     {

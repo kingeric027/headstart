@@ -1,18 +1,18 @@
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using System.Linq;
-using Marketplace.Common.Constants;
+using Headstart.Common.Constants;
 using ordercloud.integrations.library.helpers;
-using Marketplace.Models;
+using Headstart.Models;
 using System;
 using System.Dynamic;
 using System.Collections.Generic;
-using Marketplace.Common.Extensions;
-using Marketplace.Common.Helpers;
+using Headstart.Common.Extensions;
+using Headstart.Common.Helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IMarketplaceSupplierCommand
     {

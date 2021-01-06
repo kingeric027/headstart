@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
-using Marketplace.Models;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.CMS.Models;
+using Headstart.Models;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.CMS.Models;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Kit Products\" represents Kit Products for Marketplace")]
     [MarketplaceSection.Marketplace(ListOrder = 3)]

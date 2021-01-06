@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OrderCloud.SDK;
 using ordercloud.integrations.cardconnect;
-using Marketplace.Common.Services;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
+using Headstart.Common.Services;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
 
     public interface IPaymentCommand

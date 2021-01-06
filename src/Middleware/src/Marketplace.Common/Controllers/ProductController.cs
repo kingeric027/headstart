@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
+using Headstart.Common.Commands.Crud;
+using Headstart.Models;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using Newtonsoft;
@@ -11,7 +11,7 @@ using System.Dynamic;
 using System.Collections.Generic;
 using Flurl.Util;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[DocComments("\"Products\" represents Products for Marketplace")]
 	[MarketplaceSection.Marketplace(ListOrder = 3)]

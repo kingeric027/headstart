@@ -1,11 +1,11 @@
 using OrderCloud.SDK;
 using ordercloud.integrations.avalara;
 using System.Threading.Tasks;
-using Marketplace.Models.Misc;
-using Marketplace.Models;
+using Headstart.Models.Misc;
+using Headstart.Models;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IResaleCertCommand
     {

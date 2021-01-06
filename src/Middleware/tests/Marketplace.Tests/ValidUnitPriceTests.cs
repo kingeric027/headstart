@@ -1,14 +1,14 @@
-﻿using Marketplace.Common.Commands;
+﻿using Headstart.Common.Commands;
 using OrderCloud.SDK;
 using NSubstitute;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models;
+using Headstart.Models.Models.Marketplace;
+using Headstart.Models;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     class ValidUnitPriceTests
     {

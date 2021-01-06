@@ -1,4 +1,4 @@
-﻿using Marketplace.Models.Models.Marketplace;
+﻿using Headstart.Models.Models.Marketplace;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ordercloud.integrations.library;
@@ -6,7 +6,7 @@ using SendGrid.Helpers.Mail;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
     [DocIgnore]
     public class EnvironmentSeed

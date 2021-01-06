@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Flurl.Http;
-using Marketplace.Common.Services.Zoho.Models;
+using Headstart.Common.Services.Zoho.Models;
 
-namespace Marketplace.Common.Services.Zoho.Resources
+namespace Headstart.Common.Services.Zoho.Resources
 {
     public interface IZohoCurrencyResource
     {

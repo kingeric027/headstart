@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Marketplace.Models.Marketplace.Extended;
+using Headstart.Models.Marketplace.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Models.Models.Marketplace
+namespace Headstart.Models.Models.Marketplace
 {
     [SwaggerModel]
     public class HSSupplier : Supplier<SupplierXp>, IHSObject

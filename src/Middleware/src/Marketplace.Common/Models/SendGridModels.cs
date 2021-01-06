@@ -1,12 +1,12 @@
-﻿using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+﻿using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     class SendGridModels
     {

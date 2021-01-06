@@ -1,16 +1,16 @@
-﻿using Marketplace.Models;
+﻿using Headstart.Models;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using System;
-using Marketplace.Common.Commands.Crud;
+using Headstart.Common.Commands.Crud;
 using ordercloud.integrations.library.Cosmos;
 using System.Collections.Generic;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Services.CMS;
-using Marketplace.Common.Services.CMS.Models;
+using Headstart.Common.Helpers;
+using Headstart.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface INotificationCommand
     {

@@ -1,13 +1,13 @@
-using Marketplace.Common.Commands;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Commands;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
     [MarketplaceSection.Marketplace(ListOrder = 2)]

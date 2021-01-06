@@ -1,7 +1,7 @@
-using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Models.Attributes;
+using Headstart.Common.Commands;
+using Headstart.Common.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Orders\" for handling payment commands in Marketplace")]
     [MarketplaceSection.Marketplace(ListOrder = 2)]

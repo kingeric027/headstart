@@ -1,10 +1,10 @@
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Models;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 
-namespace Marketplace.Common.Models.Marketplace
+namespace Headstart.Common.Models.Marketplace
 {
     [SwaggerModel]
     public class HSMeKitProduct

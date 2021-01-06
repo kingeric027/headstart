@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.Crud
+namespace Headstart.Common.Commands.Crud
 {
 	public interface IMarketplaceCatalogCommand
 	{

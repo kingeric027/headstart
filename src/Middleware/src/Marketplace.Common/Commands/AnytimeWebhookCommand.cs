@@ -1,11 +1,11 @@
-﻿using Marketplace.Common.Mappers;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
+﻿using Headstart.Common.Mappers;
+using Headstart.Common.Services.AnytimeDashboard.Models;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
 	public interface IAnytimeWebhookCommand
 	{

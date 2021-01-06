@@ -1,16 +1,16 @@
 ﻿using Common;
 using Common.Services.AnytimeDashboard;
 using Flurl.Http;
-using Marketplace.Common.Mappers;
-using Marketplace.Common.Services.WazingDashboard;
-using Marketplace.Models;
+using Headstart.Common.Mappers;
+using Headstart.Common.Services.WazingDashboard;
+using Headstart.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
 	public enum FranchiseEnum
 	{

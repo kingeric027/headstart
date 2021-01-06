@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Models.Attributes;
-using Marketplace.Models.Extended;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Models.Attributes;
+using Headstart.Models.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.easypost;
@@ -12,7 +12,7 @@ using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class SuperHSProduct : IHSObject

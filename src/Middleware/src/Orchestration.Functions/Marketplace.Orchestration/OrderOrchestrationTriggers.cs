@@ -1,16 +1,16 @@
 using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Queries;
-using Marketplace.Common;
+using Headstart.Common.Commands;
+using Headstart.Common.Queries;
+using Headstart.Common;
 using System.Threading.Tasks;
 using System.Linq;
-using Marketplace.Common.Helpers;
+using Headstart.Common.Helpers;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 
-namespace Marketplace.Orchestration
+namespace Headstart.Orchestration
 {
     public class OrderOrchestrationTrigger
     {

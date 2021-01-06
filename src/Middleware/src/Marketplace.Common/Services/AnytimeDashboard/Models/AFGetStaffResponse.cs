@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.AnytimeDashboard.Models
+namespace Headstart.Common.Services.AnytimeDashboard.Models
 {
 	public class AFGetStaffResponse
 	{

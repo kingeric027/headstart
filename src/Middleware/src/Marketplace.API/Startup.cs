@@ -4,17 +4,17 @@ using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Marketplace.Common;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
-using Marketplace.Common.Services;
-using Marketplace.Common.Services.DevCenter;
-using Marketplace.Common.Services.ShippingIntegration;
-using Marketplace.Common.Services.Zoho;
+using Headstart.Common;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Commands.Zoho;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
+using Headstart.Common.Services;
+using Headstart.Common.Services.DevCenter;
+using Headstart.Common.Services.ShippingIntegration;
+using Headstart.Common.Services.Zoho;
 using OrderCloud.SDK;
 using Swashbuckle.AspNetCore.Swagger;
 using ordercloud.integrations.smartystreets;
@@ -36,11 +36,11 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using SendGrid;
 using SmartyStreets;
 using SmartyStreets.USStreetApi;
-using Marketplace.Common.Services.CMS;
+using Headstart.Common.Services.CMS;
 using Common.Services.AnytimeDashboard;
-using Marketplace.Common.Services.WazingDashboard;
+using Headstart.Common.Services.WazingDashboard;
 
-namespace Marketplace.API
+namespace Headstart.API
 {
     public class Startup
     {

@@ -1,9 +1,9 @@
-﻿using Marketplace.Common.Models;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Models;
+using Headstart.Common.Services.AnytimeDashboard.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Mappers
+namespace Headstart.Common.Mappers
 {
 	public class SyncUser : HSUser
 	{

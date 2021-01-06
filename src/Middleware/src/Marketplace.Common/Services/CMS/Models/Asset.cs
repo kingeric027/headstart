@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.CMS.Models
+namespace Headstart.Common.Services.CMS.Models
 {
 	public enum AssetType { Image, Text, Audio, Video, Presentation, SpreadSheet, PDF, Compressed, Code, JSON, Markup, Unknown }
 

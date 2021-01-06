@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     public interface IOrchestrationObject<T>
     {

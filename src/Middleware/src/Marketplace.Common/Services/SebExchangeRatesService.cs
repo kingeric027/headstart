@@ -1,4 +1,4 @@
-﻿using Marketplace.Models;
+﻿using Headstart.Models;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Services
+namespace Headstart.Common.Services
 {
     public interface ISebExchangeRatesService
     {

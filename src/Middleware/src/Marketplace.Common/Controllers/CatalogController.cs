@@ -1,13 +1,13 @@
-using Marketplace.Common.Commands;
-using Marketplace.Models;
+using Headstart.Common.Commands;
+using Headstart.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
-using Marketplace.Common.Commands.Crud;
+using Headstart.Common.Commands.Crud;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[DocComments("\"Marketplace Catalogs\" for product groupings and visibility in Marketplace")]
 	[MarketplaceSection.Marketplace(ListOrder = 2)]

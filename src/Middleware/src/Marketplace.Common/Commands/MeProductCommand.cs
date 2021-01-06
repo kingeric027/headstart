@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LazyCache;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services;
+using Headstart.Models;
+using Headstart.Models.Misc;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
 	public interface IMeProductCommand
 	{

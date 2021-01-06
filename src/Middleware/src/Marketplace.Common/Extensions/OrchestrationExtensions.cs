@@ -1,10 +1,10 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Common.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Commands;
+using Headstart.Common.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
-using ErrorCodes = Marketplace.Models.ErrorCodes;
+using ErrorCodes = Headstart.Models.ErrorCodes;
 
-namespace Marketplace.Common.Extensions
+namespace Headstart.Common.Extensions
 {
     public static class OrchestrationExtensions
     {

@@ -1,21 +1,21 @@
 using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Marketplace.Common;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
-using Marketplace.Orchestration;
+using Headstart.Common;
+using Headstart.Common.Commands;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
+using Headstart.Orchestration;
 using Flurl.Http;
 using Microsoft.Extensions.DependencyInjection;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
-using Marketplace.Common.Services;
+using Headstart.Common.Services;
 using Flurl.Http.Configuration;
-using Marketplace.Common.Services.CMS;
+using Headstart.Common.Services.CMS;
 
 [assembly: FunctionsStartup(typeof(Startup))]
-namespace Marketplace.Orchestration
+namespace Headstart.Orchestration
 {
     public class Startup : FunctionsStartup
     {

@@ -1,6 +1,6 @@
 ﻿using OrderCloud.SDK;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
 	public class HSSecurityProfile
 	{

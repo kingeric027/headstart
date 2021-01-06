@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Extensions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Services.CMS;
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Models;
+using Headstart.Common.Helpers;
+using Headstart.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 
-namespace Marketplace.Common.Commands.Crud
+namespace Headstart.Common.Commands.Crud
 {
 	public interface IHSProductCommand
 	{

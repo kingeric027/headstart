@@ -1,6 +1,6 @@
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Services;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Zoho;
+using Headstart.Common.Services;
 using NUnit.Framework;
 using NSubstitute;
 using ordercloud.integrations.avalara;
@@ -8,19 +8,19 @@ using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Marketplace.Common;
+using Headstart.Common;
 using ordercloud.integrations.cardconnect;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Models.Models.Marketplace;
 using System.Security.Claims;
-using Marketplace.Models;
+using Headstart.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class OrderSubmitCommandTests
     {

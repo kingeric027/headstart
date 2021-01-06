@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Extensions;
+﻿using Headstart.Common.Extensions;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Helpers
+namespace Headstart.Common.Helpers
 {
     public interface ISupplierApiClientHelper
     {

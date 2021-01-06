@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Exceptions;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Queries;
+using Headstart.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class HydratedProductSyncCommand : SyncCommand, IWorkItemCommand
     {

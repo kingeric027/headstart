@@ -4,8 +4,8 @@
 // ====================================================================
 const brand = Brand.WAXING_THE_CITY
 const sebEnvironment = Environment.TEST
-const useLocalMiddleware = false
-const localMiddlewareURL = 'https://localhost:5001'
+const useLocalMiddleware = true
+const localMiddlewareURL = 'https://localhost:44304'
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 

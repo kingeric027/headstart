@@ -1,5 +1,5 @@
 using Cosmonaut.Attributes;
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using OrderCloud.SDK;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
 
     public interface IResourceHistory : ICosmosObject

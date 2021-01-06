@@ -2,7 +2,7 @@
 using OrderCloud.SDK;
 using System.Collections.Generic;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class HSUser : User<UserXp>, IHSObject

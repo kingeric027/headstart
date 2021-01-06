@@ -1,14 +1,14 @@
-﻿using Marketplace.Models;
+﻿using Headstart.Models;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Misc;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
 using System.Linq;
 using System.Dynamic;
 using System;
-using Marketplace.Common.Services.CMS;
+using Headstart.Common.Services.CMS;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IHSBuyerCommand
     {

@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
+using Headstart.Common.Exceptions;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Queries;
+using Headstart.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Models;
-using Marketplace.Models.Extended;
+using Headstart.Models;
+using Headstart.Models.Extended;
 using ordercloud.integrations.library;
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Common.Services.CMS;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class TemplateProductFlatSyncCommand : SyncCommand, IWorkItemCommand
     {

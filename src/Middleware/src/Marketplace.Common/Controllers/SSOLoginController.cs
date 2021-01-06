@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
-using Marketplace.Models.Attributes;
+using Headstart.Common.Commands;
+using Headstart.Common.Mappers;
+using Headstart.Common.Models;
+using Headstart.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[MarketplaceSection.Marketplace(ListOrder = 1)]
 	[Route("api")]

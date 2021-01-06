@@ -1,7 +1,7 @@
 ﻿using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Models.Models.Marketplace
+namespace Headstart.Models.Models.Marketplace
 {
 	[SwaggerModel]
 	public class HSCreditCard: CreditCard<CreditCardXP>

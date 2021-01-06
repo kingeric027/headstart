@@ -1,4 +1,4 @@
-using Marketplace.Models.Extended;
+using Headstart.Models.Extended;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.exchangerates;
@@ -6,11 +6,11 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 using Avalara.AvaTax.RestClient;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Exceptions;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class HSOrder : Order<OrderXp, HSUser, HSAddressBuyer>

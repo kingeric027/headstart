@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut.Extensions;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.CMS;
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
 
-namespace Marketplace.Common.Commands.Crud
+namespace Headstart.Common.Commands.Crud
 {
     public interface IHSKitProductCommand
     {

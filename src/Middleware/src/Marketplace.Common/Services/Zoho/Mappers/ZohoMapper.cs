@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Common.Services.Zoho.Models;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.Zoho.Models;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.Zoho.Mappers
+namespace Headstart.Common.Services.Zoho.Mappers
 {
     public static class ZohoContactMapper
     {

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     [SupplierSync("027"),SupplierSync("093"), SupplierSync("129"), SupplierSync("waxinthecitydistribution")]
     public class WaxInTheCityDistributionCommand : ISupplierSyncCommand

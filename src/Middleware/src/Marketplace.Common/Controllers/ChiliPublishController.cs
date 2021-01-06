@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Marketplace.Models.Attributes;
+using Headstart.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.tecra;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands;
+using Headstart.Common.Commands;
 using ordercloud.integrations.tecra.Models;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Integration\" represents a Chili Template Spec Option")]
     [MarketplaceSection.Content(ListOrder = 3)]

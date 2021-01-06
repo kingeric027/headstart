@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
+using Headstart.Models;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
-using Marketplace.Common.Constants;
+using Headstart.Common.Constants;
 using Azure.Core;
 using ordercloud.integrations.library.helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface ILocationPermissionCommand
     {

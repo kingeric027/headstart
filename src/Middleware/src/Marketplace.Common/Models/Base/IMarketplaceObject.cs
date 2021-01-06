@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     public interface IHSObject
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.AnytimeDashboard.Models
+namespace Headstart.Common.Services.AnytimeDashboard.Models
 {
 	// This is basically equivallent to the response from /me in OC.
 	// I need to use it for SSO to get a username from the bearer token. 

@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 using Dynamitey;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using Marketplace.Common.Constants;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Constants;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
+using Headstart.Models.Misc;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using static Marketplace.Common.Models.SendGridModels;
+using static Headstart.Common.Models.SendGridModels;
 
-namespace Marketplace.Common.Services
+namespace Headstart.Common.Services
 {
     public interface ISendgridService
     {

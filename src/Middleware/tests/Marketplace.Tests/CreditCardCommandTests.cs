@@ -1,9 +1,9 @@
-﻿using Marketplace.Common;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Tests.Mocks;
+﻿using Headstart.Common;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
+using Headstart.Tests.Mocks;
 using NSubstitute;
 using NUnit.Framework;
 using ordercloud.integrations.cardconnect;
@@ -15,7 +15,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     class CreditCardCommandTests
     {

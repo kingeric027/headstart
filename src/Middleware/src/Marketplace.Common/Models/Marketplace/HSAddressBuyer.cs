@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class HSAddressBuyer : Address<BuyerAddressXP>, IHSObject

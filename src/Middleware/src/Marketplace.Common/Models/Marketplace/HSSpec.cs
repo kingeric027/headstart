@@ -1,9 +1,9 @@
-﻿using Marketplace.Models.Extended;
+﻿using Headstart.Models.Extended;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
-namespace Marketplace.Models
+namespace Headstart.Models
 {
     [SwaggerModel]
     public class HSSpec : Spec, IHSObject

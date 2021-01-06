@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
     [SwaggerModel]
 	public class HSUserType

@@ -1,9 +1,9 @@
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using Marketplace.Models.Extended;
+using Headstart.Models.Extended;
 using System.Collections.Generic;
 
-namespace Marketplace.Models.Models.Marketplace
+namespace Headstart.Models.Models.Marketplace
 {
     [SwaggerModel]
 	public class HSLineItem : LineItem<LineItemXp, HSLineItemProduct, LineItemVariant, HSAddressBuyer, HSAddressSupplier> { }

@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Common.Constants;
-using Marketplace.Common.Extensions;
-using Marketplace.Common.Models;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Constants;
+using Headstart.Common.Extensions;
+using Headstart.Common.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.EntityFrameworkCore.Design;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.easypost;
@@ -17,7 +17,7 @@ using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface ICheckoutIntegrationCommand
     {

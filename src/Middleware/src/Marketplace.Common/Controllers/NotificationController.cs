@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
-using Marketplace.Models.Misc;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Models;
+using Headstart.Models.Attributes;
+using Headstart.Models.Misc;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[DocComments("Notifications")]
 	[Route("notifications")]

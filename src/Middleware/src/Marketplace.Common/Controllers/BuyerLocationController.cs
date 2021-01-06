@@ -1,14 +1,14 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
+﻿using Headstart.Common.Commands;
+using Headstart.Models;
+using Headstart.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Marketplace.Models.Misc;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Files\" represents files for Marketplace content management control")]
     [MarketplaceSection.Marketplace(ListOrder = 6)]

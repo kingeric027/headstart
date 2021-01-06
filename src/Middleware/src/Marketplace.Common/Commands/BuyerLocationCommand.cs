@@ -1,13 +1,13 @@
-﻿using Marketplace.Models;
-using Marketplace.Models.Misc;
+﻿using Headstart.Models;
+using Headstart.Models.Misc;
 using OrderCloud.SDK;
 using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
-using Marketplace.Common.Constants;
+using Headstart.Common.Constants;
 using System;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IMarketplaceBuyerLocationCommand
     {
