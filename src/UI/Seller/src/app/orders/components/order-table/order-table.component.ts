@@ -53,7 +53,7 @@ export class OrderTableComponent extends ResourceCrudComponent<Order> {
     Filters: [
       {
         Display: 'ADMIN.FILTERS.STATUS',
-        Path: 'Status',
+        Path: 'xp.SubmittedOrderStatus',
         Items: [
           { Text: 'ADMIN.FILTER_OPTIONS.OPEN', Value: 'Open' },
           {
