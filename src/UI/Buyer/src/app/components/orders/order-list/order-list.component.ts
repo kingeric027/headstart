@@ -5,7 +5,7 @@ import { ListPage, Order } from 'ordercloud-javascript-sdk'
 import { isQuoteOrder } from '../../../services/orderType.helper'
 import { MarketplaceOrder } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderViewContext } from 'src/app/shopper-context'
+import { OrderViewContext } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-list.component.html',

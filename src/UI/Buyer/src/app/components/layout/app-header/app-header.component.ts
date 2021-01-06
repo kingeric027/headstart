@@ -19,10 +19,12 @@ import {
   MarketplaceLineItem,
 } from '@ordercloud/headstart-sdk'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper'
-import { AppConfig, CurrentUser, ProductFilters } from 'src/app/shopper-context'
-import { RouteConfig } from 'src/app/services/route/route-config'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { StaticPageService } from 'src/app/services/static-page/static-page.service'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { RouteConfig } from 'src/app/models/config.types'
+import { AppConfig } from 'src/app/models/environment.types'
+import { ProductFilters } from 'src/app/models/filter-config.types'
 
 @Component({
   templateUrl: './app-header.component.html',

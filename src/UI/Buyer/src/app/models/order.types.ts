@@ -23,6 +23,12 @@ export interface OrderSummaryMeta {
     OrderTotal: number
   }
 
+// TODO - remove once SDK has enum types
+export enum OrderType {
+  Standard = 'Standard',
+  Quote = 'Quote',
+}
+
 export enum OrderAddressType {
   Billing = 'Billing',
   Shipping = 'Shipping',
@@ -65,3 +71,17 @@ export interface OrderReorderResponse {
   ValidLi: Array<LineItem>
   InvalidLi: Array<LineItem>
 }
+
+export enum ClaimStatus {
+  NoClaim = 'NoClaim',
+  Pending = 'Pending',
+  Complete = 'Complete',
+}
+
+export type OrderListColumn =
+  | 'ID'
+  | 'Status'
+  | 'DateSubmitted'
+  | 'SubmittedBy'
+  | 'Total'
+  | 'Favorite'

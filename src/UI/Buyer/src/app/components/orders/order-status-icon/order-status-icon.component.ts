@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core'
 import { faCircle, faClock, faBan } from '@fortawesome/free-solid-svg-icons'
-import { ClaimStatus, LineItemStatus, OrderStatus, ShippingStatus } from 'src/app/shopper-context'
+import { LineItemStatus } from 'src/app/models/line-item.types'
+import { ClaimStatus, OrderStatus } from 'src/app/models/order.types'
+import { ShippingStatus } from 'src/app/models/shipping.types'
 
 @Component({
   templateUrl: './order-status-icon.component.html',
@@ -15,7 +17,6 @@ export class OCMOrderStatusIcon {
     [OrderStatus.Completed]: this.faCircle,
     [OrderStatus.AwaitingApproval]: this.faClock,
     [OrderStatus.Open]: this.faCircle,
-    // [OrderStatus.Declined]: this.faCircle,
     [OrderStatus.Canceled]: this.faBan,
     [ClaimStatus.Pending]: this.faClock,
     [ClaimStatus.NoClaim]: this.faCircle,

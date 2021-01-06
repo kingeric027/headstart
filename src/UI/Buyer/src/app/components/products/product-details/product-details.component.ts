@@ -10,6 +10,7 @@ import {
   ChiliConfig,
   MarketplaceVariant,
   HeadStartSDK,
+  MarketplaceMeProduct,
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
 import { ModalState } from 'src/app/models/modal-state.class'
@@ -18,9 +19,10 @@ import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from './product-detail.service'
 import { ToastrService } from 'ngx-toastr'
-import { ContactSupplierBody, CurrentUser, MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { ContactSupplierBody } from 'src/app/models/buyer.types'
 
 @Component({
   templateUrl: './product-details.component.html',

@@ -6,9 +6,9 @@ import {
 } from '@angular/core'
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers'
 import { Address, PriceSchedule } from 'ordercloud-javascript-sdk'
-import { MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { ShipFromSourcesDic } from 'src/app/models/ship-from-sources.interface'
+import { MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
+import { ShipFromSourcesDic } from 'src/app/models/product.types'
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],

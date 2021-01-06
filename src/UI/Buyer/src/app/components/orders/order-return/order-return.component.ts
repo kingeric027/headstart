@@ -3,15 +3,13 @@ import {
   MarketplaceOrder,
   MarketplaceLineItem,
   OrderDetails,
-  LineItem,
 } from '@ordercloud/headstart-sdk'
 import { groupBy as _groupBy, flatten as _flatten } from 'lodash'
 import { FormGroup, FormArray, FormBuilder } from '@angular/forms'
 import { ReturnRequestForm } from './order-return-table/models/return-request-form.model'
 import { CanReturnOrCancel } from 'src/app/services/lineitem-status.helper'
-import { faThermometerHalf } from '@fortawesome/free-solid-svg-icons'
-import { LineItemGroupSupplier } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
 
 @Component({
   templateUrl: './order-return.component.html',

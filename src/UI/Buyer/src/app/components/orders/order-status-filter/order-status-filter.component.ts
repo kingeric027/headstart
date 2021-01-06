@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { takeWhile } from 'rxjs/operators'
+import { OrderFilters, OrderStatus } from 'src/app/models/order.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderFilters, OrderStatus } from 'src/app/shopper-context'
 
 @Component({
   templateUrl: './order-status-filter.component.html',

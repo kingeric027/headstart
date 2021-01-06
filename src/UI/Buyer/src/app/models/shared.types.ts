@@ -1,4 +1,9 @@
-export interface CountryDefinition {
+export class ModalState {
+    static Open = { isOpen: true }
+    static Closed = { isOpen: false }
+  }
+
+  export interface CountryDefinition {
     label: string
     abbreviation: string
 }
@@ -9,10 +14,7 @@ export interface StateDefinition {
     country: string
 }
 
-export interface MerchantDefinition {
-    cardConnectMerchantID: string
-    currency: string
-}
+
 
 export interface RouteConfig {
     routerCall: string
@@ -23,3 +25,4 @@ export interface RouteConfig {
     rolesWithAccess?: string[]
     context?: string
   }
+

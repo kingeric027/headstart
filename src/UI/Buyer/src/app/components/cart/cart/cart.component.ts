@@ -2,11 +2,11 @@ import { Component, Input } from '@angular/core'
 import { ListPage, OrderPromotion, Orders } from 'ordercloud-javascript-sdk'
 import { MarketplaceOrder } from '@ordercloud/headstart-sdk'
 import {
-  OrderSummaryMeta,
   getOrderSummaryMeta,
 } from 'src/app/services/purchase-order.helper'
-import { LineItemWithProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { OrderSummaryMeta } from 'src/app/models/order.types'
+import { LineItemWithProduct } from 'src/app/models/product.types'
 
 @Component({
   templateUrl: './cart.component.html',

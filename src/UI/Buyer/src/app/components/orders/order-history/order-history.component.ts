@@ -5,12 +5,12 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core'
-import { ListPage } from 'ordercloud-javascript-sdk'
+import { ListPage, OrderStatus } from 'ordercloud-javascript-sdk'
 import { takeWhile } from 'rxjs/operators'
 import { MarketplaceOrder } from '@ordercloud/headstart-sdk'
-import { OrderFilters, OrderStatus, OrderViewContext } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { RouteConfig } from 'src/app/services/route/route-config'
+import { RouteConfig } from 'src/app/models/config.types'
+import { OrderFilters, OrderViewContext } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-history.component.html',

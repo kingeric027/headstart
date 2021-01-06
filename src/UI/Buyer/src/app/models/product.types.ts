@@ -1,7 +1,7 @@
-import { MarketplaceVariant, SpecOption } from '@ordercloud/headstart-sdk'
+import { MarketplaceVariant, MeProductInKit, SpecOption } from '@ordercloud/headstart-sdk'
 import { ValidatorFn } from '@angular/forms'
 import { FormGroup } from '@angular/forms'
-import { Address, LineItemSpec } from 'ordercloud-javascript-sdk'
+import { LineItemSpec } from 'ordercloud-javascript-sdk'
 
 export interface QtyChangeEvent {
     qty: number
@@ -65,6 +65,13 @@ export interface FullSpecOption extends SpecOption {
     }
   }
 
-  export interface ShipFromSourcesDic {
-    [key: string]: Address[]
-  }
+export interface ProductSelectionEvent {
+  productKitDetails: MeProductInKit
+  variantSelection?: KitVariantSelection
+}
+
+export interface KitVariantSelection {
+  productID: string
+  specForm: FormGroup
+  quantity: number
+}
