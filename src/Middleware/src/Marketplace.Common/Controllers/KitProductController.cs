@@ -15,8 +15,8 @@ namespace Marketplace.Common.Controllers
     [Route("kitproducts")]
     public class KitProductController : BaseController
     {
-        private readonly IMarketplaceKitProductCommand _command;
-        public KitProductController(AppSettings settings, IMarketplaceKitProductCommand command) : base(settings)
+        private readonly IHSKitProductCommand _command;
+        public KitProductController(AppSettings settings, IHSKitProductCommand command) : base(settings)
         {
             _command = command;
         }
