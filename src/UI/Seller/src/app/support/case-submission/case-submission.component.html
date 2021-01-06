@@ -105,18 +105,42 @@
                 Attachment
                 <small>(Optional)</small>
               </label>
-              <label
-                class="rmpm dropzone"
-                for="imageUpload"
-                appDrag
-                (files)="stageImages($event)"
-              ></label>
-              <input
-                class="d-none"
-                id="imageUpload"
-                type="file"
-                (change)="onImageUpload($event)"
-              />
+              <div *ngIf="!attachmentFile">
+                <label
+                  class="rmpm dropzone"
+                  for="attachmentUpload"
+                  appDrag
+                  (files)="onAttachmentDrop($event)"
+                ></label>
+                <input
+                  class="d-none"
+                  id="attachmentUpload"
+                  type="file"
+                  (change)="onAttachmentUpload($event)"
+                />
+              </div>
+              <div *ngIf="attachmentFile">
+                <img
+                  *ngIf="isImageFileType"
+                  class="d-block"
+                  id="supplier-logo"
+                  [src]="stagedAttachmentUrl"
+                  width="auto"
+                  height="100px"
+                />
+                <small>
+                  {{ attachmentFile.name }}
+                </small>
+                <div class="mt-3">
+                  <button
+                    type="button"
+                    (click)="removeAttachment()"
+                    class="btn btn-sm btn-link"
+                  >
+                    Remove Attachment
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <button

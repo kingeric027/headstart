@@ -1,10 +1,12 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config';
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service';
-import { MeUser } from '@ordercloud/angular-sdk';
-import { takeWhile } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http'
+import { Component, Inject, OnInit } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config'
+import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
+import { MeUser } from '@ordercloud/angular-sdk'
+import { takeWhile } from 'rxjs/operators'
 
 @Component({
   selector: 'support-case-submission',
@@ -20,12 +22,15 @@ export class CaseSubmissionComponent implements OnInit {
     'Payment, Billing, or Refunds'
   ]
   user: MeUser
-  imageFile;
+  attachmentFile
+  stagedAttachmentUrl: SafeUrl = null
+  isImageFileType: boolean = false
   
   constructor(
     private currentUserService: CurrentUserService,
     private formBuilder: FormBuilder,
     private http: HttpClient,
+    private sanitizer: DomSanitizer,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
   ) { }
 
@@ -48,18 +53,32 @@ export class CaseSubmissionComponent implements OnInit {
     })
   }
 
-  onImageUpload(event): void {
-    this.imageFile = event.target.files[0]
-    this.caseSubmissionForm.controls['File'].setValue(this.imageFile)
+  onAttachmentUpload(event: any): void {
+    this.attachmentFile = event.target.files[0]
+    this.stageAttachment(this.attachmentFile)
+  }
+  
+  onAttachmentDrop(event: FileHandle[]): void {
+    this.attachmentFile = event[0].File
+    this.stageAttachment(this.attachmentFile)
+  }
+  
+  stageAttachment(file: any): void {
+    this.isImageFileType = file.type.includes('image')
+    this.caseSubmissionForm.controls['File'].setValue(file)
+    this.stagedAttachmentUrl = this.sanitizer.bypassSecurityTrustUrl(
+      window.URL.createObjectURL(file)
+    )
   }
 
-  stageImages(file): void {
-    this.imageFile = file[0].File;
-    this.caseSubmissionForm.controls['File'].setValue(this.imageFile)
+  removeAttachment(): void {
+    this.caseSubmissionForm.controls['File'].setValue(null)
+    this.stagedAttachmentUrl = null
+    this.attachmentFile = null
   }
 
   sendCaseSubmission() {
-    const form = new FormData();
+    const form = new FormData()
     Object.keys(this.caseSubmissionForm.value).forEach(key => {
       if (key === 'File') {
         form.append('file', this.caseSubmissionForm.value[key])
@@ -68,7 +87,7 @@ export class CaseSubmissionComponent implements OnInit {
       }
     })
     return this.http.post(`${this.appConfig.middlewareUrl}/support/submitcase`, form).subscribe((response) => {
-      console.log(response);
+      console.log(response)
     })
   }
 
