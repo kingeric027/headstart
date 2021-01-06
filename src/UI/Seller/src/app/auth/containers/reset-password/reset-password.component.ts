@@ -1,3 +1,4 @@
+import { OrderCloudService } from './../../../shared/services/ordercloud.service'
 // angular
 import { Component, OnInit, Inject } from '@angular/core'
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
@@ -22,7 +23,8 @@ import {
   ValidateFieldMatches,
   ValidateStrongPassword,
 } from '@app-seller/validators/validators'
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpHeaders } from '@angular/common/http'
+import { timingSafeEqual } from 'crypto'
 
 @Component({
   selector: 'auth-reset-password',
@@ -39,7 +41,7 @@ export class ResetPasswordComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private toasterService: ToastrService,
     private formErrorService: AppFormErrorService,
-    private http: HttpClient,
+    private orderCloudService: OrderCloudService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {}
 
@@ -72,16 +74,17 @@ export class ResetPasswordComponent implements OnInit {
       NewPassword: this.resetPasswordForm.get('password').value,
     }
 
-    const url = `${this.appConfig.orderCloudApiUrl}/${this.appConfig.orderCloudApiVersion}/me/password`
-    this.http.post(url, config, { headers: this.buildHeaders() }).subscribe(
-      () => {
-        this.toasterService.success('Password Reset Successfully')
-        this.router.navigateByUrl('/login')
-      },
-      (error) => {
-        throw error
-      }
+    const isResetSuccessful = this.orderCloudService.resetPassword(
+      config,
+      this.buildHeaders()
     )
+
+    if (isResetSuccessful) {
+      this.toasterService.success('Password Reset Successfully')
+      void this.router.navigateByUrl('/login')
+    } else {
+      this.toasterService.error('Unable to reset password')
+    }
     // TODO: We SHOULD be able to use this function from the SDK, but if you uncomment,
     // ***  you'll see that you are unable to send along an accessToken ...
 
