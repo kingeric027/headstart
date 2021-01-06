@@ -159,15 +159,14 @@ test('Can a user checkout with a PO product and standard product in their cart? 
 	await t.expect(await orderDetailPage.productExists(secondProductName)).ok()
 })
 
-//This test is throwing a large number of console errors and is killing the browser and the whole test run
+//This is no longer throwing errors, adding it back in to test suite
 test('Can I request a quote product? | 19979', async t => {
-	await t.expect(false).ok() //place holder assetion so the test still runs and fails
-	// const productName = '4 X 4 Foot Siege Storage Rack - X1 Package'
-	// await buyerHeaderPage.search(productName)
-	// await productListPage.clickProduct(productName)
-	// await productDetailPage.clickRequestQuoteButton()
-	// await requestQuoteForm.enterPhoneNumber('1231231234')
-	// await requestQuoteForm.clickSubmitForQuoteButton()
-	// await productDetailPage.clickViewQuoteRequestButton()
-	// await t.expect(await orderDetailPage.productExists(productName)).ok()
+	const productName = '4 X 4 Foot Siege Storage Rack - X1 Package'
+	await buyerHeaderPage.search(productName)
+	await productListPage.clickProduct(productName)
+	await productDetailPage.clickRequestQuoteButton()
+	await requestQuoteForm.enterPhoneNumber('1231231234')
+	await requestQuoteForm.clickSubmitForQuoteButton()
+	await productDetailPage.clickViewQuoteRequestButton()
+	await t.expect(await orderDetailPage.productExists(productName)).ok()
 })

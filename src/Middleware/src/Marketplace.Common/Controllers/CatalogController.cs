@@ -53,7 +53,7 @@ namespace Marketplace.Common.Controllers
 		[HttpPost, Route("{buyerID}/{locationID}/catalogs/assignments"), OrderCloudIntegrationsAuth(ApiRole.UserGroupAdmin)]
 		public async Task SetAssignments(string buyerID, string locationID, [FromBody] HSCatalogAssignmentRequest assignmentRequest)
 		{
-			await _command.SetAssignments(buyerID, locationID, assignmentRequest.CatalogIDs, VerifiedUserContext);
+			await _command.SetAssignments(buyerID, locationID, assignmentRequest.CatalogIDs, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("PUT Catalog")]

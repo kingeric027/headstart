@@ -20,7 +20,7 @@ import { environment as selfesteembrandsproduction } from './environment.selfest
 const apps = {
   TEST: {
     SELF_ESTEEM_BRANDS: selfesteembrandstest,
-    BRANDWEAR_DESIGNS: brandweardesignstest,
+    BRAND_WEAR_DESIGNS: brandweardesignstest,
     GO2PARTNERS: go2partnerstest,
     HEADSTART_DEMO: headstartdemotest,
     FAST_SIGNS: fastsignstest,

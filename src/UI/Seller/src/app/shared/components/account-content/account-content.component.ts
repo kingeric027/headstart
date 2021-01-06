@@ -13,7 +13,7 @@ import {
 } from '@app-seller/config/app.config'
 import { environment } from 'src/environments/environment'
 import { UserContext } from '@app-seller/config/user-context'
-import { MeUser } from '@ordercloud/angular-sdk'
+import { ListPage, MeUser } from '@ordercloud/angular-sdk'
 import { FormGroup, FormControl } from '@angular/forms'
 import { isEqual as _isEqual, set as _set, get as _get } from 'lodash'
 import { HeadStartSDK, Asset, AssetUpload } from '@ordercloud/headstart-sdk'
@@ -76,20 +76,25 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     })
   }
 
-  retrieveNotifications() {
-    ContentManagementClient.Documents.List(
-      'MonitoredProductFieldModifiedNotification',
-      {
-        pageSize: 100,
-        sortBy: ['!History.DateUpdated'],
-      }
-    ).then((results: any) => {
-      if (results?.Items?.length > 0) {
-        this.notificationsToReview = results?.Items.filter(
-          (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
-        )
-      }
-    })
+  async retrieveNotifications(): Promise<void> {
+    try {
+      await ContentManagementClient.Documents.List(
+        'MonitoredProductFieldModifiedNotification',
+        {
+          pageSize: 100,
+          sortBy: ['!History.DateUpdated'],
+        }
+      ).then((results: ListPage<JDocument>) => {
+        if (results?.Items?.length > 0) {
+          this.notificationsToReview = results?.Items.filter(
+            (i: { Doc: { Status: NotificationStatus } }) =>
+              i?.Doc?.Status === NotificationStatus.SUBMITTED
+          )
+        }
+      })
+    } catch (error) {
+      console.log(`No documents are found`)
+    }
   }
 
   setCurrentUserInitials(user: MeUser): void {
@@ -98,7 +103,7 @@ export abstract class AccountContent implements AfterViewChecked, OnInit {
     this.currentUserInitials = `${firstFirst}${firstLast}`
   }
 
-  async getSupplierOrg() {
+  async getSupplierOrg(): Promise<void> {
     const mySupplier = await this.currentUserService.getMySupplier()
     this.organizationName = mySupplier.Name
   }
