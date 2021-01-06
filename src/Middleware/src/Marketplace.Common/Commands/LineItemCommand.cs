@@ -22,7 +22,7 @@ namespace Marketplace.Common.Commands
         Task<List<HSLineItem>> UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection orderDirection, string orderID, LineItemStatusChanges lineItemStatusChanges, VerifiedUserContext verifiedUser = null);
         Task<List<HSLineItem>> SetInitialSubmittedLineItemStatuses(string buyerOrderID);
         Task DeleteLineItem(string orderID, string lineItemID, VerifiedUserContext verifiedUser);
-        Task<decimal> ValidateLineItemUnitCost(string orderID, HSMarketplaceMeProduct product, List<HSLineItem> existingLineItems, HSLineItem li);
+        Task<decimal> ValidateLineItemUnitCost(string orderID, SuperHSMeProduct product, List<HSLineItem> existingLineItems, HSLineItem li);
     }
 
     public class LineItemCommand : ILineItemCommand
@@ -394,7 +394,7 @@ namespace Marketplace.Common.Commands
             await _promotionCommand.AutoApplyPromotions(orderID);
         }
 
-        public async Task<decimal> ValidateLineItemUnitCost(string orderID, HSMarketplaceMeProduct product, List<HSLineItem> existingLineItems, HSLineItem li)
+        public async Task<decimal> ValidateLineItemUnitCost(string orderID, SuperHSMeProduct product, List<HSLineItem> existingLineItems, HSLineItem li)
         {
             
             if (product.PriceSchedule.UseCumulativeQuantity)

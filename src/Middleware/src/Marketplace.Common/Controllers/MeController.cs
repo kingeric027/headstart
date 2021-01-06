@@ -28,7 +28,7 @@ namespace Marketplace.Common.Controllers
 
 		[DocName("GET Super Product")]
 		[HttpGet, Route("products/{productID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<HSMarketplaceMeProduct> GetSuperProduct(string productID)
+		public async Task<SuperHSMeProduct> GetSuperProduct(string productID)
 		{
 			return await _meProductCommand.Get(productID, VerifiedUserContext);
 		}

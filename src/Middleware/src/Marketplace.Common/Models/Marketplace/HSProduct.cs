@@ -27,7 +27,7 @@ namespace Marketplace.Models
     }
 
     [SwaggerModel]
-    public class HSMarketplaceMeProduct : IHSObject
+    public class SuperHSMeProduct : IHSObject
     {
         public string ID { get; set; }
         public HSMeProduct Product { get; set; }

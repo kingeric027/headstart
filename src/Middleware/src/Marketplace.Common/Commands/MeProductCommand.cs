@@ -17,7 +17,7 @@ namespace Marketplace.Common.Commands
 	public interface IMeProductCommand
 	{
 		Task<ListPageWithFacets<HSMeProduct>> List(ListArgs<HSMeProduct> args, VerifiedUserContext user);
-		Task<HSMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
+		Task<SuperHSMeProduct> Get(string id, VerifiedUserContext user);
 		Task RequestProductInfo(ContactSupplierBody template);
 		Task<HSMeKitProduct> ApplyBuyerPricing(HSMeKitProduct kitProduct, VerifiedUserContext user);
 	}
@@ -46,14 +46,14 @@ namespace Marketplace.Common.Commands
 			_cache = cache;
 			_sebExchangeRates = sebExchangeRates;
 		}
-		public async Task<HSMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
+		public async Task<SuperHSMeProduct> Get(string id, VerifiedUserContext user)
 		{
 			var _product = _oc.Me.GetProductAsync<HSMeProduct>(id, user.AccessToken);
 			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<HSVariant>(id, null, null, null, 1, 100, null);
 			var _images = _marketplaceProductCommand.GetProductImages(id, user.AccessToken);
 			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user.AccessToken);
-			var unconvertedSuperMarketplaceProduct = new HSMarketplaceMeProduct 
+			var unconvertedSuperMarketplaceProduct = new SuperHSMeProduct 
 			{
 				Product = await _product,
 				PriceSchedule = (await _product).PriceSchedule,
@@ -65,7 +65,7 @@ namespace Marketplace.Common.Commands
 			return await ApplyBuyerPricing(unconvertedSuperMarketplaceProduct, user);
 		}
 
-		private async Task<HSMarketplaceMeProduct> ApplyBuyerPricing(HSMarketplaceMeProduct superMarketplaceProduct, VerifiedUserContext user)
+		private async Task<SuperHSMeProduct> ApplyBuyerPricing(SuperHSMeProduct superMarketplaceProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);

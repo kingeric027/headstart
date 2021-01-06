@@ -28,7 +28,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_NoMarkups_CumulativeQtyFalse()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 0); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
 
@@ -40,7 +40,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_NoMarkups_CumulativeQtyFalse()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 0);
 
@@ -52,7 +52,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_OneMarkup_CumulativeQtyFalse()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 1); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
 
@@ -64,7 +64,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_OneMarkup_CumulativeQtyFalse()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 1);
 
@@ -76,7 +76,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_TwoMarkups_CumulativeQtyFalse()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 2); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
 
@@ -88,7 +88,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_TwoMarkups_CumulativeQtyFalse()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 2);
 
@@ -100,7 +100,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_NoMarkups_CumulativeQtyTrue()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 0); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
@@ -112,7 +112,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_NoMarkups_CumulativeQtyTrue()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 0); // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
@@ -124,7 +124,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_OneMarkup_CumulativeQtyTrue()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 1); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
@@ -136,7 +136,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_OneMarkup_CumulativeQtyTrue()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 1);  // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
@@ -148,7 +148,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_TwoMarkups_CumulativeQtyTrue()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 2); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
@@ -160,7 +160,7 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_TwoMarkups_CumulativeQtyTrue()
         {
-            HSMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
             HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 2);  // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
@@ -169,9 +169,9 @@ namespace Marketplace.Tests
             Assert.AreEqual(lineItemTotal, 9.75);
         }
 
-        private HSMarketplaceMeProduct BuildMockProductData(bool UseCumulativeQty)
+        private SuperHSMeProduct BuildMockProductData(bool UseCumulativeQty)
         {
-            HSMarketplaceMeProduct product = Substitute.For<HSMarketplaceMeProduct>();
+            SuperHSMeProduct product = Substitute.For<SuperHSMeProduct>();
             product.PriceSchedule = Substitute.For<PriceSchedule>();
             product.PriceSchedule.UseCumulativeQuantity = UseCumulativeQty;
 

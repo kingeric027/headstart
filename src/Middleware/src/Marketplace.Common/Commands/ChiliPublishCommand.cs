@@ -26,7 +26,7 @@ namespace Marketplace.Common.Commands
     [SwaggerModel]
     public class MeChiliTemplate
     {
-        public HSMarketplaceMeProduct Product { get; set; }
+        public SuperHSMeProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
         public string ChiliConfigID { get; set; }
