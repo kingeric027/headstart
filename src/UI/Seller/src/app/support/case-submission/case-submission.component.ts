@@ -6,6 +6,7 @@ import { applicationConfiguration, AppConfig } from '@app-seller/config/app.conf
 import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { MeUser } from '@ordercloud/angular-sdk'
+import { ToastrService } from 'ngx-toastr'
 import { takeWhile } from 'rxjs/operators'
 
 @Component({
@@ -31,6 +32,7 @@ export class CaseSubmissionComponent implements OnInit {
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private sanitizer: DomSanitizer,
+    private toastrService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
   ) { }
 
@@ -86,9 +88,11 @@ export class CaseSubmissionComponent implements OnInit {
         form.append(key, this.caseSubmissionForm.value[key])
       }
     })
-    return this.http.post(`${this.appConfig.middlewareUrl}/support/submitcase`, form).subscribe((response) => {
-      console.log(response)
-    })
+    return this.http.post(`${this.appConfig.middlewareUrl}/support/submitcase`, form)
+      .subscribe(
+        () => this.toastrService.success('Support case sent', 'Success'), 
+        () => this.toastrService.error('There was an issue sending your request', 'Error')
+      )
   }
 
   ngOnDestroy(): void {
