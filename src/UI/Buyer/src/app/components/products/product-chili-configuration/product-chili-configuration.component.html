@@ -14,14 +14,14 @@
       </div>
     </div>
     <div class="col-md-6">
-      <div [hidden]="ShowAddToCart">
+      <div [hidden]="ShowAddToCart || loadingSpecs">
         <div class="card-body">
           <form ngNoForm>
             <div
               *ngFor="let spec of chiliTemplate.TemplateSpecs; let i = index"
             >
               <div *ngIf="spec.xp.UI.ControlType == 'Text'">
-                <label>{{ spec.Name }}</label>
+                <label>{{ spec.xp.Label || spec.Name }}</label>
                 <input
                   class="form-control"
                   type="text"
@@ -33,9 +33,12 @@
                 />
               </div>
               <div *ngIf="spec.xp.UI.ControlType == 'DropDown'">
-                <label>{{ spec.Name }}</label>
+                <label>{{ spec.xp.Label || spec.Name }}</label>
                 <select
                   class="form-control"
+                  name="{{ spec.Name }}"
+                  id="{{ spec.ID }}"
+                  value="{{ spec.DefaultValue }}"
                   (change)="setTecraSpec($event, spec)"
                 >
                   <option selected [ngValue]="null">Select</option>
@@ -312,7 +315,7 @@
 </div>
 <div [hidden]="!isLoading">
   <ocm-loading-layout
-    height="350px"
+    height="750px"
     width="100%"
     mb="1.5rem"
     [rows]="3"

@@ -83,6 +83,7 @@ export class OCMProductChiliConfig implements OnInit {
   currentDocID = ''
   ShowAddToCart = false
   isLoading = true
+  loadingSpecs = true
   editor
   frameWindow
   variant: MarketplaceVariant
@@ -123,10 +124,28 @@ export class OCMProductChiliConfig implements OnInit {
       types[spec.xp.UI.ControlType]
     )
   }
+  setSpecValue(id) {
+    const element = document.getElementById(id)
+    const event = new Event('change')
+    if (element) {
+      element.dispatchEvent(event)
+    }
+  }
 
   loadChiliEditor(url: string): void {
     setTimeout(() => {
       LoadChiliEditor(url)
+      setTimeout(() => {
+        this.chiliTemplate.TemplateSpecs.forEach((s) => {
+          if (
+            (s.DefaultValue && s.xp.UI.ControlType == 'Text') ||
+            (s.xp.UI.ControlType == 'DropDown' && s.OptionCount > 0)
+          ) {
+            this.setSpecValue(s.ID)
+          }
+        })
+        this.loadingSpecs = false
+      }, 3500)
       this.isLoading = false
     }, 1000)
   }
