@@ -35,6 +35,7 @@ import { MarketplaceBuyerCreditCard, SelectedCreditCard } from 'src/app/models/c
 import { OrderSummaryMeta } from 'src/app/models/order.types'
 import { ModalState } from 'src/app/models/shared.types'
 import { MiddlewareError } from 'src/app/models/error.types'
+import { Router } from '@angular/router'
 
 
 
@@ -49,6 +50,7 @@ export class OCMCheckout implements OnInit {
   order: MarketplaceOrder
   orderPromotions: OrderPromotion[] = []
   lineItems: ListPage<MarketplaceLineItem>
+  invalidLineItems: MarketplaceLineItem[] = []
   orderSummaryMeta: OrderSummaryMeta
   payments: ListPage<Payment>
   cards: ListPage<BuyerCreditCard>
@@ -87,7 +89,8 @@ export class OCMCheckout implements OnInit {
   constructor(
     private context: ShopperContextService,
     private spinner: NgxSpinnerService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -111,7 +114,13 @@ export class OCMCheckout implements OnInit {
     this.setValidation('login', !this.isAnon)
 
     this.isNewCard = false
-    await this.reIDLineItems()
+    this.invalidLineItems = await this.context.order.cart.getInvalidLineItems()
+    if (this.invalidLineItems?.length) {
+      // Navigate to cart to review invalid itemss
+      void this.router.navigate(['/cart'])
+    } else {
+      await this.reIDLineItems()
+    }
   }
 
   async reIDLineItems(): Promise<void> {

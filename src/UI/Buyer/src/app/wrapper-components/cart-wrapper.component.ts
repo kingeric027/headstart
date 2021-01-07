@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import {
   MarketplaceOrder,
+  Meta,
   ListPage,
   MarketplaceLineItem,
   MarketplaceMeProduct,
@@ -15,6 +16,7 @@ import { PromoService } from '../services/order/promo.service'
     <ocm-cart
       [order]="order"
       [lineItems]="lineItems"
+      [invalidLineItems]="invalidLineItems"
       [orderPromos]="orderPromos"
     ></ocm-cart>
   `,
@@ -22,6 +24,7 @@ import { PromoService } from '../services/order/promo.service'
 export class CartWrapperComponent implements OnInit {
   order: MarketplaceOrder
   lineItems: ListPage<LineItemWithProduct>
+  invalidLineItems: MarketplaceLineItem[]
   orderPromos: ListPage<OrderPromotion>
   productCache: MarketplaceMeProduct[] = [] // TODO - move to cart service?
 
@@ -43,10 +46,35 @@ export class CartWrapperComponent implements OnInit {
   setLineItems = async (
     items: ListPage<LineItemWithProduct>
   ): Promise<void> => {
+    this.invalidLineItems = []
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
-    await this.updateProductCache(items.Items.map((li) => li.ProductID))
-    this.lineItems = this.mapToLineItemsWithProduct(items)
+    const availableLineItems = await this.checkForProductAvailability(items)
+    await this.updateProductCache(availableLineItems.map((li) => li.ProductID))
+    this.lineItems = this.mapToLineItemsWithProduct(
+      availableLineItems,
+      items.Meta
+    )
+  }
+
+  async checkForProductAvailability(
+    items: ListPage<MarketplaceLineItem>
+  ): Promise<MarketplaceLineItem[]> {
+    const activeLineItems: MarketplaceLineItem[] = []
+    const inactiveLineItems: MarketplaceLineItem[] = []
+    for (const item of items.Items) {
+      const eligibleProductList = await Me.ListProducts({
+        filters: { ID: item.ProductID },
+      })
+      const matchingLineItem = eligibleProductList.Items.find(
+        (product) => product.ID === item.ProductID
+      )
+      matchingLineItem
+        ? activeLineItems.push(item)
+        : inactiveLineItems.push(item)
+    }
+    this.invalidLineItems = inactiveLineItems
+    return activeLineItems
   }
 
   setOrderPromos = (promos: ListPage<OrderPromotion>): void => {
@@ -63,14 +91,15 @@ export class CartWrapperComponent implements OnInit {
   }
 
   mapToLineItemsWithProduct(
-    lis: ListPage<LineItemWithProduct>
+    items: MarketplaceLineItem[],
+    meta: Meta
   ): ListPage<LineItemWithProduct> {
-    const Items = lis.Items.map((li: LineItemWithProduct) => {
+    const Items = items.map((li: LineItemWithProduct) => {
       const product = this.getCachedProduct(li.ProductID)
       li.Product = product
       return li
     })
-    return { Items, Meta: lis.Meta }
+    return { Items, Meta: meta }
   }
 
   async requestProducts(ids: string[]): Promise<MarketplaceMeProduct[]> {
