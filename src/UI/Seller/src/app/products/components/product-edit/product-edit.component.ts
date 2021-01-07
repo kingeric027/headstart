@@ -10,8 +10,6 @@ import {
 } from '@angular/core'
 import { get as _get } from 'lodash'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
-import { UserContext } from '@app-seller/config/user-context'
 import {
   Address,
   OcSupplierAddressService,
@@ -29,10 +27,7 @@ import { Router } from '@angular/router'
 import { Product } from '@ordercloud/angular-sdk'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   faTrash,
   faTimes,
@@ -59,7 +54,6 @@ import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload'
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import {
   ValidateMinMax,
   ValidateNoSpecialCharactersAndSpaces,
@@ -71,10 +65,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
-} from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
+} from '@app-seller/models/notification.types'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { ToastrService } from 'ngx-toastr'
 import { Subscription } from 'rxjs'
+import { SupportedRates } from '@app-seller/models/currency-geography.types'
+import { FileHandle } from '@app-seller/models/file-upload.types'
+import { UserContext } from '@app-seller/models/user.types'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'app-product-edit',

@@ -18,15 +18,13 @@ import {
   PRODUCT_IMAGE_PATH_STRATEGY,
   getProductSmallImageUrl,
 } from '@app-seller/products/product-image.helper'
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { Router } from '@angular/router'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   SUPPLIER_LOGO_PATH_STRATEGY,
   getSupplierLogoSmallUrl,
 } from '@app-seller/suppliers/supplier-logo.helper'
+import { AppConfig } from '@app-seller/shared'
 
 @Component({
   selector: 'summary-resource-display-component',

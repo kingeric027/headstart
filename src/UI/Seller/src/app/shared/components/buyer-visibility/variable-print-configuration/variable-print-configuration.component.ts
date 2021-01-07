@@ -1,18 +1,7 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core'
-import { FormControl } from '@angular/forms'
+import { Component, OnInit, Input } from '@angular/core'
 import { UserGroup, ProductAssignment } from '@ordercloud/angular-sdk'
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
-import {
-  MarketplaceProduct,
-  ChiliConfig,
-  ChiliSpec,
-  ChiliSpecXp,
-  ChiliSpecUI,
-} from '@ordercloud/headstart-sdk'
-import {
-  TecraDocument,
-  TecraSpec,
-} from '../../../../shared/services/middleware-api/middleware-chili.service'
+import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'variable-print-configuration-component',

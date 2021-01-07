@@ -7,7 +7,7 @@ import {
   MarketplacePromoEligibility,
   PromotionXp,
   MinRequirementType,
-} from '@app-seller/shared/models/marketplace-promo.interface'
+} from '@app-seller/models/promo-types'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { Promotions } from 'ordercloud-javascript-sdk'
 import { MarketplaceSupplier } from '@ordercloud/headstart-sdk'

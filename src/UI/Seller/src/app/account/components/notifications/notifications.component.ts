@@ -2,10 +2,7 @@ import { Component, ChangeDetectorRef, Inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   faExclamationCircle,
   faTimesCircle,
@@ -14,6 +11,7 @@ import { ToastrService } from 'ngx-toastr'
 import { AppAuthService } from '@app-seller/auth'
 import { get as _get } from 'lodash'
 import { JDocument } from '@ordercloud/cms-sdk'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'account-notifications',

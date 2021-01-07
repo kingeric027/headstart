@@ -1,22 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { HSBuyerPriceMarkup } from '@app-seller/models/buyer-markups.types'
+import { AppConfig } from '@app-seller/models/environment.types'
 import { OcTokenService } from '@ordercloud/angular-sdk'
 import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
 
 // WHOPLE FILE TO BE REPLACED BY SDK
-
-export interface SuperMarketplaceBuyer {
-  Buyer: MarketplaceBuyer
-  Markup: BuyerMarkup
-}
-
-interface BuyerMarkup {
-  Percent: number
-}
 
 @Injectable({
   providedIn: 'root',
@@ -34,19 +24,17 @@ export class BuyerTempService {
     })
   }
 
-  async get(buyerID: string): Promise<SuperMarketplaceBuyer> {
+  async get(buyerID: string): Promise<HSBuyerPriceMarkup> {
     const url = `${this.appConfig.middlewareUrl}/buyer/${buyerID}`
     return await this.http
-      .get<SuperMarketplaceBuyer>(url, { headers: this.buildHeaders() })
+      .get<HSBuyerPriceMarkup>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 
-  async create(
-    superBuyer: SuperMarketplaceBuyer
-  ): Promise<SuperMarketplaceBuyer> {
+  async create(superBuyer: HSBuyerPriceMarkup): Promise<HSBuyerPriceMarkup> {
     const url = `${this.appConfig.middlewareUrl}/buyer`
     return await this.http
-      .post<SuperMarketplaceBuyer>(url, superBuyer, {
+      .post<HSBuyerPriceMarkup>(url, superBuyer, {
         headers: this.buildHeaders(),
       })
       .toPromise()
@@ -54,11 +42,11 @@ export class BuyerTempService {
 
   async save(
     buyerID: string,
-    superBuyer: SuperMarketplaceBuyer
-  ): Promise<SuperMarketplaceBuyer> {
+    superBuyer: HSBuyerPriceMarkup
+  ): Promise<HSBuyerPriceMarkup> {
     const url = `${this.appConfig.middlewareUrl}/buyer/${buyerID}`
     return await this.http
-      .put<SuperMarketplaceBuyer>(url, superBuyer, {
+      .put<HSBuyerPriceMarkup>(url, superBuyer, {
         headers: this.buildHeaders(),
       })
       .toPromise()

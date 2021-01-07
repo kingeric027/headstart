@@ -6,7 +6,6 @@ import { ValidatePhone, ValidateEmail } from '@app-seller/validators/validators'
 import { Router } from '@angular/router'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper'
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation'
 import {
@@ -14,12 +13,11 @@ import {
   MarketplaceCatalog,
   MarketplaceCatalogAssignmentRequest,
 } from '@ordercloud/headstart-sdk'
-import {
-  SupportedCountries,
-  GeographyConfig,
-} from '@app-seller/shared/models/supported-countries.interface'
+import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config'
+import { ResourceUpdate } from '@app-seller/models/shared.types'
+import { SupportedCountries } from '@app-seller/models/currency-geography.types'
 @Component({
   selector: 'app-buyer-location-edit',
   templateUrl: './buyer-location-edit.component.html',

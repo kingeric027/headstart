@@ -3,7 +3,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnInit,
   OnChanges,
   SimpleChanges,
   Inject,
@@ -12,30 +11,24 @@ import {
   User,
   UserGroup,
   UserGroupAssignment,
-  OcSupplierUserGroupService,
-  OcSupplierUserService,
   OcTokenService,
   ListPage,
 } from '@ordercloud/angular-sdk'
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
-import { IUserPermissionsService } from '@app-seller/shared/models/user-permissions.interface'
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config'
 import { GetDisplayText } from './user-group-assignments.constants'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import {
   HeadStartSDK,
   MarketplaceLocationUserGroup,
 } from '@ordercloud/headstart-sdk'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
-
-interface AssignmentsToAddUpdate {
-  UserGroupType: string
-  Assignments: UserGroupAssignment[]
-}
+import {
+  AssignmentsToAddUpdate,
+  IUserPermissionsService,
+} from '@app-seller/models/user.types'
+import { AppConfig } from '@app-seller/shared'
 
 @Component({
   selector: 'user-group-assignments',

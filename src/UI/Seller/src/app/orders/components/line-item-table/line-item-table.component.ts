@@ -7,10 +7,7 @@ import {
   OnInit,
 } from '@angular/core'
 import { groupBy as _groupBy } from 'lodash'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   MarketplaceLineItem,
   HeadStartSDK,
@@ -22,12 +19,11 @@ import {
   CanChangeTo,
   CanChangeLineItemsOnOrderTo,
 } from '@app-seller/orders/line-item-status.helper'
-import { LineItemStatus } from '@app-seller/shared/models/order-status.interface'
 import { FormArray, Validators, FormControl } from '@angular/forms'
 import { getPrimaryLineItemImage } from '@app-seller/products/product-image.helper'
 import { MeUser, OcOrderService } from '@ordercloud/angular-sdk'
 import { LineItem, LineItemSpec } from 'ordercloud-javascript-sdk'
-import { RegexService } from '@app-seller/shared'
+import { AppConfig, LineItemStatus, RegexService } from '@app-seller/shared'
 
 @Component({
   selector: 'app-line-item-table',

@@ -1,5 +1,5 @@
-import { MarketplaceLineItem, HeadStartSDK } from '@ordercloud/headstart-sdk'
-import { LineItemStatus } from '@app-seller/shared/models/order-status.interface'
+import { LineItemStatus } from '@app-seller/models/order.types'
+import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
 
 const validPreviousStates = {
   Submitted: [],

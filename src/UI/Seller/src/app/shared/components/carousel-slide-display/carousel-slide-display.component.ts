@@ -1,13 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
-import {
-  CarouselSlide,
-  CarouselSlideUpdate,
-} from '@app-seller/shared/components/carousel-slide-display/carousel-slide.interface'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { faSave, faTrashAlt, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { ToastrService } from 'ngx-toastr'
 import { RegexService } from '@app-seller/shared/services/regex/regex.service'
 import { AppFormErrorService } from '@app-seller/shared/services/form-error/form-error.service'
+import {
+  CarouselSlide,
+  CarouselSlideUpdate,
+} from '@app-seller/models/carousel.types'
 
 @Component({
   selector: 'shared-carousel-slide-display',

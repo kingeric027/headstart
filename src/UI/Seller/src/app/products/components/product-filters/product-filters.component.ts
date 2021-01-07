@@ -16,14 +16,12 @@ import { omit as _omit } from 'lodash'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { cloneDeep } from 'lodash'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   MarketplaceProduct,
   SuperMarketplaceProduct,
 } from '@ordercloud/headstart-sdk'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'product-filters-component',

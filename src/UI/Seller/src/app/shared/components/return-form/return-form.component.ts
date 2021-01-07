@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
-import { LineItemStatus } from '@app-seller/shared/models/order-status.interface'
+import { LineItemStatus } from '@app-seller/models/order.types'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import {
   LineItem,

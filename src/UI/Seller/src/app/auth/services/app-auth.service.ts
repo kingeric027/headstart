@@ -5,21 +5,19 @@ import { Router } from '@angular/router'
 
 // 3rd party
 import { OcTokenService, OcAuthService } from '@ordercloud/angular-sdk'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { CookieService } from 'ngx-cookie'
 import { keys as _keys } from 'lodash'
 import { isUndefined as _isUndefined } from 'lodash'
 import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service'
 import * as jwtDecode from 'jwt-decode'
-import { DecodedOrderCloudToken } from '@app-seller/shared'
 import {
+  AppConfig,
+  DecodedOrderCloudToken,
+  OrderCloudUserType,
   SELLER,
   SUPPLIER,
-  OrderCloudUserType,
-} from '@app-seller/shared/models/ordercloud-user.types'
+} from '@app-seller/shared'
 import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 

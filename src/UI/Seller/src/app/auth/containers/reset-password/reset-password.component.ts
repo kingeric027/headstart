@@ -1,23 +1,15 @@
 // angular
 import { Component, OnInit, Inject } from '@angular/core'
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
+import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { Router, ActivatedRoute } from '@angular/router'
 
 // angular libs
 import { ToastrService } from 'ngx-toastr'
 
 // ordercloud
-import { AppFormErrorService } from '@app-seller/shared'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
-import {
-  OcForgottenPasswordService,
-  PasswordReset,
-  TokenPasswordReset,
-  OcMeService,
-} from '@ordercloud/angular-sdk'
+import { AppConfig, AppFormErrorService } from '@app-seller/shared'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { TokenPasswordReset } from '@ordercloud/angular-sdk'
 import {
   ValidateFieldMatches,
   ValidateStrongPassword,

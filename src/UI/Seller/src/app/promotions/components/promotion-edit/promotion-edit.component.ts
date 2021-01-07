@@ -29,7 +29,7 @@ import {
   MarketplacePromoType,
   MarketplacePromoEligibility,
   MinRequirementType,
-} from '@app-seller/shared/models/marketplace-promo.interface'
+} from '@app-seller/models/promo-types'
 import * as moment from 'moment'
 import { Router } from '@angular/router'
 import { ListArgs, MarketplaceSupplier } from '@ordercloud/headstart-sdk'

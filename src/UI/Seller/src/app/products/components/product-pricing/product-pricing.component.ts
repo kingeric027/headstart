@@ -1,13 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
 import { PriceSchedule, OcBuyerService } from '@ordercloud/angular-sdk'
 import { ToastrService } from 'ngx-toastr'
 import { FormControl } from '@angular/forms'
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
-import {
-  BuyerTempService,
-  SuperMarketplaceBuyer,
-} from '@app-seller/shared/services/middleware-api/buyer-temp.service'
+import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
 import {
   SuperMarketplaceProduct,
@@ -16,6 +11,9 @@ import {
   MarketplacePriceSchedule,
 } from '@ordercloud/headstart-sdk'
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { SupportedRates } from '@app-seller/models/currency-geography.types'
+import { ResourceUpdate } from '@app-seller/models/shared.types'
+import { HSBuyerPriceMarkup } from '@app-seller/models/buyer-markups.types'
 
 @Component({
   selector: 'product-pricing-component',
@@ -55,7 +53,7 @@ export class ProductPricingComponent {
 
   buyers: MarketplaceBuyer[] = []
   selectedBuyerIndex = 0
-  selectedSuperMarketplaceBuyer: SuperMarketplaceBuyer
+  selectedSuperMarketplaceBuyer: HSBuyerPriceMarkup
 
   isUsingPriceOverride = false
   areChangesToBuyerVisibility = false

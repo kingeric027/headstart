@@ -5,9 +5,11 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core'
+import {
+  ResourceUpdate,
+  SwaggerSpecProperty,
+} from '@app-seller/models/shared.types'
 import { schemas } from './swagger-spec'
-import { SwaggerSpecProperty } from '@app-seller/shared/models/swagger-spec-proeprty.interface'
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
 
 @Component({
   selector: 'resource-edit-component',

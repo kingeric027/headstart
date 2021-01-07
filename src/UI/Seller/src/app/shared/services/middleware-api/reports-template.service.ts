@@ -1,44 +1,14 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
-import {
-  OcTokenService,
-  OcBuyerService,
-  OcSupplierService,
-} from '@ordercloud/angular-sdk'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { OcTokenService } from '@ordercloud/angular-sdk'
 import { Observable } from 'rxjs'
 import { ResourceCrudService } from '../resource-crud/resource-crud.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { ListPage } from '@ordercloud/headstart-sdk'
-import { singular } from 'pluralize'
+import { ListPage, ReportTemplate } from '@ordercloud/headstart-sdk'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
-
-export interface ReportTemplate {
-  TemplateID?: string
-  SellerID?: string
-  ReportType?: ReportType
-  Name: string
-  Description?: string
-  Headers?: string[]
-  Filters?: ReportFilters
-  AvailableToSuppliers?: boolean
-}
-export enum ReportType {
-  BuyerLocation,
-  SalesOrderDetail,
-}
-
-export interface ReportFilters {
-  BuyerID: string[]
-  Country: string[]
-  State: string[]
-  Status: string[]
-  Type: string[]
-}
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

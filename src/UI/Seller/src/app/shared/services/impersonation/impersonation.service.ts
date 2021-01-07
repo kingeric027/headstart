@@ -1,9 +1,7 @@
 import { Injectable, Inject } from '@angular/core'
 import { OcUserService, OcBuyerService } from '@ordercloud/angular-sdk'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

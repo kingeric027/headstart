@@ -1,4 +1,4 @@
-import { EnvironmentConfig } from './environment.interfaces'
+import { EnvironmentConfig } from '@app-seller/models/environment.types'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,

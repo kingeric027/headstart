@@ -32,13 +32,8 @@ import {
 import { getProductSmallImageUrl } from '@app-seller/products/product-image.helper'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { AppAuthService } from '@app-seller/auth'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { OrderService } from '@app-seller/orders/order.service'
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
-import { LineItemStatus } from '../../../shared/models/order-status.interface'
 import {
   CanChangeLineItemsOnOrderTo,
   NumberCanChangeTo,
@@ -46,6 +41,9 @@ import {
 import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { flatten as _flatten } from 'lodash'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { LineItemStatus } from '@app-seller/models/order.types'
+import { SELLER } from '@app-seller/models/user.types'
 
 @Component({
   selector: 'app-order-shipments',

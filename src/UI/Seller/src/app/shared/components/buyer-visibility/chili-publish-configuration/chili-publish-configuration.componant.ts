@@ -16,14 +16,10 @@ import {
   ChiliSpecUI,
   ChiliTemplate,
   ChiliSpecOption,
-  ChiliSpecOptionXp,
   HeadStartSDK,
-} from '@ordercloud/headstart-sdk'
-import {
   TecraDocument,
   TecraSpec,
-} from '../../../../shared/services/middleware-api/middleware-chili.service'
-import ChiliSpecOptions from '@ordercloud/headstart-sdk/dist/api/ChiliSpecOptions'
+} from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'chili-publish-configuration-component',

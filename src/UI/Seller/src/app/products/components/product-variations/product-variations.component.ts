@@ -34,10 +34,10 @@ import {
   MarketplaceVariant,
 } from '@ordercloud/headstart-sdk'
 import { AppAuthService } from '@app-seller/auth'
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import { BehaviorSubject } from 'rxjs'
 import { Products } from 'ordercloud-javascript-sdk'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { SupportedRates } from '@app-seller/shared'
 
 @Component({
   selector: 'product-variations-component',
