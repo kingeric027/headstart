@@ -112,11 +112,11 @@ export class CatalogsTempService {
     assignments: string[]
   ): Promise<any> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/${locationID}/catalogs/assignments`
-    const marketplaceCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = {
+    const hsCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = {
       CatalogIDs: assignments,
     }
     return await this.http
-      .post(url, marketplaceCatalogAssignmentRequest, {
+      .post(url, hsCatalogAssignmentRequest, {
         headers: this.buildHeaders(),
       })
       .toPromise()

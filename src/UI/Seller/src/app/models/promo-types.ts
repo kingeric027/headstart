@@ -1,26 +1,26 @@
 export interface PromotionXp {
-  Type?: MarketplacePromoType
+  Type?: HSPromoType
   Value?: number
-  AppliesTo?: MarketplacePromoEligibility
+  AppliesTo?: HSPromoEligibility
   SKUs?: string[]
   Supplier?: string
   Automatic?: boolean
-  MinReq?: MarketplacePromoMinRequirement
+  MinReq?: HSPromoMinRequirement
   MaxShipCost?: number
 }
 
-export interface MarketplacePromoMinRequirement {
+export interface HSPromoMinRequirement {
   Type?: MinRequirementType
   Int?: number
 }
 
-export enum MarketplacePromoType {
+export enum HSPromoType {
   Percentage = 'Percentage',
   FixedAmount = 'FixedAmount',
   FreeShipping = 'FreeShipping',
 }
 
-export enum MarketplacePromoEligibility {
+export enum HSPromoEligibility {
   EntireOrder = 'EntireOrder',
   SpecificSupplier = 'SpecificSupplier',
   SpecificSKUs = 'SpecificSKUs',

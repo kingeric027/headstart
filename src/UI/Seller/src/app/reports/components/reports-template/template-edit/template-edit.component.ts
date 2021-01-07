@@ -27,7 +27,11 @@ import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { OcBuyerService } from '@ordercloud/angular-sdk'
 import { cloneDeep } from 'lodash'
 import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
-import { AppGeographyService, FilterObject, OrderType } from '@app-seller/shared'
+import {
+  AppGeographyService,
+  FilterObject,
+  OrderType,
+} from '@app-seller/shared'
 import { ReportTemplate } from '@ordercloud/headstart-sdk'
 
 @Component({

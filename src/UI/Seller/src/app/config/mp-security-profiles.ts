@@ -4,7 +4,7 @@
  *
  */
 
-import { MPRole } from "@app-seller/models/user.types"
+import { MPRole } from '@app-seller/models/user.types'
 
 export const MPRoles = {
   MPMeProductAdmin: 'MPMeProductAdmin',
@@ -264,9 +264,8 @@ const MPStorefrontAdmin: MPRole = {
   ],
 }
 
-
-const MarketPlaceManager = {
-  Name: 'MarketPlaceManager',
+const HSManager = {
+  Name: 'HSManager',
   MPRoles: [
     MPProductReader,
     MPPromotionReader,
@@ -309,4 +308,4 @@ const SupplierTeamMember = {
     MPReportReader,
   ],
 }
-const SEBUserTypes = [SupplierManager, SupplierTeamMember, MarketPlaceManager]
+const SEBUserTypes = [SupplierManager, SupplierTeamMember, HSManager]

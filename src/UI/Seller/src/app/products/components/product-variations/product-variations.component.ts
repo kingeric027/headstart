@@ -46,7 +46,7 @@ import { SupportedRates } from '@app-seller/shared'
 })
 export class ProductVariations implements OnChanges {
   @Input()
-  set superMarketplaceProductEditable(
+  set superHSProductEditable(
     superProductEditable: SuperMarketplaceProduct
   ) {
     this.superProductEditable = superProductEditable
@@ -59,7 +59,7 @@ export class ProductVariations implements OnChanges {
     this.editSpecs = superProductEditable?.Specs?.some((s) => !s.AllowOpenText)
   }
   @Input()
-  set superMarketplaceProductStatic(
+  set superHSProductStatic(
     superProductStatic: SuperMarketplaceProduct
   ) {
     this.superProductStatic = superProductStatic
@@ -130,9 +130,9 @@ export class ProductVariations implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes?.superMarketplaceProductEditable) {
+    if (changes?.superHSProductEditable) {
       this.variants.next(
-        changes?.superMarketplaceProductEditable?.currentValue?.Variants
+        changes?.superHSProductEditable?.currentValue?.Variants
       )
     }
   }

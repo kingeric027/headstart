@@ -32,7 +32,7 @@ export class ProductPricingComponent {
   @Input()
   isRequired: boolean
   @Input()
-  set superMarketplaceProductStatic(value: SuperMarketplaceProduct) {
+  set superHSProductStatic(value: SuperMarketplaceProduct) {
     this.setData(value);
     if (value && this.readonly) {
       this.setUpBuyers()
@@ -53,7 +53,7 @@ export class ProductPricingComponent {
 
   buyers: MarketplaceBuyer[] = []
   selectedBuyerIndex = 0
-  selectedSuperMarketplaceBuyer: HSBuyerPriceMarkup
+  selectedSuperHSBuyer: HSBuyerPriceMarkup
 
   isUsingPriceOverride = false
   areChangesToBuyerVisibility = false
@@ -123,7 +123,7 @@ export class ProductPricingComponent {
 
   getBuyerPercentMarkupPrice(supplierPrice: number): number {
     const markupMultiplier =
-      (this.selectedSuperMarketplaceBuyer?.Markup?.Percent || 0) / 100 + 1
+      (this.selectedSuperHSBuyer?.Markup?.Percent || 0) / 100 + 1
     return supplierPrice * markupMultiplier
   }
 
@@ -155,7 +155,7 @@ export class ProductPricingComponent {
 
   async handleSaveBuyerPricing(): Promise<void> {
     const productID = this.superProduct.Product.ID
-    const buyerID = this.selectedSuperMarketplaceBuyer.Buyer.ID
+    const buyerID = this.selectedSuperHSBuyer.Buyer.ID
     this.overridePriceScheduleEditable.Name =
       this.superProduct.Product.Name + ' Seller Override'
     if (!this.isSavedOverride && this.isUsingPriceOverride) {
@@ -201,7 +201,7 @@ export class ProductPricingComponent {
     try {
       const override = await this.catalogsTempService.GetPricingOverride(
         this.superProduct.Product.ID,
-        this.selectedSuperMarketplaceBuyer.Buyer.ID
+        this.selectedSuperHSBuyer.Buyer.ID
       )
       this.resetOverridePriceSchedules(override)
       this.isSavedOverride = true
@@ -237,7 +237,7 @@ export class ProductPricingComponent {
 
   async selectBuyer(buyer: MarketplaceBuyer): Promise<void> {
     const superBuyer = await this.buyerTempService.get(buyer.ID)
-    this.selectedSuperMarketplaceBuyer = superBuyer
+    this.selectedSuperHSBuyer = superBuyer
     this.buyerMarkedUpSupplierPrices = this.getBuyerDisplayOfSupplierPriceSchedule()
     this.getPriceScheduleOverrides()
   }

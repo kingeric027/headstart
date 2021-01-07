@@ -113,10 +113,10 @@ export class KitsEditComponent implements OnInit {
   async handleSelectedProductChange(
     product: MarketplaceKitProduct
   ): Promise<void> {
-    const marketplaceKitProduct = this.isCreatingNew
+    const hsKitProduct = this.isCreatingNew
       ? this.kitService.emptyResource
       : await HeadStartSDK.KitProducts.Get(product.Product.ID)
-    this.refreshProductData(marketplaceKitProduct)
+    this.refreshProductData(hsKitProduct)
   }
 
   async refreshProductData(product: MarketplaceKitProduct): Promise<void> {
@@ -428,7 +428,7 @@ export class KitsEditComponent implements OnInit {
       superProduct = await this.uploadAsset(productID, file, true)
     }
     this.staticContentFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
     superProduct = Object.assign(this.kitProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }
@@ -438,7 +438,7 @@ export class KitsEditComponent implements OnInit {
       superProduct = await this.uploadAsset(productID, file)
     }
     this.imageFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
     superProduct = Object.assign(this.kitProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }

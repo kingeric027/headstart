@@ -59,7 +59,7 @@ export class BuyerLocationEditComponent implements OnInit {
     private router: Router,
     private middleware: MiddlewareAPIService,
     private currentUserService: CurrentUserService,
-    private marketplaceCatalogService: CatalogsTempService
+    private hsCatalogService: CatalogsTempService
   ) {
     this.countryOptions = GeographyConfig.getCountries()
   }
@@ -125,9 +125,7 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   async getCatalogs(): Promise<void> {
-    const catalogsResponse = await this.marketplaceCatalogService.list(
-      this.buyerID
-    )
+    const catalogsResponse = await this.hsCatalogService.list(this.buyerID)
     this.catalogs = catalogsResponse.Items
   }
 
@@ -266,10 +264,10 @@ export class BuyerLocationEditComponent implements OnInit {
   }
 
   private async handleSelectedAddressChange(address: Address): Promise<void> {
-    const marketplaceBuyerLocation = await HeadStartSDK.BuyerLocations.Get(
+    const hsBuyerLocation = await HeadStartSDK.BuyerLocations.Get(
       this.buyerID,
       address.ID
     )
-    this.refreshBuyerLocationData(marketplaceBuyerLocation)
+    this.refreshBuyerLocationData(hsBuyerLocation)
   }
 }

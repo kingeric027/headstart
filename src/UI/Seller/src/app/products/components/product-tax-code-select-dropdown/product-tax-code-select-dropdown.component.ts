@@ -28,7 +28,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Input()
   taxCodes: ListPage<TaxProperties>
   @Input()
-  superMarketplaceProductEditable: SuperMarketplaceProduct
+  superHSProductEditable: SuperMarketplaceProduct
   @Input()
   readonly: boolean
   @Input()
@@ -52,9 +52,9 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (
-      changes?.superMarketplaceProductEditable?.previousValue &&
-      changes.superMarketplaceProductEditable.previousValue.Product.ID !==
-        changes.superMarketplaceProductEditable.currentValue.Product.ID
+      changes?.superHSProductEditable?.previousValue &&
+      changes.superHSProductEditable.previousValue.Product.ID !==
+        changes.superHSProductEditable.currentValue.Product.ID
     ) {
       this.searchTerm = ''
     }
@@ -74,7 +74,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
     const { Category, ...rest } = taxCode
     const Tax = {
       ...rest,
-      Category: this.superMarketplaceProductEditable.Product.xp?.Tax.Category,
+      Category: this.superHSProductEditable.Product.xp?.Tax.Category,
     }
     this.onSelectTaxCode.emit(Tax)
   }
