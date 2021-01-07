@@ -1,7 +1,5 @@
-import { Component, OnInit, Input, OnChanges } from '@angular/core'
-import { FormControl } from '@angular/forms'
+import { Component, OnInit, Input } from '@angular/core'
 import {
-  Buyer,
   OcBuyerService,
   UserGroup,
   ProductAssignment,
@@ -20,9 +18,6 @@ import {
   TecraDocument,
   TecraSpec,
 } from '@ordercloud/headstart-sdk'
-} from '../../../../shared/services/middleware-api/middleware-chili.service'
-import ChiliSpecOptions from '@ordercloud/headstart-sdk/dist/api/ChiliSpecOptions'
-import ChiliSpecs from '@ordercloud/headstart-sdk/dist/api/ChiliSpecs'
 import { Sortable } from 'sortablejs'
 
 @Component({
