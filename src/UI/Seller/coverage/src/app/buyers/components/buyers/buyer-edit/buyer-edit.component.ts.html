@@ -314,7 +314,7 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms'
 import {
   BuyerTempService,
-  SuperMarketplaceBuyer,
+  HSBuyerPriceMarkup,
 } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
 import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
 import { BuyerService } from '../buyer.service'
@@ -332,8 +332,8 @@ export class BuyerEditComponent {
   areChanges = false
   dataIsSaving = false
 &nbsp;
-  _superBuyerStatic: SuperMarketplaceBuyer
-  _superBuyerEditable: SuperMarketplaceBuyer
+  _superBuyerStatic: HSBuyerPriceMarkup
+  _superBuyerEditable: HSBuyerPriceMarkup
 &nbsp;
   @Input()
   labelSingular: string
@@ -359,14 +359,14 @@ export class BuyerEditComponent {
     const value =
 <span class="cstat-no" title="statement not covered" >      field === 'Buyer.Active' ? event.target.checked : event.target.value</span>
     const resourceUpdate = <span class="cstat-no" title="statement not covered" >{ field, value }</span>
-<span class="cstat-no" title="statement not covered" >    this._superBuyerEditable = this.buyerService.getUpdatedEditableResource&lt;SuperMarketplaceBuyer&gt;(</span>
+<span class="cstat-no" title="statement not covered" >    this._superBuyerEditable = this.buyerService.getUpdatedEditableResource&lt;HSBuyerPriceMarkup&gt;(</span>
       resourceUpdate,
       this._superBuyerEditable
     )
 <span class="cstat-no" title="statement not covered" >    this.checkForChanges()</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  createBuyerForm</span>(superBuyer: SuperMarketplaceBuyer): void {
+<span class="fstat-no" title="function not covered" >  createBuyerForm</span>(superBuyer: HSBuyerPriceMarkup): void {
     const buyer = <span class="cstat-no" title="statement not covered" >superBuyer.Buyer</span>
     const markup = <span class="cstat-no" title="statement not covered" >superBuyer.Markup</span>
 <span class="cstat-no" title="statement not covered" >    this.resourceForm = new FormGroup({</span>
@@ -382,7 +382,7 @@ export class BuyerEditComponent {
 <span class="cstat-no" title="statement not covered" >    this.refreshBuyerData(superMarketplaceBuyer)</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  refreshBuyerData</span>(superBuyer: SuperMarketplaceBuyer): void {
+<span class="fstat-no" title="function not covered" >  refreshBuyerData</span>(superBuyer: HSBuyerPriceMarkup): void {
 <span class="cstat-no" title="statement not covered" >    this.createBuyerForm(superBuyer)</span>
 <span class="cstat-no" title="statement not covered" >    this._superBuyerStatic = superBuyer</span>
 <span class="cstat-no" title="statement not covered" >    this._superBuyerEditable = superBuyer</span>

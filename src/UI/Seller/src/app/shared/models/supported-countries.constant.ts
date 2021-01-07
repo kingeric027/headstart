@@ -1,10 +1,6 @@
 // replace with sdk in the future
 
-export interface SupportedCountries {
-  label: string
-  abbreviation: string
-  currency: string
-}
+import { SupportedCountries } from '@app-seller/models/currency-geography.types'
 
 export class GeographyConfig {
   static getCountries(): SupportedCountries[] {

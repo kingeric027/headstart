@@ -1,21 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { OcTokenService, OcSupplierService } from '@ordercloud/angular-sdk'
 import { ResourceCrudService } from '../resource-crud/resource-crud.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { ReportType } from './reports-template.service'
-import { ListPage } from '@ordercloud/headstart-sdk'
+import { ListPage, ReportTypeResource } from '@ordercloud/headstart-sdk'
+import { AppConfig } from '@app-seller/models/environment.types'
 
-export interface ReportTypeResource {
-  ID: ReportType
-  Name: string
-  ReportCategory: string
-}
+
 
 export const REPORTS_SUB_RESOURCE_LIST = [
   { route: 'reports', display: 'Reports' },

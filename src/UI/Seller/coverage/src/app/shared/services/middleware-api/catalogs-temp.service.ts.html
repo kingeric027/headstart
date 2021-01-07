@@ -589,11 +589,11 @@ export class CatalogsTempService {
     assignments: string[]
   ): Promise&lt;any&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyers/${buyerID}/${locationID}/catalogs/assignments`</span>
-    const marketplaceCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = <span class="cstat-no" title="statement not covered" >{</span>
+    const hsCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = <span class="cstat-no" title="statement not covered" >{</span>
       CatalogIDs: assignments,
     }
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .post(url, marketplaceCatalogAssignmentRequest, {
+      .post(url, hsCatalogAssignmentRequest, {
         headers: this.buildHeaders(),
       })
       .toPromise()

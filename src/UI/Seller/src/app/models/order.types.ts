@@ -1,3 +1,16 @@
+export interface OrderProgress {
+  StatusDisplay: string
+  Value: number
+  ProgressBarType: string
+  Striped: boolean
+  Animated: boolean
+}
+
+export enum OrderType {
+  Quote = 'Quote',
+  Standard = 'Standard',
+}
+
 export enum ShippingStatus {
   Shipped = 'Shipped',
   PartiallyShipped = 'PartiallyShipped',

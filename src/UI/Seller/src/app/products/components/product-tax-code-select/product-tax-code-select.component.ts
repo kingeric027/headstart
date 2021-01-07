@@ -22,7 +22,7 @@ export class ProductTaxCodeSelect {
   @Input()
   productForm: FormGroup
   @Input()
-  superMarketplaceProductEditable: SuperMarketplaceProduct
+  superHSProductEditable: SuperMarketplaceProduct
   @Input()
   taxCodes: ListPage<TaxCodes>
   @Output()

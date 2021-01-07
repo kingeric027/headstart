@@ -14,3 +14,20 @@ export interface AssignedCategory extends Category {
   Assigned?: boolean
   AssignedByParent?: boolean
 }
+
+export interface SupplierCategoryConfigFilters {
+  Display: string
+  Path: string
+  Items: any[]
+}
+export interface SupplierCategoryConfig {
+  id: string
+  timeStamp: string
+  MarketplaceName: string
+  Filters: Array<SupplierCategoryConfigFilters>
+}
+
+export interface SupplierCategorySelection {
+  ServiceCategory: string
+  VendorLevel: string
+}

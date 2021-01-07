@@ -3,11 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { Promotion } from '@ordercloud/angular-sdk'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import {
-  MarketplacePromoType,
-  MarketplacePromoEligibility,
+  HSPromoType,
+  HSPromoEligibility,
   PromotionXp,
   MinRequirementType,
-} from '@app-seller/shared/models/marketplace-promo.interface'
+} from '@app-seller/models/promo-types'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { Promotions } from 'ordercloud-javascript-sdk'
 import { MarketplaceSupplier } from '@ordercloud/headstart-sdk'
@@ -33,9 +33,9 @@ export class PromotionService extends ResourceCrudService<Promotion> {
     CanCombine: true,
     AllowAllBuyers: true,
     xp: {
-      Type: MarketplacePromoType.Percentage,
+      Type: HSPromoType.Percentage,
       Value: null,
-      AppliesTo: MarketplacePromoEligibility.EntireOrder,
+      AppliesTo: HSPromoEligibility.EntireOrder,
       ScopeToSupplier: false,
       Supplier: null,
       SKUs: [],
@@ -68,10 +68,10 @@ export class PromotionService extends ResourceCrudService<Promotion> {
   ): string {
     let eligibleExpression = ''
     switch (safeXp?.AppliesTo) {
-      case MarketplacePromoEligibility.SpecificSupplier:
+      case HSPromoEligibility.SpecificSupplier:
         eligibleExpression = `item.SupplierID = '${selectedSupplier?.ID}'`
         break
-      case MarketplacePromoEligibility.SpecificSKUs:
+      case HSPromoEligibility.SpecificSKUs:
         const skuArr = safeXp?.SKUs?.map((sku) => `item.ProductID = '${sku}'`)
         skuArr.forEach(
           (exp, i) =>
@@ -91,11 +91,11 @@ export class PromotionService extends ResourceCrudService<Promotion> {
     switch (safeXp?.MinReq?.Type) {
       case MinRequirementType.MinPurchase:
         if (
-          safeXp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier
+          safeXp?.AppliesTo === HSPromoEligibility.SpecificSupplier
         ) {
           eligibleExpression = `${eligibleExpression} and items.total(SupplierID = '${selectedSupplier?.ID}') >= ${safeXp?.MinReq?.Int}`
         } else if (
-          safeXp?.AppliesTo === MarketplacePromoEligibility.SpecificSKUs
+          safeXp?.AppliesTo === HSPromoEligibility.SpecificSKUs
         ) {
           eligibleExpression = `${eligibleExpression} and Order.Subtotal >= ${safeXp?.MinReq?.Int}`
         } else {
@@ -103,10 +103,10 @@ export class PromotionService extends ResourceCrudService<Promotion> {
         }
         break
       case MinRequirementType.MinItemQty:
-        if (safeXp.AppliesTo === MarketplacePromoEligibility.SpecificSupplier) {
+        if (safeXp.AppliesTo === HSPromoEligibility.SpecificSupplier) {
           eligibleExpression = `${eligibleExpression} and items.Quantity(SupplierID = '${selectedSupplier?.ID}') >= ${safeXp?.MinReq?.Int}`
         } else if (
-          safeXp?.AppliesTo === MarketplacePromoEligibility.SpecificSKUs
+          safeXp?.AppliesTo === HSPromoEligibility.SpecificSKUs
         ) {
           eligibleExpression = `${eligibleExpression} and Order.LineItemCount >= ${safeXp?.MinReq?.Int}`
         } else {
@@ -128,30 +128,30 @@ export class PromotionService extends ResourceCrudService<Promotion> {
   ): string {
     let valueExpression = 'Order.Subtotal'
     switch (safeXp?.AppliesTo) {
-      case MarketplacePromoEligibility.SpecificSupplier:
+      case HSPromoEligibility.SpecificSupplier:
         valueExpression = 'item.LineSubtotal'
-        if (safeXp?.Type === MarketplacePromoType.Percentage) {
+        if (safeXp?.Type === HSPromoType.Percentage) {
           valueExpression = `item.LineSubtotal * ${safeXp?.Value / 100}`
         }
-        if (safeXp?.Type === MarketplacePromoType.FixedAmount) {
+        if (safeXp?.Type === HSPromoType.FixedAmount) {
           valueExpression = `${safeXp?.Value} / items.count(SupplierID = '${selectedSupplier?.ID}')`
         }
         break
-      case MarketplacePromoEligibility.SpecificSKUs:
-        if (safeXp?.Type === MarketplacePromoType.Percentage) {
+      case HSPromoEligibility.SpecificSKUs:
+        if (safeXp?.Type === HSPromoType.Percentage) {
           valueExpression = `item.LineSubtotal * ${safeXp?.Value / 100}`
         }
-        if (safeXp?.Type === MarketplacePromoType.FixedAmount) {
+        if (safeXp?.Type === HSPromoType.FixedAmount) {
           valueExpression = `item.Quantity * ${safeXp?.Value}`
         }
         break
       default:
-        if (safeXp?.Type === MarketplacePromoType.Percentage) {
+        if (safeXp?.Type === HSPromoType.Percentage) {
           valueExpression = `items.total(Product.xp.PromotionEligible=\'true\') * ${
             safeXp.Value / 100
           }`
         }
-        if (safeXp?.Type === MarketplacePromoType.FixedAmount) {
+        if (safeXp?.Type === HSPromoType.FixedAmount) {
           valueExpression = `${safeXp?.Value}`
         }
         break

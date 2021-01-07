@@ -2282,8 +2282,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >      this.handleSelectedProductChange(product)</span>
     } else {
 <span class="cstat-no" title="statement not covered" >      this.createProductForm(this.productService.emptyResource)</span>
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductEditable = this.productService.emptyResource</span>
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductStatic = this.productService.emptyResource</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductEditable = this.productService.emptyResource</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductStatic = this.productService.emptyResource</span>
     }
   }
   @Input() readonly: boolean
@@ -2309,8 +2309,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >  faTimesCircle = faTimesCircle</span>
 <span class="cstat-no" title="statement not covered" >  faCheckCircle = faCheckCircle</span>
 <span class="cstat-no" title="statement not covered" >  faExclamationCircle = faExclamationCircle</span>
-  _superMarketplaceProductStatic: SuperMarketplaceProduct
-  _superMarketplaceProductEditable: SuperMarketplaceProduct
+  _superHSProductStatic: SuperMarketplaceProduct
+  _superHSProductEditable: SuperMarketplaceProduct
   supplierCurrency: SupportedRates
   sellerCurrency: SupportedRates
   _exchangeRates: SupportedRates[]
@@ -2428,41 +2428,41 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="fstat-no" title="function not covered" >      (r</span>) =&gt; <span class="cstat-no" title="statement not covered" >r.Currency === superProduct?.Product?.xp?.Currency</span>
     )
     // copying to break reference bugs
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductStatic = JSON.parse(</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductStatic = JSON.parse(</span>
       JSON.stringify(superProduct)
     )
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductEditable = JSON.parse(</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductEditable = JSON.parse(</span>
       JSON.stringify(superProduct)
     )
-<span class="cstat-no" title="statement not covered" >    if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) {</span>
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = {</span>
+<span class="cstat-no" title="statement not covered" >    if (!this._superHSProductEditable?.Product?.xp?.UnitOfMeasure) {</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductEditable.Product.xp.UnitOfMeasure = {</span>
         Unit: null,
         Qty: null,
       }
     }
-<span class="cstat-no" title="statement not covered" >    if (this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category) {</span>
+<span class="cstat-no" title="statement not covered" >    if (this._superHSProductEditable.Product?.xp?.Tax?.Category) {</span>
 <span class="cstat-no" title="statement not covered" >      await this.setTaxCodes(</span>
-        this._superMarketplaceProductEditable.Product.xp.Tax.Category,
+        this._superHSProductEditable.Product.xp.Tax.Category,
         ''
       )
     } else {
 <span class="cstat-no" title="statement not covered" >      this.taxCodes = { Meta: {}, Items: [] }</span>
     }
-<span class="cstat-no" title="statement not covered" >    this.staticContent = this._superMarketplaceProductEditable.Attachments</span>
-<span class="cstat-no" title="statement not covered" >    this.images = this._superMarketplaceProductEditable.Images</span>
+<span class="cstat-no" title="statement not covered" >    this.staticContent = this._superHSProductEditable.Attachments</span>
+<span class="cstat-no" title="statement not covered" >    this.images = this._superHSProductEditable.Images</span>
 <span class="cstat-no" title="statement not covered" >    this.taxCodeCategorySelected =</span>
-      this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null
-<span class="cstat-no" title="statement not covered" >    this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType</span>
-<span class="cstat-no" title="statement not covered" >    this.createProductForm(this._superMarketplaceProductEditable)</span>
+      this._superHSProductEditable.Product?.xp?.Tax?.Category !== null
+<span class="cstat-no" title="statement not covered" >    this.productType = this._superHSProductEditable.Product?.xp?.ProductType</span>
+<span class="cstat-no" title="statement not covered" >    this.createProductForm(this._superHSProductEditable)</span>
 <span class="cstat-no" title="statement not covered" >    if (this.userContext?.UserType === 'SELLER') {</span>
 <span class="cstat-no" title="statement not covered" >      this.addresses = await this.ocSupplierAddressService</span>
-        .List(this._superMarketplaceProductEditable?.Product?.DefaultSupplierID)
+        .List(this._superHSProductEditable?.Product?.DefaultSupplierID)
         .toPromise()
 <span class="cstat-no" title="statement not covered" >      if (superProduct.Product?.ShipFromAddressID)</span>
 <span class="cstat-no" title="statement not covered" >        this.shippingAddress = await this.ocSupplierAddressService</span>
           .Get(
-            this._superMarketplaceProductEditable.Product.OwnerID,
-            this._superMarketplaceProductEditable.Product.ShipFromAddressID
+            this._superHSProductEditable.Product.OwnerID,
+            this._superHSProductEditable.Product.ShipFromAddressID
           )
           .toPromise()
     }
@@ -2470,114 +2470,114 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >    this.checkForChanges()</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  createProductForm</span>(superMarketplaceProduct: SuperMarketplaceProduct): void {
-<span class="cstat-no" title="statement not covered" >    if (superMarketplaceProduct.Product) {</span>
+<span class="fstat-no" title="function not covered" >  createProductForm</span>(superHSProduct: SuperMarketplaceProduct): void {
+<span class="cstat-no" title="statement not covered" >    if (superHSProduct.Product) {</span>
 <span class="cstat-no" title="statement not covered" >      this.productForm = new FormGroup(</span>
         {
-          Active: new FormControl(superMarketplaceProduct.Product.Active),
-          Name: new FormControl(superMarketplaceProduct.Product.Name, [
+          Active: new FormControl(superHSProduct.Product.Active),
+          Name: new FormControl(superHSProduct.Product.Name, [
             Validators.required,
             Validators.maxLength(100),
           ]),
-          ID: new FormControl(superMarketplaceProduct.Product.ID),
+          ID: new FormControl(superHSProduct.Product.ID),
           Description: new FormControl(
-            superMarketplaceProduct.Product.Description,
+            superHSProduct.Product.Description,
             Validators.maxLength(2000)
           ),
           QuantityMultiplier: new FormControl(
-            superMarketplaceProduct.Product.QuantityMultiplier
+            superHSProduct.Product.QuantityMultiplier
           ),
           ShipFromAddressID: new FormControl(
-            superMarketplaceProduct.Product.ShipFromAddressID,
+            superHSProduct.Product.ShipFromAddressID,
             Validators.required
           ),
           ShipHeight: new FormControl(
-            superMarketplaceProduct.Product.ShipHeight
+            superHSProduct.Product.ShipHeight
           ),
-          ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth),
+          ShipWidth: new FormControl(superHSProduct.Product.ShipWidth),
           ShipLength: new FormControl(
-            superMarketplaceProduct.Product.ShipLength
+            superHSProduct.Product.ShipLength
           ),
           ShipWeight: new FormControl(
-            superMarketplaceProduct.Product.ShipWeight,
+            superHSProduct.Product.ShipWeight,
             [Validators.required, Validators.min(0)]
           ),
           Price: new FormControl(
             _get(
-              superMarketplaceProduct.PriceSchedule,
+              superHSProduct.PriceSchedule,
               'PriceBreaks[0].Price',
               null
             ),
             Validators.required
           ),
           MinQuantity: new FormControl(
-            superMarketplaceProduct.PriceSchedule?.MinQuantity,
+            superHSProduct.PriceSchedule?.MinQuantity,
             Validators.min(1)
           ),
           MaxQuantity: new FormControl(
-            superMarketplaceProduct.PriceSchedule?.MaxQuantity,
+            superHSProduct.PriceSchedule?.MaxQuantity,
             Validators.min(1)
           ),
           UseCumulativeQuantity: new FormControl(
-            superMarketplaceProduct.PriceSchedule?.UseCumulativeQuantity
+            superHSProduct.PriceSchedule?.UseCumulativeQuantity
           ),
           Note: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.Note'),
+            _get(superHSProduct.Product, 'xp.Note'),
             Validators.maxLength(140)
           ),
           ProductType: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.ProductType'),
+            _get(superHSProduct.Product, 'xp.ProductType'),
             Validators.required
           ),
           IsResale: new FormControl({
-            value: _get(superMarketplaceProduct.Product, 'xp.IsResale'),
+            value: _get(superHSProduct.Product, 'xp.IsResale'),
             disabled: this.readonly,
           }),
           QuantityAvailable: new FormControl(
-            superMarketplaceProduct.Product?.Inventory?.QuantityAvailable,
+            superHSProduct.Product?.Inventory?.QuantityAvailable,
             null
           ),
           InventoryEnabled: new FormControl({
-            value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'),
+            value: _get(superHSProduct.Product, 'Inventory.Enabled'),
             disabled: this.readonly,
           }),
           VariantLevelTracking: new FormControl(
             _get(
-              superMarketplaceProduct.Product,
+              superHSProduct.Product,
               'Inventory.VariantLevelTracking'
             ),
             null
           ),
           OrderCanExceed: new FormControl(
-            _get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')
+            _get(superHSProduct.Product, 'Inventory.OrderCanExceed')
           ),
           TaxCodeCategory: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.Tax.Category', null),
+            _get(superHSProduct.Product, 'xp.Tax.Category', null),
             Validators.required
           ),
           TaxCode: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.Tax.Code', null),
+            _get(superHSProduct.Product, 'xp.Tax.Code', null),
             Validators.required
           ),
           UnitOfMeasureUnit: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'),
+            _get(superHSProduct.Product, 'xp.UnitOfMeasure.Unit'),
             Validators.required
           ),
           SizeTier: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.SizeTier')
+            _get(superHSProduct.Product, 'xp.SizeTier')
           ),
           UnitOfMeasureQty: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'),
+            _get(superHSProduct.Product, 'xp.UnitOfMeasure.Qty'),
             Validators.required
           ),
           ArtworkRequired: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.ArtworkRequired')
+            _get(superHSProduct.Product, 'xp.ArtworkRequired')
           ),
           FreeShipping: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.FreeShipping')
+            _get(superHSProduct.Product, 'xp.FreeShipping')
           ),
           FreeShippingMessage: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.FreeShippingMessage') ||
+            _get(superHSProduct.Product, 'xp.FreeShippingMessage') ||
               'Free Shipping'
           ),
         },
@@ -2742,7 +2742,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async <span class="fstat-no" title="function not covered" >handleDelete</span>(): Promise&lt;void&gt; {
     const accessToken = <span class="cstat-no" title="statement not covered" >await this.appAuthService.fetchToken().toPromise()</span>
 <span class="cstat-no" title="statement not covered" >    await HeadStartSDK.Products.Delete(</span>
-      this._superMarketplaceProductStatic.Product.ID,
+      this._superHSProductStatic.Product.ID,
       accessToken
     )
 <span class="cstat-no" title="statement not covered" >    this.router.navigateByUrl('/products')</span>
@@ -2751,15 +2751,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="fstat-no" title="function not covered" >  handleDiscardChanges</span>(): void {
 <span class="cstat-no" title="statement not covered" >    this.imageFiles = []</span>
 <span class="cstat-no" title="statement not covered" >    this.staticContentFiles = []</span>
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductEditable = this._superMarketplaceProductStatic</span>
-<span class="cstat-no" title="statement not covered" >    this.refreshProductData(this._superMarketplaceProductStatic)</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductEditable = this._superHSProductStatic</span>
+<span class="cstat-no" title="statement not covered" >    this.refreshProductData(this._superHSProductStatic)</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >createNewProduct</span>(): Promise&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      this.dataIsSaving = true</span>
-      const superProduct = <span class="cstat-no" title="statement not covered" >await this.createNewSuperMarketplaceProduct(</span>
-        this._superMarketplaceProductEditable
+      const superProduct = <span class="cstat-no" title="statement not covered" >await this.createNewSuperHSProduct(</span>
+        this._superHSProductEditable
       )
 <span class="cstat-no" title="statement not covered" >      if (this.imageFiles.length &gt; 0)</span>
 <span class="cstat-no" title="statement not covered" >        await this.addImages(this.imageFiles, superProduct.Product.ID)</span>
@@ -2780,13 +2780,13 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async <span class="fstat-no" title="function not covered" >updateProduct</span>(): Promise&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      this.dataIsSaving = true</span>
-      let superProduct = <span class="cstat-no" title="statement not covered" >this._superMarketplaceProductStatic</span>
+      let superProduct = <span class="cstat-no" title="statement not covered" >this._superHSProductStatic</span>
 <span class="cstat-no" title="statement not covered" >      if (</span>
-        JSON.stringify(this._superMarketplaceProductEditable) !==
-        JSON.stringify(this._superMarketplaceProductStatic)
+        JSON.stringify(this._superHSProductEditable) !==
+        JSON.stringify(this._superHSProductStatic)
       ) {
 <span class="cstat-no" title="statement not covered" >        superProduct = await this.updateMarketplaceProduct(</span>
-          this._superMarketplaceProductEditable
+          this._superHSProductEditable
         )
       }
 <span class="cstat-no" title="statement not covered" >      if (this.appConfig?.superProductFieldsToMonitor.length &gt; 0) {</span>
@@ -2825,7 +2825,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       fieldsToMonitorForChanges.map(<span class="fstat-no" title="function not covered" >async (f</span>) =&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
         const fieldChanged =
 <span class="cstat-no" title="statement not covered" >          JSON.stringify(_get(editedSuperProduct, f)) !==</span>
-          JSON.stringify(_get(this._superMarketplaceProductStatic, f))
+          JSON.stringify(_get(this._superHSProductStatic, f))
 <span class="cstat-no" title="statement not covered" >        if (fieldChanged) {</span>
           const document = <span class="cstat-no" title="statement not covered" >{</span>
             Supplier: {
@@ -2833,11 +2833,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
               Name: mySupplier?.Name,
             },
             Product: {
-              ID: this._superMarketplaceProductStatic?.Product?.ID,
-              Name: this._superMarketplaceProductStatic?.Product?.Name,
+              ID: this._superHSProductStatic?.Product?.ID,
+              Name: this._superHSProductStatic?.Product?.Name,
               FieldModified: f,
-              PreviousValue: _get(this._superMarketplaceProductStatic, f),
-              CurrentValue: _get(this._superMarketplaceProductEditable, f),
+              PreviousValue: _get(this._superHSProductStatic, f),
+              CurrentValue: _get(this._superHSProductEditable, f),
             },
             Status: NotificationStatus.SUBMITTED,
             History: {
@@ -2894,8 +2894,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  updateProductResource</span>(productUpdate: any): void {
     const resourceToUpdate =
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductEditable || this.productService.emptyResource</span>
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductEditable || this.productService.emptyResource</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductEditable = this.productService.getUpdatedEditableResource(</span>
       productUpdate,
       resourceToUpdate
     )
@@ -2931,20 +2931,20 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
 <span class="fstat-no" title="function not covered" >  updateResourceFromFieldValue</span>(field: string, value: any): void {
     const updateProductResourceCopy = <span class="cstat-no" title="statement not covered" >this.productService.copyResource(</span>
-      this._superMarketplaceProductEditable || this.productService.emptyResource
+      this._superHSProductEditable || this.productService.emptyResource
     )
 <span class="cstat-no" title="statement not covered" >    updateProductResourceCopy.Product = {</span>
       ...updateProductResourceCopy.Product,
       [field]: value,
     }
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductEditable = updateProductResourceCopy</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductEditable = updateProductResourceCopy</span>
 <span class="cstat-no" title="statement not covered" >    this.checkForChanges()</span>
   }
   // TODO: Remove duplicate function, function exists in resource-crud.component.ts (minus the files check);
 <span class="fstat-no" title="function not covered" >  checkForChanges</span>(): void {
 <span class="cstat-no" title="statement not covered" >    this.areChanges =</span>
-      JSON.stringify(this._superMarketplaceProductEditable) !==
-        JSON.stringify(this._superMarketplaceProductStatic) ||
+      JSON.stringify(this._superHSProductEditable) !==
+        JSON.stringify(this._superHSProductStatic) ||
       this.imageFiles?.length &gt; 0 ||
       this.staticContentFiles?.length &gt; 0
   }
@@ -3012,9 +3012,9 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >      superProduct = await this.uploadAsset(productID, file, true)</span>
     }
 <span class="cstat-no" title="statement not covered" >    this.staticContentFiles = []</span>
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
 <span class="cstat-no" title="statement not covered" >    superProduct = Object.assign(</span>
-      this._superMarketplaceProductStatic || {},
+      this._superHSProductStatic || {},
       superProduct
     )
 <span class="cstat-no" title="statement not covered" >    this.refreshProductData(superProduct)</span>
@@ -3027,12 +3027,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
 <span class="cstat-no" title="statement not covered" >    this.imageFiles = []</span>
     //  need to copy the object so object.assign does not modify target
-    const copiedMarketPlaceStatic = <span class="cstat-no" title="statement not covered" >JSON.parse(</span>
-      JSON.stringify(this._superMarketplaceProductStatic)
+    const copiedHSStatic = <span class="cstat-no" title="statement not covered" >JSON.parse(</span>
+      JSON.stringify(this._superHSProductStatic)
     )
 &nbsp;
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
-<span class="cstat-no" title="statement not covered" >    superProduct = Object.assign(copiedMarketPlaceStatic || {}, superProduct)</span>
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
+<span class="cstat-no" title="statement not covered" >    superProduct = Object.assign(copiedHSStatic || {}, superProduct)</span>
 <span class="cstat-no" title="statement not covered" >    this.refreshProductData(superProduct)</span>
   }
 &nbsp;
@@ -3041,7 +3041,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     // Remove the image assignment, then remove the image
 <span class="cstat-no" title="statement not covered" >    await HeadStartSDK.Assets.DeleteAssetAssignment(</span>
       file.ID,
-      this._superMarketplaceProductStatic.Product.ID,
+      this._superHSProductStatic.Product.ID,
       'Products',
       null,
       null,
@@ -3049,15 +3049,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     )
 <span class="cstat-no" title="statement not covered" >    await HeadStartSDK.Assets.Delete(file.ID, accessToken)</span>
 <span class="cstat-no" title="statement not covered" >    if (file.Type === 'Image') {</span>
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductStatic.Images = this._superHSProductStatic.Images.filter(</span>
 <span class="fstat-no" title="function not covered" >        (i</span>) =&gt; <span class="cstat-no" title="statement not covered" >i.ID !== file.ID</span>
       )
     } else {
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductStatic.Attachments = this._superHSProductStatic.Attachments.filter(</span>
 <span class="fstat-no" title="function not covered" >        (a</span>) =&gt; <span class="cstat-no" title="statement not covered" >a.ID !== file.ID</span>
       )
     }
-<span class="cstat-no" title="statement not covered" >    this.refreshProductData(this._superMarketplaceProductStatic)</span>
+<span class="cstat-no" title="statement not covered" >    this.refreshProductData(this._superHSProductStatic)</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  unstageFile</span>(index: number, fileType: string): void {
@@ -3097,10 +3097,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async <span class="fstat-no" title="function not covered" >handleTaxCodeCategorySelection</span>(event): Promise&lt;void&gt; {
     // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
 <span class="cstat-no" title="statement not covered" >    if (</span>
-      this._superMarketplaceProductEditable?.Product?.xp &amp;&amp;
-      !this._superMarketplaceProductEditable.Product.xp.Tax
+      this._superHSProductEditable?.Product?.xp &amp;&amp;
+      !this._superHSProductEditable.Product.xp.Tax
     ) {
-<span class="cstat-no" title="statement not covered" >      this._superMarketplaceProductEditable.Product.xp.Tax = {</span>
+<span class="cstat-no" title="statement not covered" >      this._superHSProductEditable.Product.xp.Tax = {</span>
         Category: '',
         Code: '',
         Description: '',
@@ -3108,7 +3108,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
 <span class="cstat-no" title="statement not covered" >    this.resetTaxCodeAndDescription()</span>
 <span class="cstat-no" title="statement not covered" >    this.handleUpdateProduct(event, 'Product.xp.Tax.Category')</span>
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductEditable.Product.xp.Tax.Code = ''</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductEditable.Product.xp.Tax.Code = ''</span>
 <span class="cstat-no" title="statement not covered" >    await this.setTaxCodes(event.target.value, '')</span>
   }
 &nbsp;
@@ -3131,7 +3131,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 &nbsp;
   async <span class="fstat-no" title="function not covered" >searchTaxCodes</span>(searchTerm: string): Promise&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >    if (searchTerm === undefined) <span class="cstat-no" title="statement not covered" >searchTerm = ''</span></span>
-    const taxCodeCategory = <span class="cstat-no" title="statement not covered" >this._superMarketplaceProductEditable.Product.xp.Tax</span>
+    const taxCodeCategory = <span class="cstat-no" title="statement not covered" >this._superHSProductEditable.Product.xp.Tax</span>
       .Category
 <span class="cstat-no" title="statement not covered" >    await this.setTaxCodes(taxCodeCategory, searchTerm)</span>
   }
@@ -3141,7 +3141,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const totalPages = <span class="cstat-no" title="statement not covered" >this.taxCodes.Meta.TotalPages</span>
     const nextPageNumber = <span class="cstat-no" title="statement not covered" >this.taxCodes.Meta.Page + 1</span>
 <span class="cstat-no" title="statement not covered" >    if (totalPages &gt; nextPageNumber) {</span>
-      const taxCodeCategory = <span class="cstat-no" title="statement not covered" >this._superMarketplaceProductEditable.Product.xp</span>
+      const taxCodeCategory = <span class="cstat-no" title="statement not covered" >this._superHSProductEditable.Product.xp</span>
         .Tax.Category
       const avalaraTaxCodes = <span class="cstat-no" title="statement not covered" >await this.listTaxCodes(</span>
         taxCodeCategory,
@@ -3164,44 +3164,44 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     )
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >createNewSuperMarketplaceProduct</span>(
-    superMarketplaceProduct: SuperMarketplaceProduct
+  async <span class="fstat-no" title="function not covered" >createNewSuperHSProduct</span>(
+    superHSProduct: SuperMarketplaceProduct
   ): Promise&lt;SuperMarketplaceProduct&gt; {
     const supplier = <span class="cstat-no" title="statement not covered" >await this.currentUserService.getMySupplier()</span>
-<span class="cstat-no" title="statement not covered" >    superMarketplaceProduct.Product.xp.ProductType = this.productType</span>
-    ;(<span class="cstat-no" title="statement not covered" >superMarketplaceProduct.Product.xp as any).PromotionEligible =</span>
+<span class="cstat-no" title="statement not covered" >    superHSProduct.Product.xp.ProductType = this.productType</span>
+    ;(<span class="cstat-no" title="statement not covered" >superHSProduct.Product.xp as any).PromotionEligible =</span>
       this.productType === 'PurchaseOrder' ? false : true
-<span class="cstat-no" title="statement not covered" >    superMarketplaceProduct.Product.xp.Status = 'Draft'</span>
-<span class="cstat-no" title="statement not covered" >    superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency</span>
-<span class="cstat-no" title="statement not covered" >    superMarketplaceProduct.PriceSchedule.ID =</span>
-      superMarketplaceProduct.Product.ID
-<span class="cstat-no" title="statement not covered" >    superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`</span>
-<span class="cstat-no" title="statement not covered" >    if (superMarketplaceProduct.Product.xp.Tax.Category === null)</span>
-<span class="cstat-no" title="statement not covered" >      superMarketplaceProduct.Product.xp.Tax = null</span>
-<span class="cstat-no" title="statement not covered" >    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null)</span>
-<span class="cstat-no" title="statement not covered" >      superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price = 0</span>
-<span class="cstat-no" title="statement not covered" >    return await HeadStartSDK.Products.Post(superMarketplaceProduct)</span>
+<span class="cstat-no" title="statement not covered" >    superHSProduct.Product.xp.Status = 'Draft'</span>
+<span class="cstat-no" title="statement not covered" >    superHSProduct.Product.xp.Currency = supplier?.xp?.Currency</span>
+<span class="cstat-no" title="statement not covered" >    superHSProduct.PriceSchedule.ID =</span>
+      superHSProduct.Product.ID
+<span class="cstat-no" title="statement not covered" >    superHSProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superHSProduct.Product.Name}`</span>
+<span class="cstat-no" title="statement not covered" >    if (superHSProduct.Product.xp.Tax.Category === null)</span>
+<span class="cstat-no" title="statement not covered" >      superHSProduct.Product.xp.Tax = null</span>
+<span class="cstat-no" title="statement not covered" >    if (superHSProduct.PriceSchedule.PriceBreaks[0].Price === null)</span>
+<span class="cstat-no" title="statement not covered" >      superHSProduct.PriceSchedule.PriceBreaks[0].Price = 0</span>
+<span class="cstat-no" title="statement not covered" >    return await HeadStartSDK.Products.Post(superHSProduct)</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >updateMarketplaceProduct</span>(
-    superMarketplaceProduct: SuperMarketplaceProduct
+    superHSProduct: SuperMarketplaceProduct
   ): Promise&lt;SuperMarketplaceProduct&gt; {
     // If PriceSchedule has a price break price, but no ID or name, set them
 <span class="cstat-no" title="statement not covered" >    if (</span>
-      superMarketplaceProduct.PriceSchedule?.PriceBreaks[0]?.Price &amp;&amp;
-      superMarketplaceProduct.PriceSchedule.ID === null
+      superHSProduct.PriceSchedule?.PriceBreaks[0]?.Price &amp;&amp;
+      superHSProduct.PriceSchedule.ID === null
     ) {
-<span class="cstat-no" title="statement not covered" >      superMarketplaceProduct.PriceSchedule.ID =</span>
-        superMarketplaceProduct.Product.ID
-<span class="cstat-no" title="statement not covered" >      superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`</span>
+<span class="cstat-no" title="statement not covered" >      superHSProduct.PriceSchedule.ID =</span>
+        superHSProduct.Product.ID
+<span class="cstat-no" title="statement not covered" >      superHSProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superHSProduct.Product.Name}`</span>
     }
-<span class="cstat-no" title="statement not covered" >    if (superMarketplaceProduct.PriceSchedule.PriceBreaks.length === 0)</span>
-<span class="cstat-no" title="statement not covered" >      superMarketplaceProduct.PriceSchedule = null</span>
+<span class="cstat-no" title="statement not covered" >    if (superHSProduct.PriceSchedule.PriceBreaks.length === 0)</span>
+<span class="cstat-no" title="statement not covered" >      superHSProduct.PriceSchedule = null</span>
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
-<span class="cstat-no" title="statement not covered" >    superMarketplaceProduct.Product.xp.Status = 'Draft'</span>
+<span class="cstat-no" title="statement not covered" >    superHSProduct.Product.xp.Status = 'Draft'</span>
 <span class="cstat-no" title="statement not covered" >    return await HeadStartSDK.Products.Put(</span>
-      superMarketplaceProduct.Product.ID,
-      superMarketplaceProduct
+      superHSProduct.Product.ID,
+      superHSProduct
     )
   }
 &nbsp;
@@ -3213,11 +3213,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     )
 <span class="cstat-no" title="statement not covered" >    this.sellerCurrency = this._exchangeRates?.find(<span class="fstat-no" title="function not covered" >(r</span>) =&gt; <span class="cstat-no" title="statement not covered" >r.Currency === 'USD')</span></span>
     const accessToken = <span class="cstat-no" title="statement not covered" >await this.appAuthService.fetchToken().toPromise()</span>
-    const marketplaceProduct = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.Products.Get(</span>
+    const hsProduct = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.Products.Get(</span>
       product.ID,
       accessToken
     )
-<span class="cstat-no" title="statement not covered" >    this.refreshProductData(marketplaceProduct)</span>
+<span class="cstat-no" title="statement not covered" >    this.refreshProductData(hsProduct)</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >listTaxCodes</span>(taxCategory, search, page, pageSize): Promise&lt;any&gt; {
@@ -3241,11 +3241,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  updateEditableProductWithVariationChanges</span>(e): void {
     const updateProductResourceCopy = <span class="cstat-no" title="statement not covered" >this.productService.copyResource(</span>
-      this._superMarketplaceProductEditable || this.productService.emptyResource
+      this._superHSProductEditable || this.productService.emptyResource
     )
 <span class="cstat-no" title="statement not covered" >    updateProductResourceCopy.Specs = e.Specs</span>
 <span class="cstat-no" title="statement not covered" >    updateProductResourceCopy.Variants = e.Variants</span>
-<span class="cstat-no" title="statement not covered" >    this._superMarketplaceProductEditable = updateProductResourceCopy</span>
+<span class="cstat-no" title="statement not covered" >    this._superHSProductEditable = updateProductResourceCopy</span>
 <span class="cstat-no" title="statement not covered" >    this.checkForChanges()</span>
   }
 &nbsp;
@@ -3254,14 +3254,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  shouldIsResaleBeChecked</span>(): boolean {
-<span class="cstat-no" title="statement not covered" >    return this._superMarketplaceProductEditable?.Product?.xp?.IsResale</span>
+<span class="cstat-no" title="statement not covered" >    return this._superHSProductEditable?.Product?.xp?.IsResale</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  getProductPreviewImage</span>(): string | SafeUrl {
 <span class="cstat-no" title="statement not covered" >    return (</span>
       this.imageFiles[0]?.URL ||
       getProductMediumImageUrl(
-        this._superMarketplaceProductEditable?.Product,
+        this._superHSProductEditable?.Product,
         this.appConfig.sellerID
       )
     )

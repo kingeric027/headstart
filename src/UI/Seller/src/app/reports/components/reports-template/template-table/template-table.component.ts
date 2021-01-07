@@ -1,13 +1,11 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
-import {
-  ReportsTemplateService,
-  ReportTemplate,
-} from '@app-seller/shared/services/middleware-api/reports-template.service'
+import { ReportsTemplateService } from '@app-seller/shared/services/middleware-api/reports-template.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ReportsTypeService } from '@app-seller/shared/services/middleware-api/reports-type.service'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { ValidateRichTextDescription } from '@app-seller/validators/validators'
+import { ReportTemplate } from '@ordercloud/headstart-sdk'
 
 function createTemplateForm(template: ReportTemplate): FormGroup {
   const resourceForm = new FormGroup({

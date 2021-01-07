@@ -111,28 +111,28 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export interface PromotionXp {
-  Type?: MarketplacePromoType
+  Type?: HSPromoType
   Value?: number
-  AppliesTo?: MarketplacePromoEligibility
+  AppliesTo?: HSPromoEligibility
   SKUs?: string[]
   Supplier?: string
   Automatic?: boolean
-  MinReq?: MarketplacePromoMinRequirement
+  MinReq?: HSPromoMinRequirement
   MaxShipCost?: number
 }
 &nbsp;
-export interface MarketplacePromoMinRequirement {
+export interface HSPromoMinRequirement {
   Type?: MinRequirementType
   Int?: number
 }
 &nbsp;
-export enum MarketplacePromoType {
+export enum HSPromoType {
   Percentage = 'Percentage',
   FixedAmount = 'FixedAmount',
   FreeShipping = 'FreeShipping',
 }
 &nbsp;
-export enum MarketplacePromoEligibility {
+export enum HSPromoEligibility {
   EntireOrder = 'EntireOrder',
   SpecificSupplier = 'SpecificSupplier',
   SpecificSKUs = 'SpecificSKUs',

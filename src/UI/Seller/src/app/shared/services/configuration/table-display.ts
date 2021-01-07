@@ -1,16 +1,9 @@
+import { SummaryResourceInfoPathsDictionary } from '@app-seller/models/shared.types'
+import { ResourceConfigurationDictionary } from '@app-seller/models/table-display.types'
 import { PRODUCT_IMAGE_PATH_STRATEGY } from '@app-seller/products/product-image.helper'
 import { SUPPLIER_LOGO_PATH_STRATEGY } from '@app-seller/suppliers/supplier-logo.helper'
 
-export interface SummaryResourceInfoPaths {
-  toPrimaryHeader: string
-  toSecondaryHeader: string
-  toImage: string
-  toExpandable: boolean
-}
 
-export interface SummaryResourceInfoPathsDictionary {
-  [resourceType: string]: SummaryResourceInfoPaths
-}
 
 export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDictionary = {
   suppliers: {
@@ -117,33 +110,7 @@ export const SUMMARY_RESOURCE_INFO_PATHS_DICTIONARY: SummaryResourceInfoPathsDic
   },
 }
 
-export interface ResourceColumnConfiguration {
-  path: string
-  header: string
-  type: string
-  sortable: boolean
-  queryRestriction?: string
-}
 
-export interface ResourceConfiguration {
-  fields: ResourceColumnConfiguration[]
-  imgPath?: string
-}
-
-export interface ResourceCell {
-  type: string
-  value: any
-}
-
-export interface ResourceRow {
-  resource: any
-  cells: ResourceCell[]
-  imgPath?: string
-}
-
-export interface ResourceConfigurationDictionary {
-  [resourceType: string]: ResourceConfiguration
-}
 
 export const STRING_WITH_IMAGE = 'STRING_WITH_IMAGE'
 export const BOOLEAN = 'BOOLEAN'

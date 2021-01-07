@@ -379,8 +379,8 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { Promotion } from '@ordercloud/angular-sdk'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import {
-  MarketplacePromoType,
-  MarketplacePromoEligibility,
+  HSPromoType,
+  HSPromoEligibility,
   PromotionXp,
   MinRequirementType,
 } from '@app-seller/shared/models/marketplace-promo.interface'
@@ -409,9 +409,9 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
     CanCombine: true,
     AllowAllBuyers: true,
     xp: {
-      Type: MarketplacePromoType.Percentage,
+      Type: HSPromoType.Percentage,
       Value: null,
-      AppliesTo: MarketplacePromoEligibility.EntireOrder,
+      AppliesTo: HSPromoEligibility.EntireOrder,
       ScopeToSupplier: false,
       Supplier: null,
       SKUs: [],
@@ -444,10 +444,10 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
   ): string {
     let eligibleExpression = <span class="cstat-no" title="statement not covered" >''</span>
 <span class="cstat-no" title="statement not covered" >    switch (safeXp?.AppliesTo) {</span>
-      case MarketplacePromoEligibility.SpecificSupplier:
+      case HSPromoEligibility.SpecificSupplier:
 <span class="cstat-no" title="statement not covered" >        eligibleExpression = `item.SupplierID = '${selectedSupplier?.ID}'`</span>
 <span class="cstat-no" title="statement not covered" >        break</span>
-      case MarketplacePromoEligibility.SpecificSKUs:
+      case HSPromoEligibility.SpecificSKUs:
         const skuArr<span class="cstat-no" title="statement not covered" > = safeXp?.SKUs?.map(<span class="fstat-no" title="function not covered" >(s</span>ku) =&gt; <span class="cstat-no" title="statement not covered" >`item.ProductID = '${sku}'`)</span></span>
 <span class="cstat-no" title="statement not covered" >        skuArr.forEach(</span>
 <span class="fstat-no" title="function not covered" >          (e</span>xp, i) =&gt;
@@ -467,11 +467,11 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
 <span class="cstat-no" title="statement not covered" >    switch (safeXp?.MinReq?.Type) {</span>
       case MinRequirementType.MinPurchase:
 <span class="cstat-no" title="statement not covered" >        if (</span>
-          safeXp?.AppliesTo === MarketplacePromoEligibility.SpecificSupplier
+          safeXp?.AppliesTo === HSPromoEligibility.SpecificSupplier
         ) {
 <span class="cstat-no" title="statement not covered" >          eligibleExpression = `${eligibleExpression} and items.total(SupplierID = '${selectedSupplier?.ID}') &gt;= ${safeXp?.MinReq?.Int}`</span>
         } else <span class="cstat-no" title="statement not covered" >if (</span>
-          safeXp?.AppliesTo === MarketplacePromoEligibility.SpecificSKUs
+          safeXp?.AppliesTo === HSPromoEligibility.SpecificSKUs
         ) {
 <span class="cstat-no" title="statement not covered" >          eligibleExpression = `${eligibleExpression} and Order.Subtotal &gt;= ${safeXp?.MinReq?.Int}`</span>
         } else {
@@ -479,10 +479,10 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
         }
 <span class="cstat-no" title="statement not covered" >        break</span>
       case MinRequirementType.MinItemQty:
-<span class="cstat-no" title="statement not covered" >        if (safeXp.AppliesTo === MarketplacePromoEligibility.SpecificSupplier) {</span>
+<span class="cstat-no" title="statement not covered" >        if (safeXp.AppliesTo === HSPromoEligibility.SpecificSupplier) {</span>
 <span class="cstat-no" title="statement not covered" >          eligibleExpression = `${eligibleExpression} and items.Quantity(SupplierID = '${selectedSupplier?.ID}') &gt;= ${safeXp?.MinReq?.Int}`</span>
         } else <span class="cstat-no" title="statement not covered" >if (</span>
-          safeXp?.AppliesTo === MarketplacePromoEligibility.SpecificSKUs
+          safeXp?.AppliesTo === HSPromoEligibility.SpecificSKUs
         ) {
 <span class="cstat-no" title="statement not covered" >          eligibleExpression = `${eligibleExpression} and Order.LineItemCount &gt;= ${safeXp?.MinReq?.Int}`</span>
         } else {
@@ -504,30 +504,30 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
   ): string {
     let valueExpression = <span class="cstat-no" title="statement not covered" >'Order.Subtotal'</span>
 <span class="cstat-no" title="statement not covered" >    switch (safeXp?.AppliesTo) {</span>
-      case MarketplacePromoEligibility.SpecificSupplier:
+      case HSPromoEligibility.SpecificSupplier:
 <span class="cstat-no" title="statement not covered" >        valueExpression = 'item.LineSubtotal'</span>
-<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === MarketplacePromoType.Percentage) {</span>
+<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === HSPromoType.Percentage) {</span>
 <span class="cstat-no" title="statement not covered" >          valueExpression = `item.LineSubtotal * ${safeXp?.Value / 100}`</span>
         }
-<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === MarketplacePromoType.FixedAmount) {</span>
+<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === HSPromoType.FixedAmount) {</span>
 <span class="cstat-no" title="statement not covered" >          valueExpression = `${safeXp?.Value} / items.count(SupplierID = '${selectedSupplier?.ID}')`</span>
         }
 <span class="cstat-no" title="statement not covered" >        break</span>
-      case MarketplacePromoEligibility.SpecificSKUs:
-<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === MarketplacePromoType.Percentage) {</span>
+      case HSPromoEligibility.SpecificSKUs:
+<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === HSPromoType.Percentage) {</span>
 <span class="cstat-no" title="statement not covered" >          valueExpression = `item.LineSubtotal * ${safeXp?.Value / 100}`</span>
         }
-<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === MarketplacePromoType.FixedAmount) {</span>
+<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === HSPromoType.FixedAmount) {</span>
 <span class="cstat-no" title="statement not covered" >          valueExpression = `item.Quantity * ${safeXp?.Value}`</span>
         }
 <span class="cstat-no" title="statement not covered" >        break</span>
       default:
-<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === MarketplacePromoType.Percentage) {</span>
+<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === HSPromoType.Percentage) {</span>
 <span class="cstat-no" title="statement not covered" >          valueExpression = `items.total(Product.xp.PromotionEligible=\'true\') * ${</span>
             safeXp.Value / 100
           }`
         }
-<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === MarketplacePromoType.FixedAmount) {</span>
+<span class="cstat-no" title="statement not covered" >        if (safeXp?.Type === HSPromoType.FixedAmount) {</span>
 <span class="cstat-no" title="statement not covered" >          valueExpression = `${safeXp?.Value}`</span>
         }
 <span class="cstat-no" title="statement not covered" >        break</span>

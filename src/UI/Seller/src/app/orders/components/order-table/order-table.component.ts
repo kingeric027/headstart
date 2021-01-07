@@ -3,8 +3,8 @@ import { ResourceCrudComponent } from '@app-seller/shared/components/resource-cr
 import { Order } from '@ordercloud/angular-sdk'
 import { Router, ActivatedRoute, Params } from '@angular/router'
 import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
 import { OrderService } from '@app-seller/orders/order.service'
+import { SELLER } from '@app-seller/models/user.types'
 
 @Component({
   selector: 'app-order-table',

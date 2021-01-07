@@ -41,7 +41,7 @@ export class BuyerLocationCatalogs {
 
   constructor(
     private router: Router,
-    private marketplaceCatalogService: CatalogsTempService
+    private hsCatalogService: CatalogsTempService
   ) {}
 
   resetAssignments(assignments: string[]): void {
@@ -88,7 +88,7 @@ export class BuyerLocationCatalogs {
 
   async saveChanges(): Promise<void> {
     this.resetAssignments(this.locationCatalogAssignmentsEditable)
-    await this.marketplaceCatalogService.setLocationAssignments(
+    await this.hsCatalogService.setLocationAssignments(
       this.buyerID,
       this.locationID,
       this.locationCatalogAssignmentsEditable

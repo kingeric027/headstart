@@ -4,10 +4,8 @@ import { faSitemap, faBoxOpen } from '@fortawesome/free-solid-svg-icons'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import { flatMap } from 'rxjs/operators'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'category-details',

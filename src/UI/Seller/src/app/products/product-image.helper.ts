@@ -1,10 +1,8 @@
-import { Product, MeUser, User } from '@ordercloud/angular-sdk'
 import { environment } from 'src/environments/environment'
 import {
   MarketplaceProduct,
   MarketplaceLineItem,
 } from '@ordercloud/headstart-sdk'
-import { UserContext } from '@app-seller/config/user-context'
 
 export const IMAGE_HOST_URL =
   'https://s3.dualstack.us-east-1.amazonaws.com/staticcintas.eretailing.com/images/product'

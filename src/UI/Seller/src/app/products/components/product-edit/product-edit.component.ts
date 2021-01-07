@@ -10,8 +10,6 @@ import {
 } from '@angular/core'
 import { get as _get } from 'lodash'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
-import { UserContext } from '@app-seller/config/user-context'
 import {
   Address,
   OcSupplierAddressService,
@@ -29,10 +27,7 @@ import { Router } from '@angular/router'
 import { Product } from '@ordercloud/angular-sdk'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   faTrash,
   faTimes,
@@ -59,7 +54,6 @@ import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
 import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload'
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import {
   ValidateMinMax,
   ValidateNoSpecialCharactersAndSpaces,
@@ -71,10 +65,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
-} from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
+} from '@app-seller/models/notification.types'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { ToastrService } from 'ngx-toastr'
 import { Subscription } from 'rxjs'
+import { SupportedRates } from '@app-seller/models/currency-geography.types'
+import { FileHandle } from '@app-seller/models/file-upload.types'
+import { UserContext } from '@app-seller/models/user.types'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'app-product-edit',
@@ -90,8 +88,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.handleSelectedProductChange(product)
     } else {
       this.createProductForm(this.productService.emptyResource)
-      this._superMarketplaceProductEditable = this.productService.emptyResource
-      this._superMarketplaceProductStatic = this.productService.emptyResource
+      this._superHSProductEditable = this.productService.emptyResource
+      this._superHSProductStatic = this.productService.emptyResource
     }
   }
   @Input() readonly: boolean
@@ -117,8 +115,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   faTimesCircle = faTimesCircle
   faCheckCircle = faCheckCircle
   faExclamationCircle = faExclamationCircle
-  _superMarketplaceProductStatic: SuperMarketplaceProduct
-  _superMarketplaceProductEditable: SuperMarketplaceProduct
+  _superHSProductStatic: SuperMarketplaceProduct
+  _superHSProductEditable: SuperMarketplaceProduct
   supplierCurrency: SupportedRates
   sellerCurrency: SupportedRates
   _exchangeRates: SupportedRates[]
@@ -253,41 +251,37 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       (r) => r.Currency === superProduct?.Product?.xp?.Currency
     )
     // copying to break reference bugs
-    this._superMarketplaceProductStatic = JSON.parse(
-      JSON.stringify(superProduct)
-    )
-    this._superMarketplaceProductEditable = JSON.parse(
-      JSON.stringify(superProduct)
-    )
-    if (!this._superMarketplaceProductEditable?.Product?.xp?.UnitOfMeasure) {
-      this._superMarketplaceProductEditable.Product.xp.UnitOfMeasure = {
+    this._superHSProductStatic = JSON.parse(JSON.stringify(superProduct))
+    this._superHSProductEditable = JSON.parse(JSON.stringify(superProduct))
+    if (!this._superHSProductEditable?.Product?.xp?.UnitOfMeasure) {
+      this._superHSProductEditable.Product.xp.UnitOfMeasure = {
         Unit: null,
         Qty: null,
       }
     }
-    if (this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category) {
+    if (this._superHSProductEditable.Product?.xp?.Tax?.Category) {
       await this.setTaxCodes(
-        this._superMarketplaceProductEditable.Product.xp.Tax.Category,
+        this._superHSProductEditable.Product.xp.Tax.Category,
         ''
       )
     } else {
       this.taxCodes = { Meta: {}, Items: [] }
     }
-    this.staticContent = this._superMarketplaceProductEditable.Attachments
-    this.images = this._superMarketplaceProductEditable.Images
+    this.staticContent = this._superHSProductEditable.Attachments
+    this.images = this._superHSProductEditable.Images
     this.taxCodeCategorySelected =
-      this._superMarketplaceProductEditable.Product?.xp?.Tax?.Category !== null
-    this.productType = this._superMarketplaceProductEditable.Product?.xp?.ProductType
-    this.createProductForm(this._superMarketplaceProductEditable)
+      this._superHSProductEditable.Product?.xp?.Tax?.Category !== null
+    this.productType = this._superHSProductEditable.Product?.xp?.ProductType
+    this.createProductForm(this._superHSProductEditable)
     if (this.userContext?.UserType === 'SELLER') {
       this.addresses = await this.ocSupplierAddressService
-        .List(this._superMarketplaceProductEditable?.Product?.DefaultSupplierID)
+        .List(this._superHSProductEditable?.Product?.DefaultSupplierID)
         .toPromise()
       if (superProduct.Product?.ShipFromAddressID)
         this.shippingAddress = await this.ocSupplierAddressService
           .Get(
-            this._superMarketplaceProductEditable.Product.OwnerID,
-            this._superMarketplaceProductEditable.Product.ShipFromAddressID
+            this._superHSProductEditable.Product.OwnerID,
+            this._superHSProductEditable.Product.ShipFromAddressID
           )
           .toPromise()
     }
@@ -295,117 +289,106 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges()
   }
 
-  createProductForm(superMarketplaceProduct: SuperMarketplaceProduct): void {
-    if (superMarketplaceProduct.Product) {
+  createProductForm(superHSProduct: SuperMarketplaceProduct): void {
+    if (superHSProduct.Product) {
       this.productForm = new FormGroup(
         {
-          Active: new FormControl(superMarketplaceProduct.Product.Active),
-          Name: new FormControl(superMarketplaceProduct.Product.Name, [
+          Active: new FormControl(superHSProduct.Product.Active),
+          Name: new FormControl(superHSProduct.Product.Name, [
             Validators.required,
             Validators.maxLength(100),
           ]),
           ID: new FormControl(
-            superMarketplaceProduct.Product.ID,
+            superHSProduct.Product.ID,
             ValidateNoSpecialCharactersAndSpaces
           ),
           Description: new FormControl(
-            superMarketplaceProduct.Product.Description,
+            superHSProduct.Product.Description,
             Validators.maxLength(2000)
           ),
           QuantityMultiplier: new FormControl(
-            superMarketplaceProduct.Product.QuantityMultiplier
+            superHSProduct.Product.QuantityMultiplier
           ),
           ShipFromAddressID: new FormControl(
-            superMarketplaceProduct.Product.ShipFromAddressID,
+            superHSProduct.Product.ShipFromAddressID,
             Validators.required
           ),
-          ShipHeight: new FormControl(
-            superMarketplaceProduct.Product.ShipHeight
-          ),
-          ShipWidth: new FormControl(superMarketplaceProduct.Product.ShipWidth),
-          ShipLength: new FormControl(
-            superMarketplaceProduct.Product.ShipLength
-          ),
-          ShipWeight: new FormControl(
-            superMarketplaceProduct.Product.ShipWeight,
-            [Validators.required, Validators.min(0)]
-          ),
+          ShipHeight: new FormControl(superHSProduct.Product.ShipHeight),
+          ShipWidth: new FormControl(superHSProduct.Product.ShipWidth),
+          ShipLength: new FormControl(superHSProduct.Product.ShipLength),
+          ShipWeight: new FormControl(superHSProduct.Product.ShipWeight, [
+            Validators.required,
+            Validators.min(0),
+          ]),
           Price: new FormControl(
-            _get(
-              superMarketplaceProduct.PriceSchedule,
-              'PriceBreaks[0].Price',
-              null
-            ),
+            _get(superHSProduct.PriceSchedule, 'PriceBreaks[0].Price', null),
             Validators.required
           ),
           MinQuantity: new FormControl(
-            superMarketplaceProduct.PriceSchedule?.MinQuantity,
+            superHSProduct.PriceSchedule?.MinQuantity,
             Validators.min(1)
           ),
           MaxQuantity: new FormControl(
-            superMarketplaceProduct.PriceSchedule?.MaxQuantity,
+            superHSProduct.PriceSchedule?.MaxQuantity,
             Validators.min(1)
           ),
           UseCumulativeQuantity: new FormControl(
-            superMarketplaceProduct.PriceSchedule?.UseCumulativeQuantity
+            superHSProduct.PriceSchedule?.UseCumulativeQuantity
           ),
           Note: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.Note'),
+            _get(superHSProduct.Product, 'xp.Note'),
             Validators.maxLength(140)
           ),
           ProductType: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.ProductType'),
+            _get(superHSProduct.Product, 'xp.ProductType'),
             Validators.required
           ),
           IsResale: new FormControl({
-            value: _get(superMarketplaceProduct.Product, 'xp.IsResale'),
+            value: _get(superHSProduct.Product, 'xp.IsResale'),
             disabled: this.readonly,
           }),
           QuantityAvailable: new FormControl(
-            superMarketplaceProduct.Product?.Inventory?.QuantityAvailable,
+            superHSProduct.Product?.Inventory?.QuantityAvailable,
             null
           ),
           InventoryEnabled: new FormControl({
-            value: _get(superMarketplaceProduct.Product, 'Inventory.Enabled'),
+            value: _get(superHSProduct.Product, 'Inventory.Enabled'),
             disabled: this.readonly,
           }),
           VariantLevelTracking: new FormControl(
-            _get(
-              superMarketplaceProduct.Product,
-              'Inventory.VariantLevelTracking'
-            ),
+            _get(superHSProduct.Product, 'Inventory.VariantLevelTracking'),
             null
           ),
           OrderCanExceed: new FormControl(
-            _get(superMarketplaceProduct.Product, 'Inventory.OrderCanExceed')
+            _get(superHSProduct.Product, 'Inventory.OrderCanExceed')
           ),
           TaxCodeCategory: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.Tax.Category', null),
+            _get(superHSProduct.Product, 'xp.Tax.Category', null),
             Validators.required
           ),
           TaxCode: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.Tax.Code', null),
+            _get(superHSProduct.Product, 'xp.Tax.Code', null),
             Validators.required
           ),
           UnitOfMeasureUnit: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Unit'),
+            _get(superHSProduct.Product, 'xp.UnitOfMeasure.Unit'),
             Validators.required
           ),
           SizeTier: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.SizeTier')
+            _get(superHSProduct.Product, 'xp.SizeTier')
           ),
           UnitOfMeasureQty: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.UnitOfMeasure.Qty'),
+            _get(superHSProduct.Product, 'xp.UnitOfMeasure.Qty'),
             Validators.required
           ),
           ArtworkRequired: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.ArtworkRequired')
+            _get(superHSProduct.Product, 'xp.ArtworkRequired')
           ),
           FreeShipping: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.FreeShipping')
+            _get(superHSProduct.Product, 'xp.FreeShipping')
           ),
           FreeShippingMessage: new FormControl(
-            _get(superMarketplaceProduct.Product, 'xp.FreeShippingMessage') ||
+            _get(superHSProduct.Product, 'xp.FreeShippingMessage') ||
               'Free Shipping'
           ),
         },
@@ -594,7 +577,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async handleDelete(): Promise<void> {
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     await HeadStartSDK.Products.Delete(
-      this._superMarketplaceProductStatic.Product.ID,
+      this._superHSProductStatic.Product.ID,
       accessToken
     )
     this.router.navigateByUrl('/products')
@@ -603,15 +586,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   handleDiscardChanges(): void {
     this.imageFiles = []
     this.staticContentFiles = []
-    this._superMarketplaceProductEditable = this._superMarketplaceProductStatic
-    this.refreshProductData(this._superMarketplaceProductStatic)
+    this._superHSProductEditable = this._superHSProductStatic
+    this.refreshProductData(this._superHSProductStatic)
   }
 
   async createNewProduct(): Promise<void> {
     try {
       this.dataIsSaving = true
-      const superProduct = await this.createNewSuperMarketplaceProduct(
-        this._superMarketplaceProductEditable
+      const superProduct = await this.createNewSuperHSProduct(
+        this._superHSProductEditable
       )
       if (this.imageFiles.length > 0)
         await this.addImages(this.imageFiles, superProduct.Product.ID)
@@ -679,13 +662,13 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async updateProduct(): Promise<void> {
     try {
       this.dataIsSaving = true
-      let superProduct = this._superMarketplaceProductStatic
+      let superProduct = this._superHSProductStatic
       if (
-        JSON.stringify(this._superMarketplaceProductEditable) !==
-        JSON.stringify(this._superMarketplaceProductStatic)
+        JSON.stringify(this._superHSProductEditable) !==
+        JSON.stringify(this._superHSProductStatic)
       ) {
         superProduct = await this.updateMarketplaceProduct(
-          this._superMarketplaceProductEditable
+          this._superHSProductEditable
         )
       }
       if (this.appConfig?.superProductFieldsToMonitor.length > 0) {
@@ -724,7 +707,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       fieldsToMonitorForChanges.map(async (f) => {
         const fieldChanged =
           JSON.stringify(_get(editedSuperProduct, f)) !==
-          JSON.stringify(_get(this._superMarketplaceProductStatic, f))
+          JSON.stringify(_get(this._superHSProductStatic, f))
         if (fieldChanged) {
           const document = {
             Supplier: {
@@ -732,11 +715,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
               Name: mySupplier?.Name,
             },
             Product: {
-              ID: this._superMarketplaceProductStatic?.Product?.ID,
-              Name: this._superMarketplaceProductStatic?.Product?.Name,
+              ID: this._superHSProductStatic?.Product?.ID,
+              Name: this._superHSProductStatic?.Product?.Name,
               FieldModified: f,
-              PreviousValue: _get(this._superMarketplaceProductStatic, f),
-              CurrentValue: _get(this._superMarketplaceProductEditable, f),
+              PreviousValue: _get(this._superHSProductStatic, f),
+              CurrentValue: _get(this._superHSProductEditable, f),
             },
             Status: NotificationStatus.SUBMITTED,
             History: {
@@ -793,8 +776,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   updateProductResource(productUpdate: any): void {
     const resourceToUpdate =
-      this._superMarketplaceProductEditable || this.productService.emptyResource
-    this._superMarketplaceProductEditable = this.productService.getUpdatedEditableResource(
+      this._superHSProductEditable || this.productService.emptyResource
+    this._superHSProductEditable = this.productService.getUpdatedEditableResource(
       productUpdate,
       resourceToUpdate
     )
@@ -830,20 +813,20 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   // Used only for Product.Description coming out of quill editor (no 'event.target'.)
   updateResourceFromFieldValue(field: string, value: any): void {
     const updateProductResourceCopy = this.productService.copyResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
+      this._superHSProductEditable || this.productService.emptyResource
     )
     updateProductResourceCopy.Product = {
       ...updateProductResourceCopy.Product,
       [field]: value,
     }
-    this._superMarketplaceProductEditable = updateProductResourceCopy
+    this._superHSProductEditable = updateProductResourceCopy
     this.checkForChanges()
   }
   // TODO: Remove duplicate function, function exists in resource-crud.component.ts (minus the files check);
   checkForChanges(): void {
     this.areChanges =
-      JSON.stringify(this._superMarketplaceProductEditable) !==
-        JSON.stringify(this._superMarketplaceProductStatic) ||
+      JSON.stringify(this._superHSProductEditable) !==
+        JSON.stringify(this._superHSProductStatic) ||
       this.imageFiles?.length > 0 ||
       this.staticContentFiles?.length > 0
   }
@@ -911,11 +894,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       superProduct = await this.uploadAsset(productID, file, true)
     }
     this.staticContentFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
-    superProduct = Object.assign(
-      this._superMarketplaceProductStatic || {},
-      superProduct
-    )
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
+    superProduct = Object.assign(this._superHSProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }
 
@@ -926,12 +906,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     this.imageFiles = []
     //  need to copy the object so object.assign does not modify target
-    const copiedMarketPlaceStatic = JSON.parse(
-      JSON.stringify(this._superMarketplaceProductStatic)
+    const copiedHSStatic = JSON.parse(
+      JSON.stringify(this._superHSProductStatic)
     )
 
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
-    superProduct = Object.assign(copiedMarketPlaceStatic || {}, superProduct)
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
+    superProduct = Object.assign(copiedHSStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }
 
@@ -940,7 +920,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     // Remove the image assignment, then remove the image
     await ContentManagementClient.Assets.DeleteAssetAssignment(
       file.ID,
-      this._superMarketplaceProductStatic.Product.ID,
+      this._superHSProductStatic.Product.ID,
       'Products',
       null,
       null,
@@ -948,15 +928,15 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     )
     await ContentManagementClient.Assets.Delete(file.ID, accessToken)
     if (file.Type === 'Image') {
-      this._superMarketplaceProductStatic.Images = this._superMarketplaceProductStatic.Images.filter(
+      this._superHSProductStatic.Images = this._superHSProductStatic.Images.filter(
         (i) => i.ID !== file.ID
       )
     } else {
-      this._superMarketplaceProductStatic.Attachments = this._superMarketplaceProductStatic.Attachments.filter(
+      this._superHSProductStatic.Attachments = this._superHSProductStatic.Attachments.filter(
         (a) => a.ID !== file.ID
       )
     }
-    this.refreshProductData(this._superMarketplaceProductStatic)
+    this.refreshProductData(this._superHSProductStatic)
   }
 
   unstageFile(index: number, fileType: string): void {
@@ -996,10 +976,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async handleTaxCodeCategorySelection(event): Promise<void> {
     // TODO: This is a temporary fix to accomodate for data not having xp.TaxCode yet
     if (
-      this._superMarketplaceProductEditable?.Product?.xp &&
-      !this._superMarketplaceProductEditable.Product.xp.Tax
+      this._superHSProductEditable?.Product?.xp &&
+      !this._superHSProductEditable.Product.xp.Tax
     ) {
-      this._superMarketplaceProductEditable.Product.xp.Tax = {
+      this._superHSProductEditable.Product.xp.Tax = {
         Category: '',
         Code: '',
         Description: '',
@@ -1007,7 +987,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     this.resetTaxCodeAndDescription()
     this.handleUpdateProduct(event, 'Product.xp.Tax.Category')
-    this._superMarketplaceProductEditable.Product.xp.Tax.Code = ''
+    this._superHSProductEditable.Product.xp.Tax.Code = ''
     await this.setTaxCodes(event.target.value, '')
   }
 
@@ -1030,8 +1010,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   async searchTaxCodes(searchTerm: string): Promise<void> {
     if (searchTerm === undefined) searchTerm = ''
-    const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp.Tax
-      .Category
+    const taxCodeCategory = this._superHSProductEditable.Product.xp.Tax.Category
     await this.setTaxCodes(taxCodeCategory, searchTerm)
   }
 
@@ -1040,8 +1019,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     const totalPages = this.taxCodes.Meta.TotalPages
     const nextPageNumber = this.taxCodes.Meta.Page + 1
     if (totalPages > nextPageNumber) {
-      const taxCodeCategory = this._superMarketplaceProductEditable.Product.xp
-        .Tax.Category
+      const taxCodeCategory = this._superHSProductEditable.Product.xp.Tax
+        .Category
       const avalaraTaxCodes = await this.listTaxCodes(
         taxCodeCategory,
         searchTerm,
@@ -1063,58 +1042,56 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     )
   }
 
-  async createNewSuperMarketplaceProduct(
-    superMarketplaceProduct: SuperMarketplaceProduct
+  async createNewSuperHSProduct(
+    superHSProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
     const supplier = await this.currentUserService.getMySupplier()
-    superMarketplaceProduct.Product.xp.ProductType = this.productType
-    ;(superMarketplaceProduct.Product.xp as any).PromotionEligible =
+    superHSProduct.Product.xp.ProductType = this.productType
+    ;(superHSProduct.Product.xp as any).PromotionEligible =
       this.productType === 'PurchaseOrder' ? false : true
-    superMarketplaceProduct.Product.xp.Status = 'Draft'
-    superMarketplaceProduct.Product.xp.Currency = supplier?.xp?.Currency
-    superMarketplaceProduct.PriceSchedule.ID =
-      superMarketplaceProduct.Product.ID
-    superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`
+    superHSProduct.Product.xp.Status = 'Draft'
+    superHSProduct.Product.xp.Currency = supplier?.xp?.Currency
+    superHSProduct.PriceSchedule.ID = superHSProduct.Product.ID
+    superHSProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superHSProduct.Product.Name}`
     // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer'.
-    if (superMarketplaceProduct.PriceSchedule.Name.length > 100) {
-      superMarketplaceProduct.PriceSchedule.Name = superMarketplaceProduct.PriceSchedule.Name.slice(
+    if (superHSProduct.PriceSchedule.Name.length > 100) {
+      superHSProduct.PriceSchedule.Name = superHSProduct.PriceSchedule.Name.slice(
         0,
         100
       )
     }
-    if (superMarketplaceProduct.Product.xp.Tax.Category === null)
-      superMarketplaceProduct.Product.xp.Tax = null
-    if (superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price === null)
-      superMarketplaceProduct.PriceSchedule.PriceBreaks[0].Price = 0
-    return await HeadStartSDK.Products.Post(superMarketplaceProduct)
+    if (superHSProduct.Product.xp.Tax.Category === null)
+      superHSProduct.Product.xp.Tax = null
+    if (superHSProduct.PriceSchedule.PriceBreaks[0].Price === null)
+      superHSProduct.PriceSchedule.PriceBreaks[0].Price = 0
+    return await HeadStartSDK.Products.Post(superHSProduct)
   }
 
   async updateMarketplaceProduct(
-    superMarketplaceProduct: SuperMarketplaceProduct
+    superHSProduct: SuperMarketplaceProduct
   ): Promise<SuperMarketplaceProduct> {
     // If PriceSchedule has a price break price, but no ID or name, set them
     if (
-      superMarketplaceProduct.PriceSchedule?.PriceBreaks[0]?.Price &&
-      superMarketplaceProduct.PriceSchedule.ID === null
+      superHSProduct.PriceSchedule?.PriceBreaks[0]?.Price &&
+      superHSProduct.PriceSchedule.ID === null
     ) {
-      superMarketplaceProduct.PriceSchedule.ID =
-        superMarketplaceProduct.Product.ID
-      superMarketplaceProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superMarketplaceProduct.Product.Name}`
+      superHSProduct.PriceSchedule.ID = superHSProduct.Product.ID
+      superHSProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superHSProduct.Product.Name}`
       // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer'.
-      if (superMarketplaceProduct.PriceSchedule.Name.length > 100) {
-        superMarketplaceProduct.PriceSchedule.Name = superMarketplaceProduct.PriceSchedule.Name.slice(
+      if (superHSProduct.PriceSchedule.Name.length > 100) {
+        superHSProduct.PriceSchedule.Name = superHSProduct.PriceSchedule.Name.slice(
           0,
           100
         )
       }
     }
-    if (superMarketplaceProduct.PriceSchedule.PriceBreaks.length === 0)
-      superMarketplaceProduct.PriceSchedule = null
+    if (superHSProduct.PriceSchedule.PriceBreaks.length === 0)
+      superHSProduct.PriceSchedule = null
     // TODO: Temporary while Product set doesn't reflect the current strongly typed Xp
-    superMarketplaceProduct.Product.xp.Status = 'Draft'
+    superHSProduct.Product.xp.Status = 'Draft'
     return await HeadStartSDK.Products.Put(
-      superMarketplaceProduct.Product.ID,
-      superMarketplaceProduct
+      superHSProduct.Product.ID,
+      superHSProduct
     )
   }
 
@@ -1126,11 +1103,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     )
     this.sellerCurrency = this._exchangeRates?.find((r) => r.Currency === 'USD')
     const accessToken = await this.appAuthService.fetchToken().toPromise()
-    const marketplaceProduct = await HeadStartSDK.Products.Get(
-      product.ID,
-      accessToken
-    )
-    this.refreshProductData(marketplaceProduct)
+    const hsProduct = await HeadStartSDK.Products.Get(product.ID, accessToken)
+    this.refreshProductData(hsProduct)
   }
 
   async listTaxCodes(taxCategory, search, page, pageSize): Promise<any> {
@@ -1154,11 +1128,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   updateEditableProductWithVariationChanges(e): void {
     const updateProductResourceCopy = this.productService.copyResource(
-      this._superMarketplaceProductEditable || this.productService.emptyResource
+      this._superHSProductEditable || this.productService.emptyResource
     )
     updateProductResourceCopy.Specs = e.Specs
     updateProductResourceCopy.Variants = e.Variants
-    this._superMarketplaceProductEditable = updateProductResourceCopy
+    this._superHSProductEditable = updateProductResourceCopy
     this.checkForChanges()
   }
 
@@ -1171,14 +1145,14 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   shouldIsResaleBeChecked(): boolean {
-    return this._superMarketplaceProductEditable?.Product?.xp?.IsResale
+    return this._superHSProductEditable?.Product?.xp?.IsResale
   }
 
   getProductPreviewImage(): string | SafeUrl {
     return (
       this.imageFiles[0]?.URL ||
       getProductMediumImageUrl(
-        this._superMarketplaceProductEditable?.Product,
+        this._superHSProductEditable?.Product,
         this.appConfig.sellerID
       )
     )
