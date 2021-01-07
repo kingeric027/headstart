@@ -53,7 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Marketplace.Common\Marketplace.Common.csproj" />
+    <ProjectReference Include="..\..\src\Marketplace.Common\Headstart.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

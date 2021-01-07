@@ -1,7 +1,4 @@
-export interface MerchantDefinition {
-  cardConnectMerchantID: string
-  currency: string
-}
+import { MerchantDefinition } from "../models/config.types"
 
 export class MerchantConfig {
   static merchants: MerchantDefinition[] = [

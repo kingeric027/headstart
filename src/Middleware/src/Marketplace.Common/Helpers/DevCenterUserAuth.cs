@@ -4,14 +4,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.DevCenter;
+using Headstart.Common.Services.DevCenter;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Helpers
+namespace Headstart.Common.Helpers
 {
     public class DevCenterUserAuthAttribute : AuthorizeAttribute
     {

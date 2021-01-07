@@ -1,11 +1,11 @@
-﻿using Marketplace.Common.Models;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Models;
+using Headstart.Common.Services.AnytimeDashboard.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Mappers
+namespace Headstart.Common.Mappers
 {
-	public class SyncUser : MarketplaceUser
+	public class SyncUser : HSUser
 	{
 		public bool ShouldSync { get; set; }
 		public bool IsAdmin { get; set; }
@@ -13,7 +13,7 @@ namespace Marketplace.Common.Mappers
 
 	public static class UserMapper
 	{
-		public static SyncUser MapToUser(string buyerID, MarketplaceBuyerLocation location, AFStaff staff)
+		public static SyncUser MapToUser(string buyerID, HSBuyerLocation location, AFStaff staff)
 		{
 			if (staff == null || location == null) { return null; }
 			return new SyncUser()

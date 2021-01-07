@@ -12,7 +12,7 @@ import {
   CanCancelOrder,
 } from 'src/app/services/lineitem-status.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderReorderResponse, OrderViewContext } from 'src/app/shopper-context'
+import { OrderReorderResponse, OrderViewContext } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-detail.component.html',

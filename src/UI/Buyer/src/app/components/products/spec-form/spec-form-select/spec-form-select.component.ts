@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormArray, AbstractControl } from '@angular/forms'
-import { FieldConfig } from '../field-config.interface'
-import { Field } from '../field.interface'
+import { Field, FieldConfig } from 'src/app/models/product.types'
 
 @Component({
   selector: 'spec-form-select',

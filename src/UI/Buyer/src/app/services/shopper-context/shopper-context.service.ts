@@ -3,7 +3,6 @@ import { RouteService } from '../route/route.service'
 import { ProductFilterService } from '../product-filter/product-filter.service'
 import { AuthService } from '../auth/auth.service'
 import { OrderHistoryService } from '../order-history/order-history.service'
-import { AppConfig } from '../../shopper-context'
 import { SupplierFilterService } from '../supplier-filter/supplier-filter.service'
 import { ProductCategoriesService } from '../product-categories/product-categories.service'
 import { CurrentOrderService } from '../order/order.service'
@@ -15,6 +14,7 @@ import { ExchangeRatesService } from '../exchange-rates/exchange-rates.service'
 import { TempSdk } from '../temp-sdk/temp-sdk.service'
 import { ChiliConfigService } from '../chili-config/chili-config.service'
 import { PDFService } from '../pdf-render/pdf-render.service'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

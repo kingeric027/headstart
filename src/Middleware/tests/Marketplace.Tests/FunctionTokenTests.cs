@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Common;
-using Marketplace.Common.Helpers;
+using Headstart.Common;
+using Headstart.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using NSubstitute;
 using NUnit.Framework;
 using OrderCloud.SDK;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class FunctionTokenTests
     {

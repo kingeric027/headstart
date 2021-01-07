@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Models.Misc
+namespace Headstart.Common.Models.Misc
 {
     public class SupportCase
     {

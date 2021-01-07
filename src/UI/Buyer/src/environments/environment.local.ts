@@ -1,11 +1,11 @@
-import { Brand, Environment, EnvironmentConfig } from './environment.interfaces'
+
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
 const brand = Brand.WAXING_THE_CITY
 const sebEnvironment = Environment.TEST
-const useLocalMiddleware = false
-const localMiddlewareURL = 'https://localhost:5001'
+const useLocalMiddleware = true
+const localMiddlewareURL = 'https://localhost:44304'
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
@@ -46,6 +46,7 @@ const apps = {
 
 // for easier debugging in development mode, ignores zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
 import 'zone.js/dist/zone-error'
+import { Brand, Environment, EnvironmentConfig } from 'src/app/models/environment.types'
 
 const target: EnvironmentConfig = apps[sebEnvironment][brand]
 target.hostedApp = false

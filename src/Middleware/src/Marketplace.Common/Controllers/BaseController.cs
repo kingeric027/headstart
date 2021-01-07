@@ -1,4 +1,4 @@
-﻿using Marketplace.Models.Misc;
+﻿using Headstart.Models.Misc;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[EnableCors("marketplacecors")]
 	[Produces("application/json")]

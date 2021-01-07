@@ -1,20 +1,20 @@
-﻿using Marketplace.Common.Commands;
+﻿using Headstart.Common.Commands;
 using OrderCloud.SDK;
 using NSubstitute;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models;
+using Headstart.Models.Models.Marketplace;
+using Headstart.Models;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     class ValidUnitPriceTests
     {
         private IOrderCloudClient _oc;
         private LineItemCommand _commandSub;
-        private List<MarketplaceLineItem> _existingLineItems;
+        private List<HSLineItem> _existingLineItems;
 
         [SetUp]
         public void Setup()
@@ -22,15 +22,15 @@ namespace Marketplace.Tests
             _oc = Substitute.For<IOrderCloudClient>();
             _commandSub = Substitute.ForPartsOf<LineItemCommand>(default, _oc, default, default);
             _existingLineItems = BuildMockExistingLineItemData(); // Mock data consists of two total line items for one product (with different specs)
-            Substitute.For<ILineItemsResource>().PatchAsync<MarketplaceLineItem>(OrderDirection.Incoming, default, default, default).ReturnsForAnyArgs((Task)null);
+            Substitute.For<ILineItemsResource>().PatchAsync<HSLineItem>(OrderDirection.Incoming, default, default, default).ReturnsForAnyArgs((Task)null);
         }
 
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_NoMarkups_CumulativeQtyFalse()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 0); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 0); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -40,9 +40,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_NoMarkups_CumulativeQtyFalse()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 0);
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 0);
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -52,9 +52,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_OneMarkup_CumulativeQtyFalse()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 1); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 1); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -64,9 +64,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_OneMarkup_CumulativeQtyFalse()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 1);
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 1);
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -76,9 +76,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_TwoMarkups_CumulativeQtyFalse()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 2); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(4, 2); // Existing line items with different specs (quantity 2) cannot combine with this quantity (4).  Does not hit discount price break (minimum quantity 5).
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -88,9 +88,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_TwoMarkups_CumulativeQtyFalse()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(false);
+            SuperHSMeProduct product = BuildMockProductData(false);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 2);
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(5, 2);
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -100,9 +100,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_NoMarkups_CumulativeQtyTrue()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 0); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 0); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -112,9 +112,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_NoMarkups_CumulativeQtyTrue()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 0); // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 0); // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -124,9 +124,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_OneMarkup_CumulativeQtyTrue()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 1); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 1); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -136,9 +136,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_OneMarkup_CumulativeQtyTrue()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 1);  // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 1);  // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -148,9 +148,9 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_FirstPriceBreak_TwoMarkups_CumulativeQtyTrue()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 2); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(2, 2); // Does not hit discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
@@ -160,18 +160,18 @@ namespace Marketplace.Tests
         [Test]
         public async Task GetUnitPrice_SecondPriceBreak_TwoMarkups_CumulativeQtyTrue()
         {
-            SuperMarketplaceMeProduct product = BuildMockProductData(true);
+            SuperHSMeProduct product = BuildMockProductData(true);
 
-            MarketplaceLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 2);  // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
+            HSLineItem lineItem = SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(3, 2);  // Hits discount price break (minimum quantity 5) when adding existing line item quantity (2)
 
             decimal lineItemTotal = await _commandSub.ValidateLineItemUnitCost(default, product, _existingLineItems, lineItem);
 
             Assert.AreEqual(lineItemTotal, 9.75);
         }
 
-        private SuperMarketplaceMeProduct BuildMockProductData(bool UseCumulativeQty)
+        private SuperHSMeProduct BuildMockProductData(bool UseCumulativeQty)
         {
-            SuperMarketplaceMeProduct product = Substitute.For<SuperMarketplaceMeProduct>();
+            SuperHSMeProduct product = Substitute.For<SuperHSMeProduct>();
             product.PriceSchedule = Substitute.For<PriceSchedule>();
             product.PriceSchedule.UseCumulativeQuantity = UseCumulativeQty;
 
@@ -198,13 +198,13 @@ namespace Marketplace.Tests
             return product;
         }
 
-        private List<MarketplaceLineItem> BuildMockExistingLineItemData()
+        private List<HSLineItem> BuildMockExistingLineItemData()
         {
-            MarketplaceLineItem existingLineItem1 = Substitute.For<MarketplaceLineItem>();
+            HSLineItem existingLineItem1 = Substitute.For<HSLineItem>();
             existingLineItem1.Quantity = 1;
             existingLineItem1.xp = new LineItemXp() { PrintArtworkURL = null };
 
-            MarketplaceLineItem existingLineItem2 = Substitute.For<MarketplaceLineItem>();
+            HSLineItem existingLineItem2 = Substitute.For<HSLineItem>();
             existingLineItem2.Quantity = 1;
             existingLineItem2.xp = new LineItemXp() { PrintArtworkURL = null };
 
@@ -226,14 +226,14 @@ namespace Marketplace.Tests
             existingLineItem1.Specs = new List<LineItemSpec> { liSpecSizeSmall, liSpecColorRed };
             existingLineItem2.Specs = new List<LineItemSpec> { liSpecSizeMedium, liSpecColorRed };
 
-            List<MarketplaceLineItem> existingLineItems = new List<MarketplaceLineItem> { existingLineItem1, existingLineItem2 };
+            List<HSLineItem> existingLineItems = new List<HSLineItem> { existingLineItem1, existingLineItem2 };
 
             return existingLineItems;
         }
 
-        private MarketplaceLineItem SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(int quantity, int numberOfMarkedUpSpecs)
+        private HSLineItem SetMockLineItemQtyAndMockNumberOfMarkedUpSpecs(int quantity, int numberOfMarkedUpSpecs)
         {
-            MarketplaceLineItem lineItem = Substitute.For<MarketplaceLineItem>();
+            HSLineItem lineItem = Substitute.For<HSLineItem>();
 
             lineItem.Quantity = quantity;
 

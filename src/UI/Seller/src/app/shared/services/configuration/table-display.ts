@@ -425,7 +425,7 @@ export const FULL_TABLE_RESOURCE_DICTIONARY: ResourceConfigurationDictionary = {
         path: 'xp.SubmittedOrderStatus',
         header: 'ADMIN.HEADERS.STATUS',
         type: BASIC_STRING,
-        sortable: true,
+        sortable: false,
       },
       {
         path: 'Comments',

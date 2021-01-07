@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Extended
+namespace Headstart.Models.Extended
 {
     [SwaggerModel]
     public class SpecUI

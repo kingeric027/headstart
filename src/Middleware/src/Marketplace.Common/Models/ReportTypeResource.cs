@@ -1,6 +1,6 @@
 ﻿using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     [SwaggerModel]
     public class ReportTypeResource

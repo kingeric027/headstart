@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Cosmonaut.Extensions;
-using Marketplace.Common.Models;
+using Headstart.Common.Models;
 using Microsoft.Azure.Documents.Client;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Queries
+namespace Headstart.Common.Queries
 {
     public class LogQuery : ICosmosQuery<OrchestrationLog>
     {

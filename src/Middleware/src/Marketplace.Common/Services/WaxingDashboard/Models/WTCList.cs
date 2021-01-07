@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.WaxingDashboard.Models
+namespace Headstart.Common.Services.WaxingDashboard.Models
 {
 	public class WTCList<T>
 	{

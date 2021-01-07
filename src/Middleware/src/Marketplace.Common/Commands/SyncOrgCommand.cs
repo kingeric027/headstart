@@ -1,12 +1,12 @@
 ﻿using Common.Services.AnytimeDashboard;
 using Common.Services.NProg;
 using Flurl.Http;
-using Marketplace.Common;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services.WazingDashboard;
+using Headstart.Common;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Mappers;
+using Headstart.Common.Models;
+using Headstart.Common.Services.WazingDashboard;
 using Microsoft.Extensions.Logging;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
 	public interface ISyncOrgCommand
 	{

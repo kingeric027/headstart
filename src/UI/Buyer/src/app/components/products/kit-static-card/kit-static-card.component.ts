@@ -6,11 +6,9 @@ import {
   Spec,
   VariantSpec,
 } from '@ordercloud/headstart-sdk'
-import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface'
-import { ProductSelectionEvent } from 'src/app/models/product-selection-event.interface'
+import { LineItemToAdd, ProductSelectionEvent, QtyChangeEvent } from 'src/app/models/product.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { ProductDetailService } from '../product-details/product-detail.service'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
 import { SpecFormService } from '../spec-form/spec-form.service'
 
 @Component({

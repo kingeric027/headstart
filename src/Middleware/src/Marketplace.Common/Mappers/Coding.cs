@@ -1,10 +1,10 @@
-﻿using Marketplace.Common.Models;
+﻿using Headstart.Common.Models;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Marketplace.Common.Mappers
+namespace Headstart.Common.Mappers
 {
 	public static class Coding
 	{

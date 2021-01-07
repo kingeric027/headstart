@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Configuration, Me, Tokens } from 'ordercloud-javascript-sdk'
+import { Me, Tokens } from 'ordercloud-javascript-sdk'
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import {
   TaxCertificate,
@@ -7,8 +7,8 @@ import {
   HeadStartSDK,
   ListPage,
 } from '@ordercloud/headstart-sdk'
-import { AppConfig } from '../../shopper-context'
 import Axios, { AxiosRequestConfig } from 'axios'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

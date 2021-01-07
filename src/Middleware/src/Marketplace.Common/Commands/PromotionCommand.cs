@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IPromotionCommand
     {

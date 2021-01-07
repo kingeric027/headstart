@@ -5,7 +5,7 @@ using Flurl.Http;
 using ordercloud.integrations.library;
 using Newtonsoft.Json;
 
-namespace Marketplace.Common.Exceptions
+namespace Headstart.Common.Exceptions
 {
     public class ProcessResultException
     {

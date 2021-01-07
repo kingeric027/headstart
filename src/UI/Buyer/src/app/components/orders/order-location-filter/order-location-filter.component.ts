@@ -3,7 +3,7 @@ import { takeWhile } from 'rxjs/operators'
 import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderFilters } from 'src/app/shopper-context'
+import { OrderFilters } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-location-filter.component.html',

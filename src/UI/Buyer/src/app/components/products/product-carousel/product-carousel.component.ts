@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
-import { MarketplaceMeProduct } from 'src/app/shopper-context'
+import { MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   templateUrl: './product-carousel.component.html',

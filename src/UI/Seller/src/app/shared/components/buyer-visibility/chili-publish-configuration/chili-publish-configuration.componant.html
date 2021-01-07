@@ -62,7 +62,7 @@
                     type="submit"
                     (click)="editChiliTemplate(config.ID)"
                   >
-                    Edit
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="openingEditor"></span> Edit
                   </button>
                 </div>
                 <div class="btn-group" role="group">
@@ -82,92 +82,184 @@
       </table>
     </div>
   </div>
-  <div *ngIf="showEditor">
-    <strong>Template Specs</strong>
-    <table
-      class="table table-bordered table-condensed table-striped table-hover"
-    >
-      <tr class="table-row" *ngFor="let spec of chiliTemplate.TemplateSpecs">
-        <td>
-          <div class="row">
-            <div class="col-md-6">
-              <label>Spec Name</label>
-              <input
-                class="form-control"
-                type="text"
-                name="{{spec.ID + '_name'}}"
-                id="{{spec.ID + '_name'}}"
-                placeholder="{{spec.Name}}"
-                disabled
-              />
-            </div>
-            <div class="col-md-6">
-              <label>Default Value</label>
-              <input
-                class="form-control"
-                type="text"
-                name="{{spec.ID + '_defaultvalue'}}"
-                id="{{spec.ID + '_defaultvalue'}}"
-                placeholder="{{spec.DefaultValue}}"
-              />
-            </div>
-          </div>
-          <div class="row" *ngIf="spec.xp.UI.ControlType == 'DropDown'">
-            <div class="col-md-6">
-              <div class="spec-options">
-                <label>Spec Options</label>
-                <div class="input-group" *ngFor="let option of spec.Options">
-                  <input
-                    class="form-control"
-                    type="text"
-                    name="{{option.ID + '_option'}}"
-                    id="{{option.ID + '_option'}}"
-                    [value]="option.Value"
-                  />
-                  <div class="input-group-append">
-                    <button
-                      class="btn btn-primary"
-                      type="submit"
-                      (click)="saveChiliSpecOption(option, spec)"
-                    >
-                      Save
-                    </button>
-                    <button
-                      class="btn btn-danger"
-                      type="submit"
-                      (click)="deleteChiliSpecOption(option, spec)"
-                    >
-                      Delete
-                    </button>
+  <div *ngIf="showEditor" id="editorTop">
+    <div class="card shadow-sm p-3 table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="border-0" scope="col">
+              Update Template Specs  <button type="button" class="btn btn-link sort-btn" (click)="selectedSpecIndex=50000">Sort Specs...</button>
+            </th>
+          </tr>
+        </thead>
+        <tbody [hidden]="selectedSpecIndex == 50000">
+          <ng-container *ngFor="let spec of chiliTemplate.TemplateSpecs;let i=index">
+            <tr
+              cdkDrag
+              class="cursor-pointer"
+              (click)="toggleTemplateSpec(i)"
+              [ngClass]="{'selected-spec-row':selectedSpecIndex==i}"
+            >
+              <td>{{ spec.Name }}</td>
+            </tr>
+            <tr class="table-row spec-row" *ngIf="selectedSpecIndex==i">
+            <td>
+              <div class="spec-edit-div">
+                <div class="d-flex justify-content-center loading-div" *ngIf="showLoadingIndicator">
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
                   </div>
                 </div>
-                <div class="spec-options">
-                  <label>Add Option</label>
-                  <div class="input-group">
+                <div class="row input-group">
+                  <div class="col-md-6">
+                    <label>Custom Label</label>
                     <input
                       class="form-control"
                       type="text"
-                      name="{{spec.ID + '_newOption'}}"
-                      id="{{spec.ID + '_newOption'}}"
+                      name="{{spec.ID + '_labelvalue'}}"
+                      id="{{spec.ID + '_labelvalue'}}"
+                      [value]="spec.xp.Label"
                     />
-                    <div class="input-group-append">
-                      <button
-                        class="btn btn-primary"
-                        type="submit"
-                        (click)="saveNewChiliSpecOption(spec)"
-                      >
-                        Add
-                      </button>
+                  </div>
+                  <div class="col-md-6">
+                    <label>Default Value</label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      name="{{spec.ID + '_defaultvalue'}}"
+                      id="{{spec.ID + '_defaultvalue'}}"
+                      [value]="spec.DefaultValue"
+                    />
+                  </div>
+                </div>
+                <div class="row" *ngIf="spec.xp.UI.ControlType == 'DropDown'">
+                  <div class="col-md-6">
+                    <div class="spec-options spacer-div" [hidden]="specOptionSortID">
+                      <label>Spec Options</label> <button type="button" class="btn btn-link sort-btn" (click)="showOptionsSortOrder(spec)">Sort Options...</button>
+                      <div class="input-group" *ngFor="let option of spec.Options">
+                        <input
+                          class="form-control"
+                          type="text"
+                          name="{{option.ID + '_option'}}"
+                          id="{{option.ID + '_option'}}"
+                          [value]="option.Value"
+                        />
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-primary"
+                            type="submit"
+                            (click)="saveChiliSpecOption(option, spec)"
+                          >
+                            Save
+                          </button>
+                          <button
+                            class="btn btn-danger"
+                            type="submit"
+                            (click)="deleteChiliSpecOption(option, spec)"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      <div class="spec-options">
+                        <label>Add Option</label>
+                        <div class="input-group">
+                          <input
+                            class="form-control"
+                            type="text"
+                            name="{{spec.ID + '_newOption'}}"
+                            id="{{spec.ID + '_newOption'}}"
+                          />
+                          <div class="input-group-append">
+                            <button
+                              class="btn btn-primary"
+                              type="submit"
+                              (click)="saveNewChiliSpecOption(spec)"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div [hidden]="specOptionSortID != spec.ID" class="spec-options">
+                      <label>Options</label>
+                      <ol class="sort-list" id="{{spec.ID + '_options'}}">
+                        <li *ngFor="let option of spec.Options">{{option.Value}}</li>
+                      </ol>
+                      <div class="spacer-div btn-group" role="group">
+                        <button
+                                class="btn btn-primary"
+                                type="submit"
+                                (click)="saveOptionsOrder(spec)"
+                              >
+                                Save Sort Order
+                              </button>
+                        <button
+                              class="btn btn-danger"
+                              type="submit"
+                              (click)="specOptionSortID = null"
+                            >
+                              Cancel
+                            </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div class="row input-group-append" [hidden]="specOptionSortID">
+                  <div class="spacer-div">
+                    <button
+                            class="btn btn-primary"
+                            type="submit"
+                            (click)="saveChiliSpec(spec)"
+                          >
+                            Save Changes
+                          </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <div>
+            </td>
+          </tr>
+          </ng-container>
+        </tbody>
+        <tbody [hidden]="selectedSpecIndex!=50000">
+          <ng-container>
+            <tr class="table-row spec-row">
+              <td>
+                <div class="spec-edit-div">
+                  <div class="d-flex justify-content-center loading-div" *ngIf="showLoadingIndicator">
+                    <div class="spinner-border" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                  <label>Specs</label>
+                  <ol class="sort-list" id="templateSpecs">
+                    <li *ngFor="let specOrder of chiliSpecSortOrder;let i=index">{{specOrder}}</li>
+                  </ol>
+                  <div class="spacer-div btn-group" role="group">
+                    <button
+                            class="btn btn-primary"
+                            type="submit"
+                            (click)="saveSortOrder()"
+                          >
+                            Save Sort Order
+                          </button>
+                    <button
+                          class="btn btn-danger"
+                          type="submit"
+                          (click)="selectedSpecIndex = null"
+                        >
+                          Cancel
+                        </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="spacer-div">
       <div class="btn-group" role="group">
         <button
           class="btn btn-danger"

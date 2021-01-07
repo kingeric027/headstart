@@ -1,4 +1,4 @@
-﻿using Marketplace.Common.Commands;
+﻿using Headstart.Common.Commands;
 using OrderCloud.SDK;
 using NSubstitute;
 using NUnit.Framework;
@@ -6,12 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
 using System.Linq;
-using Marketplace.Common.Models.Marketplace;
+using Headstart.Common.Models.Marketplace;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class CheckoutIntegrationCommandTests
     {
@@ -20,17 +20,17 @@ namespace Marketplace.Tests
         public void dont_filter_valid_rates()
         {
             // preserve order, rates are already correct
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 25
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 15
             };
-            var method3 = new MarketplaceShipMethod
+            var method3 = new HSShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 5
@@ -49,17 +49,17 @@ namespace Marketplace.Tests
         public void remove_invalid_method()
         {
             // remove one offending ship method
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 10
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 5
             };
-            var method3 = new MarketplaceShipMethod
+            var method3 = new HSShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 20
@@ -77,17 +77,17 @@ namespace Marketplace.Tests
         public void remove_two_invalid_methods()
         {
             // remove two offending ship methods
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 5
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 10
             };
-            var method3 = new MarketplaceShipMethod
+            var method3 = new HSShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 15
@@ -104,17 +104,17 @@ namespace Marketplace.Tests
         public void handle_mixed_order_by_transit_days()
         {
             // remove two offending ship methods, transit days ordered backwards
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 15
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 10
             };
-            var method3 = new MarketplaceShipMethod
+            var method3 = new HSShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 5
@@ -131,17 +131,17 @@ namespace Marketplace.Tests
         public void handle_free_shipping()
         {
             // handle free shipping
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 15
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 0
             };
-            var method3 = new MarketplaceShipMethod
+            var method3 = new HSShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 5
@@ -160,17 +160,17 @@ namespace Marketplace.Tests
         {
             // handle two estimates with same rates
             // we do not want to filter out a slower estimate with the same rate
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 EstimatedTransitDays = 1,
                 Cost = 15
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 EstimatedTransitDays = 2,
                 Cost = 15
             };
-            var method3 = new MarketplaceShipMethod
+            var method3 = new HSShipMethod
             {
                 EstimatedTransitDays = 3,
                 Cost = 5
@@ -200,13 +200,13 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 20,
                 SupplierID = "012"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -231,13 +231,13 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 20,
                 SupplierID = "012"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -261,19 +261,19 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 20,
                 SupplierID = "100"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
                 Cost = 89
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 Name = "NEXT_DAY",
                 EstimatedTransitDays = 1,
@@ -297,13 +297,13 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 20,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "PRIORITY_OVERNIGHT",
                 EstimatedTransitDays = 1,
@@ -328,13 +328,13 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 0,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -359,13 +359,13 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 370,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -394,19 +394,19 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line2"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 200,
                 SupplierID = "027"
             };
-            var line2 = new MarketplaceLineItem
+            var line2 = new HSLineItem
             {
                 ID = "Line2",
                 LineSubtotal = 250,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -431,13 +431,13 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 602,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -454,7 +454,7 @@ namespace Marketplace.Tests
             Assert.AreEqual(method1.Name, methods[0].Name);
         }
 
-        private IList<MarketplaceShipEstimate> ApplyFlatRateShipping(MarketplaceOrderWorksheet worksheet, List<MarketplaceShipEstimate> estimates, string medlineSupplierID, string laliciousSupplierID)
+        private IList<HSShipEstimate> ApplyFlatRateShipping(HSOrderWorksheet worksheet, List<HSShipEstimate> estimates, string medlineSupplierID, string laliciousSupplierID)
         {
             return CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, medlineSupplierID, laliciousSupplierID);
         }
@@ -471,19 +471,19 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line2"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 250,
                 SupplierID = "027"
             };
-            var line2 = new MarketplaceLineItem
+            var line2 = new HSLineItem
             {
                 ID = "Line2",
                 LineSubtotal = 250,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -513,26 +513,26 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line2"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 250,
                 SupplierID = "027"
             };
-            var line2 = new MarketplaceLineItem
+            var line2 = new HSLineItem
             {
                 ID = "Line2",
                 LineSubtotal = 130,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
                 Cost = 60,
                 xp = new ShipMethodXP { }
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 Name = "PRIORITY_OVERNIGHT",
                 EstimatedTransitDays = 1,
@@ -561,26 +561,26 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Line2"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Line1",
                 LineSubtotal = 250,
                 SupplierID = "027"
             };
-            var line2 = new MarketplaceLineItem
+            var line2 = new HSLineItem
             {
                 ID = "Line2",
                 LineSubtotal = 130,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "SOMETHING_ELSE",
                 EstimatedTransitDays = 3,
                 Cost = 60,
                 xp = new ShipMethodXP { }
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 Name = "PRIORITY_OVERNIGHT",
                 EstimatedTransitDays = 1,
@@ -611,38 +611,38 @@ namespace Marketplace.Tests
             {
                 LineItemID = "Supplier2Line1"
             };
-            var line1 = new MarketplaceLineItem
+            var line1 = new HSLineItem
             {
                 ID = "Supplier1Line1",
                 LineSubtotal = 110,
                 SupplierID = "010"
             };
-            var line2 = new MarketplaceLineItem
+            var line2 = new HSLineItem
             {
                 ID = "Supplier1Line2",
                 LineSubtotal = 125,
                 SupplierID = "010"
             };
-            var line3 = new MarketplaceLineItem
+            var line3 = new HSLineItem
             {
                 ID = "Supplier2Line1",
                 LineSubtotal = 130,
                 SupplierID = "027"
             };
-            var line4 = new MarketplaceLineItem
+            var line4 = new HSLineItem
             {
                 ID = "Supplier2Line2",
                 LineSubtotal = 180,
                 SupplierID = "027"
             };
-            var method1 = new MarketplaceShipMethod
+            var method1 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 1,
                 Cost = 80,
                 xp = new ShipMethodXP { }
             };
-            var method2 = new MarketplaceShipMethod
+            var method2 = new HSShipMethod
             {
                 Name = "FEDEX_GROUND",
                 EstimatedTransitDays = 3,
@@ -667,11 +667,11 @@ namespace Marketplace.Tests
         }
         #endregion
 
-        private List<MarketplaceShipEstimate> BuildEstimates( MarketplaceShipMethod[] shipMethods, ShipEstimateItem[] shipItems = null)
+        private List<HSShipEstimate> BuildEstimates( HSShipMethod[] shipMethods, ShipEstimateItem[] shipItems = null)
         {
-            return new List<MarketplaceShipEstimate>
+            return new List<HSShipEstimate>
             {
-                new MarketplaceShipEstimate
+                new HSShipEstimate
                 {
                     ShipMethods = shipMethods.ToList(),
                     ShipEstimateItems = shipItems?.ToList()
@@ -679,9 +679,9 @@ namespace Marketplace.Tests
             };
         }
 
-        private MarketplaceOrderWorksheet BuildOrderWorksheet(params MarketplaceLineItem[] lineItems)
+        private HSOrderWorksheet BuildOrderWorksheet(params HSLineItem[] lineItems)
         {
-            return new MarketplaceOrderWorksheet
+            return new HSOrderWorksheet
             {
                 LineItems = lineItems.ToList()
             };

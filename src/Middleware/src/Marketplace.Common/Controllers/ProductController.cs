@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Models;
-using Marketplace.Models.Attributes;
+using Headstart.Common.Commands.Crud;
+using Headstart.Models;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using Newtonsoft;
@@ -11,7 +11,7 @@ using System.Dynamic;
 using System.Collections.Generic;
 using Flurl.Util;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[DocComments("\"Products\" represents Products for Marketplace")]
 	[MarketplaceSection.Marketplace(ListOrder = 3)]
@@ -19,36 +19,36 @@ namespace Marketplace.Common.Controllers
 	public class ProductController : BaseController
 	{
 
-		private readonly IMarketplaceProductCommand _command;
-		public ProductController(AppSettings settings, IMarketplaceProductCommand command) : base(settings)
+		private readonly IHSProductCommand _command;
+		public ProductController(AppSettings settings, IHSProductCommand command) : base(settings)
 		{
 			_command = command;
 		}
 
 		[DocName("GET Super Product")]
 		[HttpGet, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-		public async Task<SuperMarketplaceProduct> Get(string id)
+		public async Task<SuperHSProduct> Get(string id)
 		{
 			return await _command.Get(id, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("LIST Super Product")]
 		[HttpGet, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin, ApiRole.ProductReader)]
-		public async Task<ListPage<SuperMarketplaceProduct>> List(ListArgs<MarketplaceProduct> args)
+		public async Task<ListPage<SuperHSProduct>> List(ListArgs<HSProduct> args)
 		{
 			return await _command.List(args, VerifiedUserContext.AccessToken);
 		}
 
 		[DocName("POST Super Product")]
 		[HttpPost, OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> Post([FromBody] SuperMarketplaceProduct obj)
+		public async Task<SuperHSProduct> Post([FromBody] SuperHSProduct obj)
 		{
 			return await _command.Post(obj, VerifiedUserContext);
 		}
 
 		[DocName("PUT Super Product")]
 		[HttpPut, Route("{id}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<SuperMarketplaceProduct> Put([FromBody] SuperMarketplaceProduct obj, string id)
+		public async Task<SuperHSProduct> Put([FromBody] SuperHSProduct obj, string id)
 		{
 			return await _command.Put(id, obj, this.VerifiedUserContext.AccessToken);
 		}
@@ -64,7 +64,7 @@ namespace Marketplace.Common.Controllers
 		// todo add auth for seller user
 		[DocName("GET Product pricing override")]
 		[HttpGet, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<MarketplacePriceSchedule> GetPricingOverride(string id, string buyerID)
+		public async Task<HSPriceSchedule> GetPricingOverride(string id, string buyerID)
 		{
 			return await _command.GetPricingOverride(id, buyerID, VerifiedUserContext.AccessToken);
 		}
@@ -72,7 +72,7 @@ namespace Marketplace.Common.Controllers
 		// todo add auth for seller user
 		[DocName("CREATE Product pricing override")]
 		[HttpPost, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<MarketplacePriceSchedule> CreatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
+		public async Task<HSPriceSchedule> CreatePricingOverride(string id, string buyerID, [FromBody] HSPriceSchedule priceSchedule)
 		{
 			return await _command.CreatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext.AccessToken);
 		}
@@ -80,7 +80,7 @@ namespace Marketplace.Common.Controllers
 		// todo add auth for seller user
 		[DocName("PUT Product pricing override")]
 		[HttpPut, Route("{id}/pricingoverride/buyer/{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<MarketplacePriceSchedule> UpdatePricingOverride(string id, string buyerID, [FromBody] MarketplacePriceSchedule priceSchedule)
+		public async Task<HSPriceSchedule> UpdatePricingOverride(string id, string buyerID, [FromBody] HSPriceSchedule priceSchedule)
 		{
 			return await _command.UpdatePricingOverride(id, buyerID, priceSchedule, VerifiedUserContext.AccessToken);
 		}

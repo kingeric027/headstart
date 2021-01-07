@@ -1,12 +1,12 @@
-﻿using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
+﻿using Headstart.Common.Mappers;
+using Headstart.Common.Models;
 using NUnit.Framework;
 using ordercloud.integrations.exchangerates;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
 	public class GeographyTests
 	{

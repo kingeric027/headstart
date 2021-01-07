@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Common.Services.Zoho.Models
+﻿namespace Headstart.Common.Services.Zoho.Models
 {
     /// <summary>
     /// Used to define the model object of ZohoPageContext.

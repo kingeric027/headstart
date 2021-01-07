@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { BuyerCreditCard, Address } from 'ordercloud-javascript-sdk'
-import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
+import { MarketplaceBuyerCreditCard } from 'src/app/models/credit-card.types'
 
 @Component({
   templateUrl: './credit-card-display.component.html',

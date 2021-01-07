@@ -1,9 +1,9 @@
-﻿using Marketplace.Models;
+﻿using Headstart.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.AnytimeDashboard.Models
+namespace Headstart.Common.Services.AnytimeDashboard.Models
 {
     // See https://api.anytimefitness.com/Help/Api/GET-clubs for the origin of this model.
     public class AFClub

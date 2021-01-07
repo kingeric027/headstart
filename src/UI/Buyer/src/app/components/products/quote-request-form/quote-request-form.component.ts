@@ -9,8 +9,8 @@ import {
   QuoteOrderInfo,
   MarketplaceAddressBuyer,
 } from '@ordercloud/headstart-sdk'
-import { CurrentUser } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { CurrentUser } from 'src/app/models/profile.types'
 
 @Component({
   templateUrl: './quote-request-form.component.html',

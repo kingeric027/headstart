@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common;
-using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
+using Headstart.Common;
+using Headstart.Common.Mappers;
+using Headstart.Common.Models;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface ISSOLoginCommand
 	{

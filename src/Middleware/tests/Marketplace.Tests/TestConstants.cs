@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public static class TestConstants
     {

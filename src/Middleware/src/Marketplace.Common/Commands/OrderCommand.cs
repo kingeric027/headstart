@@ -3,26 +3,26 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OrderCloud.SDK;
-using Marketplace.Models;
-using Marketplace.Common.Services;
-using Marketplace.Models.Misc;
+using Headstart.Models;
+using Headstart.Common.Services;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
 using ordercloud.integrations.exchangerates;
-using Marketplace.Models.Extended;
+using Headstart.Models.Extended;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library.helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IOrderCommand
     {
         Task<Order> AcknowledgeQuoteOrder(string orderID);
-        Task<ListPage<MarketplaceOrder>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser);
+        Task<ListPage<HSOrder>> ListOrdersForLocation(string locationID, ListArgs<HSOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
-        Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
-        Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
-        Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID);
+        Task<List<HSShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
+        Task<HSOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
+        Task<HSOrder> ApplyAutomaticPromotions(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
     }
 
@@ -55,7 +55,7 @@ namespace Marketplace.Common.Commands
             //  Need to complete sales and purchase order and patch the xp.SubmittedStatus of both orders            
             var salesOrderID = orderID.Split('-')[0];
             var completeSalesOrder = _oc.Orders.CompleteAsync(OrderDirection.Incoming, salesOrderID);
-            var patchSalesOrder = _oc.Orders.PatchAsync<MarketplaceOrder>(OrderDirection.Incoming, salesOrderID, orderPatch);
+            var patchSalesOrder = _oc.Orders.PatchAsync<HSOrder>(OrderDirection.Incoming, salesOrderID, orderPatch);
             var completedSalesOrder = await completeSalesOrder;
             var patchedSalesOrder = await patchSalesOrder;
 
@@ -79,7 +79,7 @@ namespace Marketplace.Common.Commands
             await _oc.Orders.PatchAsync(OrderDirection.Incoming, orderID, partialOrder);
         }
 
-        public async Task<ListPage<MarketplaceOrder>> ListOrdersForLocation(string locationID, ListArgs<MarketplaceOrder> listArgs, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<HSOrder>> ListOrdersForLocation(string locationID, ListArgs<HSOrder> listArgs, VerifiedUserContext verifiedUser)
         {
             await EnsureUserCanAccessLocationOrders(locationID, verifiedUser);
             if(listArgs.Filters == null)
@@ -90,7 +90,7 @@ namespace Marketplace.Common.Commands
             {
                 QueryParams = new List<Tuple<string, string>>() { new Tuple<string, string>("BillingAddress.ID", locationID) }
             });
-            return await _oc.Orders.ListAsync<MarketplaceOrder>(OrderDirection.Incoming,
+            return await _oc.Orders.ListAsync<HSOrder>(OrderDirection.Incoming,
                 page: listArgs.Page,
                 pageSize: listArgs.PageSize,
                 search: listArgs.Search,
@@ -100,7 +100,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser)
         {
-            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            var order = await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
             var lineItems = ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, page: page, pageSize: 100));
@@ -117,20 +117,20 @@ namespace Marketplace.Common.Commands
             };
         }
 
-        public async Task<List<MarketplaceShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
+        public async Task<List<HSShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
         {
-            var order = await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            var order = await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);
 
             var lineItems = await ListAllAsync.List((page) => _oc.LineItems.ListAsync(OrderDirection.Incoming, orderID, page: page, pageSize: 100));
-            var shipments = await _oc.Orders.ListShipmentsAsync<MarketplaceShipmentWithItems>(OrderDirection.Incoming, orderID);
-            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (MarketplaceShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.ToList()));
+            var shipments = await _oc.Orders.ListShipmentsAsync<HSShipmentWithItems>(OrderDirection.Incoming, orderID);
+            var shipmentsWithItems = await Throttler.RunAsync(shipments.Items, 100, 5, (HSShipmentWithItems shipment) => GetShipmentWithItems(shipment, lineItems.ToList()));
             return shipmentsWithItems.ToList();
         }
 
-        private async Task<MarketplaceShipmentWithItems> GetShipmentWithItems(MarketplaceShipmentWithItems shipment, List<LineItem> lineItems)
+        private async Task<HSShipmentWithItems> GetShipmentWithItems(HSShipmentWithItems shipment, List<LineItem> lineItems)
         {
-            var shipmentItems = await _oc.Shipments.ListItemsAsync<MarketplaceShipmentItemWithLineItem>(shipment.ID);
+            var shipmentItems = await _oc.Shipments.ListItemsAsync<HSShipmentItemWithLineItem>(shipment.ID);
             shipment.ShipmentItems = shipmentItems.Items.Select(shipmentItem =>
             {
                 shipmentItem.LineItem = lineItems.First(li => li.ID == shipmentItem.LineItemID);
@@ -139,16 +139,16 @@ namespace Marketplace.Common.Commands
             return shipment;
         }
 
-        public async Task<MarketplaceOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
+        public async Task<HSOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser)
         {
             var orderPromo = await _oc.Orders.AddPromotionAsync(OrderDirection.Incoming, orderID, promoCode);
-            return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            return await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, orderID);
         }
 
-        public async Task<MarketplaceOrder> ApplyAutomaticPromotions(string orderID)
+        public async Task<HSOrder> ApplyAutomaticPromotions(string orderID)
         {
             await _promotionCommand.AutoApplyPromotions(orderID);
-            return await _oc.Orders.GetAsync<MarketplaceOrder>(OrderDirection.Incoming, orderID);
+            return await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, orderID);
         }
 
         private async Task EnsureUserCanAccessLocationOrders(string locationID, VerifiedUserContext verifiedUser, string overrideErrorMessage = "")
@@ -157,7 +157,7 @@ namespace Marketplace.Common.Commands
             Require.That(hasAccess, new ErrorCode("Insufficient Access", 403, $"User cannot access orders from this location: {locationID}"));
         }
 
-        private async Task EnsureUserCanAccessOrder(MarketplaceOrder order, VerifiedUserContext verifiedUser)
+        private async Task EnsureUserCanAccessOrder(HSOrder order, VerifiedUserContext verifiedUser)
         {
             /* ensures user has access to order through at least 1 of 3 methods
              * 1) user submitted the order

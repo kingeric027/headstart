@@ -1,14 +1,14 @@
-﻿using Marketplace.Common.Mappers;
-using Marketplace.Common.Models;
-using Marketplace.Common.Services.AnytimeDashboard.Models;
-using Marketplace.Common.Services.WaxingDashboard.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Mappers;
+using Headstart.Common.Models;
+using Headstart.Common.Services.AnytimeDashboard.Models;
+using Headstart.Common.Services.WaxingDashboard.Models;
+using Headstart.Models;
 using NUnit.Framework;
 using ordercloud.integrations.exchangerates;
 using System;
 using System.Collections;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class UserMappingTests
     {
@@ -29,7 +29,7 @@ namespace Marketplace.Tests
 		[TestCaseSource(typeof(UserFactory), nameof(UserFactory.AFUsers))]
 		public void map_anytime_staff_to_user(string buyerID, string country, AFStaff staff, SyncUser expectedUser)
 		{
-            var location = new MarketplaceBuyerLocation() { Address = new MarketplaceAddressBuyer() { Country = country } };
+            var location = new HSBuyerLocation() { Address = new HSAddressBuyer() { Country = country } };
             var user = UserMapper.MapToUser(buyerID, location, staff);
             assert_users_are_equal(expectedUser, user);
         }

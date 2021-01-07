@@ -1,10 +1,10 @@
 ﻿using System;
-using Marketplace.Common.Models;
+using Headstart.Common.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-namespace Marketplace.Common.Exceptions
+namespace Headstart.Common.Exceptions
 {
     public class OrchestrationException : Exception
     {

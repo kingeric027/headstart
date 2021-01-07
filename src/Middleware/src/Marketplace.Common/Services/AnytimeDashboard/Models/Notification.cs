@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
-namespace Marketplace.Common.Services.AnytimeDashboard.Models
+namespace Headstart.Common.Services.AnytimeDashboard.Models
 {
 	// https://api.anytimefitness.com/Help/Webhooks
 	public class Notification

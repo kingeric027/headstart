@@ -1,5 +1,6 @@
-import { RouteConfig } from './route-config'
-import { OrderViewContext } from '../../shopper-context'
+import { OrderViewContext } from "src/app/models/order.types";
+import { RouteConfig } from "src/app/models/shared.types";
+
 
 export const OrderRoutes: RouteConfig[] = [
   {

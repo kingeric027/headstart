@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Marketplace.Common.Models.Misc
+namespace Headstart.Common.Models.Misc
 {
     public class Error
     {

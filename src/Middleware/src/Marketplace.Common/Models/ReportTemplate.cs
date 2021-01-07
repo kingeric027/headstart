@@ -4,9 +4,9 @@ using ordercloud.integrations.library;
 using System.Collections.Generic;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library.Cosmos;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     [SwaggerModel]
     [CosmosCollection("reporttemplates")]

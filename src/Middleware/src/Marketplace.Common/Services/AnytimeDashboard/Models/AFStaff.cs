@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.AnytimeDashboard.Models
+namespace Headstart.Common.Services.AnytimeDashboard.Models
 {
 	// See https://api.anytimefitness.com/Help/Api/GET-clubs-ClubId-staff for the origin of this model.
     public class AFStaff

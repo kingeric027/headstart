@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.CMS.Models
+namespace Headstart.Common.Services.CMS.Models
 {
 	public class AssetAssignment
 	{
