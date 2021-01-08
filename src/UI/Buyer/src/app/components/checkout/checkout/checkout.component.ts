@@ -222,24 +222,33 @@ export class OCMCheckout implements OnInit {
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
-    this.initLoadingIndicator('submitLoading')
-    await this.checkout.addComment(comment)
-    try {
-      const payment = this.orderSummaryMeta.StandardLineItemCount
-        ? this.getCCPaymentData()
-        : {}
-      const order = await HeadStartSDK.Orders.Submit(
-        'Outgoing',
-        this.order.ID,
-        payment
-      )
-      await this.checkout.appendPaymentMethodToOrderXp(order.ID, payment)
+    // Check that line items in cart are all from active products (none were made inactive during checkout).
+    this.invalidLineItems = await this.context.order.cart.getInvalidLineItems()
+    if (this.invalidLineItems?.length) {
+      // Navigate to cart to review invalid itemss
+      await this.context.order.reset() // orderID might've been incremented
       this.isLoading = false
-      await this.context.order.reset() // get new current order
-      this.toastrService.success('Order submitted successfully', 'Success')
-      this.context.router.toMyOrderDetails(order.ID)
-    } catch (e) {
-      await this.handleSubmitError(e)
+      void this.router.navigate(['/cart'])
+    } else {
+      this.initLoadingIndicator('submitLoading')
+      await this.checkout.addComment(comment)
+      try {
+        const payment = this.orderSummaryMeta.StandardLineItemCount
+          ? this.getCCPaymentData()
+          : {}
+        const order = await HeadStartSDK.Orders.Submit(
+          'Outgoing',
+          this.order.ID,
+          payment
+        )
+        await this.checkout.appendPaymentMethodToOrderXp(order.ID, payment)
+        this.isLoading = false
+        await this.context.order.reset() // get new current order
+        this.toastrService.success('Order submitted successfully', 'Success')
+        this.context.router.toMyOrderDetails(order.ID)
+      } catch (e) {
+        await this.handleSubmitError(e)
+      }
     }
   }
 
