@@ -1,3 +1,4 @@
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import {
   Component,
   Inject,
@@ -30,7 +31,7 @@ import {
   ListPage,
 } from '@ordercloud/angular-sdk'
 import { getProductSmallImageUrl } from '@app-seller/products/product-image.helper'
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpHeaders } from '@angular/common/http'
 import { AppAuthService } from '@app-seller/auth'
 import {
   AppConfig,
@@ -44,7 +45,6 @@ import {
   NumberCanChangeTo,
 } from '@app-seller/orders/line-item-status.helper'
 import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk'
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { flatten as _flatten } from 'lodash'
 
 @Component({
@@ -91,8 +91,7 @@ export class OrderShipmentsComponent implements OnChanges {
     private ocSupplierAddressService: OcSupplierAddressService,
     private ocShipmentService: OcShipmentService,
     private ocLineItemService: OcLineItemService,
-    private httpClient: HttpClient,
-    private currentUser: CurrentUserService,
+    private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
@@ -229,7 +228,10 @@ export class OrderShipmentsComponent implements OnChanges {
         ]
       }
       return await Promise.all(lineItemRequests).then((response) => {
-        allOrderLineItems = [...allOrderLineItems, ..._flatten(response.map((r) => r.Items))]
+        allOrderLineItems = [
+          ...allOrderLineItems,
+          ..._flatten(response.map((r) => r.Items)),
+        ]
         this.lineItems = allOrderLineItems
       })
     }
@@ -382,14 +384,8 @@ export class OrderShipmentsComponent implements OnChanges {
         })
         .filter((li) => li !== undefined),
     }
-    this.patchLineItems()
-    const postedShipment: any = await this.httpClient
-      .post(
-        this.appConfig.middlewareUrl + '/shipment',
-        superShipment,
-        httpOptions
-      )
-      .toPromise()
+    await this.patchLineItems()
+    await this.middleware.patchLineItems(superShipment, httpOptions.headers)
     this.isSaving = false
     this.createOrViewShipmentEvent.emit(false)
     this.shipmentCreated.emit()

@@ -227,22 +227,12 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   async refreshProductData(
     superProduct: SuperMarketplaceProduct
   ): Promise<void> {
-    const headers = {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-      }),
-    }
-    const productModifiedNotifications = await this.http
-      .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
-        `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
-        superProduct,
-        headers
-      )
-      .toPromise()
+    void this.middleware
+      .getProductNotifications(superProduct)
+      .then((result) => {
+        this.productInReviewNotifications = result
+      })
 
-    this.productInReviewNotifications = productModifiedNotifications?.Items.filter(
-      (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
-    )
     // If a seller, and not editing the product, grab the currency from the product xp.
     this.supplierCurrency = this._exchangeRates?.find(
       (r) => r.Currency === superProduct?.Product?.xp?.Currency
@@ -770,20 +760,11 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`,
     }
     notification.Doc.History.DateReviewed = new Date().toISOString()
-    const headers = {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-      }),
-    }
-    // TODO: Replace with the SDK
-    const superProduct = await this.http
-      .put<SuperMarketplaceProduct>(
-        `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
-        notification,
-        headers
-      )
-      .toPromise()
-    this.refreshProductData(superProduct)
+
+    const superProduct = await this.middleware.updateProductNotifications(
+      notification
+    )
+    void this.refreshProductData(superProduct)
   }
 
   updateProductResource(productUpdate: any): void {

@@ -1,17 +1,10 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core'
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
 } from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
-import { PriceBreak, SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
-import { JDocument } from '@ordercloud/cms-sdk'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { OcTokenService } from '@ordercloud/angular-sdk'
 
 @Component({
   selector: 'monitored-product-notification',
@@ -25,10 +18,8 @@ export class MonitoredProductNotificationComponent {
   hasPriceBreak = false
 
   constructor(
-    private http: HttpClient,
-    @Inject(applicationConfiguration) private appConfig: AppConfig,
     private currentUserService: CurrentUserService,
-    private ocTokenService: OcTokenService
+    private middleware: MiddlewareAPIService
   ) {}
 
   async reviewMonitoredFieldChange(
@@ -42,19 +33,11 @@ export class MonitoredProductNotificationComponent {
       Name: `${myContext?.Me?.FirstName} ${myContext?.Me?.LastName}`,
     }
     notification.Doc.History.DateReviewed = new Date().toISOString()
-    const headers = {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.ocTokenService.GetAccess()}`,
-      }),
-    }
-    // TODO: Replace with the SDK
-    const superProduct = await this.http
-      .put<SuperMarketplaceProduct>(
-        `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
-        notification,
-        headers
-      )
-      .toPromise()
+
+    const superProduct = await this.middleware.updateProductNotifications(
+      notification
+    )
+
     this.onActionTaken.emit('ACCEPTED')
   }
   navigateToProductPage(productId: string) {

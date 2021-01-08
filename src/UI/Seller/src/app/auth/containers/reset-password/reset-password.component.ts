@@ -1,7 +1,7 @@
 import { OrderCloudService } from './../../../shared/services/ordercloud.service'
 // angular
-import { Component, OnInit, Inject } from '@angular/core'
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
+import { Component, OnInit } from '@angular/core'
+import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { Router, ActivatedRoute } from '@angular/router'
 
 // angular libs
@@ -9,22 +9,12 @@ import { ToastrService } from 'ngx-toastr'
 
 // ordercloud
 import { AppFormErrorService } from '@app-seller/shared'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
-import {
-  OcForgottenPasswordService,
-  PasswordReset,
-  TokenPasswordReset,
-  OcMeService,
-} from '@ordercloud/angular-sdk'
+import { TokenPasswordReset } from '@ordercloud/angular-sdk'
 import {
   ValidateFieldMatches,
   ValidateStrongPassword,
 } from '@app-seller/validators/validators'
 import { HttpHeaders } from '@angular/common/http'
-import { timingSafeEqual } from 'crypto'
 
 @Component({
   selector: 'auth-reset-password',
@@ -41,8 +31,7 @@ export class ResetPasswordComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private toasterService: ToastrService,
     private formErrorService: AppFormErrorService,
-    private orderCloudService: OrderCloudService,
-    @Inject(applicationConfiguration) private appConfig: AppConfig
+    private orderCloudService: OrderCloudService
   ) {}
 
   ngOnInit() {
@@ -71,7 +60,7 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     const config: TokenPasswordReset = {
-      NewPassword: this.resetPasswordForm.get('password').value,
+      NewPassword: this.resetPasswordForm?.get('password')?.value,
     }
 
     const isResetSuccessful = this.orderCloudService.resetPassword(
