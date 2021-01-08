@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http'
 import { Component, Inject, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
-import { applicationConfiguration, AppConfig } from '@app-seller/config/app.config'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig, FileHandle } from '@app-seller/shared'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { MeUser } from '@ordercloud/angular-sdk'
 import { ToastrService } from 'ngx-toastr'
@@ -12,7 +12,7 @@ import { takeWhile } from 'rxjs/operators'
 @Component({
   selector: 'support-case-submission',
   templateUrl: './case-submission.component.html',
-  styleUrls: ['./case-submission.component.scss']
+  styleUrls: ['./case-submission.component.scss'],
 })
 export class CaseSubmissionComponent implements OnInit {
   alive = true
@@ -59,12 +59,12 @@ export class CaseSubmissionComponent implements OnInit {
     this.attachmentFile = event.target.files[0]
     this.stageAttachment(this.attachmentFile)
   }
-  
+
   onAttachmentDrop(event: FileHandle[]): void {
     this.attachmentFile = event[0].File
     this.stageAttachment(this.attachmentFile)
   }
-  
+
   stageAttachment(file: any): void {
     this.isImageFileType = file.type.includes('image')
     this.caseSubmissionForm.controls['File'].setValue(file)
