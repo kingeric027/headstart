@@ -103,10 +103,13 @@ namespace Headstart.Common.Commands
             foreach (HSLineItem lineItem in worksheet.LineItems)
             {
                 var availableProductInCatalog = await _oc.Me.ListProductsAsync(filters: $"ID={ lineItem.ProductID}", accessToken: userToken);
-                var matchingLineItem = availableProductInCatalog.Items.FirstOrDefault(product => product.ID == lineItem.ProductID);
-                if (matchingLineItem == null)
+                if (availableProductInCatalog != null)
                 {
-                    inactiveLineItems.Add(lineItem);
+                    var matchingLineItem = availableProductInCatalog.Items?.FirstOrDefault(product => product.ID == lineItem.ProductID);
+                    if (matchingLineItem == null)
+                    {
+                        inactiveLineItems.Add(lineItem);
+                    }
                 }
             }
             return inactiveLineItems;
