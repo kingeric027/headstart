@@ -4,13 +4,11 @@ import {
   MarketplaceLineItem,
   MarketplaceOrder,
 } from '@ordercloud/headstart-sdk'
-import {
-  getOrderSummaryMeta,
-} from 'src/app/services/purchase-order.helper'
+import { getOrderSummaryMeta } from 'src/app/services/purchase-order.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { OrderSummaryMeta } from 'src/app/models/order.types'
 import { LineItemWithProduct } from 'src/app/models/line-item.types'
-import { ModalState } from 'src/app/models/modal-state.class'
+import { ModalState } from 'src/app/models/shared.types'
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
 
