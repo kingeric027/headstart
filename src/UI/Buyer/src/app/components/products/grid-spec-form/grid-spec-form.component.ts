@@ -192,6 +192,7 @@ export class OCMGridSpecForm {
           return false
         }
         if (
+          li.Product.PriceSchedule.MaxQuantity !== null &&
           li.Quantity !== 0 &&
           li.Quantity !== null &&
           li.Quantity + qtyInCart > li.Product.PriceSchedule.MaxQuantity

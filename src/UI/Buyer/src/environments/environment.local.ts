@@ -1,10 +1,8 @@
-
-
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
 const brand = Brand.WAXING_THE_CITY
 const sebEnvironment = Environment.TEST
-const useLocalMiddleware = true
+const useLocalMiddleware = false
 const localMiddlewareURL = 'https://localhost:44304'
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
