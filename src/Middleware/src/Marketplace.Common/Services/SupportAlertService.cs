@@ -1,3 +1,4 @@
+using Headstart.Common.Models.Misc;
 ﻿using Headstart.Common.Models.Marketplace;
 using Headstart.Models;
 using Microsoft.ApplicationInsights;
@@ -15,6 +16,11 @@ namespace Headstart.Common.Services
     public interface ISupportAlertService
     {
         Task VoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex);
+
+        Task EmailGeneralSupportQueue(SupportCase supportCase);
+
+        
+
     }
 
     // use this service to alert support of critical failures
@@ -84,6 +90,46 @@ namespace Headstart.Common.Services
                 toList.Add(new EmailAddress { Email = email });
             }
             await _sendgrid.SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, toList, SUPPORT_TEMPLATE_ID, templateData);
+        }
+
+        public async Task EmailGeneralSupportQueue(SupportCase supportCase)
+        {
+            var templateData = new EmailTemplate()
+            {
+                Data = new
+                {
+                    DynamicPropertyName1 = "FirstName",
+                    DynamicPropertyValue1 = supportCase.FirstName,
+                    DynamicPropertyName2 = "LastName",
+                    DynamicPropertyValue2 = supportCase.LastName,
+                    DynamicPropertyName3 = "Email",
+                    DynamicPropertyValue3 = supportCase.Email,
+                    DynamicPropertyName4 = "Vendor",
+                    DynamicPropertyValue4 = supportCase.Vendor,
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = supportCase.Subject,
+                    DynamicText = supportCase.Message
+                }
+            };
+            var recipient = DetermineRecipient(supportCase.Subject);
+            await _sendgrid.SendSingleTemplateEmailSingleRcptAttachment(_settings.SendgridSettings.FromEmail, recipient, SUPPORT_TEMPLATE_ID, templateData, supportCase.File);
+        }
+
+        private string DetermineRecipient(string subject)
+        {
+            switch (subject.ToLower())
+            {
+                case "general":
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
+                case "report an error/bug":
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
+                case "payment, billing, or refunds":
+                    return _settings.SendgridSettings.SEBBillingEmail;
+                default:
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
+            }
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Headstart.Common.Commands;
 using Headstart.Common.Commands.Zoho;
+using Headstart.Common.Models.Misc;
+using Headstart.Common.Services;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
 using Headstart.Models.Models.Marketplace;
@@ -20,14 +22,16 @@ namespace Headstart.Common.Controllers
         private static ICheckoutIntegrationCommand _checkoutIntegrationCommand;
         private static IPostSubmitCommand _postSubmitCommand;
         private static IZohoCommand _zoho;
+        private readonly ISupportAlertService _supportAlertService;
         private readonly IOrderCloudClient _oc;
 
-        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc) : base(settings)
+        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc, ISupportAlertService supportAlertService) : base(settings)
         {
             _checkoutIntegrationCommand = checkoutIntegrationCommand;
             _postSubmitCommand = postSubmitCommand;
             _zoho = zoho;
             _oc = oc;
+            _supportAlertService = supportAlertService;
         }
 
         [HttpGet, Route("shipping")]
@@ -79,6 +83,12 @@ namespace Headstart.Common.Controllers
         {
             var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
             return await _postSubmitCommand.HandleBuyerOrderSubmit(worksheet);
+        }
+
+        [HttpPost, Route("submitcase")]
+        public async Task SendSupportRequest([FromForm]SupportCase supportCase)
+        {
+            await _supportAlertService.EmailGeneralSupportQueue(supportCase);
         }
     }
 

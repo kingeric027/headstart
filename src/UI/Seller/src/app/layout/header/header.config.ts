@@ -290,6 +290,13 @@ const MySupplerUsers = {
   route: '/my-supplier/users',
 }
 
+const Support = {
+  rolesWithAccess: [],
+  orderCloudUserTypesWithAccess: [SUPPLIER, SELLER],
+  title: 'Submit a Case',
+  route: '/support'
+}
+
 const AllNavGroupings: MPRoute[] = [
   ProductNavGrouping,
   SupplierOrderNavGrouping,
@@ -302,6 +309,7 @@ const AllNavGroupings: MPRoute[] = [
   MySupplierProfile,
   MySupplierLocations,
   MySupplerUsers,
+  Support
 ]
 
 export const getHeaderConfig = (
@@ -335,9 +343,13 @@ const filterOutNavGroupings = (
 ): MPRoute[] => {
   return navGroupings.filter((navGrouping) => {
     return (
-      navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) &&
+      (navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) || 
+        !navGrouping.rolesWithAccess.length
+      ) 
+      &&
       (!navGrouping.orderCloudUserTypesWithAccess ||
-        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType))
+        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType)
+      )
     )
   })
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dynamitey;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Microsoft.AspNetCore.Http;
 using Headstart.Common.Constants;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
@@ -27,6 +28,7 @@ namespace Headstart.Common.Services
         Task SendSingleTemplateEmail(string from, string to, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcpts(string from, List<EmailAddress> tos, string templateID, object templateData);
         Task SendSingleTemplateEmailMultipleRcptsAttachment(string from, List<EmailAddress> tos, string templateID, object templateData, CloudAppendBlob fileReference, string fileName);
+        Task SendSingleTemplateEmailSingleRcptAttachment(string from, string to, string templateID, object templateData, IFormFile fileReference);
         Task SendOrderSubmitEmail(HSOrderWorksheet orderData);
         Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> payload);
         Task SendPasswordResetEmail(MessageNotification<PasswordResetEventBody> messageNotification);
@@ -92,6 +94,18 @@ namespace Headstart.Common.Services
             using (var stream = await fileReference.OpenReadAsync())
             {
                 await msg.AddAttachmentAsync(fileName, stream);
+            }
+            await _client.SendEmailAsync(msg);
+        }
+
+        public async Task SendSingleTemplateEmailSingleRcptAttachment(string from, string to, string templateID, object templateData, IFormFile fileReference)
+        {
+            var fromEmail = new EmailAddress(from);
+            var toEmail = new EmailAddress(to);
+            var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
+            using (var stream = fileReference.OpenReadStream())
+            {
+                await msg.AddAttachmentAsync(fileReference.FileName, stream);
             }
             await _client.SendEmailAsync(msg);
         }

@@ -137,6 +137,8 @@ namespace Headstart.Common
         public string ApiKey { get; set; }
         public string FromEmail { get; set; }
         public string SupportEmails { get; set; } // comma delimited list of emails that should be contacted when critical failures occur
+        public string SEBSupportCaseEmail { get; set; }
+        public string SEBBillingEmail { get; set; }
     }
 
     public class FlurlSettings
