@@ -3,7 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Helpers
+namespace Headstart.Common.Helpers
 {
     public static class ClientHelper
     {

@@ -27,6 +27,7 @@ class ProductDetailsPage {
 	sizeTierDropdown: Selector
 	sizeTierOptions: Selector
 	buyerList: Selector
+	acceptChangesButton: Selector
 
 	constructor() {
 		this.nameField = Selector('#Name')
@@ -55,6 +56,9 @@ class ProductDetailsPage {
 		this.sizeTierDropdown = Selector('#SizeTier')
 		this.sizeTierOptions = this.sizeTierDropdown.find('option')
 		this.buyerList = Selector('.list-group-item')
+		this.acceptChangesButton = Selector('button').withText(
+			createRegExp('Accept')
+		)
 	}
 
 	async createDefaultStandardProduct() {
@@ -164,6 +168,11 @@ class ProductDetailsPage {
 
 	async clickBuyerVisibilityTab() {
 		await t.click(this.buyerVisibilityTab)
+		await loadingHelper.waitForLoadingBar()
+	}
+
+	async clickacceptChangesButton() {
+		await t.click(this.acceptChangesButton)
 		await loadingHelper.waitForLoadingBar()
 	}
 

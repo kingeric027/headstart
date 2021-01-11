@@ -4,17 +4,17 @@ using System.Text;
 using NUnit.Framework;
 using NSubstitute;
 using OrderCloud.SDK;
-using Marketplace.Common.Services;
+using Headstart.Common.Services;
 using ordercloud.integrations.cardconnect;
-using Marketplace.Common.Commands;
+using Headstart.Common.Commands;
 using System.Threading.Tasks;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Models.Marketplace;
-using Marketplace.Models;
-using Marketplace.Tests.Mocks;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
+using Headstart.Models;
+using Headstart.Tests.Mocks;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     class PaymentCommandTests
     {
@@ -34,19 +34,19 @@ namespace Marketplace.Tests
         {
             // oc
             _oc = Substitute.For<IOrderCloudClient>();
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, mockOrderID)
-                    .Returns(Task.FromResult(new MarketplaceOrderWorksheet { Order = new Models.MarketplaceOrder { ID = mockOrderID } }));
-            _oc.Payments.CreateAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID, Arg.Any<MarketplacePayment>())
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, mockOrderID)
+                    .Returns(Task.FromResult(new HSOrderWorksheet { Order = new Models.HSOrder { ID = mockOrderID } }));
+            _oc.Payments.CreateAsync<HSPayment>(OrderDirection.Incoming, mockOrderID, Arg.Any<HSPayment>())
                 .Returns(Task.FromResult(PaymentMocks.CCPayment(creditcard1, 20)));
             
             // orderCalcc
             _orderCalc = Substitute.For<IOrderCalcService>();
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(20);
 
             // ccCommand
             _ccCommand = Substitute.For<ICreditCardCommand>();
-            _ccCommand.VoidPaymentAsync(Arg.Any<MarketplacePayment>(), Arg.Any<MarketplaceOrder>(), mockUserToken)
+            _ccCommand.VoidPaymentAsync(Arg.Any<HSPayment>(), Arg.Any<HSOrder>(), mockUserToken)
                 .Returns(Task.FromResult(0));
 
             _sut = new PaymentCommand(_oc, _orderCalc, _ccCommand);
@@ -58,10 +58,10 @@ namespace Marketplace.Tests
             // Arrange
             var mockedCreditCardTotal = 20;
             var existing = PaymentMocks.PaymentList(PaymentMocks.POPayment(20));
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.CCPayment(creditcard1));
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedCreditCardTotal);
 
             // Act
@@ -69,7 +69,7 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockPoPaymentID);
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID && p.Type == PaymentType.CreditCard && p.Amount == mockedCreditCardTotal), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID && p.Type == PaymentType.CreditCard && p.Amount == mockedCreditCardTotal), mockUserToken);
         }
 
         [Test] public async Task should_handle_new_cc_payment()
@@ -77,10 +77,10 @@ namespace Marketplace.Tests
             // Arrange
             var mockedCreditCardTotal = 30;
             var existing = PaymentMocks.EmptyPaymentsList();
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.CCPayment(creditcard1));
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedCreditCardTotal);
 
             // Act
@@ -88,7 +88,7 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID && p.Type == PaymentType.CreditCard && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID && p.Type == PaymentType.CreditCard && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
         [Test]
@@ -100,10 +100,10 @@ namespace Marketplace.Tests
             // Arrange
             var mockedCreditCardTotal = 30;
             var existing = PaymentMocks.PaymentList(PaymentMocks.CCPayment(creditcard1, 20));
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.CCPayment(creditcard1));
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedCreditCardTotal);
 
             // Act
@@ -111,8 +111,8 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
-            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID), Arg.Is<MarketplaceOrder>(o => o.ID == mockOrderID), mockUserToken);
-            await _oc.Payments.Received().PatchAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID, mockCCPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedCreditCardTotal && p.Accepted == false));
+            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
+            await _oc.Payments.Received().PatchAsync<HSPayment>(OrderDirection.Incoming, mockOrderID, mockCCPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedCreditCardTotal && p.Accepted == false));
         }
 
         [Test]
@@ -124,10 +124,10 @@ namespace Marketplace.Tests
             // Arrange
             var mockedCreditCardTotal = 50;
             var existing = PaymentMocks.PaymentList(PaymentMocks.CCPayment(creditcard1, 50, mockCCPaymentID));
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.CCPayment(creditcard2));
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedCreditCardTotal);
 
             // Act
@@ -135,8 +135,8 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockCCPaymentID);
-            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID), Arg.Is<MarketplaceOrder>(o => o.ID == mockOrderID), mockUserToken);
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
+            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<HSPayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
         [Test]
@@ -148,10 +148,10 @@ namespace Marketplace.Tests
             // Arrange
             var mockedCreditCardTotal = 50;
             var existing = PaymentMocks.PaymentList(PaymentMocks.CCPayment(creditcard1, 40, mockCCPaymentID));
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.CCPayment(creditcard2));
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedCreditCardTotal);
 
             // Act
@@ -159,8 +159,8 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockCCPaymentID);
-            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<MarketplacePayment>(p => p.ID == mockCCPaymentID), Arg.Is<MarketplaceOrder>(o => o.ID == mockOrderID), mockUserToken);
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<MarketplacePayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
+            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
+            await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<HSPayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
         [Test]
@@ -171,10 +171,10 @@ namespace Marketplace.Tests
             // Arrange
             var mockedCreditCardTotal = 50;
             var existing = PaymentMocks.PaymentList(PaymentMocks.CCPayment(creditcard1, 50, mockCCPaymentID));
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.CCPayment(creditcard1));
-            _orderCalc.GetCreditCardTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetCreditCardTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedCreditCardTotal);
 
             // Act
@@ -182,9 +182,9 @@ namespace Marketplace.Tests
 
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
-            await _ccCommand.DidNotReceive().VoidPaymentAsync(Arg.Any<MarketplacePayment>(), Arg.Any<MarketplaceOrder>(), mockUserToken);
-            await _oc.Payments.DidNotReceive().CreateAsync<MarketplacePayment>(Arg.Any<OrderDirection>(), mockOrderID, Arg.Any<MarketplacePayment>(), mockUserToken);
-            await _oc.Payments.DidNotReceive().PatchAsync<MarketplacePayment>(Arg.Any<OrderDirection>(), mockOrderID, Arg.Any<string>(), Arg.Any<PartialPayment>());
+            await _ccCommand.DidNotReceive().VoidPaymentAsync(Arg.Any<HSPayment>(), Arg.Any<HSOrder>(), mockUserToken);
+            await _oc.Payments.DidNotReceive().CreateAsync<HSPayment>(Arg.Any<OrderDirection>(), mockOrderID, Arg.Any<HSPayment>(), mockUserToken);
+            await _oc.Payments.DidNotReceive().PatchAsync<HSPayment>(Arg.Any<OrderDirection>(), mockOrderID, Arg.Any<string>(), Arg.Any<PartialPayment>());
         }
 
         [Test]
@@ -193,17 +193,17 @@ namespace Marketplace.Tests
             // Arrange
             var mockedPOTotal = 50;
             var existing = PaymentMocks.EmptyPaymentsList();
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.POPayment());
-            _orderCalc.GetPurchaseOrderTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetPurchaseOrderTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedPOTotal);
 
             // Act
             var result = await _sut.SavePayments(mockOrderID, requested, mockUserToken);
 
             // Assert
-            await _oc.Payments.Received().CreateAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID, Arg.Is<MarketplacePayment>(p => p.ID == mockPoPaymentID && p.Amount == mockedPOTotal));
+            await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Incoming, mockOrderID, Arg.Is<HSPayment>(p => p.ID == mockPoPaymentID && p.Amount == mockedPOTotal));
         }
 
         [Test]
@@ -212,17 +212,17 @@ namespace Marketplace.Tests
             // Arrange
             var mockedPOTotal = 30;
             var existing = PaymentMocks.PaymentList(PaymentMocks.POPayment(40));
-            _oc.Payments.ListAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID)
+            _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, mockOrderID)
                 .Returns(Task.FromResult(existing));
             var requested = PaymentMocks.Payments(PaymentMocks.POPayment());
-            _orderCalc.GetPurchaseOrderTotal(Arg.Any<MarketplaceOrderWorksheet>())
+            _orderCalc.GetPurchaseOrderTotal(Arg.Any<HSOrderWorksheet>())
                 .Returns(mockedPOTotal);
 
             // Act
             var result = await _sut.SavePayments(mockOrderID, requested, mockUserToken);
 
             // Assert
-            await _oc.Payments.Received().PatchAsync<MarketplacePayment>(OrderDirection.Incoming, mockOrderID, mockPoPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedPOTotal));
+            await _oc.Payments.Received().PatchAsync<HSPayment>(OrderDirection.Incoming, mockOrderID, mockPoPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedPOTotal));
         }
     }
 }

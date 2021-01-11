@@ -21,11 +21,7 @@ import {
   faUserAlt,
 } from '@fortawesome/free-solid-svg-icons'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppAuthService } from '@app-seller/auth'
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface'
 import {
@@ -33,6 +29,9 @@ import {
   MarketplaceOrder,
 } from '@ordercloud/headstart-sdk'
 import { flatten as _flatten } from 'lodash'
+import { OrderProgress } from '@app-seller/models/order.types'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { SELLER } from '@app-seller/models/user.types'
 
 export const LineItemTableStatus = {
   Default: 'Default',
@@ -41,13 +40,7 @@ export const LineItemTableStatus = {
   Backorered: 'Backorered',
 }
 
-export interface OrderProgress {
-  StatusDisplay: string
-  Value: number
-  ProgressBarType: string
-  Striped: boolean
-  Animated: boolean
-}
+
 
 @Component({
   selector: 'app-order-details',

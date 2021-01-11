@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Exceptions;
-using Marketplace.Common.Helpers;
-using Marketplace.Common.Models;
+using Headstart.Common.Exceptions;
+using Headstart.Common.Helpers;
+using Headstart.Common.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Queries;
+using Headstart.Common.Queries;
 using OrderCloud.SDK;
-using Marketplace.Models;
+using Headstart.Models;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class CostCenterSyncCommand : SyncCommand, IWorkItemCommand
     {
@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> CreateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceCostCenter>();
+            var obj = wi.Current.ToObject<HSCostCenter>();
             try
             {
                 obj.ID = wi.RecordId;
@@ -62,7 +62,7 @@ namespace Marketplace.Common.Commands
 
         public async Task<JObject> UpdateAsync(WorkItem wi)
         {
-            var obj = wi.Current.ToObject<MarketplaceCostCenter>(OrchestrationSerializer.Serializer);
+            var obj = wi.Current.ToObject<HSCostCenter>(OrchestrationSerializer.Serializer);
             try
             {
                 if (obj.ID == null) obj.ID = wi.RecordId;

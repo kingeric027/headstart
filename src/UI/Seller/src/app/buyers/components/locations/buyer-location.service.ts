@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
 import {
-  OcAddressService,
   BuyerAddress,
   OcUserGroupService,
   UserGroupAssignment,
@@ -14,11 +13,8 @@ import { HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { BuyerUserService } from '../users/buyer-user.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { Addresses } from 'ordercloud-javascript-sdk'
+import { PermissionType } from '@app-seller/models/user.types'
 
-export interface PermissionType {
-  UserGroupSuffix: string
-  DisplayText: string
-}
 
 export const PermissionTypes: PermissionType[] = [
   { UserGroupSuffix: 'PermissionAdmin', DisplayText: 'Permission Admin' },

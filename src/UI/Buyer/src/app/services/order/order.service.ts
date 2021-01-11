@@ -1,6 +1,5 @@
 // angular
 import { Injectable } from '@angular/core'
-import { AppConfig, OrderType } from '../../shopper-context'
 import { OrderStateService } from './order-state.service'
 import { CartService } from './cart.service'
 import { CheckoutService } from './checkout.service'
@@ -17,6 +16,8 @@ import {
   QuoteOrderInfo,
 } from '@ordercloud/headstart-sdk'
 import { PromoService } from './promo.service'
+import { AppConfig } from 'src/app/models/environment.types'
+import { OrderType } from 'src/app/models/order.types'
 
 @Injectable({
   providedIn: 'root',

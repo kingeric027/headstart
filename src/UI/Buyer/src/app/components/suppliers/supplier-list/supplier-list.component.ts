@@ -10,8 +10,9 @@ import { faTimes, faFilter } from '@fortawesome/free-solid-svg-icons'
 import { FormControl, FormGroup } from '@angular/forms'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { takeWhile } from 'rxjs/operators'
-import { BuyerAppFilterType, SupplierFilterConfig, SupplierFilters } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { SupplierFilterConfig } from '@ordercloud/headstart-sdk/dist/models'
+import { BuyerAppFilterType, SupplierFilters } from 'src/app/models/filter-config.types'
 
 @Component({
   templateUrl: './supplier-list.component.html',

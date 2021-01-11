@@ -18,7 +18,6 @@ import {
   ProductInKit,
 } from '@ordercloud/headstart-sdk'
 import { Router } from '@angular/router'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
 import { DomSanitizer } from '@angular/platform-browser'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Location } from '@angular/common'
@@ -26,6 +25,7 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { Buyer, OcBuyerService } from '@ordercloud/angular-sdk'
 import { TabIndexMapper } from './tab-mapper'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { FileHandle } from '@app-seller/models/file-upload.types'
 @Component({
   selector: 'app-kits-edit',
   templateUrl: './kits-edit.component.html',
@@ -113,10 +113,10 @@ export class KitsEditComponent implements OnInit {
   async handleSelectedProductChange(
     product: MarketplaceKitProduct
   ): Promise<void> {
-    const marketplaceKitProduct = this.isCreatingNew
+    const hsKitProduct = this.isCreatingNew
       ? this.kitService.emptyResource
       : await HeadStartSDK.KitProducts.Get(product.Product.ID)
-    this.refreshProductData(marketplaceKitProduct)
+    this.refreshProductData(hsKitProduct)
   }
 
   async refreshProductData(product: MarketplaceKitProduct): Promise<void> {
@@ -428,7 +428,7 @@ export class KitsEditComponent implements OnInit {
       superProduct = await this.uploadAsset(productID, file, true)
     }
     this.staticContentFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
     superProduct = Object.assign(this.kitProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }
@@ -438,7 +438,7 @@ export class KitsEditComponent implements OnInit {
       superProduct = await this.uploadAsset(productID, file)
     }
     this.imageFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
     superProduct = Object.assign(this.kitProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }

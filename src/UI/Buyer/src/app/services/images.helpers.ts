@@ -1,6 +1,6 @@
 import { ocAppConfig } from '../config/app.config'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
-import { CurrentUser, MarketplaceMeProduct } from '../shopper-context'
+import { MarketplaceLineItem, MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
+import { CurrentUser } from '../models/profile.types'
 
 export const getPrimaryImageUrl = (
   product: MarketplaceMeProduct,

@@ -1,12 +1,12 @@
-﻿using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+﻿using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     class SendGridModels
     {
@@ -23,6 +23,7 @@ namespace Marketplace.Common.Models
             public string ProductID { get; set; }
             public int Quantity { get; set; }
             public decimal LineTotal { get; set; }
+            public string SpecCombo { get; set; }
         }
 
         public class OrderTemplateData
@@ -35,6 +36,7 @@ namespace Marketplace.Common.Models
             public Address ShippingAddress { get; set; }
             public string BillingAddressID { get; set; }
             public Address BillingAddress { get; set; }
+            public Address BillTo { get; set; }
             public IEnumerable<ProductInfo> Products { get; set; }
             public decimal Subtotal { get; set; }
             public decimal TaxCost { get; set; }
@@ -53,7 +55,7 @@ namespace Marketplace.Common.Models
             public string Location { get; set; }
             public string ProductID { get; set; }
             public string ProductName { get; set; }
-            public MarketplaceOrder Order { get; set; }
+            public HSOrder Order { get; set; }
         }
 
     }

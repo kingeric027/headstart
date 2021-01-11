@@ -14,7 +14,9 @@ import {
   IntegrationEvents,
 } from 'ordercloud-javascript-sdk'
 import { BehaviorSubject } from 'rxjs'
-import { AppConfig, ClaimStatus, ShippingStatus } from '../../shopper-context'
+import { AppConfig } from 'src/app/models/environment.types'
+import { ClaimStatus } from 'src/app/models/order.types'
+import { ShippingStatus } from 'src/app/models/shipping.types'
 import { CurrentUserService } from '../current-user/current-user.service'
 import { listAll } from '../listAll'
 import { TokenHelperService } from '../token-helper/token-helper.service'

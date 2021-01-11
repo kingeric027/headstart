@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import {
-  StateDefinition,
   CountryDefinition,
-} from '@app-seller/shared/services/geography/geography.models'
+  StateDefinition,
+} from '@app-seller/models/currency-geography.types'
 
 @Injectable({
   providedIn: 'root',

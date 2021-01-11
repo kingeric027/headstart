@@ -6,8 +6,8 @@ import {
 } from '@ordercloud/angular-sdk'
 import { ToastrService } from 'ngx-toastr'
 import { faCog, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { SupportedRates } from '@app-seller/shared/models/supported-rates.interface'
 import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
+import { SupportedRates } from '@app-seller/models/currency-geography.types'
 
 @Component({
   selector: 'price-break-editor',

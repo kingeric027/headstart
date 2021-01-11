@@ -1,4 +1,4 @@
-﻿using Marketplace.Models.Models.Marketplace;
+﻿using Headstart.Models.Models.Marketplace;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ordercloud.integrations.library;
@@ -6,7 +6,7 @@ using SendGrid.Helpers.Mail;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
     [DocIgnore]
     public class EnvironmentSeed
@@ -16,8 +16,8 @@ namespace Marketplace.Models.Misc
 		// the org will need to be created first in order to be seeded
 		public string SellerOrgID { get; set; }
 		[Required]
-		public List<MarketplaceSupplier> Suppliers { get; set; }
+		public List<HSSupplier> Suppliers { get; set; }
 		[Required]
-		public List<MarketplaceBuyer> Buyers { get; set; }
+		public List<HSBuyer> Buyers { get; set; }
 	}
 }

@@ -1,8 +1,9 @@
-import { EnvironmentConfig } from './environment.interfaces'
+import { EnvironmentConfig } from '@app-seller/models/environment.types'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'FASTSIGNS_TEST',
+  sellerName: 'FastSigns Seller',
   clientID: 'E8B2E3BD-2FAE-4C26-9BE3-054953393C2C',
   middlewareUrl: 'https://fastsigns-middleware-test.azurewebsites.net',
   cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',

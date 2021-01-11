@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { RouteConfig } from 'src/app/services/route/route-config'
+import { RouteConfig } from 'src/app/models/shared.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({

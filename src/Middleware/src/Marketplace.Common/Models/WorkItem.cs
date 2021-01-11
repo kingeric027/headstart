@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Marketplace.Common.Exceptions;
+using Headstart.Common.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     [DocIgnore]
     public class WorkItem

@@ -1,10 +1,8 @@
 import { Component, ChangeDetectorRef, NgZone } from '@angular/core'
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
-import {
-  ReportsTemplateService,
-  ReportTemplate,
-} from '@app-seller/shared/services/middleware-api/reports-template.service'
+import { ReportsTemplateService } from '@app-seller/shared/services/middleware-api/reports-template.service'
 import { Router, ActivatedRoute } from '@angular/router'
+import { ReportTemplate } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'app-reports-table',

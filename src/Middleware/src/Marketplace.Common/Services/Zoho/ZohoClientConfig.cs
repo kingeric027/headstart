@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.Zoho
+namespace Headstart.Common.Services.Zoho
 {
     public class ZohoClientConfig
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Services.Zoho.Models
+namespace Headstart.Common.Services.Zoho.Models
 {
     public class ZohoAddress
     {

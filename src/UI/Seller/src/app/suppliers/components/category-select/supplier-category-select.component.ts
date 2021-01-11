@@ -1,21 +1,10 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectorRef,
-} from '@angular/core'
+import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { FormControl } from '@angular/forms'
 import {
   SupplierCategoryConfig,
   SupplierCategoryConfigFilters,
-} from '../suppliers/supplier-table/supplier-table.component'
-import { FormControl } from '@angular/forms'
-import { SupplierFilterConfigDocument } from '@ordercloud/headstart-sdk'
-
-interface SupplierCategorySelection {
-  ServiceCategory: string
-  VendorLevel: string
-}
+  SupplierCategorySelection,
+} from '@app-seller/models/category.types'
 
 export const areAllCategoriesComplete = (
   categorySelections: SupplierCategorySelection[]

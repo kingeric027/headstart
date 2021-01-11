@@ -4,7 +4,7 @@ import { ResourceCrudComponent } from '@app-seller/shared/components/resource-cr
 import { Router, ActivatedRoute } from '@angular/router'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { ProductService } from '@app-seller/products/product.service'
-import { UserContext } from '@app-seller/config/user-context'
+import { UserContext } from '@app-seller/models/user.types'
 
 @Component({
   selector: 'app-product-table',

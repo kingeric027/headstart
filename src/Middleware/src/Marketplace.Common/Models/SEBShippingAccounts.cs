@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore.Internal;
 using ordercloud.integrations.easypost;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     public class SelfEsteemBrandsShippingProfiles : EasyPostShippingProfiles
     {

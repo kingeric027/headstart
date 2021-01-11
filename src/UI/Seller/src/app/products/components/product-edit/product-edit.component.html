@@ -71,7 +71,7 @@
       #nav="ngbNav"
       [(activeId)]="active"
       (navChange)="
-        tabChanged($event, _superMarketplaceProductEditable?.Product?.ID)
+        tabChanged($event, _superHSProductEditable?.Product?.ID)
       "
       class="nav-pills border-top border-bottom nav-fill"
     >
@@ -246,14 +246,14 @@
                   </div>
                   <div
                     class="form-group w-50"
-                    *ngIf="!isCreatingNew && _superMarketplaceProductStatic"
+                    *ngIf="!isCreatingNew && _superHSProductStatic"
                   >
                     <label for="ID" translate
                       >ADMIN.PRODUCT_EDIT.PRODUCT_ID</label
                     >
                     <input
                       class="form-control"
-                      value="{{ _superMarketplaceProductStatic.Product.ID }}"
+                      value="{{ _superHSProductStatic.Product.ID }}"
                       disabled
                     />
                   </div>
@@ -271,7 +271,7 @@
                         type="checkbox"
                         (click)="handleUpdateProduct($event, 'Product.Active')"
                         [checked]="
-                          _superMarketplaceProductEditable?.Product.Active
+                          _superHSProductEditable?.Product.Active
                         "
                       />
                       <span class="slider round"></span>
@@ -438,7 +438,7 @@
                   </div>
                   <div
                     *ngIf="
-                      _superMarketplaceProductEditable?.Product?.Inventory
+                      _superHSProductEditable?.Product?.Inventory
                         ?.Enabled
                     "
                     class="form-group"
@@ -466,13 +466,13 @@
                   </div>
                   <div
                     [ngbTooltip]="
-                      !_superMarketplaceProductEditable?.Product?.ID
+                      !_superHSProductEditable?.Product?.ID
                         ? 'Your product must have a SKU before you can enable variants'
                         : ''
                     "
                     placement="bottom-left"
                     *ngIf="
-                      _superMarketplaceProductEditable?.Product?.Inventory
+                      _superHSProductEditable?.Product?.Inventory
                         ?.Enabled
                     "
                     class="form-group"
@@ -500,9 +500,9 @@
                   </div>
                   <div
                     *ngIf="
-                      _superMarketplaceProductEditable?.Product?.Inventory
+                      _superHSProductEditable?.Product?.Inventory
                         ?.Enabled &&
-                      !_superMarketplaceProductEditable?.Product?.Inventory
+                      !_superHSProductEditable?.Product?.Inventory
                         ?.VariantLevelTracking
                     "
                     class="form-group w-50"
@@ -539,9 +539,9 @@
                   </div>
                   <ng-container
                     *ngIf="
-                      _superMarketplaceProductEditable?.Product?.Inventory
+                      _superHSProductEditable?.Product?.Inventory
                         ?.Enabled &&
-                      _superMarketplaceProductEditable?.Product?.Inventory
+                      _superHSProductEditable?.Product?.Inventory
                         ?.VariantLevelTracking
                     "
                   >
@@ -556,7 +556,7 @@
                       (click)="
                         tabChanged(
                           { nextId: 5 },
-                          _superMarketplaceProductEditable?.Product?.ID
+                          _superHSProductEditable?.Product?.ID
                         )
                       "
                     >
@@ -569,8 +569,8 @@
                 <product-tax-code-select-component
                   [readonly]="readonly"
                   [productForm]="productForm"
-                  [superMarketplaceProductEditable]="
-                    _superMarketplaceProductEditable
+                  [superHSProductEditable]="
+                    _superHSProductEditable
                   "
                   [taxCodes]="taxCodes"
                   [isRequired]="isRequired('TaxCodeCategory')"
@@ -640,7 +640,7 @@
                     </div>
                     <div
                       *ngIf="
-                        _superMarketplaceProductEditable?.Product?.xp
+                        _superHSProductEditable?.Product?.xp
                           ?.FreeShipping
                       "
                       class="mb-3"
@@ -758,7 +758,7 @@
                       <option
                         *ngFor="let tier of availableSizeTiers"
                         [selected]="
-                          _superMarketplaceProductEditable?.xp?.SizeTier ===
+                          _superHSProductEditable?.xp?.SizeTier ===
                           tier.Tier
                         "
                         value="{{ tier.Tier }}"
@@ -894,25 +894,25 @@
                       <img
                         [src]="getProductPreviewImage()"
                         style="max-width: 100%"
-                        [alt]="_superMarketplaceProductEditable?.Product?.Name"
+                        [alt]="_superHSProductEditable?.Product?.Name"
                       />
                       <div
                         class="card-body d-flex flex-column justify-content-between bg-light"
                       >
                         <h5
                           class="card-title"
-                          title="_superMarketplaceProductEditable?.Product?.Name"
+                          title="_superHSProductEditable?.Product?.Name"
                         >
-                          {{ _superMarketplaceProductEditable?.Product?.Name }}
+                          {{ _superHSProductEditable?.Product?.Name }}
                         </h5>
                         <small class="card-text text-muted">{{
-                          _superMarketplaceProductEditable?.Product?.ID
+                          _superHSProductEditable?.Product?.ID
                         }}</small>
                         <p class="card-text">
                           {{
-                            _superMarketplaceProductEditable?.Product?.xp
+                            _superHSProductEditable?.Product?.xp
                               ?.Facets?.supplier &&
-                              _superMarketplaceProductEditable?.Product?.xp
+                              _superHSProductEditable?.Product?.xp
                                 ?.Facets?.supplier[0]
                           }}
                         </p>
@@ -921,19 +921,19 @@
                         >
                           <p class="card-text mb-0">
                             {{
-                              _superMarketplaceProductEditable?.PriceSchedule
+                              _superHSProductEditable?.PriceSchedule
                                 ?.PriceBreaks[0]?.Price
                                 | currency: supplierCurrency?.Currency
                             }}
                           </p>
                           <small class="card-text text-muted"
                             >{{
-                              _superMarketplaceProductEditable?.Product?.xp
+                              _superHSProductEditable?.Product?.xp
                                 ?.UnitOfMeasure?.Qty
                             }}
                             /
                             {{
-                              _superMarketplaceProductEditable?.Product?.xp
+                              _superHSProductEditable?.Product?.xp
                                 ?.UnitOfMeasure?.Unit
                             }}</small
                           ><label class="sr-only" for="quantity" translate
@@ -962,8 +962,8 @@
         >
         <ng-template ngbNavContent>
           <product-visibility-assignments-component
-            *ngIf="_superMarketplaceProductStatic?.Product?.ID"
-            [product]="_superMarketplaceProductStatic.Product"
+            *ngIf="_superHSProductStatic?.Product?.ID"
+            [product]="_superHSProductStatic.Product"
           >
           </product-visibility-assignments-component>
         </ng-template>
@@ -1046,7 +1046,7 @@
                     class="alert alert-info"
                   >
                     <span translate>ADMIN.PRODUCT_EDIT.NOTE</span>:
-                    {{ _superMarketplaceProductEditable?.Product?.xp?.Note }}
+                    {{ _superHSProductEditable?.Product?.xp?.Note }}
                   </div>
                 </div>
               </div>
@@ -1060,7 +1060,7 @@
         [ngbNavItem]="3"
         id="3"
         [disabled]="
-          readonly && !_superMarketplaceProductEditable?.PriceSchedule?.ID
+          readonly && !_superHSProductEditable?.PriceSchedule?.ID
         "
       >
         <a
@@ -1099,7 +1099,7 @@
             [productForm]="productForm"
             [supplierCurrency]="supplierCurrency"
             [sellerCurrency]="sellerCurrency"
-            [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
+            [superHSProductStatic]="_superHSProductStatic"
             [isRequired]="isRequired('Price')"
             (updateProduct)="handleUpdatePricing($event)"
           >
@@ -1122,9 +1122,9 @@
               })
             "
             [facetsOnProduct]="
-              _superMarketplaceProductEditable?.Product?.xp?.Facets || []
+              _superHSProductEditable?.Product?.xp?.Facets || []
             "
-            [superProduct]="_superMarketplaceProductEditable?.Product"
+            [superProduct]="_superHSProductEditable?.Product"
           >
           </product-filters-component>
         </ng-template>
@@ -1133,20 +1133,20 @@
       <!-- Varitaions -->
       <li
         [ngbNavItem]="5"
-        [disabled]="!_superMarketplaceProductEditable?.Product?.ID"
+        [disabled]="!_superHSProductEditable?.Product?.ID"
         id="5"
       >
         <a [fragment]="variants" class="text-muted" ngbNavLink translate
           >ADMIN.PRODUCT_EDIT.VARIANTS
           <span class="badge badge-pill badge-info">{{
-            _superMarketplaceProductEditable?.Variants?.length || 0
+            _superHSProductEditable?.Variants?.length || 0
           }}</span></a
         >
         <ng-template ngbNavContent>
           <product-variations-component
             [readonly]="readonly"
-            [superMarketplaceProductStatic]="_superMarketplaceProductStatic"
-            [superMarketplaceProductEditable]="_superMarketplaceProductEditable"
+            [superHSProductStatic]="_superHSProductStatic"
+            [superHSProductEditable]="_superHSProductEditable"
             [areChanges]="areChanges"
             [isCreatingNew]="isCreatingNew"
             [checkForChanges]="checkForChanges"
@@ -1171,8 +1171,8 @@
           translate
           >ADMIN.PRODUCT_EDIT.IMAGES_AND_DOCUMENTS
           <span class="badge badge-pill badge-info">{{
-            _superMarketplaceProductEditable?.Images?.length +
-              _superMarketplaceProductEditable?.Attachments?.length +
+            _superHSProductEditable?.Images?.length +
+              _superHSProductEditable?.Attachments?.length +
               imageFiles?.length +
               staticContentFiles?.length
           }}</span></a

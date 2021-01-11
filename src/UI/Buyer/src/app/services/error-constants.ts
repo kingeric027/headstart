@@ -1,20 +1,6 @@
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
 import { AxiosError } from 'axios'
 import { Promotion } from 'ordercloud-javascript-sdk'
-
-export interface MiddlewareError<TData = any> {
-  ErrorCode: string
-  Message: string
-  Data: TData
-}
-
-export interface InventoryErrorData {
-  LineItemID: string
-  ProductID: string
-  QuantityAvailable: number
-  QuantityRequested: number
-  VariantID: string
-}
+import { MiddlewareError, InventoryErrorData } from '../models/error.types'
 
 export class ErrorMessages {
   public static get orderNotAccessibleError(): string {

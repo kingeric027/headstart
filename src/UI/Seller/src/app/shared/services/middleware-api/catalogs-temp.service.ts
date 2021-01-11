@@ -1,27 +1,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { OcTokenService, CatalogAssignment } from '@ordercloud/angular-sdk'
 import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
-import {
-  OcTokenService,
-  Order,
-  CatalogAssignment,
-} from '@ordercloud/angular-sdk'
-import {
-  SuperMarketplaceProduct,
   MarketplaceCatalog,
-  HeadStartSDK,
   ListPage,
   MarketplacePriceSchedule,
+  MarketplaceCatalogAssignmentRequest,
 } from '@ordercloud/headstart-sdk'
 
 // WHOPLE FILE TO BE REPLACED BY SDK
-
-interface MarketplaceCatalogAssignmentRequest {
-  CatalogIDs: string[]
-}
 
 @Injectable({
   providedIn: 'root',
@@ -123,11 +112,11 @@ export class CatalogsTempService {
     assignments: string[]
   ): Promise<any> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/${locationID}/catalogs/assignments`
-    const marketplaceCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = {
+    const hsCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = {
       CatalogIDs: assignments,
     }
     return await this.http
-      .post(url, marketplaceCatalogAssignmentRequest, {
+      .post(url, hsCatalogAssignmentRequest, {
         headers: this.buildHeaders(),
       })
       .toPromise()

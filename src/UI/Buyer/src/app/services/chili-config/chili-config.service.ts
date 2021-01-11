@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core'
-import { Me, Tokens } from 'ordercloud-javascript-sdk'
-import { AppConfig } from '../../shopper-context'
+import { Tokens } from 'ordercloud-javascript-sdk'
 import {
-  HeadStartSDK,
   ChiliConfig,
   ChiliSpec,
   ListPage,
@@ -10,6 +8,7 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http'
 import { TempSdk } from '../temp-sdk/temp-sdk.service'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

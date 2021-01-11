@@ -1,16 +1,16 @@
-﻿using Marketplace.Common.Queries;
+﻿using Headstart.Common.Queries;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
-using Marketplace.Models.Extended;
+using Headstart.Models.Attributes;
+using Headstart.Models.Extended;
 using ordercloud.integrations.library;
-using Marketplace.Models;
+using Headstart.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Services.CMS;
-using Marketplace.Common.Services.CMS.Models;
+using Headstart.Common.Services.CMS;
+using Headstart.Common.Services.CMS.Models;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocComments("\"Supplier Filter Config\" represents Supplier Category Configuration")]
     [MarketplaceSection.Marketplace(ListOrder = 5)]

@@ -11,13 +11,13 @@ import {
   REFRESHING_ITEMS,
   SUCCESSFUL_NO_ITEMS_WITH_FILTERS,
   SUCCESSFUL_NO_ITEMS_NO_FILTERS,
-} from './resource-crud.types'
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
+} from '../../../models/resource-crud.types'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { set as _set } from 'lodash'
 import { CurrentUserService } from '../current-user/current-user.service'
 import { BuyerAddress, ListPage } from 'ordercloud-javascript-sdk'
 import { singular } from 'pluralize'
+import { ResourceUpdate } from '@app-seller/models/shared.types'
 
 export abstract class ResourceCrudService<ResourceType> {
   public resourceSubject: BehaviorSubject<

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [Route("env")]
     public class EnvController : BaseController

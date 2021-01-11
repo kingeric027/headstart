@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Models.Exceptions
+﻿namespace Headstart.Models.Exceptions
 {
 	public class InvalidShipFromAddressIDError
 	{

@@ -1,20 +1,20 @@
-﻿using Marketplace.Models;
-using Marketplace.Models.Misc;
+﻿using Headstart.Models;
+using Headstart.Models.Misc;
 using OrderCloud.SDK;
 using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
-using Marketplace.Common.Constants;
+using Headstart.Common.Constants;
 using System;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IMarketplaceBuyerLocationCommand
     {
-        Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user, string token);
-        Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, VerifiedUserContext user);
-        Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user);
-        Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user);
+        Task<HSBuyerLocation> Create(string buyerID, HSBuyerLocation buyerLocation, string token);
+        Task<HSBuyerLocation> Get(string buyerID, string buyerLocationID, string token);
+        Task<HSBuyerLocation> Save(string buyerID, string buyerLocationID, HSBuyerLocation buyerLocation, string token);
+        Task Delete(string buyerID, string buyerLocationID, string token);
     }
 
     public class MarketplaceBuyerLocationCommand : IMarketplaceBuyerLocationCommand
@@ -26,29 +26,29 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = oc;
         }
-        public async Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, VerifiedUserContext user)
+        public async Task<HSBuyerLocation> Get(string buyerID, string buyerLocationID, string token)
         {
-            var buyerAddress = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, buyerLocationID, accessToken: user.AccessToken);
-            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocationID, accessToken: user.AccessToken);
-            return new MarketplaceBuyerLocation
+            var buyerAddress = await _oc.Addresses.GetAsync<HSAddressBuyer>(buyerID, buyerLocationID, accessToken: token);
+            var buyerUserGroup = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, buyerLocationID, accessToken: token);
+            return new HSBuyerLocation
             {
                 Address = buyerAddress,
                 UserGroup = buyerUserGroup
             };
         }
 
-        public async Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user, string token)
+        public async Task<HSBuyerLocation> Create(string buyerID, HSBuyerLocation buyerLocation, string token)
         {
             var buyerLocationID = CreateBuyerLocationID(buyerID, buyerLocation.Address.ID);
             buyerLocation.Address.ID = buyerLocationID;
-            var buyerAddress = await _oc.Addresses.CreateAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address, accessToken: user.AccessToken);
+            var buyerAddress = await _oc.Addresses.CreateAsync<HSAddressBuyer>(buyerID, buyerLocation.Address, accessToken: token);
 
             buyerLocation.UserGroup.ID = buyerAddress.ID;
-            var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: user.AccessToken);
-            await CreateUserGroupAndAssignments(token, buyerID, buyerAddress.ID);
-            await CreateLocationUserGroupsAndApprovalRule(token, buyerAddress.ID, buyerAddress.AddressName);
+            var buyerUserGroup = await _oc.UserGroups.CreateAsync<HSLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: token);
+            await CreateUserGroupAndAssignments(buyerID, buyerAddress.ID, token);
+            await CreateLocationUserGroupsAndApprovalRule(buyerAddress.ID, buyerAddress.AddressName, token);
 
-            return new MarketplaceBuyerLocation
+            return new HSBuyerLocation
             {
                 Address = buyerAddress,
                 UserGroup = buyerUserGroup,
@@ -66,13 +66,15 @@ namespace Marketplace.Common.Commands
             {
                 return buyerID + "-{" + buyerID + "-LocationIncrementor}";
             }
-            else
-            {
-                return buyerID + "-" + idInRequest.Replace("-", "_");
+            if (idInRequest.StartsWith(buyerID + "-"))
+			{
+                // prevents prefix duplication
+                return idInRequest;
             }
+            return buyerID + "-" + idInRequest.Replace("-", "_");
         }
 
-        public async Task CreateUserGroupAndAssignments(string token, string buyerID, string buyerLocationID)
+        public async Task CreateUserGroupAndAssignments(string buyerID, string buyerLocationID, string token)
         {
             var assignment = new AddressAssignment
             {
@@ -84,39 +86,39 @@ namespace Marketplace.Common.Commands
             await _oc.Addresses.SaveAssignmentAsync(buyerID, assignment, accessToken: token);
         }
 
-        public async Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, VerifiedUserContext user)
+        public async Task<HSBuyerLocation> Save(string buyerID, string buyerLocationID, HSBuyerLocation buyerLocation, string token)
         {
             buyerLocation.Address.ID = buyerLocationID;
             buyerLocation.UserGroup.ID = buyerLocationID;
             UserGroup existingLocation = null;
             try
             {
-                existingLocation = await _oc.UserGroups.GetAsync(buyerID, buyerLocationID, user.AccessToken);
+                existingLocation = await _oc.UserGroups.GetAsync(buyerID, buyerLocationID, token);
             } catch (Exception e) { } // Do nothing if not found
-            var updatedBuyerAddress = _oc.Addresses.SaveAsync<MarketplaceAddressBuyer>(buyerID, buyerLocationID, buyerLocation.Address, accessToken: user.AccessToken);
-            var updatedBuyerUserGroup = _oc.UserGroups.SaveAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocationID, buyerLocation.UserGroup, accessToken: user.AccessToken);
-            var location = new MarketplaceBuyerLocation
+            var updatedBuyerAddress = _oc.Addresses.SaveAsync<HSAddressBuyer>(buyerID, buyerLocationID, buyerLocation.Address, accessToken: token);
+            var updatedBuyerUserGroup = _oc.UserGroups.SaveAsync<HSLocationUserGroup>(buyerID, buyerLocationID, buyerLocation.UserGroup, accessToken: token);
+            var location = new HSBuyerLocation
             {
                 Address = await updatedBuyerAddress,
                 UserGroup = await updatedBuyerUserGroup,
             };
             if (existingLocation == null)
 			{
-                var assingments = CreateUserGroupAndAssignments(user.AccessToken, buyerID, buyerLocationID);
-                var groups =  CreateLocationUserGroupsAndApprovalRule(user.AccessToken, buyerLocationID, buyerLocation.Address.AddressName);
+                var assingments = CreateUserGroupAndAssignments(token, buyerID, buyerLocationID);
+                var groups =  CreateLocationUserGroupsAndApprovalRule(token, buyerLocationID, buyerLocation.Address.AddressName);
                 await Task.WhenAll(assingments, groups);
             }
             return location;
         }
 
-        public async Task Delete(string buyerID, string buyerLocationID, VerifiedUserContext user)
+        public async Task Delete(string buyerID, string buyerLocationID, string token)
         {
-            var deleteAddressReq = _oc.Addresses.DeleteAsync(buyerID, buyerLocationID, accessToken: user.AccessToken);
-            var deleteUserGroupReq = _oc.UserGroups.DeleteAsync(buyerID, buyerLocationID, accessToken: user.AccessToken);
+            var deleteAddressReq = _oc.Addresses.DeleteAsync(buyerID, buyerLocationID, accessToken: token);
+            var deleteUserGroupReq = _oc.UserGroups.DeleteAsync(buyerID, buyerLocationID, accessToken: token);
             await Task.WhenAll(deleteAddressReq, deleteUserGroupReq);
         }
 
-        public async Task CreateLocationUserGroupsAndApprovalRule(string token, string buyerLocationID, string locationName)
+        public async Task CreateLocationUserGroupsAndApprovalRule(string buyerLocationID, string locationName, string token)
         {
             var buyerID = buyerLocationID.Split('-').First();
             var AddUserTypeRequests = SEBUserTypes.BuyerLocation().Select(userType => AddUserTypeToLocation(token, buyerLocationID, userType));
@@ -133,7 +135,7 @@ namespace Marketplace.Common.Commands
             });
         }
 
-        public async Task AddUserTypeToLocation(string token, string buyerLocationID, MarketplaceUserType marketplaceUserType)
+        public async Task AddUserTypeToLocation(string token, string buyerLocationID, HSUserType marketplaceUserType)
         {
             var buyerID = buyerLocationID.Split('-').First();
             var userGroupID = $"{buyerLocationID}-{marketplaceUserType.UserGroupIDSuffix}";

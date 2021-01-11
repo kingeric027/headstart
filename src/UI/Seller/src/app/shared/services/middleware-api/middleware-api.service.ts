@@ -1,31 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
-import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk'
-import { MarketplaceSupplier, ListPage } from '@ordercloud/headstart-sdk'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { SupplierFilterConfigDocument } from '@app-seller/models/filter.types'
+import { OcTokenService, Order } from '@ordercloud/angular-sdk'
+import { ListPage } from '@ordercloud/headstart-sdk'
 
-export interface SupplierFilterConfigDocument extends Document {
-  Doc: SupplierFilterConfig
-}
-export interface SupplierFilterConfig {
-  Display: string
-  Path: string
-  Items: Filter[]
-  AllowSupplierEdit: boolean
-  AllowSellerEdit: boolean
-  BuyerAppFilterType: BuyerAppFilterType
-}
-export declare enum BuyerAppFilterType {
-  SelectOption = 'SelectOption',
-  NonUI = 'NonUI',
-}
-export interface Filter {
-  Text: string
-  Value: string
-}
 @Injectable({
   providedIn: 'root',
 })

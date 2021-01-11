@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Marketplace.Common.Exceptions;
+using Headstart.Common.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Extensions;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
-using Marketplace.Models;
+using Headstart.Common.Extensions;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
+using Headstart.Models;
 using ordercloud.integrations.library;
-using Action = Marketplace.Common.Models.Action;
+using Action = Headstart.Common.Models.Action;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IOrchestrationCommand
     {
@@ -20,7 +20,7 @@ namespace Marketplace.Common.Commands
         Task<JObject> CalculateDiff(WorkItem wi);
         Task<JObject> GetQueuedItem(string path);
         Task<JObject> GetCachedItem(string path);
-        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IMarketplaceObject;
+        Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IHSObject;
     }
 
     public class OrchestrationCommand : IOrchestrationCommand
@@ -55,7 +55,7 @@ namespace Marketplace.Common.Commands
             _log = log;
         }
 
-        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IMarketplaceObject
+        public async Task<T> SaveToQueue<T>(T obj, VerifiedUserContext user, string resourceId) where T : IHSObject
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Marketplace.Common.Commands
                     Message = $"Failed to save blob to queue from API: {user.SupplierID} - {typeof(T)}:  {ex.Message}",
                     Current = JObject.FromObject(obj)
                 });
-                throw new OrderCloudIntegrationException(Marketplace.Models.ErrorCodes.All["WriteFailure"], obj);
+                throw new OrderCloudIntegrationException(Headstart.Models.ErrorCodes.All["WriteFailure"], obj);
             }
         }
 

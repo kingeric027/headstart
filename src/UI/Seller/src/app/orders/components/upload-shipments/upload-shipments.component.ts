@@ -1,19 +1,16 @@
 import { OcTokenService } from '@ordercloud/angular-sdk'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Component, Inject } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { Observable } from 'rxjs'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
 import { DomSanitizer } from '@angular/platform-browser'
 import { AppAuthService } from '@app-seller/auth'
 import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { getPsHeight } from '@app-seller/shared/services/dom.helper'
-import { BatchProcessResult } from './shipment-upload.interface'
 import { NgxSpinnerService } from 'ngx-spinner'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { BatchProcessResult, FileHandle } from '@app-seller/models/file-upload.types'
 
 @Component({
   selector: 'upload-shipments',

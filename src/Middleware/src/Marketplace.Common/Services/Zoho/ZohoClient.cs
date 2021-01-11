@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using Marketplace.Common.Services.Zoho.Models;
-using Marketplace.Common.Services.Zoho.Resources;
+using Headstart.Common.Services.Zoho.Models;
+using Headstart.Common.Services.Zoho.Resources;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.Zoho
+namespace Headstart.Common.Services.Zoho
 {
     public partial interface IZohoClient
     {

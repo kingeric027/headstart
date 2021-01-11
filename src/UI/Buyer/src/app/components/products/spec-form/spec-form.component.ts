@@ -10,10 +10,9 @@ import {
 import { FormControl, FormBuilder } from '@angular/forms'
 import { FormGroup, Validators } from '@angular/forms'
 import { map as _map, find as _find } from 'lodash'
-import { FieldConfig } from './field-config.interface'
 import { SpecOption, Spec } from 'ordercloud-javascript-sdk'
-import { SpecFormEvent } from './spec-form-values.interface'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { FieldConfig, SpecFormEvent } from 'src/app/models/product.types'
 
 @Component({
   template: `

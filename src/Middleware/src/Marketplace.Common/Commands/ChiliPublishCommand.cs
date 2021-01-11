@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmonaut.Attributes;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Queries;
-using Marketplace.Models;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Queries;
+using Headstart.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     #region Models
     [SwaggerModel]
     public class ChiliTemplate
     {
-        public SuperMarketplaceProduct Product { get; set; }
+        public SuperHSProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
         public string ChiliConfigID { get; set; }
@@ -26,7 +26,7 @@ namespace Marketplace.Common.Commands
     [SwaggerModel]
     public class MeChiliTemplate
     {
-        public SuperMarketplaceMeProduct Product { get; set; }
+        public SuperHSMeProduct Product { get; set; }
         public List<ChiliSpec> TemplateSpecs { get; set; } = new List<ChiliSpec>();
         public string ChiliTemplateID { get; set; }
         public string ChiliConfigID { get; set; }
@@ -293,10 +293,10 @@ namespace Marketplace.Common.Commands
         private readonly OrderCloudClientConfig _config;
         private readonly IOrderCloudClient _oc;
         private readonly IMeProductCommand _product;
-        private readonly IMarketplaceProductCommand _adminProduct;
+        private readonly IHSProductCommand _adminProduct;
         private readonly ChiliPublishConfigQuery _query;
 
-        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, IMarketplaceProductCommand adminProduct, ChiliPublishConfigQuery query)
+        public ChiliTemplateCommand(AppSettings settings, IMeProductCommand product, IHSProductCommand adminProduct, ChiliPublishConfigQuery query)
         {
             _settings = settings;
             _product = product;
