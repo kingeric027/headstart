@@ -382,6 +382,7 @@ namespace Headstart.Common.Commands.Crud
 
 		private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
 		{
+			var ocAuth = await _oc.AuthenticateAsync();
 			var initial = await _oc.PriceSchedules.GetAsync(updated.ID);
 			if (initial.MaxQuantity != updated.MaxQuantity ||
 				initial.MinQuantity != updated.MinQuantity ||
@@ -403,7 +404,7 @@ namespace Headstart.Common.Commands.Crud
 				var priceSchedulesToUpdate = relatedPriceSchedules.Where(p => p.ID.StartsWith(updated.ID) && p.ID != updated.ID);
 				await Throttler.RunAsync(priceSchedulesToUpdate, 100, 5, p =>
 				{
-					return _oc.PriceSchedules.PatchAsync(p.ID, patch, token);
+					return _oc.PriceSchedules.PatchAsync(p.ID, patch, ocAuth.AccessToken);
 				});
 			}
 			return await _oc.PriceSchedules.SaveAsync<PriceSchedule>(updated.ID, updated, token);
