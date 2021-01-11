@@ -1,4 +1,5 @@
-﻿using Headstart.Models.Extended;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Extended;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace Headstart.Models.Models.Marketplace
 	{
 		public LineItemStatus Status { get; set; }
 		public List<LineItemStatusChange> Changes { get; set; }
-	}
+        public SuperHSShipment superShipment { get; set; }
+    }
 
 	[SwaggerModel]
 	public class LineItemStatusChange
