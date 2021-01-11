@@ -34,6 +34,32 @@ export class CartService {
     return this.lineItems
   }
 
+  async getInvalidLineItems(): Promise<MarketplaceLineItem[]> {
+    const unavailableLineItems = await this.getInactiveProducts(this.lineItems)
+    if (unavailableLineItems.length) {
+      return unavailableLineItems
+    }
+    return null
+  }
+
+  async getInactiveProducts(
+    items: ListPage<MarketplaceLineItem>
+  ): Promise<MarketplaceLineItem[]> {
+    const inactiveLineItems: MarketplaceLineItem[] = []
+    for (const item of items.Items) {
+      const eligibleProductList = await Me.ListProducts({
+        filters: { ID: item.ProductID },
+      })
+      const matchingLineItem = eligibleProductList.Items.find(
+        (product) => product.ID === item.ProductID
+      )
+      if (!matchingLineItem) {
+        inactiveLineItems.push(item)
+      }
+    }
+    return inactiveLineItems
+  }
+
   // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
   async add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
     // order is well defined, line item can be added
