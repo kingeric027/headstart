@@ -15,7 +15,7 @@ namespace Headstart.Common.Models
             {
                 ID = "Provision",
                 SupplierID = settings.OrderCloudSettings.ProvisionSupplierID,
-                CarrierAccountID = settings.EasyPostSettings.ProvisionFedexAccountId,
+                CarrierAccountIDs = new List<string>() { settings.EasyPostSettings.ProvisionFedexAccountId },
                 Customs_Signer = "Christa Zaspel",
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",
@@ -28,7 +28,7 @@ namespace Headstart.Common.Models
             {
                 ID = "SMG",
                 SupplierID = null,
-                CarrierAccountID = settings.EasyPostSettings.SMGFedexAccountId,
+                CarrierAccountIDs = new List<string>() { settings.EasyPostSettings.SMGFedexAccountId },
                 Customs_Signer = "Bob Bernier",
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",
@@ -38,22 +38,22 @@ namespace Headstart.Common.Models
             });
             this.ShippingProfiles.Add(new EasyPostShippingProfile()
             {
-                ID = "SMG",
+                ID = "FirstChoice",
                 SupplierID = settings.OrderCloudSettings.FirstChoiceSupplierID,
-                CarrierAccountID = settings.EasyPostSettings.SMGFedexAccountId,
+                CarrierAccountIDs = new List<string>() { settings.EasyPostSettings.SMGFedexAccountId, settings.EasyPostSettings.USPSAccountId },
                 Customs_Signer = "Bob Bernier",
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",
                 Customs_Certify = true,
-                Markup = 1.5M,
+                Markup = 1.0M,
                 Default = false,
-                AllowedServiceFilter = new List<string>() { "FEDEX_GROUND" }
+                AllowedServiceFilter = new List<string>() { "FEDEX_GROUND", "First" } // First is the USPS choice for their base service
             });
             this.ShippingProfiles.Add(new EasyPostShippingProfile()
             {
                 ID = "SEB",
                 SupplierID = settings.OrderCloudSettings.SEBDistributionSupplierID,
-                CarrierAccountID = settings.EasyPostSettings.SEBDistributionFedexAccountId,
+                CarrierAccountIDs = new List<string>() { settings.EasyPostSettings.SEBDistributionFedexAccountId },
                 Customs_Signer = "Christa Zaspel",
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",
@@ -65,7 +65,7 @@ namespace Headstart.Common.Models
             {
                 ID = "Medline",
                 SupplierID = settings.OrderCloudSettings.MedlineSupplierID,
-                CarrierAccountID = settings.EasyPostSettings.SEBDistributionFedexAccountId,
+                CarrierAccountIDs = new List<string>() { settings.EasyPostSettings.SEBDistributionFedexAccountId },
                 Customs_Signer = "Christa Zaspel",
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",

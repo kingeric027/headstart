@@ -27,7 +27,7 @@ namespace ordercloud.integrations.easypost
         public string ID { get; set; }
         public string SupplierID { get; set; }
         public bool Default { get; set; }
-        public string CarrierAccountID { get; set; }
+        public List<string> CarrierAccountIDs { get; set; }
         public string Customs_Signer { get; set; }
         public string Restriction_Type { get; set; }
         public string EEL_PFC { get; set; }
