@@ -18,7 +18,7 @@ namespace Headstart.Models.Models.Marketplace
 	{
 		public LineItemStatus Status { get; set; }
 		public List<LineItemStatusChange> Changes { get; set; }
-        public SuperHSShipment superShipment { get; set; }
+        public SuperHSShipment SuperShipment { get; set; }
     }
 
 	[SwaggerModel]
