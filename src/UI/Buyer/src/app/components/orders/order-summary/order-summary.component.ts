@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core'
-import { OrderSummaryMeta } from 'src/app/services/purchase-order.helper'
+import { OrderSummaryMeta } from 'src/app/models/order.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({

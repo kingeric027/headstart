@@ -1,14 +1,6 @@
-export interface Filter {
-  name: string
-  path: string
-  nestedDataPath?: string
-  dataKey?: string
-  sourceType: string
-  source: string
-  filterValues: any[]
-}
+import { FilterObject } from '@app-seller/shared'
 
-export const buyerLocation: Filter[] = [
+export const buyerLocation: FilterObject[] = [
   {
     name: 'Buyer',
     path: 'BuyerID',
@@ -35,7 +27,7 @@ export const buyerLocation: Filter[] = [
   },
 ]
 
-export const salesOrderDetail: Filter[] = [
+export const salesOrderDetail: FilterObject[] = [
   {
     name: 'Submitted Order Status',
     path: 'SubmittedOrderStatus',
@@ -60,7 +52,7 @@ export const salesOrderDetail: Filter[] = [
   },
 ]
 
-export const purchaseOrderDetail: Filter[] = [
+export const purchaseOrderDetail: FilterObject[] = [
   {
     name: 'Submitted Order Status',
     path: 'SubmittedOrderStatus',
@@ -77,7 +69,7 @@ export const purchaseOrderDetail: Filter[] = [
   },
 ]
 
-export const lineItemDetail: Filter[] = [
+export const lineItemDetail: FilterObject[] = [
   {
     name: 'Submitted Order Status',
     path: 'SubmittedOrderStatus',

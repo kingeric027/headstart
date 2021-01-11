@@ -1,9 +1,9 @@
-﻿using Marketplace.Models.Extended;
+﻿using Headstart.Models.Extended;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 
-namespace Marketplace.Models.Models.Marketplace
+namespace Headstart.Models.Models.Marketplace
 {
 	// a line item status change always changes lineitems to one status as the change triggers an email related to that change
 	// changing to multiple different statuses can be done in multiple calls which will trigger multiple emails

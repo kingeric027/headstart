@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class SupplierSyncAttribute : Attribute

@@ -5,12 +5,8 @@ import {
   MeProductInKit,
 } from '@ordercloud/headstart-sdk'
 import { ProductDetailService } from '../product-details/product-detail.service'
-import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface'
-import {
-  KitVariantSelection,
-  ProductSelectionEvent,
-} from 'src/app/models/product-selection-event.interface'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { KitVariantSelection, LineItemToAdd, ProductSelectionEvent } from 'src/app/models/product.types'
 
 @Component({
   templateUrl: './kit-product-details.component.html',

@@ -1,18 +1,12 @@
-import {
-  OnInit,
-  OnDestroy,
-  ChangeDetectorRef,
-  NgZone,
-  Output,
-} from '@angular/core'
+import { OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core'
 import { takeWhile } from 'rxjs/operators'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import { FormGroup } from '@angular/forms'
 import { Router, ActivatedRoute } from '@angular/router'
 import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.config'
-import { ResourceUpdate } from '@app-seller/shared/models/resource-update.interface'
 import { ListPage } from '@ordercloud/headstart-sdk'
 import { BehaviorSubject } from 'rxjs'
+import { ResourceUpdate } from '@app-seller/models/shared.types'
 
 export abstract class ResourceCrudComponent<ResourceType>
   implements OnInit, OnDestroy {

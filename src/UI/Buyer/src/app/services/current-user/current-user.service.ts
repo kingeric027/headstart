@@ -4,13 +4,9 @@ import { MeUser, Me, User, UserGroup, Tokens } from 'ordercloud-javascript-sdk'
 import { TokenHelperService } from '../token-helper/token-helper.service'
 import { CreditCardService } from './credit-card.service'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import {
-  CurrentUser,
-  AppConfig,
-  ContactSupplierBody,
-  BuyerRequestForInfo,
-} from '../../shopper-context'
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { AppConfig } from 'src/app/models/environment.types'
+import { ContactSupplierBody } from 'src/app/models/buyer.types'
 
 @Injectable({
   providedIn: 'root',

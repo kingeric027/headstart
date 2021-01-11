@@ -4,16 +4,12 @@ import {
   Input,
   Output,
   OnChanges,
-  SimpleChanges,
 } from '@angular/core'
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { Address, ListPage } from '@ordercloud/angular-sdk'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { ActivatedRoute } from '@angular/router'
-import {
-  SupportedCountries,
-  GeographyConfig,
-} from '@app-seller/shared/models/supported-countries.interface'
+import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
 import {
   ValidateCAZip,
   ValidateUSZip,
@@ -25,6 +21,7 @@ import {
   OrderCloudIntegrationsConversionRate,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
+import { SupportedCountries } from '@app-seller/models/currency-geography.types'
 @Component({
   selector: 'app-supplier-location-edit',
   templateUrl: './supplier-location-edit.component.html',

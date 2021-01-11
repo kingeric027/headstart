@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core'
 import * as jwtDecode_ from 'jwt-decode'
 const jwtDecode = jwtDecode_
 import { isUndefined as _isUndefined } from 'lodash'
-import { AppConfig, DecodedOCToken } from '../../shopper-context'
 import { Tokens } from 'ordercloud-javascript-sdk'
 import { CookieService } from 'ngx-cookie'
+import { AppConfig } from 'src/app/models/environment.types'
+import { DecodedOCToken } from 'src/app/models/profile.types'
 
 @Injectable({
   providedIn: 'root',

@@ -8,6 +8,7 @@ import {
 import { Injectable } from '@angular/core'
 import { Asset } from '@ordercloud/headstart-sdk'
 import { FormGroup } from '@angular/forms'
+import { GridSpecOption } from 'src/app/models/product.types'
 
 @Injectable({
   providedIn: 'root',
@@ -201,12 +202,4 @@ export class SpecFormService {
     if (type === 'grid') return _find(spec.Options, (o) => o.ID === value)
     else return _find(spec.Options, (o) => o.Value === value)
   }
-}
-
-export interface GridSpecOption {
-  SpecID: string
-  OptionID: string
-  Value: string
-  MarkupType: string
-  Markup: number
 }

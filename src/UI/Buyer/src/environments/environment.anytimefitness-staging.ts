@@ -1,6 +1,5 @@
-import { EnvironmentConfig } from './environment.interfaces'
+import { EnvironmentConfig, OrdercloudEnv } from 'src/app/models/environment.types'
 import afTheme from '../styles/themes/anytime-fitness/theme-config'
-import { OrdercloudEnv } from 'src/app/shopper-context'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,

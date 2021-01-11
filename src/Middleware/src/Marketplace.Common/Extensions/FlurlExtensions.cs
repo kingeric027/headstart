@@ -8,7 +8,7 @@ using Flurl;
 using Flurl.Http;
 using Flurl.Http.Content;
 
-namespace Marketplace.Common.Extensions
+namespace Headstart.Common.Extensions
 {
     public static class FlurlExtensions
     {

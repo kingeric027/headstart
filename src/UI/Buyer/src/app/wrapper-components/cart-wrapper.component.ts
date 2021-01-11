@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core'
-import { MarketplaceMeProduct, LineItemWithProduct } from '../shopper-context'
 import {
   MarketplaceOrder,
   ListPage,
   MarketplaceLineItem,
+  MarketplaceMeProduct,
 } from '@ordercloud/headstart-sdk'
 import { Me, Orders, OrderPromotion } from 'ordercloud-javascript-sdk'
+import { LineItemWithProduct } from '../models/line-item.types'
 import { CurrentOrderService } from '../services/order/order.service'
 import { PromoService } from '../services/order/promo.service'
 
@@ -40,7 +41,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   setLineItems = async (
-    items: ListPage<MarketplaceLineItem>
+    items: ListPage<LineItemWithProduct>
   ): Promise<void> => {
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
@@ -62,7 +63,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   mapToLineItemsWithProduct(
-    lis: ListPage<MarketplaceLineItem>
+    lis: ListPage<LineItemWithProduct>
   ): ListPage<LineItemWithProduct> {
     const Items = lis.Items.map((li: LineItemWithProduct) => {
       const product = this.getCachedProduct(li.ProductID)

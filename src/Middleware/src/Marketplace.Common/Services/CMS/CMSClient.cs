@@ -1,6 +1,6 @@
 ﻿using Flurl;
 using Flurl.Http;
-using Marketplace.Common.Services.CMS.Models;
+using Headstart.Common.Services.CMS.Models;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Services.CMS
+namespace Headstart.Common.Services.CMS
 {
 	public interface ICMSClient
 	{

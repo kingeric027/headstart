@@ -1,23 +1,11 @@
-import {
-  Component,
-  AfterViewChecked,
-  ChangeDetectorRef,
-  Inject,
-} from '@angular/core'
+import { Component, ChangeDetectorRef, Inject } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { getPsHeight } from '@app-seller/shared/services/dom.helper'
 import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
-import {
-  MeUser,
-  OcAdminUserService,
-  OcSupplierUserService,
-} from '@ordercloud/angular-sdk'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { MeUser } from '@ordercloud/angular-sdk'
 import { AppAuthService } from '@app-seller/auth'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'account',

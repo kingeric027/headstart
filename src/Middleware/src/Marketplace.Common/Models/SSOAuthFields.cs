@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
 	public class SSOAuthFields
 	{

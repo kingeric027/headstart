@@ -1,6 +1,6 @@
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Services;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Zoho;
+using Headstart.Common.Services;
 using NUnit.Framework;
 using NSubstitute;
 using ordercloud.integrations.avalara;
@@ -8,19 +8,19 @@ using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Marketplace.Common;
+using Headstart.Common;
 using ordercloud.integrations.cardconnect;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Models.Models.Marketplace;
 using System.Security.Claims;
-using Marketplace.Models;
+using Headstart.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace Marketplace.Tests
+namespace Headstart.Tests
 {
     public class OrderSubmitCommandTests
     {
@@ -50,7 +50,7 @@ namespace Marketplace.Tests
 
             _oc.Orders.PatchAsync(OrderDirection.Incoming, "mockOrderID", Arg.Any<PartialOrder>()).Returns(Task.FromResult(new Order { ID = "SEB12345" }));
             _oc.AuthenticateAsync().Returns(Task.FromResult(new TokenResponse { AccessToken = "mockToken" }));
-            _oc.Orders.SubmitAsync<MarketplaceOrder>(Arg.Any<OrderDirection>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Task.FromResult(new MarketplaceOrder { ID = "submittedorderid" }));
+            _oc.Orders.SubmitAsync<HSOrder>(Arg.Any<OrderDirection>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Task.FromResult(new HSOrder { ID = "submittedorderid" }));
             _sut = new OrderSubmitCommand(_oc, _settings, _card); // sut is subject under test
         }
 
@@ -58,9 +58,9 @@ namespace Marketplace.Tests
         public async Task should_throw_if_order_is_already_submitted()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = true }
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = true }
             }));
 
             // Act
@@ -74,18 +74,18 @@ namespace Marketplace.Tests
         public async Task should_throw_if_order_is_missing_shipping_selections()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         },
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = null
                         }
@@ -104,24 +104,24 @@ namespace Marketplace.Tests
         public async Task should_throw_if_has_standard_lines_and_missing_payment()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -143,24 +143,24 @@ namespace Marketplace.Tests
         public async Task should_not_increment_orderid_if_is_resubmitting()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = true } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = true } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -184,24 +184,24 @@ namespace Marketplace.Tests
         public async Task should_not_increment_orderid_if_is_already_incremented()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "SEBmockOrderID", IsSubmitted = false, xp = new Models.OrderXp { } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "SEBmockOrderID", IsSubmitted = false, xp = new Models.OrderXp { } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -225,24 +225,24 @@ namespace Marketplace.Tests
         public async Task should_increment_orderid_if_has_not_been_incremented_and_is_not_resubmit()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -264,24 +264,24 @@ namespace Marketplace.Tests
         public async Task should_capture_credit_card_payment_if_has_standard_lineitems()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -303,24 +303,24 @@ namespace Marketplace.Tests
         public async Task should_not_capture_credit_card_payment_if_all_po_lineitems()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -343,24 +343,24 @@ namespace Marketplace.Tests
         public async Task should_use_usd_merchant_when_appropriate()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -382,24 +382,24 @@ namespace Marketplace.Tests
         public async Task should_use_cad_merchant_when_appropriate()
         {
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -423,24 +423,24 @@ namespace Marketplace.Tests
             // use eur merchant account when currency is not USD and not CAD
 
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -464,24 +464,24 @@ namespace Marketplace.Tests
             // call order submit with direction outgoing
 
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -496,7 +496,7 @@ namespace Marketplace.Tests
             await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment { }, "mockUserToken");
 
             // Assert
-            await _oc.Orders.Received().SubmitAsync<MarketplaceOrder>(OrderDirection.Outgoing, Arg.Any<string>(), Arg.Any<string>());
+            await _oc.Orders.Received().SubmitAsync<HSOrder>(OrderDirection.Outgoing, Arg.Any<string>(), Arg.Any<string>());
         }
 
         [Test]
@@ -505,24 +505,24 @@ namespace Marketplace.Tests
             // call order submit with direction incoming
 
             // Arrange
-            _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new MarketplaceOrderWorksheet
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.MarketplaceOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
-                ShipEstimateResponse = new MarketplaceShipEstimateResponse
+                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
                 {
-                    ShipEstimates = new List<MarketplaceShipEstimate>()
+                    ShipEstimates = new List<HSShipEstimate>()
                     {
-                        new MarketplaceShipEstimate
+                        new HSShipEstimate
                         {
                             SelectedShipMethodID = "FEDEX_GROUND"
                         }
                     }
                 },
-                LineItems = new List<MarketplaceLineItem>()
+                LineItems = new List<HSLineItem>()
                 {
-                    new MarketplaceLineItem
+                    new HSLineItem
                     {
-                        Product = new Models.MarketplaceLineItemProduct
+                        Product = new Models.HSLineItemProduct
                         {
                             xp = new Models.ProductXp
                             {
@@ -537,7 +537,7 @@ namespace Marketplace.Tests
             await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Incoming, new OrderCloudIntegrationsCreditCardPayment { }, "mockUserToken");
 
             // Assert
-            await _oc.Orders.Received().SubmitAsync<MarketplaceOrder>(OrderDirection.Incoming, Arg.Any<string>(), Arg.Any<string>());
+            await _oc.Orders.Received().SubmitAsync<HSOrder>(OrderDirection.Incoming, Arg.Any<string>(), Arg.Any<string>());
         }
     }
 }

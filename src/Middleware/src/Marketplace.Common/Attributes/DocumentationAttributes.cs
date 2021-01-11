@@ -1,7 +1,7 @@
 ﻿using System;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Attributes
+namespace Headstart.Models.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class MarketplaceSection : DocSection

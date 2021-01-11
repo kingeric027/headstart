@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Common.Models
+﻿namespace Headstart.Common.Models
 { 
 	public class SSOState
 	{

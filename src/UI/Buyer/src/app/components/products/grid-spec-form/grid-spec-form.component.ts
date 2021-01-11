@@ -2,16 +2,16 @@ import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
   MarketplaceLineItem,
+  MarketplaceMeProduct,
   PriceSchedule,
   SuperMarketplaceProduct,
 } from '@ordercloud/headstart-sdk'
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk'
 import { ProductDetailService } from '../product-details/product-detail.service'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
-import { GridSpecOption, SpecFormService } from '../spec-form/spec-form.service'
+import { SpecFormService } from '../spec-form/spec-form.service'
 import { minBy as _minBy } from 'lodash'
-import { MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { QtyChangeEvent, GridSpecOption } from 'src/app/models/product.types'
 
 @Component({
   templateUrl: `./grid-spec-form.component.html`,
@@ -192,6 +192,7 @@ export class OCMGridSpecForm {
           return false
         }
         if (
+          li.Product.PriceSchedule.MaxQuantity !== null &&
           li.Quantity !== 0 &&
           li.Quantity !== null &&
           li.Quantity + qtyInCart > li.Product.PriceSchedule.MaxQuantity

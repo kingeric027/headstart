@@ -30,7 +30,7 @@ import { ResetPasswordWrapperComponent } from './wrapper-components/reset-passwo
 import { StaticPageWrapperComponent } from './wrapper-components/static-page-wrapper.component'
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component'
 
-const MarketplaceRoutes: Routes = [
+const HeadstartRoutes: Routes = [
   { path: 'login', component: LoginWrapperComponent },
   { path: 'register', component: RegisterWrapperComponent },
   { path: 'forgot-password', component: ForgotPasswordWrapperComponent },
@@ -142,7 +142,7 @@ const MarketplaceRoutes: Routes = [
 ]
 
 @NgModule({
-  imports: [RouterModule.forRoot(MarketplaceRoutes)],
+  imports: [RouterModule.forRoot(HeadstartRoutes)],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

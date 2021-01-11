@@ -5,13 +5,10 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core'
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { DomSanitizer } from '@angular/platform-browser'
+import { FileHandle } from '@app-seller/models/file-upload.types'
 
-export interface FileHandle {
-  File: File
-  URL: SafeUrl
-  Filename?: string
-}
+
 
 @Directive({
   selector: '[appDrag]',

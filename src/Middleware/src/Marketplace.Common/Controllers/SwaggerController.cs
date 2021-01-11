@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
-using ErrorCodes = Marketplace.Models.ErrorCodes;
+using ErrorCodes = Headstart.Models.ErrorCodes;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [Route("swagger")]
     public class SwaggerController : BaseController

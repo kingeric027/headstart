@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { MarketplaceMeProduct } from '../shopper-context'
-import { ListPage } from '@ordercloud/headstart-sdk'
+import { ListPage, MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   template: `

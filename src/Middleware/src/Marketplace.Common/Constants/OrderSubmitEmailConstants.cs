@@ -1,5 +1,5 @@
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Marketplace.Common.Constants
+namespace Headstart.Common.Constants
 {
     class OrderSubmitEmailConstants
     {

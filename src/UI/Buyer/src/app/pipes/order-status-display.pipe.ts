@@ -1,17 +1,19 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { ClaimStatus, LineItemStatus, OrderStatus, ShippingStatus } from '../shopper-context'
+import { LineItemStatus } from '../models/line-item.types'
+import { ClaimStatus, HeadstartOrderStatus } from '../models/order.types'
+import { ShippingStatus } from '../models/shipping.types'
 
 @Pipe({
   name: 'orderStatusDisplay',
 })
 export class OrderStatusDisplayPipe implements PipeTransform {
   OrderStatusMap = {
-    [OrderStatus.AllSubmitted]: 'All Submitted',
-    [OrderStatus.AwaitingApproval]: 'Awaiting Approval',
-    [OrderStatus.ChangesRequested]: 'Changes Requested',
-    [OrderStatus.Open]: 'Open',
-    [OrderStatus.Completed]: 'Completed',
-    [OrderStatus.Canceled]: 'Canceled',
+    [HeadstartOrderStatus.AllSubmitted]: 'All Submitted',
+    [HeadstartOrderStatus.AwaitingApproval]: 'Awaiting Approval',
+    [HeadstartOrderStatus.ChangesRequested]: 'Changes Requested',
+    [HeadstartOrderStatus.Open]: 'Open',
+    [HeadstartOrderStatus.Completed]: 'Completed',
+    [HeadstartOrderStatus.Canceled]: 'Canceled',
     [ShippingStatus.Shipped]: 'Shipped',
     [ShippingStatus.Backordered]: 'Backordered',
     [ShippingStatus.Processing]: 'Processing',
@@ -25,7 +27,7 @@ export class OrderStatusDisplayPipe implements PipeTransform {
     [ClaimStatus.NoClaim]: 'No Claim',
   }
 
-  transform(status: OrderStatus): string {
+  transform(status: HeadstartOrderStatus): string {
     if (!status) {
       return null
     }

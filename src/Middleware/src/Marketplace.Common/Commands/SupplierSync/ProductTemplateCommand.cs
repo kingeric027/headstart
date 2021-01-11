@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Common.Services.CMS.Models;
-using Marketplace.Models;
+using Headstart.Common.Services.CMS.Models;
+using Headstart.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using Npoi.Mapper;
@@ -15,7 +15,7 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using IPartial = ordercloud.integrations.library.IPartial;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IProductTemplateCommand
     {
@@ -165,7 +165,7 @@ namespace Marketplace.Common.Commands
 
 
     [SwaggerModel]
-    public class TemplateProductFlat : IMarketplaceObject
+    public class TemplateProductFlat : IHSObject
     {
         [OrderCloud.SDK.Required]
         [RegularExpression("^[a-zA-Z0-9-_]*$", ErrorMessage = "IDs must have at least 8 characters and no more than 100, are required and can only contain characters Aa-Zz, 0-9, -, and _")]

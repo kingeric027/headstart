@@ -3,37 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LazyCache;
-using Marketplace.Common.Commands.Crud;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
+using Headstart.Common.Commands.Crud;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services;
+using Headstart.Models;
+using Headstart.Models.Misc;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
 	public interface IMeProductCommand
 	{
-		Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user);
-		Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user);
+		Task<ListPageWithFacets<HSMeProduct>> List(ListArgs<HSMeProduct> args, VerifiedUserContext user);
+		Task<SuperHSMeProduct> Get(string id, VerifiedUserContext user);
 		Task RequestProductInfo(ContactSupplierBody template);
-		Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user);
+		Task<HSMeKitProduct> ApplyBuyerPricing(HSMeKitProduct kitProduct, VerifiedUserContext user);
 	}
 
 	public class MeProductCommand : IMeProductCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IMarketplaceBuyerCommand _marketplaceBuyerCommand;
-		private readonly IMarketplaceProductCommand _marketplaceProductCommand;
+		private readonly IHSBuyerCommand _marketplaceBuyerCommand;
+		private readonly IHSProductCommand _marketplaceProductCommand;
 		private readonly ISendgridService _sendgridService;
 		private readonly IAppCache _cache;
 		private readonly ISebExchangeRatesService _sebExchangeRates;
 		public MeProductCommand(
 			IOrderCloudClient elevatedOc, 
-			IMarketplaceBuyerCommand marketplaceBuyerCommand,
-			IMarketplaceProductCommand marketplaceProductCommand,
+			IHSBuyerCommand marketplaceBuyerCommand,
+			IHSProductCommand marketplaceProductCommand,
 			ISendgridService sendgridService,
 			IAppCache cache,
 			ISebExchangeRatesService sebExchangeRates
@@ -46,14 +46,14 @@ namespace Marketplace.Common.Commands
 			_cache = cache;
 			_sebExchangeRates = sebExchangeRates;
 		}
-		public async Task<SuperMarketplaceMeProduct> Get(string id, VerifiedUserContext user)
+		public async Task<SuperHSMeProduct> Get(string id, VerifiedUserContext user)
 		{
-			var _product = _oc.Me.GetProductAsync<MarketplaceMeProduct>(id, user.AccessToken);
+			var _product = _oc.Me.GetProductAsync<HSMeProduct>(id, user.AccessToken);
 			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
-			var _variants = _oc.Products.ListVariantsAsync<MarketplaceVariant>(id, null, null, null, 1, 100, null);
+			var _variants = _oc.Products.ListVariantsAsync<HSVariant>(id, null, null, null, 1, 100, null);
 			var _images = _marketplaceProductCommand.GetProductImages(id, user.AccessToken);
 			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user.AccessToken);
-			var unconvertedSuperMarketplaceProduct = new SuperMarketplaceMeProduct 
+			var unconvertedSuperMarketplaceProduct = new SuperHSMeProduct 
 			{
 				Product = await _product,
 				PriceSchedule = (await _product).PriceSchedule,
@@ -65,7 +65,7 @@ namespace Marketplace.Common.Commands
 			return await ApplyBuyerPricing(unconvertedSuperMarketplaceProduct, user);
 		}
 
-		private async Task<SuperMarketplaceMeProduct> ApplyBuyerPricing(SuperMarketplaceMeProduct superMarketplaceProduct, VerifiedUserContext user)
+		private async Task<SuperHSMeProduct> ApplyBuyerPricing(SuperHSMeProduct superMarketplaceProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
@@ -82,7 +82,7 @@ namespace Marketplace.Common.Commands
 			return superMarketplaceProduct;
 		}
 
-		public async Task<MarketplaceMeKitProduct> ApplyBuyerPricing(MarketplaceMeKitProduct kitProduct, VerifiedUserContext user)
+		public async Task<HSMeKitProduct> ApplyBuyerPricing(HSMeKitProduct kitProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
@@ -119,15 +119,15 @@ namespace Marketplace.Common.Commands
 			}).ToList();
 		}
 
-		public async Task<ListPageWithFacets<MarketplaceMeProduct>> List(ListArgs<MarketplaceMeProduct> args, VerifiedUserContext user)
+		public async Task<ListPageWithFacets<HSMeProduct>> List(ListArgs<HSMeProduct> args, VerifiedUserContext user)
 		{
 			var searchText = args.Search ?? "";
 			var searchFields = args.Search!=null ? "ID,Name,Description,xp.Facets.supplier" : "";
 			var sortBy = args.SortBy.FirstOrDefault();
-			var meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
+			var meProducts = await _oc.Me.ListProductsAsync<HSMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.ExactPhrasePrefix, sortBy: sortBy,  accessToken: user.AccessToken);
 			if(!(bool)(meProducts?.Items?.Any()))
             {
-				meProducts = await _oc.Me.ListProductsAsync<MarketplaceMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.AnyTerm, sortBy: sortBy, accessToken: user.AccessToken);
+				meProducts = await _oc.Me.ListProductsAsync<HSMeProduct>(filters: args.ToFilterString(), page: args.Page, search: searchText, searchOn: searchFields, searchType: SearchType.AnyTerm, sortBy: sortBy, accessToken: user.AccessToken);
 				if (!(bool)(meProducts?.Items?.Any()))
                 {
 					//if no products after retry search, avoid making extra calls for pricing details
@@ -152,7 +152,7 @@ namespace Marketplace.Common.Commands
 			await _sendgridService.SendContactSupplierAboutProductEmail(template);
         }
 
-		private MarketplaceMeProduct ApplyBuyerProductPricing(MarketplaceMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+		private HSMeProduct ApplyBuyerProductPricing(HSMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
 		{
 			
 			if(product.PriceSchedule != null)

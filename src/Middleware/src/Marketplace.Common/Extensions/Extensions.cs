@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Marketplace.Common.Extensions
+namespace Headstart.Common.Extensions
 {
     public static class Extensions
     {

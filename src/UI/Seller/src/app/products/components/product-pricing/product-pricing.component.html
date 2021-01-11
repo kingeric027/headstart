@@ -42,7 +42,7 @@
       <span>
         <div
           ngbDropdown
-          *ngIf="buyers.length && selectedSuperMarketplaceBuyer"
+          *ngIf="buyers.length && selectedSuperHSBuyer"
           class="btn-block"
         >
           <button
@@ -50,7 +50,7 @@
             id="buyerSelectDropdown"
             ngbDropdownToggle
           >
-            {{ selectedSuperMarketplaceBuyer?.Buyer?.Name }}
+            {{ selectedSuperHSBuyer?.Buyer?.Name }}
           </button>
           <div ngbDropdownMenu aria-labelledby="buyer select dropdown">
             <button
@@ -106,9 +106,9 @@
         </p>
         <p class="font-italic">
           <span translate>ADMIN.PRODUCT_EDIT.DEFAULT_MARKUP_INFO_1</span>
-          {{ selectedSuperMarketplaceBuyer?.Buyer?.Name }}
+          {{ selectedSuperHSBuyer?.Buyer?.Name }}
           <span translate>ADMIN.PRODUCT_EDIT.DEFAULT_MARKUP_INFO_2</span>
-          {{ selectedSuperMarketplaceBuyer?.Markup?.Percent || 0 }}%.
+          {{ selectedSuperHSBuyer?.Markup?.Percent || 0 }}%.
         </p>
 
         <price-break-editor

@@ -1,8 +1,8 @@
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
-using Marketplace.Common.Services;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
+using Headstart.Common.Services;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,7 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IProductUpdateCommand
     {

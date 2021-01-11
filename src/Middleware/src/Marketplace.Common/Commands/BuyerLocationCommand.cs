@@ -1,19 +1,19 @@
-﻿using Marketplace.Models;
-using Marketplace.Models.Misc;
+﻿using Headstart.Models;
+using Headstart.Models.Misc;
 using OrderCloud.SDK;
 using System.Linq;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
-using Marketplace.Common.Constants;
+using Headstart.Common.Constants;
 using System;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IMarketplaceBuyerLocationCommand
     {
-        Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, string token);
-        Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, string token);
-        Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, string token);
+        Task<HSBuyerLocation> Create(string buyerID, HSBuyerLocation buyerLocation, string token);
+        Task<HSBuyerLocation> Get(string buyerID, string buyerLocationID, string token);
+        Task<HSBuyerLocation> Save(string buyerID, string buyerLocationID, HSBuyerLocation buyerLocation, string token);
         Task Delete(string buyerID, string buyerLocationID, string token);
     }
 
@@ -26,29 +26,29 @@ namespace Marketplace.Common.Commands
             _settings = settings;
             _oc = oc;
         }
-        public async Task<MarketplaceBuyerLocation> Get(string buyerID, string buyerLocationID, string token)
+        public async Task<HSBuyerLocation> Get(string buyerID, string buyerLocationID, string token)
         {
-            var buyerAddress = await _oc.Addresses.GetAsync<MarketplaceAddressBuyer>(buyerID, buyerLocationID, accessToken: token);
-            var buyerUserGroup = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocationID, accessToken: token);
-            return new MarketplaceBuyerLocation
+            var buyerAddress = await _oc.Addresses.GetAsync<HSAddressBuyer>(buyerID, buyerLocationID, accessToken: token);
+            var buyerUserGroup = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, buyerLocationID, accessToken: token);
+            return new HSBuyerLocation
             {
                 Address = buyerAddress,
                 UserGroup = buyerUserGroup
             };
         }
 
-        public async Task<MarketplaceBuyerLocation> Create(string buyerID, MarketplaceBuyerLocation buyerLocation, string token)
+        public async Task<HSBuyerLocation> Create(string buyerID, HSBuyerLocation buyerLocation, string token)
         {
             var buyerLocationID = CreateBuyerLocationID(buyerID, buyerLocation.Address.ID);
             buyerLocation.Address.ID = buyerLocationID;
-            var buyerAddress = await _oc.Addresses.CreateAsync<MarketplaceAddressBuyer>(buyerID, buyerLocation.Address, accessToken: token);
+            var buyerAddress = await _oc.Addresses.CreateAsync<HSAddressBuyer>(buyerID, buyerLocation.Address, accessToken: token);
 
             buyerLocation.UserGroup.ID = buyerAddress.ID;
-            var buyerUserGroup = await _oc.UserGroups.CreateAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: token);
+            var buyerUserGroup = await _oc.UserGroups.CreateAsync<HSLocationUserGroup>(buyerID, buyerLocation.UserGroup, accessToken: token);
             await CreateUserGroupAndAssignments(buyerID, buyerAddress.ID, token);
             await CreateLocationUserGroupsAndApprovalRule(buyerAddress.ID, buyerAddress.AddressName, token);
 
-            return new MarketplaceBuyerLocation
+            return new HSBuyerLocation
             {
                 Address = buyerAddress,
                 UserGroup = buyerUserGroup,
@@ -86,7 +86,7 @@ namespace Marketplace.Common.Commands
             await _oc.Addresses.SaveAssignmentAsync(buyerID, assignment, accessToken: token);
         }
 
-        public async Task<MarketplaceBuyerLocation> Save(string buyerID, string buyerLocationID, MarketplaceBuyerLocation buyerLocation, string token)
+        public async Task<HSBuyerLocation> Save(string buyerID, string buyerLocationID, HSBuyerLocation buyerLocation, string token)
         {
             buyerLocation.Address.ID = buyerLocationID;
             buyerLocation.UserGroup.ID = buyerLocationID;
@@ -95,9 +95,9 @@ namespace Marketplace.Common.Commands
             {
                 existingLocation = await _oc.UserGroups.GetAsync(buyerID, buyerLocationID, token);
             } catch (Exception e) { } // Do nothing if not found
-            var updatedBuyerAddress = _oc.Addresses.SaveAsync<MarketplaceAddressBuyer>(buyerID, buyerLocationID, buyerLocation.Address, accessToken: token);
-            var updatedBuyerUserGroup = _oc.UserGroups.SaveAsync<MarketplaceLocationUserGroup>(buyerID, buyerLocationID, buyerLocation.UserGroup, accessToken: token);
-            var location = new MarketplaceBuyerLocation
+            var updatedBuyerAddress = _oc.Addresses.SaveAsync<HSAddressBuyer>(buyerID, buyerLocationID, buyerLocation.Address, accessToken: token);
+            var updatedBuyerUserGroup = _oc.UserGroups.SaveAsync<HSLocationUserGroup>(buyerID, buyerLocationID, buyerLocation.UserGroup, accessToken: token);
+            var location = new HSBuyerLocation
             {
                 Address = await updatedBuyerAddress,
                 UserGroup = await updatedBuyerUserGroup,
@@ -135,7 +135,7 @@ namespace Marketplace.Common.Commands
             });
         }
 
-        public async Task AddUserTypeToLocation(string token, string buyerLocationID, MarketplaceUserType marketplaceUserType)
+        public async Task AddUserTypeToLocation(string token, string buyerLocationID, HSUserType marketplaceUserType)
         {
             var buyerID = buyerLocationID.Split('-').First();
             var userGroupID = $"{buyerLocationID}-{marketplaceUserType.UserGroupIDSuffix}";

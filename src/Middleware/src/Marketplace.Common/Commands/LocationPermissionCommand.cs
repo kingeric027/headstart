@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
-using Marketplace.Models;
-using Marketplace.Models.Misc;
+using Headstart.Models;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
-using Marketplace.Common.Constants;
+using Headstart.Common.Constants;
 using Azure.Core;
 using ordercloud.integrations.library.helpers;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface ILocationPermissionCommand
     {
@@ -19,12 +19,12 @@ namespace Marketplace.Common.Commands
         Task<List<UserGroupAssignment>> ListLocationApprovalPermissionAsssignments(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<decimal> GetApprovalThreshold(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<decimal> SetLocationApprovalThreshold(string buyerID, string locationID, decimal newApprovalThreshold, VerifiedUserContext verifiedUser);
-        Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
+        Task<ListPage<HSUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> UpdateLocationPermissions(string buyerID, string locationID, LocationPermissionUpdate locationPermissionUpdate, VerifiedUserContext verifiedUser);
         Task<bool> IsUserInAccessGroup(string locationID, string groupSuffix, VerifiedUserContext verifiedUser);
         Task<List<UserGroupAssignment>> ListUserUserGroupAssignments(string userGroupType, string parentID, string userID, VerifiedUserContext verifiedUser);
-        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
-        Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
+        Task<ListPage<HSLocationUserGroup>> ListUserGroupsByCountry(ListArgs<HSLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
+        Task<ListPage<HSLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<HSLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser);
     }
 
     public class LocationPermissionCommand : ILocationPermissionCommand
@@ -97,10 +97,10 @@ namespace Marketplace.Common.Commands
             return await ListLocationPermissionAsssignments(buyerID, locationID, verifiedUser);
         }
 
-        public async Task<ListPage<MarketplaceUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<HSUser>> ListLocationUsers(string buyerID, string locationID, VerifiedUserContext verifiedUser)
         {
             await EnsureUserIsLocationAdmin(locationID, verifiedUser);
-            return await _oc.Users.ListAsync<MarketplaceUser>(buyerID, userGroupID: locationID);
+            return await _oc.Users.ListAsync<HSUser>(buyerID, userGroupID: locationID);
         }
 
         public async Task EnsureUserIsLocationAdmin(string locationID, VerifiedUserContext verifiedUser)
@@ -122,19 +122,19 @@ namespace Marketplace.Common.Commands
             return userUserGroupAssignments;
         }
 
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsByCountry(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<HSLocationUserGroup>> ListUserGroupsByCountry(ListArgs<HSLocationUserGroup> args, string buyerID, string userID, VerifiedUserContext verifiedUser)
         {
             var user = await _oc.Users.GetAsync(
                 buyerID,
                 userID
                 );
-            var userGroups = new ListPage<MarketplaceLocationUserGroup>();
+            var userGroups = new ListPage<HSLocationUserGroup>();
             var assigned = args.Filters.FirstOrDefault(f => f.Name == "assigned").QueryParams.
                               FirstOrDefault(q => q.Item1 == "assigned").Item2;
 
             if (!bool.Parse(assigned))
             {
-                userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+                userGroups = await _oc.UserGroups.ListAsync<HSLocationUserGroup>(
                    buyerID,
                    search: args.Search,
                    filters: $"xp.Country={user.xp.Country}&xp.Type=BuyerLocation",
@@ -144,13 +144,13 @@ namespace Marketplace.Common.Commands
             } else
             {
                 var userUserGroupAssignments = await GetUserUserGroupAssignments("BuyerLocation", buyerID, userID, verifiedUser);
-                var userBuyerLocationAssignments = new List<MarketplaceLocationUserGroup>();
+                var userBuyerLocationAssignments = new List<HSLocationUserGroup>();
                 foreach (var assignment in userUserGroupAssignments)
                 {
                     //Buyer Location user groups are formatted as {buyerID}-{userID}.  This eliminates the unnecessary groups that end in "-{OrderApproval}", for example, helping performance.
                     if (assignment.UserGroupID.Split('-').Length == 2)
                     {
-                        var userGroupLocation = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(
+                        var userGroupLocation = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(
                             buyerID,
                             assignment.UserGroupID
                             );
@@ -199,9 +199,9 @@ namespace Marketplace.Common.Commands
             }
         }
 
-        public async Task<ListPage<MarketplaceLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<MarketplaceLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext verifiedUser)
+        public async Task<ListPage<HSLocationUserGroup>> ListUserGroupsForNewUser(ListArgs<HSLocationUserGroup> args, string buyerID, string homeCountry, VerifiedUserContext verifiedUser)
         {
-            var userGroups = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(
+            var userGroups = await _oc.UserGroups.ListAsync<HSLocationUserGroup>(
                    buyerID,
                    search: args.Search,
                    filters: $"xp.Country={homeCountry}&xp.Type=BuyerLocation",

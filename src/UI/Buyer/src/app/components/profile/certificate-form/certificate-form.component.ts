@@ -8,6 +8,7 @@ import {
 import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { DateValidator } from 'src/app/validators/validators'
 import { faCalendar } from '@fortawesome/free-solid-svg-icons'
+import { CertificateFormOutput } from 'src/app/models/profile.types'
 
 @Component({
   templateUrl: './certificate-form.component.html',
@@ -71,8 +72,4 @@ export class OCMCertificateForm implements OnInit {
   }
 }
 
-export interface CertificateFormOutput {
-  ExpirationDate: string
-  SignedDate: string
-  Base64UrlEncodedPDF: string
-}
+

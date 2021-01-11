@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
-using Marketplace.Models.Attributes;
+using Headstart.Models.Attributes;
 using ordercloud.integrations.avalara;
-using Marketplace.Common.Commands;
+using Headstart.Common.Commands;
 using ordercloud.integrations.library;
 using System;
 
-namespace Marketplace.Common.Controllers.Avalara
+namespace Headstart.Common.Controllers.Avalara
 {
 	[DocComments("\"Integration\" represents Avalara Tax Functionality")]
 	[MarketplaceSection.Integration(ListOrder = 1)]

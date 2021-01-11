@@ -3,30 +3,8 @@ import {
   MarketplaceLineItem,
   OrderPromotion,
 } from '@ordercloud/headstart-sdk'
-import { ShipEstimate, LineItem } from 'ordercloud-javascript-sdk'
-import { concatAll } from 'rxjs/operators'
-
-export interface OrderSummaryMeta {
-  StandardLineItems: MarketplaceLineItem[]
-  POLineItems: MarketplaceLineItem[]
-  StandardLineItemCount: number
-  POLineItemCount: number
-
-  ShouldHideShippingAndText: boolean
-  ShippingAndTaxOverrideText: string
-
-  // with no purchase order these are displayed as the whole order
-  CreditCardDisplaySubtotal: number
-  ShippingCost: number
-  TaxCost: number
-  CreditCardTotal: number
-  DiscountTotal: number
-
-  POSubtotal: number
-  POShippingCost: number
-  POTotal: number
-  OrderTotal: number
-}
+import { ShipEstimate } from 'ordercloud-javascript-sdk'
+import { OrderSummaryMeta } from '../models/order.types'
 
 const getPurchaseOrderLineItems = (
   lineItems: MarketplaceLineItem[]

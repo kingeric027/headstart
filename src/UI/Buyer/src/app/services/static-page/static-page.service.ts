@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
-import { AppConfig } from '../../shopper-context'
 import { ContentManagementClient, JDocument } from '@ordercloud/cms-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',

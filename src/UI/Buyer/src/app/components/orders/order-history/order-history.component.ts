@@ -8,9 +8,9 @@ import {
 import { ListPage } from 'ordercloud-javascript-sdk'
 import { takeWhile } from 'rxjs/operators'
 import { MarketplaceOrder } from '@ordercloud/headstart-sdk'
-import { OrderFilters, OrderStatus, OrderViewContext } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { RouteConfig } from 'src/app/services/route/route-config'
+import { OrderFilters, HeadstartOrderStatus, OrderViewContext } from 'src/app/models/order.types'
+import { RouteConfig } from 'src/app/models/shared.types'
 
 @Component({
   templateUrl: './order-history.component.html',
@@ -64,7 +64,7 @@ export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
     this.context.orderHistory.filters.searchBy(search)
   }
 
-  filterByStatus(status: OrderStatus): void {
+  filterByStatus(status: HeadstartOrderStatus): void {
     this.context.orderHistory.filters.filterByStatus(status)
   }
 

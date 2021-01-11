@@ -3,14 +3,12 @@ import { Component, EventEmitter, Inject, Input, Output } from '@angular/core'
 import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
-} from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
+} from '@app-seller/models/notification.types'
 import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { OcTokenService } from '@ordercloud/angular-sdk'
+import { AppConfig } from '@app-seller/shared'
 
 @Component({
   selector: 'monitored-product-notification',

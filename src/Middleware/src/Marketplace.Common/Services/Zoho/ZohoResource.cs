@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NullValueHandling = Newtonsoft.Json.NullValueHandling;
 
-namespace Marketplace.Common.Services.Zoho
+namespace Headstart.Common.Services.Zoho
 {
     public abstract class ZohoResource
     {

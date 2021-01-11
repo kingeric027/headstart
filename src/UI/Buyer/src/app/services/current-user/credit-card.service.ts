@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Me, ListPage } from 'ordercloud-javascript-sdk'
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk'
-import { MarketplaceBuyerCreditCard } from '../../shopper-context'
+import { MarketplaceBuyerCreditCard } from 'src/app/models/credit-card.types'
 
 @Injectable({
   providedIn: 'root',

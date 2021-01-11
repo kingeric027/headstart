@@ -8,24 +8,24 @@
     id="productTaxCodeDropdown"
     ngbDropdownToggle
     [disabled]="
-      !superMarketplaceProductEditable?.Product?.xp?.Tax?.Category || readonly
+      !superHSProductEditable?.Product?.xp?.Tax?.Category || readonly
     "
   >
     <span
-      *ngIf="!superMarketplaceProductEditable?.Product?.xp?.Tax?.Category"
+      *ngIf="!superHSProductEditable?.Product?.xp?.Tax?.Category"
       translate
       >ADMIN.PRODUCT_EDIT.FIRST_SELECT_CATEGORY</span
     >
     <span
       class="product-tax-code-dropdown-toggle-text"
-      *ngIf="superMarketplaceProductEditable?.Product?.xp?.Tax?.Description"
+      *ngIf="superHSProductEditable?.Product?.xp?.Tax?.Description"
       >{{
-        superMarketplaceProductEditable?.Product?.xp?.Tax?.Description
+        superHSProductEditable?.Product?.xp?.Tax?.Description
       }}</span
     >
     <span
       class="product-tax-code-dropdown-toggle-text"
-      *ngIf="!superMarketplaceProductEditable?.Product?.xp?.Tax?.Code"
+      *ngIf="!superHSProductEditable?.Product?.xp?.Tax?.Code"
       translate
       >ADMIN.PRODUCT_EDIT.SELECT_TAX_CODE</span
     >
@@ -46,7 +46,7 @@
     >
       <button
         class="bg-light"
-        *ngIf="superMarketplaceProductEditable?.Product?.xp?.Tax?.Code"
+        *ngIf="superHSProductEditable?.Product?.xp?.Tax?.Code"
         ngbDropdownItem
         disabled
       >
@@ -54,11 +54,11 @@
           <span class="ml-3 d-flex flex-column justify-content-center">
             <div class="h6">
               {{
-                superMarketplaceProductEditable?.Product?.xp?.Tax?.Description
+                superHSProductEditable?.Product?.xp?.Tax?.Description
               }}
             </div>
             <div>
-              {{ superMarketplaceProductEditable?.Product?.xp?.Tax?.Code }}
+              {{ superHSProductEditable?.Product?.xp?.Tax?.Code }}
             </div>
           </span>
         </div>

@@ -7,10 +7,8 @@ import {
 } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { OcTokenService } from '@ordercloud/angular-sdk'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 /**
  * automatically append token to the authorization header

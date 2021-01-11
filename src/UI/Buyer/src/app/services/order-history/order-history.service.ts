@@ -8,11 +8,6 @@ import {
   Tokens,
 } from 'ordercloud-javascript-sdk'
 import { ReorderHelperService } from '../reorder/reorder.service'
-import {
-  OrderReorderResponse,
-  LineItemGroupSupplier,
-  AppConfig,
-} from '../../shopper-context'
 import { OrderFilterService } from './order-filter.service'
 import {
   MarketplaceAddressBuyer,
@@ -23,6 +18,9 @@ import {
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
 import { HttpHeaders, HttpClient } from '@angular/common/http'
+import { AppConfig } from 'src/app/models/environment.types'
+import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
+import { OrderReorderResponse } from 'src/app/models/order.types'
 @Injectable({
   providedIn: 'root',
 })

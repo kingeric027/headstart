@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { Router, Params, ActivatedRoute } from '@angular/router'
 import { transform as _transform, pickBy as _pickBy } from 'lodash'
-import { SupplierFilters } from '../../shopper-context'
 import { Suppliers, Supplier, Sortable, Address, SupplierAddresses } from 'ordercloud-javascript-sdk'
 import { ListPage } from '@ordercloud/headstart-sdk'
+import { SupplierFilters } from 'src/app/models/filter-config.types'
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({

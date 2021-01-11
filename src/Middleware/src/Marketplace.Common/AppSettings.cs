@@ -7,7 +7,7 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.tecra;
 
-namespace Marketplace.Common
+namespace Headstart.Common
 {
 	public enum AppEnvironment { Qa, Demo, Prod }
 
@@ -137,6 +137,8 @@ namespace Marketplace.Common
         public string ApiKey { get; set; }
         public string FromEmail { get; set; }
         public string SupportEmails { get; set; } // comma delimited list of emails that should be contacted when critical failures occur
+        public string SEBSupportCaseEmail { get; set; }
+        public string SEBBillingEmail { get; set; }
     }
 
     public class FlurlSettings

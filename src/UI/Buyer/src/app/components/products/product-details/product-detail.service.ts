@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk'
 import { minBy as _minBy } from 'lodash'
-import { GridSpecOption, SpecFormService } from '../spec-form/spec-form.service'
-import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface'
+import { SpecFormService } from '../spec-form/spec-form.service'
+import { GridSpecOption, LineItemToAdd } from 'src/app/models/product.types'
 
 @Injectable({
   providedIn: 'root',
