@@ -63,15 +63,12 @@ export class CartWrapperComponent implements OnInit {
     const activeLineItems: MarketplaceLineItem[] = []
     const inactiveLineItems: MarketplaceLineItem[] = []
     for (const item of items.Items) {
-      const eligibleProductList = await Me.ListProducts({
-        filters: { ID: item.ProductID },
-      })
-      const matchingLineItem = eligibleProductList.Items.find(
-        (product) => product.ID === item.ProductID
-      )
-      matchingLineItem
-        ? activeLineItems.push(item)
-        : inactiveLineItems.push(item)
+      try {
+        await Me.GetProduct(item.ProductID)
+        activeLineItems.push(item)
+      } catch {
+        inactiveLineItems.push(item)
+      }
     }
     this.invalidLineItems = inactiveLineItems
     return activeLineItems

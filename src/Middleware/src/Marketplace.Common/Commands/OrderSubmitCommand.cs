@@ -102,14 +102,13 @@ namespace Headstart.Common.Commands
             List<HSLineItem> inactiveLineItems = new List<HSLineItem>();
             foreach (HSLineItem lineItem in worksheet.LineItems)
             {
-                var availableProductInCatalog = await _oc.Me.ListProductsAsync(filters: $"ID={ lineItem.ProductID}", accessToken: userToken);
-                if (availableProductInCatalog != null)
+                try
                 {
-                    var matchingLineItem = availableProductInCatalog.Items?.FirstOrDefault(product => product.ID == lineItem.ProductID);
-                    if (matchingLineItem == null)
-                    {
-                        inactiveLineItems.Add(lineItem);
-                    }
+                    await _oc.Me.GetProductAsync(lineItem.ProductID, accessToken: userToken);
+                }
+                catch (OrderCloudException ex) when (ex.HttpStatus == HttpStatusCode.NotFound)
+                {
+                    inactiveLineItems.Add(lineItem);
                 }
             }
             return inactiveLineItems;
