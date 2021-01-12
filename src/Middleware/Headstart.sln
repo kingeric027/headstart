@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.tecra", "integrations\ordercloud.integrations.tecra\ordercloud.integrations.tecra.csproj", "{F6A6353E-B195-4885-9E0F-2533D204C8EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.easypost", "ordercloud.integrations.easypost\ordercloud.integrations.easypost.csproj", "{DA2B1503-680A-44BA-B23D-0188BF282B2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.easypost", "integrations\ordercloud.integrations.easypost\ordercloud.integrations.easypost.csproj", "{DA2B1503-680A-44BA-B23D-0188BF282B2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -71,14 +71,14 @@ namespace Headstart.Common.Commands
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
                 var profile = _profiles.FirstOrDefault(supplierID);
-                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => s.xp.CarrierAccountID == profile.CarrierAccountID).ToList(), profile); 
+                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => profile.CarrierAccountIDs.Contains(s.xp.CarrierAccountID)).ToList(), profile); 
                 var cheapestMethods = WhereRateIsCheapestOfItsKind(methods);
                 shipResponse.ShipEstimates[i].ShipMethods = cheapestMethods.Select(s =>
                 {
                     // apply a 75% markup to key fob shipments https://four51.atlassian.net/browse/SEB-1260
                     s.Cost = groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder) ? 
                         Math.Round(s.Cost * (decimal)1.75, 2) : 
-                        Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountID == s.xp?.CarrierAccountID).Markup), s.xp.ListRate);
+                        Math.Min((s.xp.OriginalCost * _profiles.ShippingProfiles.First(p => p.CarrierAccountIDs.Contains(s.xp?.CarrierAccountID)).Markup), s.xp.ListRate);
                     return s;
                 }).ToList();
             }

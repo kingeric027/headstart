@@ -67,7 +67,7 @@ namespace ordercloud.integrations.easypost
 					var cost = group.Aggregate(0M, (sum, rate) => sum += decimal.Parse(rate.rate));
 					var listRate = group.Aggregate(0M, (sum, rate) => sum += decimal.Parse(rate.list_rate));
 					var deliveryDays = group.Max(rate => rate.delivery_days ?? rate.est_delivery_days ?? 10);
-					var euaranteedDeliveryDays = group.Max(rate => rate.delivery_date_guaranteed);
+					var guaranteedDeliveryDays = group.Max(rate => rate.delivery_date_guaranteed);
 
 					return new ShipMethod()
 					{
@@ -80,7 +80,7 @@ namespace ordercloud.integrations.easypost
 							Carrier = group.Key.carrier,
 							CarrierAccountID = group.Key.carrier_account_id,
 							ListRate = listRate,
-							Guaranteed = euaranteedDeliveryDays,
+							Guaranteed = guaranteedDeliveryDays,
 							OriginalCost = cost
 						}
 					};
@@ -97,8 +97,13 @@ namespace ordercloud.integrations.easypost
 					from_address = MapAddress(groupedLineItems.Key.ShipFrom),
 					to_address = MapAddress(groupedLineItems.Key.ShipTo),
 					parcel = parcel, // All line items with the same shipFrom and shipTo are grouped into 1 "parcel"
-					carrier_accounts = profiles.ShippingProfiles.Select(id => new EasyPostCarrierAccount() { id = id.CarrierAccountID }).ToList()
+					carrier_accounts = new List<EasyPostCarrierAccount>()
+                    //carrier_accounts = profiles.ShippingProfiles.Select(id =>  new EasyPostCarrierAccount() { id = id.CarrierAccountIDs })
 				};
+				foreach (var p in profiles.ShippingProfiles)
+                {
+                    p.CarrierAccountIDs.ForEach(i => shipment.carrier_accounts.Add(new EasyPostCarrierAccount() { id = i }));
+                }
 
 				// add customs info for international shipments
 				if (groupedLineItems.Key.ShipTo.Country != "US")
