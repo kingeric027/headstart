@@ -163,7 +163,8 @@ namespace Headstart.Common.Services
                     Products = productsList,
                     DateSubmitted = order?.DateSubmitted?.ToString(),
                     OrderID = order.ID,
-                    order.Comments
+                    order.Comments,
+                    TrackingNumber = lineItemStatusChanges.SuperShipment.Shipment.TrackingNumber
                 },
                 Message = new EmailDisplayText()
                 {
