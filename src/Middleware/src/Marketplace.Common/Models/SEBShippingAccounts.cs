@@ -45,7 +45,7 @@ namespace Headstart.Common.Models
                 Restriction_Type = "none",
                 EEL_PFC = "NOEEI30.37(a)",
                 Customs_Certify = true,
-                Markup = 1.0M,
+                Markup = 1.4M,
                 Default = false,
                 AllowedServiceFilter = new List<string>() { "FEDEX_GROUND", "First" } // First is the USPS choice for their base service
             });
