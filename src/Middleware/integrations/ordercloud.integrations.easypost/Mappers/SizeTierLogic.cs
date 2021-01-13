@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.Json.Serialization;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.easypost
 {
@@ -83,12 +84,12 @@ namespace ordercloud.integrations.easypost
 					var currentPackage = packages.Last();
 					if (currentPackage.PercentFilled + percentFillToAdd > 100) // this should be a 1, not a 100. However, this mathematically correct packaging produces very high rates.
 					{
-						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = item.Product.ShipWeight ?? 0 };
+						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = (decimal)item.ShipWeightOrDefault(0) };
 						packages.Add(newPackage);
 					} else
 					{
 						currentPackage.PercentFilled += percentFillToAdd;
-						currentPackage.Weight += item.Product.ShipWeight ?? 0;
+						currentPackage.Weight += (decimal)item.ShipWeightOrDefault(0);
 					}
 					return packages;
 				});
@@ -108,10 +109,10 @@ namespace ordercloud.integrations.easypost
 			var individualPackages = lineItemsThatShipAlone.Select(li => new EasyPostParcel()
             {
                 // length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
-                weight = li.Product.ShipWeight.ValueOrDefault(Package.DEFAULT_WEIGHT), // (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
-                length = li.Product.ShipLength.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
-                width = li.Product.ShipWidth.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
-                height = li.Product.ShipHeight.ValueOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
+                weight = li.ShipWeightOrDefault(Package.DEFAULT_WEIGHT), // (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),
+                length = li.ShipLengthOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipLength.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipLength),
+                width = li.ShipWidthOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipWidth.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipWidth),
+                height = li.ShipHeightOrDefault(Package.FULL_PACKAGE_DIMENSION), // (double) (li.Product.ShipHeight.IsNullOrZero() ? Package.FULL_PACKAGE_DIMENSION : li.Product.ShipHeight),
 			}).Select(p => CapParcelDimensions(p, EASYPOST_MAX_PARCEL_DIMENSION));
 
 			return combinationPackages.Union(individualPackages).ToList();

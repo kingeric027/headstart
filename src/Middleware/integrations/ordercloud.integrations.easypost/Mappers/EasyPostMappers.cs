@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ordercloud.integrations.library;
 
 namespace ordercloud.integrations.easypost
 {
@@ -50,7 +51,7 @@ namespace ordercloud.integrations.easypost
                     origin_country = lineItem.ShipFromAddress.Country,
                     value = decimal.ToDouble(lineItem.LineSubtotal),
                     quantity = lineItem.Quantity,
-                    weight = (double)Convert.ChangeType(lineItem.Product.ShipWeight, typeof(double))
+                    weight = lineItem.ShipWeightOrDefault(Package.DEFAULT_WEIGHT)
                 })
                 .ToList();
         }
