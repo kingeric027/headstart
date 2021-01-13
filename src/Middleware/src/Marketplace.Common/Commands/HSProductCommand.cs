@@ -203,8 +203,7 @@ namespace Headstart.Common.Commands.Crud
 			// Determine ID up front so price schedule ID can match
 			superProduct.Product.ID = superProduct.Product.ID ?? CosmosInteropID.New();
 
-			//TODO: Once variants are fixed, enable this.
-			//await ValidateVariantsAsync(superProduct, user);
+			await ValidateVariantsAsync(superProduct, user.AccessToken);
 
 			// Create Specs
 			var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
@@ -284,23 +283,38 @@ namespace Headstart.Common.Commands.Crud
 			};
 		}
 
-		private async Task ValidateVariantsAsync(SuperHSProduct superProduct, VerifiedUserContext user)
+		private async Task ValidateVariantsAsync(SuperHSProduct superProduct, string token)
         {
-			if (superProduct.Variants == null) { return; }
+			List<Variant> allVariants = new List<Variant>();
+			if (superProduct.Variants == null || !superProduct.Variants.Any()) { return; }
 
-			//var specToSearchFor = GetSpecCombo(superProduct.Specs);
+			try
+			{
+				ListPageWithFacets<Product> allProducts = await _oc.Products.ListAsync(accessToken: token);
 
+				if (allProducts == null || !allProducts.Items.Any()) { return; }
+
+				foreach (Product product in allProducts.Items)
+				{
+					if (product.VariantCount > 0)
+					{
+						allVariants.AddRange((await _oc.Products.ListVariantsAsync(productID: product.ID, accessToken: token)).Items);
+					}
+				}
+			} 
+			catch (Exception ex)
+            {
+				return;
+            }
+			
 			foreach (Variant variant in superProduct.Variants)
             {
-				ListPage<SpecOption> currentVariants = await _oc.Specs.ListOptionsAsync(variant.xp.NewID, user.AccessToken);
+				if (!allVariants.Any()) { return; }
 
-				if (currentVariants == null) { return; }
-
-				List<SpecOption> duplicateSpecNames = currentVariants.Items.Where(currVariant => variant.xp.NewID == currVariant.ID).ToList();
+				List<Variant> duplicateSpecNames = allVariants.Where(currVariant => variant.xp.NewID == currVariant.ID).ToList();
 				if (duplicateSpecNames.Any())
-                {
-					
-					throw new Exception($"{duplicateSpecNames.First().ID} same as {variant.ID}");
+                {	
+					throw new Exception($"{duplicateSpecNames.First().ID} already exists on a variant. Please use unique names for SKUS and try again.");
                 }
             }
         }
@@ -364,6 +378,9 @@ namespace Headstart.Common.Commands.Crud
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.
 			if (variantsAdded || variantsRemoved || hasVariantChange || requestVariants.Any(v => v.xp.NewID != null))
 			{
+				//validate variant names before continuing saving.
+				await ValidateVariantsAsync(superProduct, token);
+
 				// Re-generate Variants
 				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: token);
 				// Patch NEW variants with the User Specified ID (Name,ID), and correct xp values (SKU)

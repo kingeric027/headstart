@@ -686,6 +686,10 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       this.dataIsSaving = false
     } catch (ex) {
       this.dataIsSaving = false
+      const message = ex?.response?.data?.Data
+      if (message) {
+        this.toastrService.error(message, 'Error', { onActivateTick: true })
+      }
       throw ex
     }
   }
