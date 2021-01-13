@@ -8,6 +8,7 @@ import {
   Payment,
   OcOrderService,
   OrderDirection,
+  OcAddressService
 } from '@ordercloud/angular-sdk'
 
 // temporarily any with sdk update
@@ -55,6 +56,7 @@ export class OrderDetailsComponent {
   faUser = faUserAlt
   _order: Order = {}
   _buyerOrder: Order = {}
+  _buyerQuoteAddress: Address = null
   _supplierOrder: Order = {}
   _lineItems: MarketplaceLineItem[] = []
   _payments: Payment[] = []
@@ -88,6 +90,7 @@ export class OrderDetailsComponent {
     private pdfService: PDFService,
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
+    private ocAddressService: OcAddressService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER
@@ -204,6 +207,13 @@ export class OrderDetailsComponent {
     } else {
       this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)
+    }
+    if(this.isQuoteOrder(order)) {
+      const buyerId = this._buyerOrder.FromCompanyID
+      if(this._buyerOrder.ShippingAddressID) {
+        const address = await this.ocAddressService.Get(buyerId, this._buyerOrder.ShippingAddressID).toPromise()
+        this._buyerQuoteAddress = address
+      } 
     }
   }
 
