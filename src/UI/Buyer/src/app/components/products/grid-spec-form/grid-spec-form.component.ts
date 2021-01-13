@@ -212,7 +212,8 @@ export class OCMGridSpecForm {
     // If not tracking inventory, return true
     if (
       this._superProduct.Product.Inventory === null ||
-      !this._superProduct.Product.Inventory?.Enabled
+      !this._superProduct.Product.Inventory?.Enabled ||
+      this._superProduct.Product.Inventory?.OrderCanExceed
     ) {
       return true
     }
