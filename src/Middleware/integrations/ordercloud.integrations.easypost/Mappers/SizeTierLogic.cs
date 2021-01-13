@@ -89,7 +89,7 @@ namespace ordercloud.integrations.easypost
 					} else
 					{
 						currentPackage.PercentFilled += percentFillToAdd;
-						currentPackage.Weight += item.Product.ShipWeight ?? 0;
+						currentPackage.Weight += (decimal)item.ShipWeightOrDefault(0);
 					}
 					return packages;
 				});
