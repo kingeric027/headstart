@@ -34,7 +34,7 @@ export class OCMCart {
       !this.invalidLineItemsAreBeingRemoved
     ) {
       this.orderError =
-        "We're sorry, but some items in your cart are no longer for sale."
+        "We're sorry, but some items in your cart are not available."
       this.orderErrorModal = ModalState.Open
     }
   }
