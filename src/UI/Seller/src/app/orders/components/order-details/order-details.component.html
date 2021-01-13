@@ -185,6 +185,25 @@
           </small>
         </div>
       </div>
+      <div *ngIf="_buyerQuoteAddress" class="d-block text-right">
+        <small class="font-weight-bolder text-muted text-uppercase d-block"
+          >Ship To</small
+        >
+        <small class="mb-0 text-capitalize d-block font-weight-bold">{{
+          _buyerQuoteAddress.CompanyName
+        }}</small>
+        <small class="mb-0 text-capitalize d-block"
+          >{{ _buyerQuoteAddress.Street1
+          }}<span *ngIf="_buyerQuoteAddress.Street2"
+            >, {{ _buyerQuoteAddress.Street2 }}</span
+          ></small
+        >
+        <small class="mb-0 text-capitalize d-block"
+          >{{ _buyerQuoteAddress.City }},
+          {{ _buyerQuoteAddress.State }}
+          {{ _buyerQuoteAddress.Zip }}</small
+        >
+      </div>
     </div>
     <!-- Comments -->
     <div

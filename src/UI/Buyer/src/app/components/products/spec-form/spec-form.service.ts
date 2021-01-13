@@ -199,7 +199,12 @@ export class SpecFormService {
       })
       return o as SpecOption
     }
-    if (type === 'grid') return _find(spec.Options, (o) => o.ID === value)
+    if (type === 'grid')
+      return _find(
+        spec.Options,
+        // Do not evaluate special characters, including hyphens and underscores
+        (o) => o.ID === value.replace(/[^a-zA-Z0-9 ]/g, '')
+      )
     else return _find(spec.Options, (o) => o.Value === value)
   }
 }
