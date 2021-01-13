@@ -198,6 +198,7 @@ export class OrderDetailsComponent {
   }
 
   async setData(order: Order): Promise<void> {
+    this._buyerQuoteAddress = null
     this._order = order
     if (this.isSupplierOrder(order.ID)) {
       const orderData = await this.middleware.getSupplierData(order.ID)

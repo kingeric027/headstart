@@ -44,6 +44,11 @@ export class OCMQuoteRequestForm implements OnInit {
     this.myBuyerLocations = addresses.Items
   }
 
+  onLocationChange(value: string) {
+    const selectedIndex = parseInt(value.substring(0,1))
+    this.quoteRequestForm.patchValue({"ShippingAddressId": this.myBuyerLocations[selectedIndex].ID})
+  }
+
   setForms(): void {
     this.quoteRequestForm = new FormGroup({
       FirstName: new FormControl(this.currentUser?.FirstName || '', [
@@ -67,6 +72,7 @@ export class OCMQuoteRequestForm implements OnInit {
         ValidateEmail,
       ]),
       Comments: new FormControl(''),
+      ShippingAddressId: new FormControl(this.myBuyerLocations[0]?.ID || '')
     })
   }
 
