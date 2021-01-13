@@ -24,6 +24,7 @@ export class OCMQuoteRequestForm implements OnInit {
     pageSize: 100,
   }
   myBuyerLocations: MarketplaceAddressBuyer[]
+  //todo revert type to QuoteOrderInfo
   @Output() formSubmitted = new EventEmitter<{ user: any }>()
   @Output() formDismissed = new EventEmitter()
 
