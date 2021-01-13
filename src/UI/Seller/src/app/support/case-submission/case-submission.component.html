@@ -3,6 +3,7 @@
     <h1 class="resource-name mb-0" translate>Submit a Case for Support</h1>
   </div>
   <form
+    *ngIf="caseSubmissionForm"
     [formGroup]="caseSubmissionForm"
     (ngSubmit)="sendCaseSubmission()"
     name="CaseSubmissionForm"
@@ -146,7 +147,9 @@
           <button
             type="submit"
             class="btn btn-primary mt-4 w-100"
-            [disabled]="caseSubmissionForm?.status === 'INVALID'"
+            [disabled]="
+              caseSubmissionForm?.status === 'INVALID' || submitBtnDisabled
+            "
           >
             Submit
           </button>
