@@ -290,15 +290,15 @@ namespace Headstart.Common.Commands.Crud
 
 			try
 			{
-				ListPageWithFacets<Product> allProducts = await _oc.Products.ListAsync(accessToken: token);
+				List<Product> allProducts = await ListAllAsync.ListWithFacets(page => _oc.Products.ListAsync(page: page, pageSize: 100, accessToken: token));
 
-				if (allProducts == null || !allProducts.Items.Any()) { return; }
+				if (allProducts == null || !allProducts.Any()) { return; }
 
-				foreach (Product product in allProducts.Items)
+				foreach (Product product in allProducts)
 				{
 					if (product.VariantCount > 0)
 					{
-						allVariants.AddRange((await _oc.Products.ListVariantsAsync(productID: product.ID, accessToken: token)).Items);
+						allVariants.AddRange((await _oc.Products.ListVariantsAsync(productID: product.ID, pageSize: 100, accessToken: token)).Items);
 					}
 				}
 			} 
