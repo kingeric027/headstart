@@ -112,11 +112,14 @@ export class CaseSubmissionComponent implements OnInit {
       .subscribe(
         () => {
           this.toastrService.success('Support case sent', 'Success')
+          this.submitBtnDisabled = false
           this.setForm()
           this.removeAttachment()
         }, 
-        () => this.toastrService.error('There was an issue sending your request', 'Error'),
-        () => this.submitBtnDisabled = false
+        () => {
+          this.toastrService.error('There was an issue sending your request', 'Error')
+          this.submitBtnDisabled = false
+        }
       )
   }
 
