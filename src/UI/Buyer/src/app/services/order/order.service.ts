@@ -76,7 +76,8 @@ export class CurrentOrderService {
     return submittedQuoteOrder
   }
 
-  buildQuoteOrder(info: QuoteOrderInfo): Order {
+  //todo revert type to QuoteOrderInfo
+  buildQuoteOrder(info: any): Order {
     return {
       ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
       ShippingAddressID: info.ShippingAddressId,
