@@ -202,6 +202,10 @@ namespace Headstart.Common.Commands.Crud
 		{
 			// Determine ID up front so price schedule ID can match
 			superProduct.Product.ID = superProduct.Product.ID ?? CosmosInteropID.New();
+
+			//TODO: Once variants are fixed, enable this.
+			//await ValidateVariantsAsync(superProduct, user);
+
 			// Create Specs
 			var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
 			var specRequests = await Throttler.RunAsync(superProduct.Specs, 100, 5, s =>
@@ -246,9 +250,24 @@ namespace Headstart.Common.Commands.Crud
 			{
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
-				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
+                v.Name = v.xp.NewID ?? v.ID;
+
+				if ((superProduct?.Product?.Inventory?.VariantLevelTracking) == true && v.Inventory == null)
+				{
+					v.Inventory = new PartialVariantInventory { QuantityAvailable = 0 };
+				}
+				if (superProduct.Product?.Inventory == null)
+				{
+					//If Inventory doesn't exist on the product, don't patch variants with inventory either.
+					return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp}, accessToken: user.AccessToken);
+				}
+				else
+				{
+					return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
+				}
 			});
+
+
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<HSVariant>(_product.ID, accessToken: user.AccessToken);
 			// List Product Specs
@@ -265,7 +284,28 @@ namespace Headstart.Common.Commands.Crud
 			};
 		}
 
-		public async Task<SuperHSProduct> Put(string id, SuperHSProduct superProduct, string token)
+		private async Task ValidateVariantsAsync(SuperHSProduct superProduct, VerifiedUserContext user)
+        {
+			if (superProduct.Variants == null) { return; }
+
+			//var specToSearchFor = GetSpecCombo(superProduct.Specs);
+
+			foreach (Variant variant in superProduct.Variants)
+            {
+				ListPage<SpecOption> currentVariants = await _oc.Specs.ListOptionsAsync(variant.xp.NewID, user.AccessToken);
+
+				if (currentVariants == null) { return; }
+
+				List<SpecOption> duplicateSpecNames = currentVariants.Items.Where(currVariant => variant.xp.NewID == currVariant.ID).ToList();
+				if (duplicateSpecNames.Any())
+                {
+					
+					throw new Exception($"{duplicateSpecNames.First().ID} same as {variant.ID}");
+                }
+            }
+        }
+
+        public async Task<SuperHSProduct> Put(string id, SuperHSProduct superProduct, string token)
 		{
 			// Update the Product itself
 			var _updatedProduct = await _oc.Products.SaveAsync<HSProduct>(superProduct.Product.ID, superProduct.Product, token);
