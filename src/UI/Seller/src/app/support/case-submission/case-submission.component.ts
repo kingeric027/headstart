@@ -97,7 +97,11 @@ export class CaseSubmissionComponent implements OnInit {
     })
     return this.http.post(`${this.appConfig.middlewareUrl}/support/submitcase`, form)
       .subscribe(
-        () => this.toastrService.success('Support case sent', 'Success'), 
+        () => {
+          this.toastrService.success('Support case sent', 'Success')
+          this.setForm()
+          this.removeAttachment()
+        }, 
         () => this.toastrService.error('There was an issue sending your request', 'Error'),
         () => this.submitBtnDisabled = false
       )
