@@ -15,7 +15,16 @@
         <div class="card py-2 px-3 mt-3 bg-white">
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label for="firstName">First Name</label>
+              <label for="firstName">
+                First Name
+                <sup *ngIf="isRequired('FirstName')">
+                  <fa-icon
+                    class="tab-status-icon text-danger"
+                    [icon]="faAsterisk"
+                  >
+                  </fa-icon>
+                </sup>
+              </label>
               <input
                 id="firstName"
                 formControlName="FirstName"
@@ -28,7 +37,16 @@
               />
             </div>
             <div class="form-group col-md-6">
-              <label for="lastName">Last Name</label>
+              <label for="lastName">
+                Last Name
+                <sup *ngIf="isRequired('LastName')">
+                  <fa-icon
+                    class="tab-status-icon text-danger"
+                    [icon]="faAsterisk"
+                  >
+                  </fa-icon>
+                </sup>
+              </label>
               <input
                 id="lastName"
                 formControlName="LastName"
@@ -43,7 +61,16 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label for="email">Email Address</label>
+              <label for="email">
+                Email Address
+                <sup *ngIf="isRequired('Email')">
+                  <fa-icon
+                    class="tab-status-icon text-danger"
+                    [icon]="faAsterisk"
+                  >
+                  </fa-icon>
+                </sup>
+              </label>
               <input
                 id="email"
                 formControlName="Email"
@@ -56,7 +83,17 @@
               />
             </div>
             <div class="form-group col-md-6">
-              <label for="vendor">Vendor Name</label>
+              <label for="vendor">
+                Vendor Name
+                <sup *ngIf="isRequired('Vendor')">
+                  <fa-icon
+                    class="tab-status-icon text-danger"
+                    [icon]="faAsterisk"
+                  >
+                  </fa-icon>
+                </sup>
+                <small *ngIf="!isRequired('Vendor')">(Optional)</small>
+              </label>
               <input
                 id="vendor"
                 formControlName="Vendor"
@@ -71,7 +108,16 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-4">
-              <label for="subject">Subject</label>
+              <label for="subject">
+                Subject
+                <sup *ngIf="isRequired('Subject')">
+                  <fa-icon
+                    class="tab-status-icon text-danger"
+                    [icon]="faAsterisk"
+                  >
+                  </fa-icon>
+                </sup>
+              </label>
               <select
                 type="dropdown"
                 class="form-control"
@@ -91,7 +137,16 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-10">
-              <label for="message">Message</label>
+              <label for="message">
+                Message
+                <sup *ngIf="isRequired('Message')">
+                  <fa-icon
+                    class="tab-status-icon text-danger"
+                    [icon]="faAsterisk"
+                  >
+                  </fa-icon>
+                </sup>
+              </label>
               <textarea
                 type="text"
                 class="form-control"

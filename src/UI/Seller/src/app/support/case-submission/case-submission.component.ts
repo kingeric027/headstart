@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, Inject, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppConfig, FileHandle } from '@app-seller/shared'
@@ -8,6 +8,9 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { MeUser, OcSupplierService, Supplier } from '@ordercloud/angular-sdk'
 import { ToastrService } from 'ngx-toastr'
 import { takeWhile } from 'rxjs/operators'
+import {
+  faAsterisk
+} from '@fortawesome/free-solid-svg-icons'
 
 @Component({
   selector: 'support-case-submission',
@@ -28,6 +31,7 @@ export class CaseSubmissionComponent implements OnInit {
   isImageFileType: boolean = false
   vendor: Supplier
   submitBtnDisabled: boolean = false
+  faAsterisk = faAsterisk
   
   constructor(
     private currentUserService: CurrentUserService,
@@ -54,7 +58,7 @@ export class CaseSubmissionComponent implements OnInit {
       FirstName: [this.user ? this.user.FirstName : '', Validators.required],
       LastName: [this.user ? this.user.LastName : '', Validators.required],
       Email: [this.user ? this.user.Email : '', Validators.required],
-      Vendor: [this.vendor ? this.vendor.Name : '', Validators.required],
+      Vendor: [this.vendor ? this.vendor.Name : '', this.vendor ? Validators.required : null],
       Subject: [null, Validators.required],
       Message: ['', Validators.required],
       File: [null]
@@ -83,6 +87,15 @@ export class CaseSubmissionComponent implements OnInit {
     this.caseSubmissionForm.controls['File'].setValue(null)
     this.stagedAttachmentUrl = null
     this.attachmentFile = null
+  }
+
+  isRequired(control: string): boolean {
+    const theControl = this.caseSubmissionForm.get(control)
+    if (theControl.validator === null) return false
+    const validator = this.caseSubmissionForm
+      .get(control)
+      .validator({} as AbstractControl)
+    return validator && validator.required
   }
 
   sendCaseSubmission() {
