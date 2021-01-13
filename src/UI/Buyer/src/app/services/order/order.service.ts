@@ -79,6 +79,7 @@ export class CurrentOrderService {
   buildQuoteOrder(info: QuoteOrderInfo): Order {
     return {
       ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      ShippingAddressID: info.ShippingAddressId,
       xp: {
         AvalaraTaxTransactionCode: '',
         OrderType: OrderType.Quote,
