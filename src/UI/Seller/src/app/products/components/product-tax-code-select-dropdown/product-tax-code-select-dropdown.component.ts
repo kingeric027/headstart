@@ -10,7 +10,7 @@ import {
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
 import {
-  SuperMarketplaceProduct,
+  SuperHSProduct,
   ListPage,
   TaxProperties,
 } from '@ordercloud/headstart-sdk'
@@ -28,7 +28,7 @@ export class ProductTaxCodeSelectDropdown implements OnChanges {
   @Input()
   taxCodes: ListPage<TaxProperties>
   @Input()
-  superHSProductEditable: SuperMarketplaceProduct
+  superHSProductEditable: SuperHSProduct
   @Input()
   readonly: boolean
   @Input()

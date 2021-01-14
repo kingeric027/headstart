@@ -1,7 +1,7 @@
 import { environment } from 'src/environments/environment'
 import {
-  MarketplaceProduct,
-  MarketplaceLineItem,
+  HSProduct,
+  HSLineItem,
 } from '@ordercloud/headstart-sdk'
 
 export const IMAGE_HOST_URL =
@@ -10,14 +10,14 @@ export const PLACEHOLDER_URL = 'http://placehold.it/300x300'
 export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY'
 
 export function getProductSmallImageUrl(
-  product: MarketplaceProduct,
+  product: HSProduct,
   sellerID: string
 ): string {
   return `${environment.cmsUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`
 }
 
 export function getProductMediumImageUrl(
-  product: MarketplaceProduct,
+  product: HSProduct,
   sellerID: string
 ): string {
   return `${environment.cmsUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`
@@ -25,7 +25,7 @@ export function getProductMediumImageUrl(
 
 export const getPrimaryLineItemImage = (
   lineItemID: string,
-  lineItems: MarketplaceLineItem[],
+  lineItems: HSLineItem[],
   sellerID: string
 ): string => {
   const li = lineItems.find((item) => item.ID === lineItemID)

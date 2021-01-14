@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core'
 import { UserGroup, ProductAssignment } from '@ordercloud/angular-sdk'
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
+import { HSProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'variable-print-configuration-component',
@@ -10,7 +10,7 @@ import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
 })
 export class VariablePrintConfiguration implements OnInit {
   @Input()
-  product: MarketplaceProduct
+  product: HSProduct
   faExclamationCircle = faExclamationCircle
 
   _buyerID = ''

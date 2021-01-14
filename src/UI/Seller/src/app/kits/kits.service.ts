@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { MarketplaceKitProduct, HeadStartSDK } from '@ordercloud/headstart-sdk'
+import { HSKitProduct, HeadStartSDK } from '@ordercloud/headstart-sdk'
 @Injectable({
   providedIn: 'root',
 })
-export class KitService extends ResourceCrudService<MarketplaceKitProduct> {
+export class KitService extends ResourceCrudService<HSKitProduct> {
   emptyResource = {
     ID: null,
     Name: null,

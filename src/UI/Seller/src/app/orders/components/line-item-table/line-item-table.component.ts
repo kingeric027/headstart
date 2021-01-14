@@ -9,9 +9,9 @@ import {
 import { groupBy as _groupBy } from 'lodash'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
-  MarketplaceLineItem,
+  HSLineItem,
   HeadStartSDK,
-  MarketplaceOrder,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { LineItemTableStatus } from '../order-details/order-details.component'
 import {
@@ -31,15 +31,15 @@ import { AppConfig, LineItemStatus, RegexService } from '@app-seller/shared'
   styleUrls: ['./line-item-table.component.scss'],
 })
 export class LineItemTableComponent {
-  _lineItems: MarketplaceLineItem[] = []
-  _order: MarketplaceOrder
-  _liGroupedByShipFrom: MarketplaceLineItem[][]
-  _supplierOrders: MarketplaceOrder[] = []
+  _lineItems: HSLineItem[] = []
+  _order: HSOrder
+  _liGroupedByShipFrom: HSLineItem[][]
+  _supplierOrders: HSOrder[] = []
   _statusChangeForm = new FormArray([])
   _tableStatus = LineItemTableStatus.Default
   _user: MeUser
   @Input()
-  set order(value: MarketplaceOrder) {
+  set order(value: HSOrder) {
     this._order = value
     this.setSupplierOrders(value)
   }
@@ -48,7 +48,7 @@ export class LineItemTableComponent {
   isSaving = false
 
   @Input()
-  set lineItems(value: MarketplaceLineItem[]) {
+  set lineItems(value: HSLineItem[]) {
     this._lineItems = value
     if (value?.length) {
       this.setLineItemGroups(value)
@@ -70,7 +70,7 @@ export class LineItemTableComponent {
     }
   }
 
-  getShipMethodString(lineItem: MarketplaceLineItem): string {
+  getShipMethodString(lineItem: HSLineItem): string {
     const salesOrderID = this._order.ID.split('-')[0]
     const isPurchaseOrder = salesOrderID !== this._order.ID
     const supplierOrder = this._supplierOrders?.find(
@@ -113,12 +113,12 @@ export class LineItemTableComponent {
     this.setLineItemGroups(filteredLineItems)
   }
 
-  setLineItemGroups(lineItems: MarketplaceLineItem[]): void {
+  setLineItemGroups(lineItems: HSLineItem[]): void {
     const liGroups = _groupBy(lineItems, (li) => li.ShipFromAddressID)
     this._liGroupedByShipFrom = Object.values(liGroups)
   }
 
-  async setSupplierOrders(order: MarketplaceOrder): Promise<void> {
+  async setSupplierOrders(order: HSOrder): Promise<void> {
     const salesOrderID = order?.ID?.split('-')[0]
     if (order?.ID && salesOrderID && order.ID === salesOrderID) {
       const supplierOrderFilterString = order?.xp?.SupplierIDs?.map(
@@ -142,7 +142,7 @@ export class LineItemTableComponent {
   getVariableTextSpecs = (li: LineItem): LineItemSpec[] =>
     li?.Specs?.filter((s) => s.OptionID === null)
 
-  getLineItemStatusDisplay(lineItem: MarketplaceLineItem): string {
+  getLineItemStatusDisplay(lineItem: HSLineItem): string {
     return Object.entries(lineItem.xp.StatusByQuantity)
       .filter(([status, quantity]) => quantity)
       .map(([status, quantity]) => {
@@ -158,7 +158,7 @@ export class LineItemTableComponent {
     return this.regexService.getStatusSplitByCapitalLetter(reason)
   }
 
-  quantityCanChange(lineItem: MarketplaceLineItem): number {
+  quantityCanChange(lineItem: HSLineItem): number {
     return NumberCanChangeTo(this._tableStatus as LineItemStatus, lineItem)
   }
 

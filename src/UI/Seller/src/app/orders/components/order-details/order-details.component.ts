@@ -26,8 +26,8 @@ import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppAuthService } from '@app-seller/auth'
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface'
 import {
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { flatten as _flatten } from 'lodash'
 import { OrderProgress } from '@app-seller/models/order.types'
@@ -58,7 +58,7 @@ export class OrderDetailsComponent {
   _buyerOrder: Order = {}
   _buyerQuoteAddress: Address = null
   _supplierOrder: Order = {}
-  _lineItems: MarketplaceLineItem[] = []
+  _lineItems: HSLineItem[] = []
   _payments: Payment[] = []
   images: any[] = []
   orderDirection: OrderDirection
@@ -97,7 +97,7 @@ export class OrderDetailsComponent {
     this.setOrderDirection()
   }
 
-  setOrderProgress(order: MarketplaceOrder): void {
+  setOrderProgress(order: HSOrder): void {
     switch (order?.xp?.ShippingStatus) {
       case 'Processing':
         this.orderProgress = {
@@ -254,7 +254,7 @@ export class OrderDetailsComponent {
       .toPromise()
     lineItems = [
       ...lineItems,
-      ...(lineItemsResponse.Items as MarketplaceLineItem[]),
+      ...(lineItemsResponse.Items as HSLineItem[]),
     ]
     if (lineItemsResponse.Meta.TotalPages <= 1) {
       return lineItems

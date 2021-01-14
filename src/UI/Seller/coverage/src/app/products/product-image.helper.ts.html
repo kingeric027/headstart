@@ -119,8 +119,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Product, MeUser, User } from '@ordercloud/angular-sdk'
 import { environment } from 'src/environments/environment'
 import {
-  MarketplaceProduct,
-  MarketplaceLineItem,
+  HSProduct,
+  HSLineItem,
 } from '@ordercloud/headstart-sdk'
 import { UserContext } from '@app-seller/config/user-context'
 &nbsp;
@@ -130,14 +130,14 @@ export const PLACEHOLDER_URL = 'http://placehold.it/300x300'
 export const PRODUCT_IMAGE_PATH_STRATEGY = 'PRODUCT_IMAGE_PATH_STRATEGY'
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >getProductSmallImageUrl(</span>
-  product: MarketplaceProduct,
+  product: HSProduct,
   sellerID: string
 ): string {
 <span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=s`</span>
 }
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >getProductMediumImageUrl(</span>
-  product: MarketplaceProduct,
+  product: HSProduct,
   sellerID: string
 ): string {
 <span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/products/${product.ID}/thumbnail?size=m`</span>
@@ -145,7 +145,7 @@ export function <span class="fstat-no" title="function not covered" >getProductM
 &nbsp;
 export const getPrimaryLineItemImage = <span class="fstat-no" title="function not covered" >(</span>
   lineItemID: string,
-  lineItems: MarketplaceLineItem[],
+  lineItems: HSLineItem[],
   sellerID: string
 ): string =&gt; {
   const li = <span class="cstat-no" title="statement not covered" >lineItems.find(<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.ID === lineItemID)</span></span>

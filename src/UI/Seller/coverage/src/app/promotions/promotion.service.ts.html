@@ -386,7 +386,7 @@ import {
 } from '@app-seller/shared/models/marketplace-promo.interface'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { Promotions } from 'ordercloud-javascript-sdk'
-import { MarketplaceSupplier } from '@ordercloud/headstart-sdk'
+import { HSSupplier } from '@ordercloud/headstart-sdk'
 &nbsp;
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -440,7 +440,7 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
   }
 <span class="fstat-no" title="function not covered" >  buildEligibleExpression</span>(
     safeXp: PromotionXp,
-    selectedSupplier?: MarketplaceSupplier
+    selectedSupplier?: HSSupplier
   ): string {
     let eligibleExpression = <span class="cstat-no" title="statement not covered" >''</span>
 <span class="cstat-no" title="statement not covered" >    switch (safeXp?.AppliesTo) {</span>
@@ -500,7 +500,7 @@ export class PromotionService extends ResourceCrudService&lt;Promotion&gt; {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  buildValueExpression</span>(
     safeXp: PromotionXp,
-    selectedSupplier?: MarketplaceSupplier
+    selectedSupplier?: HSSupplier
   ): string {
     let valueExpression = <span class="cstat-no" title="statement not covered" >'Order.Subtotal'</span>
 <span class="cstat-no" title="statement not covered" >    switch (safeXp?.AppliesTo) {</span>

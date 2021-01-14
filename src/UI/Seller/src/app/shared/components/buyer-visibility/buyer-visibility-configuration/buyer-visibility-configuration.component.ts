@@ -14,8 +14,8 @@ import { ProductService } from '@app-seller/products/product.service'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
 import {
   HeadStartSDK,
-  MarketplaceBuyer,
-  MarketplaceProduct,
+  HSBuyer,
+  HSProduct,
 } from '@ordercloud/headstart-sdk'
 
 @Component({
@@ -27,19 +27,19 @@ export class BuyerVisibilityConfiguration {
   faEyeSlash = faEyeSlash
   faEye = faEye
   @Input()
-  set buyer(value: MarketplaceBuyer) {
+  set buyer(value: HSBuyer) {
     this._buyer = value
     this.fetchData()
   }
 
   @Input()
-  set product(value: MarketplaceProduct) {
+  set product(value: HSProduct) {
     this._product = value
     this.fetchData()
   }
 
-  _product: MarketplaceProduct = {}
-  _buyer: MarketplaceBuyer = {}
+  _product: HSProduct = {}
+  _buyer: HSBuyer = {}
 
   addCatalogAssignments: ProductAssignment[] = []
   delCatalogAssignments: ProductAssignment[] = []
@@ -110,7 +110,7 @@ export class BuyerVisibilityConfiguration {
     )
   }
 
-  async getKitProductCatalogAssignments(product: MarketplaceProduct) {
+  async getKitProductCatalogAssignments(product: HSProduct) {
     const productCatalogAssignments = []
     const kitProduct = await HeadStartSDK.KitProducts.Get(product.ID)
     kitProduct.ProductAssignments.ProductsInKit.forEach(async (prod) => {

@@ -32,7 +32,7 @@ import {
 } from '@app-seller/models/promo-types'
 import * as moment from 'moment'
 import { Router } from '@angular/router'
-import { ListArgs, MarketplaceSupplier } from '@ordercloud/headstart-sdk'
+import { ListArgs, HSSupplier } from '@ordercloud/headstart-sdk'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateService } from '@ngx-translate/core'
 import { Products, Meta } from 'ordercloud-javascript-sdk'
@@ -62,10 +62,10 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   updatedResource
   @Output()
   updateResource = new EventEmitter<any>()
-  suppliers: MarketplaceSupplier[]
+  suppliers: HSSupplier[]
   products = new BehaviorSubject<Product[]>([])
   productMeta: Meta
-  selectedSupplier: MarketplaceSupplier
+  selectedSupplier: HSSupplier
   resourceForm: FormGroup
   _promotionEditable: Promotion<PromotionXp>
   _promotionStatic: Promotion<PromotionXp>

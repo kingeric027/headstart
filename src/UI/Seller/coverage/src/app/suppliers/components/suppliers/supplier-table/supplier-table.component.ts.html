@@ -521,7 +521,7 @@ import {
   applicationConfiguration,
 } from '@app-seller/config/app.config'
 import {
-  MarketplaceSupplier,
+  HSSupplier,
   HeadStartSDK,
   Asset,
   AssetUpload,
@@ -540,7 +540,7 @@ export interface SupplierCategoryConfig {
   Filters: Array&lt;SupplierCategoryConfigFilters&gt;
 }
 &nbsp;
-function createSupplierForm(supplier: MarketplaceSupplier) {
+function createSupplierForm(supplier: HSSupplier) {
   return new FormGroup({
     ID: new FormControl({
       value: supplier.ID,
@@ -701,7 +701,7 @@ export class SupplierTableComponent extends ResourceCrudComponent&lt;Supplier&gt
           NotificationRcpts: [users.Items[0].Email],
         },
       }
-      const patchedSupplier: MarketplaceSupplier = <span class="cstat-no" title="statement not covered" >await this.ocSupplierService</span>
+      const patchedSupplier: HSSupplier = <span class="cstat-no" title="statement not covered" >await this.ocSupplierService</span>
         .Patch(supplier.ID, patch)
         .toPromise()
 <span class="cstat-no" title="statement not covered" >      this.selectResource(patchedSupplier)</span>

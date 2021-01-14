@@ -10,8 +10,8 @@ import { getSuggestedAddresses } from '@app-seller/shared/services/address-sugge
 import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation'
 import {
   HeadStartSDK,
-  MarketplaceCatalog,
-  MarketplaceCatalogAssignmentRequest,
+  HSCatalog,
+  HSCatalogAssignmentRequest,
 } from '@ordercloud/headstart-sdk'
 import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
@@ -44,7 +44,7 @@ export class BuyerLocationEditComponent implements OnInit {
   updateResource = new EventEmitter<ResourceUpdate>()
   @Output()
   isCreatingNew: boolean
-  catalogAssignments: MarketplaceCatalogAssignmentRequest = { CatalogIDs: [] }
+  catalogAssignments: HSCatalogAssignmentRequest = { CatalogIDs: [] }
   buyerID: string
   selectAddress = new EventEmitter<any>()
   buyerLocationEditable: MarketplaceBuyerLocation
@@ -52,7 +52,7 @@ export class BuyerLocationEditComponent implements OnInit {
   areChanges = false
   dataIsSaving = false
   countryOptions: SupportedCountries[]
-  catalogs: MarketplaceCatalog[] = []
+  catalogs: HSCatalog[] = []
 
   constructor(
     private buyerLocationService: BuyerLocationService,

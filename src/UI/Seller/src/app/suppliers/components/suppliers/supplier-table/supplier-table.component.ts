@@ -17,7 +17,7 @@ import {
 import { SupplierService } from '../supplier.service'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
-  MarketplaceSupplier,
+  HSSupplier,
   HeadStartSDK,
   Asset,
   AssetUpload,
@@ -27,7 +27,7 @@ import { AppAuthService } from '@app-seller/auth'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
 
-function createSupplierForm(supplier: MarketplaceSupplier) {
+function createSupplierForm(supplier: HSSupplier) {
   return new FormGroup({
     ID: new FormControl({
       value: supplier.ID,
@@ -188,7 +188,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
           NotificationRcpts: [users.Items[0].Email],
         },
       }
-      const patchedSupplier: MarketplaceSupplier = await this.ocSupplierService
+      const patchedSupplier: HSSupplier = await this.ocSupplierService
         .Patch(supplier.ID, patch)
         .toPromise()
       this.selectResource(patchedSupplier)
