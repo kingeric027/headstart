@@ -1,13 +1,16 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, Inject, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppConfig, FileHandle } from '@app-seller/shared'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { MeUser } from '@ordercloud/angular-sdk'
+import { MeUser, OcSupplierService, Supplier } from '@ordercloud/angular-sdk'
 import { ToastrService } from 'ngx-toastr'
 import { takeWhile } from 'rxjs/operators'
+import {
+  faAsterisk
+} from '@fortawesome/free-solid-svg-icons'
 
 @Component({
   selector: 'support-case-submission',
@@ -26,19 +29,26 @@ export class CaseSubmissionComponent implements OnInit {
   attachmentFile
   stagedAttachmentUrl: SafeUrl = null
   isImageFileType: boolean = false
+  vendor: Supplier
+  submitBtnDisabled: boolean = false
+  faAsterisk = faAsterisk
   
   constructor(
     private currentUserService: CurrentUserService,
     private formBuilder: FormBuilder,
     private http: HttpClient,
+    private ocSupplierService: OcSupplierService,
     private sanitizer: DomSanitizer,
     private toastrService: ToastrService,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
   ) { }
 
   ngOnInit(): void {
-    this.currentUserService.userSubject.pipe(takeWhile(() => this.alive)).subscribe((user) => {
+    this.currentUserService.userSubject.pipe(takeWhile(() => this.alive)).subscribe(async (user) => {
       this.user = user
+      if (this.user?.Supplier?.ID) {
+        this.vendor = await this.ocSupplierService.Get(this.user.Supplier.ID).toPromise()
+      }
       this.setForm()
     })
   }
@@ -48,7 +58,7 @@ export class CaseSubmissionComponent implements OnInit {
       FirstName: [this.user ? this.user.FirstName : '', Validators.required],
       LastName: [this.user ? this.user.LastName : '', Validators.required],
       Email: [this.user ? this.user.Email : '', Validators.required],
-      Vendor: ['', Validators.required],
+      Vendor: [this.vendor ? this.vendor.Name : '', this.vendor ? Validators.required : null],
       Subject: [null, Validators.required],
       Message: ['', Validators.required],
       File: [null]
@@ -79,7 +89,17 @@ export class CaseSubmissionComponent implements OnInit {
     this.attachmentFile = null
   }
 
+  isRequired(control: string): boolean {
+    const theControl = this.caseSubmissionForm.get(control)
+    if (theControl.validator === null) return false
+    const validator = this.caseSubmissionForm
+      .get(control)
+      .validator({} as AbstractControl)
+    return validator && validator.required
+  }
+
   sendCaseSubmission() {
+    this.submitBtnDisabled = true
     const form = new FormData()
     Object.keys(this.caseSubmissionForm.value).forEach(key => {
       if (key === 'File') {
@@ -90,8 +110,16 @@ export class CaseSubmissionComponent implements OnInit {
     })
     return this.http.post(`${this.appConfig.middlewareUrl}/support/submitcase`, form)
       .subscribe(
-        () => this.toastrService.success('Support case sent', 'Success'), 
-        () => this.toastrService.error('There was an issue sending your request', 'Error')
+        () => {
+          this.toastrService.success('Support case sent', 'Success')
+          this.submitBtnDisabled = false
+          this.setForm()
+          this.removeAttachment()
+        }, 
+        () => {
+          this.toastrService.error('There was an issue sending your request', 'Error')
+          this.submitBtnDisabled = false
+        }
       )
   }
 
