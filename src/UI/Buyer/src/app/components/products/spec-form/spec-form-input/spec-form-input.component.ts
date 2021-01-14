@@ -23,16 +23,12 @@ import { specErrors } from '../errors'
           alert="alert alert-danger"
         >
           <div *ngIf="byIndex(index).errors['required']">
-            <div *ngIf="byIndex(index).errors['required']">
-              {{ errorMsgs.required }}
-            </div>
+            {{ errorMsgs.required }}
           </div>
           <div *ngIf="byIndex(index).errors['maxlength']">
-            <div *ngIf="byIndex(index).errors['maxlength']">
-              {{ errorMsgs.maxLength }} ({{
-                byIndex(index).errors['maxlength']['requiredLength']
-              }})
-            </div>
+            {{ errorMsgs.maxLength }} ({{
+              byIndex(index).errors['maxlength']['requiredLength']
+            }})
           </div>
         </div>
       </div>
