@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { ListPage, MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
+import { ListPage, HSMeProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   template: `
@@ -7,7 +7,7 @@ import { ListPage, MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
   `,
 })
 export class HomeWrapperComponent implements OnInit {
-  featuredProducts: ListPage<MarketplaceMeProduct>
+  featuredProducts: ListPage<HSMeProduct>
 
   constructor() {}
 

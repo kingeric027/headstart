@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core'
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { groupBy as _groupBy } from 'lodash'
 import {
-  MarketplaceKitProduct,
-  MarketplaceLineItem,
+  HSKitProduct,
+  HSLineItem,
 } from '@ordercloud/headstart-sdk'
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum'
@@ -19,7 +19,7 @@ import { QtyChangeEvent } from 'src/app/models/product.types'
   styleUrls: ['./lineitem-table.component.scss'],
 })
 export class OCMLineitemTable implements OnInit {
-  @Input() set lineItems(lineItems: MarketplaceLineItem[]) {
+  @Input() set lineItems(lineItems: HSLineItem[]) {
     this._lineItems = lineItems
     this.initLineItems() // if line items change we need to regroup them
   }
@@ -34,12 +34,12 @@ export class OCMLineitemTable implements OnInit {
   closeIcon = faTimes
   faTrashAlt = faTrashAlt
   suppliers: LineItemGroupSupplier[]
-  liGroupedByShipFrom: MarketplaceLineItem[][]
-  liGroupedByKit: MarketplaceLineItem[][]
-  productsInKit: MarketplaceKitProduct[] = []
+  liGroupedByShipFrom: HSLineItem[][]
+  liGroupedByKit: HSLineItem[][]
+  productsInKit: HSKitProduct[] = []
   updatingLiIDs: string[] = []
   _groupByKits: boolean
-  _lineItems: MarketplaceLineItem[] = []
+  _lineItems: HSLineItem[] = []
   _orderCurrency: string
   showKitDetails = true
   showComments: Record<string, string> = {}
@@ -69,8 +69,8 @@ export class OCMLineitemTable implements OnInit {
   }
 
   groupLineItemsByKitID(
-    lineItems: MarketplaceLineItem[]
-  ): MarketplaceLineItem[][] {
+    lineItems: HSLineItem[]
+  ): HSLineItem[][] {
     if (!this._groupByKits) return []
     const kitLineItems = lineItems.filter((li) => li.xp.KitProductID)
     const liKitGroups = _groupBy(kitLineItems, (li) => li.xp.KitProductID)
@@ -78,8 +78,8 @@ export class OCMLineitemTable implements OnInit {
   }
 
   groupLineItemsByShipFrom(
-    lineItems: MarketplaceLineItem[]
-  ): MarketplaceLineItem[][] {
+    lineItems: HSLineItem[]
+  ): HSLineItem[][] {
     const supplierLineItems = this._groupByKits
       ? lineItems.filter((li) => !li.xp.KitProductID)
       : lineItems
@@ -91,7 +91,7 @@ export class OCMLineitemTable implements OnInit {
     })
   }
 
-  async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
+  async setSupplierInfo(liGroups: HSLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(
       liGroups
     )
@@ -101,7 +101,7 @@ export class OCMLineitemTable implements OnInit {
     await this.context.order.cart.remove(lineItemID)
   }
 
-  async removeKit(kit: MarketplaceLineItem[]): Promise<void> {
+  async removeKit(kit: HSLineItem[]): Promise<void> {
     await this.context.order.cart.removeMany(kit)
   }
 
@@ -169,7 +169,7 @@ export class OCMLineitemTable implements OnInit {
     )
   }
 
-  getLineItem(lineItemID: string): MarketplaceLineItem {
+  getLineItem(lineItemID: string): HSLineItem {
     return this._lineItems.find((li) => li.ID === lineItemID)
   }
 

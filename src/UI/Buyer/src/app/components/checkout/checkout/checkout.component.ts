@@ -10,9 +10,9 @@ import {
   OrderPromotion,
 } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
-  MarketplacePayment,
+  HSOrder,
+  HSLineItem,
+  HSPayment,
   OrderCloudIntegrationsCreditCardPayment,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
@@ -31,7 +31,7 @@ import { AxiosError } from 'axios'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { CheckoutSection } from 'src/app/models/checkout.types'
-import { MarketplaceBuyerCreditCard, SelectedCreditCard } from 'src/app/models/credit-card.types'
+import { HSBuyerCreditCard, SelectedCreditCard } from 'src/app/models/credit-card.types'
 import { OrderSummaryMeta } from 'src/app/models/order.types'
 import { ModalState } from 'src/app/models/shared.types'
 import { MiddlewareError } from 'src/app/models/error.types'
@@ -47,10 +47,10 @@ export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion
   isAnon: boolean
   isNewCard: boolean
-  order: MarketplaceOrder
+  order: HSOrder
   orderPromotions: OrderPromotion[] = []
-  lineItems: ListPage<MarketplaceLineItem>
-  invalidLineItems: MarketplaceLineItem[] = []
+  lineItems: ListPage<HSLineItem>
+  invalidLineItems: HSLineItem[] = []
   orderSummaryMeta: OrderSummaryMeta
   payments: ListPage<Payment>
   cards: ListPage<BuyerCreditCard>
@@ -157,7 +157,7 @@ export class OCMCheckout implements OnInit {
     this.toSection('shippingAddress')
   }
 
-  buildCCPayment(card: MarketplaceBuyerCreditCard): Payment {
+  buildCCPayment(card: HSBuyerCreditCard): Payment {
     // amount gets calculated in middleware
     return {
       DateCreated: new Date().toDateString(),
@@ -182,7 +182,7 @@ export class OCMCheckout implements OnInit {
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.initLoadingIndicator('paymentLoading')
-    const payments: MarketplacePayment[] = []
+    const payments: HSPayment[] = []
     this.selectedCard = output
     if (!output.SavedCard) {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.

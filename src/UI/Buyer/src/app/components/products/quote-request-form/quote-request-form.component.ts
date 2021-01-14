@@ -7,7 +7,7 @@ import {
 } from 'src/app/validators/validators'
 import {
   QuoteOrderInfo,
-  MarketplaceAddressBuyer,
+  HSAddressBuyer,
 } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { CurrentUser } from 'src/app/models/profile.types'
@@ -23,7 +23,7 @@ export class OCMQuoteRequestForm implements OnInit {
   } = {
     pageSize: 100,
   }
-  myBuyerLocations: MarketplaceAddressBuyer[]
+  myBuyerLocations: HSAddressBuyer[]
   //todo revert type to QuoteOrderInfo
   @Output() formSubmitted = new EventEmitter<{ user: any }>()
   @Output() formDismissed = new EventEmitter()

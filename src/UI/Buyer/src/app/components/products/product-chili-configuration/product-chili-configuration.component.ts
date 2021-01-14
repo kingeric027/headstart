@@ -3,11 +3,11 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons'
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk'
 import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceLineItem,
+  HSLineItem,
   Asset,
   QuoteOrderInfo,
-  ProductInKit,
-  MarketplaceVariant,
+  HSProductInKit,
+  HSVariant,
   ChiliSpec,
   ChiliConfig,
   MeChiliTemplate,
@@ -15,8 +15,8 @@ import {
 import { Observable } from 'rxjs'
 import { SpecFormService } from '../spec-form/spec-form.service'
 import {
-  SuperMarketplaceProduct,
-  MarketplaceMeProduct,
+  SuperHSProduct,
+  HSMeProduct,
 } from '@ordercloud/headstart-sdk'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from '../product-details/product-detail.service'
@@ -41,9 +41,9 @@ export class OCMProductChiliConfig implements OnInit {
   faListUl = faListUl
   faTimes = faTimes
 
-  _superProduct: SuperMarketplaceProduct
+  _superProduct: SuperHSProduct
   specs: Spec[]
-  _product: MarketplaceMeProduct
+  _product: HSMeProduct
   priceSchedule: PriceSchedule
   priceBreaks: PriceBreak[]
   attachments: Asset[] = []
@@ -51,7 +51,7 @@ export class OCMProductChiliConfig implements OnInit {
   quantity: number
   price: number
   percentSavings: number
-  relatedProducts$: Observable<MarketplaceMeProduct[]>
+  relatedProducts$: Observable<HSMeProduct[]>
   favoriteProducts: string[] = []
   qtyValid = true
   supplierNote: string
@@ -65,7 +65,7 @@ export class OCMProductChiliConfig implements OnInit {
   showGrid = false
   isAddingToCart = false
   isKitProduct: boolean
-  productsIncludedInKit: ProductInKit[]
+  productsIncludedInKit: HSProductInKit[]
   ocProductsInKit: any[]
   isKitStatic = false
   _chiliConfigs: ChiliConfig[] = []
@@ -73,7 +73,7 @@ export class OCMProductChiliConfig implements OnInit {
   contactRequest: ContactSupplierBody
   specForm: FormGroup
   isInactiveVariant: boolean
-  _disabledVariants: MarketplaceVariant[]
+  _disabledVariants: HSVariant[]
   variantInventory: number
   chiliTemplate: MeChiliTemplate
   showSpecs = false
@@ -86,8 +86,8 @@ export class OCMProductChiliConfig implements OnInit {
   loadingSpecs = true
   editor
   frameWindow
-  variant: MarketplaceVariant
-  lineItems: MarketplaceLineItem[] = []
+  variant: HSVariant
+  lineItems: HSLineItem[] = []
 
   constructor(
     private specFormService: SpecFormService,
@@ -227,7 +227,7 @@ export class OCMProductChiliConfig implements OnInit {
     this.isInactiveVariant = event
   }
 
-  populateInactiveVariants(superProduct: SuperMarketplaceProduct): void {
+  populateInactiveVariants(superProduct: SuperHSProduct): void {
     this._disabledVariants = []
     superProduct.Variants?.forEach((variant) => {
       if (!variant.Active) {
@@ -339,7 +339,7 @@ export class OCMProductChiliConfig implements OnInit {
 
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
-      const lineItem: MarketplaceLineItem = {}
+      const lineItem: HSLineItem = {}
       lineItem.ProductID = this._product.ID
       lineItem.Specs = this.specFormService.getLineItemSpecs(
         this.specs,

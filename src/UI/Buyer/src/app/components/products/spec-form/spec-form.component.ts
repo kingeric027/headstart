@@ -1,4 +1,4 @@
-import { MarketplaceVariant } from '@ordercloud/headstart-sdk'
+import { HSVariant } from '@ordercloud/headstart-sdk'
 import {
   Component,
   EventEmitter,
@@ -41,7 +41,7 @@ export class OCMSpecForm implements OnChanges {
   controlInactive: boolean
 
   @Input() currency: string
-  @Input() disabledVariants: MarketplaceVariant[]
+  @Input() disabledVariants: HSVariant[]
   @Input() compact?: boolean = false // displays inputs in a compact way by setting them on a single line
   @Input() specs: Spec[]
 
@@ -115,7 +115,7 @@ export class OCMSpecForm implements OnChanges {
 
   validateChangeAvailability(
     form: FormGroup,
-    disabledVariants: MarketplaceVariant[]
+    disabledVariants: HSVariant[]
   ): void {
     let controlInactive = false
     if (!disabledVariants) {
@@ -139,7 +139,7 @@ export class OCMSpecForm implements OnChanges {
 
   isControlInactive(
     ctrls: string[],
-    disabledVariant: MarketplaceVariant
+    disabledVariant: HSVariant
   ): boolean {
     let controlCount = 0
     for (const variant of disabledVariant.Specs) {

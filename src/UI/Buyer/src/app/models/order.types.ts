@@ -1,9 +1,9 @@
-import { MarketplaceLineItem } from "@ordercloud/headstart-sdk";
+import { HSLineItem } from "@ordercloud/headstart-sdk";
 import { LineItem, Sortable } from "ordercloud-javascript-sdk";
 
 export interface OrderSummaryMeta {
-    StandardLineItems: MarketplaceLineItem[]
-    POLineItems: MarketplaceLineItem[]
+    StandardLineItems: HSLineItem[]
+    POLineItems: HSLineItem[]
     StandardLineItemCount: number
     POLineItemCount: number
   

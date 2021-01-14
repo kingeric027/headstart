@@ -1,5 +1,5 @@
 import { FormControl, Validators } from '@angular/forms'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 import { NumberCanCancelOrReturn } from 'src/app/services/lineitem-status.helper'
 
 export class LineItemForm {
@@ -7,9 +7,9 @@ export class LineItemForm {
   selected = new FormControl()
   quantityToReturnOrCancel = new FormControl()
   returnReason = new FormControl()
-  lineItem: MarketplaceLineItem
+  lineItem: HSLineItem
 
-  constructor(lineItem: MarketplaceLineItem, action: string) {
+  constructor(lineItem: HSLineItem, action: string) {
     if (lineItem.ID) this.id.setValue(lineItem.ID)
     const amountCanBeReturnedOrCanceled = NumberCanCancelOrReturn(
       lineItem,

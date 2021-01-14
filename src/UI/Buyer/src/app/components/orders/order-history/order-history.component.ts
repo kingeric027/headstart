@@ -7,7 +7,7 @@ import {
 } from '@angular/core'
 import { ListPage } from 'ordercloud-javascript-sdk'
 import { takeWhile } from 'rxjs/operators'
-import { MarketplaceOrder } from '@ordercloud/headstart-sdk'
+import { HSOrder } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { OrderFilters, HeadstartOrderStatus, OrderViewContext } from 'src/app/models/order.types'
 import { RouteConfig } from 'src/app/models/shared.types'
@@ -19,7 +19,7 @@ import { RouteConfig } from 'src/app/models/shared.types'
 export class OCMOrderHistory implements OnInit, AfterViewInit, OnDestroy {
   alive = true
   columns: string[] = ['ID', 'Status', 'DateSubmitted', 'Total']
-  @Input() orders: ListPage<MarketplaceOrder>
+  @Input() orders: ListPage<HSOrder>
   viewContext: string
   showOnlyFavorites = false
   sortBy: string

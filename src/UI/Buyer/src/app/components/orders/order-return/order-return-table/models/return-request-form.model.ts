@@ -1,5 +1,5 @@
 import { FormArray, FormControl, FormBuilder } from '@angular/forms'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 import { LineItemGroupForm } from './line-item-group-form.model'
 
 export class ReturnRequestForm {
@@ -9,7 +9,7 @@ export class ReturnRequestForm {
   constructor(
     private fb: FormBuilder,
     orderID: string,
-    liGroups: MarketplaceLineItem[][],
+    liGroups: HSLineItem[][],
     action: string
   ) {
     if (orderID) {
