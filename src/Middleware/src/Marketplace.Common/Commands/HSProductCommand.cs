@@ -296,7 +296,7 @@ namespace Headstart.Common.Commands.Crud
 
 				foreach (Product product in allProducts)
 				{
-					if (product.VariantCount > 0)
+					if (product.VariantCount > 0 && product.ID != superProduct.Product.ID)
 					{
 						allVariants.AddRange((await _oc.Products.ListVariantsAsync(productID: product.ID, pageSize: 100, accessToken: token)).Items);
 					}
@@ -311,12 +311,27 @@ namespace Headstart.Common.Commands.Crud
             {
 				if (!allVariants.Any()) { return; }
 
-				List<Variant> duplicateSpecNames = allVariants.Where(currVariant => variant.xp.NewID == currVariant.ID).ToList();
+				List<Variant> duplicateSpecNames = allVariants.Where(currVariant => IsDifferentVariantWithSameName(variant, currVariant)).ToList();
 				if (duplicateSpecNames.Any())
                 {	
 					throw new Exception($"{duplicateSpecNames.First().ID} already exists on a variant. Please use unique names for SKUS and try again.");
                 }
             }
+        }
+
+        private bool IsDifferentVariantWithSameName(Variant variant, Variant currVariant)
+        {
+			//Do they have the same name
+            if (variant.xp.NewID == currVariant.ID)
+            {
+				if (variant.xp.SpecCombo == variant.xp.SpecCombo)
+                {
+					//It's most likely the same variant
+					return false;
+                }
+				return true;
+            }
+			return false;
         }
 
         public async Task<SuperHSProduct> Put(string id, SuperHSProduct superProduct, string token)
@@ -370,6 +385,7 @@ namespace Headstart.Common.Commands.Crud
 
 			foreach (Variant variant in requestVariants)
 			{
+				ValidateRequestVariant(variant);
 				var currVariant = existingVariants.Where(v => v.ID == variant.ID);
 				if (currVariant == null || currVariant.Count() < 1) { continue; }
 				hasVariantChange = HasVariantChange(variant, currVariant.First());
@@ -437,7 +453,16 @@ namespace Headstart.Common.Commands.Crud
 			};
 		}
 
-		private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
+        private void ValidateRequestVariant(Variant variant)
+        {
+            if (variant.xp.NewID == variant.ID)
+            {
+				//If NewID is same as ID, no changes have happened so NewID shouldn't be populated.
+				variant.xp.NewID = null;
+            }
+        }
+
+        private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
 		{
 			var ocAuth = await _oc.AuthenticateAsync();
 			var initial = await _oc.PriceSchedules.GetAsync(updated.ID);
@@ -477,7 +502,8 @@ namespace Headstart.Common.Commands.Crud
 			if (variant.ShipLength != currVariant.ShipLength) { return true; }
 			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
 			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
-			if (variant.Inventory != currVariant.Inventory) { return true; }
+			if (variant?.Inventory?.LastUpdated != currVariant?.Inventory?.LastUpdated) { return true; }
+			if (variant?.Inventory?.QuantityAvailable != currVariant?.Inventory?.QuantityAvailable) { return true; }
 
 			return false;
 		}
