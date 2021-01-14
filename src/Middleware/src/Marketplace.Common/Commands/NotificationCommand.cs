@@ -98,6 +98,7 @@ namespace Headstart.Common.Commands
         public async Task<SuperHSProduct> UpdateMonitoredSuperProductNotificationStatus(Document<MonitoredProductFieldModifiedNotification> document, string supplierID, string productID, VerifiedUserContext user)
         {
             HSProduct product = null;
+            HSProduct patchedProduct = null;
             var token = await GetAdminToken();
             try
             {
@@ -133,7 +134,11 @@ namespace Headstart.Common.Commands
                 };
                 try
                 {
-                    await ClientHelper.RunAction(configToUse, x => x.Products.PatchAsync<HSProduct>(productID, new PartialProduct() { Active = true }));
+                    await ClientHelper.RunAction(configToUse, async x =>
+                    {
+                        patchedProduct = await x.Products.PatchAsync<HSProduct>(productID, new PartialProduct() { Active = true });
+                    }
+                    );
                 }
                 catch (OrderCloudException ex)
                 {
@@ -152,7 +157,7 @@ namespace Headstart.Common.Commands
                 await _cms.Documents.Save(_documentSchemaID, document.ID, document, token);
             }
             var superProduct = await _productCommand.Get(productID, token);
-            superProduct.Product = product;
+            superProduct.Product = patchedProduct;
             return superProduct;
         }
 
