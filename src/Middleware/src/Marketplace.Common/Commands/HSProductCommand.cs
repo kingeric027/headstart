@@ -324,7 +324,7 @@ namespace Headstart.Common.Commands.Crud
 			//Do they have the same SKU
             if (variant.xp.NewID == currVariant.ID)
             {
-				if (variant.xp.SpecCombo == variant.xp.SpecCombo)
+				if (variant.xp.SpecCombo == currVariant.xp.SpecCombo)
                 {
 					//It's most likely the same variant
 					return false;
