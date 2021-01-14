@@ -227,6 +227,9 @@ export class OCMSpecForm implements OnChanges {
       value: spec.DefaultValue,
       validation: [
         spec.Required ? Validators.required : Validators.nullValidator,
+        spec.xp?.CharacterLimit > 0
+          ? Validators.maxLength(spec.xp.CharacterLimit)
+          : Validators.nullValidator,
       ],
     }
   }

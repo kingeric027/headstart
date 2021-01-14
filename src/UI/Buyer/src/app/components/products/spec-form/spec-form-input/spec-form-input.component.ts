@@ -27,6 +27,13 @@ import { specErrors } from '../errors'
               {{ errorMsgs.required }}
             </div>
           </div>
+          <div *ngIf="byIndex(index).errors['maxlength']">
+            <div *ngIf="byIndex(index).errors['maxlength']">
+              {{ errorMsgs.maxLength }} ({{
+                byIndex(index).errors['maxlength']['requiredLength']
+              }})
+            </div>
+          </div>
         </div>
       </div>
     </div>
