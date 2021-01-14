@@ -24,6 +24,7 @@ export const ocAppConfig: AppConfig = {
     'ApiClientReader',
     'AdminAddressReader',
     'MeAddressAdmin',
+    'AddressReader',
     'MeAdmin',
     'BuyerUserAdmin',
     'UserGroupAdmin',
