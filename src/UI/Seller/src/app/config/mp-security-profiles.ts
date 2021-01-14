@@ -168,7 +168,7 @@ const MPCategoryReader: MPRole = {
 const MPOrderAdmin: MPRole = {
   // Assigned to user types who want to edit orders, line items, and shipments. Would likely by a supplier who needs to make manual updates to an order
   RoleName: MPRoles.MPOrderAdmin,
-  OrderCloudRoles: [OrderCloudRoles.OrderAdmin, OrderCloudRoles.ShipmentReader],
+  OrderCloudRoles: [OrderCloudRoles.OrderAdmin, OrderCloudRoles.ShipmentReader, OrderCloudRoles.AddressReader],
 }
 const MPOrderReader: MPRole = {
   // Assigned to a user type who wants to view orders. Would likely be a seller user who shouldn't edit orders but wants to view
@@ -176,12 +176,13 @@ const MPOrderReader: MPRole = {
   OrderCloudRoles: [
     OrderCloudRoles.OrderReader,
     OrderCloudRoles.ShipmentReader,
+    OrderCloudRoles.AddressReader
   ],
 }
 const MPShipmentAdmin: MPRole = {
   // Assigned to a user type who wants to administer shipping for a supplier
   RoleName: MPRoles.MPShipmentAdmin,
-  OrderCloudRoles: [OrderCloudRoles.OrderReader, OrderCloudRoles.ShipmentAdmin],
+  OrderCloudRoles: [OrderCloudRoles.OrderReader, OrderCloudRoles.ShipmentAdmin, OrderCloudRoles.AddressReader],
 }
 // unclear if we need a MeBuyerAdmin
 // will need to be some disucssion about the breakout of these for SEB
