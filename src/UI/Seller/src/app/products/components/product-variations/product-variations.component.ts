@@ -169,7 +169,7 @@ export class ProductVariations implements OnChanges {
 
   hasSpecOptions(): boolean {
     return this.superProductEditable?.Specs?.every(
-      (spec) => spec?.Options?.length
+      (spec) => spec?.Options?.length || spec.AllowOpenText
     )
   }
 
