@@ -5,6 +5,7 @@ using Headstart.Common.Controllers;
 using Headstart.Common.Services.AnytimeDashboard.Models;
 using Headstart.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using ordercloud.integrations.library;
 
 namespace Headstart.Common.Controllerss
 {
@@ -21,9 +22,18 @@ namespace Headstart.Common.Controllerss
 		}
 
 		[HttpPost]
-		public async Task HandleAnytimeEventNotification([FromBody] List<Notification> notifications)
+		[DocName("Anytime Webhook")]
+		public async Task HandleAnytimeEventNotification([FromBody] ListNotification notifications)
 		{
 			await _command.HandleAnytimeEventNotifications(notifications);
 		}
+
 	}
+
+	// need this temporary model to mitigate shortcomings with sdk generation
+	[SwaggerModel]
+	public class ListNotification : List<Notification>
+    {
+
+    }
 }
