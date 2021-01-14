@@ -1,5 +1,9 @@
 @import '../../../styles/main.scss';
 
+.tab-status-icon {
+    font-size: .5rem;
+}
+
 .dropzone {
     background-image: url("../../../assets/FileUploadCircle.png");
     background-size: contain;
