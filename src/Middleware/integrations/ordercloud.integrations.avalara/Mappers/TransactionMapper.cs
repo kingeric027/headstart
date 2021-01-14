@@ -50,6 +50,7 @@ namespace ordercloud.integrations.avalara
 			var line = new LineItemModel()
 			{
 				amount = lineItem.LineTotal,
+				quantity = lineItem.Quantity,
 				taxCode = lineItem.Product.xp.Tax.Code,
 				itemCode = lineItem.ProductID,
 				customerUsageType = null,
