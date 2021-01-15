@@ -7,6 +7,7 @@ using Headstart.Tests.Mocks;
 using NSubstitute;
 using NUnit.Framework;
 using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;
@@ -28,6 +29,7 @@ namespace Headstart.Tests
 		private ICreditCardCommand _sut;
 
 		private string validretref = "myretref";
+		private CurrencySymbol currency = CurrencySymbol.CAD;
 		private string merchantID = "123";
 		private string cvv = "112";
 		private string orderID = "mockOrderID";
@@ -62,6 +64,9 @@ namespace Headstart.Tests
 				.Returns(ccTotal);
 
 			_sebExchangeRates = Substitute.For<ISebExchangeRatesService>();
+			_sebExchangeRates.GetCurrencyForUser(userToken)
+				.Returns(Task.FromResult(currency));
+
 			_supportAlerts = Substitute.For<ISupportAlertService>();
 			_settings = Substitute.For<AppSettings>();
 			_settings.CardConnectSettings.CadMerchantID = merchantID;
@@ -136,7 +141,7 @@ namespace Headstart.Tests
 			await _sut.AuthorizePayment(payment, userToken, merchantID);
 
 			// Assert
-			await _cardConnect.Received().VoidAuthorization(Arg.Is<CardConnectVoidRequest>(x => x.retref == validretref && x.merchid == merchantID));
+			await _cardConnect.Received().VoidAuthorization(Arg.Is<CardConnectVoidRequest>(x => x.retref == validretref && x.merchid == merchantID && x.currency == "CAD"));
 			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PaymentTransaction>(x => x.Amount == paymentTotal));
 			await _cardConnect.Received().AuthWithoutCapture(Arg.Any<CardConnectAuthorizationRequest>());
 			await _oc.Payments.Received().PatchAsync<HSPayment>(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PartialPayment>(p => p.Accepted == true && p.Amount == ccTotal));
@@ -202,7 +207,76 @@ namespace Headstart.Tests
 			await _sut.AuthorizePayment(payment, userToken, merchantID);
 
 			// Assert
-			await _cardConnect.Received().VoidAuthorization(Arg.Is<CardConnectVoidRequest>(x => x.retref == "retref3" && x.merchid == merchantID));
+			await _cardConnect.Received().VoidAuthorization(Arg.Is<CardConnectVoidRequest>(x => x.retref == "retref3" && x.merchid == merchantID && x.currency == "CAD"));
+			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PaymentTransaction>(x => x.Amount == paymentTotal));
+			await _cardConnect.Received().AuthWithoutCapture(Arg.Any<CardConnectAuthorizationRequest>());
+			await _oc.Payments.Received().PatchAsync<HSPayment>(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PartialPayment>(p => p.Accepted == true && p.Amount == ccTotal));
+			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID, paymentID, Arg.Any<PaymentTransaction>());
+		}
+
+		[Test]
+		public async Task should_handle_existing_voids_us()
+		{
+			// same as should_handle_existing_voids but handle usd merchant
+
+			var paymentTotal = 30; // credit card total is 38
+
+			// Arrange
+			var payment1transactions = new List<HSPaymentTransaction>()
+			{
+				new HSPaymentTransaction
+				{
+					ID = "authattempt1",
+					Succeeded = true,
+					Type = "CreditCard",
+					xp = new TransactionXP
+					{
+						CardConnectResponse = new CardConnectAuthorizationResponse
+						{
+							retref = "retref1"
+						}
+					}
+				},
+				new HSPaymentTransaction
+				{
+					ID = "voidattempt1",
+					Succeeded = true,
+					Type = "CreditCardVoidAuthorization",
+					xp = new TransactionXP
+					{
+						CardConnectResponse = new CardConnectAuthorizationResponse
+						{
+							retref = "retref2"
+						}
+					}
+				},
+				new HSPaymentTransaction
+				{
+					ID = "authattempt2",
+					Type = "CreditCard",
+					Succeeded = true,
+					xp = new TransactionXP
+					{
+						CardConnectResponse = new CardConnectAuthorizationResponse
+						{
+							retref = "retref3"
+						}
+					}
+				}
+			};
+			_settings.CardConnectSettings.UsdMerchantID = merchantID;
+			_settings.CardConnectSettings.CadMerchantID = "somethingelse";
+			_sebExchangeRates.GetCurrencyForUser(userToken)
+				.Returns(Task.FromResult(CurrencySymbol.USD));
+			_oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, orderID, filters: Arg.Is<object>(f => (string)f == "Type=CreditCard"))
+				.Returns(PaymentMocks.PaymentList(MockCCPayment(paymentTotal, true, payment1transactions)));
+			var payment = ValidIntegrationsPayment();
+
+			// Act
+			await _sut.AuthorizePayment(payment, userToken, merchantID);
+
+			// Assert
+			await _cardConnect.Received().VoidAuthorization(Arg.Is<CardConnectVoidRequest>(x => x.retref == "retref3" && x.merchid == merchantID && x.currency == "USD"));
 			await _oc.Payments.Received().CreateTransactionAsync(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PaymentTransaction>(x => x.Amount == paymentTotal));
 			await _cardConnect.Received().AuthWithoutCapture(Arg.Any<CardConnectAuthorizationRequest>());
 			await _oc.Payments.Received().PatchAsync<HSPayment>(OrderDirection.Incoming, orderID, paymentID, Arg.Is<PartialPayment>(p => p.Accepted == true && p.Amount == ccTotal));
