@@ -32,11 +32,13 @@ namespace Headstart.Common.Commands
     {
         private readonly IOrderCloudClient _oc;
         private readonly ReportTemplateQuery _template;
+        private readonly IMarketplaceSupplierCommand _supplierCommand;
 
-        public MarketplaceReportCommand(IOrderCloudClient oc, ReportTemplateQuery template)
+        public MarketplaceReportCommand(IOrderCloudClient oc, ReportTemplateQuery template, IMarketplaceSupplierCommand supplierCommand)
         {
             _oc = oc;
             _template = template;
+            _supplierCommand = supplierCommand;
         }
 
         public ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser)
@@ -256,6 +258,12 @@ namespace Headstart.Common.Commands
             var lineItemOrders = new List<HSLineItemOrder>();
             foreach (var order in filteredOrders)
             {
+                // If suppliers are reporting on From User information, this must come from the seller order instead.
+                if (template.Headers.Any(header => header.Contains("FromUser") && verifiedUser.UsrType == "supplier"))
+                {
+                    var supplierOrderData = await _supplierCommand.GetSupplierOrderData(order.ID, verifiedUser);
+                    order.FromUser = supplierOrderData.BuyerOrder.Order.FromUser;
+                }
                 var lineItems = new List<HSLineItem>();
                 lineItems.AddRange(await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(
                     OrderDirection.Incoming,
