@@ -39,7 +39,10 @@
         </div>
         <small class="d-block">SKU: {{ _product?.ID }}</small>
         <!-- TODO: Uncomment when grid bugs are fixed -->
-        <div class="btn-group float-right" *ngIf="specs?.length > 0">
+        <div
+          class="btn-group float-right"
+          *ngIf="specs?.length > 0 && hasNoOpenTextSpecs()"
+        >
           <button
             class="btn btn-sm btn-outline-secondary"
             [ngClass]="{ active: !showGrid }"

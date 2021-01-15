@@ -98,7 +98,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   setPageTitle() {
-    this.context.router.setPageTitle(this._superProduct.Product.Name);
+    this.context.router.setPageTitle(this._superProduct.Product.Name)
   }
   async listChiliConfigs(): Promise<void> {
     if (!this._product?.xp?.ArtworkRequired) {
@@ -304,5 +304,9 @@ export class OCMProductDetails implements OnInit {
 
   toOrderDetail(): void {
     this.context.router.toMyOrderDetails(this.submittedQuoteOrder.ID)
+  }
+
+  hasNoOpenTextSpecs(): boolean {
+    return !this.specs.some((spec) => spec?.AllowOpenText)
   }
 }
