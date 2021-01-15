@@ -143,7 +143,7 @@ namespace ordercloud.integrations.cardconnect
 						var response = await _cardConnect.VoidAuthorization(new CardConnectVoidRequest
 						{
 							currency = userCurrency.ToString(),
-							merchid = GetMerchantIDAsync(userCurrency),
+							merchid = GetMerchantID(userCurrency),
 							retref = transaction.xp.CardConnectResponse.retref
 						});
 						await WithRetry().ExecuteAsync(() => _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, payment.ID, CardConnectMapper.Map(payment, response)));
@@ -163,7 +163,7 @@ namespace ordercloud.integrations.cardconnect
 			}
 		}
 
-		private string GetMerchantIDAsync(CurrencySymbol userCurrency)
+		private string GetMerchantID(CurrencySymbol userCurrency)
 		{
 			if (userCurrency == CurrencySymbol.USD)
 				return _settings.CardConnectSettings.UsdMerchantID;
