@@ -52,13 +52,13 @@ namespace ordercloud.integrations.cardconnect
 
 		public async Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user)
 		{
-			var creditCard = await _oc.CreditCards.CreateAsync(buyerID, await Tokenize(card), user.AccessToken);
+			var creditCard = await _oc.CreditCards.CreateAsync(buyerID, await Tokenize(card, user.AccessToken), user.AccessToken);
 			return creditCard;
 		}
 
 		public async Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user)
 		{
-			var buyerCreditCard = await _oc.Me.CreateCreditCardAsync(await MeTokenize(card), user.AccessToken);
+			var buyerCreditCard = await _oc.Me.CreateCreditCardAsync(await MeTokenize(card, user.AccessToken), user.AccessToken);
 			return buyerCreditCard;
 		}
 
@@ -139,9 +139,11 @@ namespace ordercloud.integrations.cardconnect
 					if (retref != null)
 					{
 						transactionID = transaction.ID;
+						var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
 						var response = await _cardConnect.VoidAuthorization(new CardConnectVoidRequest
 						{
-							merchid = await GetMerchantIDAsync(userToken),
+							currency = userCurrency.ToString(),
+							merchid = GetMerchantIDAsync(userCurrency),
 							retref = transaction.xp.CardConnectResponse.retref
 						});
 						await WithRetry().ExecuteAsync(() => _oc.Payments.CreateTransactionAsync(OrderDirection.Incoming, order.ID, payment.ID, CardConnectMapper.Map(payment, response)));
@@ -161,9 +163,8 @@ namespace ordercloud.integrations.cardconnect
 			}
 		}
 
-		private async Task<string> GetMerchantIDAsync(string userToken)
+		private string GetMerchantIDAsync(CurrencySymbol userCurrency)
 		{
-			var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
 			if (userCurrency == CurrencySymbol.USD)
 				return _settings.CardConnectSettings.UsdMerchantID;
 			else if (userCurrency == CurrencySymbol.CAD)
@@ -178,18 +179,20 @@ namespace ordercloud.integrations.cardconnect
 			{
 				return await _oc.Me.GetCreditCardAsync<CardConnectBuyerCreditCard>(payment.CreditCardID, userToken);
 			}
-			return await MeTokenize(payment.CreditCardDetails);
+			return await MeTokenize(payment.CreditCardDetails, userToken);
 		}
 
-		private async Task<CardConnectBuyerCreditCard> MeTokenize(OrderCloudIntegrationsCreditCardToken card)
+		private async Task<CardConnectBuyerCreditCard> MeTokenize(OrderCloudIntegrationsCreditCardToken card, string userToken)
 		{
-			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
+			var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
+			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card, userCurrency.ToString()));
 			return BuyerCreditCardMapper.Map(card, auth);
 		}
 
-		private async Task<CreditCard> Tokenize(OrderCloudIntegrationsCreditCardToken card)
+		private async Task<CreditCard> Tokenize(OrderCloudIntegrationsCreditCardToken card, string userToken)
 		{
-			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card));
+			var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
+			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card, userCurrency.ToString()));
 			return CreditCardMapper.Map(card, auth);
 		}
 

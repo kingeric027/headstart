@@ -48,10 +48,11 @@ namespace ordercloud.integrations.cardconnect
 
     public static class CardConnectMapper
     {
-        public static CardConnectAccountRequest Map(OrderCloudIntegrationsCreditCardToken card)
+        public static CardConnectAccountRequest Map(OrderCloudIntegrationsCreditCardToken card, string currency)
         {
             var acct = new CardConnectAccountRequest()
             {
+                currency = currency,
                 account = card.AccountNumber
             };
             return acct;
