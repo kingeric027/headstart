@@ -3,7 +3,7 @@ import { Me, Tokens } from 'ordercloud-javascript-sdk'
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import {
   TaxCertificate,
-  MarketplaceAddressBuyer,
+  HSAddressBuyer,
   HeadStartSDK,
   ListPage,
 } from '@ordercloud/headstart-sdk'
@@ -18,24 +18,24 @@ export class AddressService {
     private appConfig: AppConfig
   ) {}
 
-  async get(addressID: string): Promise<MarketplaceAddressBuyer> {
+  async get(addressID: string): Promise<HSAddressBuyer> {
     return Me.GetAddress(addressID)
   }
 
-  async list(args: ListArgs): Promise<ListPage<MarketplaceAddressBuyer>> {
+  async list(args: ListArgs): Promise<ListPage<HSAddressBuyer>> {
     return Me.ListAddresses(args as any)
   }
 
   async create(
-    address: MarketplaceAddressBuyer
-  ): Promise<MarketplaceAddressBuyer> {
+    address: HSAddressBuyer
+  ): Promise<HSAddressBuyer> {
     return HeadStartSDK.ValidatedAddresses.CreateMeAddress(address)
   }
 
   async edit(
     addressID: string,
-    address: MarketplaceAddressBuyer
-  ): Promise<MarketplaceAddressBuyer> {
+    address: HSAddressBuyer
+  ): Promise<HSAddressBuyer> {
     return HeadStartSDK.ValidatedAddresses.SaveMeAddress(addressID, address)
   }
 
@@ -45,14 +45,14 @@ export class AddressService {
 
   async listBuyerLocations(
     args: ListArgs = {}
-  ): Promise<ListPage<MarketplaceAddressBuyer>> {
+  ): Promise<ListPage<HSAddressBuyer>> {
     args.filters = { ...args.filters, Editable: 'false' };
     return await this.list(args)
   }
 
   async listShippingAddresses(
     args: ListArgs = {}
-  ): Promise<ListPage<MarketplaceAddressBuyer>> {
+  ): Promise<ListPage<HSAddressBuyer>> {
     args.filters = { ...args.filters, Shipping: 'true' };
     return await this.list(args)
   }

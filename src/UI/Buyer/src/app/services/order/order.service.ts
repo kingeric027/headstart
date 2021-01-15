@@ -11,8 +11,8 @@ import {
   IntegrationEvents,
 } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSOrder,
+  HSLineItem,
   QuoteOrderInfo,
 } from '@ordercloud/headstart-sdk'
 import { PromoService } from './promo.service'
@@ -23,7 +23,7 @@ import { OrderType } from 'src/app/models/order.types'
   providedIn: 'root',
 })
 export class CurrentOrderService {
-  onChange: (callback: (order: MarketplaceOrder) => void) => void
+  onChange: (callback: (order: HSOrder) => void) => void
   reset: () => Promise<void>
   constructor(
     private cartService: CartService,
@@ -38,7 +38,7 @@ export class CurrentOrderService {
     this.reset = this.state.reset.bind(this.state)
   }
 
-  get(): MarketplaceOrder {
+  get(): HSOrder {
     return this.state.order
   }
 
@@ -56,7 +56,7 @@ export class CurrentOrderService {
 
   async submitQuoteOrder(
     info: QuoteOrderInfo,
-    lineItem: MarketplaceLineItem
+    lineItem: HSLineItem
   ): Promise<Order> {
     const order = this.buildQuoteOrder(info)
     lineItem.xp.StatusByQuantity = {

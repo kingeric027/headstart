@@ -7,7 +7,7 @@ export interface CreditCardFormOutput {
 }
 
 export interface SelectedCreditCard {
-  SavedCard?: MarketplaceBuyerCreditCard
+  SavedCard?: HSBuyerCreditCard
   NewCard?: OrderCloudIntegrationsCreditCardToken
   CVV: string
 }
@@ -25,7 +25,7 @@ export interface CreditCard {
   cvv: string
 }
 
-export type MarketplaceBuyerCreditCard = BuyerCreditCard<CreditCardXP>
+export type HSBuyerCreditCard = BuyerCreditCard<CreditCardXP>
 
 export interface CreditCardXP {
   CCBillingAddress: Address

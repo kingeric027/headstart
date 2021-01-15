@@ -841,7 +841,7 @@ import {
   CanChangeLineItemsOnOrderTo,
   NumberCanChangeTo,
 } from '@app-seller/orders/line-item-status.helper'
-import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk'
+import { HSLineItem, SuperHSShipment } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 &nbsp;
 @Component({
@@ -860,12 +860,12 @@ export class OrderShipmentsComponent implements OnChanges {
   editShipFromAddress = false // TO-DO - Use for editing Ship From address.
   shipmentForm: FormGroup
   // TODO: Get middleware route for listing super shipments
-  superShipments: SuperShipment[] = []
+  superShipments: SuperHSShipment[] = []
   shipments: ListPage&lt;Shipment&gt;
   shipmentItems: ListPage&lt;ShipmentItem&gt;
   selectedShipment: Shipment
   supplierAddresses: ListPage&lt;Address&gt;
-  lineItems: MarketplaceLineItem[]
+  lineItems: HSLineItem[]
   isSaving = false
   isSellerUser = false
   shipAllItems = false
@@ -1003,7 +1003,7 @@ export class OrderShipmentsComponent implements OnChanges {
     const lineItemsResponse = <span class="cstat-no" title="statement not covered" >await this.ocLineItemService</span>
       .List(this.orderDirection, orderID)
       .toPromise()
-<span class="cstat-no" title="statement not covered" >    this.lineItems = lineItemsResponse.Items as MarketplaceLineItem[]</span>
+<span class="cstat-no" title="statement not covered" >    this.lineItems = lineItemsResponse.Items as HSLineItem[]</span>
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >patchLineItems</span>(): Promise&lt;void&gt; {
@@ -1076,7 +1076,7 @@ export class OrderShipmentsComponent implements OnChanges {
     }
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  getQuantityDropdown</span>(lineItem: MarketplaceLineItem): number[] {
+<span class="fstat-no" title="function not covered" >  getQuantityDropdown</span>(lineItem: HSLineItem): number[] {
     const quantityAvailableToShip = <span class="cstat-no" title="statement not covered" >NumberCanChangeTo(</span>
       LineItemStatus.Complete,
       lineItem

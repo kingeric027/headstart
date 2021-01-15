@@ -249,7 +249,7 @@ import {
   OcCatalogService,
 } from '@ordercloud/angular-sdk'
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
+import { HSProduct } from '@ordercloud/headstart-sdk'
 &nbsp;
 @Component({
   selector: 'product-visibility-assignments-component',
@@ -258,7 +258,7 @@ import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
 })
 export class ProductVisibilityAssignments implements OnInit, OnChanges {
   @Input()
-  product: MarketplaceProduct
+  product: HSProduct
   buyers: Buyer[]
   add: ProductAssignment[]
   del: ProductAssignment[]
@@ -293,7 +293,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >getProductCatalogAssignments</span>(
-    product: MarketplaceProduct
+    product: HSProduct
   ): Promise&lt;void&gt; {
     const productCatalogAssignments = <span class="cstat-no" title="statement not covered" >await this.ocCatalogService</span>
       .ListProductAssignments({ productID: product &amp;&amp; product.ID })

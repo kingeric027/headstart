@@ -692,7 +692,7 @@ import {
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import {
   HeadStartSDK,
-  MarketplaceLocationUserGroup,
+  HSLocationUserGroup,
 } from '@ordercloud/headstart-sdk'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 &nbsp;
@@ -717,7 +717,7 @@ export class UserGroupAssignments implements OnChanges {
 &nbsp;
   userOrgID: string
   userID: string
-  userGroups: ListPage&lt;MarketplaceLocationUserGroup&gt; | UserGroup[]
+  userGroups: ListPage&lt;HSLocationUserGroup&gt; | UserGroup[]
   add: UserGroupAssignment[]
   del: UserGroupAssignment[]
 <span class="cstat-no" title="statement not covered" >  _userUserGroupAssignmentsStatic: UserGroupAssignment[] = []</span>
@@ -790,7 +790,7 @@ export class UserGroupAssignments implements OnChanges {
       const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyerlocations/${ID}/${this.homeCountry}/usergroups`</span>
       //TO-DO - Replace with SDK
 <span class="cstat-no" title="statement not covered" >      this.userGroups = await this.http</span>
-        .get&lt;ListPage&lt;MarketplaceLocationUserGroup&gt;&gt;(url, {
+        .get&lt;ListPage&lt;HSLocationUserGroup&gt;&gt;(url, {
           headers: this.buildHeaders(),
           params: this.createHttpParams(this.args),
         })
@@ -909,7 +909,7 @@ export class UserGroupAssignments implements OnChanges {
   async <span class="fstat-no" title="function not covered" >getUserGroupsByCountry</span>(
     buyerID: string,
     userID: string
-  ): Promise&lt;ListPage&lt;MarketplaceLocationUserGroup&gt;&gt; {
+  ): Promise&lt;ListPage&lt;HSLocationUserGroup&gt;&gt; {
     const userGroups = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.BuyerLocations.ListUserGroupsByCountry(</span>
       buyerID,
       userID,

@@ -17,10 +17,7 @@ import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { cloneDeep } from 'lodash'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { applicationConfiguration } from '@app-seller/config/app.config'
-import {
-  MarketplaceProduct,
-  SuperMarketplaceProduct,
-} from '@ordercloud/headstart-sdk'
+import { HSProduct, SuperHSProduct } from '@ordercloud/headstart-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
@@ -42,7 +39,7 @@ export class ProductFilters implements OnInit {
     this.facetsOnProductEditable = facets
   }
   @Input() readonly = false
-  @Input() superProduct: MarketplaceProduct
+  @Input() superProduct: HSProduct
   @Output() updatedFacets = new EventEmitter<any>()
 
   constructor(

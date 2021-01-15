@@ -3,7 +3,7 @@ import wtcTheme from '../styles/themes/waxing-the-city/theme-config'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,
-  appname: 'Marketplace Test',
+  appname: 'Headstart Test',
   clientID: 'A5231DF1-2B00-4002-AB40-738A9E2CEC4B',
   marketplaceID: 'SEB_TEST',
   baseUrl: 'https://marketplace-buyer-ui-test.azurewebsites.net/',

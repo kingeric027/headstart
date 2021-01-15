@@ -21,7 +21,7 @@ import { applicationConfiguration } from '@app-seller/config/app.config'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import {
   HeadStartSDK,
-  MarketplaceLocationUserGroup,
+  HSLocationUserGroup,
 } from '@ordercloud/headstart-sdk'
 import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import {
@@ -46,7 +46,7 @@ export class UserGroupAssignments implements OnChanges {
 
   userOrgID: string
   userID: string
-  userGroups: ListPage<MarketplaceLocationUserGroup> | UserGroup[]
+  userGroups: ListPage<HSLocationUserGroup> | UserGroup[]
   add: UserGroupAssignment[]
   del: UserGroupAssignment[]
   _userUserGroupAssignmentsStatic: UserGroupAssignment[] = []
@@ -119,7 +119,7 @@ export class UserGroupAssignments implements OnChanges {
       const url = `${this.appConfig.middlewareUrl}/buyerlocations/${ID}/${this.homeCountry}/usergroups`
       //TO-DO - Replace with SDK
       this.userGroups = await this.http
-        .get<ListPage<MarketplaceLocationUserGroup>>(url, {
+        .get<ListPage<HSLocationUserGroup>>(url, {
           headers: this.buildHeaders(),
           params: this.createHttpParams(this.args),
         })
@@ -238,7 +238,7 @@ export class UserGroupAssignments implements OnChanges {
   async getUserGroupsByCountry(
     buyerID: string,
     userID: string
-  ): Promise<ListPage<MarketplaceLocationUserGroup>> {
+  ): Promise<ListPage<HSLocationUserGroup>> {
     const userGroups = await HeadStartSDK.BuyerLocations.ListUserGroupsByCountry(
       buyerID,
       userID,

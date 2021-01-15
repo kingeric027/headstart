@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSOrder,
+  HSLineItem,
 } from '@ordercloud/headstart-sdk'
 import {
   ShipEstimate,
@@ -19,8 +19,8 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   styleUrls: ['./checkout-shipping.component.scss'],
 })
 export class OCMCheckoutShipping implements OnInit {
-  @Input() order?: MarketplaceOrder
-  @Input() lineItems?: ListPage<MarketplaceLineItem>
+  @Input() order?: HSOrder
+  @Input() lineItems?: ListPage<HSLineItem>
   @Input() set shipEstimates(value: ShipEstimate[]) {
     this._shipEstimates = value
     this._areAllShippingSelectionsMade = this.areAllShippingSelectionsMade(
@@ -37,7 +37,7 @@ export class OCMCheckoutShipping implements OnInit {
   @Output() backToAddress = new EventEmitter()
   _shipEstimates?: ShipEstimate[]
   _areAllShippingSelectionsMade = false
-  _lineItemsByShipEstimate?: MarketplaceLineItem[][]
+  _lineItemsByShipEstimate?: HSLineItem[][]
   faExclamationCircle = faExclamationCircle
 
   constructor() {
@@ -49,7 +49,7 @@ export class OCMCheckoutShipping implements OnInit {
 
   getLineItemsForShipEstimate(
     shipEstimate: ShipEstimate
-  ): MarketplaceLineItem[] {
+  ): HSLineItem[] {
     if (!shipEstimate.ShipEstimateItems) {
       return []
     }
@@ -86,7 +86,7 @@ export class OCMCheckoutShipping implements OnInit {
 
   getFirstLineItem(
     shipEstimate: ShipEstimate
-  ): MarketplaceLineItem | undefined {
+  ): HSLineItem | undefined {
     if (
       !shipEstimate ||
       !shipEstimate.ShipEstimateItems ||

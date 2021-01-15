@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Me, Inventory, PriceSchedule } from 'ordercloud-javascript-sdk'
 import { partition as _partition } from 'lodash'
-import { MarketplaceLineItem, MarketplaceMeProduct, MarketplacePriceSchedule } from '@ordercloud/headstart-sdk'
+import { HSLineItem, HSMeProduct, HSPriceSchedule } from '@ordercloud/headstart-sdk'
 import { TempSdk } from '../temp-sdk/temp-sdk.service'
 import { OrderReorderResponse } from 'src/app/models/order.types'
 
@@ -13,7 +13,7 @@ export class ReorderHelperService {
 
   public async validateReorder(
     orderID: string,
-    lineItems: MarketplaceLineItem[]
+    lineItems: HSLineItem[]
   ): Promise<OrderReorderResponse> {
     // instead of moving all of this logic to the middleware to support orders not
     // submitted by the current user we are adding line items as a paramter
@@ -27,8 +27,8 @@ export class ReorderHelperService {
   }
 
   private async ListProducts(
-    items: MarketplaceLineItem[]
-  ): Promise<MarketplaceMeProduct[]> {
+    items: HSLineItem[]
+  ): Promise<HSMeProduct[]> {
     const productIds = items.map((item) => item.ProductID)
     // TODO - what if the url is too long?
     return (
@@ -39,14 +39,14 @@ export class ReorderHelperService {
   }
 
   private isLineItemValid(
-    item: MarketplaceLineItem,
-    products: MarketplaceMeProduct[]
+    item: HSLineItem,
+    products: HSMeProduct[]
   ): boolean {
     const product = products.find((prod) => prod.ID === item.ProductID)
     return product && !this.quantityInvalid(item.Quantity, product)
   }
 
-  private quantityInvalid(qty: number, product: MarketplaceMeProduct): boolean {
+  private quantityInvalid(qty: number, product: HSMeProduct): boolean {
     return (
       this.inventoryTooLow(qty, product.Inventory) ||
       this.restrictedQuantitiesInvalidate(qty, product.PriceSchedule)
@@ -64,7 +64,7 @@ export class ReorderHelperService {
 
   private restrictedQuantitiesInvalidate(
     qty: number,
-    schedule: MarketplacePriceSchedule
+    schedule: HSPriceSchedule
   ): boolean {
     return (
       schedule.RestrictedQuantity &&

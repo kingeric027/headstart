@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
-  MarketplaceLineItem,
-  MarketplaceMeProduct,
+  HSLineItem,
+  HSMeProduct,
   PriceSchedule,
-  SuperMarketplaceProduct,
+  SuperHSProduct,
 } from '@ordercloud/headstart-sdk'
 import { PriceBreak, Spec } from 'ordercloud-javascript-sdk'
 import { ProductDetailService } from '../product-details/product-detail.service'
@@ -19,8 +19,8 @@ import { QtyChangeEvent, GridSpecOption } from 'src/app/models/product.types'
 export class OCMGridSpecForm {
   _specs: Spec[]
   _specForm: FormGroup
-  _superProduct: SuperMarketplaceProduct
-  product: MarketplaceMeProduct
+  _superProduct: SuperHSProduct
+  product: HSMeProduct
   specOptions: string[]
   lineItems: any[] = []
   lineTotals: number[] = []
@@ -41,7 +41,7 @@ export class OCMGridSpecForm {
     private productDetailService: ProductDetailService
   ) {}
 
-  @Input() set superProduct(value: SuperMarketplaceProduct) {
+  @Input() set superProduct(value: SuperHSProduct) {
     this._superProduct = value
     this.product = this._superProduct.Product
     this.priceBreaks = this._superProduct.PriceSchedule.PriceBreaks
@@ -129,7 +129,7 @@ export class OCMGridSpecForm {
   validateQuantity(lineItems: any[]): boolean {
     this.resetGridQtyFields = false
     this.errorMsg = ''
-    const lineItemsOfCurrentProductInCart: MarketplaceLineItem[] = this.context.order.cart
+    const lineItemsOfCurrentProductInCart: HSLineItem[] = this.context.order.cart
       .get()
       ?.Items?.filter((i) => i.ProductID === this.product?.ID)
     const isInventoryAvailable = this.checkIfInventoryIsAvailable(
@@ -144,7 +144,7 @@ export class OCMGridSpecForm {
     if (this.priceSchedule.UseCumulativeQuantity) {
       // When users have not reached the minimum quantity
       lineItemsOfCurrentProductInCart.forEach(
-        (li: MarketplaceLineItem) => (qtyInCart += li.Quantity)
+        (li: HSLineItem) => (qtyInCart += li.Quantity)
       )
       if (
         this.totalQtyToAdd + qtyInCart <
@@ -170,7 +170,7 @@ export class OCMGridSpecForm {
         qtyInCart = 0
         const liSpecs = li.Specs.map((spec) => spec.Value)
         const matchingLineItem = lineItemsOfCurrentProductInCart.find(
-          (li: MarketplaceLineItem) => {
+          (li: HSLineItem) => {
             const specs = li.Specs.map((spec) => spec.Value)
             return (
               specs.length === liSpecs.length &&
@@ -206,8 +206,8 @@ export class OCMGridSpecForm {
   }
 
   checkIfInventoryIsAvailable(
-    lineItems: MarketplaceLineItem[],
-    lineItemsOfCurrentProductInCart: MarketplaceLineItem[]
+    lineItems: HSLineItem[],
+    lineItemsOfCurrentProductInCart: HSLineItem[]
   ): boolean {
     // If not tracking inventory, return true
     if (

@@ -41,7 +41,7 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProductService } from '@app-seller/products/product.service'
 import {
-  SuperMarketplaceProduct,
+  SuperHSProduct,
   ListPage,
   HeadStartSDK,
   SpecOption,
@@ -115,8 +115,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   faTimesCircle = faTimesCircle
   faCheckCircle = faCheckCircle
   faExclamationCircle = faExclamationCircle
-  _superHSProductStatic: SuperMarketplaceProduct
-  _superHSProductEditable: SuperMarketplaceProduct
+  _superHSProductStatic: SuperHSProduct
+  _superHSProductEditable: SuperHSProduct
   supplierCurrency: SupportedRates
   sellerCurrency: SupportedRates
   _exchangeRates: SupportedRates[]
@@ -222,9 +222,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.taxCodes = await this.listTaxCodes(taxCategory, searchTerm, 1, 100)
   }
 
-  async refreshProductData(
-    superProduct: SuperMarketplaceProduct
-  ): Promise<void> {
+  async refreshProductData(superProduct: SuperHSProduct): Promise<void> {
     let productModifiedNotifications: ListPage<MonitoredProductFieldModifiedNotificationDocument>
     const headers = {
       headers: new HttpHeaders({
@@ -289,7 +287,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.checkForChanges()
   }
 
-  createProductForm(superHSProduct: SuperMarketplaceProduct): void {
+  createProductForm(superHSProduct: SuperHSProduct): void {
     if (superHSProduct.Product) {
       this.productForm = new FormGroup(
         {
@@ -617,7 +615,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       throw ex
     }
   }
-  async createMonitoredProductDocument(superProduct: SuperMarketplaceProduct) {
+  async createMonitoredProductDocument(superProduct: SuperHSProduct) {
     const mySupplier = await this.currentUserService.getMySupplier()
     const myContext = await this.currentUserService.getUserContext()
     const document = {
@@ -651,7 +649,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     // TODO: Replace with the SDK
     const updatedProduct = await this.http
-      .post<SuperMarketplaceProduct>(
+      .post<SuperHSProduct>(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified`,
         document,
         headers
@@ -695,8 +693,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async checkForFieldsToMonitor(
-    editedSuperProduct: SuperMarketplaceProduct
-  ): Promise<SuperMarketplaceProduct> {
+    editedSuperProduct: SuperHSProduct
+  ): Promise<SuperHSProduct> {
     const fieldsToMonitorForChanges = this.appConfig
       ?.superProductFieldsToMonitor
     const mySupplier = await this.currentUserService.getMySupplier()
@@ -739,7 +737,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           }
           // TODO: Replace with the SDK
           superProduct = await this.http
-            .post<SuperMarketplaceProduct>(
+            .post<SuperHSProduct>(
               `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified`,
               document,
               headers
@@ -769,7 +767,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     // TODO: Replace with the SDK
     const superProduct = await this.http
-      .put<SuperMarketplaceProduct>(
+      .put<SuperHSProduct>(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
         notification,
         headers
@@ -873,7 +871,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     productID: string,
     file: FileHandle,
     isAttachment = false
-  ): Promise<SuperMarketplaceProduct> {
+  ): Promise<SuperHSProduct> {
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     const asset = {
       Active: true,
@@ -1047,8 +1045,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async createNewSuperHSProduct(
-    superHSProduct: SuperMarketplaceProduct
-  ): Promise<SuperMarketplaceProduct> {
+    superHSProduct: SuperHSProduct
+  ): Promise<SuperHSProduct> {
     const supplier = await this.currentUserService.getMySupplier()
     superHSProduct.Product.xp.ProductType = this.productType
     ;(superHSProduct.Product.xp as any).PromotionEligible =
@@ -1072,8 +1070,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   async updateMarketplaceProduct(
-    superHSProduct: SuperMarketplaceProduct
-  ): Promise<SuperMarketplaceProduct> {
+    superHSProduct: SuperHSProduct
+  ): Promise<SuperHSProduct> {
     // If PriceSchedule has a price break price, but no ID or name, set them
     if (
       superHSProduct.PriceSchedule?.PriceBreaks[0]?.Price &&

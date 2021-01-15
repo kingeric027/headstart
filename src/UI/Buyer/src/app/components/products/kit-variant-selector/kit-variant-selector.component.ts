@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
-  MarketplaceMeKitProduct,
-  MeProductInKit,
+  HSMeKitProduct,
+  HSMeProductInKit,
   Variant,
 } from '@ordercloud/headstart-sdk'
 import { KitVariantSelection, LineItemToAdd, ProductSelectionEvent, QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
@@ -23,11 +23,11 @@ export class OCMKitVariantSelector {
   @Input() set allLineItems(value: LineItemToAdd[]) {
     this._allLineItems = value
   }
-  @Input() kitProduct: MarketplaceMeKitProduct
+  @Input() kitProduct: HSMeKitProduct
   @Output() addLineItem = new EventEmitter<LineItemToAdd>()
   _allLineItems: LineItemToAdd[]
   _event: ProductSelectionEvent
-  productKitDetails: MeProductInKit
+  productKitDetails: HSMeProductInKit
   selection: KitVariantSelection
   disabledVariants: Variant[]
   specForm = {} as FormGroup

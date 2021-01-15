@@ -29,9 +29,9 @@ import { ProductService } from '@app-seller/products/product.service'
 import { ToastrService } from 'ngx-toastr'
 import {
   HeadStartSDK,
-  SuperMarketplaceProduct,
+  SuperHSProduct,
   Asset,
-  MarketplaceVariant,
+  HSVariant,
 } from '@ordercloud/headstart-sdk'
 import { AppAuthService } from '@app-seller/auth'
 import { BehaviorSubject } from 'rxjs'
@@ -46,9 +46,7 @@ import { SupportedRates } from '@app-seller/shared'
 })
 export class ProductVariations implements OnChanges {
   @Input()
-  set superHSProductEditable(
-    superProductEditable: SuperMarketplaceProduct
-  ) {
+  set superHSProductEditable(superProductEditable: SuperHSProduct) {
     this.superProductEditable = superProductEditable
     this.variants.next(superProductEditable?.Variants)
     this.variantInSelection = {}
@@ -59,9 +57,7 @@ export class ProductVariations implements OnChanges {
     this.editSpecs = superProductEditable?.Specs?.some((s) => !s.AllowOpenText)
   }
   @Input()
-  set superHSProductStatic(
-    superProductStatic: SuperMarketplaceProduct
-  ) {
+  set superHSProductStatic(superProductStatic: SuperHSProduct) {
     this.superProductStatic = superProductStatic
   }
   @Input() areChanges: boolean
@@ -88,13 +84,13 @@ export class ProductVariations implements OnChanges {
     return this.superProductEditable?.Specs?.filter((s) => s.AllowOpenText)
   }
   @Output()
-  productVariationsChanged = new EventEmitter<SuperMarketplaceProduct>()
-  @Output() skuUpdated = new EventEmitter<SuperMarketplaceProduct>()
+  productVariationsChanged = new EventEmitter<SuperHSProduct>()
+  @Output() skuUpdated = new EventEmitter<SuperHSProduct>()
   @Output() variantsValidated = new EventEmitter<boolean>()
   @Output() specsValidated = new EventEmitter<boolean>()
-  superProductEditable: SuperMarketplaceProduct
-  superProductStatic: SuperMarketplaceProduct
-  variants: BehaviorSubject<MarketplaceVariant[]>
+  superProductEditable: SuperHSProduct
+  superProductStatic: SuperHSProduct
+  variants: BehaviorSubject<HSVariant[]>
   specOptAdded = new EventEmitter<SpecOption>()
   canConfigureVariations = false
   areSpecChanges = false
@@ -126,7 +122,7 @@ export class ProductVariations implements OnChanges {
     private ocProductService: OcProductService,
     private appAuthService: AppAuthService
   ) {
-    this.variants = new BehaviorSubject<MarketplaceVariant[]>([])
+    this.variants = new BehaviorSubject<HSVariant[]>([])
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -614,7 +610,7 @@ export class ProductVariations implements OnChanges {
         break
     }
     try {
-      const patchedVariant = await Products.PatchVariant<MarketplaceVariant>(
+      const patchedVariant = await Products.PatchVariant<HSVariant>(
         this.superProductEditable.Product?.ID,
         this.variantInSelection.ID,
         partialVariant

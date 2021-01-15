@@ -10,7 +10,7 @@ import {
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import { Router } from '@angular/router'
-import { HeadStartSDK, MarketplaceMeProduct, MarketplaceVariant } from '@ordercloud/headstart-sdk'
+import { HeadStartSDK, HSMeProduct, HSVariant } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { QtyChangeEvent } from 'src/app/models/product.types'
 
@@ -20,8 +20,8 @@ import { QtyChangeEvent } from 'src/app/models/product.types'
 })
 export class OCMQuantityInput implements OnInit, OnChanges {
   @Input() priceSchedule: PriceSchedule
-  @Input() product: MarketplaceMeProduct
-  @Input() selectedVariant: MarketplaceVariant
+  @Input() product: HSMeProduct
+  @Input() selectedVariant: HSVariant
   @Input() variantInventory?: number
   @Input() variantID: string
   @Input() isAddingToCart: boolean
@@ -81,7 +81,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     }
   }
 
-  init(product: MarketplaceMeProduct, priceSchedule: PriceSchedule): void {
+  init(product: HSMeProduct, priceSchedule: PriceSchedule): void {
     this.disabled =
       this.isQtyChanging ||
       priceSchedule.MinQuantity === priceSchedule.MaxQuantity
@@ -179,7 +179,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     return priceSchedule.MaxQuantity || Infinity
   }
 
-  getInventory(product: MarketplaceMeProduct): number {
+  getInventory(product: HSMeProduct): number {
     if (product?.Inventory?.OrderCanExceed) return Infinity
     if (
       product.Inventory &&

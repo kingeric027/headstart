@@ -9,8 +9,8 @@ import { Subject } from 'rxjs'
 import { OrderStateService } from './order-state.service'
 import { isUndefined as _isUndefined } from 'lodash'
 import {
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
   HeadStartSDK,
   ListPage,
 } from '@ordercloud/headstart-sdk'
@@ -66,11 +66,11 @@ export class PromoService {
     }
   }
 
-  private get order(): MarketplaceOrder {
+  private get order(): HSOrder {
     return this.state.order
   }
 
-  private set order(value: MarketplaceOrder) {
+  private set order(value: HSOrder) {
     this.state.order = value
   }
 

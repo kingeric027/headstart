@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import {
   ListPage,
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import {
   LineItems,
@@ -25,7 +25,7 @@ import { TokenHelperService } from '../token-helper/token-helper.service'
   providedIn: 'root',
 })
 export class OrderStateService {
-  public readonly DefaultLineItems: ListPage<MarketplaceLineItem> = {
+  public readonly DefaultLineItems: ListPage<HSLineItem> = {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
   }
@@ -33,7 +33,7 @@ export class OrderStateService {
     Meta: { Page: 1, PageSize: 25, TotalCount: 0, TotalPages: 1 },
     Items: [],
   }
-  private readonly DefaultOrder: MarketplaceOrder = {
+  private readonly DefaultOrder: HSOrder = {
     xp: {
       AvalaraTaxTransactionCode: '',
       OrderType: 'Standard',
@@ -48,14 +48,14 @@ export class OrderStateService {
       ShippingStatus: ShippingStatus.Processing,
     },
   }
-  private orderSubject = new BehaviorSubject<MarketplaceOrder>(
+  private orderSubject = new BehaviorSubject<HSOrder>(
     this.DefaultOrder
   )
   private shipEstimatesSubject = new BehaviorSubject<ShipEstimate[]>([])
   private orderPromosSubject = new BehaviorSubject<ListPage<OrderPromotion>>(
     this.DefaultOrderPromos
   )
-  private lineItemSubject = new BehaviorSubject<ListPage<MarketplaceLineItem>>(
+  private lineItemSubject = new BehaviorSubject<ListPage<HSLineItem>>(
     this.DefaultLineItems
   )
 
@@ -65,11 +65,11 @@ export class OrderStateService {
     private appConfig: AppConfig
   ) {}
 
-  get order(): MarketplaceOrder {
+  get order(): HSOrder {
     return this.orderSubject.value
   }
 
-  set order(value: MarketplaceOrder) {
+  set order(value: HSOrder) {
     this.orderSubject.next(value)
   }
 
@@ -81,11 +81,11 @@ export class OrderStateService {
     this.shipEstimatesSubject.next(value)
   }
 
-  get lineItems(): ListPage<MarketplaceLineItem> {
+  get lineItems(): ListPage<HSLineItem> {
     return this.lineItemSubject.value
   }
 
-  set lineItems(value: ListPage<MarketplaceLineItem>) {
+  set lineItems(value: ListPage<HSLineItem>) {
     this.lineItemSubject.next(value)
   }
 
@@ -97,12 +97,12 @@ export class OrderStateService {
     this.orderPromosSubject.next(value)
   }
 
-  onOrderChange(callback: (order: MarketplaceOrder) => void): void {
+  onOrderChange(callback: (order: HSOrder) => void): void {
     this.orderSubject.subscribe(callback)
   }
 
   onLineItemsChange(
-    callback: (lineItems: ListPage<MarketplaceLineItem>) => void
+    callback: (lineItems: ListPage<HSLineItem>) => void
   ): void {
     this.lineItemSubject.subscribe(callback)
   }
@@ -134,7 +134,7 @@ export class OrderStateService {
       this.order = (await Orders.Create(
         'Outgoing',
         this.DefaultOrder as Order
-      )) as MarketplaceOrder
+      )) as HSOrder
     }
     if (this.order.DateCreated) {
       await this.resetLineItems()
@@ -164,7 +164,7 @@ export class OrderStateService {
     )
   }
 
-  private async getOrdersForResubmit(): Promise<ListPage<MarketplaceOrder>> {
+  private async getOrdersForResubmit(): Promise<ListPage<HSOrder>> {
     const orders = await Me.ListOrders({
       sortBy: '!DateCreated',
       filters: {
@@ -176,7 +176,7 @@ export class OrderStateService {
     return orders
   }
 
-  private async getOrdersNeverSubmitted(): Promise<ListPage<MarketplaceOrder>> {
+  private async getOrdersNeverSubmitted(): Promise<ListPage<HSOrder>> {
     const orders = await Me.ListOrders({
       sortBy: '!DateCreated',
       filters: {

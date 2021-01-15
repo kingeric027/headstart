@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSOrder,
+  HSLineItem,
   OrderDetails,
 } from '@ordercloud/headstart-sdk'
 import { groupBy as _groupBy, flatten as _flatten } from 'lodash'
@@ -16,10 +16,10 @@ import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
   styleUrls: ['./order-return.component.scss'],
 })
 export class OCMOrderReturn {
-  order: MarketplaceOrder
-  lineItems: MarketplaceLineItem[]
+  order: HSOrder
+  lineItems: HSLineItem[]
   suppliers: LineItemGroupSupplier[]
-  liGroupedByShipFrom: MarketplaceLineItem[][]
+  liGroupedByShipFrom: HSLineItem[][]
   quantitiesToReturn: number[] = []
   requestReturnForm: FormGroup
   groupedLineItemsToReturn: FormArray
@@ -77,7 +77,7 @@ export class OCMOrderReturn {
     )
   }
 
-  async setSupplierInfo(liGroups: MarketplaceLineItem[][]): Promise<void> {
+  async setSupplierInfo(liGroups: HSLineItem[][]): Promise<void> {
     this.suppliers = await this.context.orderHistory.getLineItemSuppliers(
       liGroups
     )

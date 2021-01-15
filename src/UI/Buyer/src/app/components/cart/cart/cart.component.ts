@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core'
 import { ListPage, OrderPromotion } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { getOrderSummaryMeta } from 'src/app/services/purchase-order.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
@@ -17,17 +17,17 @@ import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
   styleUrls: ['./cart.component.scss'],
 })
 export class OCMCart {
-  _order: MarketplaceOrder
+  _order: HSOrder
   _orderPromos: ListPage<OrderPromotion>
   _lineItems: ListPage<LineItemWithProduct>
-  _invalidLineItems: MarketplaceLineItem[] = []
+  _invalidLineItems: HSLineItem[] = []
   invalidLineItemCount: number
   invalidLineItemsAreBeingRemoved: boolean
   orderSummaryMeta: OrderSummaryMeta
   orderErrorModal = ModalState.Closed
   orderError: string
   faShoppingCart = faShoppingCart
-  @Input() set invalidLineItems(value: MarketplaceLineItem[]) {
+  @Input() set invalidLineItems(value: HSLineItem[]) {
     this._invalidLineItems = value
     if (
       this._invalidLineItems.length &&
@@ -38,7 +38,7 @@ export class OCMCart {
       this.orderErrorModal = ModalState.Open
     }
   }
-  @Input() set order(value: MarketplaceOrder) {
+  @Input() set order(value: HSOrder) {
     this._order = value
     if (this._order) {
       this.setOrderSummaryMeta()

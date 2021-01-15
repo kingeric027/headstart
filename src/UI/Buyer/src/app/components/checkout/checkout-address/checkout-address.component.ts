@@ -6,8 +6,8 @@ import {
   ListPage,
 } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceOrder,
-  MarketplaceAddressBuyer,
+  HSOrder,
+  HSAddressBuyer,
 } from '@ordercloud/headstart-sdk'
 
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper'
@@ -24,7 +24,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
   styleUrls: ['./checkout-address.component.scss'],
 })
 export class OCMCheckoutAddress implements OnInit {
-  @Input() order: MarketplaceOrder
+  @Input() order: HSOrder
   @Input() lineItems: ListPage<LineItem>
   @Output() continue = new EventEmitter()
   @Output() handleOrderError = new EventEmitter()
@@ -193,7 +193,7 @@ export class OCMCheckoutAddress implements OnInit {
 
   private async saveNewShippingAddress(
     address: BuyerAddress
-  ): Promise<MarketplaceAddressBuyer> {
+  ): Promise<HSAddressBuyer> {
     address.Shipping = true
     address.Billing = false
     try {

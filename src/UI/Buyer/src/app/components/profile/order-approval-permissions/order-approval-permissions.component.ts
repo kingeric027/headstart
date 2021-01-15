@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { UserGroup, UserGroupAssignment } from 'ordercloud-javascript-sdk'
-import { MarketplaceUser } from '@ordercloud/headstart-sdk'
+import { HSUser } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -8,7 +8,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
   styleUrls: ['./order-approval-permissions.component.scss'],
 })
 export class OCMOrderAccessManagement {
-  users: MarketplaceUser[] = []
+  users: HSUser[] = []
   permissionAssignmentsStatic: UserGroupAssignment[] = []
   permissionAssignmentsEditable: UserGroupAssignment[] = []
   add: UserGroupAssignment[] = []

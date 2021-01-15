@@ -4,7 +4,7 @@ import { takeWhile } from 'rxjs/operators'
 import { ListPage } from 'ordercloud-javascript-sdk'
 import { uniq as _uniq } from 'lodash'
 import { SupplierFilterService } from '../services/supplier-filter/supplier-filter.service'
-import { MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
+import { HSMeProduct } from '@ordercloud/headstart-sdk'
 import { ShipFromSourcesDic } from '../models/shipping.types'
 
 @Component({
@@ -18,7 +18,7 @@ import { ShipFromSourcesDic } from '../models/shipping.types'
   `,
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {
-  products: ListPage<MarketplaceMeProduct>
+  products: ListPage<HSMeProduct>
   shipFromSources: ShipFromSourcesDic = {}
   alive = true
   isProductListLoading = true

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import {
-  MarketplaceCatalog,
-  MarketplaceCatalogAssignmentRequest,
+  HSCatalog,
+  HSCatalogAssignmentRequest,
 } from '@ordercloud/headstart-sdk'
 import { Router } from '@angular/router'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
@@ -25,17 +25,17 @@ export class BuyerLocationCatalogs {
     }
   }
   @Input()
-  catalogs: MarketplaceCatalog[] = []
+  catalogs: HSCatalog[] = []
   @Input()
   isCreatingNew: boolean
   @Output()
-  assignmentsToAdd = new EventEmitter<MarketplaceCatalogAssignmentRequest>()
+  assignmentsToAdd = new EventEmitter<HSCatalogAssignmentRequest>()
 
   locationCatalogAssignmentsEditable: string[] = []
   locationCatalogAssignmentsStatic: string[] = []
   addLocationCatalogAssignments: string[] = []
   delLocationCatalogAssignments: string[] = []
-  catalogAssignments: MarketplaceCatalogAssignmentRequest = { CatalogIDs: [] }
+  catalogAssignments: HSCatalogAssignmentRequest = { CatalogIDs: [] }
   areChanges = false
   dataIsSaving = false
 
@@ -64,11 +64,11 @@ export class BuyerLocationCatalogs {
       !!this.addLocationCatalogAssignments.length
   }
 
-  isAssigned(catalog: MarketplaceCatalog): boolean {
+  isAssigned(catalog: HSCatalog): boolean {
     return this.locationCatalogAssignmentsEditable.includes(catalog.ID)
   }
 
-  toggleAssignment(catalog: MarketplaceCatalog): void {
+  toggleAssignment(catalog: HSCatalog): void {
     if (this.isAssigned(catalog)) {
       this.locationCatalogAssignmentsEditable = this.locationCatalogAssignmentsEditable.filter(
         (c) => c !== catalog.ID

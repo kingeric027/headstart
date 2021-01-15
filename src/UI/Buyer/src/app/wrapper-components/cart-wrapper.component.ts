@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core'
 import {
-  MarketplaceOrder,
+  HSOrder,
   Meta,
   ListPage,
-  MarketplaceLineItem,
-  MarketplaceMeProduct,
+  HSLineItem,
+  HSMeProduct,
 } from '@ordercloud/headstart-sdk'
-import { Me, Orders, OrderPromotion } from 'ordercloud-javascript-sdk'
+import { Me, OrderPromotion } from 'ordercloud-javascript-sdk'
 import { LineItemWithProduct } from '../models/line-item.types'
 import { CurrentOrderService } from '../services/order/order.service'
 import { PromoService } from '../services/order/promo.service'
@@ -22,11 +22,11 @@ import { PromoService } from '../services/order/promo.service'
   `,
 })
 export class CartWrapperComponent implements OnInit {
-  order: MarketplaceOrder
+  order: HSOrder
   lineItems: ListPage<LineItemWithProduct>
-  invalidLineItems: MarketplaceLineItem[]
+  invalidLineItems: HSLineItem[]
   orderPromos: ListPage<OrderPromotion>
-  productCache: MarketplaceMeProduct[] = [] // TODO - move to cart service?
+  productCache: HSMeProduct[] = [] // TODO - move to cart service?
 
   constructor(
     private currentOrder: CurrentOrderService,
@@ -39,7 +39,7 @@ export class CartWrapperComponent implements OnInit {
     this.currentOrder.cart.onChange(this.setLineItems)
   }
 
-  setOrder = (order: MarketplaceOrder): void => {
+  setOrder = (order: HSOrder): void => {
     this.order = order
   }
 
@@ -58,10 +58,10 @@ export class CartWrapperComponent implements OnInit {
   }
 
   async checkForProductAvailability(
-    items: ListPage<MarketplaceLineItem>
-  ): Promise<MarketplaceLineItem[]> {
-    const activeLineItems: MarketplaceLineItem[] = []
-    const inactiveLineItems: MarketplaceLineItem[] = []
+    items: ListPage<HSLineItem>
+  ): Promise<HSLineItem[]> {
+    const activeLineItems: HSLineItem[] = []
+    const inactiveLineItems: HSLineItem[] = []
     for (const item of items.Items) {
       try {
         await Me.GetProduct(item.ProductID)
@@ -88,7 +88,7 @@ export class CartWrapperComponent implements OnInit {
   }
 
   mapToLineItemsWithProduct(
-    items: MarketplaceLineItem[],
+    items: HSLineItem[],
     meta: Meta
   ): ListPage<LineItemWithProduct> {
     const Items = items.map((li: LineItemWithProduct) => {
@@ -99,11 +99,11 @@ export class CartWrapperComponent implements OnInit {
     return { Items, Meta: meta }
   }
 
-  async requestProducts(ids: string[]): Promise<MarketplaceMeProduct[]> {
+  async requestProducts(ids: string[]): Promise<HSMeProduct[]> {
     return await Promise.all(ids.map((id) => Me.GetProduct(id)))
   }
 
-  getCachedProduct(id: string): MarketplaceMeProduct {
+  getCachedProduct(id: string): HSMeProduct {
     return this.productCache.find((product) => product.ID === id)
   }
 }

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { UserGroupAssignment } from 'ordercloud-javascript-sdk'
-import { MarketplaceUser } from '@ordercloud/headstart-sdk'
+import { HSUser } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { PermissionType, PermissionTypes } from 'src/app/models/permissions.types'
 
@@ -15,7 +15,7 @@ export class OCMBuyerLocationPermissions {
   add: UserGroupAssignment[]
   del: UserGroupAssignment[]
   areChanges = false
-  locationUsers: MarketplaceUser[]
+  locationUsers: HSUser[]
   _locationID: string
   permissionTypes: PermissionType[] = PermissionTypes.filter(
     (p) =>

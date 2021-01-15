@@ -1,5 +1,5 @@
 import { LineItemStatus } from '@app-seller/models/order.types'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 
 const validPreviousStates = {
   Submitted: [],
@@ -17,7 +17,7 @@ const validPreviousStates = {
 
 export function NumberCanChangeTo(
   lineItemStatus: LineItemStatus,
-  lineItem: MarketplaceLineItem
+  lineItem: HSLineItem
 ): number {
   return Object.entries(lineItem.xp.StatusByQuantity as any)
     .filter(([status, quantity]) =>
@@ -27,14 +27,14 @@ export function NumberCanChangeTo(
 }
 export function CanChangeTo(
   lineItemStatus: LineItemStatus,
-  lineItem: MarketplaceLineItem
+  lineItem: HSLineItem
 ): boolean {
   return !!NumberCanChangeTo(lineItemStatus, lineItem)
 }
 
 export function CanChangeLineItemsOnOrderTo(
   lineItemStatus: LineItemStatus,
-  lineItems: MarketplaceLineItem[]
+  lineItems: HSLineItem[]
 ): boolean {
   return lineItems.some((li) => CanChangeTo(lineItemStatus, li))
 }

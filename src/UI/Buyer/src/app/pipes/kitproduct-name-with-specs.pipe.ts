@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
+import { HSProduct } from '@ordercloud/headstart-sdk'
 import { Spec } from 'ordercloud-javascript-sdk'
 import { flatten } from 'lodash'
 
@@ -7,7 +7,7 @@ import { flatten } from 'lodash'
   name: 'kitproductNameWithSpecs',
 })
 export class KitProductNameWithSpecsPipe implements PipeTransform {
-  transform(product: MarketplaceProduct, specs: Spec[]): string {
+  transform(product: HSProduct, specs: Spec[]): string {
     if (!product) return ''
     const productName = product.Name
     if (!specs || specs.length === 0) return productName

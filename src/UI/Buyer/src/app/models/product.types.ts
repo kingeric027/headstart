@@ -1,4 +1,4 @@
-import { MarketplaceVariant, MeProductInKit, SpecOption } from '@ordercloud/headstart-sdk'
+import { HSVariant, HSMeProductInKit, SpecOption } from '@ordercloud/headstart-sdk'
 import { ValidatorFn } from '@angular/forms'
 import { FormGroup } from '@angular/forms'
 import { LineItemSpec } from 'ordercloud-javascript-sdk'
@@ -22,7 +22,7 @@ export interface FieldConfig {
     validation?: ValidatorFn[]
     value?: any
     currency?: string
-    disabledVariants?: MarketplaceVariant[]
+    disabledVariants?: HSVariant[]
 }
 
 export interface Field {
@@ -66,7 +66,7 @@ export interface FullSpecOption extends SpecOption {
   }
 
 export interface ProductSelectionEvent {
-  productKitDetails: MeProductInKit
+  productKitDetails: HSMeProductInKit
   variantSelection?: KitVariantSelection
 }
 
