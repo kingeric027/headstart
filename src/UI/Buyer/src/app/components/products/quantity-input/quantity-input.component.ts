@@ -73,7 +73,7 @@ export class OCMQuantityInput implements OnInit, OnChanges {
     }
     if (this.product && this.priceSchedule)
       this.init(this.product, this.priceSchedule)
-    if (!this.isAddingToCart && !this.gridDisplay) {
+    if (this.priceSchedule && !this.isAddingToCart && !this.gridDisplay) {
       this.validateQty(this.getDefaultQty())
     }
     if (this.resetGridQtyFields) {
