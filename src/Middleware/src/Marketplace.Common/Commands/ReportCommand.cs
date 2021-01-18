@@ -170,17 +170,7 @@ namespace Headstart.Common.Commands
                  ));
 
             // From User headers must pull from the Sales Order record
-            var salesOrders = new List<HSOrder>();
-            if (template.Headers.Any(header => header.Contains("FromUser")))
-            {
-                 salesOrders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
-                 OrderDirection.Incoming,
-                 filters: verifiedUser.UsrType == "supplier" ? $"from={dateLow}&to={dateHigh}&xp.SupplierIDs={verifiedUser.SupplierID}" : $"from={dateLow}&to={dateHigh}",
-                 page: page,
-                 pageSize: 100
-                ));
-            }
-
+            var salesOrders = await GetSalesOrdersIfNeeded(template, dateLow, dateHigh, verifiedUser);
             var filterClassProperties = template.Filters.GetType().GetProperties();
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
@@ -255,17 +245,7 @@ namespace Headstart.Common.Commands
                  ));
 
             // From User headers must pull from the Sales Order record
-            var salesOrders = new List<HSOrder>();
-            if (template.Headers.Any(header => header.Contains("FromUser")))
-            {
-                salesOrders = await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
-                OrderDirection.Incoming,
-                filters: verifiedUser.UsrType == "supplier" ? $"from={dateLow}&to={dateHigh}&xp.SupplierIDs={verifiedUser.SupplierID}" : $"from={dateLow}&to={dateHigh}",
-                page: page,
-                pageSize: 100
-               ));
-            }
-
+            var salesOrders = await GetSalesOrdersIfNeeded(template, dateLow, dateHigh, verifiedUser);
             var filterClassProperties = template.Filters.GetType().GetProperties();
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
@@ -421,6 +401,20 @@ namespace Headstart.Common.Commands
                        return data;
                     }
                 }
+            }
+            return null;
+        }
+
+        private async Task<List<HSOrder>> GetSalesOrdersIfNeeded(ReportTemplate template, string dateLow, string dateHigh, VerifiedUserContext verifiedUser)
+        {
+            if (template.Headers.Any(header => header.Contains("FromUser")))
+            {
+                return await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
+                OrderDirection.Incoming,
+                filters: verifiedUser.UsrType == "supplier" ? $"from={dateLow}&to={dateHigh}&xp.SupplierIDs={verifiedUser.SupplierID}" : $"from={dateLow}&to={dateHigh}",
+                page: page,
+                pageSize: 100
+               ));
             }
             return null;
         }
