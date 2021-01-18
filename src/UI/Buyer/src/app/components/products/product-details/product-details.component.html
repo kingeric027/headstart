@@ -324,7 +324,7 @@
             (qtyChange)="qtyChange($event.detail)"
             [product]="_product"
             [selectedVariant]="variant"
-            [priceSchedule]="priceSchedule"
+            [priceSchedule]="_product.PriceSchedule"
             [variantInventory]="variantInventory"
           >
           </ocm-quantity-input>
