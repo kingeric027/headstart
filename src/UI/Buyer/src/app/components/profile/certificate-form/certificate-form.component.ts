@@ -9,6 +9,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { DateValidator } from 'src/app/validators/validators'
 import { faCalendar } from '@fortawesome/free-solid-svg-icons'
 import { CertificateFormOutput } from 'src/app/models/profile.types'
+import jsPDF from 'jspdf'
 
 @Component({
   templateUrl: './certificate-form.component.html',
@@ -43,12 +44,22 @@ export class OCMCertificateForm implements OnInit {
   }
 
   onSubmit(): void {
-    const pdf = this.file.replace('data:application/pdf;base64,', '')
+    const pdf = this.getBase64UrlEncodedString();
     this.submitted.emit({
       SignedDate: this.form.value.SignedDate.toUTCString(),
       ExpirationDate: this.form.value.ExpirationDate.toUTCString(),
       Base64UrlEncodedPDF: pdf,
     })
+  }
+
+  getBase64UrlEncodedString() {
+    return this.isGeneratedPdf(this.file) ? 
+    this.file.replace('data:application/pdf;filename=generated.pdf;base64,', '') : 
+    this.file.replace('data:application/pdf;base64,', '')
+  }
+
+  isGeneratedPdf(base64FileString: string) {
+    return base64FileString.includes('generated.pdf')
   }
 
   onDismiss(): void {
@@ -64,7 +75,17 @@ export class OCMCertificateForm implements OnInit {
       reader.readAsDataURL(file)
 
       reader.onload = (): void => {
-        this.file = reader.result as string
+        if(file.type.includes("image")) {
+          //handle uploading image
+          const extension = file.name.split(".")[1];
+          const imageString = reader.result as string;
+          var generatedPdf = new jsPDF('p', 'pt', 'a4');
+          generatedPdf.addImage(imageString, extension, 10, 30, 150, 76);
+          this.file = generatedPdf.output('datauristring');
+          
+        } else {
+          this.file = reader.result as string
+        }
         // need to run CD since file load runs outside of zone
         this.cd.markForCheck()
       }
