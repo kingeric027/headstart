@@ -1,10 +1,22 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import { applicationConfiguration } from '@app-seller/config/app.config'
-import { AppConfig } from '@app-seller/models/environment.types'
-import { SupplierFilterConfigDocument } from '@app-seller/models/filter.types'
-import { OcTokenService, Order } from '@ordercloud/angular-sdk'
-import { ListPage } from '@ordercloud/headstart-sdk'
+import {
+  AppConfig,
+  applicationConfiguration,
+} from '@app-seller/config/app.config'
+import {
+  MonitoredProductFieldModifiedNotificationDocument,
+  NotificationStatus,
+} from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
+import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk'
+import {
+  MarketplaceSupplier,
+  ListPage,
+  SuperMarketplaceProduct,
+  SuperShipment,
+  BatchProcessResult,
+} from '@ordercloud/headstart-sdk'
+import { Observable } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -47,8 +59,56 @@ export class MiddlewareAPIService {
 
   async getSupplierData(supplierOrderID: string): Promise<any> {
     const url = `${this.appConfig.middlewareUrl}/supplier/orderdetails/${supplierOrderID}`
+    return await this.http.get<any>(url, this.headers).toPromise()
+  }
+
+  async updateProductNotifications(
+    notification: MonitoredProductFieldModifiedNotificationDocument
+  ): Promise<SuperMarketplaceProduct> {
     return await this.http
-      .get<any>(url, this.headers)
+      .put<SuperMarketplaceProduct>(
+        `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
+        notification,
+        this.headers
+      )
       .toPromise()
+  }
+
+  async getProductNotifications(
+    superProduct: SuperMarketplaceProduct
+  ): Promise<MonitoredProductFieldModifiedNotificationDocument[]> {
+    const productModifiedNotifications = await this.http
+      .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
+        `${this.appConfig.middlewareUrl}/notifications/monitored-product-notification`,
+        superProduct,
+        this.headers
+      )
+      .toPromise()
+
+    return productModifiedNotifications?.Items.filter(
+      (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
+    )
+  }
+
+  async patchLineItems(
+    superShipment: SuperShipment,
+    headers: HttpHeaders
+  ): Promise<any> {
+    return await this.http
+      .post(this.appConfig.middlewareUrl + '/shipment', superShipment, {
+        headers,
+      })
+      .toPromise()
+  }
+
+  batchShipmentUpload(
+    formData: FormData,
+    headers: HttpHeaders
+  ): Observable<BatchProcessResult> {
+    return this.http.post(
+      this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment',
+      formData,
+      { headers }
+    )
   }
 }

@@ -1,3 +1,4 @@
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { OcTokenService } from '@ordercloud/angular-sdk'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Component, Inject } from '@angular/core'
@@ -21,10 +22,10 @@ export class UploadShipmentsComponent {
   constructor(
     private http: HttpClient,
     @Inject(applicationConfiguration) private appConfig: AppConfig,
-    private sanitizer: DomSanitizer,
     private appAuthService: AppAuthService,
     private spinner: NgxSpinnerService,
-    private ocTokenService: OcTokenService
+    private ocTokenService: OcTokenService,
+    private middleware: MiddlewareAPIService
   ) {
     this.contentHeight = getPsHeight('base-layout-item')
   }
@@ -105,19 +106,15 @@ export class UploadShipmentsComponent {
         }
       }
 
-      this.http
-        .post(
-          this.appConfig.middlewareUrl + '/shipment/batch/uploadshipment',
-          formData,
-          { headers }
-        )
-        .subscribe((result: BatchProcessResult) => {
+      ;(await this.middleware.batchShipmentUpload(formData, headers)).subscribe(
+        (result: BatchProcessResult) => {
           if (result !== null) {
             this.batchProcessResult = result
             this.spinner.hide()
             this.showResults = true
           }
-        })
+        }
+      )
     }
   }
 
