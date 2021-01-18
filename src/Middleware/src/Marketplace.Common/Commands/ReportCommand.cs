@@ -168,6 +168,9 @@ namespace Headstart.Common.Commands
                 pageSize: 100,
                 accessToken: verifiedUser.AccessToken
                  ));
+
+            // From User headers must pull from the Sales Order record
+            var salesOrders = await GetSalesOrdersIfNeeded(template, dateLow, dateHigh, verifiedUser);
             var filterClassProperties = template.Filters.GetType().GetProperties();
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
@@ -189,13 +192,19 @@ namespace Headstart.Common.Commands
             }
             // If headers include shipping address info, run check that they have Shipping Address data
             // Orders before 01/2021 may not have this on Order XP.
-            if (template.Headers.Any(header => header.Contains("xp.ShippingAddress")))
+            if (template.Headers.Any(header => header.Contains("xp.ShippingAddress") || header.Contains("FromUser")))
             {
                 foreach (var order in filteredOrders)
                 {
+                    // If users are reporting on From User information, this must come from the sales order instead of the purchase order.
+                    if (template.Headers.Any(header => header.Contains("FromUser")))
+                    {
+                        var matchingSalesOrder = salesOrders.Find(salesOrder => order.ID.Split('-')[0] == salesOrder.ID);
+                        order.FromUser = matchingSalesOrder?.FromUser;
+                    }
                     // If orders do not have shipping address data, pull that from the first line item.
                     // Orders after 01/2021 should have this information on Order XP already.
-                    if (order.xp.ShippingAddress == null)
+                    if (template.Headers.Any(header => header.Contains("xp.ShippingAddress") && order.xp.ShippingAddress == null))
                     {
                         var lineItems = await _oc.LineItems.ListAsync(
                         orderDirection,
@@ -205,14 +214,14 @@ namespace Headstart.Common.Commands
                         );
                         order.xp.ShippingAddress = new HSAddressBuyer()
                         {
-                            FirstName = lineItems.Items[0].ShippingAddress.FirstName,
-                            LastName = lineItems.Items[0].ShippingAddress.LastName,
-                            Street1 = lineItems.Items[0].ShippingAddress.Street1,
-                            Street2 = lineItems.Items[0].ShippingAddress.Street2,
-                            City = lineItems.Items[0].ShippingAddress.City,
-                            State = lineItems.Items[0].ShippingAddress.State,
-                            Zip = lineItems.Items[0].ShippingAddress.Zip,
-                            Country = lineItems.Items[0].ShippingAddress.Country,
+                            FirstName = lineItems.Items[0].ShippingAddress?.FirstName,
+                            LastName = lineItems.Items[0].ShippingAddress?.LastName,
+                            Street1 = lineItems.Items[0].ShippingAddress?.Street1,
+                            Street2 = lineItems.Items[0].ShippingAddress?.Street2,
+                            City = lineItems.Items[0].ShippingAddress?.City,
+                            State = lineItems.Items[0].ShippingAddress?.State,
+                            Zip = lineItems.Items[0].ShippingAddress?.Zip,
+                            Country = lineItems.Items[0].ShippingAddress?.Country,
                         };
                     }
                 }
@@ -234,6 +243,9 @@ namespace Headstart.Common.Commands
                 pageSize: 100,
                 accessToken: verifiedUser.AccessToken
                  ));
+
+            // From User headers must pull from the Sales Order record
+            var salesOrders = await GetSalesOrdersIfNeeded(template, dateLow, dateHigh, verifiedUser);
             var filterClassProperties = template.Filters.GetType().GetProperties();
             var filtersToEvaluateMap = new Dictionary<PropertyInfo, List<string>>();
             foreach (var property in filterClassProperties)
@@ -256,6 +268,12 @@ namespace Headstart.Common.Commands
             var lineItemOrders = new List<HSLineItemOrder>();
             foreach (var order in filteredOrders)
             {
+                // If suppliers are reporting on From User information, this must come from the seller order instead.
+                if (template.Headers.Any(header => header.Contains("FromUser") && verifiedUser.UsrType == "supplier"))
+                {
+                    var matchingSalesOrder = salesOrders.Find(salesOrder => order.ID.Split('-')[0] == salesOrder.ID);
+                    order.FromUser = matchingSalesOrder?.FromUser;
+                }
                 var lineItems = new List<HSLineItem>();
                 lineItems.AddRange(await ListAllAsync.List((page) => _oc.LineItems.ListAsync<HSLineItem>(
                     OrderDirection.Incoming,
@@ -383,6 +401,20 @@ namespace Headstart.Common.Commands
                        return data;
                     }
                 }
+            }
+            return null;
+        }
+
+        private async Task<List<HSOrder>> GetSalesOrdersIfNeeded(ReportTemplate template, string dateLow, string dateHigh, VerifiedUserContext verifiedUser)
+        {
+            if (template.Headers.Any(header => header.Contains("FromUser")))
+            {
+                return await ListAllAsync.List((page) => _oc.Orders.ListAsync<HSOrder>(
+                OrderDirection.Incoming,
+                filters: verifiedUser.UsrType == "supplier" ? $"from={dateLow}&to={dateHigh}&xp.SupplierIDs={verifiedUser.SupplierID}" : $"from={dateLow}&to={dateHigh}",
+                page: page,
+                pageSize: 100
+               ));
             }
             return null;
         }
