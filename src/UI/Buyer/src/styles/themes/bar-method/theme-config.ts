@@ -1,4 +1,4 @@
-import { Theme } from "src/app/models/environment.types"
+import { Theme } from 'src/app/models/environment.types'
 
 const bmTheme: Theme = {
   logoSrc: `assets/bm-logo.png`,
