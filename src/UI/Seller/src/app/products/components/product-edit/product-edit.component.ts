@@ -222,9 +222,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     this.taxCodes = await this.listTaxCodes(taxCategory, searchTerm, 1, 100)
   }
 
-  async refreshProductData(
-    superProduct: SuperMarketplaceProduct
-  ): Promise<void> {
+  async refreshProductData(superProduct: SuperHSProduct): Promise<void> {
     void this.middleware
       .getProductNotifications(superProduct)
       .then((result) => {
