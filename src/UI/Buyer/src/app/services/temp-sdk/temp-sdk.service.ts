@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core'
 import { ListPageWithFacets, Tokens } from 'ordercloud-javascript-sdk'
 import {
   ListArgs,
-  MarketplaceOrder,
-  MarketplaceKitProduct,
-  SuperMarketplaceMeProduct,
+  HSOrder,
+  HSKitProduct,
+  SuperHSMeProduct,
   SupplierFilterConfigDocument,
-  MarketplaceMeProduct,
+  HSMeProduct,
 } from '@ordercloud/headstart-sdk'
 import { ListPage } from '@ordercloud/headstart-sdk'
 import { AppConfig } from 'src/app/models/environment.types'
@@ -42,27 +42,27 @@ export class TempSdk {
 
   async listMeProducts(
     args: ListArgs
-  ): Promise<ListPageWithFacets<MarketplaceMeProduct>> {
+  ): Promise<ListPageWithFacets<HSMeProduct>> {
     const url = `${this.appConfig.middlewareUrl}/me/products`
     return await this.http
-      .get<ListPageWithFacets<MarketplaceMeProduct>>(url, {
+      .get<ListPageWithFacets<HSMeProduct>>(url, {
         headers: this.buildHeaders(),
         params: this.createHttpParams(args),
       })
       .toPromise()
   }
 
-  async getMeKitProduct(id: string): Promise<MarketplaceKitProduct> {
+  async getMeKitProduct(id: string): Promise<HSKitProduct> {
     const url = `${this.appConfig.middlewareUrl}/me/kitproducts/${id}`
     return await this.http
-      .get<MarketplaceKitProduct>(url, { headers: this.buildHeaders() })
+      .get<HSKitProduct>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 
-  async getMeProduct(id: string): Promise<SuperMarketplaceMeProduct> {
+  async getMeProduct(id: string): Promise<SuperHSMeProduct> {
     const url = `${this.appConfig.middlewareUrl}/me/products/${id}`
     return await this.http
-      .get<SuperMarketplaceMeProduct>(url, { headers: this.buildHeaders() })
+      .get<SuperHSMeProduct>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 
@@ -86,10 +86,10 @@ export class TempSdk {
 
   async applyAutomaticPromotionsToOrder(
     orderID: string
-  ): Promise<MarketplaceOrder> {
+  ): Promise<HSOrder> {
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/applypromotions`
     return await this.http
-      .post<MarketplaceOrder>(url, { headers: this.buildHeaders() })
+      .post<HSOrder>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 }

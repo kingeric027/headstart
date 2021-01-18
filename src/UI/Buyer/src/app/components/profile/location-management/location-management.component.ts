@@ -3,7 +3,7 @@ import { Address } from 'ordercloud-javascript-sdk'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 
 import {
-  MarketplaceAddressBuyer,
+  HSAddressBuyer,
   TaxCertificate,
 } from '@ordercloud/headstart-sdk'
 import { GeographyConfig } from '../../../config/geography.class'
@@ -18,7 +18,7 @@ import { CertificateFormOutput } from 'src/app/models/profile.types'
 })
 export class OCMLocationManagement {
   faDownload = faDownload
-  address: MarketplaceAddressBuyer = {}
+  address: HSAddressBuyer = {}
   certificate: TaxCertificate = {}
   showCertificateForm = false
   userCanAdminResaleCert = false

@@ -1,4 +1,4 @@
-import { MarketplaceLocationUserGroup } from "@ordercloud/headstart-sdk";
+import { HSLocationUserGroup } from "@ordercloud/headstart-sdk";
 import { MeUser } from "ordercloud-javascript-sdk";
 import { CurrenySymbol } from "./currency.types";
 
@@ -65,6 +65,6 @@ export interface CertificateFormOutput {
   export interface CurrentUser extends MeUser {
     FavoriteProductIDs: string[]
     FavoriteOrderIDs: string[]
-    UserGroups: MarketplaceLocationUserGroup[]
+    UserGroups: HSLocationUserGroup[]
     Currency: CurrenySymbol
   }

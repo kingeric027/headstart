@@ -39,7 +39,7 @@
     "@ordercloud/angular-cms-components": "^2.0.0",
     "@ordercloud/angular-sdk": "1.0.0-12",
     "@ordercloud/cms-sdk": "^1.0.1",
-    "@ordercloud/headstart-sdk": "1.20.6",
+    "@ordercloud/headstart-sdk": "1.21.6",
     "@tinymce/tinymce-angular": "^4.1.0",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",

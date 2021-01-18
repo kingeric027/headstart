@@ -17,5 +17,6 @@ namespace Headstart.Models.Extended
         public string Email { get; set; }
         [MaxLength(200, ErrorMessage = "Quote request comments cannot exceed 200 characters")]
         public string Comments { get; set; }
+        public string ShippingAddressId { get; set; }
     }
 }

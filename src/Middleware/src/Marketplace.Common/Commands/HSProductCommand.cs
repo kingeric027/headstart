@@ -202,6 +202,9 @@ namespace Headstart.Common.Commands.Crud
 		{
 			// Determine ID up front so price schedule ID can match
 			superProduct.Product.ID = superProduct.Product.ID ?? CosmosInteropID.New();
+
+			await ValidateVariantsAsync(superProduct, user.AccessToken);
+
 			// Create Specs
 			var defaultSpecOptions = new List<DefaultOptionSpecAssignment>();
 			var specRequests = await Throttler.RunAsync(superProduct.Specs, 100, 5, s =>
@@ -246,9 +249,24 @@ namespace Headstart.Common.Commands.Crud
 			{
 				var oldVariantID = v.ID;
 				v.ID = v.xp.NewID ?? v.ID;
-				v.Name = v.xp.NewID ?? v.ID;
-				return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
+                v.Name = v.xp.NewID ?? v.ID;
+
+				if ((superProduct?.Product?.Inventory?.VariantLevelTracking) == true && v.Inventory == null)
+				{
+					v.Inventory = new PartialVariantInventory { QuantityAvailable = 0 };
+				}
+				if (superProduct.Product?.Inventory == null)
+				{
+					//If Inventory doesn't exist on the product, don't patch variants with inventory either.
+					return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp}, accessToken: user.AccessToken);
+				}
+				else
+				{
+					return _oc.Products.PatchVariantAsync(_product.ID, oldVariantID, new PartialVariant { ID = v.ID, Name = v.Name, xp = v.xp, Inventory = v.Inventory }, accessToken: user.AccessToken);
+				}
 			});
+
+
 			// List Variants
 			var _variants = await _oc.Products.ListVariantsAsync<HSVariant>(_product.ID, accessToken: user.AccessToken);
 			// List Product Specs
@@ -265,7 +283,58 @@ namespace Headstart.Common.Commands.Crud
 			};
 		}
 
-		public async Task<SuperHSProduct> Put(string id, SuperHSProduct superProduct, string token)
+		private async Task ValidateVariantsAsync(SuperHSProduct superProduct, string token)
+        {
+			List<Variant> allVariants = new List<Variant>();
+			if (superProduct.Variants == null || !superProduct.Variants.Any()) { return; }
+
+			try
+			{
+				List<Product> allProducts = await ListAllAsync.ListWithFacets(page => _oc.Products.ListAsync(page: page, pageSize: 100, accessToken: token));
+
+				if (allProducts == null || !allProducts.Any()) { return; }
+
+				foreach (Product product in allProducts)
+				{
+					if (product.VariantCount > 0 && product.ID != superProduct.Product.ID)
+					{
+						allVariants.AddRange((await _oc.Products.ListVariantsAsync(productID: product.ID, pageSize: 100, accessToken: token)).Items);
+					}
+				}
+			} 
+			catch (Exception ex)
+            {
+				return;
+            }
+			
+			foreach (Variant variant in superProduct.Variants)
+            {
+				if (!allVariants.Any()) { return; }
+
+				List<Variant> duplicateSpecNames = allVariants.Where(currVariant => IsDifferentVariantWithSameName(variant, currVariant)).ToList();
+				if (duplicateSpecNames.Any())
+                {	
+					throw new Exception($"{duplicateSpecNames.First().ID} already exists on a variant. Please use unique names for SKUS and try again.");
+                }
+            }
+        }
+
+        private bool IsDifferentVariantWithSameName(Variant variant, Variant currVariant)
+        {
+			//Do they have the same SKU
+            if (variant.xp.NewID == currVariant.ID)
+            {
+				if (variant.xp.SpecCombo == currVariant.xp.SpecCombo)
+                {
+					//It's most likely the same variant
+					return false;
+                }
+				return true;
+            }
+			return false;
+        }
+
+        public async Task<SuperHSProduct> Put(string id, SuperHSProduct superProduct, string token)
 		{
 			// Update the Product itself
 			var _updatedProduct = await _oc.Products.SaveAsync<HSProduct>(superProduct.Product.ID, superProduct.Product, token);
@@ -316,6 +385,7 @@ namespace Headstart.Common.Commands.Crud
 
 			foreach (Variant variant in requestVariants)
 			{
+				ValidateRequestVariant(variant);
 				var currVariant = existingVariants.Where(v => v.ID == variant.ID);
 				if (currVariant == null || currVariant.Count() < 1) { continue; }
 				hasVariantChange = HasVariantChange(variant, currVariant.First());
@@ -324,6 +394,9 @@ namespace Headstart.Common.Commands.Crud
 			// IF variants differ, then re-generate variants and re-patch IDs to match the user input.
 			if (variantsAdded || variantsRemoved || hasVariantChange || requestVariants.Any(v => v.xp.NewID != null))
 			{
+				//validate variant names before continuing saving.
+				await ValidateVariantsAsync(superProduct, token);
+
 				// Re-generate Variants
 				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: token);
 				// Patch NEW variants with the User Specified ID (Name,ID), and correct xp values (SKU)
@@ -380,8 +453,18 @@ namespace Headstart.Common.Commands.Crud
 			};
 		}
 
-		private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
+        private void ValidateRequestVariant(Variant variant)
+        {
+            if (variant.xp.NewID == variant.ID)
+            {
+				//If NewID is same as ID, no changes have happened so NewID shouldn't be populated.
+				variant.xp.NewID = null;
+            }
+        }
+
+        private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
 		{
+			var ocAuth = await _oc.AuthenticateAsync();
 			var initial = await _oc.PriceSchedules.GetAsync(updated.ID);
 			if (initial.MaxQuantity != updated.MaxQuantity ||
 				initial.MinQuantity != updated.MinQuantity ||
@@ -403,7 +486,7 @@ namespace Headstart.Common.Commands.Crud
 				var priceSchedulesToUpdate = relatedPriceSchedules.Where(p => p.ID.StartsWith(updated.ID) && p.ID != updated.ID);
 				await Throttler.RunAsync(priceSchedulesToUpdate, 100, 5, p =>
 				{
-					return _oc.PriceSchedules.PatchAsync(p.ID, patch, token);
+					return _oc.PriceSchedules.PatchAsync(p.ID, patch, ocAuth.AccessToken);
 				});
 			}
 			return await _oc.PriceSchedules.SaveAsync<PriceSchedule>(updated.ID, updated, token);
@@ -419,7 +502,8 @@ namespace Headstart.Common.Commands.Crud
 			if (variant.ShipLength != currVariant.ShipLength) { return true; }
 			if (variant.ShipWeight != currVariant.ShipWeight) { return true; }
 			if (variant.ShipWidth != currVariant.ShipWidth) { return true; }
-			if (variant.Inventory != currVariant.Inventory) { return true; }
+			if (variant?.Inventory?.LastUpdated != currVariant?.Inventory?.LastUpdated) { return true; }
+			if (variant?.Inventory?.QuantityAvailable != currVariant?.Inventory?.QuantityAvailable) { return true; }
 
 			return false;
 		}
@@ -476,7 +560,7 @@ namespace Headstart.Common.Commands.Crud
 			var _attachments = await GetProductAttachments(id, token);
 			// Delete specs images and attachments associated with the requested product
 			await Task.WhenAll(
-				_oc.PriceSchedules.DeleteAsync(product.DefaultPriceScheduleID),
+				_oc.PriceSchedules.DeleteAsync(product.DefaultPriceScheduleID, token),
 				Throttler.RunAsync(_images, 100, 5, i => _cms.Assets.Delete(i.ID, token)),
 				Throttler.RunAsync(_attachments, 100, 5, i => _cms.Assets.Delete(i.ID, token)),
 				Throttler.RunAsync(_specs.Items, 100, 5, s => _oc.Specs.DeleteAsync(s.ID, accessToken: token)),

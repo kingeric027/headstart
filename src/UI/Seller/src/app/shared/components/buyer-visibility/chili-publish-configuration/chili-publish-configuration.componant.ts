@@ -7,7 +7,7 @@ import {
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import { ProductService } from '@app-seller/products/product.service'
 import {
-  MarketplaceProduct,
+  HSProduct,
   ChiliConfig,
   ChiliSpec,
   ChiliSpecXp,
@@ -27,7 +27,7 @@ import { Sortable } from 'sortablejs'
 })
 export class ChiliPublishConfiguration implements OnInit {
   @Input()
-  product: MarketplaceProduct
+  product: HSProduct
   faExclamationCircle = faExclamationCircle
 
   showChiliConfigs = false

@@ -1,7 +1,7 @@
-import { MarketplaceAddressBuyer, MarketplaceMeProduct, TaxCertificate } from "@ordercloud/headstart-sdk";
+import { HSAddressBuyer, HSMeProduct, TaxCertificate } from "@ordercloud/headstart-sdk";
 
 export interface BuyerLocationWithCert {
-    location?: MarketplaceAddressBuyer
+    location?: HSAddressBuyer
     certificate?: TaxCertificate
   }
 
@@ -15,6 +15,6 @@ export interface BuyerRequestForInfo {
 }
 
 export interface ContactSupplierBody {
-    Product: MarketplaceMeProduct
+    Product: HSMeProduct
     BuyerRequest: BuyerRequestForInfo
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using ordercloud.integrations.library;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,6 +8,7 @@ using System.Text;
 namespace Headstart.Common.Services.AnytimeDashboard.Models
 {
 	// https://api.anytimefitness.com/Help/Webhooks
+	[SwaggerModel]
 	public class Notification
 	{
 		public NotificationChannel Channel { get; set; } // the type of entity that changed
@@ -18,5 +20,6 @@ namespace Headstart.Common.Services.AnytimeDashboard.Models
 	}
 
 	public enum NotificationChannel { Club, Staff }
+
 	public enum NotificationAction { Update, Delete, Create }
 }

@@ -4,7 +4,7 @@ import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
 } from '@app-seller/models/notification.types'
-import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
+import { SuperHSProduct } from '@ordercloud/headstart-sdk'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { OcTokenService } from '@ordercloud/angular-sdk'
@@ -46,7 +46,7 @@ export class MonitoredProductNotificationComponent {
     }
     // TODO: Replace with the SDK
     const superProduct = await this.http
-      .put<SuperMarketplaceProduct>(
+      .put<SuperHSProduct>(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
         notification,
         headers

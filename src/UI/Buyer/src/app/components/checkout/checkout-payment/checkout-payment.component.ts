@@ -12,7 +12,7 @@ import {
   OrderPromotion,
 } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceOrder,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { FormGroup, FormControl } from '@angular/forms'
 import { groupBy as _groupBy } from 'lodash'
@@ -33,7 +33,7 @@ import { OrderSummaryMeta } from 'src/app/models/order.types'
 export class OCMCheckoutPayment implements OnInit, OnChanges {
   @Input() cards: ListPage<BuyerCreditCard>
   @Input() isAnon: boolean
-  @Input() order: MarketplaceOrder
+  @Input() order: HSOrder
   @Input() paymentError: string
   @Input() orderSummaryMeta: OrderSummaryMeta
   @Output() cardSelected = new EventEmitter<SelectedCreditCard>()

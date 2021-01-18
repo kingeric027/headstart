@@ -859,7 +859,7 @@ import {
 } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import {
   ListPage,
-  MarketplaceSupplier,
+  HSSupplier,
   HeadStartSDK,
   AssetUpload,
   Asset,
@@ -897,12 +897,12 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   updateResource = new EventEmitter&lt;any&gt;()
   @Output()
   logoStaged = new EventEmitter&lt;File&gt;()
-  @Input() <span class="fstat-no" title="function not covered" >set </span>supplierEditable(value: MarketplaceSupplier) {
+  @Input() <span class="fstat-no" title="function not covered" >set </span>supplierEditable(value: HSSupplier) {
 <span class="cstat-no" title="statement not covered" >    this._supplierEditable = value</span>
   }
   supplierUsers: ListPage&lt;User&gt;
   buyers: ListPage&lt;Buyer&gt;
-  _supplierEditable: MarketplaceSupplier
+  _supplierEditable: HSSupplier
 <span class="cstat-no" title="statement not covered" >  availableCurrencies: SupportedRates[] = []</span>
   isCreatingNew: boolean
 <span class="cstat-no" title="statement not covered" >  countriesServicingOptions = []</span>
@@ -952,7 +952,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >handleSelectedSupplierChange</span>(
-    supplier: MarketplaceSupplier
+    supplier: HSSupplier
   ): Promise&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >    this.logoUrl = `${environment.middlewareUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`</span>
 <span class="cstat-no" title="statement not covered" >    !this.isCreatingNew &amp;&amp;</span>

@@ -83,19 +83,19 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { environment } from 'src/environments/environment'
-import { MarketplaceSupplier } from '@ordercloud/headstart-sdk'
+import { HSSupplier } from '@ordercloud/headstart-sdk'
 &nbsp;
 export const SUPPLIER_LOGO_PATH_STRATEGY = 'SUPPLIER_LOGO_PATH_STRATEGY'
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >getSupplierLogoSmallUrl(</span>
-  supplier: MarketplaceSupplier,
+  supplier: HSSupplier,
   sellerID: string
 ): string {
 <span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/suppliers/${supplier.ID}/thumbnail?size=s`</span>
 }
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >getSupplierLogoMediumUrl(</span>
-  supplier: MarketplaceSupplier,
+  supplier: HSSupplier,
   sellerID: string
 ): string {
 <span class="cstat-no" title="statement not covered" >  return `${environment.middlewareUrl}/assets/${sellerID}/suppliers/${supplier.ID}/thumbnail?size=m`</span>

@@ -8,7 +8,7 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faShoppingCart, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { DOCUMENT } from '@angular/common'
 
 @Component({
@@ -20,6 +20,7 @@ export class OCMModal implements OnInit, OnDestroy {
   @Output() closeEvent = new EventEmitter()
   isOpen = false
   faTimes = faTimes
+  faShoppingCart = faShoppingCart
 
   @Input() set state(value: { isOpen: boolean }) {
     if (value.isOpen && !this.isOpen) {

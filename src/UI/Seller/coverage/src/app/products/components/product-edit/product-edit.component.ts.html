@@ -2244,7 +2244,7 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ProductService } from '@app-seller/products/product.service'
 import {
-  SuperMarketplaceProduct,
+  SuperHSProduct,
   ListPage,
   HeadStartSDK,
   SpecOption,
@@ -2309,8 +2309,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >  faTimesCircle = faTimesCircle</span>
 <span class="cstat-no" title="statement not covered" >  faCheckCircle = faCheckCircle</span>
 <span class="cstat-no" title="statement not covered" >  faExclamationCircle = faExclamationCircle</span>
-  _superHSProductStatic: SuperMarketplaceProduct
-  _superHSProductEditable: SuperMarketplaceProduct
+  _superHSProductStatic: SuperHSProduct
+  _superHSProductEditable: SuperHSProduct
   supplierCurrency: SupportedRates
   sellerCurrency: SupportedRates
   _exchangeRates: SupportedRates[]
@@ -2413,7 +2413,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >refreshProductData</span>(
-    superProduct: SuperMarketplaceProduct
+    superProduct: SuperHSProduct
   ): Promise&lt;void&gt; {
     const productModifiedNotifications = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.Documents.ListDocuments(</span>
       'MonitoredProductFieldModifiedNotification',
@@ -2470,7 +2470,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 <span class="cstat-no" title="statement not covered" >    this.checkForChanges()</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  createProductForm</span>(superHSProduct: SuperMarketplaceProduct): void {
+<span class="fstat-no" title="function not covered" >  createProductForm</span>(superHSProduct: SuperHSProduct): void {
 <span class="cstat-no" title="statement not covered" >    if (superHSProduct.Product) {</span>
 <span class="cstat-no" title="statement not covered" >      this.productForm = new FormGroup(</span>
         {
@@ -2809,8 +2809,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >checkForFieldsToMonitor</span>(
-    editedSuperProduct: SuperMarketplaceProduct
-  ): Promise&lt;SuperMarketplaceProduct&gt; {
+    editedSuperProduct: SuperHSProduct
+  ): Promise&lt;SuperHSProduct&gt; {
     const fieldsToMonitorForChanges<span class="cstat-no" title="statement not covered" > = this.appConfig</span>
       ?.superProductFieldsToMonitor
     const mySupplier = <span class="cstat-no" title="statement not covered" >await this.currentUserService.getMySupplier()</span>
@@ -2853,7 +2853,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
           }
           // TODO: Replace with the SDK
 <span class="cstat-no" title="statement not covered" >          superProduct = await this.http</span>
-            .post&lt;SuperMarketplaceProduct&gt;(
+            .post&lt;SuperHSProduct&gt;(
               `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified`,
               document,
               headers
@@ -2883,7 +2883,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     }
     // TODO: Replace with the SDK
     const superProduct = <span class="cstat-no" title="statement not covered" >await this.http</span>
-      .put&lt;SuperMarketplaceProduct&gt;(
+      .put&lt;SuperHSProduct&gt;(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
         notification,
         headers
@@ -2987,7 +2987,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     productID: string,
     file: FileHandle,
     isAttachment = <span class="branch-0 cbranch-no" title="branch not covered" >false</span>
-  ): Promise&lt;SuperMarketplaceProduct&gt; {
+  ): Promise&lt;SuperHSProduct&gt; {
     const accessToken = <span class="cstat-no" title="statement not covered" >await this.appAuthService.fetchToken().toPromise()</span>
     const asset = <span class="cstat-no" title="statement not covered" >{</span>
       Active: true,
@@ -3165,8 +3165,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >createNewSuperHSProduct</span>(
-    superHSProduct: SuperMarketplaceProduct
-  ): Promise&lt;SuperMarketplaceProduct&gt; {
+    superHSProduct: SuperHSProduct
+  ): Promise&lt;SuperHSProduct&gt; {
     const supplier = <span class="cstat-no" title="statement not covered" >await this.currentUserService.getMySupplier()</span>
 <span class="cstat-no" title="statement not covered" >    superHSProduct.Product.xp.ProductType = this.productType</span>
     ;(<span class="cstat-no" title="statement not covered" >superHSProduct.Product.xp as any).PromotionEligible =</span>
@@ -3184,8 +3184,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >updateMarketplaceProduct</span>(
-    superHSProduct: SuperMarketplaceProduct
-  ): Promise&lt;SuperMarketplaceProduct&gt; {
+    superHSProduct: SuperHSProduct
+  ): Promise&lt;SuperHSProduct&gt; {
     // If PriceSchedule has a price break price, but no ID or name, set them
 <span class="cstat-no" title="statement not covered" >    if (</span>
       superHSProduct.PriceSchedule?.PriceBreaks[0]?.Price &amp;&amp;

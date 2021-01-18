@@ -5,9 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { BuyerService } from '../../buyers/buyer.service'
 import { BuyerCatalogService } from '../buyer-catalog.service'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { MarketplaceUserGroup } from '@ordercloud/headstart-sdk'
+import { HSUserGroup } from '@ordercloud/headstart-sdk'
 
-function createBuyerCatalogForm(userGroup: MarketplaceUserGroup) {
+function createBuyerCatalogForm(userGroup: HSUserGroup) {
   return new FormGroup({
     Name: new FormControl(userGroup?.Name, Validators.required),
   })

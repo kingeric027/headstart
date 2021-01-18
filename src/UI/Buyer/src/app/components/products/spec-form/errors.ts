@@ -10,4 +10,5 @@ export const specErrors = {
   mismatch: 'Passwords do not match',
   min: 'Value less than minimum allowed',
   max: 'Value more than maximum allowed',
+  maxLength: 'Maximum character limit exceeded',
 }

@@ -8,6 +8,7 @@ import {
   Payment,
   OcOrderService,
   OrderDirection,
+  OcAddressService
 } from '@ordercloud/angular-sdk'
 
 // temporarily any with sdk update
@@ -25,8 +26,8 @@ import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppAuthService } from '@app-seller/auth'
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface'
 import {
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { flatten as _flatten } from 'lodash'
 import { OrderProgress } from '@app-seller/models/order.types'
@@ -55,8 +56,9 @@ export class OrderDetailsComponent {
   faUser = faUserAlt
   _order: Order = {}
   _buyerOrder: Order = {}
+  _buyerQuoteAddress: Address = null
   _supplierOrder: Order = {}
-  _lineItems: MarketplaceLineItem[] = []
+  _lineItems: HSLineItem[] = []
   _payments: Payment[] = []
   images: any[] = []
   orderDirection: OrderDirection
@@ -88,13 +90,14 @@ export class OrderDetailsComponent {
     private pdfService: PDFService,
     private middleware: MiddlewareAPIService,
     private appAuthService: AppAuthService,
+    private ocAddressService: OcAddressService,
     @Inject(applicationConfiguration) private appConfig: AppConfig
   ) {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER
     this.setOrderDirection()
   }
 
-  setOrderProgress(order: MarketplaceOrder): void {
+  setOrderProgress(order: HSOrder): void {
     switch (order?.xp?.ShippingStatus) {
       case 'Processing':
         this.orderProgress = {
@@ -195,6 +198,7 @@ export class OrderDetailsComponent {
   }
 
   async setData(order: Order): Promise<void> {
+    this._buyerQuoteAddress = null
     this._order = order
     if (this.isSupplierOrder(order.ID)) {
       const orderData = await this.middleware.getSupplierData(order.ID)
@@ -204,6 +208,13 @@ export class OrderDetailsComponent {
     } else {
       this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)
+    }
+    if(this.isQuoteOrder(order)) {
+      const buyerId = this._buyerOrder.FromCompanyID
+      if(this._buyerOrder.ShippingAddressID) {
+        const address = await this.ocAddressService.Get(buyerId, this._buyerOrder.ShippingAddressID).toPromise()
+        this._buyerQuoteAddress = address
+      } 
     }
   }
 
@@ -243,7 +254,7 @@ export class OrderDetailsComponent {
       .toPromise()
     lineItems = [
       ...lineItems,
-      ...(lineItemsResponse.Items as MarketplaceLineItem[]),
+      ...(lineItemsResponse.Items as HSLineItem[]),
     ]
     if (lineItemsResponse.Meta.TotalPages <= 1) {
       return lineItems

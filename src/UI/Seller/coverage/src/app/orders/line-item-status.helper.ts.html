@@ -126,7 +126,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { MarketplaceLineItem, HeadStartSDK } from '@ordercloud/headstart-sdk'
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { HSLineItem, HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { LineItemStatus } from '@app-seller/shared/models/order-status.interface'
 &nbsp;
 const validPreviousStates = {
@@ -145,7 +145,7 @@ const validPreviousStates = {
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >NumberCanChangeTo(</span>
   lineItemStatus: LineItemStatus,
-  lineItem: MarketplaceLineItem
+  lineItem: HSLineItem
 ): number {
 <span class="cstat-no" title="statement not covered" >  return Object.entries(lineItem.xp.StatusByQuantity as any)</span>
     .filter(<span class="fstat-no" title="function not covered" >([</span>status, quantity]) =&gt;
@@ -155,14 +155,14 @@ export function <span class="fstat-no" title="function not covered" >NumberCanCh
 }
 export function <span class="fstat-no" title="function not covered" >CanChangeTo(</span>
   lineItemStatus: LineItemStatus,
-  lineItem: MarketplaceLineItem
+  lineItem: HSLineItem
 ): boolean {
 <span class="cstat-no" title="statement not covered" >  return !!NumberCanChangeTo(lineItemStatus, lineItem)</span>
 }
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >CanChangeLineItemsOnOrderTo(</span>
   lineItemStatus: LineItemStatus,
-  lineItems: MarketplaceLineItem[]
+  lineItems: HSLineItem[]
 ): boolean {
 <span class="cstat-no" title="statement not covered" >  return lineItems.some(<span class="fstat-no" title="function not covered" >(l</span>i) =&gt; <span class="cstat-no" title="statement not covered" >CanChangeTo(lineItemStatus, li))</span></span>
 }

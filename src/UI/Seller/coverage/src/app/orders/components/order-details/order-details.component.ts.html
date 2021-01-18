@@ -611,8 +611,8 @@ import {
 import { AppAuthService } from '@app-seller/auth'
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface'
 import {
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { flatten as _flatten } from 'lodash'
 &nbsp;
@@ -643,7 +643,7 @@ export class OrderDetailsComponent {
   faInfoCircle = faInfoCircle
   faUser = faUserAlt
   _order: Order = {}
-  _lineItems: MarketplaceLineItem[] = []
+  _lineItems: HSLineItem[] = []
   _payments: Payment[] = []
   images: any[] = []
   orderDirection: OrderDirection
@@ -680,7 +680,7 @@ export class OrderDetailsComponent {
     this.isSellerUser = this.appAuthService.getOrdercloudUserType() === SELLER
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  setOrderProgress</span>(order: MarketplaceOrder): void {
+<span class="fstat-no" title="function not covered" >  setOrderProgress</span>(order: HSOrder): void {
 <span class="cstat-no" title="statement not covered" >    switch (order?.xp?.ShippingStatus) {</span>
       case 'Processing':
 <span class="cstat-no" title="statement not covered" >        this.orderProgress = {</span>
@@ -810,7 +810,7 @@ export class OrderDetailsComponent {
       .toPromise()
 <span class="cstat-no" title="statement not covered" >    lineItems = [</span>
       ...lineItems,
-      ...(lineItemsResponse.Items as MarketplaceLineItem[]),
+      ...(lineItemsResponse.Items as HSLineItem[]),
     ]
 <span class="cstat-no" title="statement not covered" >    if (lineItemsResponse.Meta.TotalPages &lt;= 1) {</span>
 <span class="cstat-no" title="statement not covered" >      return lineItems</span>

@@ -103,9 +103,12 @@ namespace Headstart.Common.Services
             var fromEmail = new EmailAddress(from);
             var toEmail = new EmailAddress(to);
             var msg = MailHelper.CreateSingleTemplateEmail(fromEmail, toEmail, templateID, templateData);
-            using (var stream = fileReference.OpenReadStream())
+            if (fileReference != null)
             {
-                await msg.AddAttachmentAsync(fileReference.FileName, stream);
+                using (var stream = fileReference.OpenReadStream())
+                {
+                    await msg.AddAttachmentAsync(fileReference.FileName, stream);
+                }
             }
             await _client.SendEmailAsync(msg);
         }
@@ -163,7 +166,8 @@ namespace Headstart.Common.Services
                     Products = productsList,
                     DateSubmitted = order?.DateSubmitted?.ToString(),
                     OrderID = order.ID,
-                    order.Comments
+                    order.Comments,
+                    TrackingNumber = lineItemStatusChanges.SuperShipment.Shipment.TrackingNumber
                 },
                 Message = new EmailDisplayText()
                 {

@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core'
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
-import { MarketplaceMeProduct } from '@ordercloud/headstart-sdk'
+import { HSMeProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   templateUrl: './product-carousel.component.html',
   styleUrls: ['./product-carousel.component.scss'],
 })
 export class OCMProductCarousel {
-  @Input() products: MarketplaceMeProduct[] = []
+  @Input() products: HSMeProduct[] = []
   @Input() displayTitle: string
 
   index = 0
@@ -23,7 +23,7 @@ export class OCMProductCarousel {
     this.index += this.rowLength
   }
 
-  getProducts(): MarketplaceMeProduct[] {
+  getProducts(): HSMeProduct[] {
     return this.products.slice(this.index, this.index + this.rowLength)
   }
 }

@@ -36,14 +36,14 @@ namespace ordercloud.integrations.cardconnect
             _flurl = flurlFactory.Get($"https://{Config.Site}.{Config.BaseUrl}/");
         }
 
-        private IFlurlRequest Request(string resource, string currency = null)
+        private IFlurlRequest Request(string resource, string currency)
         {
             return _flurl.Request($"{resource}").WithHeader("Authorization", $"Basic {((currency == "USD") ? Config.Authorization : Config.AuthorizationCad)}");
         }
 
         public async Task<CardConnectAccountResponse> Tokenize(CardConnectAccountRequest request)
         {
-            return await this.Request("cardsecure/api/v1/ccn/tokenize").PostJsonAsync(request).ReceiveJson<CardConnectAccountResponse>();
+            return await this.Request("cardsecure/api/v1/ccn/tokenize", request.currency).PostJsonAsync(request).ReceiveJson<CardConnectAccountResponse>();
         }
 
         public async Task<CardConnectAuthorizationResponse> AuthWithoutCapture(CardConnectAuthorizationRequest request)
@@ -60,7 +60,7 @@ namespace ordercloud.integrations.cardconnect
         public async Task<CardConnectVoidResponse> VoidAuthorization(CardConnectVoidRequest request)
         {
             var attempt = await this
-                .Request("cardconnect/rest/void")
+                .Request("cardconnect/rest/void", request.currency)
                 .PutJsonAsync(request)
                 .ReceiveJson<CardConnectVoidResponse>();
 

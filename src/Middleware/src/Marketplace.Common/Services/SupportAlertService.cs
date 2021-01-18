@@ -105,7 +105,7 @@ namespace Headstart.Common.Services
                     DynamicPropertyName3 = "Email",
                     DynamicPropertyValue3 = supportCase.Email,
                     DynamicPropertyName4 = "Vendor",
-                    DynamicPropertyValue4 = supportCase.Vendor,
+                    DynamicPropertyValue4 = supportCase.Vendor ?? "N/A",
                 },
                 Message = new EmailDisplayText()
                 {

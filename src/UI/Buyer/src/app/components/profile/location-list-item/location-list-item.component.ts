@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { Address } from 'ordercloud-javascript-sdk'
-import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk'
+import { HSAddressBuyer } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -8,7 +8,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
   styleUrls: ['./location-list-item.component.scss'],
 })
 export class OCMLocationListItem {
-  @Input() location: MarketplaceAddressBuyer
+  @Input() location: HSAddressBuyer
   @Input() canViewOrders: boolean
 
   constructor(private context: ShopperContextService) {}

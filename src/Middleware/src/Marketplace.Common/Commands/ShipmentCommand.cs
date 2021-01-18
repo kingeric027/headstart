@@ -1,4 +1,4 @@
-﻿using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models.Extended;
 using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
@@ -145,7 +145,8 @@ namespace Headstart.Common.Commands
             LineItemStatusChanges lineItemStatusChange = new LineItemStatusChanges()
             {
                 Changes = lineItemStatusChanges,
-                Status = LineItemStatus.Complete
+                Status = LineItemStatus.Complete,
+                SuperShipment = superShipment
             };
 
             await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, supplierOrderID, lineItemStatusChange);

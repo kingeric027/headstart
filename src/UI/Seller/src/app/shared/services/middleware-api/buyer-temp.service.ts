@@ -4,7 +4,7 @@ import { applicationConfiguration } from '@app-seller/config/app.config'
 import { HSBuyerPriceMarkup } from '@app-seller/models/buyer-markups.types'
 import { AppConfig } from '@app-seller/models/environment.types'
 import { OcTokenService } from '@ordercloud/angular-sdk'
-import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
+import { HSBuyer } from '@ordercloud/headstart-sdk'
 
 // WHOPLE FILE TO BE REPLACED BY SDK
 

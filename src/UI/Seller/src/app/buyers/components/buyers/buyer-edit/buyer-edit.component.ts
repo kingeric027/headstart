@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
-import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
+import { HSBuyer } from '@ordercloud/headstart-sdk'
 import { BuyerService } from '../buyer.service'
 import { AppAuthService } from '@app-seller/auth'
 import { Router } from '@angular/router'
@@ -24,7 +24,7 @@ export class BuyerEditComponent {
   @Input()
   labelSingular: string
   @Input()
-  set orderCloudBuyer(buyer: MarketplaceBuyer) {
+  set orderCloudBuyer(buyer: HSBuyer) {
     if (buyer.ID) {
       this.handleSelectedBuyerChange(buyer)
     } else {
@@ -63,7 +63,7 @@ export class BuyerEditComponent {
     })
   }
 
-  async handleSelectedBuyerChange(buyer: MarketplaceBuyer): Promise<void> {
+  async handleSelectedBuyerChange(buyer: HSBuyer): Promise<void> {
     const superMarketplaceBuyer = await this.buyerTempService.get(buyer.ID)
     this.refreshBuyerData(superMarketplaceBuyer)
   }

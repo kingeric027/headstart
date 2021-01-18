@@ -4,8 +4,8 @@ import { Subject } from 'rxjs'
 import { OrderStateService } from './order-state.service'
 import { isUndefined as _isUndefined } from 'lodash'
 import {
-  MarketplaceLineItem,
-  MarketplaceOrder,
+  HSLineItem,
+  HSOrder,
   HeadStartSDK,
   ListPage,
 } from '@ordercloud/headstart-sdk'
@@ -16,9 +16,9 @@ import { listAll } from '../listAll'
   providedIn: 'root',
 })
 export class CartService {
-  public onAdd = new Subject<MarketplaceLineItem>() // need to make available as observable
+  public onAdd = new Subject<HSLineItem>() // need to make available as observable
   public onChange: (
-    callback: (lineItems: ListPage<MarketplaceLineItem>) => void
+    callback: (lineItems: ListPage<HSLineItem>) => void
   ) => void
   private initializingOrder = false
 
@@ -30,12 +30,38 @@ export class CartService {
     this.onChange = this.state.onLineItemsChange.bind(this.state)
   }
 
-  get(): ListPage<MarketplaceLineItem> {
+  get(): ListPage<HSLineItem> {
     return this.lineItems
   }
 
+  async getInvalidLineItems(): Promise<HSLineItem[]> {
+    const unavailableLineItems = await this.getInactiveProducts(this.lineItems)
+    if (unavailableLineItems.length) {
+      return unavailableLineItems
+    }
+    return null
+  }
+
+  async getInactiveProducts(
+    items: ListPage<HSLineItem>
+  ): Promise<HSLineItem[]> {
+    const inactiveLineItems: HSLineItem[] = []
+    for (const item of items.Items) {
+      const eligibleProductList = await Me.ListProducts({
+        filters: { ID: item.ProductID },
+      })
+      const matchingLineItem = eligibleProductList.Items.find(
+        (product) => product.ID === item.ProductID
+      )
+      if (!matchingLineItem) {
+        inactiveLineItems.push(item)
+      }
+    }
+    return inactiveLineItems
+  }
+
   // TODO - get rid of the progress spinner for all Cart functions. Just makes it look slower.
-  async add(lineItem: MarketplaceLineItem): Promise<MarketplaceLineItem> {
+  async add(lineItem: HSLineItem): Promise<HSLineItem> {
     // order is well defined, line item can be added
     this.onAdd.next(lineItem)
     if (!_isUndefined(this.order.DateCreated)) {
@@ -91,14 +117,14 @@ export class CartService {
     }
   }
 
-  async removeMany(lineItems: MarketplaceLineItem[]): Promise<void[]> {
+  async removeMany(lineItems: HSLineItem[]): Promise<void[]> {
     const req = lineItems.map((li) => this.remove(li.ID))
     return Promise.all(req)
   }
 
   async setQuantity(
-    lineItem: MarketplaceLineItem
-  ): Promise<MarketplaceLineItem> {
+    lineItem: HSLineItem
+  ): Promise<HSLineItem> {
     try {
       return await this.upsertLineItem(lineItem)
     } finally {
@@ -109,7 +135,7 @@ export class CartService {
   async addSupplierComments(
     lineItemID: string,
     comments: string
-  ): Promise<MarketplaceLineItem> {
+  ): Promise<HSLineItem> {
     try {
       const lineToUpdate = this.state.lineItems.Items.find(
         (li) => li.ID === lineItemID
@@ -130,8 +156,8 @@ export class CartService {
   }
 
   async addMany(
-    lineItem: MarketplaceLineItem[]
-  ): Promise<MarketplaceLineItem[]> {
+    lineItem: HSLineItem[]
+  ): Promise<HSLineItem[]> {
     const req = lineItem.map((li) => this.add(li))
     return Promise.all(req)
   }
@@ -145,7 +171,7 @@ export class CartService {
 
     const orderToUpdate = (await Orders.Patch('Outgoing', orderID, {
       xp: { IsResubmitting: true },
-    })) as MarketplaceOrder
+    })) as HSOrder
 
     const currentUnsubmittedOrders = await Me.ListOrders({
       sortBy: '!DateCreated',
@@ -185,8 +211,8 @@ export class CartService {
   }
 
   private hasSameSpecs(
-    line1: MarketplaceLineItem,
-    line2: MarketplaceLineItem
+    line1: HSLineItem,
+    line2: HSLineItem
   ): boolean {
     if (!line1?.Specs?.length && !line2?.Specs?.length) {
       return true
@@ -218,8 +244,8 @@ export class CartService {
   }
 
   private async upsertLineItem(
-    lineItem: MarketplaceLineItem
-  ): Promise<MarketplaceLineItem> {
+    lineItem: HSLineItem
+  ): Promise<HSLineItem> {
     try {
       return await HeadStartSDK.Orders.UpsertLineItem(this.order?.ID, lineItem)
     } finally {
@@ -231,7 +257,7 @@ export class CartService {
     }
   }
 
-  private calculateOrder(): MarketplaceOrder {
+  private calculateOrder(): HSOrder {
     const LineItemCount = this.lineItems.Items.length
     this.lineItems.Items.forEach((li: any) => {
       li.LineTotal = li.Quantity * li.UnitPrice
@@ -245,19 +271,19 @@ export class CartService {
     return { LineItemCount, Total, Subtotal }
   }
 
-  private get order(): MarketplaceOrder {
+  private get order(): HSOrder {
     return this.state.order
   }
 
-  private set order(value: MarketplaceOrder) {
+  private set order(value: HSOrder) {
     this.state.order = value
   }
 
-  private get lineItems(): ListPage<MarketplaceLineItem> {
+  private get lineItems(): ListPage<HSLineItem> {
     return this.state.lineItems
   }
 
-  private set lineItems(value: ListPage<MarketplaceLineItem>) {
+  private set lineItems(value: ListPage<HSLineItem>) {
     this.state.lineItems = value
   }
 }

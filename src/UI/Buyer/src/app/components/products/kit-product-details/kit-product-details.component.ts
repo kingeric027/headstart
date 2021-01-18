@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core'
 import {
   Asset,
-  MarketplaceMeKitProduct,
-  MeProductInKit,
+  HSMeKitProduct,
+  HSMeProductInKit,
 } from '@ordercloud/headstart-sdk'
 import { ProductDetailService } from '../product-details/product-detail.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
@@ -13,17 +13,17 @@ import { KitVariantSelection, LineItemToAdd, ProductSelectionEvent } from 'src/a
   styleUrls: ['./kit-product-details.component.scss'],
 })
 export class OCMKitProductDetails {
-  @Input() set product(product: MarketplaceMeKitProduct) {
+  @Input() set product(product: HSMeKitProduct) {
     this._product = product
     this.images = product.Images
   }
 
   isAddingToCart = false
-  _product: MarketplaceMeKitProduct
+  _product: HSMeKitProduct
   variantSelection: KitVariantSelection
   productSelectionEvent: ProductSelectionEvent
   lineItemsToAdd: LineItemToAdd[] = []
-  selectedProduct: MeProductInKit
+  selectedProduct: HSMeProductInKit
   images: Asset[]
 
   constructor(

@@ -1,7 +1,7 @@
-import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
+import { HSBuyer } from '@ordercloud/headstart-sdk'
 
 export interface HSBuyerPriceMarkup {
-  Buyer: MarketplaceBuyer
+  Buyer: HSBuyer
   Markup: BuyerMarkup
 }
 

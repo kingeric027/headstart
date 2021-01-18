@@ -36,9 +36,12 @@
     <div *ngIf="myBuyerLocations.length > 0" class="form-group">
       <label for="BuyerLocation" translate>For Location</label>
       <select
+        #LocationDropdown
         id="BuyerLocation"
         class="custom-select custom-select-sm"
         formControlName="BuyerLocation"
+        (change)="onLocationChange(LocationDropdown.value)"
+        showErrors
       >
         <option
           *ngFor="let location of myBuyerLocations"

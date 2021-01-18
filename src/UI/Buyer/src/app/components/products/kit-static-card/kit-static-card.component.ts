@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
-  MarketplaceMeKitProduct,
-  MeProductInKit,
+  HSMeKitProduct,
+  HSMeProductInKit,
   Spec,
   VariantSpec,
 } from '@ordercloud/headstart-sdk'
@@ -17,16 +17,16 @@ import { SpecFormService } from '../spec-form/spec-form.service'
   styleUrls: ['./kit-static-card.component.scss'],
 })
 export class OCMKitStaticCard {
-  @Input() set productKitDetails(value: MeProductInKit) {
+  @Input() set productKitDetails(value: HSMeProductInKit) {
     this._productKitDetails = value
     this.onInit()
   }
-  @Input() kitProduct: MarketplaceMeKitProduct
+  @Input() kitProduct: HSMeKitProduct
   @Output() addLineItem = new EventEmitter<LineItemToAdd>()
   @Output() removeLineItem = new EventEmitter<LineItemToAdd>()
   @Output() selectProduct = new EventEmitter<ProductSelectionEvent>()
 
-  _productKitDetails: MeProductInKit
+  _productKitDetails: HSMeProductInKit
   imageUrl: string
   quantityValid = false
   errorMessage: string
@@ -99,7 +99,7 @@ export class OCMKitStaticCard {
     }
   }
 
-  filterStaticKitSpecs(_productKitDetails: MeProductInKit): Spec[] {
+  filterStaticKitSpecs(_productKitDetails: HSMeProductInKit): Spec[] {
     // filter our spec list to only include our pre-determined static specs
     const allowedSpecs = this.buildStaticKitSpecs(_productKitDetails)
     const filteredSpecs = _productKitDetails.Specs.filter((spec) =>
@@ -115,7 +115,7 @@ export class OCMKitStaticCard {
     return filteredSpecs
   }
 
-  buildStaticKitSpecs(_productKitDetails: MeProductInKit): VariantSpec[] {
+  buildStaticKitSpecs(_productKitDetails: HSMeProductInKit): VariantSpec[] {
     // a static kit is one where the options for all specs are pre-determined
     // spec combo is the identifier for the combination of spec/variant
     const specCombo = _productKitDetails.SpecCombo

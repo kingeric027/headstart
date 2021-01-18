@@ -16,7 +16,7 @@ import { CurrentUserService } from '@app-seller/shared/services/current-user/cur
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import {
   ListPage,
-  MarketplaceSupplier,
+  HSSupplier,
   HeadStartSDK,
   AssetUpload,
   Asset,
@@ -54,12 +54,12 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   updateResource = new EventEmitter<any>()
   @Output()
   logoStaged = new EventEmitter<File>()
-  @Input() set supplierEditable(value: MarketplaceSupplier) {
+  @Input() set supplierEditable(value: HSSupplier) {
     this._supplierEditable = value
   }
   supplierUsers: ListPage<User>
   buyers: ListPage<Buyer>
-  _supplierEditable: MarketplaceSupplier
+  _supplierEditable: HSSupplier
   availableCurrencies: SupportedRates[] = []
   isCreatingNew: boolean
   countriesServicingOptions = []
@@ -109,7 +109,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   }
 
   async handleSelectedSupplierChange(
-    supplier: MarketplaceSupplier
+    supplier: HSSupplier
   ): Promise<void> {
     this.logoUrl = `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`
     !this.isCreatingNew &&

@@ -7,7 +7,7 @@ import {
   TecraSpec,
 } from '@ordercloud/headstart-sdk'
 import {
-  SuperMarketplaceMeProduct,
+  SuperHSMeProduct,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
 import { ChiliConfigService } from '../services/chili-config/chili-config.service'
@@ -22,7 +22,7 @@ export class ChiliTemplateResolver implements Resolve<MeChiliTemplate> {
     )
     const superProduct = (await HeadStartSDK.Mes.GetSuperProduct(
       route.params.productID
-    )) as SuperMarketplaceMeProduct
+    )) as SuperHSMeProduct
     template.Product = superProduct
     const templateID = (route.params.documentID
       ? route.params.documentID

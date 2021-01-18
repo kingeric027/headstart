@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { ListPage, MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk'
+import { ListPage, HSAddressBuyer } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -7,8 +7,8 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
   styleUrls: ['./location-list.component.scss'],
 })
 export class OCMLocationList implements OnInit {
-  locations: ListPage<MarketplaceAddressBuyer>
-  currentLocation: MarketplaceAddressBuyer
+  locations: ListPage<HSAddressBuyer>
+  currentLocation: HSAddressBuyer
   requestOptions: { page?: number; search?: string } = {
     page: undefined,
     search: undefined,

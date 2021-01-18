@@ -7,7 +7,7 @@ import { filter } from 'rxjs/operators'
 import {
   HeadStartSDK,
   ListPage,
-  MarketplaceOrder,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
@@ -122,7 +122,7 @@ export class OrderFilterService {
   }
 
   // Used in requests to the OC API
-  async listOrders(): Promise<ListPage<MarketplaceOrder>> {
+  async listOrders(): Promise<ListPage<HSOrder>> {
     const viewContext = this.getOrderViewContext()
     switch (viewContext) {
       case OrderViewContext.MyOrders:
@@ -136,7 +136,7 @@ export class OrderFilterService {
     }
   }
 
-  async ListLocationOrders(): Promise<ListPage<MarketplaceOrder>> {
+  async ListLocationOrders(): Promise<ListPage<HSOrder>> {
     const locationID = this.activeFiltersSubject.value.location
     // Changed middleware route, awaiting next SDK bump (1.10.5?)
     // return await HeadStartSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
@@ -144,14 +144,14 @@ export class OrderFilterService {
     const args = this.createListOptions()
     const params = this.createHttpParams(args)
     return await this.http
-      .get<ListPage<MarketplaceOrder>>(url, {
+      .get<ListPage<HSOrder>>(url, {
         headers: this.buildHeaders(),
         params,
       })
       .toPromise()
   }
 
-  async listApprovableOrders(): Promise<ListPage<MarketplaceOrder>> {
+  async listApprovableOrders(): Promise<ListPage<HSOrder>> {
     return await Me.ListApprovableOrders(this.createListOptions() as any)
   }
 
@@ -196,7 +196,7 @@ export class OrderFilterService {
     }
   }
 
-  private createListOptions(): ListArgs<MarketplaceOrder> {
+  private createListOptions(): ListArgs<HSOrder> {
     const {
       page,
       sortBy,
