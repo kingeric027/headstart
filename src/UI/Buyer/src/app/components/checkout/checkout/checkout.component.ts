@@ -10,22 +10,18 @@ import {
   OrderPromotion,
 } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
-  MarketplacePayment,
+  HSOrder,
+  HSLineItem,
+  HSPayment,
   OrderCloudIntegrationsCreditCardPayment,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
-import { SelectedCreditCard } from '../checkout-payment/checkout-payment.component'
 import {
   getOrderSummaryMeta,
-  OrderSummaryMeta,
 } from 'src/app/services/purchase-order.helper'
 import { NgxSpinnerService } from 'ngx-spinner'
-import { ModalState } from 'src/app/models/modal-state.class'
 import { ToastrService } from 'ngx-toastr'
 import {
-  MiddlewareError,
   extractMiddlewareError,
   isInventoryError,
   getPaymentError,
@@ -34,12 +30,14 @@ import {
 import { AxiosError } from 'axios'
 import { CheckoutService } from 'src/app/services/order/checkout.service'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
+import { CheckoutSection } from 'src/app/models/checkout.types'
+import { HSBuyerCreditCard, SelectedCreditCard } from 'src/app/models/credit-card.types'
+import { OrderSummaryMeta } from 'src/app/models/order.types'
+import { ModalState } from 'src/app/models/shared.types'
+import { MiddlewareError } from 'src/app/models/error.types'
+import { Router } from '@angular/router'
 
-interface CheckoutSection {
-  id: string
-  valid: boolean
-}
+
 
 @Component({
   templateUrl: './checkout.component.html',
@@ -49,9 +47,10 @@ export class OCMCheckout implements OnInit {
   @ViewChild('acc', { static: false }) public accordian: NgbAccordion
   isAnon: boolean
   isNewCard: boolean
-  order: MarketplaceOrder
+  order: HSOrder
   orderPromotions: OrderPromotion[] = []
-  lineItems: ListPage<MarketplaceLineItem>
+  lineItems: ListPage<HSLineItem>
+  invalidLineItems: HSLineItem[] = []
   orderSummaryMeta: OrderSummaryMeta
   payments: ListPage<Payment>
   cards: ListPage<BuyerCreditCard>
@@ -90,7 +89,8 @@ export class OCMCheckout implements OnInit {
   constructor(
     private context: ShopperContextService,
     private spinner: NgxSpinnerService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -114,7 +114,13 @@ export class OCMCheckout implements OnInit {
     this.setValidation('login', !this.isAnon)
 
     this.isNewCard = false
-    await this.reIDLineItems()
+    this.invalidLineItems = await this.context.order.cart.getInvalidLineItems()
+    if (this.invalidLineItems?.length) {
+      // Navigate to cart to review invalid itemss
+      void this.router.navigate(['/cart'])
+    } else {
+      await this.reIDLineItems()
+    }
   }
 
   async reIDLineItems(): Promise<void> {
@@ -151,7 +157,7 @@ export class OCMCheckout implements OnInit {
     this.toSection('shippingAddress')
   }
 
-  buildCCPayment(card: MarketplaceBuyerCreditCard): Payment {
+  buildCCPayment(card: HSBuyerCreditCard): Payment {
     // amount gets calculated in middleware
     return {
       DateCreated: new Date().toDateString(),
@@ -176,7 +182,7 @@ export class OCMCheckout implements OnInit {
 
   async onCardSelected(output: SelectedCreditCard): Promise<void> {
     this.initLoadingIndicator('paymentLoading')
-    const payments: MarketplacePayment[] = []
+    const payments: HSPayment[] = []
     this.selectedCard = output
     if (!output.SavedCard) {
       // need to figure out how to use the platform. ran into creditCardID cannot be null.
@@ -216,24 +222,33 @@ export class OCMCheckout implements OnInit {
   }
 
   async submitOrderWithComment(comment: string): Promise<void> {
-    this.initLoadingIndicator('submitLoading')
-    await this.checkout.addComment(comment)
-    try {
-      const payment = this.orderSummaryMeta.StandardLineItemCount
-        ? this.getCCPaymentData()
-        : {}
-      const order = await HeadStartSDK.Orders.Submit(
-        'Outgoing',
-        this.order.ID,
-        payment
-      )
-      await this.checkout.appendPaymentMethodToOrderXp(order.ID, payment)
+    // Check that line items in cart are all from active products (none were made inactive during checkout).
+    this.invalidLineItems = await this.context.order.cart.getInvalidLineItems()
+    if (this.invalidLineItems?.length) {
+      // Navigate to cart to review invalid itemss
+      await this.context.order.reset() // orderID might've been incremented
       this.isLoading = false
-      await this.context.order.reset() // get new current order
-      this.toastrService.success('Order submitted successfully', 'Success')
-      this.context.router.toMyOrderDetails(order.ID)
-    } catch (e) {
-      await this.handleSubmitError(e)
+      void this.router.navigate(['/cart'])
+    } else {
+      this.initLoadingIndicator('submitLoading')
+      await this.checkout.addComment(comment)
+      try {
+        const payment = this.orderSummaryMeta.StandardLineItemCount
+          ? this.getCCPaymentData()
+          : {}
+        const order = await HeadStartSDK.Orders.Submit(
+          'Outgoing',
+          this.order.ID,
+          payment
+        )
+        await this.checkout.appendPaymentMethodToOrderXp(order.ID, payment)
+        this.isLoading = false
+        await this.context.order.reset() // get new current order
+        this.toastrService.success('Order submitted successfully', 'Success')
+        this.context.router.toMyOrderDetails(order.ID)
+      } catch (e) {
+        await this.handleSubmitError(e)
+      }
     }
   }
 

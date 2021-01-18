@@ -19,7 +19,7 @@ import {
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
 // app modules
-import { SharedModule } from '@app-seller/shared'
+import { AppConfig, SharedModule } from '@app-seller/shared'
 import { AppRoutingModule } from '@app-seller/app-routing.module'
 import { LayoutModule } from '@app-seller/layout/layout.module'
 import { AuthModule } from '@app-seller/auth'
@@ -40,11 +40,7 @@ import {
   Configuration as OcConfiguration,
   SdkConfiguration,
 } from 'ordercloud-javascript-sdk'
-import {
-  applicationConfiguration,
-  AppConfig,
-  ocAppConfig,
-} from './config/app.config'
+import { applicationConfiguration, ocAppConfig } from './config/app.config'
 import { CMSConfiguration } from '@ordercloud/cms-sdk'
 
 export function HttpLoaderFactory(

@@ -1,13 +1,13 @@
-using Marketplace.Common.Services;
+using Headstart.Common.Services;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using System;
-using Marketplace.Common.Models;
-using Marketplace.Common.Queries;
-using Marketplace.Common.Models.Marketplace;
+using Headstart.Common.Models;
+using Headstart.Common.Queries;
+using Headstart.Common.Models.Marketplace;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     public class WebhooksController : BaseController
     {
@@ -33,7 +33,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("productcreated")]
         [OrderCloudWebhookAuth]
-        public async void HandleProductCreation([FromBody] MarketplaceProductCreatePayload payload)
+        public async void HandleProductCreation([FromBody] HSProductCreatePayload payload)
         {
             var update = new ProductHistory()
             {
@@ -46,7 +46,7 @@ namespace Marketplace.Common.Controllers
 
         [HttpPost, Route("productupdated")]
         [OrderCloudWebhookAuth]
-        public async void HandleProductUpdate([FromBody] MarketplaceProductUpdatePayload payload)
+        public async void HandleProductUpdate([FromBody] HSProductUpdatePayload payload)
         {
             Console.WriteLine(payload);
             var update = new ProductHistory()

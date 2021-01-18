@@ -3,31 +3,29 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons'
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk'
 import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceLineItem,
+  HSLineItem,
   Asset,
   QuoteOrderInfo,
-  ProductInKit,
-  MarketplaceVariant,
+  HSProductInKit,
+  HSVariant,
   ChiliSpec,
   ChiliConfig,
-  ChiliTemplate,
   MeChiliTemplate,
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
-import { ModalState } from 'src/app/models/modal-state.class'
 import { SpecFormService } from '../spec-form/spec-form.service'
 import {
-  SuperMarketplaceProduct,
-  MarketplaceMeProduct,
+  SuperHSProduct,
+  HSMeProduct,
 } from '@ordercloud/headstart-sdk'
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from '../product-details/product-detail.service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
-import { ContactSupplierBody, CurrentUser } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { RouteConfigLoadEnd } from '@angular/router'
+import { QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { ContactSupplierBody } from 'src/app/models/buyer.types'
+import { ModalState } from 'src/app/models/shared.types'
 
 declare let SetVariableValue: any
 declare let saveDocument: any
@@ -43,9 +41,9 @@ export class OCMProductChiliConfig implements OnInit {
   faListUl = faListUl
   faTimes = faTimes
 
-  _superProduct: SuperMarketplaceProduct
+  _superProduct: SuperHSProduct
   specs: Spec[]
-  _product: MarketplaceMeProduct
+  _product: HSMeProduct
   priceSchedule: PriceSchedule
   priceBreaks: PriceBreak[]
   attachments: Asset[] = []
@@ -53,7 +51,7 @@ export class OCMProductChiliConfig implements OnInit {
   quantity: number
   price: number
   percentSavings: number
-  relatedProducts$: Observable<MarketplaceMeProduct[]>
+  relatedProducts$: Observable<HSMeProduct[]>
   favoriteProducts: string[] = []
   qtyValid = true
   supplierNote: string
@@ -67,7 +65,7 @@ export class OCMProductChiliConfig implements OnInit {
   showGrid = false
   isAddingToCart = false
   isKitProduct: boolean
-  productsIncludedInKit: ProductInKit[]
+  productsIncludedInKit: HSProductInKit[]
   ocProductsInKit: any[]
   isKitStatic = false
   _chiliConfigs: ChiliConfig[] = []
@@ -75,7 +73,7 @@ export class OCMProductChiliConfig implements OnInit {
   contactRequest: ContactSupplierBody
   specForm: FormGroup
   isInactiveVariant: boolean
-  _disabledVariants: MarketplaceVariant[]
+  _disabledVariants: HSVariant[]
   variantInventory: number
   chiliTemplate: MeChiliTemplate
   showSpecs = false
@@ -85,10 +83,11 @@ export class OCMProductChiliConfig implements OnInit {
   currentDocID = ''
   ShowAddToCart = false
   isLoading = true
+  loadingSpecs = true
   editor
   frameWindow
-  variant: MarketplaceVariant
-  lineItems: MarketplaceLineItem[] = []
+  variant: HSVariant
+  lineItems: HSLineItem[] = []
 
   constructor(
     private specFormService: SpecFormService,
@@ -125,10 +124,28 @@ export class OCMProductChiliConfig implements OnInit {
       types[spec.xp.UI.ControlType]
     )
   }
+  setSpecValue(id) {
+    const element = document.getElementById(id)
+    const event = new Event('change')
+    if (element) {
+      element.dispatchEvent(event)
+    }
+  }
 
   loadChiliEditor(url: string): void {
     setTimeout(() => {
       LoadChiliEditor(url)
+      setTimeout(() => {
+        this.chiliTemplate.TemplateSpecs.forEach((s) => {
+          if (
+            (s.DefaultValue && s.xp.UI.ControlType == 'Text') ||
+            (s.xp.UI.ControlType == 'DropDown' && s.OptionCount > 0)
+          ) {
+            this.setSpecValue(s.ID)
+          }
+        })
+        this.loadingSpecs = false
+      }, 3500)
       this.isLoading = false
     }, 1000)
   }
@@ -210,7 +227,7 @@ export class OCMProductChiliConfig implements OnInit {
     this.isInactiveVariant = event
   }
 
-  populateInactiveVariants(superProduct: SuperMarketplaceProduct): void {
+  populateInactiveVariants(superProduct: SuperHSProduct): void {
     this._disabledVariants = []
     superProduct.Variants?.forEach((variant) => {
       if (!variant.Active) {
@@ -322,7 +339,7 @@ export class OCMProductChiliConfig implements OnInit {
 
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
-      const lineItem: MarketplaceLineItem = {}
+      const lineItem: HSLineItem = {}
       lineItem.ProductID = this._product.ID
       lineItem.Specs = this.specFormService.getLineItemSpecs(
         this.specs,

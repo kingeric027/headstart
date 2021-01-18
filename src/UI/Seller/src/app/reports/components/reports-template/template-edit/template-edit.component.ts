@@ -8,10 +8,7 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core'
-import {
-  ReportsTemplateService,
-  ReportTemplate,
-} from '@app-seller/shared/services/middleware-api/reports-template.service'
+import { ReportsTemplateService } from '@app-seller/shared/services/middleware-api/reports-template.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { FormGroup } from '@angular/forms'
 import {
@@ -25,14 +22,17 @@ import {
   salesOrderDetail as salesOrderDetailFilters,
   purchaseOrderDetail as purchaseOrderDetailFilters,
   lineItemDetail as lineItemDetailFilters,
-  Filter,
 } from '../models/filters'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { OcBuyerService } from '@ordercloud/angular-sdk'
 import { cloneDeep } from 'lodash'
-import { GeographyConfig } from '@app-seller/shared/models/supported-countries.interface'
-import { AppGeographyService } from '@app-seller/shared'
-import { OrderType } from '@app-seller/shared/models/MarketPlaceOrder.interface'
+import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
+import {
+  AppGeographyService,
+  FilterObject,
+  OrderType,
+} from '@app-seller/shared'
+import { ReportTemplate } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'template-edit-component',
@@ -62,8 +62,8 @@ export class TemplateEditComponent implements OnChanges {
   isCreatingNew: boolean
   reportTemplateEditable: ReportTemplate
   headers: any[]
-  filters: Filter[]
-  filterChipsToDisplay: Filter[] = []
+  filters: FilterObject[]
+  filterChipsToDisplay: FilterObject[] = []
   faCheckCircle = faCheckCircle
 
   constructor(
@@ -153,7 +153,7 @@ export class TemplateEditComponent implements OnChanges {
     return this.updatedResource.Headers?.includes(header)
   }
 
-  isFilterValueSelected(filter: Filter, filterValue: any): boolean {
+  isFilterValueSelected(filter: FilterObject, filterValue: any): boolean {
     return this.updatedResource.Filters[filter?.path]?.includes(
       filter.dataKey ? filterValue[filter.dataKey] : filterValue
     )
@@ -175,7 +175,7 @@ export class TemplateEditComponent implements OnChanges {
     this.updateResource.emit({ value: headers, field: 'Headers' })
   }
 
-  toggleFilter(filter: Filter, filterValue: any): void {
+  toggleFilter(filter: FilterObject, filterValue: any): void {
     const filters = cloneDeep(this.updatedResource.Filters)
     const selectedFilterValues = filters[filter.path]
     if (!selectedFilterValues || !selectedFilterValues.length) {
@@ -198,7 +198,7 @@ export class TemplateEditComponent implements OnChanges {
     this.updateResource.emit({ value: filters, field: 'Filters' })
   }
 
-  toggleIncludeAllValues(includeAll: boolean, filter: Filter): void {
+  toggleIncludeAllValues(includeAll: boolean, filter: FilterObject): void {
     if (includeAll) {
       const i = this.filterChipsToDisplay.indexOf(filter)
       this.filterChipsToDisplay = this.filterChipsToDisplay.filter(
@@ -221,7 +221,7 @@ export class TemplateEditComponent implements OnChanges {
     }
   }
 
-  checkForChipDisplay(filter: Filter): boolean {
+  checkForChipDisplay(filter: FilterObject): boolean {
     return this.filterChipsToDisplay.includes(filter)
   }
 

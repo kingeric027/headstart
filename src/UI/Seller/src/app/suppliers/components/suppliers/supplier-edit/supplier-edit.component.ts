@@ -11,25 +11,17 @@ import {
 } from '@angular/core'
 import { get as _get } from 'lodash'
 import { FormGroup, FormControl } from '@angular/forms'
-import {
-  SupportedRates,
-  SupportedCurrencies,
-} from '@app-seller/shared/models/supported-rates.interface'
 import { SupplierService } from '../supplier.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import {
-  MiddlewareAPIService,
-  SupplierFilterConfigDocument,
-} from '@app-seller/shared/services/middleware-api/middleware-api.service'
+import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import {
   ListPage,
-  MarketplaceSupplier,
+  HSSupplier,
   HeadStartSDK,
   AssetUpload,
   Asset,
 } from '@ordercloud/headstart-sdk'
 import { HeaderComponent } from '@app-seller/layout/header/header.component'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { AppAuthService } from '@app-seller/auth'
 import {
@@ -38,16 +30,16 @@ import {
   faExclamationCircle,
   faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { environment } from 'src/environments/environment'
 import { ToastrService } from 'ngx-toastr'
 import { User, OcSupplierUserService, Buyer } from '@ordercloud/angular-sdk'
 import { Buyers } from 'ordercloud-javascript-sdk'
 import { Router } from '@angular/router'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { FileHandle } from '@app-seller/models/file-upload.types'
+import { SupportedCurrencies, SupportedRates } from '@app-seller/models/currency-geography.types'
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -62,12 +54,12 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   updateResource = new EventEmitter<any>()
   @Output()
   logoStaged = new EventEmitter<File>()
-  @Input() set supplierEditable(value: MarketplaceSupplier) {
+  @Input() set supplierEditable(value: HSSupplier) {
     this._supplierEditable = value
   }
   supplierUsers: ListPage<User>
   buyers: ListPage<Buyer>
-  _supplierEditable: MarketplaceSupplier
+  _supplierEditable: HSSupplier
   availableCurrencies: SupportedRates[] = []
   isCreatingNew: boolean
   countriesServicingOptions = []
@@ -117,7 +109,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
   }
 
   async handleSelectedSupplierChange(
-    supplier: MarketplaceSupplier
+    supplier: HSSupplier
   ): Promise<void> {
     this.logoUrl = `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`
     !this.isCreatingNew &&

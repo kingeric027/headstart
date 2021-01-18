@@ -5,10 +5,10 @@ import {
   ChangeDetectorRef,
 } from '@angular/core'
 import { getPrimaryImageUrl } from 'src/app/services/images.helpers'
-import { Address, PriceSchedule } from 'ordercloud-javascript-sdk'
-import { MarketplaceMeProduct } from 'src/app/shopper-context'
+import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { ShipFromSourcesDic } from 'src/app/models/ship-from-sources.interface'
+import { HSMeProduct } from '@ordercloud/headstart-sdk'
+import { ShipFromSourcesDic } from 'src/app/models/shipping.types'
 @Component({
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.scss'],
@@ -16,7 +16,7 @@ import { ShipFromSourcesDic } from 'src/app/models/ship-from-sources.interface'
 })
 export class OCMProductCard {
   _isFavorite = false
-  _product: MarketplaceMeProduct = {
+  _product: HSMeProduct = {
     PriceSchedule: {} as PriceSchedule,
   }
   _shipFromSources: ShipFromSourcesDic = {}
@@ -35,7 +35,7 @@ export class OCMProductCard {
     private context: ShopperContextService
   ) {}
 
-  @Input() set product(value: MarketplaceMeProduct) {
+  @Input() set product(value: HSMeProduct) {
     this._product = value
     this._price = value.PriceSchedule?.PriceBreaks[0]?.Price
     this.isViewOnlyProduct = !value.PriceSchedule

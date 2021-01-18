@@ -4,11 +4,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { UserGroupAssignment, User } from '@ordercloud/angular-sdk'
 import { BuyerUserService } from '../buyer-user.service'
 import { ValidateEmail } from '@app-seller/validators/validators'
-import {
-  SupportedCountries,
-  GeographyConfig,
-} from '@app-seller/shared/models/supported-countries.interface'
-import { AppFormErrorService } from '@app-seller/shared'
+import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
+import { AppFormErrorService, SupportedCountries } from '@app-seller/shared'
 @Component({
   selector: 'app-buyer-user-edit',
   templateUrl: './buyer-user-edit.component.html',
@@ -31,7 +28,10 @@ export class BuyerUserEditComponent {
   selectedResource: User
   countryOptions: SupportedCountries[]
   isUserAssignedToGroups: boolean
-  constructor(public buyerUserService: BuyerUserService, public appFormErrorService: AppFormErrorService) {
+  constructor(
+    public buyerUserService: BuyerUserService,
+    public appFormErrorService: AppFormErrorService
+  ) {
     this.isCreatingNew = this.buyerUserService.checkIfCreatingNew()
     this.countryOptions = GeographyConfig.getCountries()
   }

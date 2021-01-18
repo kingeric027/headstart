@@ -18,25 +18,6 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
 
-export interface SupplierFilterConfigDocument extends Document {
-  Doc: SupplierFilterConfig
-}
-export interface SupplierFilterConfig {
-  Display: string
-  Path: string
-  Items: Filter[]
-  AllowSupplierEdit: boolean
-  AllowSellerEdit: boolean
-  BuyerAppFilterType: BuyerAppFilterType
-}
-export declare enum BuyerAppFilterType {
-  SelectOption = 'SelectOption',
-  NonUI = 'NonUI',
-}
-export interface Filter {
-  Text: string
-  Value: string
-}
 @Injectable({
   providedIn: 'root',
 })

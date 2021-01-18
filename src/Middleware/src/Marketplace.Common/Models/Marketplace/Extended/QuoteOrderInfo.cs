@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Extended
+namespace Headstart.Models.Extended
 {
 	[SwaggerModel]
     public class QuoteOrderInfo
@@ -17,5 +17,6 @@ namespace Marketplace.Models.Extended
         public string Email { get; set; }
         [MaxLength(200, ErrorMessage = "Quote request comments cannot exceed 200 characters")]
         public string Comments { get; set; }
+        public string ShippingAddressId { get; set; }
     }
 }

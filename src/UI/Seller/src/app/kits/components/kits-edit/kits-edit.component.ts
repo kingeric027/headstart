@@ -13,12 +13,11 @@ import {
   Asset,
   AssetUpload,
   ListPage,
-  SuperMarketplaceProduct,
-  MarketplaceKitProduct,
-  ProductInKit,
+  SuperHSProduct,
+  HSKitProduct,
+  HSProductInKit,
 } from '@ordercloud/headstart-sdk'
 import { Router } from '@angular/router'
-import { FileHandle } from '@app-seller/shared/directives/dragDrop.directive'
 import { DomSanitizer } from '@angular/platform-browser'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Location } from '@angular/common'
@@ -26,17 +25,18 @@ import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { Buyer, OcBuyerService } from '@ordercloud/angular-sdk'
 import { TabIndexMapper } from './tab-mapper'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { FileHandle } from '@app-seller/models/file-upload.types'
 @Component({
   selector: 'app-kits-edit',
   templateUrl: './kits-edit.component.html',
   styleUrls: ['./kits-edit.component.scss'],
 })
 export class KitsEditComponent implements OnInit {
-  kitProductEditable: MarketplaceKitProduct
-  kitProductStatic: MarketplaceKitProduct
+  kitProductEditable: HSKitProduct
+  kitProductStatic: HSKitProduct
   kitProductForm: FormGroup
   @Input()
-  set selectedKitProduct(product: MarketplaceKitProduct) {
+  set selectedKitProduct(product: HSKitProduct) {
     if (product?.Product) this.handleSelectedProductChange(product)
     else {
       this.setForms(this.kitService.emptyResource)
@@ -55,9 +55,9 @@ export class KitsEditComponent implements OnInit {
   isLoading = false
   dataIsSaving = false
   areChanges = false
-  productAssignments: ProductInKit[] = []
+  productAssignments: HSProductInKit[] = []
   productsIncluded: any[] = []
-  productList: ListPage<SuperMarketplaceProduct>
+  productList: ListPage<SuperHSProduct>
   productsToAdd: string[] = []
   imageFiles: FileHandle[] = []
   images: Asset[] = []
@@ -82,7 +82,7 @@ export class KitsEditComponent implements OnInit {
     this.getBuyers()
   }
 
-  setForms(kitProduct: MarketplaceKitProduct): void {
+  setForms(kitProduct: HSKitProduct): void {
     this.kitProductForm = new FormGroup({
       ID: new FormControl(kitProduct.Product.ID),
       Name: new FormControl(kitProduct.Product.Name),
@@ -95,9 +95,7 @@ export class KitsEditComponent implements OnInit {
     this.buyers = buyers.Items
   }
 
-  async getProductList(
-    args?: ListArgs
-  ): Promise<ListPage<SuperMarketplaceProduct>> {
+  async getProductList(args?: ListArgs): Promise<ListPage<SuperHSProduct>> {
     this.isLoading = true
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     const productList = args
@@ -111,15 +109,15 @@ export class KitsEditComponent implements OnInit {
   }
 
   async handleSelectedProductChange(
-    product: MarketplaceKitProduct
+    product: HSKitProduct
   ): Promise<void> {
-    const marketplaceKitProduct = this.isCreatingNew
+    const hsKitProduct = this.isCreatingNew
       ? this.kitService.emptyResource
       : await HeadStartSDK.KitProducts.Get(product.Product.ID)
-    this.refreshProductData(marketplaceKitProduct)
+    this.refreshProductData(hsKitProduct)
   }
 
-  async refreshProductData(product: MarketplaceKitProduct): Promise<void> {
+  async refreshProductData(product: HSKitProduct): Promise<void> {
     this.kitProductEditable = JSON.parse(JSON.stringify(product))
     this.kitProductStatic = JSON.parse(JSON.stringify(product))
     this.staticContent = product.Attachments
@@ -130,7 +128,7 @@ export class KitsEditComponent implements OnInit {
     this.checkForChanges()
   }
 
-  async getProductsInKit(product: MarketplaceKitProduct): Promise<void> {
+  async getProductsInKit(product: HSKitProduct): Promise<void> {
     const productAssignments = []
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -428,7 +426,7 @@ export class KitsEditComponent implements OnInit {
       superProduct = await this.uploadAsset(productID, file, true)
     }
     this.staticContentFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
     superProduct = Object.assign(this.kitProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }
@@ -438,7 +436,7 @@ export class KitsEditComponent implements OnInit {
       superProduct = await this.uploadAsset(productID, file)
     }
     this.imageFiles = []
-    // Only need the `|| {}` to account for creating new product where this._superMarketplaceProductStatic doesn't exist yet.
+    // Only need the `|| {}` to account for creating new product where this._superHSProductStatic doesn't exist yet.
     superProduct = Object.assign(this.kitProductStatic || {}, superProduct)
     this.refreshProductData(superProduct)
   }
@@ -446,7 +444,7 @@ export class KitsEditComponent implements OnInit {
     productID: string,
     file: FileHandle,
     isAttachment = false
-  ): Promise<SuperMarketplaceProduct> {
+  ): Promise<SuperHSProduct> {
     const accessToken = await this.appAuthService.fetchToken().toPromise()
     const asset = {
       Active: true,

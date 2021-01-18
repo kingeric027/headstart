@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core'
 import { faCube, faTruck } from '@fortawesome/free-solid-svg-icons'
 import {
-  MarketplaceOrder,
+  HSOrder,
   OrderDetails,
-  MarketplaceLineItem,
+  HSLineItem,
 } from '@ordercloud/headstart-sdk'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { isQuoteOrder } from '../../../services/orderType.helper'
@@ -12,14 +12,14 @@ import {
   CanCancelOrder,
 } from 'src/app/services/lineitem-status.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderReorderResponse, OrderViewContext } from 'src/app/shopper-context'
+import { OrderReorderResponse, OrderViewContext } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss'],
 })
 export class OCMOrderDetails implements OnInit {
-  order: MarketplaceOrder
+  order: HSOrder
   orderDetails: OrderDetails
   approvalVersion = false
   faCube = faCube
@@ -51,7 +51,7 @@ export class OCMOrderDetails implements OnInit {
 
   async validateReorder(
     orderID: string,
-    lineItems: MarketplaceLineItem[]
+    lineItems: HSLineItem[]
   ): Promise<void> {
     this.reorderResponse = await this.context.orderHistory.validateReorder(
       orderID,
@@ -81,7 +81,7 @@ export class OCMOrderDetails implements OnInit {
     return CanCancelOrder(this.orderDetails.LineItems)
   }
 
-  toggleFavorite(order: MarketplaceOrder): void {
+  toggleFavorite(order: HSOrder): void {
     const newValue = !this.isFavorite(order.ID)
     this.context.currentUser.setIsFavoriteOrder(newValue, order.ID)
   }

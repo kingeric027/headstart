@@ -1,12 +1,12 @@
 using System;
-using Marketplace.Orchestration;
+using Headstart.Orchestration;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 [assembly: WebJobsStartup(typeof(Startup))]
-namespace Marketplace.Orchestration
+namespace Headstart.Orchestration
 {
     public static class ObjectQueueTrigger
     {

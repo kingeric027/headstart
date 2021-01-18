@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 
 import {
-  SuperMarketplaceProduct,
+  SuperHSProduct,
   ListPage,
   TaxProperties,
 } from '@ordercloud/headstart-sdk'
@@ -22,7 +22,7 @@ export class ProductTaxCodeSelect {
   @Input()
   productForm: FormGroup
   @Input()
-  superMarketplaceProductEditable: SuperMarketplaceProduct
+  superHSProductEditable: SuperHSProduct
   @Input()
   taxCodes: ListPage<TaxCodes>
   @Output()

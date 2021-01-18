@@ -1,12 +1,12 @@
 ﻿using System;
 using Cosmonaut.Attributes;
-using Marketplace.Common.Exceptions;
+using Headstart.Common.Exceptions;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Models
+namespace Headstart.Common.Models
 {
     [SwaggerModel]
 	[CosmosCollection("orchestrationlogs")]

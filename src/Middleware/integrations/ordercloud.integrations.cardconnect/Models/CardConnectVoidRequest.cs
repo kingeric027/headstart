@@ -2,6 +2,7 @@
 {
     public class CardConnectVoidRequest
     {
+        public string currency { get; set; }
         public string merchid { get; set; }
         public string retref { get; set; } // The retrieval reference number from the original authorization response.
         public decimal? amount { get; set; } = 0M; //  if equal to $0, the full amount is voided. Defaults to 0 to support full amount voiding

@@ -1,6 +1,6 @@
-import { MarketplaceOrder } from '@ordercloud/headstart-sdk'
-import { OrderType } from '../shopper-context'
+import { HSOrder } from '@ordercloud/headstart-sdk'
+import { OrderType } from '../models/order.types'
 
-export const isQuoteOrder = (order?: MarketplaceOrder): boolean => {
+export const isQuoteOrder = (order?: HSOrder): boolean => {
   return order.xp.OrderType === OrderType.Quote
 }

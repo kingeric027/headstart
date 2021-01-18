@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { MarketplaceShipmentWithItems } from '@ordercloud/headstart-sdk'
+import { HSShipmentWithItems } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -12,8 +12,8 @@ export class OCMOrderShipments {
       void this.init(_orderID)
     }
   }
-  selectedShipment: MarketplaceShipmentWithItems
-  shipments: MarketplaceShipmentWithItems[]
+  selectedShipment: HSShipmentWithItems
+  shipments: HSShipmentWithItems[]
 
   constructor(private context: ShopperContextService) {}
 
@@ -22,7 +22,7 @@ export class OCMOrderShipments {
     this.selectedShipment = this.shipments[0]
   }
 
-  selectShipment(shipment: MarketplaceShipmentWithItems): void {
+  selectShipment(shipment: HSShipmentWithItems): void {
     this.selectedShipment = shipment
   }
 }

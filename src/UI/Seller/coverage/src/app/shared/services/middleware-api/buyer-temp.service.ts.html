@@ -185,12 +185,12 @@ import {
   applicationConfiguration,
 } from '@app-seller/config/app.config'
 import { OcTokenService } from '@ordercloud/angular-sdk'
-import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
+import { HSBuyer } from '@ordercloud/headstart-sdk'
 &nbsp;
 // WHOPLE FILE TO BE REPLACED BY SDK
 &nbsp;
-export interface SuperMarketplaceBuyer {
-  Buyer: MarketplaceBuyer
+export interface HSBuyerPriceMarkup {
+  Buyer: HSBuyer
   Markup: BuyerMarkup
 }
 &nbsp;
@@ -214,19 +214,19 @@ export class BuyerTempService {
     })
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >get</span>(buyerID: string): Promise&lt;SuperMarketplaceBuyer&gt; {
+  async <span class="fstat-no" title="function not covered" >get</span>(buyerID: string): Promise&lt;HSBuyerPriceMarkup&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyer/${buyerID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .get&lt;SuperMarketplaceBuyer&gt;(url, { headers: this.buildHeaders() })
+      .get&lt;HSBuyerPriceMarkup&gt;(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >create</span>(
-    superBuyer: SuperMarketplaceBuyer
-  ): Promise&lt;SuperMarketplaceBuyer&gt; {
+    superBuyer: HSBuyerPriceMarkup
+  ): Promise&lt;HSBuyerPriceMarkup&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyer`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .post&lt;SuperMarketplaceBuyer&gt;(url, superBuyer, {
+      .post&lt;HSBuyerPriceMarkup&gt;(url, superBuyer, {
         headers: this.buildHeaders(),
       })
       .toPromise()
@@ -234,11 +234,11 @@ export class BuyerTempService {
 &nbsp;
   async <span class="fstat-no" title="function not covered" >save</span>(
     buyerID: string,
-    superBuyer: SuperMarketplaceBuyer
-  ): Promise&lt;SuperMarketplaceBuyer&gt; {
+    superBuyer: HSBuyerPriceMarkup
+  ): Promise&lt;HSBuyerPriceMarkup&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyer/${buyerID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .put&lt;SuperMarketplaceBuyer&gt;(url, superBuyer, {
+      .put&lt;HSBuyerPriceMarkup&gt;(url, superBuyer, {
         headers: this.buildHeaders(),
       })
       .toPromise()

@@ -87,13 +87,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Pipe, PipeTransform } from '@angular/core'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 &nbsp;
 @Pipe({
   name: 'productNameWithSpecs',
 })
 export class ProductNameWithSpecsPipe implements PipeTransform {
-<span class="fstat-no" title="function not covered" >  transform</span>(lineItem: MarketplaceLineItem): any {
+<span class="fstat-no" title="function not covered" >  transform</span>(lineItem: HSLineItem): any {
     // TODO - this check is needed because of the bare lineItem object that gets added right away.
     // If the activeProduct state was saved in some cache, this wouldn't be needed.
 <span class="cstat-no" title="statement not covered" >    if (!lineItem.Product) <span class="cstat-no" title="statement not covered" >return ''</span></span>

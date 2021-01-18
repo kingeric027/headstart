@@ -1,15 +1,15 @@
 import { faBullhorn } from '@fortawesome/free-solid-svg-icons'
 import { Component, OnInit } from '@angular/core'
-import { MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { StaticPageService } from 'src/app/services/static-page/static-page.service'
+import { HSMeProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class OCMHomePage implements OnInit {
-  featuredProducts: MarketplaceMeProduct[]
+  featuredProducts: HSMeProduct[]
   faBullhorn = faBullhorn
   URL = '../../../assets/jumbotron.svg'
 

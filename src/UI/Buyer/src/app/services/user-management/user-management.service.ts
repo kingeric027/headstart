@@ -6,13 +6,13 @@ import {
   Tokens,
 } from 'ordercloud-javascript-sdk'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { AppConfig } from '../../shopper-context'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import {
-  MarketplaceUser,
+  HSUser,
   ListPage,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +36,7 @@ export class UserManagementService {
 
   async getLocationUsers(
     locationID: string
-  ): Promise<ListPage<MarketplaceUser>> {
+  ): Promise<ListPage<HSUser>> {
     const buyerID = this.currentUserService.get().Buyer.ID
     return await HeadStartSDK.BuyerLocations.ListLocationUsers(
       buyerID,

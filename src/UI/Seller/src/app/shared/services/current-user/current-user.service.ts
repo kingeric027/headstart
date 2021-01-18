@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@angular/core'
 import {
-  User,
   Supplier,
   OcMeService,
   OcAuthService,
@@ -9,17 +8,15 @@ import {
   OcSupplierService,
   ListPage,
 } from '@ordercloud/angular-sdk'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { AppStateService } from '../app-state/app-state.service'
-import { UserContext } from '@app-seller/config/user-context'
 import { HeadStartSDK, Asset } from '@ordercloud/headstart-sdk'
 import { Tokens } from 'ordercloud-javascript-sdk'
 import { BehaviorSubject } from 'rxjs'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { UserContext } from '@app-seller/models/user.types'
 
 @Injectable({
   providedIn: 'root',

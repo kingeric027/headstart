@@ -3,7 +3,7 @@ import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
 import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { Supplier } from 'ordercloud-javascript-sdk'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 import { FormGroup, FormArray } from '@angular/forms'
 import { CancelReturnTranslations } from './models/cancel-return-translations.model'
 import {
@@ -26,7 +26,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
 export class OCMOrderReturnTable {
   dataSource = new MatTableDataSource<any>([])
   selection = new SelectionModel<FormGroup>(true, [])
-  _liGroup: MarketplaceLineItem[]
+  _liGroup: HSLineItem[]
   quantitiesToReturn: number[] = []
   translationData: CancelReturnTranslations
   lineItems: FormArray
@@ -42,7 +42,7 @@ export class OCMOrderReturnTable {
   ]
   _action: string
 
-  @Input() set liGroup(value: MarketplaceLineItem[]) {
+  @Input() set liGroup(value: HSLineItem[]) {
     this._liGroup = value
   }
   @Input() supplier: Supplier
@@ -107,7 +107,7 @@ export class OCMOrderReturnTable {
     return CanReturnOrCancel(row.controls.lineItem.value, this._action)
   }
 
-  getQuantityReturnedCanceled(lineItem: MarketplaceLineItem): number {
+  getQuantityReturnedCanceled(lineItem: HSLineItem): number {
     return NumberCanCancelOrReturn(lineItem, this._action)
   }
 

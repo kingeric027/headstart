@@ -476,16 +476,16 @@ import {
   CatalogAssignment,
 } from '@ordercloud/angular-sdk'
 import {
-  SuperMarketplaceProduct,
-  MarketplaceCatalog,
+  SuperHSProduct,
+  HSCatalog,
   HeadStartSDK,
   ListPage,
-  MarketplacePriceSchedule,
+  HSPriceSchedule,
 } from '@ordercloud/headstart-sdk'
 &nbsp;
 // WHOPLE FILE TO BE REPLACED BY SDK
 &nbsp;
-interface MarketplaceCatalogAssignmentRequest {
+interface HSCatalogAssignmentRequest {
   CatalogIDs: string[]
 }
 &nbsp;
@@ -505,38 +505,38 @@ export class CatalogsTempService {
     })
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >get</span>(buyerID: string, catalogID: string): Promise&lt;MarketplaceCatalog&gt; {
+  async <span class="fstat-no" title="function not covered" >get</span>(buyerID: string, catalogID: string): Promise&lt;HSCatalog&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/${catalogID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .get&lt;MarketplaceCatalog&gt;(url, { headers: this.buildHeaders() })
+      .get&lt;HSCatalog&gt;(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >list</span>(buyerID: string): Promise&lt;ListPage&lt;MarketplaceCatalog&gt;&gt; {
+  async <span class="fstat-no" title="function not covered" >list</span>(buyerID: string): Promise&lt;ListPage&lt;HSCatalog&gt;&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .get&lt;ListPage&lt;MarketplaceCatalog&gt;&gt;(url, { headers: this.buildHeaders() })
+      .get&lt;ListPage&lt;HSCatalog&gt;&gt;(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >create</span>(
     buyerID: string,
-    catalog: MarketplaceCatalog
-  ): Promise&lt;MarketplaceCatalog&gt; {
+    catalog: HSCatalog
+  ): Promise&lt;HSCatalog&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .post&lt;MarketplaceCatalog&gt;(url, catalog, { headers: this.buildHeaders() })
+      .post&lt;HSCatalog&gt;(url, catalog, { headers: this.buildHeaders() })
       .toPromise()
   }
 &nbsp;
   async <span class="fstat-no" title="function not covered" >save</span>(
     buyerID: string,
     catalogID: string,
-    catalog: MarketplaceCatalog
-  ): Promise&lt;MarketplaceCatalog&gt; {
+    catalog: HSCatalog
+  ): Promise&lt;HSCatalog&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/${catalogID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .post&lt;MarketplaceCatalog&gt;(url, catalog, { headers: this.buildHeaders() })
+      .post&lt;HSCatalog&gt;(url, catalog, { headers: this.buildHeaders() })
       .toPromise()
   }
 &nbsp;
@@ -589,11 +589,11 @@ export class CatalogsTempService {
     assignments: string[]
   ): Promise&lt;any&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/buyers/${buyerID}/${locationID}/catalogs/assignments`</span>
-    const marketplaceCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = <span class="cstat-no" title="statement not covered" >{</span>
+    const hsCatalogAssignmentRequest: HSCatalogAssignmentRequest = <span class="cstat-no" title="statement not covered" >{</span>
       CatalogIDs: assignments,
     }
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
-      .post(url, marketplaceCatalogAssignmentRequest, {
+      .post(url, hsCatalogAssignmentRequest, {
         headers: this.buildHeaders(),
       })
       .toPromise()
@@ -634,7 +634,7 @@ export class CatalogsTempService {
   async <span class="fstat-no" title="function not covered" >GetPricingOverride</span>(
     productID: string,
     buyerID: string
-  ): Promise&lt;MarketplacePriceSchedule&gt; {
+  ): Promise&lt;HSPriceSchedule&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
       .get(url, { headers: this.buildHeaders() })
@@ -644,8 +644,8 @@ export class CatalogsTempService {
   async <span class="fstat-no" title="function not covered" >CreatePricingOverride</span>(
     productID: string,
     buyerID: string,
-    priceSchedule: MarketplacePriceSchedule
-  ): Promise&lt;MarketplacePriceSchedule&gt; {
+    priceSchedule: HSPriceSchedule
+  ): Promise&lt;HSPriceSchedule&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
       .post(url, priceSchedule, { headers: this.buildHeaders() })
@@ -655,8 +655,8 @@ export class CatalogsTempService {
   async <span class="fstat-no" title="function not covered" >UpdatePricingOverride</span>(
     productID: string,
     buyerID: string,
-    priceSchedule: MarketplacePriceSchedule
-  ): Promise&lt;MarketplacePriceSchedule&gt; {
+    priceSchedule: HSPriceSchedule
+  ): Promise&lt;HSPriceSchedule&gt; {
     const url = <span class="cstat-no" title="statement not covered" >`${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`</span>
 <span class="cstat-no" title="statement not covered" >    return await this.http</span>
       .put(url, priceSchedule, { headers: this.buildHeaders() })

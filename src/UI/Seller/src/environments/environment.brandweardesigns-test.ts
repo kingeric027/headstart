@@ -1,8 +1,9 @@
-import { EnvironmentConfig } from './environment.interfaces'
+import { EnvironmentConfig } from '@app-seller/models/environment.types'
 
 export const environment: EnvironmentConfig = {
   hostedApp: true,
   sellerID: 'BRANDWEARDESIGNS_TEST',
+  sellerName: 'Brandwear Designs Seller',
   clientID: '13FB36D2-52CA-44D7-B426-2B4BB474EB47',
   middlewareUrl: 'https://brandweardesigns-middleware-test.azurewebsites.net',
   cmsUrl: 'https://ordercloud-cms-test.azurewebsites.net',

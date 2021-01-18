@@ -1,4 +1,4 @@
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -13,14 +13,15 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using System.Net;
 using Newtonsoft.Json;
-using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IOrderSubmitCommand
     {
-        Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken);
+        Task<HSOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken);
     }
     public class OrderSubmitCommand : IOrderSubmitCommand
     {
@@ -35,10 +36,10 @@ namespace Marketplace.Common.Commands
             _card = card;
         }
 
-        public async Task<MarketplaceOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
+        public async Task<HSOrder> SubmitOrderAsync(string orderID, OrderDirection direction, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
-            await ValidateOrderAsync(worksheet, payment);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
+            await ValidateOrderAsync(worksheet, payment, userToken);
 
             var incrementedOrderID = await IncrementOrderAsync(worksheet);
             if (worksheet.LineItems.Any(li => li.Product.xp.ProductType != ProductType.PurchaseOrder))
@@ -46,10 +47,10 @@ namespace Marketplace.Common.Commands
                 payment.OrderID = incrementedOrderID;
                 await _card.AuthorizePayment(payment, userToken, GetMerchantID(payment));
             }
-            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<MarketplaceOrder>(direction, incrementedOrderID, userToken));
+            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<HSOrder>(direction, incrementedOrderID, userToken));
         }
 
-        private async Task ValidateOrderAsync(MarketplaceOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment)
+        private async Task ValidateOrderAsync(HSOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment, string userToken)
         {
             Require.That(
                 !worksheet.Order.IsSubmitted, 
@@ -67,6 +68,11 @@ namespace Marketplace.Common.Commands
                 !standardLines.Any() || payment != null,
                 new ErrorCode("OrderSubmit.MissingPayment", 400, "Order contains standard line items and must include credit card payment details"),
                 standardLines
+            );
+            var lineItemsInactive = await GetInactiveLineItems(worksheet, userToken);
+            Require.That(
+                !lineItemsInactive.Any(),
+                new ErrorCode("OrderSubmit.InvalidProducts", 400, "Order contains line items for products that are inactive"), lineItemsInactive
             );
 
             try
@@ -91,7 +97,24 @@ namespace Marketplace.Common.Commands
             
         }
 
-        private async Task<string> IncrementOrderAsync(MarketplaceOrderWorksheet worksheet)
+        private async Task<List<HSLineItem>> GetInactiveLineItems(HSOrderWorksheet worksheet, string userToken)
+        {
+            List<HSLineItem> inactiveLineItems = new List<HSLineItem>();
+            foreach (HSLineItem lineItem in worksheet.LineItems)
+            {
+                try
+                {
+                    await _oc.Me.GetProductAsync(lineItem.ProductID, accessToken: userToken);
+                }
+                catch (OrderCloudException ex) when (ex.HttpStatus == HttpStatusCode.NotFound)
+                {
+                    inactiveLineItems.Add(lineItem);
+                }
+            }
+            return inactiveLineItems;
+        }
+
+        private async Task<string> IncrementOrderAsync(HSOrderWorksheet worksheet)
         {
             if (worksheet.Order.xp.IsResubmitting == true)
             {

@@ -2,21 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Marketplace.Models;
+using Headstart.Models;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Commands.Crud
+namespace Headstart.Common.Commands.Crud
 {
 	public interface IMarketplaceCatalogCommand
 	{
-		Task<ListPage<MarketplaceCatalog>> List(string buyerID, ListArgs<MarketplaceCatalog> args, VerifiedUserContext user);
-		Task<MarketplaceCatalog> Post(string buyerID, MarketplaceCatalog catalog, VerifiedUserContext user);
-		Task<ListPage<MarketplaceCatalogAssignment>> GetAssignments(string buyerID, string locationID, VerifiedUserContext user);
-		Task SetAssignments(string buyerID, string locationID, List<string> assignments, VerifiedUserContext user);
-		Task<MarketplaceCatalog> Get(string buyerID, string catalogID, VerifiedUserContext user);
-		Task<MarketplaceCatalog> Put(string buyerID, string catalogID, MarketplaceCatalog catalog, VerifiedUserContext user);
+		Task<ListPage<HSCatalog>> List(string buyerID, ListArgs<HSCatalog> args, VerifiedUserContext user);
+		Task<HSCatalog> Post(string buyerID, HSCatalog catalog, VerifiedUserContext user);
+		Task<ListPage<HSCatalogAssignment>> GetAssignments(string buyerID, string locationID, VerifiedUserContext user);
+		Task SetAssignments(string buyerID, string locationID, List<string> assignments, string token);
+		Task<HSCatalog> Get(string buyerID, string catalogID, VerifiedUserContext user);
+		Task<HSCatalog> Put(string buyerID, string catalogID, HSCatalog catalog, VerifiedUserContext user);
 		Task Delete(string buyerID, string catalogID, VerifiedUserContext user);
 		Task SyncUserCatalogAssignmentsForUserOnRemoveFrom(string buyerID, string locationID, string userID);
 		Task SyncUserCatalogAssignmentsForUserOnAddToLocation(string buyerID, string locationID, string userID);
@@ -30,38 +30,38 @@ namespace Marketplace.Common.Commands.Crud
 			_oc = oc;
 		}
 
-		public async Task<MarketplaceCatalog> Get(string buyerID, string catalogID, VerifiedUserContext user)
+		public async Task<HSCatalog> Get(string buyerID, string catalogID, VerifiedUserContext user)
 		{
-			return await _oc.UserGroups.GetAsync<MarketplaceCatalog>(buyerID, catalogID, user.AccessToken);
+			return await _oc.UserGroups.GetAsync<HSCatalog>(buyerID, catalogID, user.AccessToken);
 		}
 
-		public async Task<ListPage<MarketplaceCatalog>> List(string buyerID, ListArgs<MarketplaceCatalog> args, VerifiedUserContext user)
+		public async Task<ListPage<HSCatalog>> List(string buyerID, ListArgs<HSCatalog> args, VerifiedUserContext user)
 		{
 			var queryParamsForCatalogUserGroup = new Tuple<string, string>("xp.Type", "Catalog");
 			args.Filters.Add(new ListFilter()
 			{
 				QueryParams = new List<Tuple<string, string>> { queryParamsForCatalogUserGroup }
 			});
-			return await _oc.UserGroups.ListAsync<MarketplaceCatalog>(buyerID, filters: args.ToFilterString(),
+			return await _oc.UserGroups.ListAsync<HSCatalog>(buyerID, filters: args.ToFilterString(),
 				search: args.Search,
 				pageSize: args.PageSize,
 				page: args.Page,
 				accessToken: user.AccessToken);
 		}
 		
-		public async Task<ListPage<MarketplaceCatalogAssignment>> GetAssignments(string buyerID, string locationID, VerifiedUserContext user)
+		public async Task<ListPage<HSCatalogAssignment>> GetAssignments(string buyerID, string locationID, VerifiedUserContext user)
 		{
 			// assignments are stored on location usergroup xp in a string array with the ids of the catalogs
 			// currently they can only be assessed by location ID
 			// limiting to 20 catalog assignments for now
 
-			var location = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, locationID, user.AccessToken);
+			var location = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, locationID, user.AccessToken);
 
-			var catalogAssignments = new List<MarketplaceCatalogAssignment>{};
+			var catalogAssignments = new List<HSCatalogAssignment>{};
 			
 			if(location.xp.CatalogAssignments != null)
 			{
-				catalogAssignments = location.xp.CatalogAssignments.Select(catalogIDOnXp => new MarketplaceCatalogAssignment()
+				catalogAssignments = location.xp.CatalogAssignments.Select(catalogIDOnXp => new HSCatalogAssignment()
 					{
 						CatalogID = catalogIDOnXp,
 						LocationID = locationID
@@ -71,10 +71,10 @@ namespace Marketplace.Common.Commands.Crud
 			return catalogAssignments.ToListPage(page: 1, pageSize: 100);
 		}
 
-		public async Task SetAssignments(string buyerID, string locationID, List<string> newAssignments, VerifiedUserContext user)
+		public async Task SetAssignments(string buyerID, string locationID, List<string> newAssignments, string token)
 		{
-			var locationPrePatch = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, locationID, user.AccessToken);
-			await _oc.UserGroups.PatchAsync(buyerID, locationID, new PartialUserGroup() { xp = new { CatalogAssignments = newAssignments } }, user.AccessToken);
+			var locationPrePatch = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, locationID, token);
+			await _oc.UserGroups.PatchAsync(buyerID, locationID, new PartialUserGroup() { xp = new { CatalogAssignments = newAssignments } }, token);
 
 			// todo consider moving this out of the req res flow with webhooks or queue or something to prevent lengthy call
 			await UpdateUserCatalogAssignmentsForLocation(buyerID, locationID, locationPrePatch.xp.CatalogAssignments, newAssignments);
@@ -84,7 +84,7 @@ namespace Marketplace.Common.Commands.Crud
 		// wouldn't be as efficient to use the same logic for this as is used for the catalog location assignment setting
 		public async Task SyncUserCatalogAssignmentsForUserOnAddToLocation(string buyerID, string locationID, string userID)
 		{
-			var location = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, locationID);
+			var location = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, locationID);
 			if(location.xp.CatalogAssignments != null && location.xp.CatalogAssignments.Count() > 0)
 			{
 				var userGroupAssignmentsForUser = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userID: userID, pageSize: 100);
@@ -102,11 +102,11 @@ namespace Marketplace.Common.Commands.Crud
 
 		public async Task SyncUserCatalogAssignmentsForUserOnRemoveFrom(string buyerID, string locationID, string userID)
 		{
-			var location = await _oc.UserGroups.GetAsync<MarketplaceLocationUserGroup>(buyerID, locationID);
+			var location = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, locationID);
 			if (location.xp.CatalogAssignments != null && location.xp.CatalogAssignments.Count() > 0)
 			{
 				// todo more than 100 locations
-				var locations = await _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(buyerID, opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100));
+				var locations = await _oc.UserGroups.ListAsync<HSLocationUserGroup>(buyerID, opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100));
 				var locationUserAssignments = await Throttler.RunAsync(locations.Items, 100, 5, l =>
 				{
 					return _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: l.ID, pageSize: 100);
@@ -133,7 +133,7 @@ namespace Marketplace.Common.Commands.Crud
 				var addedAssignments = oldAssignments == null ? newAssignments : newAssignments.Where(newAssignment => !oldAssignments.Contains(newAssignment)).ToList();
 				var deletedAssignments = oldAssignments == null ? new List<string>() : oldAssignments.Where(oldAssignment => !newAssignments.Contains(oldAssignment)).ToList();
 
-				var users = await ListAllAsync.List((page) => _oc.Users.ListAsync<MarketplaceUser>(buyerID, userGroupID: locationID, page: page, pageSize: 100));
+				var users = await ListAllAsync.List((page) => _oc.Users.ListAsync<HSUser>(buyerID, userGroupID: locationID, page: page, pageSize: 100));
 				if (addedAssignments.Count() > 0)
 				{
 					var userCatalogAssignments = await Throttler.RunAsync(users, 100, 4, user =>
@@ -145,7 +145,7 @@ namespace Marketplace.Common.Commands.Crud
 
 				if(deletedAssignments.Count() > 0)
 				{
-					var locations = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<MarketplaceLocationUserGroup>(buyerID, opts => {
+					var locations = await ListAllAsync.List((page) => _oc.UserGroups.ListAsync<HSLocationUserGroup>(buyerID, opts => {
 							opts.Page(page);
 							opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100);
 						}
@@ -186,7 +186,7 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogsFromOtherLocations(string buyerID, string locationID, List<string> deletedAssignments, List<MarketplaceUser> users, List<MarketplaceLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
+		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogsFromOtherLocations(string buyerID, string locationID, List<string> deletedAssignments, List<HSUser> users, List<HSLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
 		{
 			await Throttler.RunAsync(deletedAssignments, 100, 5, deletedAssignment =>
 			{
@@ -194,7 +194,7 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogFromOtherLocations(string buyerID, string locationID, string deletedAssignment, List<MarketplaceUser> users, List<MarketplaceLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
+		private async Task UnassignUsersWhoDontHaveAssignmentsToCatalogFromOtherLocations(string buyerID, string locationID, string deletedAssignment, List<HSUser> users, List<HSLocationUserGroup> locations, List<UserGroupAssignment> userGroupAssignments)
 		{
 			var locationsWithAssignmentToDeletedCatalog = locations.Where(location => location.xp.CatalogAssignments != null && location.xp.CatalogAssignments.Contains(deletedAssignment) && location.ID != locationID).ToList();
 			//var usersWhoNeedAssignmentDeleted = users.Where(user => !userGroupAssignments.Any(userGroupAssignment => locationsWithAssignmentToDeletedCatalog.Any(location => userGroupAssignment.UserGroupID))
@@ -206,7 +206,7 @@ namespace Marketplace.Common.Commands.Crud
 			});
 		}
 
-		private bool IsUserAssignedToLocationWithCatalogAssignment(string userID, List<MarketplaceLocationUserGroup> locationsWithAssignmentToDeleteCatalog, List<UserGroupAssignment> userLocationAssignments)
+		private bool IsUserAssignedToLocationWithCatalogAssignment(string userID, List<HSLocationUserGroup> locationsWithAssignmentToDeleteCatalog, List<UserGroupAssignment> userLocationAssignments)
 		{
 			var locationIDsUserIsAssignedTo = userLocationAssignments.Where(assignment => assignment.UserID == userID).Select(assignment => assignment.UserGroupID).ToList();
 			return locationIDsUserIsAssignedTo.Any(locationID => locationsWithAssignmentToDeleteCatalog.Any(location => location.ID == locationID));
@@ -218,14 +218,14 @@ namespace Marketplace.Common.Commands.Crud
 			return new Tuple<string, List<UserGroupAssignment>>(userID, assignments.Items.ToList());
 		}
 
-		public async Task<MarketplaceCatalog> Post(string buyerID, MarketplaceCatalog catalog, VerifiedUserContext user)
+		public async Task<HSCatalog> Post(string buyerID, HSCatalog catalog, VerifiedUserContext user)
 		{
-			return await _oc.UserGroups.CreateAsync<MarketplaceCatalog>(buyerID, catalog, user.AccessToken);
+			return await _oc.UserGroups.CreateAsync<HSCatalog>(buyerID, catalog, user.AccessToken);
 		}
 
-		public async Task<MarketplaceCatalog> Put(string buyerID, string catalogID, MarketplaceCatalog catalog, VerifiedUserContext user)
+		public async Task<HSCatalog> Put(string buyerID, string catalogID, HSCatalog catalog, VerifiedUserContext user)
 		{
-			return await _oc.UserGroups.SaveAsync<MarketplaceCatalog>(buyerID, catalogID, catalog, user.AccessToken);
+			return await _oc.UserGroups.SaveAsync<HSCatalog>(buyerID, catalogID, catalog, user.AccessToken);
 		}
 
 		public async Task Delete(string buyerID, string catalogID, VerifiedUserContext user)

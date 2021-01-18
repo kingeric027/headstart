@@ -1,12 +1,4 @@
-import {
-  Component,
-  ChangeDetectorRef,
-  NgZone,
-  OnInit,
-  AfterViewInit,
-  ViewChild,
-  Inject,
-} from '@angular/core'
+import { Component, ChangeDetectorRef, NgZone, Inject } from '@angular/core'
 import { ResourceCrudComponent } from '@app-seller/shared/components/resource-crud/resource-crud.component'
 import {
   Supplier,
@@ -14,22 +6,18 @@ import {
   OcSupplierService,
 } from '@ordercloud/angular-sdk'
 import { Router, ActivatedRoute } from '@angular/router'
-import { FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms'
+import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { get as _get } from 'lodash'
 import {
   ValidateRichTextDescription,
   ValidateEmail,
   RequireCheckboxesToBeChecked,
-  ValidatePhone,
   ValidateSupplierCategorySelection,
 } from '@app-seller/validators/validators'
 import { SupplierService } from '../supplier.service'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
-import {
-  MarketplaceSupplier,
+  HSSupplier,
   HeadStartSDK,
   Asset,
   AssetUpload,
@@ -37,19 +25,9 @@ import {
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { AppAuthService } from '@app-seller/auth'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
-export interface SupplierCategoryConfigFilters {
-  Display: string
-  Path: string
-  Items: any[]
-}
-export interface SupplierCategoryConfig {
-  id: string
-  timeStamp: string
-  MarketplaceName: string
-  Filters: Array<SupplierCategoryConfigFilters>
-}
+import { AppConfig } from '@app-seller/models/environment.types'
 
-function createSupplierForm(supplier: MarketplaceSupplier) {
+function createSupplierForm(supplier: HSSupplier) {
   return new FormGroup({
     ID: new FormControl({
       value: supplier.ID,
@@ -210,7 +188,7 @@ export class SupplierTableComponent extends ResourceCrudComponent<Supplier> {
           NotificationRcpts: [users.Items[0].Email],
         },
       }
-      const patchedSupplier: MarketplaceSupplier = await this.ocSupplierService
+      const patchedSupplier: HSSupplier = await this.ocSupplierService
         .Patch(supplier.ID, patch)
         .toPromise()
       this.selectResource(patchedSupplier)

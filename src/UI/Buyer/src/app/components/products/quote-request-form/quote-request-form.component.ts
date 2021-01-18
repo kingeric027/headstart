@@ -7,10 +7,10 @@ import {
 } from 'src/app/validators/validators'
 import {
   QuoteOrderInfo,
-  MarketplaceAddressBuyer,
+  HSAddressBuyer,
 } from '@ordercloud/headstart-sdk'
-import { CurrentUser } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { CurrentUser } from 'src/app/models/profile.types'
 
 @Component({
   templateUrl: './quote-request-form.component.html',
@@ -23,8 +23,9 @@ export class OCMQuoteRequestForm implements OnInit {
   } = {
     pageSize: 100,
   }
-  myBuyerLocations: MarketplaceAddressBuyer[]
-  @Output() formSubmitted = new EventEmitter<{ user: QuoteOrderInfo }>()
+  myBuyerLocations: HSAddressBuyer[]
+  //todo revert type to QuoteOrderInfo
+  @Output() formSubmitted = new EventEmitter<{ user: any }>()
   @Output() formDismissed = new EventEmitter()
 
   private currentUser: CurrentUser
@@ -42,6 +43,11 @@ export class OCMQuoteRequestForm implements OnInit {
   async getMyBuyerLocations(): Promise<void> {
     const addresses = await this.context.addresses.list(this.requestOptions)
     this.myBuyerLocations = addresses.Items
+  }
+
+  onLocationChange(value: string) {
+    const selectedIndex = parseInt(value.substring(0,1))
+    this.quoteRequestForm.patchValue({"ShippingAddressId": this.myBuyerLocations[selectedIndex].ID})
   }
 
   setForms(): void {
@@ -67,6 +73,7 @@ export class OCMQuoteRequestForm implements OnInit {
         ValidateEmail,
       ]),
       Comments: new FormControl(''),
+      ShippingAddressId: new FormControl(this.myBuyerLocations[0]?.ID || '')
     })
   }
 

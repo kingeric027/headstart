@@ -8,21 +8,19 @@ import {
   Tokens,
 } from 'ordercloud-javascript-sdk'
 import { ReorderHelperService } from '../reorder/reorder.service'
-import {
-  OrderReorderResponse,
-  LineItemGroupSupplier,
-  AppConfig,
-} from '../../shopper-context'
 import { OrderFilterService } from './order-filter.service'
 import {
-  MarketplaceAddressBuyer,
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSAddressBuyer,
+  HSOrder,
+  HSLineItem,
   OrderDetails,
-  MarketplaceShipmentWithItems,
+  HSShipmentWithItems,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
 import { HttpHeaders, HttpClient } from '@angular/common/http'
+import { AppConfig } from 'src/app/models/environment.types'
+import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
+import { OrderReorderResponse } from 'src/app/models/order.types'
 @Injectable({
   providedIn: 'root',
 })
@@ -36,7 +34,7 @@ export class OrderHistoryService {
     private appConfig: AppConfig,
   ) {}
 
-  async getLocationsUserCanView(): Promise<MarketplaceAddressBuyer[]> {
+  async getLocationsUserCanView(): Promise<HSAddressBuyer[]> {
     // add strong type when sdk is regenerated
     const accessUserGroups = await Me.ListUserGroups({
       filters: { 'xp.Role': 'ViewAllOrders' },
@@ -52,29 +50,29 @@ export class OrderHistoryService {
     orderID: string = this.activeOrderID,
     Comments = '',
     AllowResubmit = false
-  ): Promise<MarketplaceOrder> {
+  ): Promise<HSOrder> {
     const order = await Orders.Approve('Outgoing', orderID, {
       Comments,
       AllowResubmit,
     })
-    return order as MarketplaceOrder
+    return order as HSOrder
   }
 
   async declineOrder(
     orderID: string = this.activeOrderID,
     Comments = '',
     AllowResubmit = true
-  ): Promise<MarketplaceOrder> {
+  ): Promise<HSOrder> {
     const order = await Orders.Decline('Outgoing', orderID, {
       Comments,
       AllowResubmit,
     })
-    return order as MarketplaceOrder
+    return order as HSOrder
   }
 
   async validateReorder(
     orderID: string = this.activeOrderID,
-    lineItems: MarketplaceLineItem[]
+    lineItems: HSLineItem[]
   ): Promise<OrderReorderResponse> {
     return this.reorderHelper.validateReorder(orderID, lineItems)
   }
@@ -86,7 +84,7 @@ export class OrderHistoryService {
   }
 
   async getLineItemSuppliers(
-    liGroups: MarketplaceLineItem[][]
+    liGroups: HSLineItem[][]
   ): Promise<LineItemGroupSupplier[]> {
     const suppliers: LineItemGroupSupplier[] = []
     for (const group of liGroups) {
@@ -109,14 +107,14 @@ export class OrderHistoryService {
 
   async listShipments(
     orderID: string = this.activeOrderID
-  ): Promise<MarketplaceShipmentWithItems[]> {
+  ): Promise<HSShipmentWithItems[]> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${Tokens.GetAccessToken()}`,
     })
     const url = `${this.appConfig.middlewareUrl}/order/${orderID}/shipmentswithitems`
     return this.httpClient
-      .get<MarketplaceShipmentWithItems[]>(url, { headers })
+      .get<HSShipmentWithItems[]>(url, { headers })
       .toPromise()
   }
 

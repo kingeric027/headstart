@@ -5,9 +5,9 @@ import {
   ValidateName,
   ValidatePhone,
 } from 'src/app/validators/validators'
-import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk'
-import { CurrentUser } from 'src/app/shopper-context'
+import { HSAddressBuyer } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { CurrentUser } from 'src/app/models/profile.types'
 
 @Component({
   templateUrl: './contact-supplier-form.component.html',
@@ -15,7 +15,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
 })
 export class OCMContactSupplierForm implements OnInit {
   contactSupplierForm: FormGroup
-  myBuyerLocations: MarketplaceAddressBuyer[]
+  myBuyerLocations: HSAddressBuyer[]
   requestOptions: {
     pageSize?: number
   } = {

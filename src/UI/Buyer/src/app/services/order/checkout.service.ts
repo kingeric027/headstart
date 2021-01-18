@@ -1,8 +1,6 @@
-import { MarketplaceBuyerCreditCard } from '../../shopper-context'
 import {
   Payment,
   Orders,
-  Payments,
   BuyerAddress,
   Me,
   OrderWorksheet,
@@ -16,11 +14,10 @@ import { OrderStateService } from './order-state.service'
 import {
   HeadStartSDK,
   Address,
-  OrderCloudIntegrationsCreditCardToken,
-  MarketplaceOrder,
+  HSOrder,
   ListPage,
-  MarketplaceLineItem,
-  MarketplaceAddressBuyer,
+  HSLineItem,
+  HSAddressBuyer,
   OrderCloudIntegrationsCreditCardPayment,
 } from '@ordercloud/headstart-sdk'
 import { max } from 'lodash'
@@ -48,11 +45,11 @@ export class CheckoutService {
     })
   }
 
-  async addComment(comment: string): Promise<MarketplaceOrder> {
+  async addComment(comment: string): Promise<HSOrder> {
     return await this.patch({ Comments: comment })
   }
 
-  async setShippingAddress(address: BuyerAddress): Promise<MarketplaceOrder> {
+  async setShippingAddress(address: BuyerAddress): Promise<HSOrder> {
     // If a saved address (with an ID) is changed by the user it is attached to an order as a one time address.
     // However, order.ShippingAddressID (or BillingAddressID) still points to the unmodified address. The ID should be cleared.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -66,8 +63,8 @@ export class CheckoutService {
   }
 
   async setShippingAddressByID(
-    address: MarketplaceAddressBuyer
-  ): Promise<MarketplaceOrder> {
+    address: HSAddressBuyer
+  ): Promise<HSOrder> {
     try {
       await Orders.Patch('Outgoing', this.order.ID, {
         xp: { ShippingAddress: address },
@@ -88,7 +85,7 @@ export class CheckoutService {
 
   async setBuyerLocationByID(
     buyerLocationID: string
-  ): Promise<MarketplaceOrder> {
+  ): Promise<HSOrder> {
     const patch = {
       BillingAddressID: buyerLocationID,
       xp: { ApprovalNeeded: '' },
@@ -96,7 +93,7 @@ export class CheckoutService {
     const isApprovalNeeded = await this.isApprovalNeeded(buyerLocationID)
     if (isApprovalNeeded) patch.xp.ApprovalNeeded = buyerLocationID
     try {
-      this.order = await this.patch(patch as MarketplaceOrder)
+      this.order = await this.patch(patch as HSOrder)
       return this.order
     } catch (ex) {
       if (ex.errors.Errors[0].ErrorCode === 'NotFound') {
@@ -130,7 +127,7 @@ export class CheckoutService {
 
   async cleanLineItemIDs(
     orderID: string,
-    lineItems: MarketplaceLineItem[]
+    lineItems: HSLineItem[]
   ): Promise<void> {
     /* line item ids are significant for suppliers creating a relationship
      * between their shipments and line items in ordercloud
@@ -197,7 +194,7 @@ export class CheckoutService {
     return orderWorksheet
   }
 
-  async calculateOrder(): Promise<MarketplaceOrder> {
+  async calculateOrder(): Promise<HSOrder> {
     const orderCalculation = await IntegrationEvents.Calculate(
       'Outgoing',
       this.order.ID
@@ -206,20 +203,20 @@ export class CheckoutService {
     return this.order
   }
 
-  private async patch(order: MarketplaceOrder): Promise<MarketplaceOrder> {
+  private async patch(order: HSOrder): Promise<HSOrder> {
     this.order = (await Orders.Patch(
       'Outgoing',
       this.order.ID,
       order
-    )) as MarketplaceOrder
+    )) as HSOrder
     return this.order
   }
 
-  private get order(): MarketplaceOrder {
+  private get order(): HSOrder {
     return this.state.order
   }
 
-  private set order(value: MarketplaceOrder) {
+  private set order(value: HSOrder) {
     this.state.order = value
   }
 }

@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core'
 import { takeWhile } from 'rxjs/operators'
-import { MarketplaceAddressBuyer } from '@ordercloud/headstart-sdk'
+import { HSAddressBuyer } from '@ordercloud/headstart-sdk'
 import { FormControl, FormGroup } from '@angular/forms'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { OrderFilters } from 'src/app/shopper-context'
+import { OrderFilters } from 'src/app/models/order.types'
 
 @Component({
   templateUrl: './order-location-filter.component.html',
@@ -12,7 +12,7 @@ import { OrderFilters } from 'src/app/shopper-context'
 export class OCMOrderLocationFilter implements OnInit, OnDestroy {
   alive = true
   form: FormGroup
-  locations: MarketplaceAddressBuyer[] = []
+  locations: HSAddressBuyer[] = []
 
   constructor(
     private context: ShopperContextService,

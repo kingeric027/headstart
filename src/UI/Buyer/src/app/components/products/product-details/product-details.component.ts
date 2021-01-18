@@ -3,26 +3,26 @@ import { faTimes, faListUl, faTh } from '@fortawesome/free-solid-svg-icons'
 import { Spec, PriceBreak, SpecOption } from 'ordercloud-javascript-sdk'
 import { PriceSchedule } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceLineItem,
+  HSLineItem,
   Asset,
   QuoteOrderInfo,
-  ProductInKit,
+  HSProductInKit,
   ChiliConfig,
-  MarketplaceVariant,
+  HSVariant,
   HeadStartSDK,
+  HSMeProduct,
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
-import { ModalState } from 'src/app/models/modal-state.class'
 import { SpecFormService } from '../spec-form/spec-form.service'
-import { SuperMarketplaceProduct } from '@ordercloud/headstart-sdk'
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
+import { SuperHSProduct } from '@ordercloud/headstart-sdk'
 import { FormGroup } from '@angular/forms'
 import { ProductDetailService } from './product-detail.service'
 import { ToastrService } from 'ngx-toastr'
-import { ContactSupplierBody, CurrentUser, MarketplaceMeProduct } from 'src/app/shopper-context'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { Title } from '@angular/platform-browser'
+import { QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { ContactSupplierBody } from 'src/app/models/buyer.types'
+import { ModalState } from 'src/app/models/shared.types'
 
 @Component({
   templateUrl: './product-details.component.html',
@@ -34,9 +34,9 @@ export class OCMProductDetails implements OnInit {
   faListUl = faListUl
   faTimes = faTimes
 
-  _superProduct: SuperMarketplaceProduct
+  _superProduct: SuperHSProduct
   specs: Spec[]
-  _product: MarketplaceMeProduct
+  _product: HSMeProduct
   priceSchedule: PriceSchedule
   priceBreaks: PriceBreak[]
   attachments: Asset[] = []
@@ -44,7 +44,7 @@ export class OCMProductDetails implements OnInit {
   quantity: number
   price: number
   percentSavings: number
-  relatedProducts$: Observable<MarketplaceMeProduct[]>
+  relatedProducts$: Observable<HSMeProduct[]>
   favoriteProducts: string[] = []
   qtyValid = true
   supplierNote: string
@@ -58,15 +58,15 @@ export class OCMProductDetails implements OnInit {
   showGrid = false
   isAddingToCart = false
   isKitProduct: boolean
-  productsIncludedInKit: ProductInKit[]
+  productsIncludedInKit: HSProductInKit[]
   ocProductsInKit: any[]
   isKitStatic = false
   _chiliConfigs: ChiliConfig[] = []
   contactRequest: ContactSupplierBody
   specForm: FormGroup
   isInactiveVariant: boolean
-  _disabledVariants: MarketplaceVariant[]
-  variant: MarketplaceVariant
+  _disabledVariants: HSVariant[]
+  variant: HSVariant
   variantInventory: number
   constructor(
     private specFormService: SpecFormService,
@@ -75,7 +75,7 @@ export class OCMProductDetails implements OnInit {
     private toastrService: ToastrService
   ) {}
 
-  @Input() set product(superProduct: SuperMarketplaceProduct) {
+  @Input() set product(superProduct: SuperHSProduct) {
     this._superProduct = superProduct
     this._product = superProduct.Product
     this.attachments = superProduct?.Attachments
@@ -98,7 +98,7 @@ export class OCMProductDetails implements OnInit {
   }
 
   setPageTitle() {
-    this.context.router.setPageTitle(this._superProduct.Product.Name);
+    this.context.router.setPageTitle(this._superProduct.Product.Name)
   }
   async listChiliConfigs(): Promise<void> {
     if (!this._product?.xp?.ArtworkRequired) {
@@ -154,7 +154,7 @@ export class OCMProductDetails implements OnInit {
     this.isInactiveVariant = event
   }
 
-  populateInactiveVariants(superProduct: SuperMarketplaceProduct): void {
+  populateInactiveVariants(superProduct: SuperHSProduct): void {
     this._disabledVariants = []
     superProduct.Variants?.forEach((variant) => {
       if (!variant.Active) {
@@ -262,7 +262,7 @@ export class OCMProductDetails implements OnInit {
 
   async submitQuoteOrder(info: QuoteOrderInfo): Promise<void> {
     try {
-      const lineItem: MarketplaceLineItem = {}
+      const lineItem: HSLineItem = {}
       lineItem.ProductID = this._product.ID
       lineItem.Specs = this.specFormService.getLineItemSpecs(
         this.specs,
@@ -304,5 +304,9 @@ export class OCMProductDetails implements OnInit {
 
   toOrderDetail(): void {
     this.context.router.toMyOrderDetails(this.submittedQuoteOrder.ID)
+  }
+
+  hasNoOpenTextSpecs(): boolean {
+    return !this.specs.some((spec) => spec?.AllowOpenText)
   }
 }

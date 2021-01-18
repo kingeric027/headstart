@@ -1,9 +1,9 @@
 using System;
-using Marketplace.Common;
+using Headstart.Common;
 using Microsoft.AspNetCore.Hosting;
 using ordercloud.integrations.library;
 
-namespace Marketplace.API
+namespace Headstart.API
 {
 	public static class Program
 	{

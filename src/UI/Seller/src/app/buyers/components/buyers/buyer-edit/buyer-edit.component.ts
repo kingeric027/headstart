@@ -1,14 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
-import {
-  BuyerTempService,
-  SuperMarketplaceBuyer,
-} from '@app-seller/shared/services/middleware-api/buyer-temp.service'
-import { MarketplaceBuyer } from '@ordercloud/headstart-sdk'
+import { BuyerTempService } from '@app-seller/shared/services/middleware-api/buyer-temp.service'
+import { HSBuyer } from '@ordercloud/headstart-sdk'
 import { BuyerService } from '../buyer.service'
 import { AppAuthService } from '@app-seller/auth'
 import { Router } from '@angular/router'
 import { isEqual as _isEqual } from 'lodash'
+import { HSBuyerPriceMarkup } from '@app-seller/models/buyer-markups.types'
 @Component({
   selector: 'app-buyer-edit',
   templateUrl: './buyer-edit.component.html',
@@ -20,13 +18,13 @@ export class BuyerEditComponent {
   areChanges = false
   dataIsSaving = false
 
-  _superBuyerStatic: SuperMarketplaceBuyer
-  _superBuyerEditable: SuperMarketplaceBuyer
+  _superBuyerStatic: HSBuyerPriceMarkup
+  _superBuyerEditable: HSBuyerPriceMarkup
 
   @Input()
   labelSingular: string
   @Input()
-  set orderCloudBuyer(buyer: MarketplaceBuyer) {
+  set orderCloudBuyer(buyer: HSBuyer) {
     if (buyer.ID) {
       this.handleSelectedBuyerChange(buyer)
     } else {
@@ -47,14 +45,14 @@ export class BuyerEditComponent {
     const value =
       field === 'Buyer.Active' ? event.target.checked : event.target.value
     const resourceUpdate = { field, value }
-    this._superBuyerEditable = this.buyerService.getUpdatedEditableResource<SuperMarketplaceBuyer>(
+    this._superBuyerEditable = this.buyerService.getUpdatedEditableResource<HSBuyerPriceMarkup>(
       resourceUpdate,
       this._superBuyerEditable
     )
     this.checkForChanges()
   }
 
-  createBuyerForm(superBuyer: SuperMarketplaceBuyer): void {
+  createBuyerForm(superBuyer: HSBuyerPriceMarkup): void {
     const buyer = superBuyer.Buyer
     const markup = superBuyer.Markup
     this.resourceForm = new FormGroup({
@@ -65,12 +63,12 @@ export class BuyerEditComponent {
     })
   }
 
-  async handleSelectedBuyerChange(buyer: MarketplaceBuyer): Promise<void> {
+  async handleSelectedBuyerChange(buyer: HSBuyer): Promise<void> {
     const superMarketplaceBuyer = await this.buyerTempService.get(buyer.ID)
     this.refreshBuyerData(superMarketplaceBuyer)
   }
 
-  refreshBuyerData(superBuyer: SuperMarketplaceBuyer): void {
+  refreshBuyerData(superBuyer: HSBuyerPriceMarkup): void {
     this.createBuyerForm(superBuyer)
     this._superBuyerStatic = superBuyer
     this._superBuyerEditable = superBuyer

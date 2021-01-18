@@ -1,22 +1,10 @@
-import {
-  SELLER,
-  SUPPLIER,
-} from '@app-seller/shared/models/ordercloud-user.types'
 import { MPRoles } from '@app-seller/config/mp-security-profiles'
+import { MPRoute } from '@app-seller/models/shared.types'
+import { SELLER, SUPPLIER } from '@app-seller/models/user.types'
 
 // ! included to ensure no overlap with ordercloud ids as this in invalid in ids
 export const REDIRECT_TO_FIRST_PARENT = '!'
 
-export interface MPRoute {
-  rolesWithAccess: string[]
-  // this allows the routes to be narrowed based upon OC user type
-  orderCloudUserTypesWithAccess?: string[]
-  title: string
-  route: string
-  queryParams?: Record<string, any>
-  // if subroutes are included, itesms will display in a dropdown
-  subRoutes?: MPRoute[]
-}
 
 // Products
 const AllProducts: MPRoute = {
@@ -302,6 +290,13 @@ const MySupplerUsers = {
   route: '/my-supplier/users',
 }
 
+const Support = {
+  rolesWithAccess: [],
+  orderCloudUserTypesWithAccess: [SUPPLIER, SELLER],
+  title: 'Submit a Case',
+  route: '/support'
+}
+
 const AllNavGroupings: MPRoute[] = [
   ProductNavGrouping,
   SupplierOrderNavGrouping,
@@ -314,6 +309,7 @@ const AllNavGroupings: MPRoute[] = [
   MySupplierProfile,
   MySupplierLocations,
   MySupplerUsers,
+  Support
 ]
 
 export const getHeaderConfig = (
@@ -347,9 +343,13 @@ const filterOutNavGroupings = (
 ): MPRoute[] => {
   return navGroupings.filter((navGrouping) => {
     return (
-      navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) &&
+      (navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) || 
+        !navGrouping.rolesWithAccess.length
+      ) 
+      &&
       (!navGrouping.orderCloudUserTypesWithAccess ||
-        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType))
+        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType)
+      )
     )
   })
 }

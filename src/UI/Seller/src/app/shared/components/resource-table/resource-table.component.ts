@@ -21,7 +21,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import {
   Options,
   RequestStatus,
-} from '@app-seller/shared/services/resource-crud/resource-crud.types'
+} from '@app-seller/models/resource-crud.types'
 import {
   faCalendar,
   faChevronLeft,

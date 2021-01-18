@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Helpers
+namespace Headstart.Common.Helpers
 {
     public interface IOrderCloudIntegrationsFunctionToken
     {

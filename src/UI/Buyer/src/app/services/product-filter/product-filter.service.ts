@@ -3,16 +3,13 @@ import { BehaviorSubject } from 'rxjs'
 import { Router, Params, ActivatedRoute } from '@angular/router'
 import { transform as _transform, pickBy as _pickBy } from 'lodash'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { ProductFilters, MarketplaceMeProduct } from '../../shopper-context'
 import {
-  Me,
-  Product,
   ListPageWithFacets,
-  BuyerProduct,
 } from 'ordercloud-javascript-sdk'
 import { ProductCategoriesService } from '../product-categories/product-categories.service'
-import { ListPage, MarketplaceKitProduct } from '@ordercloud/headstart-sdk'
 import { TempSdk } from '../temp-sdk/temp-sdk.service'
+import { ProductFilters } from 'src/app/models/filter-config.types'
+import { HSMeProduct } from '@ordercloud/headstart-sdk'
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?
 @Injectable({
@@ -56,7 +53,7 @@ export class ProductFilterService {
     return { page, sortBy, search, ...activeFacets }
   }
 
-  async listProducts(): Promise<ListPageWithFacets<MarketplaceMeProduct>> {
+  async listProducts(): Promise<ListPageWithFacets<HSMeProduct>> {
     const {
       page,
       sortBy,

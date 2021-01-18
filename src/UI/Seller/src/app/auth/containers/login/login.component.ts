@@ -3,11 +3,9 @@ import { Component, OnInit, Inject } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { Router } from '@angular/router'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { ToastrService } from 'ngx-toastr'
+import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({
   selector: 'auth-login',

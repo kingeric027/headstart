@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Marketplace.Common.Services.Zoho.Models
+namespace Headstart.Common.Services.Zoho.Models
 {
     public class ZohoItemList : ZohoListResponse
     {

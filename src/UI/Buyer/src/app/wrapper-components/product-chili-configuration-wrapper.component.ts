@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { CurrentUserService } from '../services/current-user/current-user.service'
 import {
-  SuperMarketplaceProduct,
-  MarketplaceKitProduct,
+  SuperHSProduct,
+  HSKitProduct,
 } from '@ordercloud/headstart-sdk'
 import { TempSdk } from '../services/temp-sdk/temp-sdk.service'
 

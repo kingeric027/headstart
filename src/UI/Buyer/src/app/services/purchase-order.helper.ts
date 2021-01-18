@@ -1,44 +1,22 @@
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSOrder,
+  HSLineItem,
   OrderPromotion,
 } from '@ordercloud/headstart-sdk'
-import { ShipEstimate, LineItem } from 'ordercloud-javascript-sdk'
-import { concatAll } from 'rxjs/operators'
-
-export interface OrderSummaryMeta {
-  StandardLineItems: MarketplaceLineItem[]
-  POLineItems: MarketplaceLineItem[]
-  StandardLineItemCount: number
-  POLineItemCount: number
-
-  ShouldHideShippingAndText: boolean
-  ShippingAndTaxOverrideText: string
-
-  // with no purchase order these are displayed as the whole order
-  CreditCardDisplaySubtotal: number
-  ShippingCost: number
-  TaxCost: number
-  CreditCardTotal: number
-  DiscountTotal: number
-
-  POSubtotal: number
-  POShippingCost: number
-  POTotal: number
-  OrderTotal: number
-}
+import { ShipEstimate } from 'ordercloud-javascript-sdk'
+import { OrderSummaryMeta } from '../models/order.types'
 
 const getPurchaseOrderLineItems = (
-  lineItems: MarketplaceLineItem[]
-): MarketplaceLineItem[] => {
+  lineItems: HSLineItem[]
+): HSLineItem[] => {
   return lineItems.filter(
     (li) => li.Product.xp?.ProductType === 'PurchaseOrder'
   )
 }
 
 const getStandardLineItems = (
-  lineItems: MarketplaceLineItem[]
-): MarketplaceLineItem[] => {
+  lineItems: HSLineItem[]
+): HSLineItem[] => {
   return lineItems.filter(
     (li) => !(li.Product.xp?.ProductType === 'PurchaseOrder')
   )
@@ -74,9 +52,9 @@ const getCreditCardTotal = (
 
 /* eslint-disable */
 export const getOrderSummaryMeta = (
-  order: MarketplaceOrder,
+  order: HSOrder,
   orderPromos: OrderPromotion[],
-  lineItems: MarketplaceLineItem[],
+  lineItems: HSLineItem[],
   shipEstimates: ShipEstimate[],
   checkoutPanel: string,
 ): OrderSummaryMeta => {
@@ -122,7 +100,7 @@ export const getOrderSummaryMeta = (
 
 const getPOShippingCost = (
   shipEstimates: ShipEstimate[],
-  POlineItems: MarketplaceLineItem[]
+  POlineItems: HSLineItem[]
 ): number => {
   if (!shipEstimates) {
     // the error is in orderworksheet.ShipEstimateResponse.UnhandledErrorBody

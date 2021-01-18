@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Helpers;
-using Marketplace.Models.Misc;
-using Marketplace.Common.Services.DevCenter.Models;
+using Headstart.Common.Commands;
+using Headstart.Common.Helpers;
+using Headstart.Models.Misc;
+using Headstart.Common.Services.DevCenter.Models;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     public class EnvironmentSeedController : BaseController
     {

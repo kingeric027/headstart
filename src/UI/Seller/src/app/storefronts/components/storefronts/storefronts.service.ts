@@ -1,18 +1,9 @@
 import { Injectable } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import {
-  OcBuyerService,
-  Buyer,
-  ApiClient,
-  OcApiClientService,
-} from '@ordercloud/angular-sdk'
+import { ApiClient } from '@ordercloud/angular-sdk'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import { HeadStartSDK, ListArgs } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import {
-  SuperMarketplaceBuyer,
-  BuyerTempService,
-} from '@app-seller/shared/services/middleware-api/buyer-temp.service'
 import { ApiClients } from 'ordercloud-javascript-sdk'
 
 export const STOREFRONTS_SUB_RESOURCE_LIST = [

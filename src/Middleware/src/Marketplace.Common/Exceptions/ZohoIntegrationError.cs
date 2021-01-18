@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Marketplace.Models.Exceptions
+namespace Headstart.Models.Exceptions
 {
     public class ZohoIntegrationError
     {

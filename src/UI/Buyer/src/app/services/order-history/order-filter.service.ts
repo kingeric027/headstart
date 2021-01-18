@@ -1,23 +1,18 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { Router, Params, ActivatedRoute } from '@angular/router'
-import {
-  OrderStatus,
-  OrderFilters,
-  OrderViewContext,
-  AppConfig,
-} from '../../shopper-context'
 import { CurrentUserService } from '../current-user/current-user.service'
 import { Me, Sortable, Tokens } from 'ordercloud-javascript-sdk'
 import { filter } from 'rxjs/operators'
-import { RouteService } from '../route/route.service'
 import {
   HeadStartSDK,
   ListPage,
-  MarketplaceOrder,
+  HSOrder,
 } from '@ordercloud/headstart-sdk'
 import { ListArgs } from '@ordercloud/headstart-sdk'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
+import { AppConfig } from 'src/app/models/environment.types'
+import { OrderFilters, OrderViewContext, HeadstartOrderStatus } from 'src/app/models/order.types'
 
 @Injectable({
   providedIn: 'root',
@@ -88,7 +83,7 @@ export class OrderFilterService {
     this.patchFilterState({ showOnlyFavorites, page: undefined })
   }
 
-  filterByStatus(status: OrderStatus): void {
+  filterByStatus(status: HeadstartOrderStatus): void {
     this.patchFilterState({ status: status || undefined, page: undefined })
   }
 
@@ -127,7 +122,7 @@ export class OrderFilterService {
   }
 
   // Used in requests to the OC API
-  async listOrders(): Promise<ListPage<MarketplaceOrder>> {
+  async listOrders(): Promise<ListPage<HSOrder>> {
     const viewContext = this.getOrderViewContext()
     switch (viewContext) {
       case OrderViewContext.MyOrders:
@@ -141,7 +136,7 @@ export class OrderFilterService {
     }
   }
 
-  async ListLocationOrders(): Promise<ListPage<MarketplaceOrder>> {
+  async ListLocationOrders(): Promise<ListPage<HSOrder>> {
     const locationID = this.activeFiltersSubject.value.location
     // Changed middleware route, awaiting next SDK bump (1.10.5?)
     // return await HeadStartSDK.Orders.ListLocationOrders(locationID, this.createListOptions() as any);
@@ -149,14 +144,14 @@ export class OrderFilterService {
     const args = this.createListOptions()
     const params = this.createHttpParams(args)
     return await this.http
-      .get<ListPage<MarketplaceOrder>>(url, {
+      .get<ListPage<HSOrder>>(url, {
         headers: this.buildHeaders(),
         params,
       })
       .toPromise()
   }
 
-  async listApprovableOrders(): Promise<ListPage<MarketplaceOrder>> {
+  async listApprovableOrders(): Promise<ListPage<HSOrder>> {
     return await Me.ListApprovableOrders(this.createListOptions() as any)
   }
 
@@ -201,7 +196,7 @@ export class OrderFilterService {
     }
   }
 
-  private createListOptions(): ListArgs<MarketplaceOrder> {
+  private createListOptions(): ListArgs<HSOrder> {
     const {
       page,
       sortBy,
@@ -233,11 +228,11 @@ export class OrderFilterService {
   }
 
   private addStatusFilters(status: string, listOptions: ListArgs): ListArgs {
-    if (status === OrderStatus.ChangesRequested) {
+    if (status === HeadstartOrderStatus.ChangesRequested) {
       listOptions.filters.DateDeclined = '*'
     } else if (
-      status === OrderStatus.AwaitingApproval ||
-      status === OrderStatus.AllSubmitted
+      status === HeadstartOrderStatus.AwaitingApproval ||
+      status === HeadstartOrderStatus.AllSubmitted
     ) {
       listOptions.filters.Status = status
     } else {

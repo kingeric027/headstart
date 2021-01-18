@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Marketplace.Common.Models;
+using Headstart.Common.Models;
 using Newtonsoft.Json.Linq;
-using Marketplace.Common.Queries;
+using Headstart.Common.Queries;
 using OrderCloud.SDK;
-using Action = Marketplace.Common.Models.Action;
-using Marketplace.Common.Services.CMS;
+using Action = Headstart.Common.Models.Action;
+using Headstart.Common.Services.CMS;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public interface IWorkItemCommand
     {

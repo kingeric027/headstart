@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core'
 import { BuyerCreditCard, Address } from 'ordercloud-javascript-sdk'
-import { MarketplaceBuyerCreditCard } from 'src/app/shopper-context'
+import { HSBuyerCreditCard } from 'src/app/models/credit-card.types'
 
 @Component({
   templateUrl: './credit-card-display.component.html',
   styleUrls: ['./credit-card-display.component.scss'],
 })
 export class OCMCreditCardDisplay {
-  @Input() set card(value: MarketplaceBuyerCreditCard) {
+  @Input() set card(value: HSBuyerCreditCard) {
     this.creditCard = value
     this.address = value?.xp?.CCBillingAddress
   }

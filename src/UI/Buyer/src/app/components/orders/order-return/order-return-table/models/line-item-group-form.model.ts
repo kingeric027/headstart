@@ -1,15 +1,15 @@
 import { FormArray, FormControl, FormBuilder } from '@angular/forms'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 import { LineItemForm } from './line-item-form.model'
 
 export class LineItemGroupForm {
   shipFromAddressID = new FormControl()
   lineItems = new FormArray([])
-  liGroup: MarketplaceLineItem[]
+  liGroup: HSLineItem[]
 
   constructor(
     private fb: FormBuilder,
-    liGroup: MarketplaceLineItem[],
+    liGroup: HSLineItem[],
     action: string
   ) {
     if (liGroup && liGroup[0].ShipFromAddressID) {

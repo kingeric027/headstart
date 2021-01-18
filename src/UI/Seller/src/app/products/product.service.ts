@@ -11,15 +11,13 @@ import {
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { Products, ListPage } from 'ordercloud-javascript-sdk'
-import {
-  ChiliService,
-  TecraDocument,
-  TecraSpec,
-} from '@app-seller/shared/services/middleware-api/middleware-chili.service'
+import { ChiliService } from '@app-seller/shared/services/middleware-api/middleware-chili.service'
 import {
   ChiliConfig,
   ChiliSpec,
   ChiliSpecOption,
+  TecraDocument,
+  TecraSpec,
 } from '@ordercloud/headstart-sdk'
 
 // TODO - this service is only relevent if you're already on the product details page. How can we enforce/inidcate that?

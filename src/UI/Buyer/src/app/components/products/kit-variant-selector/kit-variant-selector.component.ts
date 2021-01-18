@@ -1,19 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import {
-  MarketplaceMeKitProduct,
-  MeProductInKit,
+  HSMeKitProduct,
+  HSMeProductInKit,
   Variant,
 } from '@ordercloud/headstart-sdk'
-import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface'
-import {
-  KitVariantSelection,
-  ProductSelectionEvent,
-} from 'src/app/models/product-selection-event.interface'
+import { KitVariantSelection, LineItemToAdd, ProductSelectionEvent, QtyChangeEvent, SpecFormEvent } from 'src/app/models/product.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { ProductDetailService } from '../product-details/product-detail.service'
-import { QtyChangeEvent } from '../quantity-input/quantity-input.component'
-import { SpecFormEvent } from '../spec-form/spec-form-values.interface'
 import { SpecFormService } from '../spec-form/spec-form.service'
 
 @Component({
@@ -29,11 +23,11 @@ export class OCMKitVariantSelector {
   @Input() set allLineItems(value: LineItemToAdd[]) {
     this._allLineItems = value
   }
-  @Input() kitProduct: MarketplaceMeKitProduct
+  @Input() kitProduct: HSMeKitProduct
   @Output() addLineItem = new EventEmitter<LineItemToAdd>()
   _allLineItems: LineItemToAdd[]
   _event: ProductSelectionEvent
-  productKitDetails: MeProductInKit
+  productKitDetails: HSMeProductInKit
   selection: KitVariantSelection
   disabledVariants: Variant[]
   specForm = {} as FormGroup

@@ -1,6 +1,6 @@
-﻿using Marketplace.Common.Models.Marketplace;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
+﻿using Headstart.Common.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -10,12 +10,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Marketplace.Common.Services
+namespace Headstart.Common.Services
 {
     public interface IOrderCalcService
     {
-        decimal GetCreditCardTotal(MarketplaceOrderWorksheet worksheet);
-        decimal GetPurchaseOrderTotal(MarketplaceOrderWorksheet worksheet);
+        decimal GetCreditCardTotal(HSOrderWorksheet worksheet);
+        decimal GetPurchaseOrderTotal(HSOrderWorksheet worksheet);
     }
 
     public class OrderCalcService : IOrderCalcService
@@ -26,13 +26,13 @@ namespace Marketplace.Common.Services
             _oc = oc;
         }
 
-        public decimal GetCreditCardTotal(MarketplaceOrderWorksheet worksheet)
+        public decimal GetCreditCardTotal(HSOrderWorksheet worksheet)
         {
             var purchaseOrderTotal = GetPurchaseOrderTotal(worksheet);
             return worksheet.Order.Total - purchaseOrderTotal;
         }
 
-        public decimal GetPurchaseOrderTotal(MarketplaceOrderWorksheet worksheet)
+        public decimal GetPurchaseOrderTotal(HSOrderWorksheet worksheet)
         {
             return worksheet.LineItems
                 .Where(li => li.Product.xp.ProductType == ProductType.PurchaseOrder)

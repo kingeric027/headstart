@@ -1,34 +1,19 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
 import { OcTokenService } from '@ordercloud/angular-sdk'
 import {
   ChiliConfig,
   ChiliSpec,
   ChiliSpecOption,
   ChiliTemplate,
+  TecraDocument,
+  TecraSpec,
 } from '@ordercloud/headstart-sdk'
 import { ListPage } from 'marketplace-javascript-sdk/dist/models/ListPage'
 
 // WHOLE FILE TO BE REPLACED BY SDK
-
-export interface TecraDocument {
-  id: string
-  name: string
-  pages: number
-}
-export interface TecraSpec {
-  name: string
-  dataType: string
-  displayName: string
-  displayValue: string
-  required: string
-  value: string
-  visible: string
-}
 
 @Injectable({
   providedIn: 'root',

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
+using OrderCloud.SDK;
 
-namespace ordercloud.integrations.library.extensions
+namespace ordercloud.integrations.library
 {
     public static class DecimalExtensions
     {
         public static bool IsNullOrZero(this decimal? value)
         {
             return value == null || value == 0; 
-        }
-
-        public static double ValueOrDefault(this decimal? value, double defaultValue)
-        {
-            return value.IsNullOrZero() ? defaultValue : value.To<double>();
         }
     }
 }

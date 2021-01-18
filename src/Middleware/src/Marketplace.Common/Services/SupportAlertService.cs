@@ -1,5 +1,6 @@
-﻿using Marketplace.Common.Models.Marketplace;
-using Marketplace.Models;
+using Headstart.Common.Models.Misc;
+﻿using Headstart.Common.Models.Marketplace;
+using Headstart.Models;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
 using ordercloud.integrations.cardconnect;
@@ -8,13 +9,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using static Marketplace.Common.Models.SendGridModels;
+using static Headstart.Common.Models.SendGridModels;
 
-namespace Marketplace.Common.Services
+namespace Headstart.Common.Services
 {
     public interface ISupportAlertService
     {
-        Task VoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex);
+        Task VoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex);
+
+        Task EmailGeneralSupportQueue(SupportCase supportCase);
+
+        
+
     }
 
     // use this service to alert support of critical failures
@@ -31,13 +37,13 @@ namespace Marketplace.Common.Services
             _settings = settings;
         }
 
-        public async Task VoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex)
+        public async Task VoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex)
         {
             LogVoidAuthorizationFailed(payment, transactionID, order, ex);
             await EmailVoidAuthorizationFailedAsync(payment, transactionID, order, ex);
         }
 
-        public void LogVoidAuthorizationFailed(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex)
+        public void LogVoidAuthorizationFailed(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex)
         {
             // track in app insights
             // to find go to Transaction Search > Event Type = Event > Filter by any of these custom properties or event name "Payment.VoidAuthorizationFailed"
@@ -54,7 +60,7 @@ namespace Marketplace.Common.Services
             _telemetry.TrackEvent("Payment.VoidAuthorizationFailed", customProperties);
         }
 
-        public async Task EmailVoidAuthorizationFailedAsync(MarketplacePayment payment, string transactionID, MarketplaceOrder order, CreditCardVoidException ex)
+        public async Task EmailVoidAuthorizationFailedAsync(HSPayment payment, string transactionID, HSOrder order, CreditCardVoidException ex)
         {
             var templateData = new EmailTemplate()
             {
@@ -84,6 +90,46 @@ namespace Marketplace.Common.Services
                 toList.Add(new EmailAddress { Email = email });
             }
             await _sendgrid.SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, toList, SUPPORT_TEMPLATE_ID, templateData);
+        }
+
+        public async Task EmailGeneralSupportQueue(SupportCase supportCase)
+        {
+            var templateData = new EmailTemplate()
+            {
+                Data = new
+                {
+                    DynamicPropertyName1 = "FirstName",
+                    DynamicPropertyValue1 = supportCase.FirstName,
+                    DynamicPropertyName2 = "LastName",
+                    DynamicPropertyValue2 = supportCase.LastName,
+                    DynamicPropertyName3 = "Email",
+                    DynamicPropertyValue3 = supportCase.Email,
+                    DynamicPropertyName4 = "Vendor",
+                    DynamicPropertyValue4 = supportCase.Vendor ?? "N/A",
+                },
+                Message = new EmailDisplayText()
+                {
+                    EmailSubject = supportCase.Subject,
+                    DynamicText = supportCase.Message
+                }
+            };
+            var recipient = DetermineRecipient(supportCase.Subject);
+            await _sendgrid.SendSingleTemplateEmailSingleRcptAttachment(_settings.SendgridSettings.FromEmail, recipient, SUPPORT_TEMPLATE_ID, templateData, supportCase.File);
+        }
+
+        private string DetermineRecipient(string subject)
+        {
+            switch (subject.ToLower())
+            {
+                case "general":
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
+                case "report an error/bug":
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
+                case "payment, billing, or refunds":
+                    return _settings.SendgridSettings.SEBBillingEmail;
+                default:
+                    return _settings.SendgridSettings.SEBSupportCaseEmail;
+            }
         }
     }
 }

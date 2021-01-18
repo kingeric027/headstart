@@ -3,9 +3,9 @@ import { faEdit, faTrashAlt } from '@fortawesome/free-regular-svg-icons'
 import { faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { BuyerAddress, ListPage } from 'ordercloud-javascript-sdk'
 import { ToastrService } from 'ngx-toastr'
-import { ModalState } from '../../../models/modal-state.class'
 import { getSuggestedAddresses } from '../../../services/address-suggestion.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { ModalState } from 'src/app/models/shared.types'
 
 @Component({
   templateUrl: './address-list.component.html',

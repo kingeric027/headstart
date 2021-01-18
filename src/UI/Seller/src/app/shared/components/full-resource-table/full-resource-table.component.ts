@@ -1,10 +1,6 @@
 import { Component, Input, Output, EventEmitter, Inject } from '@angular/core'
-import {
-  FULL_TABLE_RESOURCE_DICTIONARY,
-  ResourceRow,
-  ResourceConfiguration,
-} from '@app-seller/shared/services/configuration/table-display'
-import { RequestStatus } from '@app-seller/shared/services/resource-crud/resource-crud.types'
+import { FULL_TABLE_RESOURCE_DICTIONARY } from '@app-seller/shared/services/configuration/table-display'
+import { RequestStatus } from '@app-seller/models/resource-crud.types'
 import {
   faCopy,
   faSort,
@@ -17,10 +13,8 @@ import { SortDirection } from './sort-direction.enum'
 import { environment } from 'src/environments/environment'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig, ResourceRow } from '@app-seller/shared'
 
 @Component({
   selector: 'full-resource-table-component',

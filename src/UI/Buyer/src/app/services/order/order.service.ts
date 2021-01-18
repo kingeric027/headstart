@@ -1,6 +1,5 @@
 // angular
 import { Injectable } from '@angular/core'
-import { AppConfig, OrderType } from '../../shopper-context'
 import { OrderStateService } from './order-state.service'
 import { CartService } from './cart.service'
 import { CheckoutService } from './checkout.service'
@@ -12,17 +11,19 @@ import {
   IntegrationEvents,
 } from 'ordercloud-javascript-sdk'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSOrder,
+  HSLineItem,
   QuoteOrderInfo,
 } from '@ordercloud/headstart-sdk'
 import { PromoService } from './promo.service'
+import { AppConfig } from 'src/app/models/environment.types'
+import { OrderType } from 'src/app/models/order.types'
 
 @Injectable({
   providedIn: 'root',
 })
 export class CurrentOrderService {
-  onChange: (callback: (order: MarketplaceOrder) => void) => void
+  onChange: (callback: (order: HSOrder) => void) => void
   reset: () => Promise<void>
   constructor(
     private cartService: CartService,
@@ -37,7 +38,7 @@ export class CurrentOrderService {
     this.reset = this.state.reset.bind(this.state)
   }
 
-  get(): MarketplaceOrder {
+  get(): HSOrder {
     return this.state.order
   }
 
@@ -55,7 +56,7 @@ export class CurrentOrderService {
 
   async submitQuoteOrder(
     info: QuoteOrderInfo,
-    lineItem: MarketplaceLineItem
+    lineItem: HSLineItem
   ): Promise<Order> {
     const order = this.buildQuoteOrder(info)
     lineItem.xp.StatusByQuantity = {
@@ -75,9 +76,11 @@ export class CurrentOrderService {
     return submittedQuoteOrder
   }
 
-  buildQuoteOrder(info: QuoteOrderInfo): Order {
+  //todo revert type to QuoteOrderInfo
+  buildQuoteOrder(info: any): Order {
     return {
       ID: `${this.appConfig.marketplaceID}{orderIncrementor}`,
+      ShippingAddressID: info.ShippingAddressId,
       xp: {
         AvalaraTaxTransactionCode: '',
         OrderType: OrderType.Quote,

@@ -33,19 +33,18 @@ import {
 import { getProductSmallImageUrl } from '@app-seller/products/product-image.helper'
 import { HttpHeaders } from '@angular/common/http'
 import { AppAuthService } from '@app-seller/auth'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import { OrderService } from '@app-seller/orders/order.service'
-import { SELLER } from '@app-seller/shared/models/ordercloud-user.types'
-import { LineItemStatus } from '../../../shared/models/order-status.interface'
 import {
   CanChangeLineItemsOnOrderTo,
   NumberCanChangeTo,
 } from '@app-seller/orders/line-item-status.helper'
-import { MarketplaceLineItem, SuperShipment } from '@ordercloud/headstart-sdk'
+import { HSLineItem, SuperHSShipment } from '@ordercloud/headstart-sdk'
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { flatten as _flatten } from 'lodash'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { LineItemStatus } from '@app-seller/models/order.types'
+import { SELLER } from '@app-seller/models/user.types'
 
 @Component({
   selector: 'app-order-shipments',
@@ -63,12 +62,12 @@ export class OrderShipmentsComponent implements OnChanges {
   editShipFromAddress = false // TO-DO - Use for editing Ship From address.
   shipmentForm: FormGroup
   // TODO: Get middleware route for listing super shipments
-  superShipments: SuperShipment[] = []
+  superShipments: SuperHSShipment[] = []
   shipments: ListPage<Shipment>
   shipmentItems: ListPage<ShipmentItem>
   selectedShipment: Shipment
   supplierAddresses: ListPage<Address>
-  lineItems: MarketplaceLineItem[]
+  lineItems: HSLineItem[]
   isSaving = false
   isSellerUser = false
   shipAllItems = false
@@ -202,7 +201,7 @@ export class OrderShipmentsComponent implements OnChanges {
   }
 
   async getLineItems(orderID: string): Promise<void> {
-    let allOrderLineItems: MarketplaceLineItem[] = []
+    let allOrderLineItems: HSLineItem[] = []
     const listOptions = {
       page: 1,
       pageSize: 100,
@@ -212,7 +211,7 @@ export class OrderShipmentsComponent implements OnChanges {
       .toPromise()
     allOrderLineItems = [
       ...allOrderLineItems,
-      ...(lineItemsResponse.Items as MarketplaceLineItem[]),
+      ...(lineItemsResponse.Items as HSLineItem[]),
     ]
     if (lineItemsResponse.Meta.TotalPages <= 1) {
       this.lineItems = allOrderLineItems
@@ -307,7 +306,7 @@ export class OrderShipmentsComponent implements OnChanges {
     }
   }
 
-  getQuantityDropdown(lineItem: MarketplaceLineItem): number[] {
+  getQuantityDropdown(lineItem: HSLineItem): number[] {
     const quantityAvailableToShip = NumberCanChangeTo(
       LineItemStatus.Complete,
       lineItem

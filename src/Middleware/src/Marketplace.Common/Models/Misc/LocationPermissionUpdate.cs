@@ -2,7 +2,7 @@
 using OrderCloud.SDK;
 using System.Collections.Generic;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
     [SwaggerModel]
     public class LocationPermissionUpdate

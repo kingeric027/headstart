@@ -26,13 +26,13 @@ import {
 import { PromotionService } from '@app-seller/promotions/promotion.service'
 import {
   PromotionXp,
-  MarketplacePromoType,
-  MarketplacePromoEligibility,
+  HSPromoType,
+  HSPromoEligibility,
   MinRequirementType,
-} from '@app-seller/shared/models/marketplace-promo.interface'
+} from '@app-seller/models/promo-types'
 import * as moment from 'moment'
 import { Router } from '@angular/router'
-import { ListArgs, MarketplaceSupplier } from '@ordercloud/headstart-sdk'
+import { ListArgs, HSSupplier } from '@ordercloud/headstart-sdk'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { TranslateService } from '@ngx-translate/core'
 import { Products, Meta } from 'ordercloud-javascript-sdk'
@@ -62,10 +62,10 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   updatedResource
   @Output()
   updateResource = new EventEmitter<any>()
-  suppliers: MarketplaceSupplier[]
+  suppliers: HSSupplier[]
   products = new BehaviorSubject<Product[]>([])
   productMeta: Meta
-  selectedSupplier: MarketplaceSupplier
+  selectedSupplier: HSSupplier
   resourceForm: FormGroup
   _promotionEditable: Promotion<PromotionXp>
   _promotionStatic: Promotion<PromotionXp>
@@ -103,13 +103,13 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   ngOnChanges(): void {
     this.productsCollapsed =
       this._promotionEditable?.xp?.AppliesTo !==
-      MarketplacePromoEligibility.SpecificSKUs
+      HSPromoEligibility.SpecificSKUs
     this.currentDateTime = moment().format('YYYY-MM-DD[T]hh:mm')
   }
 
   refreshPromoData(promo: Promotion<PromotionXp>): void {
     this.productsCollapsed =
-      promo?.xp?.AppliesTo !== MarketplacePromoEligibility.SpecificSKUs
+      promo?.xp?.AppliesTo !== HSPromoEligibility.SpecificSKUs
     const now = moment(Date.now()).format('YYYY-MM-DD[T]hh:mm')
     this.isExpired = promo.ExpirationDate
       ? Date.parse(promo.ExpirationDate) < Date.parse(now)
@@ -147,7 +147,7 @@ export class PromotionEditComponent implements OnInit, OnChanges {
     this.selectedSupplier = s
     if (
       this._promotionEditable?.xp?.AppliesTo ===
-      MarketplacePromoEligibility.SpecificSupplier
+      HSPromoEligibility.SpecificSupplier
     ) {
       this.handleUpdatePromo({ target: { value: s.ID } }, 'xp.Supplier')
     }
@@ -278,12 +278,12 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   handleUpdatePromo(event: any, field: string, typeOfValue?: string): void {
     if (
       field === 'xp.AppliesTo' &&
-      event?.target?.value === MarketplacePromoEligibility.SpecificSupplier
+      event?.target?.value === HSPromoEligibility.SpecificSupplier
     ) {
       this.updatePromoResource({ field: 'LineItemLevel', value: true })
     } else if (
       field === 'xp.AppliesTo' &&
-      event?.target?.value === MarketplacePromoEligibility.SpecificSKUs
+      event?.target?.value === HSPromoEligibility.SpecificSKUs
     ) {
       this.updatePromoResource({ field: 'LineItemLevel', value: true })
       this.productsCollapsed = false
@@ -320,11 +320,11 @@ export class PromotionEditComponent implements OnInit, OnChanges {
     )
   }
 
-  promoTypeCheck(type: MarketplacePromoType): boolean {
+  promoTypeCheck(type: HSPromoType): boolean {
     return type === this._promotionEditable?.xp?.Type
   }
 
-  promoEligibilityCheck(eligibility: MarketplacePromoEligibility): boolean {
+  promoEligibilityCheck(eligibility: HSPromoEligibility): boolean {
     return eligibility === this._promotionEditable?.xp?.AppliesTo
   }
 
@@ -332,14 +332,14 @@ export class PromotionEditComponent implements OnInit, OnChanges {
     const safeXp = this._promotionEditable?.xp
     let valueString = ''
     switch (safeXp?.AppliesTo) {
-      case MarketplacePromoEligibility.SpecificSupplier:
+      case HSPromoEligibility.SpecificSupplier:
         valueString = `${this.translate.instant(
           'ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_ENTIRE'
         )} ${this.selectedSupplier?.Name} ${this.translate.instant(
           'ADMIN.PROMOTIONS.DISPLAY.VALUE.PRODUCTS_ORDER'
         )}`
         break
-      case MarketplacePromoEligibility.SpecificSKUs:
+      case HSPromoEligibility.SpecificSKUs:
         valueString = this.translate.instant(
           'ADMIN.PROMOTIONS.DISPLAY.VALUE.OFF_SELECT_PRODUCTS'
         )
@@ -359,13 +359,13 @@ export class PromotionEditComponent implements OnInit, OnChanges {
   }
 
   arrangeValueString(safeXp: PromotionXp, valueString: string): string {
-    if (safeXp?.Type === MarketplacePromoType.FixedAmount) {
+    if (safeXp?.Type === HSPromoType.FixedAmount) {
       valueString = `$${safeXp?.Value} ${valueString}`
     }
-    if (safeXp?.Type === MarketplacePromoType.Percentage) {
+    if (safeXp?.Type === HSPromoType.Percentage) {
       valueString = `${safeXp?.Value}% ${valueString}`
     }
-    if (safeXp?.Type === MarketplacePromoType.FreeShipping) {
+    if (safeXp?.Type === HSPromoType.FreeShipping) {
       valueString = this.translate.instant(
         'ADMIN.PROMOTIONS.DISPLAY.VALUE.FREE_SHIPPING_ENTIRE_ORDER'
       )

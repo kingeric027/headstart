@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core'
 import {
   OrderDetails,
-  MarketplaceOrder,
-  MarketplaceLineItem,
-  MarketplaceAddressBuyer,
+  HSOrder,
+  HSLineItem,
+  HSAddressBuyer,
 } from '@ordercloud/headstart-sdk'
 import {
   OrderApproval,
@@ -27,13 +27,13 @@ export class OCMOrderHistorical implements OnInit {
     this.approvals = value.Approvals.filter((a) => a.Approver) as any
     this.getBuyerLocation(this.order.BillingAddressID)
   }
-  order: MarketplaceOrder
-  lineItems: MarketplaceLineItem[] = []
+  order: HSOrder
+  lineItems: HSLineItem[] = []
   promotions: OrderPromotion[] = []
   payments: Payment[] = []
   approvals: OrderApproval[] = []
   isQuoteOrder = isQuoteOrder
-  buyerLocation: MarketplaceAddressBuyer
+  buyerLocation: HSAddressBuyer
   _userCurrency: string
 
   constructor(private context: ShopperContextService) {}

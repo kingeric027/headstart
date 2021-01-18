@@ -15,14 +15,16 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
 import { Category } from 'ordercloud-javascript-sdk'
 import { takeWhile } from 'rxjs/operators'
 import {
-  MarketplaceOrder,
-  MarketplaceLineItem,
+  HSOrder,
+  HSLineItem,
 } from '@ordercloud/headstart-sdk'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper'
-import { AppConfig, CurrentUser, ProductFilters } from 'src/app/shopper-context'
-import { RouteConfig } from 'src/app/services/route/route-config'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 import { StaticPageService } from 'src/app/services/static-page/static-page.service'
+import { CurrentUser } from 'src/app/models/profile.types'
+import { AppConfig } from 'src/app/models/environment.types'
+import { ProductFilters } from 'src/app/models/filter-config.types'
+import { RouteConfig } from 'src/app/models/shared.types'
 
 @Component({
   templateUrl: './app-header.component.html',
@@ -33,7 +35,7 @@ export class OCMAppHeader implements OnInit {
   isAnonymous: boolean
   isSSO: boolean
   user: CurrentUser
-  order: MarketplaceOrder
+  order: HSOrder
   alive = true
   addToCartQuantity: number
   searchTermForProducts: string = null
@@ -125,7 +127,7 @@ export class OCMAppHeader implements OnInit {
 
   buildAddToCartListener(): void {
     let closePopoverTimeout
-    this.context.order.cart.onAdd.subscribe((li: MarketplaceLineItem) => {
+    this.context.order.cart.onAdd.subscribe((li: HSLineItem) => {
       clearTimeout(closePopoverTimeout)
       if (li) {
         this.addToCartPopover.ngbPopover = `Added ${li.Quantity} items to Cart`

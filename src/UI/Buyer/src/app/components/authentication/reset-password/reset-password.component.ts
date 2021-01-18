@@ -12,7 +12,7 @@ import {
 import { ToastrService } from 'ngx-toastr'
 import { ActivatedRoute } from '@angular/router'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { AppConfig } from 'src/app/shopper-context'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Component({
   templateUrl: './reset-password.component.html',

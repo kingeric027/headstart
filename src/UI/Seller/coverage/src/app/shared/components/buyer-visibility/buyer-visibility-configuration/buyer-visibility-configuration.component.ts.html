@@ -812,8 +812,8 @@ import { ProductService } from '@app-seller/products/product.service'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
 import {
   HeadStartSDK,
-  MarketplaceBuyer,
-  MarketplaceProduct,
+  HSBuyer,
+  HSProduct,
 } from '@ordercloud/headstart-sdk'
 &nbsp;
 @Component({
@@ -825,19 +825,19 @@ export class BuyerVisibilityConfiguration {
 <span class="cstat-no" title="statement not covered" >  faEyeSlash = faEyeSlash</span>
 <span class="cstat-no" title="statement not covered" >  faEye = faEye</span>
   @Input()
-<span class="fstat-no" title="function not covered" >  set </span>buyer(value: MarketplaceBuyer) {
+<span class="fstat-no" title="function not covered" >  set </span>buyer(value: HSBuyer) {
 <span class="cstat-no" title="statement not covered" >    this._buyer = value</span>
 <span class="cstat-no" title="statement not covered" >    this.fetchData()</span>
   }
 &nbsp;
   @Input()
-<span class="fstat-no" title="function not covered" >  set </span>product(value: MarketplaceProduct) {
+<span class="fstat-no" title="function not covered" >  set </span>product(value: HSProduct) {
 <span class="cstat-no" title="statement not covered" >    this._product = value</span>
 <span class="cstat-no" title="statement not covered" >    this.fetchData()</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  _product: MarketplaceProduct = {}</span>
-<span class="cstat-no" title="statement not covered" >  _buyer: MarketplaceBuyer = {}</span>
+<span class="cstat-no" title="statement not covered" >  _product: HSProduct = {}</span>
+<span class="cstat-no" title="statement not covered" >  _buyer: HSBuyer = {}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  addCatalogAssignments: ProductAssignment[] = []</span>
 <span class="cstat-no" title="statement not covered" >  delCatalogAssignments: ProductAssignment[] = []</span>
@@ -908,7 +908,7 @@ export class BuyerVisibilityConfiguration {
     )
   }
 &nbsp;
-  async <span class="fstat-no" title="function not covered" >getKitProductCatalogAssignments</span>(product: MarketplaceProduct) {
+  async <span class="fstat-no" title="function not covered" >getKitProductCatalogAssignments</span>(product: HSProduct) {
     const productCatalogAssignments = <span class="cstat-no" title="statement not covered" >[]</span>
     const kitProduct = <span class="cstat-no" title="statement not covered" >await HeadStartSDK.KitProducts.Get(product.ID)</span>
 <span class="cstat-no" title="statement not covered" >    kitProduct.ProductAssignments.ProductsInKit.forEach(<span class="fstat-no" title="function not covered" >async (p</span>rod) =&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span></span>

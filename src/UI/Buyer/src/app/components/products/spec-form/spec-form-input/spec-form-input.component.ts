@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormArray, AbstractControl } from '@angular/forms'
-import { FieldConfig } from '../field-config.interface'
-import { Field } from '../field.interface'
+import { Field, FieldConfig } from 'src/app/models/product.types'
 import { specErrors } from '../errors'
 
 @Component({
@@ -24,9 +23,12 @@ import { specErrors } from '../errors'
           alert="alert alert-danger"
         >
           <div *ngIf="byIndex(index).errors['required']">
-            <div *ngIf="byIndex(index).errors['required']">
-              {{ errorMsgs.required }}
-            </div>
+            {{ errorMsgs.required }}
+          </div>
+          <div *ngIf="byIndex(index).errors['maxlength']">
+            {{ errorMsgs.maxLength }} ({{
+              byIndex(index).errors['maxlength']['requiredLength']
+            }})
           </div>
         </div>
       </div>

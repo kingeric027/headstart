@@ -3,14 +3,14 @@ import { Address } from 'ordercloud-javascript-sdk'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 
 import {
-  MarketplaceAddressBuyer,
+  HSAddressBuyer,
   TaxCertificate,
 } from '@ordercloud/headstart-sdk'
-import { CertificateFormOutput } from '../certificate-form/certificate-form.component'
 import { GeographyConfig } from '../../../config/geography.class'
 import { downloadBase64String } from 'src/app/services/download.helper'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { AppConfig } from 'src/app/shopper-context'
+import { AppConfig } from 'src/app/models/environment.types'
+import { CertificateFormOutput } from 'src/app/models/profile.types'
 
 @Component({
   templateUrl: './location-management.component.html',
@@ -18,7 +18,7 @@ import { AppConfig } from 'src/app/shopper-context'
 })
 export class OCMLocationManagement {
   faDownload = faDownload
-  address: MarketplaceAddressBuyer = {}
+  address: HSAddressBuyer = {}
   certificate: TaxCertificate = {}
   showCertificateForm = false
   userCanAdminResaleCert = false

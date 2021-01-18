@@ -6,9 +6,9 @@ import {
 } from 'ordercloud-javascript-sdk'
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons'
-import { ModalState } from 'src/app/models/modal-state.class'
-import { CreditCardFormOutput } from '../credit-card-form/credit-card-form.component'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
+import { ModalState } from 'src/app/models/shared.types'
+import { CreditCardFormOutput } from 'src/app/models/credit-card.types'
 
 @Component({
   templateUrl: './payment-method-management.component.html',

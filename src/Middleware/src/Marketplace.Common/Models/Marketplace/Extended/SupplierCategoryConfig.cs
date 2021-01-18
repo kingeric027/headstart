@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cosmonaut.Attributes;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Extended
+namespace Headstart.Models.Extended
 {
     [SwaggerModel]
 	[CosmosCollection("suppliercategoryconfigs")]

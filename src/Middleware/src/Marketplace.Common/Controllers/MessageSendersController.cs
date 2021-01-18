@@ -1,10 +1,10 @@
-﻿using Marketplace.Common.Commands;
-using Marketplace.Common.Services;
+﻿using Headstart.Common.Commands;
+using Headstart.Common.Services;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Models.Misc;
+using Headstart.Models.Misc;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     public class MessageSendersController
     {

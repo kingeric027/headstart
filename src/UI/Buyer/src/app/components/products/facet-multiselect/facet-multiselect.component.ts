@@ -4,7 +4,7 @@ import { get as _get, xor as _xor } from 'lodash'
 import { faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons'
 import { takeWhile } from 'rxjs/operators'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { ProductFilters } from 'src/app/shopper-context'
+import { ProductFilters } from 'src/app/models/filter-config.types'
 
 @Component({
   templateUrl: './facet-multiselect.component.html',

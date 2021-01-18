@@ -8,17 +8,17 @@ import {
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { getScreenSizeBreakPoint } from 'src/app/services/breakpoint.helper'
 import { takeWhile } from 'rxjs/operators'
-import { MarketplaceKitProduct } from '@ordercloud/headstart-sdk'
-import { MarketplaceMeProduct, ProductFilters } from 'src/app/shopper-context'
+import { HSKitProduct, HSMeProduct } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { ShipFromSourcesDic } from 'src/app/models/ship-from-sources.interface'
+import { ShipFromSourcesDic } from 'src/app/models/shipping.types'
+import { ProductFilters } from 'src/app/models/filter-config.types'
 
 @Component({
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
 export class OCMProductList implements OnInit, OnDestroy {
-  @Input() products: ListPage<MarketplaceMeProduct>
+  @Input() products: ListPage<HSMeProduct>
   @Input() shipFromSources: ShipFromSourcesDic
   @Input() isProductListLoading: boolean
   alive = true

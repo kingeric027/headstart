@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Common.Services.Zoho.Models;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Common.Services.Zoho.Models;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Services.Zoho.Mappers
+namespace Headstart.Common.Services.Zoho.Mappers
 {
     public static class ZohoContactMapper
     {
-        public static ZohoContact Map(MarketplaceSupplier supplier, MarketplaceAddressSupplier address, User user,
+        public static ZohoContact Map(HSSupplier supplier, HSAddressSupplier address, User user,
             ZohoCurrency currency)
         {
             return new ZohoContact()
@@ -36,8 +36,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(ZohoContact contact, MarketplaceSupplier supplier,
-            MarketplaceAddressSupplier address, User user, ZohoCurrency currency)
+        public static ZohoContact Map(ZohoContact contact, HSSupplier supplier,
+            HSAddressSupplier address, User user, ZohoCurrency currency)
         {
             return new ZohoContact()
             {
@@ -64,8 +64,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(MarketplaceBuyer buyer, IList<MarketplaceUser> users, ZohoCurrency currency,
-            MarketplaceBuyerLocation location)
+        public static ZohoContact Map(HSBuyer buyer, IList<HSUser> users, ZohoCurrency currency,
+            HSBuyerLocation location)
         {
             return new ZohoContact()
             {
@@ -80,8 +80,8 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoContact Map(ZohoContact contact, MarketplaceBuyer buyer, IList<MarketplaceUser> users,
-            ZohoCurrency currency, MarketplaceBuyerLocation location)
+        public static ZohoContact Map(ZohoContact contact, HSBuyer buyer, IList<HSUser> users,
+            ZohoCurrency currency, HSBuyerLocation location)
         {
             contact.company_name = $"{buyer.Name} - {location.Address?.xp.LocationID}";
             contact.contact_name = $"{location.Address?.AddressName} - {location.Address?.xp.LocationID}";
@@ -94,7 +94,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return contact;
         }
 
-        public static List<ZohoContactPerson> Map(IList<MarketplaceUser> users, ZohoContact contact = null)
+        public static List<ZohoContactPerson> Map(IList<HSUser> users, ZohoContact contact = null)
         {
             // there is no property at this time for primary contact in OC, so we'll go with the first in the list
             var list = new List<ZohoContactPerson>();
@@ -128,7 +128,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoShippingLineItemMapper
     {
-        public static ZohoLineItem Map(ZohoLineItem item, MarketplaceShipMethod method)
+        public static ZohoLineItem Map(ZohoLineItem item, HSShipMethod method)
         {
             item.item_id = item.item_id;
             item.item_type = "sales_and_purchases";
@@ -143,7 +143,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return item;
         }
 
-        public static ZohoLineItem Map(MarketplaceShipMethod method)
+        public static ZohoLineItem Map(HSShipMethod method)
         {
             var item = new ZohoLineItem()
             {
@@ -163,7 +163,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoPurchaseLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item, Supplier supplier)
+        public static ZohoLineItem Map(HSLineItem item, Supplier supplier)
         {
             return new ZohoLineItem()
             {
@@ -173,7 +173,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item, Supplier supplier)
+        public static ZohoLineItem Map(ZohoLineItem zItem, HSLineItem item, Supplier supplier)
         {
             zItem.purchase_description = $"{item.Product.Name ?? item.Variant?.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
             zItem.purchase_rate = item.UnitPrice.HasValue ? Math.Round(decimal.ToDouble(item.UnitPrice.Value), 2) : 0;
@@ -185,12 +185,12 @@ namespace Marketplace.Common.Services.Zoho.Mappers
     public static class ZohoExtensions
     {
         public static string ShippingSuffix = "Shipping (41000)";
-        public static string SKU(this MarketplaceLineItem item)
+        public static string SKU(this HSLineItem item)
         {
             return item.Product == null ? "" : $"{item.Product.ID}-{item.Variant?.ID}".TrimEnd("-");
         }
 
-        public static string ShippingSku(this MarketplaceShipMethod method)
+        public static string ShippingSku(this HSShipMethod method)
         {
             return $"{method?.Name} {ShippingSuffix}";
         }
@@ -198,7 +198,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesLineItemMapper
     {
-        public static ZohoLineItem Map(MarketplaceLineItem item)
+        public static ZohoLineItem Map(HSLineItem item)
         {
             return new ZohoLineItem()
             {
@@ -213,7 +213,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoLineItem Map(ZohoLineItem zItem, MarketplaceLineItem item)
+        public static ZohoLineItem Map(ZohoLineItem zItem, HSLineItem item)
         {
             zItem.item_type = "sales_and_purchases";
             zItem.name = $"{item.Variant?.Name ?? item.Product.Name} {item.Variant?.xp?.SpecCombo ?? item.SKU()}".Trim();
@@ -229,7 +229,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
     public static class ZohoPurchaseOrderMapper
     {
         public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items,
-            List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor, ZohoPurchaseOrder po)
+            List<HSLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor, ZohoPurchaseOrder po)
         {
             po.line_items = items.Select(p => new ZohoLineItem()
             {
@@ -251,7 +251,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
         }
 
         public static ZohoPurchaseOrder Map(ZohoSalesOrder salesorder, Order order, List<ZohoLineItem> items,
-            List<MarketplaceLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor)
+            List<HSLineItem> lineitems, ZohoAddress delivery_address, ZohoContact vendor)
         {
             var po = new ZohoPurchaseOrder()
             {
@@ -279,7 +279,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoSalesOrderMapper
     {
-        public static ZohoSalesOrder Map(ZohoSalesOrder zOrder, MarketplaceOrderWorksheet worksheet, List<ZohoLineItem> items, ZohoContact contact, IList<OrderPromotion> promotions)
+        public static ZohoSalesOrder Map(ZohoSalesOrder zOrder, HSOrderWorksheet worksheet, List<ZohoLineItem> items, ZohoContact contact, IList<OrderPromotion> promotions)
         {
             zOrder.reference_number = worksheet.Order.ID;
             zOrder.salesorder_number = worksheet.Order.ID;
@@ -320,7 +320,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             return zOrder;
         }
 
-        public static ZohoSalesOrder Map(MarketplaceOrderWorksheet worksheet, List<ZohoLineItem> items, ZohoContact contact, IList<OrderPromotion> promotions)
+        public static ZohoSalesOrder Map(HSOrderWorksheet worksheet, List<ZohoLineItem> items, ZohoContact contact, IList<OrderPromotion> promotions)
         {
             var o = new ZohoSalesOrder()
             {
@@ -368,7 +368,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
 
     public static class ZohoAddressMapper
     {
-        public static ZohoAddress Map(MarketplaceAddressSupplier address)
+        public static ZohoAddress Map(HSAddressSupplier address)
         {
             return new ZohoAddress()
             {
@@ -384,7 +384,7 @@ namespace Marketplace.Common.Services.Zoho.Mappers
             };
         }
 
-        public static ZohoAddress Map(MarketplaceAddressBuyer address)
+        public static ZohoAddress Map(HSAddressBuyer address)
         {
             return new ZohoAddress()
             {

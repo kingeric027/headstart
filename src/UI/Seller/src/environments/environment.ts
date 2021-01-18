@@ -1,4 +1,3 @@
-import { Brand, Environment, EnvironmentConfig } from './environment.interfaces'
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
@@ -20,7 +19,7 @@ import { environment as selfesteembrandsproduction } from './environment.selfest
 const apps = {
   TEST: {
     SELF_ESTEEM_BRANDS: selfesteembrandstest,
-    BRANDWEAR_DESIGNS: brandweardesignstest,
+    BRAND_WEAR_DESIGNS: brandweardesignstest,
     GO2PARTNERS: go2partnerstest,
     HEADSTART_DEMO: headstartdemotest,
     FAST_SIGNS: fastsignstest,
@@ -35,6 +34,7 @@ const apps = {
 
 // for easier debugging in development mode, ignores zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
 import 'zone.js/dist/zone-error'
+import { Brand, Environment, EnvironmentConfig } from '@app-seller/models/environment.types'
 const target: EnvironmentConfig = apps[sebEnvironment][brand]
 target.hostedApp = false
 if (useLocalMiddleware) {

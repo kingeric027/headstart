@@ -7,7 +7,7 @@ import {
   OcCatalogService,
 } from '@ordercloud/angular-sdk'
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
-import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
+import { HSProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'product-visibility-assignments-component',
@@ -16,7 +16,7 @@ import { MarketplaceProduct } from '@ordercloud/headstart-sdk'
 })
 export class ProductVisibilityAssignments implements OnInit, OnChanges {
   @Input()
-  product: MarketplaceProduct
+  product: HSProduct
   buyers: Buyer[]
   add: ProductAssignment[]
   del: ProductAssignment[]
@@ -51,7 +51,7 @@ export class ProductVisibilityAssignments implements OnInit, OnChanges {
   }
 
   async getProductCatalogAssignments(
-    product: MarketplaceProduct
+    product: HSProduct
   ): Promise<void> {
     const productCatalogAssignments = await this.ocCatalogService
       .ListProductAssignments({ productID: product && product.ID })

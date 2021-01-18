@@ -6,11 +6,10 @@ import {
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons'
 import {
-  MarketplaceMeKitProduct,
-  MeProductInKit,
+  HSMeKitProduct,
+  HSMeProductInKit,
 } from '@ordercloud/headstart-sdk'
-import { LineItemToAdd } from 'src/app/models/line-item-to-add.interface'
-import { ProductSelectionEvent } from 'src/app/models/product-selection-event.interface'
+import { LineItemToAdd, ProductSelectionEvent } from 'src/app/models/product.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -19,7 +18,7 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
   styleUrls: ['./kit-variable-card.component.scss'],
 })
 export class OCMKitVariableCard {
-  @Input() set productKitDetails(value: MeProductInKit) {
+  @Input() set productKitDetails(value: HSMeProductInKit) {
     this._productKitDetails = value
     this.onInit()
   }
@@ -27,14 +26,14 @@ export class OCMKitVariableCard {
     this._allLineItems = value
     this.getLineItemTotals()
   }
-  @Input() set kitProduct(value: MarketplaceMeKitProduct) {
+  @Input() set kitProduct(value: HSMeKitProduct) {
     this._kitProduct = value
     this.getLineItemTotals()
   }
   @Output() selectProduct = new EventEmitter<ProductSelectionEvent>()
   @Output() removeLineItem = new EventEmitter<LineItemToAdd>()
   _allLineItems: LineItemToAdd[]
-  _kitProduct: MarketplaceMeKitProduct
+  _kitProduct: HSMeKitProduct
 
   faTrashAlt = faTrashAlt
   variantLineItemsTotalQuantity: number
@@ -45,7 +44,7 @@ export class OCMKitVariableCard {
   panelActiveIDs: string[]
   imageUrl: string
   userCurrency: string
-  _productKitDetails: MeProductInKit
+  _productKitDetails: HSMeProductInKit
 
   constructor(private context: ShopperContextService) {}
 

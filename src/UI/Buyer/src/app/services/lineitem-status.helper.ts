@@ -1,26 +1,26 @@
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
+import { HSLineItem } from '@ordercloud/headstart-sdk'
 
-export function NumberCanReturn(lineItem: MarketplaceLineItem): number {
+export function NumberCanReturn(lineItem: HSLineItem): number {
   return lineItem.xp.StatusByQuantity['Complete']
 }
 
-export function NumberCanCancel(lineItem: MarketplaceLineItem): number {
+export function NumberCanCancel(lineItem: HSLineItem): number {
   return (
     lineItem.xp.StatusByQuantity['Submitted'] +
     lineItem.xp.StatusByQuantity['Backordered']
   )
 }
 
-export function CanReturn(lineItem: MarketplaceLineItem): boolean {
+export function CanReturn(lineItem: HSLineItem): boolean {
   return !!NumberCanReturn(lineItem)
 }
 
-export function CanCancel(lineItem: MarketplaceLineItem): boolean {
+export function CanCancel(lineItem: HSLineItem): boolean {
   return !!NumberCanCancel(lineItem)
 }
 
 export function NumberCanCancelOrReturn(
-  lineItem: MarketplaceLineItem,
+  lineItem: HSLineItem,
   action: string
 ): number {
   if (action === 'return') {
@@ -31,16 +31,16 @@ export function NumberCanCancelOrReturn(
 }
 
 export function CanReturnOrCancel(
-  lineItem: MarketplaceLineItem,
+  lineItem: HSLineItem,
   action: string
 ): boolean {
   return !!NumberCanCancelOrReturn(lineItem, action)
 }
 
-export function CanReturnOrder(lineItems: MarketplaceLineItem[]): boolean {
+export function CanReturnOrder(lineItems: HSLineItem[]): boolean {
   return lineItems.some((li) => CanReturn(li))
 }
 
-export function CanCancelOrder(lineItems: MarketplaceLineItem[]): boolean {
+export function CanCancelOrder(lineItems: HSLineItem[]): boolean {
   return lineItems.some((li) => CanCancel(li))
 }

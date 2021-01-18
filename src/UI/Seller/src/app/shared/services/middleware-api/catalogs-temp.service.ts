@@ -1,27 +1,16 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
+import { OcTokenService, CatalogAssignment } from '@ordercloud/angular-sdk'
 import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
-import {
-  OcTokenService,
-  Order,
-  CatalogAssignment,
-} from '@ordercloud/angular-sdk'
-import {
-  SuperMarketplaceProduct,
-  MarketplaceCatalog,
-  HeadStartSDK,
+  HSCatalog,
   ListPage,
-  MarketplacePriceSchedule,
+  HSPriceSchedule,
+  HSCatalogAssignmentRequest,
 } from '@ordercloud/headstart-sdk'
 
 // WHOPLE FILE TO BE REPLACED BY SDK
-
-interface MarketplaceCatalogAssignmentRequest {
-  CatalogIDs: string[]
-}
 
 @Injectable({
   providedIn: 'root',
@@ -39,38 +28,38 @@ export class CatalogsTempService {
     })
   }
 
-  async get(buyerID: string, catalogID: string): Promise<MarketplaceCatalog> {
+  async get(buyerID: string, catalogID: string): Promise<HSCatalog> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/${catalogID}`
     return await this.http
-      .get<MarketplaceCatalog>(url, { headers: this.buildHeaders() })
+      .get<HSCatalog>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 
-  async list(buyerID: string): Promise<ListPage<MarketplaceCatalog>> {
+  async list(buyerID: string): Promise<ListPage<HSCatalog>> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs`
     return await this.http
-      .get<ListPage<MarketplaceCatalog>>(url, { headers: this.buildHeaders() })
+      .get<ListPage<HSCatalog>>(url, { headers: this.buildHeaders() })
       .toPromise()
   }
 
   async create(
     buyerID: string,
-    catalog: MarketplaceCatalog
-  ): Promise<MarketplaceCatalog> {
+    catalog: HSCatalog
+  ): Promise<HSCatalog> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs`
     return await this.http
-      .post<MarketplaceCatalog>(url, catalog, { headers: this.buildHeaders() })
+      .post<HSCatalog>(url, catalog, { headers: this.buildHeaders() })
       .toPromise()
   }
 
   async save(
     buyerID: string,
     catalogID: string,
-    catalog: MarketplaceCatalog
-  ): Promise<MarketplaceCatalog> {
+    catalog: HSCatalog
+  ): Promise<HSCatalog> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/${catalogID}`
     return await this.http
-      .post<MarketplaceCatalog>(url, catalog, { headers: this.buildHeaders() })
+      .post<HSCatalog>(url, catalog, { headers: this.buildHeaders() })
       .toPromise()
   }
 
@@ -123,11 +112,11 @@ export class CatalogsTempService {
     assignments: string[]
   ): Promise<any> {
     const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/${locationID}/catalogs/assignments`
-    const marketplaceCatalogAssignmentRequest: MarketplaceCatalogAssignmentRequest = {
+    const hsCatalogAssignmentRequest: HSCatalogAssignmentRequest = {
       CatalogIDs: assignments,
     }
     return await this.http
-      .post(url, marketplaceCatalogAssignmentRequest, {
+      .post(url, hsCatalogAssignmentRequest, {
         headers: this.buildHeaders(),
       })
       .toPromise()
@@ -168,7 +157,7 @@ export class CatalogsTempService {
   async GetPricingOverride(
     productID: string,
     buyerID: string
-  ): Promise<MarketplacePriceSchedule> {
+  ): Promise<HSPriceSchedule> {
     const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`
     return await this.http
       .get(url, { headers: this.buildHeaders() })
@@ -178,8 +167,8 @@ export class CatalogsTempService {
   async CreatePricingOverride(
     productID: string,
     buyerID: string,
-    priceSchedule: MarketplacePriceSchedule
-  ): Promise<MarketplacePriceSchedule> {
+    priceSchedule: HSPriceSchedule
+  ): Promise<HSPriceSchedule> {
     const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`
     return await this.http
       .post(url, priceSchedule, { headers: this.buildHeaders() })
@@ -189,8 +178,8 @@ export class CatalogsTempService {
   async UpdatePricingOverride(
     productID: string,
     buyerID: string,
-    priceSchedule: MarketplacePriceSchedule
-  ): Promise<MarketplacePriceSchedule> {
+    priceSchedule: HSPriceSchedule
+  ): Promise<HSPriceSchedule> {
     const url = `${this.appConfig.middlewareUrl}/products/${productID}/pricingoverride/buyer/${buyerID}`
     return await this.http
       .put(url, priceSchedule, { headers: this.buildHeaders() })

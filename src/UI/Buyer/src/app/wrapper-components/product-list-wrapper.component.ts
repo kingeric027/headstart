@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { ShopperContextService } from '../services/shopper-context/shopper-context.service'
 import { takeWhile } from 'rxjs/operators'
-import { MarketplaceMeProduct } from '../shopper-context'
 import { ListPage } from 'ordercloud-javascript-sdk'
 import { uniq as _uniq } from 'lodash'
 import { SupplierFilterService } from '../services/supplier-filter/supplier-filter.service'
-import { ShipFromSourcesDic } from '../models/ship-from-sources.interface'
+import { HSMeProduct } from '@ordercloud/headstart-sdk'
+import { ShipFromSourcesDic } from '../models/shipping.types'
 
 @Component({
   template: `
@@ -18,7 +18,7 @@ import { ShipFromSourcesDic } from '../models/ship-from-sources.interface'
   `,
 })
 export class ProductListWrapperComponent implements OnInit, OnDestroy {
-  products: ListPage<MarketplaceMeProduct>
+  products: ListPage<HSMeProduct>
   shipFromSources: ShipFromSourcesDic = {}
   alive = true
   isProductListLoading = true

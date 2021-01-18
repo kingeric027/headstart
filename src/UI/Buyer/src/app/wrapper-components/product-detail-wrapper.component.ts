@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { SuperMarketplaceProduct, KitProduct } from '@ordercloud/headstart-sdk'
+import { SuperHSProduct, HSKitProduct } from '@ordercloud/headstart-sdk'
 import { CurrentUserService } from '../services/current-user/current-user.service'
 
 @Component({
@@ -15,7 +15,7 @@ import { CurrentUserService } from '../services/current-user/current-user.servic
 })
 export class ProductDetailWrapperComponent implements OnInit {
   isKit: boolean
-  product: SuperMarketplaceProduct | KitProduct
+  product: SuperHSProduct | HSKitProduct
   constructor(
     private activatedRoute: ActivatedRoute,
     protected currentUser: CurrentUserService

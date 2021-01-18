@@ -1,6 +1,6 @@
-﻿using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models.Extended;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Extended;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using ordercloud.integrations.library;
@@ -13,9 +13,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Misc = Marketplace.Common.Models.Misc;
+using Misc = Headstart.Common.Models.Misc;
 
-namespace Marketplace.Common.Commands
+namespace Headstart.Common.Commands
 {
     public class DocumentRowError
     {
@@ -69,7 +69,7 @@ namespace Marketplace.Common.Commands
 
     public interface IShipmentCommand
     {
-        Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken);
+        Task<SuperHSShipment> CreateShipment(SuperHSShipment superShipment, string supplierToken);
         Task<BatchProcessResult> UploadShipments(IFormFile file, VerifiedUserContext userContext);
     }
     public class ShipmentCommand : IShipmentCommand
@@ -83,7 +83,7 @@ namespace Marketplace.Common.Commands
             _oc = oc;
             _lineItemCommand = lineItemCommand;
         }
-        public async Task<SuperShipment> CreateShipment(SuperShipment superShipment, string supplierToken)
+        public async Task<SuperHSShipment> CreateShipment(SuperHSShipment superShipment, string supplierToken)
         {
             ShipmentItem firstShipmentItem = superShipment.ShipmentItems.First();
             string supplierOrderID = firstShipmentItem.OrderID;
@@ -99,7 +99,7 @@ namespace Marketplace.Common.Commands
             string buyerID = await GetBuyerIDForSupplierOrder(firstShipmentItem.OrderID);
             superShipment.Shipment.BuyerID = buyerID;
 
-            MarketplaceShipment ocShipment = await _oc.Shipments.CreateAsync<MarketplaceShipment>(superShipment.Shipment, accessToken: supplierToken);
+            HSShipment ocShipment = await _oc.Shipments.CreateAsync<HSShipment>(superShipment.Shipment, accessToken: supplierToken);
 
             //  platform issue. Cant save new xp values onto shipment line item. Update order line item to have this value.
             var shipmentItemsWithComment = superShipment.ShipmentItems.Where(s => s.xp?.Comment != null); 
@@ -123,15 +123,15 @@ namespace Marketplace.Common.Commands
                 100,
                 5,
                 (shipmentItem) => _oc.Shipments.SaveItemAsync(ocShipment.ID, shipmentItem, accessToken: supplierToken));
-            MarketplaceShipment ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<MarketplaceShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
-            return new SuperShipment()
+            HSShipment ocShipmentWithDateShipped = await _oc.Shipments.PatchAsync<HSShipment>(ocShipment.ID, new PartialShipment() { DateShipped = dateShipped }, accessToken: supplierToken);
+            return new SuperHSShipment()
             {
                 Shipment = ocShipmentWithDateShipped,
                 ShipmentItems = shipmentItemResponses.ToList()
             };
         }
 
-        private async Task PatchLineItemStatuses(string supplierOrderID, SuperShipment superShipment)
+        private async Task PatchLineItemStatuses(string supplierOrderID, SuperHSShipment superShipment)
         {
             List<LineItemStatusChange> lineItemStatusChanges = superShipment.ShipmentItems.Select(shipmentItem =>
             {
@@ -145,7 +145,8 @@ namespace Marketplace.Common.Commands
             LineItemStatusChanges lineItemStatusChange = new LineItemStatusChanges()
             {
                 Changes = lineItemStatusChanges,
-                Status = LineItemStatus.Complete
+                Status = LineItemStatus.Complete,
+                SuperShipment = superShipment
             };
 
             await _lineItemCommand.UpdateLineItemStatusesAndNotifyIfApplicable(OrderDirection.Outgoing, supplierOrderID, lineItemStatusChange);

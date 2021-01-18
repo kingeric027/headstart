@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Marketplace.Common.Commands;
-using Marketplace.Common.Commands.Zoho;
-using Marketplace.Common.Services.ShippingIntegration.Models;
-using Marketplace.Models;
-using Marketplace.Models.Models.Marketplace;
+using Headstart.Common.Commands;
+using Headstart.Common.Commands.Zoho;
+using Headstart.Common.Models.Misc;
+using Headstart.Common.Services;
+using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models;
+using Headstart.Models.Models.Marketplace;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
     [DocIgnore]
     [Route("support")]
@@ -20,23 +22,25 @@ namespace Marketplace.Common.Controllers
         private static ICheckoutIntegrationCommand _checkoutIntegrationCommand;
         private static IPostSubmitCommand _postSubmitCommand;
         private static IZohoCommand _zoho;
+        private readonly ISupportAlertService _supportAlertService;
         private readonly IOrderCloudClient _oc;
 
-        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc) : base(settings)
+        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc, ISupportAlertService supportAlertService) : base(settings)
         {
             _checkoutIntegrationCommand = checkoutIntegrationCommand;
             _postSubmitCommand = postSubmitCommand;
             _zoho = zoho;
             _oc = oc;
+            _supportAlertService = supportAlertService;
         }
 
         [HttpGet, Route("shipping")]
         public async Task<ShipEstimateResponse> GetShippingRates([FromBody] ShipmentTestModel model)
         {
-            var payload = new MarketplaceOrderCalculatePayload()
+            var payload = new HSOrderCalculatePayload()
             {
                 ConfigData = null,
-                OrderWorksheet = new MarketplaceOrderWorksheet()
+                OrderWorksheet = new HSOrderWorksheet()
                 {
                     Order = model.Order,
                     LineItems = model.LineItems
@@ -77,14 +81,20 @@ namespace Marketplace.Common.Controllers
         [HttpPost, Route("postordersubmit/{orderID}"), OrderCloudIntegrationsAuth]
         public async Task<OrderSubmitResponse> ManuallyRunPostOrderSubmit(string orderID)
         {
-            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<MarketplaceOrderWorksheet>(OrderDirection.Incoming, orderID);
+            var worksheet = await _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderID);
             return await _postSubmitCommand.HandleBuyerOrderSubmit(worksheet);
+        }
+
+        [HttpPost, Route("submitcase")]
+        public async Task SendSupportRequest([FromForm]SupportCase supportCase)
+        {
+            await _supportAlertService.EmailGeneralSupportQueue(supportCase);
         }
     }
 
     public class ShipmentTestModel
     {
-        public MarketplaceOrder Order { get; set; }
-        public List<MarketplaceLineItem> LineItems { get; set; }
+        public HSOrder Order { get; set; }
+        public List<HSLineItem> LineItems { get; set; }
     }
 }

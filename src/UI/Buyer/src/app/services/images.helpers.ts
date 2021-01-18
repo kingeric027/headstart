@@ -1,9 +1,9 @@
 import { ocAppConfig } from '../config/app.config'
-import { MarketplaceLineItem } from '@ordercloud/headstart-sdk'
-import { CurrentUser, MarketplaceMeProduct } from '../shopper-context'
+import { HSLineItem, HSMeProduct } from '@ordercloud/headstart-sdk'
+import { CurrentUser } from '../models/profile.types'
 
 export const getPrimaryImageUrl = (
-  product: MarketplaceMeProduct,
+  product: HSMeProduct,
   user: CurrentUser
 ): string => {
   return `${ocAppConfig.cmsUrl}/assets/${user.Seller.ID}/products/${product.ID}/thumbnail?size=M`
@@ -11,7 +11,7 @@ export const getPrimaryImageUrl = (
 
 export const getPrimaryLineItemImage = (
   lineItemID: string,
-  lineItems: MarketplaceLineItem[],
+  lineItems: HSLineItem[],
   user: CurrentUser
 ): string => {
   const li = lineItems.find((item) => item.ID === lineItemID)

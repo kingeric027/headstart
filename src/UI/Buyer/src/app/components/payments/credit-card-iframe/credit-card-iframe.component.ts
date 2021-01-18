@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
-import { AppConfig } from 'src/app/shopper-context'
+import { AppConfig } from 'src/app/models/environment.types'
 
 @Component({
   templateUrl: './credit-card-iframe.component.html',

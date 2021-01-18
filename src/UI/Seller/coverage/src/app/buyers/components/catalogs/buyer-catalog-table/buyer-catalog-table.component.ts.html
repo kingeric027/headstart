@@ -131,9 +131,9 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { BuyerService } from '../../buyers/buyer.service'
 import { BuyerCatalogService } from '../buyer-catalog.service'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { MarketplaceUserGroup } from '@ordercloud/headstart-sdk'
+import { HSUserGroup } from '@ordercloud/headstart-sdk'
 &nbsp;
-function createBuyerCatalogForm(userGroup: MarketplaceUserGroup) {
+function createBuyerCatalogForm(userGroup: HSUserGroup) {
   return new FormGroup({
     Name: new FormControl(userGroup<span class="branch-1 cbranch-no" title="branch not covered" >?.Name,</span> Validators.required),
   })

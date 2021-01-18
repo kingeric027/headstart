@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, Validators, FormControl } from '@angular/forms'
 import { MeUser } from 'ordercloud-javascript-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { AppConfig } from 'src/app/shopper-context'
 import {
   ValidateName,
   ValidateEmail,

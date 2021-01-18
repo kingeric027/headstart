@@ -1,8 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core'
-import {
-  applicationConfiguration,
-  AppConfig,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
 import {
   faBoxOpen,
   faSignOutAlt,
@@ -12,12 +9,11 @@ import {
   faSitemap,
   faUserCircle,
   faEnvelope,
-  faVectorSquare,
 } from '@fortawesome/free-solid-svg-icons'
 import { MeUser, OcTokenService } from '@ordercloud/angular-sdk'
 import { Router, NavigationEnd } from '@angular/router'
-import { AppStateService } from '@app-seller/shared'
-import { getHeaderConfig, MPRoute } from './header.config'
+import { AppConfig, AppStateService, MPRoute } from '@app-seller/shared'
+import { getHeaderConfig } from './header.config'
 import { AppAuthService } from '@app-seller/auth'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { environment } from 'src/environments/environment'
@@ -131,12 +127,4 @@ export class HeaderComponent implements OnInit {
   }
 }
 
-export interface Route {
-  title: string
-  route: string
-}
 
-export interface HeaderNav {
-  title: string
-  routes: Route[]
-}

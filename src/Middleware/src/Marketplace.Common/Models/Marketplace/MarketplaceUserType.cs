@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ordercloud.integrations.library;
 
-namespace Marketplace.Models.Misc
+namespace Headstart.Models.Misc
 {
     [SwaggerModel]
-	public class MarketplaceUserType
+	public class HSUserType
 	{
 		public string UserGroupIDSuffix { get; set; }
 		public string UserGroupName { get; set; }

@@ -1,8 +1,8 @@
 // angular
 import { Component, OnInit } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
+import { AppConfig } from 'src/app/models/environment.types'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
-import { AppConfig } from 'src/app/shopper-context'
 
 @Component({
   templateUrl: './forgot-password.component.html',

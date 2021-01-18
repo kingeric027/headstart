@@ -1,11 +1,11 @@
-﻿using Marketplace.Models.Attributes;
+﻿using Headstart.Models.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
 
-namespace Marketplace.Common.Controllers
+namespace Headstart.Common.Controllers
 {
 	[DocComments("\"Integration\" represents Validated Addresses with suggestions")]
 	[MarketplaceSection.Integration(ListOrder = 5)]
