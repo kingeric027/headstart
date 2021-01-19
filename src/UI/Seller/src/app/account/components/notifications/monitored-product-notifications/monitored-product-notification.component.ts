@@ -1,11 +1,11 @@
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { Component, EventEmitter, Input, Output } from '@angular/core'
+
+import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
-} from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
-import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-
+} from '@app-seller/models/notification.types'
 @Component({
   selector: 'monitored-product-notification',
   templateUrl: './monitored-product-notification.component.html',

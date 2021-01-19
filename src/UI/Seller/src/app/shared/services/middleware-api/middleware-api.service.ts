@@ -1,20 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Inject, Injectable } from '@angular/core'
-import {
-  AppConfig,
-  applicationConfiguration,
-} from '@app-seller/config/app.config'
+import { applicationConfiguration } from '@app-seller/config/app.config'
+import { AppConfig } from '@app-seller/models/environment.types'
 import {
   MonitoredProductFieldModifiedNotificationDocument,
   NotificationStatus,
-} from '@app-seller/shared/models/monitored-product-field-modified-notification.interface'
-import { OcTokenService, Order, Product } from '@ordercloud/angular-sdk'
+} from '@app-seller/models/notification.types'
+
+import { OcTokenService, Order } from '@ordercloud/angular-sdk'
 import {
-  MarketplaceSupplier,
   ListPage,
-  SuperMarketplaceProduct,
-  SuperShipment,
+  SuperHSProduct,
   BatchProcessResult,
+  SupplierFilterConfigDocument,
+  SuperHSShipment,
 } from '@ordercloud/headstart-sdk'
 import { Observable } from 'rxjs'
 
@@ -64,9 +67,9 @@ export class MiddlewareAPIService {
 
   async updateProductNotifications(
     notification: MonitoredProductFieldModifiedNotificationDocument
-  ): Promise<SuperMarketplaceProduct> {
+  ): Promise<SuperHSProduct> {
     return await this.http
-      .put<SuperMarketplaceProduct>(
+      .put<SuperHSProduct>(
         `${this.appConfig.middlewareUrl}/notifications/monitored-product-field-modified/${notification.ID}`,
         notification,
         this.headers
@@ -75,7 +78,7 @@ export class MiddlewareAPIService {
   }
 
   async getProductNotifications(
-    superProduct: SuperMarketplaceProduct
+    superProduct: SuperHSProduct
   ): Promise<MonitoredProductFieldModifiedNotificationDocument[]> {
     const productModifiedNotifications = await this.http
       .post<ListPage<MonitoredProductFieldModifiedNotificationDocument>>(
@@ -85,13 +88,13 @@ export class MiddlewareAPIService {
       )
       .toPromise()
 
-    return productModifiedNotifications?.Items.filter(
+    return productModifiedNotifications.Items?.filter(
       (i) => i?.Doc?.Status === NotificationStatus.SUBMITTED
     )
   }
 
   async patchLineItems(
-    superShipment: SuperShipment,
+    superShipment: SuperHSShipment,
     headers: HttpHeaders
   ): Promise<any> {
     return await this.http
