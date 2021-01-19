@@ -91,14 +91,14 @@ export class HasTokenGuard implements CanActivate, CanActivateChild {
     const decodedToken = this.tokenHelper.getDecodedOCToken()
 
     if (!decodedToken) {
-      this.appInsightsService.trackAuthErrorEvents(null, 'HasTokenGuard: no token')
+      this.appInsightsService.trackAuthErrorEvents(null, {message: 'HasTokenGuard: no token'})
       return false
     }
 
     const expiresIn = decodedToken.exp * 1000
     const isValid = Date.now() < expiresIn
     if (!isValid) {
-      this.appInsightsService.trackAuthErrorEvents(decodedToken, 'HasTokenGuard: token expired')
+      this.appInsightsService.trackAuthErrorEvents(decodedToken, {message: 'HasTokenGuard: token expired'})
     }
 
     return isValid

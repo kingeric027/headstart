@@ -37,7 +37,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
         } else {
           // if a refresh attempt failed recently then ignore (3 seconds)`
           if (this.appAuthService.failedRefreshAttempt) {
-            this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error.message)
+            this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error)
             return throwError(error)
           }
 
@@ -54,7 +54,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
                 return next.handle(request)
               }),
               catchError((err) => {
-                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, err.message)
+                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, err)
                 return throwError(err)
               })
             )
@@ -68,7 +68,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
                 return next.handle(request)
               }),
               catchError((err) => {
-                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, err.message)
+                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, err)
                 return throwError(err)
               })
             )

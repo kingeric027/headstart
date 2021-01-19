@@ -47,7 +47,7 @@ export class ApplicationInsightsService {
     }
   }
 
-  public trackAuthErrorEvents(decodedToken?: DecodedOCToken, message?: string): void {
+  public trackAuthErrorEvents(decodedToken?: DecodedOCToken, error?: any): void {
     const currentUser = this.context.currentUser.get()
     const event: IEventTelemetry = {
       name: 'AuthError',
@@ -56,7 +56,7 @@ export class ApplicationInsightsService {
         buyerId: currentUser?.Buyer?.ID,
         tokenIssuedAt: decodedToken?.nbf,
         tokenExpAt: decodedToken?.exp,
-        message
+        error
       }
     }
     this.trackEvent(event);
