@@ -1,14 +1,14 @@
 /* eslint-disable max-lines-per-function */
-import { Injectable } from '@angular/core'
 import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor,
-  HttpErrorResponse,
+  HttpErrorResponse, HttpEvent, HttpHandler,
+
+  HttpInterceptor, HttpRequest
 } from '@angular/common/http'
+import { Injectable } from '@angular/core'
 import { Observable, throwError } from 'rxjs'
 import { catchError, filter, flatMap } from 'rxjs/operators'
+import { ApplicationInsightsService } from 'src/app/services/application-insights/application-insights.service'
+import { TokenHelperService } from 'src/app/services/token-helper/token-helper.service'
 import { AuthService } from '../../services/auth/auth.service'
 
 /**
@@ -19,19 +19,25 @@ import { AuthService } from '../../services/auth/auth.service'
   providedIn: 'root',
 })
 export class RefreshTokenInterceptor implements HttpInterceptor {
-  constructor(private appAuthService: AuthService) {}
+  constructor(
+    private appAuthService: AuthService, 
+    private appInsightsSerivce: ApplicationInsightsService, 
+    private tokenHelper: TokenHelperService
+  ) {}
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((error) => {
+        const decodedToken = this.tokenHelper.getDecodedOCToken()
         // rethrow any non auth errors
         if (!this.isAuthError(error)) {
           return throwError(error)
         } else {
           // if a refresh attempt failed recently then ignore (3 seconds)`
           if (this.appAuthService.failedRefreshAttempt) {
+            this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error.message)
             return throwError(error)
           }
 
@@ -46,6 +52,10 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
                   setHeaders: { Authorization: `Bearer ${token}` },
                 })
                 return next.handle(request)
+              }),
+              catchError((err) => {
+                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error.message)
+                return throwError(err)
               })
             )
           } else {
@@ -56,6 +66,10 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
                   setHeaders: { Authorization: `Bearer ${token}` },
                 })
                 return next.handle(request)
+              }),
+              catchError((err) => {
+                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error.message)
+                return throwError(err)
               })
             )
           }

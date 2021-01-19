@@ -47,17 +47,22 @@ export class ApplicationInsightsService {
     }
   }
 
-  public trackEvent(token?: DecodedOCToken): void {
+  public trackAuthErrorEvents(decodedToken?: DecodedOCToken, message?: string): void {
     const currentUser = this.context.currentUser.get()
     const event: IEventTelemetry = {
       name: 'AuthError',
       properties: {
-        userId: token?.usr ?? currentUser?.ID,
+        userId: decodedToken?.usr ?? currentUser?.ID,
         buyerId: currentUser?.Buyer?.ID,
-        tokenIssuedAt: token?.nbf,
-        tokenExpAt: token?.exp,
+        tokenIssuedAt: decodedToken?.nbf,
+        tokenExpAt: decodedToken?.exp,
+        message
       }
     }
+    this.trackEvent(event);
+  }
+
+  private trackEvent(event: IEventTelemetry): void {
     this.appInsights.trackEvent(event)
   }
 
