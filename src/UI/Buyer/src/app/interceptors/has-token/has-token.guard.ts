@@ -5,12 +5,14 @@ import { AuthService } from 'src/app/services/auth/auth.service'
 import { TokenHelperService } from 'src/app/services/token-helper/token-helper.service'
 import { AppConfig } from 'src/app/models/environment.types'
 import { Tokens } from 'ordercloud-javascript-sdk'
+import { ApplicationInsightsService } from 'src/app/services/application-insights/application-insights.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class HasTokenGuard implements CanActivate, CanActivateChild {
   constructor(
+    private appInsightsService: ApplicationInsightsService,
     private router: Router,
     private auth: AuthService,
     private tokenHelper: TokenHelperService,
@@ -89,10 +91,15 @@ export class HasTokenGuard implements CanActivate, CanActivateChild {
     const decodedToken = this.tokenHelper.getDecodedOCToken()
 
     if (!decodedToken) {
+      this.appInsightsService.trackEvent()
       return false
     }
 
     const expiresIn = decodedToken.exp * 1000
-    return Date.now() < expiresIn
+    const isValid = Date.now() < expiresIn
+    if (!isValid) {
+      this.appInsightsService.trackEvent(decodedToken)
+    }
+    return isValid
   }
 }

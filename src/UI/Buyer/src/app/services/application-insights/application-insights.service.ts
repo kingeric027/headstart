@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, ResolveEnd, Router } from '@angular/router'
-import { ApplicationInsights } from '@microsoft/applicationinsights-web'
+import { ApplicationInsights, IEventTelemetry } from '@microsoft/applicationinsights-web'
 import { Subscription } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { AppConfig } from 'src/app/models/environment.types'
+import { DecodedOCToken } from 'src/app/models/profile.types'
+import { ShopperContextService } from '../shopper-context/shopper-context.service'
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,11 @@ export class ApplicationInsightsService {
   appInsights: ApplicationInsights = null
   routerSubscription: Subscription
 
-  constructor(private appConfig: AppConfig, private router: Router) {
+  constructor(
+    private appConfig: AppConfig,
+    private context: ShopperContextService,
+    private router: Router
+  ) {
     let isDeployed = false
     if (window) {
       isDeployed = window.location.hostname !== 'localhost'
@@ -39,6 +45,20 @@ export class ApplicationInsightsService {
     if (this.appInsights) {
       this.appInsights.clearAuthenticatedUserContext()
     }
+  }
+
+  public trackEvent(token?: DecodedOCToken): void {
+    const currentUser = this.context.currentUser.get()
+    const event: IEventTelemetry = {
+      name: 'AuthError',
+      properties: {
+        userId: token?.usr ?? currentUser?.ID,
+        buyerId: currentUser?.Buyer?.ID,
+        tokenIssuedAt: token?.nbf,
+        tokenExpAt: token?.exp,
+      }
+    }
+    this.appInsights.trackEvent(event)
   }
 
   private createRouterSubscription(): void {
