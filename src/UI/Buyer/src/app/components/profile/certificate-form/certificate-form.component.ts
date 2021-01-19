@@ -80,7 +80,7 @@ export class OCMCertificateForm implements OnInit {
           const extension = file.name.split(".")[1];
           const imageString = reader.result as string;
           var generatedPdf = new jsPDF('p', 'pt', 'a4');
-          generatedPdf.addImage(imageString, extension, 10, 30, 150, 76);
+          generatedPdf.addImage(imageString, extension, 10, 30, 400, 400);
           this.file = generatedPdf.output('datauristring');
           
         } else {
