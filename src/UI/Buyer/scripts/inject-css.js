@@ -16,12 +16,15 @@ if (!appID) {
 }
 
 const cssManifest = fs.readFileSync('./css-manifest.json', 'utf-8')
-const indexHtml = fs.readFileSync('./index.html', 'utf-8')
+const indexHtml = fs.readFileSync('./index-original.html', 'utf-8')
 
 const cssManifestJson = JSON.parse(cssManifest)
 const styleID = appID.split('-')[0]
 const originalCssFilename = `${styleID}.css`
 const hashedCssFilename = cssManifestJson[originalCssFilename]
+if (!hashedCssFilename) {
+  throw new Error(`Unable to find css file for ${appID}`)
+}
 const updatedIndexHtml = indexHtml.replace(
   '<!-- client-theme-placeholder -->',
   `<link href="${hashedCssFilename}" rel="stylesheet" />`
