@@ -42,9 +42,9 @@
         </p>
         <table *ngIf="addVariableTextSpecs" class="table table-borderless">
           <colgroup>
-            <col span="1" style="width: 60%" />
-            <col span="1" style="width: 20%" />
-            <col span="1" style="width: 25%" />
+            <col span="1" class="width-60" />
+            <col span="1" class="width-20" />
+            <col span="1" class="width-25" />
           </colgroup>
           <thead>
             <tr>
@@ -90,8 +90,7 @@
                     id="optionalCustomizationCheckbox"
                   />
                   <label
-                    class="custom-control-label small"
-                    style="line-height: 1.5rem"
+                    class="custom-control-label small custom-label-height"
                     for="optionalCustomizationCheckbox"
                     >This customization is optional</label
                   >
@@ -193,8 +192,7 @@
                   id="skuVariationCheckbox"
                 />
                 <label
-                  class="custom-control-label small"
-                  style="line-height: 1.5rem"
+                  class="custom-control-label small custom-label-height"
                   for="skuVariationCheckbox"
                   translate
                   >ADMIN.PRODUCT_EDIT.SKUS_VARY</label
@@ -231,10 +229,10 @@
               <div class="table-responsive">
                 <table class="table table-borderless">
                   <colgroup>
-                    <col span="1" style="width: 40%" />
-                    <col span="1" style="width: 20%" />
-                    <col span="1" style="width: 20%" />
-                    <col span="1" style="width: 20%" />
+                    <col span="1" class="width-40" />
+                    <col span="1" class="width-20" />
+                    <col span="1" class="width-20" />
+                    <col span="1" class="width-20" />
                   </colgroup>
                   <thead>
                     <tr>
@@ -304,8 +302,7 @@
                             "
                           />
                           <label
-                            class="custom-control-label small"
-                            style="line-height: 1.5rem"
+                            class="custom-control-label small custom-label-height"
                             for="DefaultSpecOption_{{ opt.ID }}"
                             >Default
                           </label>
@@ -367,8 +364,7 @@
           ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_HAVE
         </h6>
         <perfect-scrollbar
-          class="product-table ps-show-always"
-          style="width: 100%; max-height: 600px"
+          class="product-table ps-show-always variations-scrollbar"
         >
           <table class="table table-borderless mb-0">
             <thead class="bg-white">
@@ -515,8 +511,8 @@
                       </fa-icon>
                     </div>
                     <img
+                      class="variant-img"
                       *ngFor="let img of getVariantImages(variantInSelection)"
-                      style="max-width: 50px"
                       [src]="img.Url"
                       alt="Variant Image"
                     />
@@ -618,8 +614,7 @@
           ADMIN.PRODUCT_EDIT.THE_FOLLOWING_VARIATIONS_DONT
         </h6>
         <perfect-scrollbar
-          class="product-table ps-show-always"
-          style="width: 100%; max-height: 600px"
+          class="product-table ps-show-always variations-scrollbar"
         >
           <table class="table table-borderless mb-0">
             <thead class="bg-white">
