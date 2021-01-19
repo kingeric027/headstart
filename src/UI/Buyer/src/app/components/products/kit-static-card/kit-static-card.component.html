@@ -9,9 +9,7 @@
     </div>
     <div class="row align-items-center">
       <div class="d-block col-md">
-        <img
-          style="height: 60px"
-          class="img-thumbnail"
+        <img class="img-thumbnail kit-thumbnail"
           [src]="imageUrl"
           alt="{{ 'Image for ' + _productKitDetails.Product.Name }}"
         />
@@ -24,10 +22,9 @@
       </h6>
       <div class="col-md">
         <ocm-quantity-input
-          class="col-md"
+          class="col-md kit-qty-input"
           *ngIf="_productKitDetails.MinQty !== _productKitDetails.MaxQty"
           [gridDisplay]="true"
-          style="min-width: 35px"
           [product]="_productKitDetails.Product"
           [priceSchedule]="_productKitDetails.Product.PriceSchedule"
           (qtyChange)="qtyChange($event.detail)"
@@ -37,7 +34,7 @@
           errorMessage
         }}</small>
       </div>
-      <p class="mb-0 col-md" style="text-align: right">
+      <p class="mb-0 col-md kit-price">
         {{ price | currency: userCurrency }}
       </p>
     </div>

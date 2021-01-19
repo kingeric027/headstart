@@ -15,9 +15,7 @@
         </div>
         <div class="row align-items-center" (click)="selectVariant()">
           <div class="d-block col-md">
-            <img
-              style="height: 60px"
-              class="img-thumbnail"
+            <img class="img-thumbnail kit-thumbnail"
               [src]="imageUrl"
               alt="{{ 'Image for ' + _productKitDetails.Product.Name }}"
             />
@@ -70,9 +68,7 @@
         <div class="card-body" *ngFor="let li of variantLineItems">
           <div class="row align-items-center">
             <div class="d-block col-md">
-              <img
-                style="height: 60px"
-                class="img-thumbnail"
+              <img class="img-thumbnail kit-thumbnail"
                 [src]="li.xp.ImageUrl"
                 alt="{{ 'Image for ' + _productKitDetails.Product.Name }}"
               />
