@@ -15,8 +15,7 @@
       <span class="d-print-none">Order&nbsp;</span>#{{ _order?.ID }}
       <span
         *ngIf="_order?.xp?.OrderType === 'Quote'"
-        class="small badge badge-pill badge-warning ml-2"
-        style="font-size: 45%"
+        class="small badge badge-pill badge-warning ml-2 order-type-text"
         >{{ _order?.xp?.OrderType }}</span
       >
     </h3>
