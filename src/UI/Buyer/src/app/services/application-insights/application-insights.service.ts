@@ -37,7 +37,7 @@ export class ApplicationInsightsService {
 
   public setUserID(username: string): void {
     if (this.appInsights) {
-      this.appInsights.setAuthenticatedUserContext(username)
+      this.appInsights.setAuthenticatedUserContext(username, null, true)
     }
   }
 
