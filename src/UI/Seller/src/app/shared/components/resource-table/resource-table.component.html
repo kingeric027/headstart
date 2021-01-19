@@ -156,8 +156,7 @@
                   <fa-icon [icon]="faFilter"> </fa-icon>
                   <fa-layers-counter
                     *ngIf="activeFilterCount && activeFilterCount > 0"
-                    class="badge__counter--large"
-                    style="background: gray"
+                    class="badge__counter--large layers-background"
                     [content]="activeFilterCount"
                   >
                   </fa-layers-counter>
@@ -276,8 +275,7 @@
       >
         <perfect-scrollbar
           id="perfectScroll"
-          class="scrollbar-top"
-          style="width: 100%"
+          class="scrollbar-top full-width"
           [ngStyle]="{ 'height.px': tableHeight }"
           (psYReachEnd)="handleScrollEnd()"
         >
@@ -310,10 +308,9 @@
       >
         <div class="col-3 p-0 d-md-block d-none">
           <perfect-scrollbar
-            style="width: 100%"
             [ngStyle]="{ 'height.px': tableHeight }"
             (psYReachEnd)="handleScrollEnd()"
-            class="resource-table-side"
+            class="resource-table-side full-width"
           >
             <table
               *ngIf="
@@ -451,7 +448,7 @@
       <ng-template #editUnwrapped>
         <div class="bg-light">
           <perfect-scrollbar
-            style="width: 100%"
+            class="full-width"
             id="resource-edit-scroll"
             [ngStyle]="{ 'height.px': editResourceHeight }"
           >
