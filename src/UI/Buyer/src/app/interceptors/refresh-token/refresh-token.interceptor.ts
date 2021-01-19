@@ -54,7 +54,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
                 return next.handle(request)
               }),
               catchError((err) => {
-                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error.message)
+                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, err.message)
                 return throwError(err)
               })
             )
@@ -68,7 +68,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
                 return next.handle(request)
               }),
               catchError((err) => {
-                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, error.message)
+                this.appInsightsSerivce.trackAuthErrorEvents(decodedToken, err.message)
                 return throwError(err)
               })
             )
