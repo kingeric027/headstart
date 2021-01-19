@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Headstart.Common.Helpers;
 using Headstart.Common.Services.CMS;
@@ -11,7 +12,8 @@ using ordercloud.integrations.library;
 using ordercloud.integrations.library.Cosmos;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
-
+using Polly;
+using Polly.Retry;
 
 namespace Headstart.Common.Commands.Crud
 {
@@ -243,7 +245,7 @@ namespace Headstart.Common.Commands.Crud
 			// Make Spec Product Assignments
 			await Throttler.RunAsync(superProduct.Specs, 100, 5, s => _oc.Specs.SaveProductAssignmentAsync(new SpecProductAssignment { ProductID = _product.ID, SpecID = s.ID }, accessToken: user.AccessToken));
 			// Generate Variants
-			await _oc.Products.GenerateVariantsAsync(_product.ID, accessToken: user.AccessToken);
+			await WithRetry().ExecuteAsync(() => _oc.Products.GenerateVariantsAsync(_product.ID, accessToken: user.AccessToken));
 			// Patch Variants with the User Specified ID(SKU) AND necessary display xp values
 			await Throttler.RunAsync(superProduct.Variants, 100, 5, v =>
 			{
@@ -398,7 +400,7 @@ namespace Headstart.Common.Commands.Crud
 				await ValidateVariantsAsync(superProduct, token);
 
 				// Re-generate Variants
-				await _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: token);
+				await WithRetry().ExecuteAsync(() => _oc.Products.GenerateVariantsAsync(id, overwriteExisting: true, accessToken: token));
 				// Patch NEW variants with the User Specified ID (Name,ID), and correct xp values (SKU)
 				await Throttler.RunAsync(superProduct.Variants, 100, 5, v =>
 				{
@@ -462,7 +464,19 @@ namespace Headstart.Common.Commands.Crud
             }
         }
 
-        private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
+		private AsyncRetryPolicy WithRetry()
+		{
+			// retries three times, waits two seconds in-between failures
+			return Policy
+				.Handle<OrderCloudException>(e => e.HttpStatus == HttpStatusCode.InternalServerError || e.HttpStatus == HttpStatusCode.RequestTimeout)
+				.WaitAndRetryAsync(new[] {
+					TimeSpan.FromSeconds(2),
+					TimeSpan.FromSeconds(2),
+					TimeSpan.FromSeconds(2),
+				});
+		}
+
+		private async Task<PriceSchedule> UpdateRelatedPriceSchedules(PriceSchedule updated, string token)
 		{
 			var ocAuth = await _oc.AuthenticateAsync();
 			var initial = await _oc.PriceSchedules.GetAsync(updated.ID);
