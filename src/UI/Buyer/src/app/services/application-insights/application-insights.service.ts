@@ -63,7 +63,9 @@ export class ApplicationInsightsService {
   }
 
   private trackEvent(event: IEventTelemetry): void {
-    this.appInsights.trackEvent(event)
+    if (this.appInsights) {
+      this.appInsights.trackEvent(event)
+    }
   }
 
   private createRouterSubscription(): void {
