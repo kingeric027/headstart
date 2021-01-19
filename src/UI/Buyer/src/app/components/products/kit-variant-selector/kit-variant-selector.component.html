@@ -24,16 +24,15 @@
     (specFormChange)="onSpecFormChange($event.detail)"
   >
   </ocm-spec-form>
-  <p class="mb-0 col-md" style="text-align: right">
+  <p class="mb-0 col-md kit-price">
     {{ price | currency: userCurrency }}
   </p>
   <div class="row">
     <div class="col-md">
       <ocm-quantity-input
         *ngIf="resetFormToggle"
-        class="col-md"
+        class="col-md kit-qty-input"
         [gridDisplay]="false" 
-        style="min-width: 35px"
         [existingQty]="selection.quantity"
         [product]="productKitDetails.Product"
         [priceSchedule]="productKitDetails.Product.PriceSchedule"

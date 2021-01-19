@@ -555,9 +555,8 @@
     </div>
     <div *ngIf="showKitDetails" class="col-md">
       <button
-        class="btn btn-remove wobble"
+        class="btn btn-remove wobble relative"
         type="button"
-        style="position: relative"
         *ngIf="!readOnly"
         (click)="removeKit(kit)"
         translate
