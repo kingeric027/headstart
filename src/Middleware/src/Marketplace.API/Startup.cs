@@ -1,9 +1,7 @@
-using System;
 using Avalara.AvaTax.RestClient;
+using Common.Services.AnytimeDashboard;
 using Flurl.Http;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using Flurl.Http.Configuration;
 using Headstart.Common;
 using Headstart.Common.Commands;
 using Headstart.Common.Commands.Crud;
@@ -12,33 +10,30 @@ using Headstart.Common.Helpers;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
 using Headstart.Common.Services;
+using Headstart.Common.Services.CMS;
 using Headstart.Common.Services.DevCenter;
-using Headstart.Common.Services.ShippingIntegration;
+using Headstart.Common.Services.WazingDashboard;
 using Headstart.Common.Services.Zoho;
-using OrderCloud.SDK;
-using Swashbuckle.AspNetCore.Swagger;
-using ordercloud.integrations.smartystreets;
-using ordercloud.integrations.easypost;
+using LazyCache;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
+using ordercloud.integrations.smartystreets;
 using ordercloud.integrations.tecra;
 using ordercloud.integrations.tecra.Storage;
-using System.Runtime.InteropServices;
-using LazyCache;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Flurl.Http.Configuration;
-using System.Net;
-using Microsoft.ApplicationInsights;
-using Microsoft.WindowsAzure.Storage.Blob;
+using OrderCloud.SDK;
 using SendGrid;
 using SmartyStreets;
-using SmartyStreets.USStreetApi;
-using Headstart.Common.Services.CMS;
-using Common.Services.AnytimeDashboard;
-using Headstart.Common.Services.WazingDashboard;
+using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Net;
 
 namespace Headstart.API
 {
@@ -103,7 +98,6 @@ namespace Headstart.API
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .Inject<ISSOLoginCommand>()
-                .Inject<IAnytimeWebhookCommand>()
                 .Inject<IAnytimeDashboardClient>()
                 .Inject<IWaxDashboardClient>()
                 .AddTransient<ISyncOrgCommand, SyncOrgCommand>()
