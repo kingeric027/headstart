@@ -4,8 +4,7 @@
       <account-menu></account-menu>
     </div>
     <div class="col-md-10 bg-light">
-      <perfect-scrollbar
-        style="width: 100%"
+      <perfect-scrollbar class="full-width"
         [ngStyle]="{ 'height.px': contentHeight }"
       >
         <div class="container-fluid py-3">
@@ -45,10 +44,8 @@
                 (addRcpt)="addAddtlRcpt()"
               >
               </seller-email-notifications>
-              <div class="mb-0" style="margin-top: 35px">
-                <h1
-                  class="resource-name mb-0"
-                  style="padding-bottom: 20px"
+              <div class="mb-0" class="notification-header-container">
+                <h1 class="resource-name mb-0"
                   translate
                 >
                   Notification Center
@@ -72,7 +69,7 @@
                   </div>
                 </ng-container>
                 <div *ngIf="!notificationsToReview?.length">
-                  <div class="card align-items-center" style="padding: 20px">
+                  <div class="card align-items-center notification-container">
                     <h5 class="mb-0">You are all caught up!</h5>
                     <div>Your notifications will show up here.</div>
                   </div>

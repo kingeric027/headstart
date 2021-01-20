@@ -319,8 +319,7 @@
         <div class="d-flex flex-column" *ngIf="isOrderable">
           <span translate>PRODUCTS.DETAILS.QUANTITY</span>:
           <ocm-quantity-input
-            class="d-inline-block mb-3"
-            style="max-width: 100px"
+            class="d-inline-block mb-3 product-qty-input"
             (qtyChange)="qtyChange($event.detail)"
             [product]="_product"
             [selectedVariant]="variant"
