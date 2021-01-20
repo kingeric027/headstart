@@ -52,13 +52,16 @@ namespace Headstart.Common.Commands
         private async Task RemoveOrderPromotions(string orderID)
         {
             var curPromos = await _oc.Orders.ListPromotionsAsync(OrderDirection.Incoming, orderID);
-            var removeQueue = new List<Task>();
-
-            await Throttler.RunAsync(curPromos.Items, 100, 5, promo =>
+            if(curPromos?.Items?.Count > 0)
             {
-                return _oc.Orders.RemovePromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
+                var removeQueue = new List<Task>();
 
-            });
+                await Throttler.RunAsync(curPromos.Items, 100, 5, promo =>
+                {
+                    return _oc.Orders.RemovePromotionAsync(OrderDirection.Incoming, orderID, promo.Code);
+
+                });
+            }
         }
     }
 }
