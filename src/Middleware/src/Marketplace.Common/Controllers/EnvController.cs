@@ -12,13 +12,18 @@ namespace Headstart.Common.Controllers
     {
         public EnvController(AppSettings settings) : base(settings)
         {
+
         }
 
         [HttpGet]
-        public async Task<object> Get()
+        public object Get()
         {
-            var publicSettings = new { env = Settings.Env.ToString(), cosmosdb = Settings.CosmosSettings.DatabaseName };
-            return await Task.FromResult(publicSettings);
+            return new { 
+                Environment = Settings.EnvironmentSettings.Environment.ToString(),
+                BuildNumber = Settings.EnvironmentSettings.BuildNumber, // set during deploy
+                Commit = Settings.EnvironmentSettings.Commit, // set during deploy
+                CosmosDatabase = Settings.CosmosSettings.DatabaseName
+            };
         }
     }
 }
