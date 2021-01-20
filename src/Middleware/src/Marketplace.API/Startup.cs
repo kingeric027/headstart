@@ -1,5 +1,4 @@
 using Avalara.AvaTax.RestClient;
-using Common.Services.AnytimeDashboard;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using Headstart.Common;
@@ -12,7 +11,6 @@ using Headstart.Common.Queries;
 using Headstart.Common.Services;
 using Headstart.Common.Services.CMS;
 using Headstart.Common.Services.DevCenter;
-using Headstart.Common.Services.WazingDashboard;
 using Headstart.Common.Services.Zoho;
 using LazyCache;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
@@ -97,10 +95,6 @@ namespace Headstart.API
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
-                .Inject<ISSOLoginCommand>()
-                .Inject<IAnytimeDashboardClient>()
-                .Inject<IWaxDashboardClient>()
-                .AddTransient<ISyncOrgCommand, SyncOrgCommand>()
                 .Inject<IDevCenterService>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
