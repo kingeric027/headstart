@@ -9,7 +9,7 @@ using OrderCloud.SDK;
 
 namespace Headstart.Common.Commands
 {
-    [SupplierSync("027"),SupplierSync("093"), SupplierSync("129"), SupplierSync("waxinthecitydistribution")]
+    [SupplierSync("027"), SupplierSync("093"), SupplierSync("129"), SupplierSync("waxinthecitydistribution")]
     public class WaxInTheCityDistributionCommand : ISupplierSyncCommand
     {
         private readonly IOrderCloudClient _ocSeller;
@@ -32,10 +32,10 @@ namespace Headstart.Common.Commands
         public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
             var supplierWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Outgoing, ID);
-            
+
             var buyerWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, ID.Split('-')[0]);
             var buyerLineItems = buyerWorksheet.LineItems.Where(li => li.SupplierID == supplierWorksheet.Order.ToCompanyID).Select(li => li);
-            var estimate = buyerWorksheet.ShipEstimateResponse.ShipEstimates.FirstOrDefault(e => e.ShipEstimateItems.Any(i => i.LineItemID == buyerLineItems.FirstOrDefault()?.ID));
+            var estimate = buyerWorksheet.ShipEstimateResponse?.ShipEstimates?.FirstOrDefault(e => e?.ShipEstimateItems?.Any(i => i?.LineItemID == buyerLineItems?.FirstOrDefault()?.ID) == true);
             var ship_method = estimate?.ShipMethods.FirstOrDefault(m => m.ID == estimate.SelectedShipMethodID);
 
             var returnObject = new JObject
@@ -46,9 +46,9 @@ namespace Headstart.Common.Commands
                 }},
                 { "BuyerOrder", new JObject {
                     {"Order", JToken.FromObject(buyerWorksheet.Order)},
-                    new JProperty("LineItems", JToken.FromObject(buyerLineItems))
+                    new JProperty("LineItems", buyerLineItems == null ? null: JToken.FromObject(buyerLineItems))
                 }},
-                { "ShipMethod", JToken.FromObject(ship_method)},
+                { "ShipMethod", ship_method == null ? null: JToken.FromObject(ship_method)},
             };
             return JObject.FromObject(returnObject);
         }
