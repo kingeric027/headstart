@@ -70,7 +70,7 @@ namespace Headstart.API
 
             var avalaraConfig = new AvalaraConfig()
 			{
-				Env = _settings.Env == AppEnvironment.Prod ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
+				Env = _settings.EnvironmentSettings.Environment == AppEnvironment.Production ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
 				AccountID = _settings.AvalaraSettings.AccountID,
 				LicenseKey = _settings.AvalaraSettings.LicenseKey,
 				CompanyCode = _settings.AvalaraSettings.CompanyCode,
