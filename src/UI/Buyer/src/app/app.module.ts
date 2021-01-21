@@ -205,6 +205,7 @@ import { TempSdk } from './services/temp-sdk/temp-sdk.service'
 import { TokenHelperService } from './services/token-helper/token-helper.service'
 import { CMSConfiguration } from '@ordercloud/cms-sdk'
 import { AppConfig, OrdercloudEnv } from './models/environment.types'
+import { OCMKitLineitemTable } from './components/cart/lineitem-table/kit-lineitem-table/kit-lineitem-table.component'
 
 export function HttpLoaderFactory(
   http: HttpClient,
@@ -252,6 +253,7 @@ const components = [
   OCMSpecForm,
   OCMOrderSummary,
   OCMLineitemTable,
+  OCMKitLineitemTable,
   OCMCart,
   OCMHomePage,
   OCMStaticPage,
@@ -442,6 +444,7 @@ export class AppModule {
     this.buildWebComponent(OCMSpecForm, 'ocm-spec-form')
     this.buildWebComponent(OCMOrderSummary, 'ocm-order-summary')
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table')
+    this.buildWebComponent(OCMKitLineitemTable, 'ocm-kit-lineitem-table')
 
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details')
     this.buildWebComponent(
