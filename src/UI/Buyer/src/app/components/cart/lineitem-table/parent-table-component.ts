@@ -14,10 +14,7 @@ import { OrderType } from 'src/app/models/order.types'
 import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
 import { QtyChangeEvent } from 'src/app/models/product.types'
 
-@Component({
-  templateUrl: './lineitem-table.component.html',
-  styleUrls: ['./lineitem-table.component.scss'],
-})
+
 export abstract class OCMParentTableComponent implements OnInit {
   @Input() set lineItems(lineItems: HSLineItem[]) {
     this._lineItems = lineItems
