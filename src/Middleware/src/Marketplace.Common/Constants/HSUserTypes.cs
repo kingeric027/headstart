@@ -6,7 +6,7 @@ using Headstart.Models.Misc;
 
 namespace Headstart.Common.Constants
 {
-    public static class SEBUserTypes
+    public static class HSUserTypes
     {
         public static List<HSUserType> Supplier() {
             return new List<HSUserType>()

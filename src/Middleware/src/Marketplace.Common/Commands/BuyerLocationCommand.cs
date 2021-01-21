@@ -121,7 +121,7 @@ namespace Headstart.Common.Commands
         public async Task CreateLocationUserGroupsAndApprovalRule(string buyerLocationID, string locationName, string token)
         {
             var buyerID = buyerLocationID.Split('-').First();
-            var AddUserTypeRequests = SEBUserTypes.BuyerLocation().Select(userType => AddUserTypeToLocation(token, buyerLocationID, userType));
+            var AddUserTypeRequests = HSUserTypes.BuyerLocation().Select(userType => AddUserTypeToLocation(token, buyerLocationID, userType));
             await Task.WhenAll(AddUserTypeRequests);
 
             var approvingGroupID = $"{buyerLocationID}-{UserGroupSuffix.OrderApprover.ToString()}";
