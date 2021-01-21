@@ -37,11 +37,11 @@ const Promotions: MPRoute = {
   route: '/promotions',
 }
 
-const Kits: MPRoute = {
-  rolesWithAccess: [MPRoles.MPStorefrontAdmin],
-  title: 'Kits',
-  route: '/kitproducts',
-}
+// const Kits: MPRoute = {
+//   rolesWithAccess: [MPRoles.MPStorefrontAdmin],
+//   title: 'Kits',
+//   route: '/kitproducts',
+// }
 
 const ProductFacets: MPRoute = {
   rolesWithAccess: [MPRoles.MPStorefrontAdmin],
@@ -57,7 +57,7 @@ const ProductNavGrouping: MPRoute = {
   ],
   title: 'ADMIN.NAV.PRODUCTS',
   route: '/products',
-  subRoutes: [AllProducts, Promotions, ProductFacets, Kits],
+  subRoutes: [AllProducts, Promotions, ProductFacets],
 }
 
 // Orders
@@ -294,7 +294,7 @@ const Support = {
   rolesWithAccess: [],
   orderCloudUserTypesWithAccess: [SUPPLIER, SELLER],
   title: 'Submit a Case',
-  route: '/support'
+  route: '/support',
 }
 
 const AllNavGroupings: MPRoute[] = [
@@ -309,7 +309,7 @@ const AllNavGroupings: MPRoute[] = [
   MySupplierProfile,
   MySupplierLocations,
   MySupplerUsers,
-  Support
+  Support,
 ]
 
 export const getHeaderConfig = (
@@ -343,13 +343,10 @@ const filterOutNavGroupings = (
 ): MPRoute[] => {
   return navGroupings.filter((navGrouping) => {
     return (
-      (navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) || 
-        !navGrouping.rolesWithAccess.length
-      ) 
-      &&
+      (navGrouping.rolesWithAccess.some((role) => userRoles?.includes(role)) ||
+        !navGrouping.rolesWithAccess.length) &&
       (!navGrouping.orderCloudUserTypesWithAccess ||
-        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType)
-      )
+        navGrouping.orderCloudUserTypesWithAccess.includes(orderCloudUserType))
     )
   })
 }
