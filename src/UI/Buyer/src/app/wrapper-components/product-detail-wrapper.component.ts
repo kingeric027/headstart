@@ -5,17 +5,13 @@ import { CurrentUserService } from '../services/current-user/current-user.servic
 
 @Component({
   template: `
-    <ocm-kit-product-details
-      *ngIf="isKit"
-      [product]="product"
-    ></ocm-kit-product-details>
-    <ocm-product-details *ngIf="!isKit" [product]="product">
+    <ocm-product-details [product]="product">
     </ocm-product-details>
   `,
 })
 export class ProductDetailWrapperComponent implements OnInit {
   isKit: boolean
-  product: SuperHSProduct | HSKitProduct
+  product: SuperHSProduct
   constructor(
     private activatedRoute: ActivatedRoute,
     protected currentUser: CurrentUserService
@@ -23,7 +19,7 @@ export class ProductDetailWrapperComponent implements OnInit {
 
   ngOnInit(): void {
     const product = this.activatedRoute.snapshot.data.product
-    this.isKit = product.Product.xp.ProductType === 'Kit'
+    //this.isKit = product.Product.xp.ProductType === 'Kit'
     this.product = product
   }
 }
