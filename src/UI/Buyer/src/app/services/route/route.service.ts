@@ -11,7 +11,10 @@ import { Title } from '@angular/platform-browser'
 import { AppConfig } from 'src/app/models/environment.types'
 import { RouteConfig } from 'src/app/models/shared.types'
 import { OrderFilters, HeadstartOrderStatus } from 'src/app/models/order.types'
-import { ProductFilters, SupplierFilters } from 'src/app/models/filter-config.types'
+import {
+  ProductFilters,
+  SupplierFilters,
+} from 'src/app/models/filter-config.types'
 
 @Injectable({
   providedIn: 'root',
@@ -71,16 +74,6 @@ export class RouteService {
 
   toProductDetails(productID: string): void {
     this.router.navigateByUrl(`/products/${productID}`)
-  }
-
-  toChiliConfigEdit(
-    productID: string,
-    configurationID: string,
-    documentID: string
-  ): void {
-    this.router.navigateByUrl(
-      `/products/${productID}/${configurationID}/${documentID}`
-    )
   }
 
   toProductList(options: ProductFilters = {}): void {

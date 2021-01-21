@@ -150,7 +150,6 @@ import { OCMBuyerLocationPermissions } from './components/profile/buyer-location
 import { OCMOrderAccessManagement } from './components/profile/order-approval-permissions/order-approval-permissions.component'
 import { SafeHTMLPipe } from './pipes/safe-html.pipe'
 import { OCMStaticPage } from './components/layout/static-page/static-page.component'
-import { OCMProductChiliConfig } from './components/products/product-chili-configuration/product-chili-configuration.component'
 import { OCMKitProductDetails } from './components/products/kit-product-details/kit-product-details.component'
 import { KitProductNameWithSpecsPipe } from './pipes/kitproduct-name-with-specs.pipe'
 import { OCMProductAttachments } from './components/products/product-attachments/product-attachments.component'
@@ -176,7 +175,6 @@ import { ResetPasswordWrapperComponent } from './wrapper-components/reset-passwo
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component'
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component'
 import { SupplierListWrapperComponent } from './wrapper-components/supplier-list-wrapper.component'
-import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/product-chili-configuration-wrapper.component'
 import { Configuration, SdkConfiguration } from 'ordercloud-javascript-sdk'
 import { Configuration as MktpConfiguration } from '@ordercloud/headstart-sdk'
 import {
@@ -184,7 +182,6 @@ import {
   MeListBuyerLocationResolver,
 } from './resolves/me.resolve'
 import { MeProductResolver } from './resolves/me.product.resolve'
-import { ChiliTemplateResolver } from './resolves/chili-template.resolve'
 import { AuthService } from './services/auth/auth.service'
 import { CreditCardService } from './services/current-user/credit-card.service'
 import { CurrentUserService } from './services/current-user/current-user.service'
@@ -234,8 +231,6 @@ const components = [
   OrderDetailWrapperComponent,
   OrderHistoryWrapperComponent,
   SupplierListWrapperComponent,
-  ProductChiliConfigurationWrapperComponent,
-
   OCMKitStaticCard,
   OCMKitVariableCard,
   OCMKitVariantSelector,
@@ -322,7 +317,6 @@ const components = [
   OCMLocationListItem,
   OCMLocationManagement,
   OCMCertificateForm,
-  OCMProductChiliConfig,
   OCMProductAttachments,
 ]
 
@@ -407,7 +401,6 @@ const components = [
     CheckoutService,
     OrderStateService,
     ShopperContextService,
-    ChiliTemplateResolver,
     { provide: AppConfig, useValue: ocAppConfig },
     { provide: NgbDateAdapter, useClass: NgbDateNativeAdapter },
     { provide: ErrorHandler, useClass: AppErrorHandler },
@@ -444,10 +437,6 @@ export class AppModule {
     this.buildWebComponent(OCMLineitemTable, 'ocm-lineitem-table')
 
     this.buildWebComponent(OCMProductDetails, 'ocm-product-details')
-    this.buildWebComponent(
-      OCMProductChiliConfig,
-      'ocm-product-chili-configuration'
-    )
     this.buildWebComponent(OCMProductAttachments, 'ocm-product-attachments')
     this.buildWebComponent(OCMKitVariableCard, 'ocm-kit-variable-card')
     this.buildWebComponent(OCMKitStaticCard, 'ocm-kit-static-card')

@@ -247,20 +247,6 @@
           _product.Description || 'This product has no description.' | safeHTML
         "
       ></p>
-      <ng-container *ngIf="_chiliConfigs && _chiliConfigs.length">
-        <strong translate>PRODUCTS.CUSTOMIZE_TEMPLATE</strong>:
-        <table
-          class="table table-bordered table-condensed table-striped table-hover"
-        >
-          <tr class="table-row" *ngFor="let config of _chiliConfigs">
-            <td>
-              <a href="products/{{ _product.ID }}/{{ config.ID }}">{{
-                config.ChiliTemplateName
-              }}</a>
-            </td>
-          </tr>
-        </table>
-      </ng-container>
       <!-- PRODUCT DOCS -->
       <ng-container *ngIf="attachments.length > 0">
         <h3 class="small font-weight-bolder text-muted" translate>

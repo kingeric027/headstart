@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router'
 import { HasTokenGuard } from './interceptors/has-token/has-token.guard'
 import { IsProfiledUserGuard } from './interceptors/is-profiled-user/is-profiled-user.guard'
 import { BaseResolve } from './resolves/base.resolve'
-import { ChiliTemplateResolver } from './resolves/chili-template.resolve'
 import { MeProductResolver } from './resolves/me.product.resolve'
 import {
   MeListAddressResolver,
@@ -21,7 +20,6 @@ import { MeChangePasswordWrapperComponent } from './wrapper-components/me-change
 import { OrderDetailWrapperComponent } from './wrapper-components/order-detail-wrapper.component'
 import { OrderHistoryWrapperComponent } from './wrapper-components/order-history-wrapper-component'
 import { PaymentListWrapperComponent } from './wrapper-components/payment-list-wrapper.component'
-import { ProductChiliConfigurationWrapperComponent } from './wrapper-components/product-chili-configuration-wrapper.component'
 import { ProductDetailWrapperComponent } from './wrapper-components/product-detail-wrapper.component'
 import { ProductListWrapperComponent } from './wrapper-components/product-list-wrapper.component'
 import { ProfileWrapperComponent } from './wrapper-components/profile-wrapper.component'
@@ -64,30 +62,6 @@ const HeadstartRoutes: Routes = [
           {
             path: '',
             component: ProductDetailWrapperComponent,
-          },
-        ],
-      },
-      {
-        path: 'products/:productID/:configurationID',
-        resolve: {
-          template: ChiliTemplateResolver,
-        },
-        children: [
-          {
-            path: '',
-            component: ProductChiliConfigurationWrapperComponent,
-          },
-        ],
-      },
-      {
-        path: 'products/:productID/:configurationID/:documentID',
-        resolve: {
-          template: ChiliTemplateResolver,
-        },
-        children: [
-          {
-            path: '',
-            component: ProductChiliConfigurationWrapperComponent,
           },
         ],
       },

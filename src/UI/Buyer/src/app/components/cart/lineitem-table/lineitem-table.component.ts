@@ -1,10 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { groupBy as _groupBy } from 'lodash'
-import {
-  HSKitProduct,
-  HSLineItem,
-} from '@ordercloud/headstart-sdk'
+import { HSKitProduct, HSLineItem } from '@ordercloud/headstart-sdk'
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum'
 import { NgxSpinnerService } from 'ngx-spinner'
@@ -68,18 +65,14 @@ export class OCMLineitemTable implements OnInit {
     this.showKitDetails = !this.showKitDetails
   }
 
-  groupLineItemsByKitID(
-    lineItems: HSLineItem[]
-  ): HSLineItem[][] {
+  groupLineItemsByKitID(lineItems: HSLineItem[]): HSLineItem[][] {
     if (!this._groupByKits) return []
     const kitLineItems = lineItems.filter((li) => li.xp.KitProductID)
     const liKitGroups = _groupBy(kitLineItems, (li) => li.xp.KitProductID)
     return Object.values(liKitGroups)
   }
 
-  groupLineItemsByShipFrom(
-    lineItems: HSLineItem[]
-  ): HSLineItem[][] {
+  groupLineItemsByShipFrom(lineItems: HSLineItem[]): HSLineItem[][] {
     const supplierLineItems = this._groupByKits
       ? lineItems.filter((li) => !li.xp.KitProductID)
       : lineItems
@@ -110,15 +103,7 @@ export class OCMLineitemTable implements OnInit {
     configurationID: string,
     documentID: string
   ): void {
-    if (configurationID && documentID) {
-      this.context.router.toChiliConfigEdit(
-        productID,
-        configurationID,
-        documentID
-      )
-    } else {
-      this.context.router.toProductDetails(productID)
-    }
+    this.context.router.toProductDetails(productID)
   }
 
   async changeQuantity(
