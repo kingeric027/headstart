@@ -21,17 +21,15 @@ namespace Headstart.Common.Controllers
     {
         private static ICheckoutIntegrationCommand _checkoutIntegrationCommand;
         private static IPostSubmitCommand _postSubmitCommand;
-        private static IZohoCommand _zoho;
-        private readonly ISupportAlertService _supportAlertService;
         private readonly IOrderCloudClient _oc;
+        private readonly ISendgridService _sendgrid;
 
-        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc, ISupportAlertService supportAlertService) : base(settings)
+        public SupportController(AppSettings settings, ICheckoutIntegrationCommand checkoutIntegrationCommand, IPostSubmitCommand postSubmitCommand, IZohoCommand zoho, IOrderCloudClient oc, ISupportAlertService supportAlertService, ISendgridService sendgrid) : base(settings)
         {
             _checkoutIntegrationCommand = checkoutIntegrationCommand;
             _postSubmitCommand = postSubmitCommand;
-            _zoho = zoho;
             _oc = oc;
-            _supportAlertService = supportAlertService;
+            _sendgrid = sendgrid;
         }
 
         [HttpGet, Route("shipping")]
@@ -88,7 +86,7 @@ namespace Headstart.Common.Controllers
         [HttpPost, Route("submitcase")]
         public async Task SendSupportRequest([FromForm]SupportCase supportCase)
         {
-            await _supportAlertService.EmailGeneralSupportQueue(supportCase);
+            await _sendgrid.EmailGeneralSupportQueue(supportCase);
         }
     }
 

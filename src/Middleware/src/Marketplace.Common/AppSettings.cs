@@ -148,6 +148,7 @@ namespace Headstart.Common
         public string InformationRequestTemplateID { get; set; }
         public string ProductUpdateTemplateID { get; set; }
         public string BuyerPasswordResetTemplateID { get; set; }
+        public string SupportTemplateID { get; set; }
     }
 
     public class FlurlSettings

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Headstart.Common.Models
 {
-    class SendGridModels
+    public class SendGridModels
     {
         public class EmailTemplate<T>
         {
@@ -72,6 +72,20 @@ namespace Headstart.Common.Models
             public string Note { get; set; }
         }
 
+        public class SupportTemplateData
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            public string Vendor { get; set; }
+            public string orderID { get; set; }
+            public string BuyerID { get; set; }
+            public string Username { get; set; }
+            public string PaymentID { get; set; }
+            public string TransactionID { get; set; }
+            public string ErrorJsonString { get; set; }
+
+        }
 
 
         public class OrderTemplateData
