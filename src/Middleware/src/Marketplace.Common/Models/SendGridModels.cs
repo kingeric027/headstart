@@ -10,21 +10,69 @@ namespace Headstart.Common.Models
 {
     class SendGridModels
     {
-        public class EmailTemplate
+        public class EmailTemplate<T>
         {
-            public object Data { get; set; }
+            public T Data { get; set; }
             public EmailDisplayText Message { get; set; }
         }
 
-        public class ProductInfo
+        public class PasswordResetData
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string PasswordRenewalAccessToken { get; set; }
+            public string PasswordRenewalUrl { get; set; }
+        }
+
+        public class LineItemStatusChangeData
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public List<LineItemProductData> Products { get; set; }
+            public string DateSubmitted { get; set; }
+            public string OrderID { get; set; }
+            public string Comments { get; set; }
+            public string TrackingNumber { get; set; }
+        }
+
+        public class LineItemProductData
         {
             public string ProductName { get; set; }
             public string ImageURL { get; set; }
             public string ProductID { get; set; }
             public int Quantity { get; set; }
             public decimal LineTotal { get; set; }
+            public int QuantityChanged { get; set; }
             public string SpecCombo { get; set; }
         }
+
+        public class ProductUpdateData
+        {
+            public string date { get; set; }
+        }
+
+        public class NewUserData
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string PasswordRenewalAccessToken { get; set; }
+            public string BaseAppURL { get; set; }
+            public string Username { get; set; }
+        }
+
+        public class InformationRequestData
+        {
+            public string ProductID { get; set; }
+            public string ProductName { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Phone { get; set; }
+            public string Location { get; set; }
+            public string Email { get; set; }
+            public string Note { get; set; }
+        }
+
+
 
         public class OrderTemplateData
         {
@@ -37,7 +85,7 @@ namespace Headstart.Common.Models
             public string BillingAddressID { get; set; }
             public Address BillingAddress { get; set; }
             public Address BillTo { get; set; }
-            public IEnumerable<ProductInfo> Products { get; set; }
+            public IEnumerable<LineItemProductData> Products { get; set; }
             public decimal Subtotal { get; set; }
             public decimal TaxCost { get; set; }
             public decimal ShippingCost { get; set; }

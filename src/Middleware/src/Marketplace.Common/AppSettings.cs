@@ -140,6 +140,14 @@ namespace Headstart.Common
         public string SupportEmails { get; set; } // comma delimited list of emails that should be contacted when critical failures occur
         public string SEBSupportCaseEmail { get; set; }
         public string SEBBillingEmail { get; set; }
+        public string OrderSubmitTemplateID { get; set; }
+        public string OrderApprovalTemplateID { get; set; }
+        public string LineItemStatusChangeTemplateID { get; set; }
+        public string QuoteOrderSubmitTemplateID { get; set; }
+        public string BuyerNewUserTemplateID { get; set; }
+        public string InformationRequestTemplateID { get; set; }
+        public string ProductUpdateTemplateID { get; set; }
+        public string BuyerPasswordResetTemplateID { get; set; }
     }
 
     public class FlurlSettings
