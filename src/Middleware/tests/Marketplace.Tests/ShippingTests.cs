@@ -54,47 +54,5 @@ namespace Headstart.Tests
         {
             return item.ShipWeightOrDefault(100);
         }
-
-        [Test]
-        public void TestSupplierFilter()
-        {
-            var command = new CheckoutIntegrationCommand(
-                Substitute.For<IAvalaraCommand>(),
-                Substitute.For<IExchangeRatesCommand>(),
-                Substitute.For<IOrderCloudClient>(),
-                Substitute.For<IEasyPostShippingService>(),
-                Substitute.For<AppSettings>()
-            );
-
-            var mockMethods = new List<HSShipMethod>()
-            {
-                new HSShipMethod() {Name = "FEDEX_GROUND"},
-                new HSShipMethod() {Name = "USPS Priority"},
-                new HSShipMethod() {Name = "UPS GROUND"}
-            };
-
-            var mockNotFoundMethods = new List<HSShipMethod>()
-            {
-                new HSShipMethod() {Name = "USPS Priority"},
-                new HSShipMethod() {Name = "UPS GROUND"}
-            };
-
-            var settings = new AppSettings()
-            {
-                OrderCloudSettings = new OrderCloudSettings()
-                {
-                    FirstChoiceSupplierID = "050"
-                }
-            };
-
-            var mockProfiles = new SelfEsteemBrandsShippingProfiles(settings);
-
-            var configured_filter = command.FilterMethodsBySupplierConfig(mockMethods, mockProfiles.FirstOrDefault("050"));
-            var misconfigured_filter = command.FilterMethodsBySupplierConfig(mockNotFoundMethods, mockProfiles.FirstOrDefault("050"));
-            var unconfigured_filter = command.FilterMethodsBySupplierConfig(mockMethods, mockProfiles.FirstOrDefault(null));
-            Assert.IsTrue(configured_filter.Count() == 1);
-            Assert.IsTrue(unconfigured_filter.Count() == 3);
-            Assert.IsTrue(misconfigured_filter.Count() == 2);
-        }
     }
 }
