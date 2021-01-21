@@ -7,7 +7,6 @@ import {
   Asset,
   QuoteOrderInfo,
   HSProductInKit,
-  ChiliConfig,
   HSVariant,
   HeadStartSDK,
   HSMeProduct,
@@ -61,7 +60,6 @@ export class OCMProductDetails implements OnInit {
   productsIncludedInKit: HSProductInKit[]
   ocProductsInKit: any[]
   isKitStatic = false
-  _chiliConfigs: ChiliConfig[] = []
   contactRequest: ContactSupplierBody
   specForm: FormGroup
   isInactiveVariant: boolean
@@ -85,7 +83,6 @@ export class OCMProductDetails implements OnInit {
     this.specs = superProduct.Specs
     this.setPageTitle()
     this.populateInactiveVariants(superProduct)
-    this.listChiliConfigs()
   }
 
   ngOnInit(): void {
@@ -99,20 +96,6 @@ export class OCMProductDetails implements OnInit {
 
   setPageTitle() {
     this.context.router.setPageTitle(this._superProduct.Product.Name)
-  }
-  async listChiliConfigs(): Promise<void> {
-    if (!this._product?.xp?.ArtworkRequired) {
-      return
-    }
-    const chiliConfigs = await HeadStartSDK.ChiliConfigs.List({
-      filters: { SupplierProductID: this._product.ID },
-      pageSize: 100,
-    })
-    this._chiliConfigs = chiliConfigs.Items.filter(
-      (item) =>
-        item.SupplierProductID === this._product.ID &&
-        item.BuyerID === this.currentUser.Buyer.ID
-    )
   }
 
   onSpecFormChange(event: SpecFormEvent): void {
