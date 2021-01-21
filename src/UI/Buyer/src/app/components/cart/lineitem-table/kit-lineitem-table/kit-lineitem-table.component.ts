@@ -8,7 +8,7 @@ import { OCMLineitemTable } from '../lineitem-table.component'
 
 @Component({
     templateUrl: './kit-lineitem-table.component.html',
-    styleUrls: ['./kit-lineitem-table.component.scss'],
+    styleUrls: ['../lineitem-table.component.scss'],
 })
 
 export class OCMKitLineitemTable extends OCMLineitemTable {
