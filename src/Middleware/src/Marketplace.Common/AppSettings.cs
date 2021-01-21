@@ -9,12 +9,9 @@ using ordercloud.integrations.tecra;
 
 namespace Headstart.Common
 {
-	public enum AppEnvironment { Qa, Demo, Prod }
-
     [DocIgnore]
     public class AppSettings
     {
-		public AppEnvironment Env { get; set; }
         public UI UI { get; set; }
 		public EnvironmentSettings EnvironmentSettings { get; set; } = new EnvironmentSettings();
 		public ApplicationInsightsSettings ApplicationInsightsSettings { get; set; } = new ApplicationInsightsSettings();
@@ -50,12 +47,17 @@ namespace Headstart.Common
 
     public class EnvironmentSettings
     {
+        public AppEnvironment Environment { get; set; }
+        public string BuildNumber { get; set; } // set during deploy
+        public string Commit { get; set; } // set during deploy
         public string BaseUrl { get; set; }
         public string AFStorefrontBaseUrl { get; set; }
         public string AFStorefrontClientID { get; set; }
         public string WTCStorefrontBaseUrl { get; set; }
         public string WTCStorefrontClientID { get; set; }
     }
+
+    public enum AppEnvironment { Test, Staging, Production }
 
     public class ApplicationInsightsSettings
     {
