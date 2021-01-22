@@ -29,14 +29,12 @@ namespace Headstart.Common.Commands
 		private readonly IHSProductCommand _marketplaceProductCommand;
 		private readonly ISendgridService _sendgridService;
 		private readonly IAppCache _cache;
-		private readonly ISebExchangeRatesService _sebExchangeRates;
 		public MeProductCommand(
 			IOrderCloudClient elevatedOc, 
 			IHSBuyerCommand marketplaceBuyerCommand,
 			IHSProductCommand marketplaceProductCommand,
 			ISendgridService sendgridService,
-			IAppCache cache,
-			ISebExchangeRatesService sebExchangeRates
+			IAppCache cache
 		)
 		{
 			_oc = elevatedOc;
@@ -44,7 +42,6 @@ namespace Headstart.Common.Commands
 			_marketplaceProductCommand = marketplaceProductCommand;
 			_sendgridService = sendgridService;
 			_cache = cache;
-			_sebExchangeRates = sebExchangeRates;
 		}
 		public async Task<SuperHSMeProduct> Get(string id, VerifiedUserContext user)
 		{
@@ -68,14 +65,12 @@ namespace Headstart.Common.Commands
 		private async Task<SuperHSMeProduct> ApplyBuyerPricing(SuperHSMeProduct superMarketplaceProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
 
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-			var exchangeRates = await exchangeRatesRequest;
 
-			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier, exchangeRates);
+			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier);
 			var productCurrency = (Nullable<CurrencySymbol>)superMarketplaceProduct.Product.xp.Currency;
-			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
+			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency);
 		
 			superMarketplaceProduct.Product = markedupProduct;
 			superMarketplaceProduct.Specs = markedupSpecs;
@@ -85,16 +80,14 @@ namespace Headstart.Common.Commands
 		public async Task<HSMeKitProduct> ApplyBuyerPricing(HSMeKitProduct kitProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
 
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
-			var exchangeRates = await exchangeRatesRequest;
 
 			foreach(var kit in kitProduct.ProductAssignments.ProductsInKit)
             {
-				var markedupProduct = ApplyBuyerProductPricing(kit.Product, defaultMarkupMultiplier, exchangeRates);
+				var markedupProduct = ApplyBuyerProductPricing(kit.Product, defaultMarkupMultiplier);
 				var productCurrency = (Nullable<CurrencySymbol>)kit.Product.xp.Currency;
-				var markedupSpecs = ApplySpecMarkups(kit.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
+				var markedupSpecs = ApplySpecMarkups(kit.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency);
 				kit.Product = markedupProduct;
 				kit.Specs = markedupSpecs;
 			}
@@ -102,7 +95,7 @@ namespace Headstart.Common.Commands
 			return kitProduct;
 		}
 
-		private List<Spec> ApplySpecMarkups(List<Spec> specs, decimal defaultMarkupMultiplier, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+		private List<Spec> ApplySpecMarkups(List<Spec> specs, decimal defaultMarkupMultiplier, CurrencySymbol? productCurrency)
 		{
 			return specs.Select(spec =>
 			{
@@ -111,7 +104,7 @@ namespace Headstart.Common.Commands
 					if (option.PriceMarkup != null)
 					{
 						var unconvertedMarkup = option.PriceMarkup ?? 0;
-						option.PriceMarkup = ConvertPrice(unconvertedMarkup, (Nullable<CurrencySymbol>)productCurrency, exchangeRates);
+						option.PriceMarkup = ConvertPrice(unconvertedMarkup, (Nullable<CurrencySymbol>)productCurrency);
 					}
 					return option;
 				}).ToList();
@@ -135,14 +128,8 @@ namespace Headstart.Common.Commands
                 }
 			}
 
-			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
-			var exchangeRatesRequest = _sebExchangeRates.GetExchangeRatesForUser(user.AccessToken);
-			await Task.WhenAll(defaultMarkupMultiplierRequest, exchangeRatesRequest);
-				
-			var defaultMarkupMultiplier = defaultMarkupMultiplierRequest.Result;
-			var exchangeRates = exchangeRatesRequest.Result;
-
-			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier, exchangeRates)).ToList();
+			var defaultMarkupMultiplier = await GetDefaultMarkupMultiplier(user);
+			meProducts.Items = meProducts.Items.Select(product => ApplyBuyerProductPricing(product, defaultMarkupMultiplier)).ToList();
 
 			return meProducts;
 		}
@@ -152,7 +139,7 @@ namespace Headstart.Common.Commands
 			await _sendgridService.SendContactSupplierAboutProductEmail(template);
         }
 
-		private HSMeProduct ApplyBuyerProductPricing(HSMeProduct product, decimal defaultMarkupMultiplier, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+		private HSMeProduct ApplyBuyerProductPricing(HSMeProduct product, decimal defaultMarkupMultiplier)
 		{
 			
 			if(product.PriceSchedule != null)
@@ -168,7 +155,7 @@ namespace Headstart.Common.Commands
 					{
 						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
 						var currency = product?.xp?.Currency ?? CurrencySymbol.USD;
-						var convertedPrice = ConvertPrice(markedupPrice, currency, exchangeRates);
+						var convertedPrice = ConvertPrice(markedupPrice, currency);
 						priceBreak.Price = convertedPrice;
 						return priceBreak;
 					}).ToList();
@@ -181,7 +168,7 @@ namespace Headstart.Common.Commands
 						// may be different rates in the future
 						// refactor to save price on the price schedule not product xp?
 						var currency = (Nullable<CurrencySymbol>)CurrencySymbol.USD;
-						priceBreak.Price = ConvertPrice(priceBreak.Price, currency, exchangeRates);
+						priceBreak.Price = ConvertPrice(priceBreak.Price, currency);
 						return priceBreak;
 					}).ToList();
 				}
@@ -189,10 +176,10 @@ namespace Headstart.Common.Commands
 			return product;
 		}
 
-        private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates)
+        private decimal ConvertPrice(decimal defaultPrice, CurrencySymbol? productCurrency, List<OrderCloudIntegrationsConversionRate> exchangeRates = null)
         {
             var exchangeRateForProduct = exchangeRates.Find(e => e.Currency == productCurrency).Rate;
-            return defaultPrice / (decimal)exchangeRateForProduct;
+            return defaultPrice / (decimal)(exchangeRateForProduct ?? 1);
         }
 
         private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
