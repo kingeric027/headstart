@@ -29,7 +29,7 @@ namespace ordercloud.integrations.cardconnect
 		private readonly IOrderCloudIntegrationsCardConnectService _cardConnect;
 		private readonly IOrderCloudClient _oc;
 		private readonly IOrderCalcService _orderCalc;
-		private readonly ISebExchangeRatesService _sebExchangeRates;
+		private readonly IHSExchangeRatesService _hsExchangeRates;
 		private readonly ISupportAlertService _supportAlerts;
 		private readonly AppSettings _settings;
 
@@ -37,7 +37,7 @@ namespace ordercloud.integrations.cardconnect
 			IOrderCloudIntegrationsCardConnectService card,
 			IOrderCloudClient oc,
 			IOrderCalcService orderCalc,
-			ISebExchangeRatesService sebExchangeRates,
+			IHSExchangeRatesService hsExchangeRates,
 			ISupportAlertService supportAlerts,
 			AppSettings settings
 		)
@@ -45,7 +45,7 @@ namespace ordercloud.integrations.cardconnect
 			_cardConnect = card;
 			_oc = oc;
 			_orderCalc = orderCalc;
-			_sebExchangeRates = sebExchangeRates;
+			_hsExchangeRates = hsExchangeRates;
 			_supportAlerts = supportAlerts;
 			_settings = settings;
 		}
@@ -139,7 +139,7 @@ namespace ordercloud.integrations.cardconnect
 					if (retref != null)
 					{
 						transactionID = transaction.ID;
-						var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
+						var userCurrency = await _hsExchangeRates.GetCurrencyForUser(userToken);
 						var response = await _cardConnect.VoidAuthorization(new CardConnectVoidRequest
 						{
 							currency = userCurrency.ToString(),
@@ -184,14 +184,14 @@ namespace ordercloud.integrations.cardconnect
 
 		private async Task<CardConnectBuyerCreditCard> MeTokenize(OrderCloudIntegrationsCreditCardToken card, string userToken)
 		{
-			var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
+			var userCurrency = await _hsExchangeRates.GetCurrencyForUser(userToken);
 			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card, userCurrency.ToString()));
 			return BuyerCreditCardMapper.Map(card, auth);
 		}
 
 		private async Task<CreditCard> Tokenize(OrderCloudIntegrationsCreditCardToken card, string userToken)
 		{
-			var userCurrency = await _sebExchangeRates.GetCurrencyForUser(userToken);
+			var userCurrency = await _hsExchangeRates.GetCurrencyForUser(userToken);
 			var auth = await _cardConnect.Tokenize(CardConnectMapper.Map(card, userCurrency.ToString()));
 			return CreditCardMapper.Map(card, auth);
 		}

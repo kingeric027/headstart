@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 
 namespace Headstart.Common.Services
 {
-    public interface ISebExchangeRatesService
+    public interface IHSExchangeRatesService
     {
         Task<CurrencySymbol> GetCurrencyForUser(string userToken);
         Task<List<OrderCloudIntegrationsConversionRate>> GetExchangeRatesForUser(string userToken);
     }
 
-    public class SebExchangeRatesService : ISebExchangeRatesService
+    public class HSExchangeRatesService : IHSExchangeRatesService
     {
         private readonly IOrderCloudClient _oc;
         private readonly IExchangeRatesCommand _exchangeRatesCommand;
-        public SebExchangeRatesService(IOrderCloudClient oc, IExchangeRatesCommand exchangeRatesCommand)
+        public HSExchangeRatesService(IOrderCloudClient oc, IExchangeRatesCommand exchangeRatesCommand)
         {
             _oc = oc;
             _exchangeRatesCommand = exchangeRatesCommand;
