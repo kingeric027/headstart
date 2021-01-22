@@ -28,7 +28,7 @@ namespace Headstart.Common.Mappers
 
         public static List<string> GetSupplierInfo(ListPage<HSLineItem> lineItems)
         {
-            var supplierList = lineItems.Items.Select(item => item.SupplierID)
+            var supplierList = lineItems?.Items?.Select(item => item.SupplierID)
                 .Distinct()
                 .ToList();
             return supplierList;
@@ -36,44 +36,44 @@ namespace Headstart.Common.Mappers
 
         public static OrderTemplateData GetOrderTemplateData(HSOrder order, IList<HSLineItem> lineItems)
         {
-            var productsList = lineItems.Select(lineItem =>
+            var productsList = lineItems?.Select(lineItem =>
             {
                 return new LineItemProductData()
                 {
-                    ProductName = lineItem.Product.Name,
-                    ImageURL = lineItem.xp.ImageUrl,
-                    ProductID = lineItem.ProductID,
-                    Quantity = lineItem.Quantity,
-                    LineTotal = lineItem.LineTotal,
-                    SpecCombo = GetSpecCombo(lineItem.Specs)
+                    ProductName = lineItem?.Product?.Name,
+                    ImageURL = lineItem?.xp?.ImageUrl,
+                    ProductID = lineItem?.ProductID,
+                    Quantity = lineItem?.Quantity,
+                    LineTotal = lineItem?.LineTotal,
+                    SpecCombo = GetSpecCombo(lineItem?.Specs)
                 };
             });
             var shippingAddress = GetShippingAddress(lineItems);
             var currencyString = order.xp?.Currency?.ToString();
             return new OrderTemplateData()
             {
-                FirstName = order.FromUser.FirstName,
-                LastName = order.FromUser.LastName,
-                OrderID = order.ID,
-                DateSubmitted = order.DateSubmitted.ToString(),
-                ShippingAddressID = order.ShippingAddressID,
+                FirstName = order?.FromUser?.FirstName,
+                LastName = order?.FromUser?.LastName,
+                OrderID = order?.ID,
+                DateSubmitted = order?.DateSubmitted?.ToString(),
+                ShippingAddressID = order?.ShippingAddressID,
                 ShippingAddress = shippingAddress,
-                BillingAddressID = order.BillingAddressID,
+                BillingAddressID = order?.BillingAddressID,
                 BillingAddress = new Address()
                 {
-                    Street1 = order.BillingAddress?.Street1,
-                    Street2 = order.BillingAddress?.Street2,
-                    City = order.BillingAddress?.City,
-                    State = order.BillingAddress?.State,
-                    Zip = order.BillingAddress?.Zip
+                    Street1 = order?.BillingAddress?.Street1,
+                    Street2 = order?.BillingAddress?.Street2,
+                    City = order?.BillingAddress?.City,
+                    State = order?.BillingAddress?.State,
+                    Zip = order?.BillingAddress?.Zip
                 },
                 BillTo = null,
                 Products = productsList,
-                Subtotal = order.Subtotal,
-                TaxCost = order.TaxCost,
-                ShippingCost = order.ShippingCost,
-                PromotionalDiscount = order.PromotionDiscount,
-                Total = order.Total,
+                Subtotal = order?.Subtotal,
+                TaxCost = order?.TaxCost,
+                ShippingCost = order?.ShippingCost,
+                PromotionalDiscount = order?.PromotionDiscount,
+                Total = order?.Total,
                 Currency = currencyString
             };
         }
@@ -126,56 +126,59 @@ namespace Headstart.Common.Mappers
         }
 
         public static LineItemProductData MapReturnedLineItemToProduct(HSLineItem lineItem) =>
-        new LineItemProductData()
-        {
-            ProductName = lineItem.Product.Name,
-            ImageURL = lineItem.xp.ImageUrl,
-            ProductID = lineItem.ProductID,
-            Quantity = lineItem.Quantity,
-            LineTotal = lineItem.LineTotal,
-        };
+        lineItem == null ? null :
+            new LineItemProductData()
+            {
+                ProductName = lineItem?.Product?.Name,
+                ImageURL = lineItem?.xp?.ImageUrl,
+                ProductID = lineItem?.ProductID,
+                Quantity = lineItem?.Quantity,
+                LineTotal = lineItem?.LineTotal,
+            };
 
         public static LineItemProductData MapCanceledLineItemToProduct(HSLineItem lineItem) =>
-        new LineItemProductData()
-        {
-            ProductName = lineItem.Product.Name,
-            ImageURL = lineItem.xp.ImageUrl,
-            ProductID = lineItem.ProductID,
-            Quantity = lineItem.Quantity,
-            LineTotal = lineItem.LineTotal,
-        };
+        lineItem == null ? null :
+            new LineItemProductData()
+            {
+                ProductName = lineItem?.Product?.Name,
+                ImageURL = lineItem?.xp?.ImageUrl,
+                ProductID = lineItem?.ProductID,
+                Quantity = lineItem?.Quantity,
+                LineTotal = lineItem?.LineTotal,
+            };
 
         public static LineItemProductData MapLineItemToProduct(HSLineItem lineItem) =>
+        lineItem == null ? null :
           new LineItemProductData()
           {
-              ProductName = lineItem.Product.Name,
-              ImageURL = lineItem.xp.ImageUrl,
-              ProductID = lineItem.ProductID,
-              Quantity = lineItem.Quantity,
-              LineTotal = lineItem.LineTotal,
+              ProductName = lineItem?.Product?.Name,
+              ImageURL = lineItem?.xp?.ImageUrl,
+              ProductID = lineItem?.ProductID,
+              Quantity = lineItem?.Quantity,
+              LineTotal = lineItem?.LineTotal,
           };
 
-        public static Address GetShippingAddress(IList<HSLineItem> lineItems)
-        {
-            return new Address()
+        public static Address GetShippingAddress(IList<HSLineItem> lineItems) =>
+        lineItems == null ? null : 
+            new Address()
             {
-                Street1 = lineItems[0].ShippingAddress.Street1,
-                Street2 = lineItems[0].ShippingAddress.Street2,
-                City = lineItems[0].ShippingAddress.City,
-                State = lineItems[0].ShippingAddress.State,
-                Zip = lineItems[0].ShippingAddress.Zip
+                Street1 = lineItems[0]?.ShippingAddress?.Street1,
+                Street2 = lineItems[0]?.ShippingAddress?.Street2,
+                City = lineItems[0]?.ShippingAddress?.City,
+                State = lineItems[0]?.ShippingAddress?.State,
+                Zip = lineItems[0]?.ShippingAddress?.Zip
             };
-        }
+  
         public static LineItemProductData MapToTemplateProduct(HSLineItem lineItem, LineItemStatusChange lineItemStatusChange)
         {
             return new LineItemProductData
             {
-                ProductName = lineItem.Product.Name,
-                ImageURL = lineItem.xp.ImageUrl,
-                ProductID = lineItem.ProductID,
-                Quantity = lineItem.Quantity,
-                LineTotal = lineItem.LineTotal,
-                QuantityChanged = lineItemStatusChange.Quantity
+                ProductName = lineItem?.Product?.Name,
+                ImageURL = lineItem?.xp?.ImageUrl,
+                ProductID = lineItem?.ProductID,
+                Quantity = lineItem?.Quantity,
+                LineTotal = lineItem?.LineTotal,
+                QuantityChanged = lineItemStatusChange?.Quantity
             };
         }
 

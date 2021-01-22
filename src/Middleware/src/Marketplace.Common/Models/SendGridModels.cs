@@ -40,9 +40,9 @@ namespace Headstart.Common.Models
             public string ProductName { get; set; }
             public string ImageURL { get; set; }
             public string ProductID { get; set; }
-            public int Quantity { get; set; }
-            public decimal LineTotal { get; set; }
-            public int QuantityChanged { get; set; }
+            public int? Quantity { get; set; }
+            public decimal? LineTotal { get; set; }
+            public int? QuantityChanged { get; set; }
             public string SpecCombo { get; set; }
         }
 
@@ -100,11 +100,11 @@ namespace Headstart.Common.Models
             public Address BillingAddress { get; set; }
             public Address BillTo { get; set; }
             public IEnumerable<LineItemProductData> Products { get; set; }
-            public decimal Subtotal { get; set; }
-            public decimal TaxCost { get; set; }
-            public decimal ShippingCost { get; set; }
-            public decimal PromotionalDiscount { get; set; }
-            public decimal Total { get; set; }
+            public decimal? Subtotal { get; set; }
+            public decimal? TaxCost { get; set; }
+            public decimal? ShippingCost { get; set; }
+            public decimal? PromotionalDiscount { get; set; }
+            public decimal? Total { get; set; }
             public  string Currency { get; set; }
         }
 

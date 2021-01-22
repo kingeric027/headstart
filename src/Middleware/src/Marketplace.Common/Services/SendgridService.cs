@@ -132,13 +132,13 @@ namespace Headstart.Common.Services
             {
                 Data = new PasswordResetData
                 {
-                    FirstName = messageNotification.Recipient.FirstName,
-                    LastName = messageNotification.Recipient.LastName,
-                    PasswordRenewalAccessToken = messageNotification.EventBody.PasswordRenewalAccessToken,
-                    PasswordRenewalUrl = messageNotification.EventBody.PasswordRenewalUrl
+                    FirstName = messageNotification?.Recipient?.FirstName,
+                    LastName = messageNotification?.Recipient?.LastName,
+                    PasswordRenewalAccessToken = messageNotification?.EventBody?.PasswordRenewalAccessToken,
+                    PasswordRenewalUrl = messageNotification?.EventBody?.PasswordRenewalUrl
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, _settings.SendgridSettings.BuyerPasswordResetTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, messageNotification?.Recipient?.Email, _settings?.SendgridSettings?.BuyerPasswordResetTemplateID, templateData);
         }
 
         private List<LineItemProductData> CreateTemplateProductList(List<HSLineItem> lineItems, LineItemStatusChanges lineItemStatusChanges)
@@ -176,7 +176,7 @@ namespace Headstart.Common.Services
                     DynamicText2 = lineItemEmailDisplayText?.DynamicText2
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, _settings.SendgridSettings.LineItemStatusChangeTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, email, _settings?.SendgridSettings?.LineItemStatusChangeTemplateID, templateData);
         }
 
         public async Task SendProductUpdateEmail(List<EmailAddress> tos, CloudAppendBlob fileReference, string fileName)
@@ -194,7 +194,7 @@ namespace Headstart.Common.Services
                     DynamicText = $"Please see the attached file of newly created and updated products from {yesterday}"
                 }
             };
-            await SendSingleTemplateEmailMultipleRcptsAttachment(_settings.SendgridSettings.FromEmail, tos, _settings.SendgridSettings.ProductUpdateTemplateID, templateData, fileReference, fileName);
+            await SendSingleTemplateEmailMultipleRcptsAttachment(_settings?.SendgridSettings?.FromEmail, tos, _settings?.SendgridSettings?.ProductUpdateTemplateID, templateData, fileReference, fileName);
         }
 
         public async Task SendLineItemStatusChangeEmailMultipleRcpts(HSOrder order, LineItemStatusChanges lineItemStatusChanges, List<HSLineItem> lineItems, List<EmailAddress> tos, EmailDisplayText lineItemEmailDisplayText)
@@ -218,7 +218,7 @@ namespace Headstart.Common.Services
                     DynamicText2 = lineItemEmailDisplayText?.DynamicText2,
                 }
             };
-            await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, tos, _settings.SendgridSettings.LineItemStatusChangeTemplateID, templateData);
+            await SendSingleTemplateEmailMultipleRcpts(_settings?.SendgridSettings?.FromEmail, tos, _settings?.SendgridSettings?.LineItemStatusChangeTemplateID, templateData);
         }
 
         public async Task SendOrderSubmittedForApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -229,7 +229,7 @@ namespace Headstart.Common.Services
                 Data = SendgridMappers.GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetRequestedApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, _settings.SendgridSettings.OrderApprovalTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, messageNotification?.Recipient?.Email, _settings?.SendgridSettings?.OrderApprovalTemplateID, templateData);
         }
 
         public async Task SendOrderRequiresApprovalEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -240,7 +240,7 @@ namespace Headstart.Common.Services
                 Data = SendgridMappers.GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderRequiresApprovalText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, _settings.SendgridSettings.OrderApprovalTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, messageNotification?.Recipient?.Email, _settings?.SendgridSettings?.OrderApprovalTemplateID, templateData);
         }
 
         public async Task SendNewUserEmail(MessageNotification<PasswordResetEventBody> messageNotification)
@@ -260,14 +260,14 @@ namespace Headstart.Common.Services
             {
                 Data = new NewUserData
                 {
-                    FirstName = messageNotification.Recipient.FirstName,
-                    LastName = messageNotification.Recipient.LastName,
-                    PasswordRenewalAccessToken = messageNotification.EventBody.PasswordRenewalAccessToken,
-                    BaseAppURL = _settings.UI.BaseAdminUrl,
-                    Username = messageNotification.EventBody.Username
+                    FirstName = messageNotification?.Recipient?.FirstName,
+                    LastName = messageNotification?.Recipient?.LastName,
+                    PasswordRenewalAccessToken = messageNotification?.EventBody?.PasswordRenewalAccessToken,
+                    BaseAppURL = _settings?.UI?.BaseAdminUrl,
+                    Username = messageNotification?.EventBody?.Username
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, _settings.SendgridSettings.BuyerNewUserTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, messageNotification?.Recipient?.Email, _settings?.SendgridSettings?.BuyerNewUserTemplateID, templateData);
         }
 
         public async Task SendOrderApprovedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -278,7 +278,7 @@ namespace Headstart.Common.Services
                 Data = SendgridMappers.GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderApprovedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, _settings.SendgridSettings.OrderApprovalTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, messageNotification?.Recipient?.Email, _settings?.SendgridSettings?.OrderApprovalTemplateID, templateData);
         }
 
         public async Task SendOrderDeclinedEmail(MessageNotification<OrderSubmitEventBody> messageNotification)
@@ -289,7 +289,7 @@ namespace Headstart.Common.Services
                 Data = SendgridMappers.GetOrderTemplateData(order, messageNotification.EventBody.LineItems),
                 Message = OrderSubmitEmailConstants.GetOrderDeclinedText()
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, messageNotification.Recipient.Email, _settings.SendgridSettings.OrderApprovalTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, messageNotification?.Recipient?.Email, _settings?.SendgridSettings?.OrderApprovalTemplateID, templateData);
         }
 
         public async Task SendOrderSubmitEmail(HSOrderWorksheet orderWorksheet)
@@ -315,8 +315,8 @@ namespace Headstart.Common.Services
 
                 //  send emails
                 
-                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, sellerEmailList, _settings.SendgridSettings.OrderSubmitTemplateID, sellerTemplateData);
-                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, _settings.SendgridSettings.OrderSubmitTemplateID, buyerTemplateData);
+                await SendSingleTemplateEmailMultipleRcpts(_settings?.SendgridSettings?.FromEmail, sellerEmailList, _settings?.SendgridSettings?.OrderSubmitTemplateID, sellerTemplateData);
+                await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, orderWorksheet.Order.FromUser.Email, _settings?.SendgridSettings?.OrderSubmitTemplateID, buyerTemplateData);
                 await SendSupplierOrderSubmitEmails(orderWorksheet);
             }
             else if (orderWorksheet.Order.xp.OrderType == OrderType.Quote)
@@ -335,8 +335,8 @@ namespace Headstart.Common.Services
                 };
 
                 //  send emails
-                await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierEmailList, _settings.SendgridSettings.QuoteOrderSubmitTemplateID, supplierTemplateData);
-                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, orderWorksheet.Order.FromUser.Email, _settings.SendgridSettings.QuoteOrderSubmitTemplateID, buyerTemplateData);
+                await SendSingleTemplateEmailMultipleRcpts(_settings?.SendgridSettings?.FromEmail, supplierEmailList, _settings?.SendgridSettings?.QuoteOrderSubmitTemplateID, supplierTemplateData);
+                await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, orderWorksheet.Order.FromUser.Email, _settings?.SendgridSettings?.QuoteOrderSubmitTemplateID, buyerTemplateData);
             }
         }
 
@@ -381,7 +381,7 @@ namespace Headstart.Common.Services
                     {
                         supplierTos.Add(new EmailAddress(rcpt));
                     };
-                    await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, supplierTos, _settings.SendgridSettings.OrderSubmitTemplateID, supplierTemplateData);
+                    await SendSingleTemplateEmailMultipleRcpts(_settings?.SendgridSettings?.FromEmail, supplierTos, _settings?.SendgridSettings?.OrderSubmitTemplateID, supplierTemplateData);
                 }   
             }
         }
@@ -456,7 +456,7 @@ namespace Headstart.Common.Services
                     DynamicText2 = lineItemEmailDisplayText?.DynamicText2
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, email, _settings.SendgridSettings.LineItemStatusChangeTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, email, _settings?.SendgridSettings?.LineItemStatusChangeTemplateID, templateData);
         }
 
         public async Task SendContactSupplierAboutProductEmail(ContactSupplierBody template)
@@ -467,17 +467,17 @@ namespace Headstart.Common.Services
             {
                 Data = new InformationRequestData
                 {
-                    ProductID = template.Product.ID,
-                    ProductName = template.Product.Name,
-                    FirstName = template.BuyerRequest.FirstName,
-                    LastName = template.BuyerRequest.LastName,
-                    Location = template.BuyerRequest.BuyerLocation,
-                    Phone = template.BuyerRequest.Phone,
-                    Email = template.BuyerRequest.Email,
-                    Note = template.BuyerRequest.Comments
+                    ProductID = template?.Product?.ID,
+                    ProductName = template?.Product?.Name,
+                    FirstName = template?.BuyerRequest?.FirstName,
+                    LastName = template?.BuyerRequest?.LastName,
+                    Location = template?.BuyerRequest?.BuyerLocation,
+                    Phone = template?.BuyerRequest?.Phone,
+                    Email = template?.BuyerRequest?.Email,
+                    Note = template?.BuyerRequest?.Comments
                 }
             };
-            await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, supplierEmail, _settings.SendgridSettings.InformationRequestTemplateID, templateData);
+            await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, supplierEmail, _settings?.SendgridSettings?.InformationRequestTemplateID, templateData);
             var sellerUsers = await ListAllAsync.List((page) => _oc.AdminUsers.ListAsync<HSUser>(
                     filters: $"xp.RequestInfoEmails=true",
                     page: page,
@@ -485,12 +485,12 @@ namespace Headstart.Common.Services
                  ));
             foreach (var sellerUser in sellerUsers)
             {
-                await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, sellerUser.Email, _settings.SendgridSettings.InformationRequestTemplateID, templateData);
+                await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, sellerUser.Email, _settings?.SendgridSettings?.InformationRequestTemplateID, templateData);
                 if (sellerUser.xp.AddtlRcpts.Any())
                 {
                     foreach (var rcpt in sellerUser.xp.AddtlRcpts)
                     {
-                        await SendSingleTemplateEmail(_settings.SendgridSettings.FromEmail, rcpt, _settings.SendgridSettings.InformationRequestTemplateID, templateData);
+                        await SendSingleTemplateEmail(_settings?.SendgridSettings?.FromEmail, rcpt, _settings?.SendgridSettings?.InformationRequestTemplateID, templateData);
                     }
                 }
             }
@@ -502,10 +502,10 @@ namespace Headstart.Common.Services
             {
                 Data = new SupportTemplateData
                 {
-                    orderID = order.ID,
-                    BuyerID = order.FromCompanyID,
-                    Username = order.FromUser.Username,
-                    PaymentID = payment.ID,
+                    orderID = order?.ID,
+                    BuyerID = order?.FromCompanyID,
+                    Username = order?.FromUser?.Username,
+                    PaymentID = payment?.ID,
                     TransactionID = transactionID,
                     ErrorJsonString = JsonConvert.SerializeObject(ex.ApiError)
                 },
@@ -516,12 +516,12 @@ namespace Headstart.Common.Services
                 }
             };
             var toList = new List<EmailAddress>();
-            var supportEmails = _settings.SendgridSettings.SupportEmails.Split(",");
+            var supportEmails = _settings?.SendgridSettings?.SupportEmails.Split(",");
             foreach (var email in supportEmails)
             {
                 toList.Add(new EmailAddress { Email = email });
             }
-            await SendSingleTemplateEmailMultipleRcpts(_settings.SendgridSettings.FromEmail, toList, _settings.SendgridSettings.SupportTemplateID, templateData);
+            await SendSingleTemplateEmailMultipleRcpts(_settings?.SendgridSettings?.FromEmail, toList, _settings?.SendgridSettings?.SupportTemplateID, templateData);
         }
 
         public async Task EmailGeneralSupportQueue(SupportCase supportCase)
@@ -530,10 +530,10 @@ namespace Headstart.Common.Services
             {
                 Data = new SupportTemplateData
                 {
-                    FirstName = supportCase.FirstName,
-                    LastName = supportCase.LastName,
-                    Email = supportCase.Email,
-                    Vendor = supportCase.Vendor ?? "N/A"
+                    FirstName = supportCase?.FirstName,
+                    LastName = supportCase?.LastName,
+                    Email = supportCase?.Email,
+                    Vendor = supportCase?.Vendor ?? "N/A"
                 },
                 Message = new EmailDisplayText()
                 {
@@ -542,7 +542,7 @@ namespace Headstart.Common.Services
                 }
             };
             var recipient = SendgridMappers.DetermineRecipient(_settings, supportCase.Subject);
-            await SendSingleTemplateEmailSingleRcptAttachment(_settings.SendgridSettings.FromEmail, recipient, _settings.SendgridSettings.SupportTemplateID, templateData, supportCase.File);
+            await SendSingleTemplateEmailSingleRcptAttachment(_settings?.SendgridSettings?.FromEmail, recipient, _settings?.SendgridSettings?.SupportTemplateID, templateData, supportCase.File);
         }
     }
 }
