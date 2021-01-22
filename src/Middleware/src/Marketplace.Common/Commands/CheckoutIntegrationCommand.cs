@@ -33,7 +33,7 @@ namespace Headstart.Common.Commands
         private readonly IEasyPostShippingService _shippingService;
         private readonly IExchangeRatesCommand _exchangeRates;
         private readonly IOrderCloudClient _oc;
-        private readonly SelfEsteemBrandsShippingProfiles _profiles;
+        private readonly HSShippingProfiles _profiles;
         private readonly AppSettings _settings;
   
         public CheckoutIntegrationCommand(IAvalaraCommand avalara, IExchangeRatesCommand exchangeRates, IOrderCloudClient orderCloud, IEasyPostShippingService shippingService, AppSettings settings)
@@ -43,7 +43,7 @@ namespace Headstart.Common.Commands
             _oc = orderCloud;
             _shippingService = shippingService;
             _settings = settings;
-            _profiles = new SelfEsteemBrandsShippingProfiles(_settings);
+            _profiles = new HSShippingProfiles(_settings);
         }
 
         public async Task<ShipEstimateResponse> GetRatesAsync(HSOrderCalculatePayload orderCalculatePayload)
@@ -71,22 +71,18 @@ namespace Headstart.Common.Commands
             {
                 var supplierID = groupedLineItems[i].First().SupplierID;
                 var profile = _profiles.FirstOrDefault(supplierID);
-                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => profile.CarrierAccountIDs.Contains(s.xp.CarrierAccountID)).ToList(), profile); 
+                var methods = FilterMethodsBySupplierConfig(shipResponse.ShipEstimates[i].ShipMethods.Where(s => profile.CarrierAccountIDs.Contains(s.xp.CarrierAccountID)).ToList(), profile);
                 var cheapestMethods = WhereRateIsCheapestOfItsKind(methods);
                 shipResponse.ShipEstimates[i].ShipMethods = cheapestMethods.Select(s =>
                 {
-                    // apply a 75% markup to key fob shipments https://four51.atlassian.net/browse/SEB-1260
-                    if (groupedLineItems[i].Any(li => li.Product.xp.ProductType == ProductType.PurchaseOrder))
-                        s.Cost = Math.Round(s.Cost * (decimal) 1.75, 2);
-                    else
-                    {
-                        // there is logic here to support not marking up shipping over list rate. But USPS is always list rate
-                        // so adding an override to the suppliers that use USPS
-                        var carrier = _profiles.ShippingProfiles.First(p => p.CarrierAccountIDs.Contains(s.xp?.CarrierAccountID));
-                        s.Cost = carrier.MarkupOverride ?
-                            s.xp.OriginalCost * carrier.Markup :
-                            Math.Min((s.xp.OriginalCost * carrier.Markup), s.xp.ListRate);
-                    }
+
+                    // there is logic here to support not marking up shipping over list rate. But USPS is always list rate
+                    // so adding an override to the suppliers that use USPS
+                    var carrier = _profiles.ShippingProfiles.First(p => p.CarrierAccountIDs.Contains(s.xp?.CarrierAccountID));
+                    s.Cost = carrier.MarkupOverride ?
+                        s.xp.OriginalCost * carrier.Markup :
+                        Math.Min((s.xp.OriginalCost * carrier.Markup), s.xp.ListRate);
+
                     return s;
                 }).ToList();
             }
@@ -98,7 +94,7 @@ namespace Headstart.Common.Commands
             shipResponse.ShipEstimates = UpdateFreeShippingRates(shipResponse.ShipEstimates, _settings.EasyPostSettings.FreeShippingTransitDays);
             shipResponse.ShipEstimates = await ApplyFreeShipping(worksheet, shipResponse.ShipEstimates);
             shipResponse.ShipEstimates = FilterSlowerRatesWithHighCost(shipResponse.ShipEstimates);
-            shipResponse.ShipEstimates = ApplyFlatRateShipping(worksheet, shipResponse.ShipEstimates, _settings.OrderCloudSettings.MedlineSupplierID, _settings.OrderCloudSettings.LaliciousSupplierID);
+            shipResponse.ShipEstimates = ApplyFlatRateShipping(worksheet, shipResponse.ShipEstimates);
             
             return shipResponse;
         }
@@ -194,32 +190,16 @@ namespace Headstart.Common.Commands
 
             return result;
         }
-        #nullable enable
-        public static IList<HSShipEstimate> ApplyFlatRateShipping(HSOrderWorksheet orderWorksheet, IList<HSShipEstimate> estimates, string medlineSupplierID, string? laliciousSupplierID)
+        public static IList<HSShipEstimate> ApplyFlatRateShipping(HSOrderWorksheet orderWorksheet, IList<HSShipEstimate> estimates)
         {
-            var result = estimates.Select(estimate => ApplyFlatRateShippingOnEstimate(estimate, orderWorksheet, medlineSupplierID, laliciousSupplierID)).ToList();
+            var result = estimates.Select(estimate => ApplyFlatRateShippingOnEstimate(estimate, orderWorksheet)).ToList();
             return result;
         }
 
-        public static HSShipEstimate ApplyFlatRateShippingOnEstimate(HSShipEstimate estimate, HSOrderWorksheet orderWorksheet, string medlineSupplierID, string? laliciousSupplierID)
+        public static HSShipEstimate ApplyFlatRateShippingOnEstimate(HSShipEstimate estimate, HSOrderWorksheet orderWorksheet)
         {
             var supplierID = orderWorksheet.LineItems.First(li => li.ID == estimate.ShipEstimateItems.FirstOrDefault()?.LineItemID).SupplierID;
-            if (laliciousSupplierID != null && supplierID == laliciousSupplierID)
-            {
-                // lalicious only wants ground shipping https://four51.atlassian.net/browse/SEB-1345
-                estimate.ShipMethods = estimate.ShipMethods
-                                       .Where(method => method.Name.Contains("GROUND"))
-                                       .ToList();
-
-                return estimate;
-            }
-
-            if (supplierID != medlineSupplierID)
-            {
-                // for now we're hardcoding flat rates for just this supplier https://four51.atlassian.net/browse/SEB-1292
-                // at some point in the future this will be handled generically for any supplier
-                return estimate;
-            }
+           
             var supplierLineItems = orderWorksheet.LineItems.Where(li => li.SupplierID == supplierID);
             var supplierSubTotal = supplierLineItems.Select(li => li.LineSubtotal).Sum();
             var qualifiesForFlatRateShipping = supplierSubTotal > .01M && estimate.ShipMethods.Any(method => method.Name.Contains("GROUND"));

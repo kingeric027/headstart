@@ -193,103 +193,6 @@ namespace Headstart.Tests
         public const decimal FLAT_RATE_SECOND_TIER = 0;
 
         [Test]
-        public void flatrateshipping_ignore_supplier_not_medline()
-        {
-            // should not transform ship methods if the supplier isn't medline
-            var shipItem1 = new ShipEstimateItem
-            {
-                LineItemID = "Line1"
-            };
-            var line1 = new HSLineItem
-            {
-                ID = "Line1",
-                LineSubtotal = 20,
-                SupplierID = "012"
-            };
-            var method1 = new HSShipMethod
-            {
-                Name = "FEDEX_GROUND",
-                EstimatedTransitDays = 3,
-                Cost = 89
-            };
-            var worksheet = BuildOrderWorksheet(line1);
-            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, "027", null);
-            var methods = result[0].ShipMethods;
-
-            Assert.AreEqual(1, methods.Count());
-            Assert.AreEqual(method1.Cost, methods[0].Cost);
-            Assert.AreEqual(method1.Name, methods[0].Name);
-        }
-
-
-        [Test]
-        public void flatrateshipping_ignore_supplier_not_lalicious()
-        {
-            // should not transform ship methods if the supplier isn't lalicious
-            var shipItem1 = new ShipEstimateItem
-            {
-                LineItemID = "Line1"
-            };
-            var line1 = new HSLineItem
-            {
-                ID = "Line1",
-                LineSubtotal = 20,
-                SupplierID = "012"
-            };
-            var method1 = new HSShipMethod
-            {
-                Name = "FEDEX_GROUND",
-                EstimatedTransitDays = 3,
-                Cost = 89
-            };
-            var worksheet = BuildOrderWorksheet(line1);
-            var estimates = BuildEstimates(new[] { method1 }, new[] { shipItem1 });
-            var result = ApplyFlatRateShipping(worksheet, estimates, "027", "100");
-            var methods = result[0].ShipMethods;
-
-            Assert.AreEqual(1, methods.Count());
-            Assert.AreEqual(method1.Cost, methods[0].Cost);
-            Assert.AreEqual(method1.Name, methods[0].Name);
-        }
-
-        [Test]
-        public void flatrateshipping_when_supplier_is_lalicious()
-        {
-            // should transform ship methods if the supplier is lalicious
-            var shipItem1 = new ShipEstimateItem
-            {
-                LineItemID = "Line1"
-            };
-            var line1 = new HSLineItem
-            {
-                ID = "Line1",
-                LineSubtotal = 20,
-                SupplierID = "100"
-            };
-            var method1 = new HSShipMethod
-            {
-                Name = "FEDEX_GROUND",
-                EstimatedTransitDays = 3,
-                Cost = 89
-            };
-            var method2 = new HSShipMethod
-            {
-                Name = "NEXT_DAY",
-                EstimatedTransitDays = 1,
-                Cost = 150
-            };
-            var worksheet = BuildOrderWorksheet(line1);
-            var estimates = BuildEstimates(new[] { method1, method2 }, new[] { shipItem1 });
-            var result = ApplyFlatRateShipping(worksheet, estimates, "027", "100");
-            var methods = result[0].ShipMethods;
-
-            Assert.AreEqual(1, methods.Count());
-            Assert.AreEqual(method1.Cost, methods[0].Cost);
-            Assert.AreEqual(method1.Name, methods[0].Name);
-        }
-
-        [Test]
         public void flatrateshipping_ignore_nonground()
         {
             // don't transform methods if they aren't ground
@@ -456,7 +359,7 @@ namespace Headstart.Tests
 
         private IList<HSShipEstimate> ApplyFlatRateShipping(HSOrderWorksheet worksheet, List<HSShipEstimate> estimates, string medlineSupplierID, string laliciousSupplierID)
         {
-            return CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates, medlineSupplierID, laliciousSupplierID);
+            return CheckoutIntegrationCommand.ApplyFlatRateShipping(worksheet, estimates);
         }
 
         [Test]
