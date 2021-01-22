@@ -47,11 +47,11 @@ namespace Headstart.Common.Controllers
 			await _meProductCommand.RequestProductInfo(template);
         }
 
-		[DocName("GET Kit Product")]
-		[HttpGet, Route("kitproducts/{kitProductID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
-		public async Task<HSMeKitProduct> GetMeKit(string kitProductID)
-		{
-			return await _kitProductCommand.GetMeKit(kitProductID, VerifiedUserContext);
-		}
+		//[DocName("GET Kit Product")]
+		//[HttpGet, Route("kitproducts/{kitProductID}"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
+		//public async Task<HSMeKitProduct> GetMeKit(string kitProductID)
+		//{
+		//	return await _kitProductCommand.GetMeKit(kitProductID, VerifiedUserContext);
+		//}
 	}
 }
