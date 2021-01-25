@@ -25,6 +25,14 @@
         </div>
       </div>
       <div class="col-lg-9 my-md-0 my-3">
+        <ngx-spinner
+          bdColor="null"
+          color="var(--primary)"
+          size="small"
+          bdColor="null"
+          [fullScreen]="false"
+          type="ball-spin-clockwise-fade"> 
+        </ngx-spinner>
         <ngb-accordion
           [closeOthers]="true"
           (panelChange)="beforeChange($event)"
@@ -91,22 +99,6 @@
               >
             </ng-template>
             <ng-template ngbPanelContent>
-              <div
-                class="d-block h-50"
-                *ngIf="!isLoading && currentPanel === 'shippingAddressLoading'"
-              >
-                <ngx-spinner
-                  *ngIf="isLoading && currentPanel === 'shippingAddressLoading'"
-                  bdColor="null"
-                  color="var(--primary)"
-                  size="small"
-                  bdColor="null"
-                  [fullScreen]="false"
-                  type="ball-spin-clockwise-fade"
-                >
-                  <small class="sr-only">Calculating Shipping Rates</small>
-                </ngx-spinner>
-              </div>
               <ocm-checkout-address
                 [isAnon]="isAnon"
                 [order]="order"
