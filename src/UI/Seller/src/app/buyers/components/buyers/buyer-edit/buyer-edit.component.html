@@ -52,23 +52,6 @@
             placeholder="Enter Markup"
           />
         </div>
-        <div class="form-group">
-          <label for="ChiliPublishFolder">Chili Publish Folder Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="ChiliPublishFolder"
-            showErrors
-            aria-describedby="ChiliPublishFolder"
-            maxlength="100"
-            [resourceForm]="resourceForm"
-            formControlName="ChiliPublishFolder"
-            (input)="
-              updateResourceFromEvent($event, 'Buyer.xp.ChiliPublishFolder')
-            "
-            placeholder="Enter Folder Name"
-          />
-        </div>
       </div>
     </div>
   </form>

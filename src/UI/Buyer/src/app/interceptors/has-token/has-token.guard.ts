@@ -1,16 +1,18 @@
-import { Injectable, Inject } from '@angular/core'
-import { CanActivate, CanActivateChild, Router } from '@angular/router'
 import { DOCUMENT } from '@angular/common'
+import { Inject, Injectable } from '@angular/core'
+import { CanActivate, CanActivateChild, Router } from '@angular/router'
+import { Tokens } from 'ordercloud-javascript-sdk'
+import { AppConfig } from 'src/app/models/environment.types'
+import { ApplicationInsightsService } from 'src/app/services/application-insights/application-insights.service'
 import { AuthService } from 'src/app/services/auth/auth.service'
 import { TokenHelperService } from 'src/app/services/token-helper/token-helper.service'
-import { AppConfig } from 'src/app/models/environment.types'
-import { Tokens } from 'ordercloud-javascript-sdk'
 
 @Injectable({
   providedIn: 'root',
 })
 export class HasTokenGuard implements CanActivate, CanActivateChild {
   constructor(
+    private appInsightsService: ApplicationInsightsService,
     private router: Router,
     private auth: AuthService,
     private tokenHelper: TokenHelperService,
@@ -89,10 +91,16 @@ export class HasTokenGuard implements CanActivate, CanActivateChild {
     const decodedToken = this.tokenHelper.getDecodedOCToken()
 
     if (!decodedToken) {
+      this.appInsightsService.trackAuthErrorEvents(null, {message: 'HasTokenGuard: no token'})
       return false
     }
 
     const expiresIn = decodedToken.exp * 1000
-    return Date.now() < expiresIn
+    const isValid = Date.now() < expiresIn
+    if (!isValid) {
+      this.appInsightsService.trackAuthErrorEvents(decodedToken, {message: 'HasTokenGuard: token expired'})
+    }
+
+    return isValid
   }
 }

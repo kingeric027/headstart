@@ -165,7 +165,7 @@ namespace Headstart.Common.Commands
                 SecurityProfileID = "MPMeAdmin"
             }, token);
 
-            foreach(var userType in SEBUserTypes.Supplier())
+            foreach(var userType in HSUserTypes.Supplier())
             {
                 var userGroupID = $"{supplierID}{userType.UserGroupIDSuffix}";
 

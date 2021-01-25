@@ -129,7 +129,7 @@ export class OCMCheckout implements OnInit {
   }
 
   async doneWithShipToAddress(): Promise<void> {
-    this.initLoadingIndicator('shippingAddressLoading')
+    this.initLoadingIndicator()
     const orderWorksheet = await this.checkout.estimateShipping()
     this.shipEstimates = orderWorksheet.ShipEstimateResponse.ShipEstimates
     this.destoryLoadingIndicator('shippingSelection')
@@ -396,14 +396,17 @@ export class OCMCheckout implements OnInit {
     )
   }
 
-  initLoadingIndicator(toSection: string): void {
+  initLoadingIndicator(toSection?: string): void {
     this.isLoading = true
-    this.currentPanel = toSection
+    if(toSection) {
+      this.currentPanel = toSection
+    }
     this.spinner.show()
   }
 
   destoryLoadingIndicator(toSection: string): void {
     this.isLoading = false
+    this.currentPanel = toSection
     this.toSection(toSection)
   }
 }

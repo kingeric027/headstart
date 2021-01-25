@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, ResolveEnd, Router } from '@angular/router'
-import { ApplicationInsights } from '@microsoft/applicationinsights-web'
+import { ApplicationInsights, IEventTelemetry } from '@microsoft/applicationinsights-web'
 import { Subscription } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { AppConfig } from 'src/app/models/environment.types'
+import { DecodedOCToken } from 'src/app/models/profile.types'
+import { ShopperContextService } from '../shopper-context/shopper-context.service'
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,11 @@ export class ApplicationInsightsService {
   appInsights: ApplicationInsights = null
   routerSubscription: Subscription
 
-  constructor(private appConfig: AppConfig, private router: Router) {
+  constructor(
+    private appConfig: AppConfig,
+    private context: ShopperContextService,
+    private router: Router
+  ) {
     let isDeployed = false
     if (window) {
       isDeployed = window.location.hostname !== 'localhost'
@@ -31,13 +37,34 @@ export class ApplicationInsightsService {
 
   public setUserID(username: string): void {
     if (this.appInsights) {
-      this.appInsights.setAuthenticatedUserContext(username)
+      this.appInsights.setAuthenticatedUserContext(username, null, true)
     }
   }
 
   public clearUser(): void {
     if (this.appInsights) {
       this.appInsights.clearAuthenticatedUserContext()
+    }
+  }
+
+  public trackAuthErrorEvents(decodedToken?: DecodedOCToken, error?: any): void {
+    const currentUser = this.context.currentUser.get()
+    const event: IEventTelemetry = {
+      name: 'AuthError',
+      properties: {
+        userId: decodedToken?.usr ?? currentUser?.ID,
+        buyerId: currentUser?.Buyer?.ID,
+        tokenIssuedAt: decodedToken?.nbf,
+        tokenExpAt: decodedToken?.exp,
+        error
+      }
+    }
+    this.trackEvent(event);
+  }
+
+  private trackEvent(event: IEventTelemetry): void {
+    if (this.appInsights) {
+      this.appInsights.trackEvent(event)
     }
   }
 

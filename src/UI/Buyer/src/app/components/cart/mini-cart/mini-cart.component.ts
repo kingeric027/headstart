@@ -1,9 +1,6 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core'
 import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
-import {
-  HSOrder,
-  HSLineItem,
-} from '@ordercloud/headstart-sdk'
+import { HSOrder, HSLineItem } from '@ordercloud/headstart-sdk'
 import { ShopperContextService } from 'src/app/services/shopper-context/shopper-context.service'
 
 @Component({
@@ -35,17 +32,8 @@ export class OCMMiniCart implements OnInit {
     configurationID: string,
     documentID: string
   ): void {
-    if (configurationID && documentID) {
-      this.context.router.toChiliConfigEdit(
-        productID,
-        configurationID,
-        documentID
-      )
-      this.navigate.emit()
-    } else {
-      this.context.router.toProductDetails(productID)
-      this.navigate.emit()
-    }
+    this.context.router.toProductDetails(productID)
+    this.navigate.emit()
   }
 
   toCheckout(): void {
