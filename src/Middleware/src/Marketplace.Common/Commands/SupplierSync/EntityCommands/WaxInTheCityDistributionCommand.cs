@@ -31,6 +31,8 @@ namespace Headstart.Common.Commands
 
         public async Task<JObject> GetOrderAsync(string ID, VerifiedUserContext user)
         {
+            HSShipEstimate estimate;
+            HSShipMethod ship_method = null;
             var supplierWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Outgoing, ID);
 
             var buyerWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, ID.Split('-')[0]);
@@ -38,7 +40,11 @@ namespace Headstart.Common.Commands
             var estimate = buyerWorksheet.ShipEstimateResponse?.ShipEstimates?.FirstOrDefault(e => e?.ShipEstimateItems?.Any(i => i?.LineItemID == buyerLineItems?.FirstOrDefault()?.ID) == true);
             var ship_method = estimate?.ShipMethods.FirstOrDefault(m => m.ID == estimate.SelectedShipMethodID);
 
-            var returnObject = new JObject
+            }
+
+            var returnObject = new JObject { };
+
+            if (supplierWorksheet.Order != null)
             {
                 { "SupplierOrder", new JObject {
                     {"Order", JToken.FromObject(supplierWorksheet.Order)},
