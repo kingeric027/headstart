@@ -23,7 +23,7 @@ namespace Headstart.Tests
 		private IOrderCloudIntegrationsCardConnectService _cardConnect;
 		private IOrderCloudClient _oc;
 		private IOrderCalcService _orderCalc;
-		private ISebExchangeRatesService _sebExchangeRates;
+		private IHSExchangeRatesService _hsExchangeRates;
 		private ISupportAlertService _supportAlerts;
 		private AppSettings _settings;
 		private ICreditCardCommand _sut;
@@ -63,15 +63,15 @@ namespace Headstart.Tests
 			_orderCalc.GetCreditCardTotal(Arg.Any< HSOrderWorksheet>())
 				.Returns(ccTotal);
 
-			_sebExchangeRates = Substitute.For<ISebExchangeRatesService>();
-			_sebExchangeRates.GetCurrencyForUser(userToken)
+			_hsExchangeRates = Substitute.For<IHSExchangeRatesService>();
+			_hsExchangeRates.GetCurrencyForUser(userToken)
 				.Returns(Task.FromResult(currency));
 
 			_supportAlerts = Substitute.For<ISupportAlertService>();
 			_settings = Substitute.For<AppSettings>();
 			_settings.CardConnectSettings.CadMerchantID = merchantID;
 
-			_sut = new CreditCardCommand(_cardConnect, _oc, _orderCalc, _sebExchangeRates, _supportAlerts, _settings);
+			_sut = new CreditCardCommand(_cardConnect, _oc, _orderCalc, _hsExchangeRates, _supportAlerts, _settings);
 		}
 
         #region AuthorizePayment
@@ -266,7 +266,7 @@ namespace Headstart.Tests
 			};
 			_settings.CardConnectSettings.UsdMerchantID = merchantID;
 			_settings.CardConnectSettings.CadMerchantID = "somethingelse";
-			_sebExchangeRates.GetCurrencyForUser(userToken)
+			_hsExchangeRates.GetCurrencyForUser(userToken)
 				.Returns(Task.FromResult(CurrencySymbol.USD));
 			_oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, orderID, filters: Arg.Is<object>(f => (string)f == "Type=CreditCard"))
 				.Returns(PaymentMocks.PaymentList(MockCCPayment(paymentTotal, true, payment1transactions)));
