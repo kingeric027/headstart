@@ -1,10 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { groupBy as _groupBy } from 'lodash'
-import {
-  HSKitProduct,
-  HSLineItem,
-} from '@ordercloud/headstart-sdk'
+import { HSKitProduct, HSLineItem } from '@ordercloud/headstart-sdk'
 import { getPrimaryLineItemImage } from 'src/app/services/images.helpers'
 import { CancelReturnReason } from '../../orders/order-return/order-return-table/models/cancel-return-translations.enum'
 import { NgxSpinnerService } from 'ngx-spinner'
@@ -13,7 +10,6 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
 import { OrderType } from 'src/app/models/order.types'
 import { LineItemGroupSupplier } from 'src/app/models/line-item.types'
 import { QtyChangeEvent } from 'src/app/models/product.types'
-
 
 export abstract class OCMParentTableComponent implements OnInit {
   @Input() set lineItems(lineItems: HSLineItem[]) {
@@ -61,19 +57,14 @@ export abstract class OCMParentTableComponent implements OnInit {
     this.spinner.show() // visibility is handled by *ngIf
   }
 
-
-  groupLineItemsByKitID(
-    lineItems: HSLineItem[]
-  ): HSLineItem[][] {
+  groupLineItemsByKitID(lineItems: HSLineItem[]): HSLineItem[][] {
     if (!this._groupByKits) return []
     const kitLineItems = lineItems.filter((li) => li.xp.KitProductID)
     const liKitGroups = _groupBy(kitLineItems, (li) => li.xp.KitProductID)
     return Object.values(liKitGroups)
   }
 
-  groupLineItemsByShipFrom(
-    lineItems: HSLineItem[]
-  ): HSLineItem[][] {
+  groupLineItemsByShipFrom(lineItems: HSLineItem[]): HSLineItem[][] {
     const supplierLineItems = this._groupByKits
       ? lineItems.filter((li) => !li.xp.KitProductID)
       : lineItems
@@ -100,15 +91,7 @@ export abstract class OCMParentTableComponent implements OnInit {
     configurationID: string,
     documentID: string
   ): void {
-    if (configurationID && documentID) {
-      this.context.router.toChiliConfigEdit(
-        productID,
-        configurationID,
-        documentID
-      )
-    } else {
-      this.context.router.toProductDetails(productID)
-    }
+    this.context.router.toProductDetails(productID)
   }
 
   async changeQuantity(

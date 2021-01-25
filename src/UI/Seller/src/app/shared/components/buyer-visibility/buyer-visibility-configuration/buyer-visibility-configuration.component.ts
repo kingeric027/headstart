@@ -12,11 +12,7 @@ import {
 } from '@ordercloud/angular-sdk'
 import { ProductService } from '@app-seller/products/product.service'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
-import {
-  HeadStartSDK,
-  HSBuyer,
-  HSProduct,
-} from '@ordercloud/headstart-sdk'
+import { HeadStartSDK, HSBuyer, HSProduct } from '@ordercloud/headstart-sdk'
 
 @Component({
   selector: 'buyer-visibility-configuration-component',
