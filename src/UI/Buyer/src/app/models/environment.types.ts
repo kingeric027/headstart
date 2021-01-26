@@ -38,7 +38,6 @@ export interface EnvironmentConfig {
   cmsUrl: string
   creditCardIframeUrl: string
   sellerID: string
-  ssoLink: string
   translateBlobUrl: string
   ordercloudEnv: OrdercloudEnv
   theme?: Theme
@@ -80,10 +79,6 @@ export class AppConfig {
    *  The ID of the seller organization.
    */
   sellerID: string
-  /**
-   *  TODO - Link to identity provider's authorization server. this field should probably be SEB-specific.
-   */
-  ssoLink: string
   /**
    * An array of security roles that will be requested upon login.
    * These roles allow access to specific endpoints in the OrderCloud.io API.

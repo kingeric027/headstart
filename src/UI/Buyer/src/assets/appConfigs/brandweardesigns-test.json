@@ -11,7 +11,6 @@
   "instrumentationKey": "4133d3cf-ae7a-43d1-a16b-172aee7cff6f",
   "translateBlobUrl": "https://stbrandweartest.blob.core.windows.net/ngx-translate/i18n/",
   "sellerID": "BRANDWEARDESIGNS_TEST",
-  "ssoLink": null,
   "ordercloudEnv": "Sandbox",
   "theme": { "logoSrc": "assets/generic-logo.png" }
 }

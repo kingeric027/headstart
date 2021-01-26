@@ -10,7 +10,6 @@
   "creditCardIframeUrl": "https://fts.cardconnect.com/itoke/ajax-tokenizer.html",
   "translateBlobUrl": "https://marktplacetest.blob.core.windows.net/ngx-translate/i18n/",
   "sellerID": "pPOiukEUHkSGrBmAIjdReQ",
-  "ssoLink": null,
   "ordercloudEnv": "Production",
   "theme": { "logoSrc": "assets/basecamp-logo.svg" },
   "instrumentationKey": "419a0c62-a800-4d19-882b-b61007e69cdb"
