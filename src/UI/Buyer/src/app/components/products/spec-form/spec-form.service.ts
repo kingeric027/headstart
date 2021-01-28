@@ -88,12 +88,16 @@ export class SpecFormService {
   ): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
     const liSpecs = this.getLineItemSpecs(specs, specForm)
+    return this.AssetTagMatches(liSpecs, image);
+  }
+
+  public AssetTagMatches(liSpecs: LineItemSpec[], image: Asset): boolean {
     return liSpecs.every((spec) =>
-      image.Tags.find((tag) =>
-        tag?.split('-').includes(
-          spec.Value.split(' ')
-            .join('')
-            .replace(/[^a-zA-Z0-9 ]/g, '')
+    image?.Tags?.find((tag) =>
+      tag?.split('-')?.includes(
+        spec?.Value?.split(' ')
+          .join('')
+          .replace(/[^a-zA-Z0-9 ]/g, '')
         )
       )
     )
@@ -145,15 +149,7 @@ export class SpecFormService {
   ): boolean {
     // Examine all specs, and find the image tag that matches all specs, removing spaces where needed on the spec to find that match.
     const liSpecs = this.getGridLineItemSpecs(specs, specValues)
-    return liSpecs.every((spec) =>
-      image.Tags.find((tag) =>
-        tag?.split('-').includes(
-          spec.Value.split(' ')
-            .join('')
-            .replace(/[^a-zA-Z0-9 ]/g, '')
-        )
-      )
-    )
+    return this.AssetTagMatches(liSpecs, image);
   }
 
   private singleSpecMarkup(
