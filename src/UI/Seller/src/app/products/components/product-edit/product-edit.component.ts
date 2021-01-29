@@ -760,21 +760,28 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   handleUpdateProduct(event: any, field: string, typeOfValue?: string): void {
+    const productFields: string[] = [
+      'Product.Active',
+      'Product.Inventory.Enabled',
+      'Product.Inventory.OrderCanExceed',
+      'Product.Inventory.VariantLevelTracking',
+      'Product.xp.ArtworkRequired',
+      'Product.xp.FreeShipping',
+    ]
     const productUpdate = {
       field,
-      value: [
-        'Product.Active',
-        'Product.Inventory.Enabled',
-        'Product.Inventory.OrderCanExceed',
-        'Product.Inventory.VariantLevelTracking',
-        'Product.xp.ArtworkRequired',
-        'Product.xp.FreeShipping',
-      ].includes(field)
+      value: productFields.includes(field)
         ? event.target.checked
         : typeOfValue === 'number'
         ? Number(event.target.value)
         : event.target.value,
     }
+
+    if (field === 'PriceSchedule.MaxQuantity' && productUpdate.value === 0) {
+      //If max quantity is changed to zero, they are trying to remove it completely.
+      productUpdate.value = null
+    }
+
     this.updateProductResource(productUpdate)
   }
 
