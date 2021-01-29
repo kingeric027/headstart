@@ -103,7 +103,8 @@ export class OCMCheckout implements OnInit {
     this.lineItems = this.context.order.cart.get()
     this.orderPromotions = this.context.order.promos.get().Items
     this.isAnon = this.context.currentUser.isAnonymous()
-    this.currentPanel = this.isAnon ? 'login' : 'shippingAddress'
+    this.currentPanel = this.isAnon ? 'login' : 'shippingAddressLoading'
+    this.initLoadingIndicator();
     this.orderSummaryMeta = getOrderSummaryMeta(
       this.order,
       this.orderPromotions,
@@ -120,6 +121,7 @@ export class OCMCheckout implements OnInit {
       void this.router.navigate(['/cart'])
     } else {
       await this.reIDLineItems()
+      this.destoryLoadingIndicator('shippingAddress')
     }
   }
 
