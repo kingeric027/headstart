@@ -63,7 +63,9 @@
         <span translate>PRODUCTS.DETAILS.NOTE</span>: {{ supplierNote }}
       </div>
       <ng-container *ngIf="!showGrid">
-        <h4 class="font-weight-bold">{{ price | currency: userCurrency }}</h4>
+        <h4 class="font-weight-bold">
+          {{ unitPrice | currency: userCurrency }}
+        </h4>
         <!-- TODO: Plug in unit of measure when data is in OC. -->
         <p class="text-muted">{{ _product | UofM }}</p>
         <span class="badge badge-pill badge-warning" *ngIf="percentSavings > 0">
@@ -128,9 +130,10 @@
                 isInactiveVariant
               "
               (click)="addToCart()"
-              translate
             >
-              PRODUCTS.DETAILS.ADD_TO_CART
+              <span translate>PRODUCTS.DETAILS.ADD_TO_CART</span>
+              &nbsp;&nbsp;|&nbsp;&nbsp;
+              {{ price | currency: userCurrency }}
             </button>
           </div>
         </div>
