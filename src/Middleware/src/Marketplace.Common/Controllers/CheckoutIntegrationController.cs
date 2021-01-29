@@ -25,8 +25,6 @@ namespace Headstart.Common.Controllers
 			return await _checkoutIntegrationCommand.GetRatesAsync(orderCalculatePayload);
 		}
 
-        
-
         [Route("ordercalculate")]
 		[HttpPost]
 		[OrderCloudWebhookAuth]
