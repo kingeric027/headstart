@@ -30,5 +30,15 @@ namespace Headstart.Common.Models.Marketplace
     public class TransactionXP
     {
         public CardConnectAuthorizationResponse CardConnectResponse { get; set; }
+        public RMADetails RMADetails { get; set; }
+    }
+
+    [SwaggerModel]
+    public class RMADetails
+    {
+        public string OrderRMANumber { get; set; }
+        public string RefundComment { get; set; }
+        public string FromSupplierID { get; set; }
+        public string FromUserID { get; set; }
     }
 }
