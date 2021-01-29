@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Headstart.Common.Services.ShippingIntegration.Models;
+using Headstart.Models.Models.Marketplace;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Headstart.Common.Extensions
 {
@@ -24,6 +27,16 @@ namespace Headstart.Common.Extensions
             { return false; }
 
             return true;
+        }
+
+        public static HSShipEstimate GetMatchingShipEstimate(this HSOrderWorksheet buyerWorksheet, string supplierID)
+        {
+            return buyerWorksheet?.ShipEstimateResponse?.ShipEstimates?.FirstOrDefault(e => e.xp.ShipFromAddressID == supplierID);
+        }
+
+        public static IEnumerable<HSLineItem> GetBuyerLineItemsBySupplierID(this HSOrderWorksheet buyerWorksheet, string supplierID)
+        {
+            return buyerWorksheet?.LineItems?.Where(li => li.SupplierID == supplierID).Select(li => li);
         }
     }
 }
