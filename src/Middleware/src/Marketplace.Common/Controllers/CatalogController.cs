@@ -70,18 +70,11 @@ namespace Headstart.Common.Controllers
 			await _command.Delete(buyerID, catalogID, VerifiedUserContext);
 		}
 
-		[DocName("SYNC User Location Catalogs On Add To Location")]
-		[HttpPost, Route("{buyerID}/catalogs/user/{userID}/location/{locationID}/Add"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task SyncOnAddToLocation(string buyerID, string userID, string locationID)
-		{
-			await _command.SyncUserCatalogAssignmentsForUserOnAddToLocation(buyerID, locationID, userID);
-		}
-
-		[DocName("SYNC User Location Catalogs On Remove From Location")]
-		[HttpPost, Route("{buyerID}/catalogs/user/{userID}/location/{locationID}/Remove"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task SyncOnRemoveFromLocation(string buyerID, string userID, string locationID)
-		{
-			await _command.SyncUserCatalogAssignmentsForUserOnRemoveFrom(buyerID, locationID, userID);
-		}
-	}
+        [DocName("SYNC User Catalogs Assignments")]
+        [HttpPost, Route("{buyerID}/catalogs/user/{userID}"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
+        public async Task SyncOnRemoveFromLocation(string buyerID, string userID)
+        {
+			await _command.SyncUserCatalogAssignments(buyerID, userID);
+        }
+    }
 }

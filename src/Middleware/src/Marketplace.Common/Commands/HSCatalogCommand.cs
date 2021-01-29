@@ -18,8 +18,7 @@ namespace Headstart.Common.Commands.Crud
 		Task<HSCatalog> Get(string buyerID, string catalogID, VerifiedUserContext user);
 		Task<HSCatalog> Put(string buyerID, string catalogID, HSCatalog catalog, VerifiedUserContext user);
 		Task Delete(string buyerID, string catalogID, VerifiedUserContext user);
-		Task SyncUserCatalogAssignmentsForUserOnRemoveFrom(string buyerID, string locationID, string userID);
-		Task SyncUserCatalogAssignmentsForUserOnAddToLocation(string buyerID, string locationID, string userID);
+		Task SyncUserCatalogAssignments(string buyerID, string userID);
 	}
 
 	public class HSCatalogCommand : IHSCatalogCommand
@@ -80,50 +79,31 @@ namespace Headstart.Common.Commands.Crud
 			await UpdateUserCatalogAssignmentsForLocation(buyerID, locationID, locationPrePatch.xp.CatalogAssignments, newAssignments);
 		}
 
-		// logic used when a user is assigned or removed from a location
-		// wouldn't be as efficient to use the same logic for this as is used for the catalog location assignment setting
-		public async Task SyncUserCatalogAssignmentsForUserOnAddToLocation(string buyerID, string locationID, string userID)
-		{
-			var location = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, locationID);
-			if(location.xp.CatalogAssignments != null && location.xp.CatalogAssignments.Count() > 0)
+		//	This function looks at all catalog-user-group ids on the xp.CatalogAssignments array of all assigned BuyerLocation usergroups
+		//	Then we add or remove usergroup assignments so the actual assignments allign with what is in the BuyerLocation usergroups
+		public async Task SyncUserCatalogAssignments(string buyerID, string userID)
+        {
+			var currentAssignments = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID: buyerID, userID: userID);
+			var currentAssignedCatalogIDs = currentAssignments?.Items?.Select(assignment => assignment?.UserGroupID)?.ToList();
+			var currentUserGroups = await _oc.UserGroups.ListAsync<HSLocationUserGroup>(buyerID: buyerID, filters: $"ID={string.Join("|", currentAssignedCatalogIDs)}");
+			var catalogsUserShouldSee = currentUserGroups?.Items?.Where(item => (item?.xp?.Type == "BuyerLocation"))?.SelectMany(c => c?.xp?.CatalogAssignments);
+
+			var actualCatalogAssignments = currentUserGroups?.Items?.Where(item => item?.xp?.Type == "Catalog")?.Select(c => c.ID)?.ToList();
+			//now remove all actualCatalogAssignments that are not included in catalogsUserShouldSee
+			var assignmentsToRemove = actualCatalogAssignments?.Where(id => !catalogsUserShouldSee.Contains(id));
+			var assignmentsToAdd = catalogsUserShouldSee?.Where(id => !actualCatalogAssignments.Contains(id));
+			await Throttler.RunAsync(assignmentsToRemove, 100, 5, catalogAssignmentToRemove =>
 			{
-				var userGroupAssignmentsForUser = await _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userID: userID, pageSize: 100);
-				var catalogAssignmentsToMake = location.xp.CatalogAssignments.Where(catalogID => !userGroupAssignmentsForUser.Items.Any(g => g.UserGroupID == catalogID));
-				await Throttler.RunAsync(catalogAssignmentsToMake, 100, 5, catalogAssignmentToMake =>
-				{
-					return _oc.UserGroups.SaveUserAssignmentAsync(buyerID, new UserGroupAssignment()
-					{
-						UserGroupID = catalogAssignmentToMake,
-						UserID = userID
-					});
-				});
-			}
-		}
-
-		public async Task SyncUserCatalogAssignmentsForUserOnRemoveFrom(string buyerID, string locationID, string userID)
-		{
-			var location = await _oc.UserGroups.GetAsync<HSLocationUserGroup>(buyerID, locationID);
-			if (location.xp.CatalogAssignments != null && location.xp.CatalogAssignments.Count() > 0)
+				return _oc.UserGroups.DeleteUserAssignmentAsync(buyerID, catalogAssignmentToRemove, userID);
+			});
+			await Throttler.RunAsync(assignmentsToAdd, 100, 5, catalogAssignmentToAdd =>
 			{
-				// todo more than 100 locations
-				var locations = await _oc.UserGroups.ListAsync<HSLocationUserGroup>(buyerID, opts => opts.AddFilter(u => u.xp.Type == "BuyerLocation").PageSize(100));
-				var locationUserAssignments = await Throttler.RunAsync(locations.Items, 100, 5, l =>
-				{
-					return _oc.UserGroups.ListUserAssignmentsAsync(buyerID, userGroupID: l.ID, pageSize: 100);
-
-				});
-				var locationUserAssignmentsFlat = locationUserAssignments.SelectMany(u => u.Items.ToList());
-				var catalogsBuyerShouldSee = locations.Items.Where(l => locationUserAssignmentsFlat.Any(assignment => assignment.UserID == userID && l.ID == assignment.UserGroupID) && l.ID != locationID).SelectMany(l =>
-				{
-					return l.xp.CatalogAssignments != null && l.xp.CatalogAssignments.Count() > 0 ? l.xp.CatalogAssignments : new List<string>() { };
-				});
-				var catalogAssignmentsToRemove = location.xp.CatalogAssignments.Where(locationCatalogAssignment => !catalogsBuyerShouldSee.Contains(locationCatalogAssignment));
-				await Throttler.RunAsync(catalogAssignmentsToRemove, 100, 5, catalogAssignmentToRemove =>
-			   {
-				   return _oc.UserGroups.DeleteUserAssignmentAsync(buyerID, catalogAssignmentToRemove, userID);
-			   });
-
-			}
+				return _oc.UserGroups.SaveUserAssignmentAsync(buyerID, new UserGroupAssignment()
+                {
+					UserGroupID = catalogAssignmentToAdd,
+					UserID = userID
+                });
+			});
 		}
 
 		private async Task UpdateUserCatalogAssignmentsForLocation(string buyerID, string locationID, List<string> oldAssignments, List<string> newAssignments)

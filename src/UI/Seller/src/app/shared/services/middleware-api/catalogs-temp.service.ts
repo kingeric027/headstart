@@ -132,23 +132,11 @@ export class CatalogsTempService {
       .toPromise()
   }
 
-  async syncUserCatalogAssignmentsOnLocationAdd(
+  async syncUserCatalogAssignments(
     buyerID: string,
-    locationID: string,
     userID: string
   ): Promise<any> {
-    const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/user/${userID}/location/${locationID}/Add`
-    return await this.http
-      .post(url, {}, { headers: this.buildHeaders() })
-      .toPromise()
-  }
-
-  async syncUserCatalogAssignmentsOnLocationRemove(
-    buyerID: string,
-    locationID: string,
-    userID: string
-  ): Promise<any> {
-    const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/user/${userID}/location/${locationID}/Remove`
+    const url = `${this.appConfig.middlewareUrl}/buyers/${buyerID}/catalogs/user/${userID}`
     return await this.http
       .post(url, {}, { headers: this.buildHeaders() })
       .toPromise()
