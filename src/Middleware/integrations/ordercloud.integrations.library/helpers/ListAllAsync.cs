@@ -1,4 +1,4 @@
-﻿using OrderCloud.SDK;
+using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,10 @@ namespace ordercloud.integrations.library.helpers
             {
                 pageTasks.Add(listFunc(i++));
                 var running = pageTasks.Where(t => !t.IsCompleted && !t.IsFaulted).ToList();
-                if (totalPages == 0 || running.Count >= 16) // throttle parallel tasks at 16
+                if(running.Count == 0 && pageTasks?.FirstOrDefault()?.Result?.Meta?.TotalPages != null)
+                {
+                    totalPages = pageTasks.FirstOrDefault().Result.Meta.TotalPages;
+                }else if (totalPages == 0 || running.Count >= 16) // throttle parallel tasks at 16
                     totalPages = (await await Task.WhenAny(running)).Meta.TotalPages;  //Set total number of pages based on returned Meta.
             } while (i <= totalPages);
             var data = (

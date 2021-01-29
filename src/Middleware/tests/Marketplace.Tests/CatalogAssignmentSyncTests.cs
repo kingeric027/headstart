@@ -9,6 +9,7 @@ using OrderCloud.SDK;
 using Headstart.Models;
 using Headstart.Common;
 using Headstart.Common.Commands.Crud;
+using ordercloud.integrations.library.helpers;
 
 namespace Headstart.Tests
 {
@@ -53,8 +54,10 @@ namespace Headstart.Tests
             {
                 "321"
             };
-            _oc.UserGroups.ListUserAssignmentsAsync(buyerID: Arg.Any<string>(), userID: Arg.Any<string>()).ReturnsForAnyArgs(GetUserGroupAssignments());
-            _oc.UserGroups.ListAsync<HSLocationUserGroup>(buyerID: Arg.Any<string>(), filters: Arg.Any<string>()).ReturnsForAnyArgs(GetUserGroups(currentLocationCatalogLists, currentCatalogAssignments, currentLocationPermissionAssignments));
+            _oc.UserGroups.ListUserAssignmentsAsync(buyerID: Arg.Any<string>(), userID: Arg.Any<string>(), page: Arg.Any<int>(), pageSize: Arg.Any<int>())
+                .ReturnsForAnyArgs(Task.FromResult(GetUserGroupAssignments()));
+            _oc.UserGroups.ListAsync<HSLocationUserGroup>(buyerID: Arg.Any<string>(), filters: Arg.Any<string>())
+                .ReturnsForAnyArgs(GetUserGroups(currentLocationCatalogLists, currentCatalogAssignments, currentLocationPermissionAssignments));
 
 
             //act
