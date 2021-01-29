@@ -6,10 +6,12 @@ import {
   HSLineItem,
   HSMeProduct,
 } from '@ordercloud/headstart-sdk'
-import { Me, OrderPromotion } from 'ordercloud-javascript-sdk'
-import { LineItemWithProduct } from '../models/line-item.types'
+import { uniq } from 'lodash'
+import { BuyerProduct, Me, OrderPromotion } from 'ordercloud-javascript-sdk'
+import { HSLineItemWithBuyerProduct, LineItemWithProduct } from '../models/line-item.types'
 import { CurrentOrderService } from '../services/order/order.service'
 import { PromoService } from '../services/order/promo.service'
+
 
 @Component({
   template: `
@@ -50,27 +52,36 @@ export class CartWrapperComponent implements OnInit {
     // TODO - this requests all the products on navigation to the cart.
     // Fewer requests could be acomplished by moving this logic to the cart service so it runs only once.
     const availableLineItems = await this.checkForProductAvailability(items)
-    await this.updateProductCache(availableLineItems.map((li) => li.ProductID))
+    await this.updateProductCache(availableLineItems.map((li) => li.buyerProduct))
     this.lineItems = this.mapToLineItemsWithProduct(
-      availableLineItems,
+      availableLineItems.map(a => a.lineItem),
       items.Meta
     )
   }
 
   async checkForProductAvailability(
     items: ListPage<HSLineItem>
-  ): Promise<HSLineItem[]> {
-    const activeLineItems: HSLineItem[] = []
-    const inactiveLineItems: HSLineItem[] = []
-    for (const item of items.Items) {
-      try {
-        await Me.GetProduct(item.ProductID)
-        activeLineItems.push(item)
-      } catch {
-        inactiveLineItems.push(item)
+  ): Promise<HSLineItemWithBuyerProduct[]> {
+    const activeLineItems: HSLineItemWithBuyerProduct[] = []
+    const invalidLineItems: HSLineItem[] = []
+    const uniqIDs = uniq(items.Items.map(i => i.ProductID))
+    const requests = uniqIDs.map(async id => 
+      Me.GetProduct(id)
+      .catch(e => undefined))
+
+    const responses = await Promise.all(requests);
+    items.Items.forEach(li => {
+      const matchingProd: BuyerProduct = responses.find(p => p && p.ID === li.ProductID);
+      if(matchingProd) {
+        activeLineItems.push({
+          lineItem: li,
+          buyerProduct: matchingProd
+        })
+      } else {
+        invalidLineItems.push(li)
       }
-    }
-    this.invalidLineItems = inactiveLineItems
+    })
+    this.invalidLineItems = invalidLineItems
     return activeLineItems
   }
 
@@ -78,12 +89,12 @@ export class CartWrapperComponent implements OnInit {
     this.orderPromos = promos
   }
 
-  async updateProductCache(productIDs: string[]): Promise<void> {
+  async updateProductCache(products: BuyerProduct[]): Promise<void> {
     const cachedIDs = this.productCache.map((p) => p.ID)
-    const toAdd = productIDs.filter((id) => !cachedIDs.includes(id))
+    const toAdd = products.filter((p) => !cachedIDs.includes(p.ID))
     this.productCache = [
       ...this.productCache,
-      ...(await this.requestProducts(toAdd)),
+      ...toAdd,
     ]
   }
 

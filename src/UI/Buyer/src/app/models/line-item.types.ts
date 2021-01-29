@@ -1,4 +1,4 @@
-import { HSMeProduct } from "@ordercloud/headstart-sdk";
+import { HSLineItem, HSMeProduct } from "@ordercloud/headstart-sdk";
 import { Address, BuyerProduct, LineItem, Supplier } from "ordercloud-javascript-sdk";
 
 export interface LineItemGroupSupplier {
@@ -23,4 +23,8 @@ export interface LineItemGroupSupplier {
 export interface LineItemWithProduct extends LineItem {
     Product?: HSMeProduct
   }
-  
+
+  export interface HSLineItemWithBuyerProduct {
+    lineItem: HSLineItem;
+    buyerProduct: BuyerProduct
+  }
