@@ -11,7 +11,6 @@ export const ocAppConfig: AppConfig = {
   cmsUrl: environment.cmsUrl,
   creditCardIframeUrl: environment.creditCardIframeUrl,
   sellerID: environment.sellerID,
-  ssoLink: environment.ssoLink,
   translateBlobUrl: environment.translateBlobUrl,
   ordercloudEnv: environment.ordercloudEnv,
   theme: environment.theme,

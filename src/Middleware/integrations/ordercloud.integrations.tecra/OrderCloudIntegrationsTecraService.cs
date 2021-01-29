@@ -5,8 +5,6 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using ordercloud.integrations.tecra.Models;
 using ordercloud.integrations.tecra.Storage;
-using Polly.Retry;
-using Polly;
 
 namespace ordercloud.integrations.tecra
 {

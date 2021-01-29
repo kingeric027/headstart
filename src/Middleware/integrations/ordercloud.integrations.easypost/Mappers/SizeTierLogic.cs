@@ -74,7 +74,6 @@ namespace ordercloud.integrations.easypost
 			var lineItemsThatCanShipTogether = lineItems.Where(li => li.Product.xp.SizeTier != SizeTier.G).OrderBy(lineItem => lineItem.Product.xp.SizeTier);
 			var lineItemsThatShipAlone = lineItems.Where(li => li.Product.xp.SizeTier == SizeTier.G);
 
-
 			var parcels = lineItemsThatCanShipTogether
 				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
 				.Aggregate(new List<Package>(), (packages, item) =>
@@ -82,7 +81,7 @@ namespace ordercloud.integrations.easypost
 					if (packages.Count == 0) packages.Add(new Package());
 					var percentFillToAdd = (double)SIZE_FACTOR_MAP[item.Product.xp.SizeTier];
 					var currentPackage = packages.Last();
-					if (currentPackage.PercentFilled + percentFillToAdd > 100) // this should be a 1, not a 100. However, this mathematically correct packaging produces very high rates.
+					if (currentPackage.PercentFilled + percentFillToAdd > 1)
 					{
 						var newPackage = new Package() { PercentFilled = percentFillToAdd, Weight = (decimal)item.ShipWeightOrDefault(0) };
 						packages.Add(newPackage);
@@ -106,7 +105,9 @@ namespace ordercloud.integrations.easypost
 				};
 			}).Select(p => CapParcelDimensions(p, TARGET_REASONABLE_PARCEL_DIMENSION));
 
-			var individualPackages = lineItemsThatShipAlone.Select(li => new EasyPostParcel()
+			var individualPackages = lineItemsThatShipAlone
+				.SelectMany(lineItem => Enumerable.Repeat(lineItem, lineItem.Quantity))
+				.Select(li => new EasyPostParcel()
             {
                 // length/width/height cannot be zero otherwise we'll get an error (422 Unprocessable Entity) from easypost
                 weight = li.ShipWeightOrDefault(Package.DEFAULT_WEIGHT), // (double) (li.Product.ShipWeight ?? Package.DEFAULT_WEIGHT),

@@ -11,7 +11,6 @@
   "instrumentationKey": "4133d3cf-ae7a-43d1-a16b-172aee7cff6f",
   "translateBlobUrl": "https://stfour51demotest.blob.core.windows.net/ngx-translate2/i18n/",
   "sellerID": "Headstart_Demo_Test",
-  "ssoLink": null,
   "ordercloudEnv": "Sandbox",
   "theme": { "logoSrc": "assets/generic-logo.png" }
 }

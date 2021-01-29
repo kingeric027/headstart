@@ -32,6 +32,8 @@ using SmartyStreets;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Net;
+using System.Collections.Generic;
+using Headstart.Common.Repositories;
 
 namespace Headstart.API
 {
@@ -60,6 +62,14 @@ namespace Headstart.API
                 _settings.CosmosSettings.MaxRequestsPerTcpConnection,
                 _settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
             );
+            var cosmosContainers = new List<ContainerInfo>() 
+            { 
+                new ContainerInfo()
+                {
+                    Name = "rmas",
+                    PartitionKey = "PartitionKey"
+                }
+            };
 
             var avalaraConfig = new AvalaraConfig()
 			{
@@ -95,6 +105,7 @@ namespace Headstart.API
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
+                .AddCosmosDb(_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey, _settings.CosmosSettings.DatabaseName, cosmosContainers)
                 .Inject<IDevCenterService>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
@@ -132,6 +143,7 @@ namespace Headstart.API
                 .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()
+                .Inject<IRMARepo>()
                 .Inject<IZohoClient>()
                 .AddSingleton<IZohoCommand>(z => new ZohoCommand(new ZohoClient(
                     new ZohoClientConfig() {

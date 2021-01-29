@@ -1,18 +1,19 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using OrderCloud.SDK;
-using Headstart.Models;
-using Headstart.Common.Services;
-using Headstart.Models.Models.Marketplace;
-using ordercloud.integrations.library;
-using Headstart.Models.Extended;
 using Headstart.Common.Constants;
-using SendGrid.Helpers.Mail;
 using Headstart.Common.Extensions;
-using System.Net;
+using Headstart.Common.Services;
+using Headstart.Models;
+using Headstart.Models.Extended;
+using Headstart.Models.Models.Marketplace;
+using Microsoft.ApplicationInsights;
+using Newtonsoft.Json;
+using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
+using OrderCloud.SDK;
+using SendGrid.Helpers.Mail;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Headstart.Common.Commands
 {
@@ -31,14 +32,15 @@ namespace Headstart.Common.Commands
         private readonly ISendgridService _sendgridService;
         private readonly IMeProductCommand _meProductCommand;
         private readonly IPromotionCommand _promotionCommand;
+        private readonly TelemetryClient _telemetry;
 
-
-        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand)
+        public LineItemCommand(ISendgridService sendgridService, IOrderCloudClient oc, IMeProductCommand meProductCommand, IPromotionCommand promotionCommand, TelemetryClient telemetry)
         {
 			_oc = oc;
             _sendgridService = sendgridService;
             _meProductCommand = meProductCommand;
             _promotionCommand = promotionCommand;
+            _telemetry = telemetry;
         }
 
         // used on post order submit
@@ -238,69 +240,94 @@ namespace Headstart.Common.Commands
 
         private async Task HandleLineItemStatusChangeNotification(VerifiedUserType setterUserType, HSOrder buyerOrder, List<string> supplierIDsRelatedToChange, List<HSLineItem> lineItemsChanged, LineItemStatusChanges lineItemStatusChanges)
         {
-            var suppliers = await Throttler.RunAsync(supplierIDsRelatedToChange, 100, 5, supplierID => _oc.Suppliers.GetAsync<HSSupplier>(supplierID));
+            try
+            {
+                var suppliers = await Throttler.RunAsync(supplierIDsRelatedToChange, 100, 5, supplierID => _oc.Suppliers.GetAsync<HSSupplier>(supplierID));
 
-            // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
-            var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
+                // currently the only place supplier name is used is when there should be lineitems from only one supplier included on the change, so we can just take the first supplier
+                var statusChangeTextDictionary = LineItemStatusConstants.GetStatusChangeEmailText(suppliers.First().Name);
 
-            foreach (KeyValuePair<VerifiedUserType, EmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status]) {
-                var userType = entry.Key;
-                var emailText = entry.Value;
-
-                var firstName = "";
-                var lastName = "";
-                var email = "";
-
-                if (userType == VerifiedUserType.buyer)
+                foreach (KeyValuePair<VerifiedUserType, EmailDisplayText> entry in statusChangeTextDictionary[lineItemStatusChanges.Status])
                 {
-                    firstName = buyerOrder.FromUser.FirstName;
-                    lastName = buyerOrder.FromUser.LastName;
-                    email = buyerOrder.FromUser.Email;
-                    await _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
-                }
-                else if (userType == VerifiedUserType.admin) {
-                    // Loop over seller users, pull out THEIR boolean, as well as the List<string> of AddtlRcpts
-                    var sellerUsers = await _oc.AdminUsers.ListAsync<HSSellerUser>();
-                    var tos = new List<EmailAddress>();
-                    foreach (var seller in sellerUsers.Items)
+                    var userType = entry.Key;
+                    var emailText = entry.Value;
+
+                    var firstName = "";
+                    var lastName = "";
+                    var email = "";
+
+                    if (userType == VerifiedUserType.buyer)
                     {
-                        if (seller?.xp?.OrderEmails ?? false)
-                        {
-                            tos.Add(new EmailAddress(seller.Email));
-                        };
-                        if (seller?.xp?.AddtlRcpts?.Any() ?? false)
-                        {
-                            foreach (var rcpt in seller.xp.AddtlRcpts) {
-                                tos.Add(new EmailAddress(rcpt));
-                            };
-                        };
-                    };
-                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.admin);
-                    if (shouldNotify)
-                    {
-                        await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
+                        firstName = buyerOrder.FromUser.FirstName;
+                        lastName = buyerOrder.FromUser.LastName;
+                        email = buyerOrder.FromUser.Email;
+                        await _sendgridService.SendLineItemStatusChangeEmail(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), firstName, lastName, email, emailText);
                     }
-                } else
-                {
-                    var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.supplier);
-                    if (shouldNotify)
+                    else if (userType == VerifiedUserType.admin)
                     {
-                        await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
+                        // Loop over seller users, pull out THEIR boolean, as well as the List<string> of AddtlRcpts
+                        var sellerUsers = await _oc.AdminUsers.ListAsync<HSSellerUser>();
+                        var tos = new List<EmailAddress>();
+                        foreach (var seller in sellerUsers.Items)
                         {
-                            if (supplier?.xp?.NotificationRcpts?.Any() ?? false)
+                            if (seller?.xp?.OrderEmails ?? false)
                             {
-                                var tos = new List<EmailAddress>();
-                                foreach (var rcpt in supplier.xp.NotificationRcpts)
+                                tos.Add(new EmailAddress(seller.Email));
+                            };
+                            if (seller?.xp?.AddtlRcpts?.Any() ?? false)
+                            {
+                                foreach (var rcpt in seller.xp.AddtlRcpts)
                                 {
                                     tos.Add(new EmailAddress(rcpt));
                                 };
-                                await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
-                            }
-                        });
-                        
+                            };
+                        };
+                        var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.admin);
+                        if (shouldNotify)
+                        {
+                            await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
+                        }
+                    }
+                    else
+                    {
+                        var shouldNotify = !(LineItemStatusConstants.LineItemStatusChangesDontNotifySetter.Contains(lineItemStatusChanges.Status) && setterUserType == VerifiedUserType.supplier);
+                        if (shouldNotify)
+                        {
+                            await Throttler.RunAsync(suppliers, 100, 5, async supplier =>
+                            {
+                                if (supplier?.xp?.NotificationRcpts?.Any() ?? false)
+                                {
+                                    var tos = new List<EmailAddress>();
+                                    foreach (var rcpt in supplier.xp.NotificationRcpts)
+                                    {
+                                        tos.Add(new EmailAddress(rcpt));
+                                    };
+                                    await _sendgridService.SendLineItemStatusChangeEmailMultipleRcpts(buyerOrder, lineItemStatusChanges, lineItemsChanged.ToList(), tos, emailText);
+                                }
+                            });
+
+                        }
                     }
                 }
+            } 
+            catch (Exception ex)
+            {
+
+                // track in app insights
+                // to find go to Transaction Search > Event Type = Event > Filter by any of these custom properties or event name "Email.LineItemEmailFailed"
+                var customProperties = new Dictionary<string, string>
+                {
+                    { "Message", "Attempt to email line item changes failed" },
+                    { "BuyerOrderID", buyerOrder.ID },
+                    { "BuyerID", buyerOrder.FromCompanyID },
+                    { "UserEmail", buyerOrder.FromUser.Email },
+                    { "UserType", setterUserType.ToString() },
+                    { "ErrorResponse", JsonConvert.SerializeObject(ex.Message, Newtonsoft.Json.Formatting.Indented)}
+                };
+                _telemetry.TrackEvent("Email.LineItemEmailFailed", customProperties);
+                return;
             }
+          
         }
 
         private void ValidateLineItemStatusChange(List<HSLineItem> previousLineItemStates, LineItemStatusChanges lineItemStatusChanges, VerifiedUserType userType)
