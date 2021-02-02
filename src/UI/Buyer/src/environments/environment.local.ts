@@ -2,46 +2,26 @@
 
 // ===== MAKE CHANGES TO CONFIGURATION BETWEEN THESE LINES ONLY =======
 // ====================================================================
-const brand = Brand.WAXING_THE_CITY
-const sebEnvironment = Environment.STAGING
+const brand = Brand.DEFAULT_BUYER
+const appEnvironment = Environment.TEST
 const useLocalMiddleware = false
 const localMiddlewareURL = 'https://localhost:44304'
 // ====================================================================
 // ======= UNLESS YOU ARE DOING SOMETHING WEIRD =======================
 
-import waxingthecitytest from '../assets/appConfigs/waxingthecity-test.json'
-import brandweardesignstest from '../assets/appConfigs/fastsigns-test.json'
-import fastsignstest from '../assets/appConfigs/waxingthecity-test.json'
-import go2partnerstest from '../assets/appConfigs/go2partners-test.json'
-import headstartdemotest from '../assets/appConfigs/headstartdemo-test.json'
-import anytimefitnessstaging from '../assets/appConfigs/anytimefitness-staging.json'
-import basecampfitnessstaging from '../assets/appConfigs/basecampfitness-staging.json'
-import thebarmethodstaging from '../assets/appConfigs/thebarmethod-staging.json'
-import waxingthecitystaging from '../assets/appConfigs/waxingthecity-staging.json'
-import anytimefitnessproduction from '../assets/appConfigs/anytimefitness-production.json'
-import basecampfitnessproduction from '../assets/appConfigs/basecampfitness-production.json'
-import thebarmethodproduction from '../assets/appConfigs/thebarmethod-production.json'
-import waxingthecityproduction from '../assets/appConfigs/waxingthecity-production.json'
+import defaultbuyertest from '../assets/appConfigs/defaultbuyer-test.json'
+import defaultbuyeruat from '../assets/appConfigs/defaultbuyer-uat.json'
+import defaultbuyerproduction from '../assets/appConfigs/defaultbuyer-production.json'
 
 const apps = {
   TEST: {
-    WAXING_THE_CITY: waxingthecitytest,
-    BRANDWEAR_DESIGNS: brandweardesignstest,
-    GO2PARTNERS: go2partnerstest,
-    HEADSTART_DEMO: headstartdemotest,
-    FAST_SIGNS: fastsignstest,
+    DEFAULT_BUYER: defaultbuyertest,
   },
-  STAGING: {
-    ANYTIME_FITNESS: anytimefitnessstaging,
-    BASECAMP_FITNESS: basecampfitnessstaging,
-    THE_BAR_METHOD: thebarmethodstaging,
-    WAXING_THE_CITY: waxingthecitystaging,
+  UAT: {
+    DEFAULT_BUYER: defaultbuyeruat,
   },
   PRODUCTION: {
-    ANYTIME_FITNESS: anytimefitnessproduction,
-    BASECAMP_FITNESS: basecampfitnessproduction,
-    THE_BAR_METHOD: thebarmethodproduction,
-    WAXING_THE_CITY: waxingthecityproduction,
+    DEFAULT_BUYER: defaultbuyerproduction,
   },
 }
 
@@ -53,9 +33,9 @@ import {
   EnvironmentConfig,
 } from 'src/app/models/environment.types'
 
-const target = apps[sebEnvironment][brand] as EnvironmentConfig
+const target = apps[appEnvironment][brand] as EnvironmentConfig
 target.hostedApp = false
-target.instrumentationKey = ''
+target.appInsightsInstrumentationKey = ''
 if (useLocalMiddleware) {
   target.middlewareUrl = localMiddlewareURL
 }

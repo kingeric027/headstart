@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core'
-import { environment } from '../../environments/environment'
+import { environment } from '../../environments/environment.local'
 import { ApiRole } from '@ordercloud/angular-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
 
@@ -10,7 +10,6 @@ export const ocAppConfig: AppConfig = {
   middlewareUrl: environment.middlewareUrl,
   cmsUrl: environment.cmsUrl,
   orderCloudApiUrl: environment.orderCloudApiUrl,
-  orderCloudApiVersion: environment.orderCloudApiVersion,
   translateBlobUrl: environment.translateBlobUrl,
   blobStorageUrl: environment.blobStorageUrl,
   buyerConfigs: environment.buyerConfigs,

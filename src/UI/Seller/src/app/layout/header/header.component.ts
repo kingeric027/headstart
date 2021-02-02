@@ -16,7 +16,7 @@ import { AppConfig, AppStateService, MPRoute } from '@app-seller/shared'
 import { getHeaderConfig } from './header.config'
 import { AppAuthService } from '@app-seller/auth'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
-import { environment } from 'src/environments/environment'
+import { environment } from 'src/environments/environment.local'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 
 @Component({
