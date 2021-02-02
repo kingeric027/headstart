@@ -1,24 +1,17 @@
 using Headstart.Common.Commands;
-using Headstart.Common.Commands.Zoho;
-using Headstart.Common.Services;
 using NUnit.Framework;
 using NSubstitute;
-using ordercloud.integrations.avalara;
 using OrderCloud.SDK;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Headstart.Common;
 using ordercloud.integrations.cardconnect;
 using System.Threading.Tasks;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using ordercloud.integrations.library;
 using Headstart.Models.Models.Marketplace;
-using System.Security.Claims;
 using Headstart.Models;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
+using System;
+using NSubstitute.ExceptionExtensions;
 
 namespace Headstart.Tests
 {
@@ -71,12 +64,12 @@ namespace Headstart.Tests
         }
 
         [Test]
-        public async Task should_throw_if_order_is_missing_shipping_selections()
+        public void should_throw_if_order_is_missing_shipping_selections()
         {
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -101,12 +94,12 @@ namespace Headstart.Tests
         }
 
         [Test]
-        public async Task should_throw_if_has_standard_lines_and_missing_payment()
+        public void should_throw_if_has_standard_lines_and_missing_payment()
         {
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -121,11 +114,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -145,7 +138,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = true } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = true } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -160,11 +153,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -186,7 +179,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "SEBmockOrderID", IsSubmitted = false, xp = new Models.OrderXp { } },
+                Order = new HSOrder { ID = "SEBmockOrderID", IsSubmitted = false, xp = new OrderXp { } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -201,11 +194,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -227,7 +220,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -242,11 +235,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -266,7 +259,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -281,11 +274,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -300,12 +293,14 @@ namespace Headstart.Tests
         }
 
         [Test]
-        public async Task should_not_capture_credit_card_payment_if_all_po_lineitems()
+        public async Task should_void_payment_if_error_on_submit()
         {
             // Arrange
+            _oc.Orders.SubmitAsync<HSOrder>(Arg.Any<OrderDirection>(), Arg.Any<string>(), Arg.Any<string>()).Throws(new Exception("Some error"));
+
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -320,11 +315,51 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.PurchaseOrder
+                                ProductType = ProductType.Standard
+                            }
+                        }
+                    }
+                }
+            }));
+
+            // Act
+            Assert.ThrowsAsync<Exception>(async () => await _sut.SubmitOrderAsync("mockOrderID", OrderDirection.Outgoing, new OrderCloudIntegrationsCreditCardPayment(), "mockUserToken"));
+
+            // Assert
+            await _card.Received().AuthorizePayment(Arg.Any<OrderCloudIntegrationsCreditCardPayment>(), "mockUserToken", Arg.Any<string>());
+            await _card.Received().VoidPaymentAsync("SEB12345", "mockUserToken");
+        }
+
+        [Test]
+        public async Task should_not_capture_credit_card_payment_if_all_po_lineitems()
+        {
+            // Arrange
+            _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
+            {
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
+                ShipEstimateResponse = new HSShipEstimateResponse
+                {
+                    ShipEstimates = new List<HSShipEstimate>()
+                    {
+                        new HSShipEstimate
+                        {
+                            SelectedShipMethodID = "FEDEX_GROUND"
+                        }
+                    }
+                },
+                LineItems = new List<HSLineItem>()
+                {
+                    new HSLineItem
+                    {
+                        Product = new HSLineItemProduct
+                        {
+                            xp = new ProductXp
+                            {
+                                ProductType = ProductType.PurchaseOrder
                             }
                         }
                     }
@@ -345,7 +380,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -360,11 +395,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -384,7 +419,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -399,11 +434,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -425,7 +460,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -440,11 +475,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -466,7 +501,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -481,11 +516,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }
@@ -507,7 +542,7 @@ namespace Headstart.Tests
             // Arrange
             _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, "mockOrderID").Returns(Task.FromResult(new HSOrderWorksheet
             {
-                Order = new Models.HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new Models.OrderXp { IsResubmitting = false } },
+                Order = new HSOrder { ID = "mockOrderID", IsSubmitted = false, xp = new OrderXp { IsResubmitting = false } },
                 ShipEstimateResponse = new HSShipEstimateResponse
                 {
                     ShipEstimates = new List<HSShipEstimate>()
@@ -522,11 +557,11 @@ namespace Headstart.Tests
                 {
                     new HSLineItem
                     {
-                        Product = new Models.HSLineItemProduct
+                        Product = new HSLineItemProduct
                         {
-                            xp = new Models.ProductXp
+                            xp = new ProductXp
                             {
-                                ProductType = Models.ProductType.Standard
+                                ProductType = ProductType.Standard
                             }
                         }
                     }

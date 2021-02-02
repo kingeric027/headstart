@@ -20,8 +20,8 @@ namespace ordercloud.integrations.cardconnect
 		Task<BuyerCreditCard> MeTokenizeAndSave(OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<CreditCard> TokenizeAndSave(string buyerID, OrderCloudIntegrationsCreditCardToken card, VerifiedUserContext user);
 		Task<Payment> AuthorizePayment(OrderCloudIntegrationsCreditCardPayment payment, string userToken, string merchantID);
-		Task VoidPaymentAsync(HSPayment payment, HSOrder order, string userToken);
-
+		Task VoidTransactionAsync(HSPayment payment, HSOrder order, string userToken);
+		Task VoidPaymentAsync(string orderID, string userToken);
 	}
 
 	public class CreditCardCommand : ICreditCardCommand
@@ -104,7 +104,7 @@ namespace ordercloud.integrations.cardconnect
 						return ocPayment;
                     } else
                     {
-						await VoidPaymentAsync(ocPayment, order, userToken);
+						await VoidTransactionAsync(ocPayment, order, userToken);
                     }
                 }
                 var call = await _cardConnect.AuthWithoutCapture(CardConnectMapper.Map(cc, order, payment, merchantID, ccAmount));
@@ -124,7 +124,18 @@ namespace ordercloud.integrations.cardconnect
 			}
 		}
 
-		public async Task VoidPaymentAsync(HSPayment payment, HSOrder order, string userToken)
+		public async Task VoidPaymentAsync(string orderID, string userToken)
+        {
+			var order = await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, orderID);
+			var paymentList = await _oc.Payments.ListAsync<HSPayment>(OrderDirection.Incoming, order.ID);
+			var payment = paymentList.Items.Any() ? paymentList.Items[0] : null;
+			if(payment == null) { return; }
+
+			await VoidTransactionAsync(payment, order, userToken);
+			await _oc.Payments.PatchAsync(OrderDirection.Incoming, orderID, payment.ID, new PartialPayment { Accepted = false });
+        }
+
+		public async Task VoidTransactionAsync(HSPayment payment, HSOrder order, string userToken)
         {
 			var transactionID = "";
 			try

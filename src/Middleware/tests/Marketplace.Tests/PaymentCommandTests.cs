@@ -46,7 +46,7 @@ namespace Headstart.Tests
 
             // ccCommand
             _ccCommand = Substitute.For<ICreditCardCommand>();
-            _ccCommand.VoidPaymentAsync(Arg.Any<HSPayment>(), Arg.Any<HSOrder>(), mockUserToken)
+            _ccCommand.VoidTransactionAsync(Arg.Any<HSPayment>(), Arg.Any<HSOrder>(), mockUserToken)
                 .Returns(Task.FromResult(0));
 
             _sut = new PaymentCommand(_oc, _orderCalc, _ccCommand);
@@ -111,7 +111,7 @@ namespace Headstart.Tests
 
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
-            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
+            await _ccCommand.Received().VoidTransactionAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
             await _oc.Payments.Received().PatchAsync<HSPayment>(OrderDirection.Incoming, mockOrderID, mockCCPaymentID, Arg.Is<PartialPayment>(p => p.Amount == mockedCreditCardTotal && p.Accepted == false));
         }
 
@@ -135,7 +135,7 @@ namespace Headstart.Tests
 
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockCCPaymentID);
-            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
+            await _ccCommand.Received().VoidTransactionAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
             await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<HSPayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
@@ -159,7 +159,7 @@ namespace Headstart.Tests
 
             // Assert
             await _oc.Payments.Received().DeleteAsync(OrderDirection.Incoming, mockOrderID, mockCCPaymentID);
-            await _ccCommand.Received().VoidPaymentAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
+            await _ccCommand.Received().VoidTransactionAsync(Arg.Is<HSPayment>(p => p.ID == mockCCPaymentID), Arg.Is<HSOrder>(o => o.ID == mockOrderID), mockUserToken);
             await _oc.Payments.Received().CreateAsync<HSPayment>(OrderDirection.Outgoing, mockOrderID, Arg.Is<HSPayment>(p => p.CreditCardID == creditcard2 && p.Amount == mockedCreditCardTotal && p.Accepted == false), mockUserToken);
         }
 
@@ -182,7 +182,7 @@ namespace Headstart.Tests
 
             // Assert
             await _oc.Payments.DidNotReceive().DeleteAsync(OrderDirection.Incoming, mockOrderID, Arg.Any<string>());
-            await _ccCommand.DidNotReceive().VoidPaymentAsync(Arg.Any<HSPayment>(), Arg.Any<HSOrder>(), mockUserToken);
+            await _ccCommand.DidNotReceive().VoidTransactionAsync(Arg.Any<HSPayment>(), Arg.Any<HSOrder>(), mockUserToken);
             await _oc.Payments.DidNotReceive().CreateAsync<HSPayment>(Arg.Any<OrderDirection>(), mockOrderID, Arg.Any<HSPayment>(), mockUserToken);
             await _oc.Payments.DidNotReceive().PatchAsync<HSPayment>(Arg.Any<OrderDirection>(), mockOrderID, Arg.Any<string>(), Arg.Any<PartialPayment>());
         }
