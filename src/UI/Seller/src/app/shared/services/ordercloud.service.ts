@@ -23,7 +23,7 @@ export class OrderCloudService {
     const headerResult: HttpHeaders =
       headerToUse == null ? headerToUse : this.headers.headers
 
-    const url = `${this.appConfig.orderCloudApiUrl}/${this.appConfig.orderCloudApiVersion}/me/password`
+    const url = `${this.appConfig.orderCloudApiUrl}/v1/me/password`
     this.http.post(url, body, { headers: headerResult }).subscribe(
       () => {
         return true

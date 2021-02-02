@@ -31,7 +31,7 @@ import {
   faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons'
 import { applicationConfiguration } from '@app-seller/config/app.config'
-import { environment } from 'src/environments/environment'
+import { environment } from 'src/environments/environment.local'
 import { ToastrService } from 'ngx-toastr'
 import { User, OcSupplierUserService, Buyer } from '@ordercloud/angular-sdk'
 import { Buyers } from 'ordercloud-javascript-sdk'

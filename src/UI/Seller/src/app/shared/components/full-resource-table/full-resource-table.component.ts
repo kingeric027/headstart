@@ -10,7 +10,7 @@ import {
 import { ToastrService } from 'ngx-toastr'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import { SortDirection } from './sort-direction.enum'
-import { environment } from 'src/environments/environment'
+import { environment } from 'src/environments/environment.local'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ImpersonationService } from '@app-seller/shared/services/impersonation/impersonation.service'
 import { applicationConfiguration } from '@app-seller/config/app.config'
