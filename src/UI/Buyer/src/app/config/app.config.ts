@@ -4,18 +4,19 @@ import { AppConfig } from '../models/environment.types'
 
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
+  appID: environment.appID,
   clientID: environment.clientID,
-  marketplaceID: environment.marketplaceID,
+  incrementorPrefix: environment.incrementorPrefix,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
   cmsUrl: environment.cmsUrl,
   creditCardIframeUrl: environment.creditCardIframeUrl,
   sellerID: environment.sellerID,
   translateBlobUrl: environment.translateBlobUrl,
-  ordercloudEnv: environment.ordercloudEnv,
+  orderCloudApiUrl: environment.orderCloudApiUrl,
   theme: environment.theme,
   anonymousShoppingEnabled: false,
-  instrumentationKey: environment.instrumentationKey,
+  appInsightsInstrumentationKey: environment.appInsightsInstrumentationKey,
   scope: [
     'MeAddressAdmin',
     'AddressAdmin', // Only for location owners

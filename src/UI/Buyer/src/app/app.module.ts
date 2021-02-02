@@ -201,7 +201,7 @@ import { ShopperContextService } from './services/shopper-context/shopper-contex
 import { TempSdk } from './services/temp-sdk/temp-sdk.service'
 import { TokenHelperService } from './services/token-helper/token-helper.service'
 import { CMSConfiguration } from '@ordercloud/cms-sdk'
-import { AppConfig, OrdercloudEnv } from './models/environment.types'
+import { AppConfig } from './models/environment.types'
 import { OCMKitLineitemTable } from './components/cart/lineitem-table/kit-lineitem-table/kit-lineitem-table.component'
 
 export function HttpLoaderFactory(
@@ -528,25 +528,12 @@ export class AppModule {
   }
 
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
-    const apiUrl = this.getApiUrl(config.ordercloudEnv)
-    const appname = config.appname.replace(/ /g, '')
     return {
-      baseApiUrl: apiUrl,
+      baseApiUrl: config.orderCloudApiUrl,
       clientID: config.clientID,
       cookieOptions: {
-        prefix: `${appname}buyer-${config.ordercloudEnv}`.toLowerCase(),
+        prefix: `${config.appID}buyer`.toLowerCase(),
       },
-    }
-  }
-
-  private getApiUrl(env: OrdercloudEnv): string {
-    switch (env) {
-      case OrdercloudEnv.Sandbox:
-        return `https://sandboxapi.ordercloud.io`
-      case OrdercloudEnv.Staging:
-        return `https://stagingapi.ordercloud.io`
-      case OrdercloudEnv.Production:
-        return `https://api.ordercloud.io`
     }
   }
 

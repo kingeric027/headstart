@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, ResolveEnd, Router } from '@angular/router'
-import { ApplicationInsights, IEventTelemetry } from '@microsoft/applicationinsights-web'
+import {
+  ApplicationInsights,
+  IEventTelemetry,
+} from '@microsoft/applicationinsights-web'
 import { Subscription } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { AppConfig } from 'src/app/models/environment.types'
@@ -23,10 +26,10 @@ export class ApplicationInsightsService {
     if (window) {
       isDeployed = window.location.hostname !== 'localhost'
     }
-    if (this.appConfig.instrumentationKey && isDeployed) {
+    if (this.appConfig.appInsightsInstrumentationKey && isDeployed) {
       this.appInsights = new ApplicationInsights({
         config: {
-          instrumentationKey: this.appConfig.instrumentationKey,
+          instrumentationKey: this.appConfig.appInsightsInstrumentationKey,
           enableAutoRouteTracking: true,
         },
       })
@@ -47,7 +50,10 @@ export class ApplicationInsightsService {
     }
   }
 
-  public trackAuthErrorEvents(decodedToken?: DecodedOCToken, error?: any): void {
+  public trackAuthErrorEvents(
+    decodedToken?: DecodedOCToken,
+    error?: any
+  ): void {
     const currentUser = this.context.currentUser.get()
     const event: IEventTelemetry = {
       name: 'AuthError',
@@ -56,10 +62,10 @@ export class ApplicationInsightsService {
         buyerId: currentUser?.Buyer?.ID,
         tokenIssuedAt: decodedToken?.nbf,
         tokenExpAt: decodedToken?.exp,
-        error
-      }
+        error,
+      },
     }
-    this.trackEvent(event);
+    this.trackEvent(event)
   }
 
   private trackEvent(event: IEventTelemetry): void {

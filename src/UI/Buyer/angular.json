@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "default-components": {
+    "headstart": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/default-components",
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -30,17 +30,12 @@
               "src/web.config"
             ],
             "styles": [
-              "src/styles/main.scss"
+              "src/styles/themes/defaultbuyer/_main.scss"
             ],
             "scripts": []
           },
           "configurations": {
             "dev": {
-              "stylePreprocessorOptions": {
-                "includePaths": [
-                  "src/styles/themes/waxing-the-city"
-                ]
-              },
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": false,
@@ -67,43 +62,8 @@
               } ],
               "styles": [
                 {
-                  "input": "src/styles/themes/anytime-fitness/_main.scss",
-                  "bundleName": "anytimefitness",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/bar-method/_main.scss",
-                  "bundleName": "thebarmethod",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/basecamp/_main.scss",
-                  "bundleName": "basecampfitness",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/brandweardesigns/_main.scss",
-                  "bundleName": "brandweardesigns",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/fastsigns/_main.scss",
-                  "bundleName": "fastsigns",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/go2partners/_main.scss",
-                  "bundleName": "go2partners",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/headstartdemo/_main.scss",
-                  "bundleName": "headstartdemo",
-                  "inject": false
-                },
-                {
-                  "input": "src/styles/themes/waxing-the-city/_main.scss",
-                  "bundleName": "waxingthecity",
+                  "input": "src/styles/themes/defaultbuyer/_main.scss",
+                  "bundleName": "defaultbuyer",
                   "inject": false
                 }
               ],
@@ -131,7 +91,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "default-components:build",
+            "browserTarget": "headstart:build",
             "sourceMap": {
               "scripts": true,
               "vendor": true
@@ -139,17 +99,17 @@
           },
           "configurations": {
             "dev": {
-              "browserTarget": "default-components:build:dev"
+              "browserTarget": "headstart:build:dev"
             },
             "deploy": {
-              "browserTarget": "default-components:build:deploy"
+              "browserTarget": "headstart:build:deploy"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "default-components:build"
+            "browserTarget": "headstart:build"
           }
         },
         "test": {
@@ -188,19 +148,19 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "default-components:serve"
+            "devServerTarget": "headstart:serve"
           },
           "configurations": {
             "test": {
-              "devServerTarget": "default-components:serve:test"
+              "devServerTarget": "headstart:serve:test"
             },
             "staging": {
-              "devServerTarget": "default-components:serve:staging"
+              "devServerTarget": "headstart:serve:staging"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "default-components"
+  "defaultProject": "headstart"
 }
