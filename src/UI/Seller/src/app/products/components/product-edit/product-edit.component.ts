@@ -48,11 +48,11 @@ import {
   ProductXp,
   TaxProperties,
   Asset,
+  TaxCode,
 } from '@ordercloud/headstart-sdk'
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
-import { AssetUpload } from 'marketplace-javascript-sdk/dist/models/AssetUpload'
 import {
   ValidateMinMax,
   ValidateNoSpecialCharactersAndSpaces,
@@ -72,7 +72,6 @@ import { SupportedRates } from '@app-seller/models/currency-geography.types'
 import { FileHandle } from '@app-seller/models/file-upload.types'
 import { UserContext } from '@app-seller/models/user.types'
 import { AppConfig } from '@app-seller/models/environment.types'
-import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
 
 @Component({
   selector: 'app-product-edit',
@@ -122,7 +121,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   _exchangeRates: SupportedRates[]
   areChanges = false
   taxCodeCategorySelected = false
-  taxCodes: ListPage<TaxCodes>
+  taxCodes: ListPage<TaxCode>
   productType: ProductXp['ProductType']
   shippingAddress: any
   productVariations: any
@@ -852,7 +851,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       Title: isAttachment ? 'Product_Attachment' : null,
       File: file.File,
       FileName: file.Filename,
-    } as AssetUpload
+    } as Asset
     const newAsset: Asset = await ContentManagementClient.Assets.Upload(
       asset,
       accessToken

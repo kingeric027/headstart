@@ -5,8 +5,8 @@ import {
   SuperHSProduct,
   ListPage,
   TaxProperties,
+  TaxCode,
 } from '@ordercloud/headstart-sdk'
-import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
 import {
   faTimesCircle,
   faCheckCircle,
@@ -24,7 +24,7 @@ export class ProductTaxCodeSelect {
   @Input()
   superHSProductEditable: SuperHSProduct
   @Input()
-  taxCodes: ListPage<TaxCodes>
+  taxCodes: ListPage<TaxCode>
   @Output()
   handleTaxCodeCategorySelection = new EventEmitter<any>()
   @Output()
