@@ -33,20 +33,14 @@ export class SellerEmailNotifications {
   @Output()
   removeRcpt = new EventEmitter<number>()
   // Ouput Functions
-  toggleOrderEmails = (event: Event): void =>
-    this.toggleReceiveOrderEmails.emit(
-      (event.target as HTMLInputElement).checked
-    )
-  toggleRequestInfoEmails = (event: Event): void =>
-    this.toggleReceiveRequestInfoEmails.emit(
-      (event.target as HTMLInputElement).checked
-    )
+  toggleOrderEmails = (event: any): void =>
+    this.toggleReceiveOrderEmails.emit(event.target.checked)
+  toggleRequestInfoEmails = (event: any): void =>
+    this.toggleReceiveRequestInfoEmails.emit(event.target.checked)
 
-  toggleProductEmails = (event: Event): void =>
-    this.toggleReceiveProductEmails.emit(
-      (event.target as HTMLInputElement).checked
-    )
+  toggleProductEmails = (event: any): void =>
+    this.toggleReceiveProductEmails.emit(event.target.checked)
 
   removeAddtlRcpt = (index: number): void => this.removeRcpt.emit(index)
-  addAddtlRcpt = (): void => this.addRcpt.emit()
+  addAddtlRcpt = () => this.addRcpt.emit()
 }

@@ -6,7 +6,6 @@ import {
   EventEmitter,
 } from '@angular/core'
 import { Router } from '@angular/router'
-import { CategoryFields } from '@app-seller/models/category.types'
 
 @Component({
   selector: 'app-buyer-category-edit',
@@ -15,7 +14,7 @@ import { CategoryFields } from '@app-seller/models/category.types'
 })
 export class BuyerCategoryEditComponent {
   _category: any
-  _categoryFields: CategoryFields[] = [
+  _categoryFields: any[] = [
     { field: 'ParentID', type: 'string' },
     { field: 'ID', type: 'string' },
     { field: 'Name', type: 'string' },

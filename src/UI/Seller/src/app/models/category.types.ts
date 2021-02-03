@@ -31,8 +31,3 @@ export interface SupplierCategorySelection {
   ServiceCategory: string
   VendorLevel: string
 }
-
-export interface CategoryFields {
-  type: string
-  field: string
-}

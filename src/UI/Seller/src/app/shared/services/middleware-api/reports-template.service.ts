@@ -96,7 +96,7 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
 
   async updateResource(
     originalID: string,
-    resource: ReportTemplate
+    resource: any
   ): Promise<ReportTemplate> {
     originalID = resource.TemplateID
     const url = `${this.appConfig.middlewareUrl}/reports/${originalID}`
@@ -115,7 +115,7 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
   }
 
   async previewReport(
-    template: ReportTemplate,
+    template: any,
     reportRequestBody: any
   ): Promise<object[]> {
     const url = `${this.appConfig.middlewareUrl}/reports/${template.ReportType}/preview/${template.TemplateID}`
@@ -166,18 +166,15 @@ export class ReportsTemplateService extends ResourceCrudService<ReportTemplate> 
     return 'TemplateID'
   }
 
-  public getResourceID(resource: ReportTemplate): string {
+  public getResourceID(resource: any): string {
     return resource.TemplateID
   }
 
-  public checkForResourceMatch(i: ReportTemplate, resourceID: string): boolean {
+  public checkForResourceMatch(i: any, resourceID: string): boolean {
     return i.TemplateID === resourceID
   }
 
-  public checkForNewResourceMatch(
-    i: ReportTemplate,
-    newResource: ReportTemplate
-  ): boolean {
+  public checkForNewResourceMatch(i: any, newResource: any): boolean {
     return i.TemplateID === newResource.TemplateID
   }
 }

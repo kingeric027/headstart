@@ -6,7 +6,6 @@ import { BuyerUserService } from '../buyer-user.service'
 import { ValidateEmail } from '@app-seller/validators/validators'
 import { GeographyConfig } from '@app-seller/shared/models/supported-countries.constant'
 import { AppFormErrorService, SupportedCountries } from '@app-seller/shared'
-import { HSUser } from '@ordercloud/headstart-sdk'
 @Component({
   selector: 'app-buyer-user-edit',
   templateUrl: './buyer-user-edit.component.html',
@@ -37,7 +36,7 @@ export class BuyerUserEditComponent {
     this.countryOptions = GeographyConfig.getCountries()
   }
 
-  createBuyerUserForm(user: HSUser): void {
+  createBuyerUserForm(user: User) {
     this.resourceForm = new FormGroup({
       Active: new FormControl(user.Active || false),
       Username: new FormControl(user.Username, Validators.required),
