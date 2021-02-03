@@ -34,8 +34,7 @@
 |         EasyPostSettings:NoRatesFallbackCost          | If no shipping rates are returned, use this as a fallback cost                                                                                              |
 |      EasyPostSettings:NoRatesFallbackTransitDays      | If no shipping rates are returned, use this as a fallback transit days                                                                                      |
 |            EasyPostSettings:USPSAccountId             | For each account used in EasyPost, add AccountID's to the settings. This setting is for USPS specifically                                                   |
-|                          Env                          | Which environment this config will be used in for Avalara.                                                                                                  |
-|        EnvironmentSettings:AppTimeoutInSeconds        | TODO: Not used in code, can delete                                                                                                                          |
+|                          Env                          | Which environment this config will be used in for Avalara (UAT , Test and Production).                                                                                                  |
 |              EnvironmentSettings:BaseUrl              | URL to be used to host the middleware                                                                                                                       |
 |            EnvironmentSettings:BuildNumber            | The build number, automatically set during deploy                                                                                                           |
 |              EnvironmentSettings:Commit               | The commit, automatically set during deploy                                                                                                                 |

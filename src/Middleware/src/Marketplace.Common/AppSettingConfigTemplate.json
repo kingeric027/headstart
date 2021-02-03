@@ -51,7 +51,6 @@
   "SendGridSettings:ApiKey": "",
   "SendgridSettings:FromEmail": "",
   "SendgridSettings:SupportEmails": "",
-  "Sentinel": "31",
   "SmartyStreetSettings:AuthID": "",
   "SmartyStreetSettings:AuthToken": "",
   "SmartyStreetSettings:RefererHost": "",
@@ -66,11 +65,11 @@
   "TecraSettings:StoreID": "",
   "TecraSettings:Username": "",
   "TecraSettings:WorkspaceID": "",
-  "UI:BaseAdminUrl": "https://marketplace-admin-ui-test.azurewebsites.net",
-  "UI:BaseBuyerUrl": "https://marketplace-buyer-ui-test.azurewebsites.net",
+  "UI:BaseAdminUrl": "",
+  "UI:BaseBuyerUrl": "",
   "ZohoSettings:AccessToken": "",
   "ZohoSettings:ClientId": "",
   "ZohoSettings:ClientSecret": "",
   "ZohoSettings:OrgID": "",
-  "ZohoSettings:PerformOrderSubmitTasks": "false",
+  "ZohoSettings:PerformOrderSubmitTasks": "false"
 }
