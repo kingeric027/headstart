@@ -7,9 +7,9 @@ import { Router } from '@angular/router'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { getSuggestedAddresses } from '@app-seller/shared/services/address-suggestion.helper'
-import { MarketplaceBuyerLocation } from 'marketplace-javascript-sdk/dist/models/MarketplaceBuyerLocation'
 import {
   HeadStartSDK,
+  HSBuyerLocation,
   HSCatalog,
   HSCatalogAssignmentRequest,
 } from '@ordercloud/headstart-sdk'
@@ -47,8 +47,8 @@ export class BuyerLocationEditComponent implements OnInit {
   catalogAssignments: HSCatalogAssignmentRequest = { CatalogIDs: [] }
   buyerID: string
   selectAddress = new EventEmitter<any>()
-  buyerLocationEditable: MarketplaceBuyerLocation
-  buyerLocationStatic: MarketplaceBuyerLocation
+  buyerLocationEditable: HSBuyerLocation
+  buyerLocationStatic: HSBuyerLocation
   areChanges = false
   dataIsSaving = false
   countryOptions: SupportedCountries[]
@@ -64,7 +64,7 @@ export class BuyerLocationEditComponent implements OnInit {
     this.countryOptions = GeographyConfig.getCountries()
   }
 
-  refreshBuyerLocationData(buyerLocation: MarketplaceBuyerLocation): void {
+  refreshBuyerLocationData(buyerLocation: HSBuyerLocation): void {
     this.buyerLocationEditable = buyerLocation
     this.buyerLocationStatic = buyerLocation
     this.catalogAssignments.CatalogIDs = this.buyerLocationEditable.UserGroup.xp.CatalogAssignments
@@ -83,7 +83,7 @@ export class BuyerLocationEditComponent implements OnInit {
     this.isCreatingNew = this.buyerLocationService.checkIfCreatingNew()
   }
 
-  createBuyerLocationForm(buyerLocation: MarketplaceBuyerLocation): void {
+  createBuyerLocationForm(buyerLocation: HSBuyerLocation): void {
     this.resourceForm = new FormGroup({
       ID: new FormControl(buyerLocation.Address.ID),
       LocationName: new FormControl(

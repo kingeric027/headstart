@@ -1,5 +1,5 @@
 /*
- * Marketplace has distinct roles which are sometimes a combination of OrderCloud roles or sometimes a single OrderCloud role
+ * Headstart has distinct roles which are sometimes a combination of OrderCloud roles or sometimes a single OrderCloud role
  * We have choosen to represent these MP roles with security profiles and identifying custom roles for example: MPProductAdmin (OrderCloud roles: ProductAdmin, FacetAdmin, SpecAdmin)
  *
  */

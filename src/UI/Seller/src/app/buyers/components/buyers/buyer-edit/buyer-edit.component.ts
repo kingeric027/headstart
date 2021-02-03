@@ -64,8 +64,8 @@ export class BuyerEditComponent {
   }
 
   async handleSelectedBuyerChange(buyer: HSBuyer): Promise<void> {
-    const superMarketplaceBuyer = await this.buyerTempService.get(buyer.ID)
-    this.refreshBuyerData(superMarketplaceBuyer)
+    const superHSBuyer = await this.buyerTempService.get(buyer.ID)
+    this.refreshBuyerData(superHSBuyer)
   }
 
   refreshBuyerData(superBuyer: HSBuyerPriceMarkup): void {

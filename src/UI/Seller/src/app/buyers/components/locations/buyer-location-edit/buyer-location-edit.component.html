@@ -11,7 +11,7 @@
       <div class="col-md-7 form-group">
         <div class="form-row">
           <div class="form-group col-md-12" *ngIf="isCreatingNew">
-            <label for="ID">Marketplace ID (Optional)</label>
+            <label for="ID">Headstart ID (Optional)</label>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">{{ buyerID }}-</span>
@@ -35,7 +35,7 @@
             class="form-group col-md-12"
             *ngIf="!isCreatingNew && buyerLocationEditable"
           >
-            <label for="ID">Marketplace ID</label>
+            <label for="ID">Headstart ID</label>
             <input
               class="form-control"
               value="{{ buyerLocationEditable.Address.ID }}"

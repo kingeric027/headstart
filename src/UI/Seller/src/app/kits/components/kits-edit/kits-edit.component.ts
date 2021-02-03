@@ -16,12 +16,12 @@ import {
   SuperHSProduct,
   HSKitProduct,
   HSProductInKit,
+  ListArgs,
 } from '@ordercloud/headstart-sdk'
 import { Router } from '@angular/router'
 import { DomSanitizer } from '@angular/platform-browser'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Location } from '@angular/common'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { Buyer, OcBuyerService } from '@ordercloud/angular-sdk'
 import { TabIndexMapper } from './tab-mapper'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
@@ -108,9 +108,7 @@ export class KitsEditComponent implements OnInit {
     }
   }
 
-  async handleSelectedProductChange(
-    product: HSKitProduct
-  ): Promise<void> {
+  async handleSelectedProductChange(product: HSKitProduct): Promise<void> {
     const hsKitProduct = this.isCreatingNew
       ? this.kitService.emptyResource
       : await HeadStartSDK.KitProducts.Get(product.Product.ID)

@@ -10,7 +10,7 @@ import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/r
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { UserGroups } from 'ordercloud-javascript-sdk'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
+import { ListArgs } from '@ordercloud/headstart-sdk'
 
 @Injectable({
   providedIn: 'root',

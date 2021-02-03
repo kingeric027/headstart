@@ -23,7 +23,7 @@ export class FacetTableComponent
     super(changeDetectorRef, facetService, router, activatedRoute, ngZone)
   }
 
-  // static filters that should apply to all marketplace orgs, custom filters for specific applications can be
+  // static filters that should apply to all headstart orgs, custom filters for specific applications can be
   // added to the filterconfig passed into the resourcetable in the future
   filterConfig = {
     Filters: [],

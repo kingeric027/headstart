@@ -49,7 +49,6 @@ import {
   TaxProperties,
   Asset,
 } from '@ordercloud/headstart-sdk'
-import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper'
 import { AppAuthService } from '@app-seller/auth'
@@ -73,6 +72,7 @@ import { SupportedRates } from '@app-seller/models/currency-geography.types'
 import { FileHandle } from '@app-seller/models/file-upload.types'
 import { UserContext } from '@app-seller/models/user.types'
 import { AppConfig } from '@app-seller/models/environment.types'
+import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
 
 @Component({
   selector: 'app-product-edit',
@@ -650,9 +650,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         JSON.stringify(this._superHSProductEditable) !==
         JSON.stringify(this._superHSProductStatic)
       ) {
-        superProduct = await this.updateMarketplaceProduct(
-          this._superHSProductEditable
-        )
+        superProduct = await this.updateHSProduct(this._superHSProductEditable)
       }
       if (this.appConfig?.superProductFieldsToMonitor.length > 0) {
         superProduct = await this.checkForFieldsToMonitor(superProduct)
@@ -1030,8 +1028,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     superHSProduct.Product.xp.Status = 'Draft'
     superHSProduct.Product.xp.Currency = supplier?.xp?.Currency
     superHSProduct.PriceSchedule.ID = superHSProduct.Product.ID
-    superHSProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superHSProduct.Product.Name}`
-    // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer'.
+    superHSProduct.PriceSchedule.Name = `Default_HS_Buyer${superHSProduct.Product.Name}`
+    // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_HS_Buyer'.
     if (superHSProduct.PriceSchedule.Name.length > 100) {
       superHSProduct.PriceSchedule.Name = superHSProduct.PriceSchedule.Name.slice(
         0,
@@ -1045,7 +1043,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     return await HeadStartSDK.Products.Post(superHSProduct)
   }
 
-  async updateMarketplaceProduct(
+  async updateHSProduct(
     superHSProduct: SuperHSProduct
   ): Promise<SuperHSProduct> {
     // If PriceSchedule has a price break price, but no ID or name, set them
@@ -1054,8 +1052,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       superHSProduct.PriceSchedule.ID === null
     ) {
       superHSProduct.PriceSchedule.ID = superHSProduct.Product.ID
-      superHSProduct.PriceSchedule.Name = `Default_Marketplace_Buyer${superHSProduct.Product.Name}`
-      // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_Marketplace_Buyer'.
+      superHSProduct.PriceSchedule.Name = `Default_HS_Buyer${superHSProduct.Product.Name}`
+      // Slice Price Schedule if more than 100 characters after the pre-pended 'Default_HS_Buyer'.
       if (superHSProduct.PriceSchedule.Name.length > 100) {
         superHSProduct.PriceSchedule.Name = superHSProduct.PriceSchedule.Name.slice(
           0,

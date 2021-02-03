@@ -9,11 +9,11 @@ import {
   UserGroup,
 } from '@ordercloud/angular-sdk'
 import { BUYER_SUB_RESOURCE_LIST } from '../buyers/buyer.service'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { CatalogsTempService } from '@app-seller/shared/services/middleware-api/catalogs-temp.service'
 import { Users } from 'ordercloud-javascript-sdk'
 import { IUserPermissionsService } from '@app-seller/models/user.types'
+import { ListArgs } from '@ordercloud/headstart-sdk'
 
 // TODO - this service is only relevent if you're already on the buyer details page. How can we enforce/inidcate that?
 @Injectable({

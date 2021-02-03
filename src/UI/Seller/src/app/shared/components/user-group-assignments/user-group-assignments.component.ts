@@ -22,8 +22,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import {
   HeadStartSDK,
   HSLocationUserGroup,
+  ListArgs,
 } from '@ordercloud/headstart-sdk'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import {
   AssignmentsToAddUpdate,
   IUserPermissionsService,
