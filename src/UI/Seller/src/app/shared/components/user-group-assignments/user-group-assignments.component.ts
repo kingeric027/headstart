@@ -19,8 +19,11 @@ import { REDIRECT_TO_FIRST_PARENT } from '@app-seller/layout/header/header.confi
 import { GetDisplayText } from './user-group-assignments.constants'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
-import { HeadStartSDK, HSLocationUserGroup } from '@ordercloud/headstart-sdk'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
+import {
+  HeadStartSDK,
+  HSLocationUserGroup,
+  ListArgs,
+} from '@ordercloud/headstart-sdk'
 import {
   AssignmentsToAddUpdate,
   IUserPermissionsService,

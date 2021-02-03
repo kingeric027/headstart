@@ -8,7 +8,6 @@ import {
   SimpleChanges,
 } from '@angular/core'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import TaxCodes from 'marketplace-javascript-sdk/dist/api/TaxCodes'
 import {
   SuperHSProduct,
   ListPage,

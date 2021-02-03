@@ -23,7 +23,7 @@ export interface SupplierCategoryConfigFilters {
 export interface SupplierCategoryConfig {
   id: string
   timeStamp: string
-  MarketplaceName: string
+  HSName: string
   Filters: Array<SupplierCategoryConfigFilters>
 }
 

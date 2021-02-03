@@ -4,7 +4,7 @@ import {
   UserGroup,
   UserGroupAssignment,
 } from '@ordercloud/angular-sdk'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
+import { ListArgs } from '@ordercloud/headstart-sdk'
 
 export interface IUserPermissionsService {
   getUserGroups(orgID: string, options: ListArgs): Promise<ListPage<UserGroup>>

@@ -6,8 +6,7 @@ import { Observable } from 'rxjs'
 import { ResourceCrudService } from '../resource-crud/resource-crud.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { CurrentUserService } from '../current-user/current-user.service'
-import { ListPage, ReportTemplate } from '@ordercloud/headstart-sdk'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
+import { ListArgs, ListPage, ReportTemplate } from '@ordercloud/headstart-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
 
 @Injectable({

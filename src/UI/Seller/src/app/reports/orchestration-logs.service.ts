@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
-import { OcBuyerService } from '@ordercloud/angular-sdk'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import {
   OrchestrationLog,
   ListPage,
   HeadStartSDK,
 } from '@ordercloud/headstart-sdk'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { Buyers } from 'ordercloud-javascript-sdk'
 

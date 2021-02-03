@@ -3,17 +3,15 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { ResourceCrudService } from '@app-seller/shared/services/resource-crud/resource-crud.service'
 import {
   User,
-  OcSupplierUserService,
   UserGroupAssignment,
   OcSupplierUserGroupService,
-  Supplier,
   ListPage,
   UserGroup,
 } from '@ordercloud/angular-sdk'
 import { SUPPLIER_SUB_RESOURCE_LIST } from '../suppliers/supplier.service'
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { SupplierUsers } from 'ordercloud-javascript-sdk'
+import { ListArgs } from '@ordercloud/headstart-sdk'
 
 // TODO - this service is only relevent if you're already on the supplier details page. How can we enforce/inidcate that?
 @Injectable({

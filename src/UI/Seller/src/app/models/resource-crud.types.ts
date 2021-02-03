@@ -1,5 +1,4 @@
-import { ListArgs } from 'marketplace-javascript-sdk/dist/models/ListArgs'
-
+import { ListArgs } from '@ordercloud/headstart-sdk'
 export interface Options extends ListArgs {
   OrderDirection?: 'Incoming' | 'Outgoing',
   searchType?: 'AnyTerm' | 'AllTermsAnyField' | 'AllTermsSameField' | 'ExactPhrase' | 'ExactPhrasePrefix'
