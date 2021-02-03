@@ -127,8 +127,11 @@ export class UserGroupAssignments implements OnChanges {
     }
   }
 
-  async getUserGroupAssignments(userID: any, userOrgID: any): Promise<void> {
-    let userGroupAssignments
+  async getUserGroupAssignments(
+    userID: string,
+    userOrgID: string
+  ): Promise<void> {
+    let userGroupAssignments: UserGroupAssignment[]
     if (this.userGroupType === 'UserPermissions') {
       userGroupAssignments = await (
         await this.userPermissionsService.listUserAssignments(userID, userOrgID)
@@ -275,7 +278,7 @@ export class UserGroupAssignments implements OnChanges {
     await this.getUserGroups(this.userOrgID)
   }
 
-  async searchedResources(searchText: any): Promise<void> {
+  async searchedResources(searchText: string): Promise<void> {
     this.searching = true
     this.searchTermInput = searchText
     this.args = { ...this.args, search: searchText, page: 1 }
