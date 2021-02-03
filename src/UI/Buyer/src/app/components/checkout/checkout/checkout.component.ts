@@ -165,7 +165,7 @@ export class OCMCheckout implements OnInit {
       Type: 'CreditCard',
       CreditCardID: card.ID,
       xp: {
-        // any additions to the xp model must be updated in c# MarketplacePaymentModel or won't show up
+        // any additions to the xp model must be updated in c# HSPaymentModel or won't show up
         partialAccountNumber: card.PartialAccountNumber,
         cardType: card.CardType,
       },

@@ -5,7 +5,7 @@ import { AppConfig } from '../models/environment.types'
 export const ocAppConfig: AppConfig = {
   appname: environment.appname,
   clientID: environment.clientID,
-  marketplaceID: environment.marketplaceID,
+  headstartID: environment.headstartID,
   baseUrl: environment.baseUrl,
   middlewareUrl: environment.middlewareUrl,
   cmsUrl: environment.cmsUrl,

@@ -1,9 +1,9 @@
 {
   "hostedApp": true,
-  "appname": "Marketplace Test",
+  "appname": "Headstart Test",
   "appID": "waxingthecity-test",
   "clientID": "A5231DF1-2B00-4002-AB40-738A9E2CEC4B",
-  "marketplaceID": "SEB_TEST",
+  "headstartID": "SEB_TEST",
   "baseUrl": "https://marketplace-buyer-ui-test.azurewebsites.net/",
   "middlewareUrl": "https://middleware-api-test.sebvendorportal.com",
   "cmsUrl": "https://ordercloud-cms-test.azurewebsites.net",

@@ -3,7 +3,7 @@
   "appname": "Basecamp Fitness",
   "appID": "basecampfitness-production",
   "clientID": "0045BB67-84CC-42BD-9FA7-009875628F7C",
-  "marketplaceID": "SEB",
+  "headstartID": "SEB",
   "baseUrl": "https://basecampfitness.sebvendorportal.com",
   "middlewareUrl": "https://middleware-api.sebvendorportal.com",
   "cmsUrl": "https://ordercloud-cms.azurewebsites.net",

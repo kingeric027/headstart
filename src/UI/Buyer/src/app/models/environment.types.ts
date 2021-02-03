@@ -32,7 +32,7 @@ export interface EnvironmentConfig {
   appname: string
   clientID: string
   // used as a prefix for order incrementor
-  marketplaceID: string
+  headstartID: string
   baseUrl: string
   middlewareUrl: string
   cmsUrl: string
@@ -58,9 +58,9 @@ export class AppConfig {
    */
   clientID: string
   /**
-   * The identifier for the marketplace.
+   * The identifier for the headstart org.
    */
-  marketplaceID: string
+  headstartID: string
   /**
    * If set to true users can browse and submit orders without profiling themselves. This requires
    * additional set up in the dashboard. Click here to

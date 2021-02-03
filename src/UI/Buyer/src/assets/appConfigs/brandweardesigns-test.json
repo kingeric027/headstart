@@ -3,7 +3,7 @@
   "appname": "BRANDWEAR Designs",
   "appID": "brandweardesigns-test",
   "clientID": "2F33BE12-D914-419C-B3D0-41AEFB72BE93",
-  "marketplaceID": "BW_TEST",
+  "headstartID": "BW_TEST",
   "baseUrl": "https://brandweardesigns-buyer-ui-test.azurewebsites.net/",
   "middlewareUrl": "https://brandweardesigns-middleware-test.azurewebsites.net",
   "cmsUrl": "https://ordercloud-cms-test.azurewebsites.net",

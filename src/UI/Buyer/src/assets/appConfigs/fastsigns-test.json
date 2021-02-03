@@ -3,7 +3,7 @@
   "appname": "FASTSIGNS",
   "appID": "fastsigns-test",
   "clientID": "3B7CD2F7-36D8-4DC4-9616-0CB1C86C9FB3",
-  "marketplaceID": "FS_TEST",
+  "headstartID": "FS_TEST",
   "baseUrl": "https://fastsigns-buyer-ui-test.azurewebsites.net/",
   "cmsUrl": "https://ordercloud-cms-test.azurewebsites.net",
   "middlewareUrl": "https://fastsigns-middleware-test.azurewebsites.net",

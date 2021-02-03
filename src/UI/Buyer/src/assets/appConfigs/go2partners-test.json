@@ -3,7 +3,7 @@
   "appname": "GO2 Partners",
   "appID": "go2partners-test",
   "clientID": "B1FEB16F-9E3E-4534-88FE-F3AE29941986",
-  "marketplaceID": "GO2_TEST",
+  "headstartID": "GO2_TEST",
   "baseUrl": "https://go2partners-buyer-ui-test.azurewebsites.net/",
   "middlewareUrl": "https://go2partners-middleware-test.azurewebsites.net",
   "cmsUrl": "https://ordercloud-cms-test.azurewebsites.net",
