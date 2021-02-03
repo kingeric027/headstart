@@ -12,7 +12,6 @@ import { ShopperContextService } from 'src/app/services/shopper-context/shopper-
 export class OCMLogin implements OnInit {
   form: FormGroup
   appName: string
-  ssoLink: string // null indicates no sso
 
   constructor(
     private context: ShopperContextService,
@@ -21,7 +20,6 @@ export class OCMLogin implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.ssoLink = this.context.appSettings.ssoLink
     this.appName = this.context.appSettings.appname
     this.form = new FormGroup({
       username: new FormControl(''),

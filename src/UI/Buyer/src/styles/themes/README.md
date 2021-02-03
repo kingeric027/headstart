@@ -2,16 +2,5 @@
 
 Want to add a new theme?
 
-1.  copy `my-first-theme` folder and rename it to your desire
-2.  Update names in [main.scss](../main.scss)
-
-## Theming strategy:
-
-Override, Override, Override.
-
-You should only be doing one of two things when theming:
-
-- Overriding existing variables
-- Overriding existing styles
-
-The base app strives to utilize bootstrap variables when possible.
+1. Copy `defaultbuyer` folder and rename it to the first part of your appID. For example if your appID is `catstore-test` then the folder should be called `catstore`
+2. In angular.json (at the root of the project) under the deploy configuration add a new entry to the styles array. Make sure the bundleName is the same as the folder name

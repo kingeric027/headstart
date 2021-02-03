@@ -1,5 +1,5 @@
 import { Configuration } from '@ordercloud/angular-sdk'
-import { environment } from '../../environments/environment'
+import { environment } from '../../environments/environment.local'
 
 export const OcSDKConfig = (): Configuration => {
   return new Configuration({

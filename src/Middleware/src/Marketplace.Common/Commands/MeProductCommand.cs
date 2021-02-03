@@ -69,8 +69,8 @@ namespace Headstart.Common.Commands
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
 
 			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier);
-			var productCurrency = (Nullable<CurrencySymbol>)superMarketplaceProduct.Product.xp.Currency;
-			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency);
+			var productCurrency = superMarketplaceProduct.Product.xp.Currency;
+			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, productCurrency);
 		
 			superMarketplaceProduct.Product = markedupProduct;
 			superMarketplaceProduct.Specs = markedupSpecs;
@@ -86,8 +86,8 @@ namespace Headstart.Common.Commands
 			foreach(var kit in kitProduct.ProductAssignments.ProductsInKit)
             {
 				var markedupProduct = ApplyBuyerProductPricing(kit.Product, defaultMarkupMultiplier);
-				var productCurrency = (Nullable<CurrencySymbol>)kit.Product.xp.Currency;
-				var markedupSpecs = ApplySpecMarkups(kit.Specs.ToList(), defaultMarkupMultiplier, (Nullable<CurrencySymbol>)productCurrency);
+				var productCurrency = kit.Product.xp.Currency;
+				var markedupSpecs = ApplySpecMarkups(kit.Specs.ToList(), defaultMarkupMultiplier, productCurrency);
 				kit.Product = markedupProduct;
 				kit.Specs = markedupSpecs;
 			}
@@ -104,7 +104,7 @@ namespace Headstart.Common.Commands
 					if (option.PriceMarkup != null)
 					{
 						var unconvertedMarkup = option.PriceMarkup ?? 0;
-						option.PriceMarkup = ConvertPrice(unconvertedMarkup, (Nullable<CurrencySymbol>)productCurrency);
+						option.PriceMarkup = ConvertPrice(unconvertedMarkup, productCurrency);
 					}
 					return option;
 				}).ToList();
@@ -153,7 +153,7 @@ namespace Headstart.Common.Commands
 				{
 					product.PriceSchedule.PriceBreaks = product.PriceSchedule.PriceBreaks.Select(priceBreak =>
 					{
-						var markedupPrice = priceBreak.Price * defaultMarkupMultiplier;
+						var markedupPrice = Math.Round(priceBreak.Price * defaultMarkupMultiplier, 2); // round to 2 decimal places since we're dealing with price
 						var currency = product?.xp?.Currency ?? CurrencySymbol.USD;
 						var convertedPrice = ConvertPrice(markedupPrice, currency);
 						priceBreak.Price = convertedPrice;
@@ -191,5 +191,6 @@ namespace Headstart.Common.Commands
 			var markupMultiplier = markupPercent + 1;
 			return markupMultiplier;
 		}
+
 	}
 }

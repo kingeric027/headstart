@@ -11,7 +11,6 @@ export interface EnvironmentConfig {
   translateBlobUrl: string
   blobStorageUrl: string
   orderCloudApiUrl: string
-  orderCloudApiVersion: string
   buyerConfigs: Record<string, BuyerConfig>
   superProductFieldsToMonitor: string[]
 }
@@ -22,16 +21,12 @@ export interface BuyerConfig {
 }
 
 export enum Brand {
-  'SELF_ESTEEM_BRANDS' = 'SELF_ESTEEM_BRANDS',
-  'BRAND_WEAR_DESIGNS' = 'BRAND_WEAR_DESIGNS',
-  'FAST_SIGNS' = 'FAST_SIGNS',
-  'GO2PARTNERS' = 'GO2PARTNERS',
-  'HEADSTART_DEMO' = 'HEADSTART_DEMO',
+  'DEFAULT_ADMIN' = 'DEFAULT_ADMIN',
 }
 
 export enum Environment {
   'TEST' = 'TEST',
-  'STAGING' = 'STAGING',
+  'UAT' = 'UAT',
   'PRODUCTION' = 'PRODUCTION',
 }
 
@@ -78,7 +73,6 @@ export interface AppConfig {
    */
 
   orderCloudApiUrl: string
-  orderCloudApiVersion: string
 
   scope: ApiRole[]
   impersonatingBuyerScope: ApiRole[]

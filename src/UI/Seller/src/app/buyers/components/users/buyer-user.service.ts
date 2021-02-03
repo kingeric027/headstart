@@ -84,9 +84,8 @@ export class BuyerUserService
       })
       .toPromise()
     if (shouldSyncUserCatalogAssignments) {
-      await this.catalogsTempService.syncUserCatalogAssignmentsOnLocationAdd(
+      await this.catalogsTempService.syncUserCatalogAssignments(
         buyerID,
-        assignment.UserGroupID,
         assignment.UserID
       )
     }
@@ -97,16 +96,15 @@ export class BuyerUserService
     assignment: UserGroupAssignment,
     shouldSyncUserCatalogAssignments = false
   ): Promise<void> {
-    if (shouldSyncUserCatalogAssignments) {
-      await this.catalogsTempService.syncUserCatalogAssignmentsOnLocationRemove(
-        buyerID,
-        assignment.UserGroupID,
-        assignment.UserID
-      )
-    }
     await this.ocBuyerUserGroupService
       .DeleteUserAssignment(buyerID, assignment.UserGroupID, assignment.UserID)
       .toPromise()
+    if (shouldSyncUserCatalogAssignments) {
+      await this.catalogsTempService.syncUserCatalogAssignments(
+        buyerID,
+        assignment.UserID
+      )
+    }
   }
 
   async getUserGroups(

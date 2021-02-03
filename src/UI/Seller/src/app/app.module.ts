@@ -123,10 +123,9 @@ export class AppModule {
     OcConfiguration.Set(this.getOrdercloudSDKConfig(appConfig))
   }
   private getOrdercloudSDKConfig(config: AppConfig): SdkConfiguration {
-    const version = config.orderCloudApiVersion
     const apiUrl = config.orderCloudApiUrl
     return {
-      baseApiUrl: `${apiUrl}/${version}`,
+      baseApiUrl: `${apiUrl}/v1`,
       baseAuthUrl: `${apiUrl}/oauth/token`,
       clientID: config.clientID,
       cookieOptions: {

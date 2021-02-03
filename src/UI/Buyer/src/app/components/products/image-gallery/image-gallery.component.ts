@@ -8,6 +8,7 @@ import {
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { fromEvent } from 'rxjs'
 import { Asset, Spec } from '@ordercloud/headstart-sdk'
+import { SpecFormService } from '../spec-form/spec-form.service'
 
 @Component({
   templateUrl: './image-gallery.component.html',
@@ -27,7 +28,7 @@ export class OCMImageGallery implements OnInit, OnChanges {
   faAngleRight = faAngleRight
   isResponsiveView: boolean
 
-  constructor() {
+  constructor(private specFormService: SpecFormService) {
     this.onResize()
   }
 
@@ -58,18 +59,8 @@ export class OCMImageGallery implements OnInit, OnChanges {
   isImageMatchingSpecs(image: Asset): boolean {
     // Examine all non-variable text specs, and find the image tag that matches all specs,
     // removing spaces where needed on the spec to find that match.
-    return this.specs
-      .filter((s) => s !== null)
-      .every((spec) =>
-        image.Tags.find((tag) =>
-          tag?.split('-').includes(
-            spec
-              .split(' ')
-              .join('')
-              .replace(/[^a-zA-Z0-9 ]/g, '')
-          )
-        )
-      )
+    const specs = this.specs.filter((s) => s !== null);
+    return this.specFormService.AssetTagMatches(specs, image);
   }
 
   onSpecsChange(): void {

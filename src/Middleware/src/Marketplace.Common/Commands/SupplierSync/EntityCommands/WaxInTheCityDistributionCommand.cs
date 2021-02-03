@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Headstart.Common.Extensions;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
@@ -36,9 +37,11 @@ namespace Headstart.Common.Commands
             var supplierWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Outgoing, ID);
 
             var buyerWorksheet = await _ocSeller.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, ID.Split('-')[0]);
-            var buyerLineItems = buyerWorksheet.LineItems.Where(li => li.SupplierID == supplierWorksheet.Order.ToCompanyID).Select(li => li);
-            var estimate = buyerWorksheet.ShipEstimateResponse?.ShipEstimates?.FirstOrDefault(e => e?.ShipEstimateItems?.Any(i => i?.LineItemID == buyerLineItems?.FirstOrDefault()?.ID) == true);
-            var ship_method = estimate?.ShipMethods.FirstOrDefault(m => m.ID == estimate.SelectedShipMethodID);
+            var buyerLineItems = buyerWorksheet.GetBuyerLineItemsBySupplierID(supplierWorksheet.Order.ToCompanyID);
+            if (buyerWorksheet?.ShipEstimateResponse != null && buyerWorksheet?.ShipEstimateResponse?.ShipEstimates.Count > 0)
+            {
+                estimate = buyerWorksheet.GetMatchingShipEstimate(supplierWorksheet?.LineItems?.FirstOrDefault()?.ShipFromAddressID);
+                ship_method = estimate?.ShipMethods?.FirstOrDefault(m => m.ID == estimate.SelectedShipMethodID);
 
             }
 
@@ -46,16 +49,25 @@ namespace Headstart.Common.Commands
 
             if (supplierWorksheet.Order != null)
             {
-                { "SupplierOrder", new JObject {
-                    {"Order", JToken.FromObject(supplierWorksheet.Order)},
-                    new JProperty("LineItems", JToken.FromObject(supplierWorksheet.LineItems))
-                }},
-                { "BuyerOrder", new JObject {
-                    {"Order", JToken.FromObject(buyerWorksheet.Order)},
-                    new JProperty("LineItems", buyerLineItems == null ? null: JToken.FromObject(buyerLineItems))
-                }},
-                { "ShipMethod", ship_method == null ? null: JToken.FromObject(ship_method)},
-            };
+                returnObject.Add(new JProperty("SupplierOrder", new JObject {
+                    {"Order", JToken.FromObject(supplierWorksheet?.Order)},
+                    new JProperty("LineItems", JToken.FromObject(supplierWorksheet?.LineItems))
+                }));
+            }
+
+            if (buyerWorksheet.Order != null)
+            {
+                returnObject.Add(new JProperty("BuyerOrder", new JObject {
+                    {"Order", JToken.FromObject(buyerWorksheet?.Order)},
+                    new JProperty("LineItems", JToken.FromObject(buyerLineItems))
+                }));
+            }
+
+            if (ship_method != null)
+            {
+                returnObject.Add(new JProperty("ShipMethod", JToken.FromObject(ship_method)));
+            }
+
             return JObject.FromObject(returnObject);
         }
 
