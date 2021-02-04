@@ -254,7 +254,7 @@ namespace Headstart.Common.Services
             // Overwrite with the buyer base url if token appname contans 'buyer'
             if (apiClient.AppName.ToLower().Contains("buyer"))
             {
-                BaseAppURL = _settings.UI.BaseBuyerUrl;
+               // BaseAppURL = _settings.UI.BaseBuyerUrl;
             }
             var templateData = new EmailTemplate<NewUserData>()
             {

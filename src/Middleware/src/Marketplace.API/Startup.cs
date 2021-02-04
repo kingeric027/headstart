@@ -8,6 +8,7 @@ using Headstart.Common.Commands.Zoho;
 using Headstart.Common.Helpers;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
+using Headstart.Common.Repositories;
 using Headstart.Common.Services;
 using Headstart.Common.Services.CMS;
 using Headstart.Common.Services.DevCenter;
@@ -17,23 +18,19 @@ using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
-using ordercloud.integrations.tecra;
-using ordercloud.integrations.tecra.Storage;
 using OrderCloud.SDK;
 using SendGrid;
 using SmartyStreets;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Net;
 using System.Collections.Generic;
-using Headstart.Common.Repositories;
+using System.Net;
 
 namespace Headstart.API
 {
@@ -54,13 +51,7 @@ namespace Headstart.API
                 _settings.CosmosSettings.DatabaseName,
                 _settings.CosmosSettings.EndpointUri,
                 _settings.CosmosSettings.PrimaryKey,
-                _settings.CosmosSettings.RequestTimeoutInSeconds,
-                _settings.CosmosSettings.MaxConnectionLimit,
-                _settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
-                _settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
-                _settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
-                _settings.CosmosSettings.MaxRequestsPerTcpConnection,
-                _settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+                _settings.CosmosSettings.RequestTimeoutInSeconds
             );
             var cosmosContainers = new List<ContainerInfo>() 
             { 
@@ -79,14 +70,11 @@ namespace Headstart.API
 				CompanyCode = _settings.AvalaraSettings.CompanyCode,
                 CompanyID = _settings.AvalaraSettings.CompanyID
 			};
-            var tecraConfig = _settings.TecraSettings;
-            tecraConfig.BlobStorageHostUrl = _settings.BlobSettings.HostUrl;
-            tecraConfig.BlobStorageConnectionString = _settings.BlobSettings.ConnectionString;
 
             var currencyConfig = new BlobServiceConfig()
             {
                 ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
-                Container = _settings.ExchangeRatesSettings.Container
+                Container = _settings.BlobSettings.ContainerNameExchangeRates
             };
             var middlewareErrorsConfig = new BlobServiceConfig()
             {
@@ -101,7 +89,6 @@ namespace Headstart.API
                 .AddLazyCache()
                 .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, "marketplacecors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
-                .InjectCosmosStore<ChiliPublishConfigQuery, ChiliConfig>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
@@ -126,20 +113,8 @@ namespace Headstart.API
                 .Inject<ICreditCardCommand>()
                 .Inject<ISupportAlertService>()
                 .Inject<IOrderCalcService>()
-                .Inject<IOrderCloudIntegrationsTecraCommand>()
-                .Inject<IChiliTemplateCommand>()
-                .Inject<IChiliConfigCommand>()
-                .Inject<IOrderCloudIntegrationsTecraCommand>()
-                .AddSingleton<IChiliBlobStorage>(x => new ChiliBlobStorage(tecraConfig, new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
-                {
-                    ConnectionString = tecraConfig.BlobStorageConnectionString,
-                    Container = "chili-assets",
-                    AccessType = BlobContainerPublicAccessType.Container
-                })))
                 .Inject<ISupplierApiClientHelper>()
                 .AddSingleton<ICMSClient>(new CMSClient(new CMSClientConfig() { BaseUrl = _settings.CMSSettings.BaseUrl }))
-                .AddSingleton<OrderCloudTecraConfig>(x => _settings.TecraSettings)
-                .Inject<IOrderCloudIntegrationsTecraService>()
                 .AddSingleton<ISendGridClient>(x => new SendGridClient(_settings.SendgridSettings.ApiKey))
                 .AddSingleton<IFlurlClientFactory>(x => flurlClientFactory)
                 .AddSingleton<DownloadReportCommand>()

@@ -41,13 +41,7 @@ namespace ordercloud.integrations.library
             {
                 ConnectionMode = ConnectionMode.Direct,
                 ConnectionProtocol = Protocol.Tcp,
-                RequestTimeout = config.RequestTimeout,
-                MaxConnectionLimit = config.MaxConnectionLimit,
-                IdleTcpConnectionTimeout = config.IdleTcpConnectionTimeout,
-                OpenTcpConnectionTimeout = config.OpenTcpConnectionTimeoutInSeconds,
-                MaxTcpConnectionsPerEndpoint = config.MaxTcpConnectionsPerEndpoint,
-                MaxRequestsPerTcpConnection = config.MaxRequestsPerTcpConnection,
-                EnableTcpConnectionEndpointRediscovery = config.EnableTcpConnectionEndpointRediscovery
+                RequestTimeout = config.RequestTimeout
             });
         }
 

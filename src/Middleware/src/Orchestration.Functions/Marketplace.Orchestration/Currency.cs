@@ -1,17 +1,14 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Flurl.Http.Configuration;
 using Headstart.Common;
+using LazyCache;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
-using Flurl.Http.Configuration;
-using LazyCache;
+using System.Threading.Tasks;
 
 namespace Headstart.Orchestration
 {
@@ -23,7 +20,7 @@ namespace Headstart.Orchestration
             _command = new ExchangeRatesCommand(new BlobServiceConfig()
             {
                 ConnectionString = settings.ExchangeRatesSettings.ConnectionString,
-                Container = settings.ExchangeRatesSettings.Container
+                Container = settings.BlobSettings.ContainerNameExchangeRates
             }, flurlFactory, cache);
         }
 

@@ -32,13 +32,7 @@ namespace Headstart.Orchestration
                 settings.CosmosSettings.DatabaseName,
                 settings.CosmosSettings.EndpointUri,
                 settings.CosmosSettings.PrimaryKey,
-                settings.CosmosSettings.RequestTimeoutInSeconds,
-                settings.CosmosSettings.MaxConnectionLimit,
-                settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
-                settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
-                settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
-                settings.CosmosSettings.MaxRequestsPerTcpConnection,
-                settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+                settings.CosmosSettings.RequestTimeoutInSeconds
             );
             builder.Services
                 .AddLazyCache()

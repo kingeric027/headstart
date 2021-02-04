@@ -17,70 +17,6 @@ namespace Headstart.Common.Commands
         {
             _oc = oc;
         }
-
-        public async Task<JObject> CreateAsync(WorkItem wi)
-        {
-            var obj = wi.Current.ToObject<ChiliSpec>();
-            try
-            {
-                obj.ID = wi.RecordId;
-                var response = await _oc.Specs.CreateAsync(obj, wi.Token);
-                return JObject.FromObject(response);
-            }
-            catch (OrderCloudException exId) when (IdExists(exId))
-            {
-                // handle 409 errors by refreshing cache
-                await _log.Save(new OrchestrationLog(wi)
-                {
-                    ErrorType = OrchestrationErrorType.CreateExistsError,
-                    Message = exId.Message,
-                    Level = LogLevel.Error
-                });
-                return await GetAsync(wi);
-            }
-            catch (OrderCloudException ex)
-            {
-                await _log.Save(new OrchestrationLog(wi)
-                {
-                    ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = ex.Message,
-                    Level = LogLevel.Error
-                });
-                throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), ex);
-            }
-            catch (Exception e)
-            {
-                await _log.Save(new OrchestrationLog(wi)
-                {
-                    ErrorType = OrchestrationErrorType.CreateGeneralError,
-                    Message = e.Message,
-                    Level = LogLevel.Error
-                });
-                throw new Exception(OrchestrationErrorType.CreateGeneralError.ToString(), e);
-            }
-        }
-
-        public async Task<JObject> UpdateAsync(WorkItem wi)
-        {
-            var obj = wi.Current.ToObject<ChiliSpec>(OrchestrationSerializer.Serializer);
-            try
-            {
-                if (obj.ID == null) obj.ID = wi.RecordId;
-                var response = await _oc.Specs.SaveAsync<Spec>(wi.RecordId, (Spec)obj, wi.Token);
-                return JObject.FromObject(response);
-            }
-            catch (OrderCloudException ex)
-            {
-                await _log.Save(new OrchestrationLog(wi)
-                {
-                    ErrorType = OrchestrationErrorType.UpdateGeneralError,
-                    Message = ex.Message,
-                    Level = LogLevel.Error
-                });
-                throw new Exception(OrchestrationErrorType.UpdateGeneralError.ToString(), ex);
-            }
-        }
-
         public async Task<JObject> PatchAsync(WorkItem wi)
         {
             var obj = wi.Diff.ToObject<PartialSpec>(OrchestrationSerializer.Serializer);
@@ -123,6 +59,16 @@ namespace Headstart.Common.Commands
                 });
                 throw new Exception(OrchestrationErrorType.GetGeneralError.ToString(), ex);
             }
+        }
+
+        public Task<JObject> CreateAsync(WorkItem wi)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<JObject> UpdateAsync(WorkItem wi)
+        {
+            throw new NotImplementedException();
         }
     }
 }
