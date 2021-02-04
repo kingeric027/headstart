@@ -63,8 +63,8 @@ namespace Headstart.API
             };
 
             var avalaraConfig = new AvalaraConfig()
-			{
-				Env = _settings.EnvironmentSettings.Environment == AppEnvironment.Production ? AvaTaxEnvironment.Production : AvaTaxEnvironment.Sandbox,
+            {
+                BaseApiUrl = _settings.AvalaraSettings.BaseApiUrl,
 				AccountID = _settings.AvalaraSettings.AccountID,
 				LicenseKey = _settings.AvalaraSettings.LicenseKey,
 				CompanyCode = _settings.AvalaraSettings.CompanyCode,
@@ -132,14 +132,14 @@ namespace Headstart.API
                     {
                         ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                         AuthUrl = _settings.OrderCloudSettings.ApiUrl,
-                        ClientId = _settings.OrderCloudSettings.ClientID,
-                        ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                        ClientId = _settings.OrderCloudSettings.MiddlewareClientID,
+                        ClientSecret = _settings.OrderCloudSettings.MiddlewareClientSecret,
                         Roles = new[] { ApiRole.FullAccess }
                 })))
                 .AddSingleton<IOrderCloudIntegrationsExchangeRatesClient, OrderCloudIntegrationsExchangeRatesClient>()
                 .AddSingleton<IExchangeRatesCommand>(provider => new ExchangeRatesCommand(currencyConfig, flurlClientFactory, provider.GetService<IAppCache>()))
                 .AddSingleton<IAvalaraCommand>(x => new AvalaraCommand(avalaraConfig, 
-                        new AvaTaxClient("four51 marketplace", "v1", "machine_name", avalaraConfig.Env)
+                        new AvaTaxClient("four51 marketplace", "v1", "machine_name", new Uri(avalaraConfig.BaseApiUrl))
                             .WithSecurity(_settings.AvalaraSettings.AccountID, _settings.AvalaraSettings.LicenseKey)))
                 .AddSingleton<IEasyPostShippingService>(x => new EasyPostShippingService(new EasyPostConfig() { APIKey = _settings.EasyPostSettings.APIKey }))
                 .AddSingleton<ISmartyStreetsService>(x => new SmartyStreetsService(_settings.SmartyStreetSettings, smartyStreetsUsClient))
@@ -148,8 +148,8 @@ namespace Headstart.API
                 {
                     ApiUrl = _settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = _settings.OrderCloudSettings.ApiUrl,
-                    ClientId = _settings.OrderCloudSettings.ClientID,
-                    ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                    ClientId = _settings.OrderCloudSettings.MiddlewareClientID,
+                    ClientSecret = _settings.OrderCloudSettings.MiddlewareClientSecret,
                     Roles = new[]
                     {
                         ApiRole.FullAccess

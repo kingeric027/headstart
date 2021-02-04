@@ -250,12 +250,7 @@ namespace Headstart.Common.Services
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(jwt);
             var cid = token.Claims.FirstOrDefault(c => c.Type == "cid");
-            var apiClient = await _oc.ApiClients.GetAsync(cid.Value);
-            // Overwrite with the buyer base url if token appname contans 'buyer'
-            if (apiClient.AppName.ToLower().Contains("buyer"))
-            {
-               // BaseAppURL = _settings.UI.BaseBuyerUrl;
-            }
+            var apiClient = await _oc.ApiClients.GetAsync(cid.Value);            
             var templateData = new EmailTemplate<NewUserData>()
             {
                 Data = new NewUserData

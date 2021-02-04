@@ -77,8 +77,8 @@ namespace Headstart.Common
 	public class OrderCloudSettings
 	{
 		public string ApiUrl { get; set; }
-        public string ClientID { get; set; }
-        public string ClientSecret { get; set; }
+        public string MiddlewareClientID { get; set; }
+        public string MiddlewareClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
         public string DevcenterApiUrl { get; set; }
         public string ProvisionSupplierID { get; set; }
@@ -104,6 +104,7 @@ namespace Headstart.Common
 
 	public class AvalaraSettings
 	{
+        public string BaseApiUrl { get; set; }
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }

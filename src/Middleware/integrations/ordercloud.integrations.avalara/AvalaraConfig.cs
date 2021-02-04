@@ -1,13 +1,8 @@
-﻿using Avalara.AvaTax.RestClient;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ordercloud.integrations.avalara
+﻿namespace ordercloud.integrations.avalara
 {
-	public class AvalaraConfig
+    public class AvalaraConfig
 	{
-		public AvaTaxEnvironment Env { get; set; }
+		public string BaseApiUrl { get; set; }
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
 		public int CompanyID { get; set; }

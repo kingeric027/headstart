@@ -115,7 +115,7 @@ namespace Headstart.Common.Commands
                 AppName = $"Integration Client {ocSupplier.Name}",
                 Active = true,
                 DefaultContextUserName = supplierUser.Username,
-                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                ClientSecret = _settings.OrderCloudSettings.MiddlewareClientSecret,
                 AccessTokenDuration = 600,
                 RefreshTokenDuration = 43200,
                 AllowAnyBuyer = false,

@@ -45,8 +45,8 @@ namespace Headstart.Orchestration
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = settings.OrderCloudSettings.ApiUrl,
-                    ClientId = settings.OrderCloudSettings.ClientID,
-                    ClientSecret = settings.OrderCloudSettings.ClientSecret,
+                    ClientId = settings.OrderCloudSettings.MiddlewareClientID,
+                    ClientSecret = settings.OrderCloudSettings.MiddlewareClientSecret,
                     Roles = new[]
                     {
                         ApiRole.FullAccess
