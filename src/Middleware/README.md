@@ -1,20 +1,9 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
-
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
-
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
-
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
-
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+1. Open the Headstart.sln in Visual Studio
+2. Right click on the Headstart.API project and click on "Properties"
+3. Go to the "Debug" panel
+4. Create a new profile and call it "Test"
+5. Set Launch to Project
+6. Add a new Environment Variable called APP_CONFIG_CONNECTION who's value is the connection string to your [azure app configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/overview)
+7. Repeat steps 4-6 for the other environments "UAT" and "Production"
+8. Save your profiles now you should be able to select it and run the project locally

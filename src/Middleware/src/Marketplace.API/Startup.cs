@@ -72,7 +72,7 @@ namespace Headstart.API
 
             var currencyConfig = new BlobServiceConfig()
             {
-                ConnectionString = _settings.ExchangeRatesSettings.ConnectionString,
+                ConnectionString = _settings.BlobSettings.ConnectionString,
                 Container = _settings.BlobSettings.ContainerNameExchangeRates
             };
             var middlewareErrorsConfig = new BlobServiceConfig()
