@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Headstart.Common.Helpers;
-using Headstart.Common.Services.DevCenter;
 using Headstart.Models;
 using Headstart.Models.Misc;
 using Headstart.Models.Models.Marketplace;
@@ -14,19 +13,20 @@ using Newtonsoft.Json.Linq;
 using Headstart.Common.Services.CMS;
 using Headstart.Common.Services.CMS.Models;
 using ordercloud.integrations.library.helpers;
+using Headstart.Common.Services;
 
 namespace Headstart.Common.Commands
 {
     public interface IEnvironmentSeedCommand
     {
-		Task<string> Seed(EnvironmentSeed seed, VerifiedUserContext devUserContext);
+		Task<string> Seed(EnvironmentSeed seed);
 		Task PostStagingRestore();
     }
 	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
 	{
 		private readonly IOrderCloudClient _oc;
 		private readonly AppSettings _settings;
-		private readonly IDevCenterService _dev;
+		private readonly IPortalService _portal;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IHSBuyerCommand _buyerCommand;
 		private readonly ICMSClient _cms;
@@ -40,7 +40,7 @@ namespace Headstart.Common.Commands
 
 		public EnvironmentSeedCommand(
 			AppSettings settings,
-			IDevCenterService dev,
+			IPortalService portal,
 			IMarketplaceSupplierCommand supplierCommand,
 			IHSBuyerCommand buyerCommand,
 			ICMSClient cms,
@@ -48,17 +48,31 @@ namespace Headstart.Common.Commands
 		)
 		{
 			_settings = settings;
-			_dev = dev;
+			_portal = portal;
 			_supplierCommand = supplierCommand;
 			_buyerCommand = buyerCommand;
 			_cms = cms;
 			_oc = oc;
 		}
 
-		public async Task<string> Seed(EnvironmentSeed seed, VerifiedUserContext devUserContext)
+		public async Task<string> Seed(EnvironmentSeed seed)
 		{
-			await VerifyOrgExists(seed.SellerOrgID, devUserContext.AccessToken);
-			var orgToken = await _dev.GetOrgToken(seed.SellerOrgID, devUserContext.AccessToken);
+			if(string.IsNullOrEmpty(_settings.OrderCloudSettings.ApiUrl))
+            {
+				throw new Exception("Missing required app setting OrderCloudSettings:ApiUrl");
+            }
+			if (string.IsNullOrEmpty(_settings.OrderCloudSettings.WebhookHashKey))
+			{
+				throw new Exception("Missing required app setting OrderCloudSettings:WebhookHashKey");
+			}
+			if (string.IsNullOrEmpty(_settings.EnvironmentSettings.BaseUrl))
+            {
+				throw new Exception("Missing required app setting EnvironmentSettings:BaseUrl");
+			}
+
+			var portalUserToken = await _portal.Login(seed.PortalUsername, seed.PortalPassword);
+			await VerifyOrgExists(seed.SellerOrgID, portalUserToken);
+			var orgToken = await _portal.GetOrgToken(seed.SellerOrgID, portalUserToken);
 
 			await CreateDefaultSellerUser(orgToken);
 			await CreateApiClients(orgToken);
@@ -86,10 +100,10 @@ namespace Headstart.Common.Commands
         {
 			try
             {
-				await _dev.GetOrganization(orgID, devToken);
+				await _portal.GetOrganization(orgID, devToken);
             } catch
             {
-				// the devcenter API no longer allows us to create an organization outside of devcenter
+				// the portal API no longer allows us to create an organization outside of portal
 				// so we need to create the org first before seeding it
 				throw new Exception("Failed to retrieve seller organization with SellerOrgID. The organization must exist before it can be seeded");
             }

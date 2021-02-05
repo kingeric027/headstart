@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Headstart.Common.Services.DevCenter.Models
+namespace Headstart.Common.Services.Portal.Models
 {
     public class OrgTokenResponse
     {

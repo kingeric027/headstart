@@ -1,4 +1,4 @@
-﻿namespace Headstart.Common.Services.DevCenter.Models
+﻿namespace Headstart.Common.Services.Portal.Models
 {
     public class ImpersonationToken
     {

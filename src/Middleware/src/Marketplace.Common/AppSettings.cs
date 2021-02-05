@@ -80,7 +80,6 @@ namespace Headstart.Common
         public string MiddlewareClientID { get; set; }
         public string MiddlewareClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
-        public string DevcenterApiUrl { get; set; }
         public string ProvisionSupplierID { get; set; }
         public string SEBDistributionSupplierID { get; set; }
         public string FirstChoiceSupplierID { get; set; }

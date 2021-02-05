@@ -11,7 +11,6 @@ using Headstart.Common.Queries;
 using Headstart.Common.Repositories;
 using Headstart.Common.Services;
 using Headstart.Common.Services.CMS;
-using Headstart.Common.Services.DevCenter;
 using Headstart.Common.Services.Zoho;
 using LazyCache;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
@@ -93,7 +92,7 @@ namespace Headstart.API
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .AddCosmosDb(_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey, _settings.CosmosSettings.DatabaseName, cosmosContainers)
-                .Inject<IDevCenterService>()
+                .Inject<IPortalService>()
                 .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
                 .Inject<IOrchestrationCommand>()
@@ -164,7 +163,6 @@ namespace Headstart.API
 
             var serviceProvider = services.BuildServiceProvider();
             services
-                .AddAuthenticationScheme<DevCenterUserAuthOptions, DevCenterUserAuthHandler>("DevCenterUser")
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations", opts => opts.OrderCloudClient = serviceProvider.GetService<IOrderCloudClient>())
                 .AddAuthenticationScheme<OrderCloudWebhookAuthOptions, OrderCloudWebhookAuthHandler>("OrderCloudWebhook", opts => opts.HashKey = _settings.OrderCloudSettings.WebhookHashKey)
                 .AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions {
