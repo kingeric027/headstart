@@ -18,7 +18,6 @@ namespace Headstart.Common
         public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
-        public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
         public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
         public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
         public FlurlSettings FlurlSettings { get; set; } = new FlurlSettings();
@@ -80,7 +79,6 @@ namespace Headstart.Common
         public string MiddlewareClientID { get; set; }
         public string MiddlewareClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
-        public string DevcenterApiUrl { get; set; }
         public string ProvisionSupplierID { get; set; }
         public string SEBDistributionSupplierID { get; set; }
         public string FirstChoiceSupplierID { get; set; }

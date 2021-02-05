@@ -1,21 +1,35 @@
-﻿using OrderCloud.SDK;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
-using Newtonsoft.Json.Linq;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json.Converters;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 
 namespace Headstart.Models
 {
     [SwaggerModel]
     public class SupplierFilterConfig
     {
+        /// <summary>
+        /// Text for UI display
+        /// </summary>
         public string Display { get; set; }
+
+        /// <summary>
+        /// Path to filter value from root of object
+        /// </summary>
         public string Path { get; set; }
+
+        /// <summary>
+        /// Potential Options for Field
+        /// </summary>
         public List<Filter> Items { get; set; }
+
+        /// <summary>
+        /// should the supplier be able to edit the options on their own supplier
+        /// </summary>
         public bool AllowSupplierEdit { get; set; }
+
+        /// <summary>
+        /// should the seller be able to edit the options on suppliers
+        /// </summary>
         public bool AllowSellerEdit { get; set; }
 
 
@@ -30,13 +44,6 @@ namespace Headstart.Models
         public string Text {get; set;}
         public string Value {get; set; }
     }
-
-    public class BuyerAppFilterType
-    {
-        public const string SelectOption = "SelectOption";
-        public const string NonUI = "NonUI";
-    }
-
 }
 
 

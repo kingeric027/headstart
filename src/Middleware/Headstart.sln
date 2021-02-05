@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.tec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ordercloud.integrations.easypost", "integrations\ordercloud.integrations.easypost\ordercloud.integrations.easypost.csproj", "{DA2B1503-680A-44BA-B23D-0188BF282B2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "easypost.tests", "easypost.tests\easypost.tests.csproj", "{A5C99CFB-230B-4B94-9F3E-F2682BFA5D3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "easypost.tests", "easypost.tests\easypost.tests.csproj", "{A5C99CFB-230B-4B94-9F3E-F2682BFA5D3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

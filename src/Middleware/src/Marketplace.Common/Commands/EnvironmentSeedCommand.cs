@@ -3,33 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Headstart.Common.Helpers;
-using Headstart.Common.Services.DevCenter;
 using Headstart.Models;
 using Headstart.Models.Misc;
 using Headstart.Models.Models.Marketplace;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
-using System.IO;
-using Newtonsoft.Json.Linq;
-using Headstart.Common.Services.CMS;
-using Headstart.Common.Services.CMS.Models;
 using ordercloud.integrations.library.helpers;
+using Headstart.Common.Services;
+using ordercloud.integrations.exchangerates;
+using System.IO;
 
 namespace Headstart.Common.Commands
 {
     public interface IEnvironmentSeedCommand
     {
-		Task<string> Seed(EnvironmentSeed seed, VerifiedUserContext devUserContext);
+		Task<string> Seed(EnvironmentSeed seed);
 		Task PostStagingRestore();
     }
 	public class EnvironmentSeedCommand : IEnvironmentSeedCommand
 	{
 		private readonly IOrderCloudClient _oc;
 		private readonly AppSettings _settings;
-		private readonly IDevCenterService _dev;
+		private readonly IPortalService _portal;
 		private readonly IMarketplaceSupplierCommand _supplierCommand;
 		private readonly IHSBuyerCommand _buyerCommand;
-		private readonly ICMSClient _cms;
+		private readonly IExchangeRatesCommand _exchangeRatesCommand;
+		private readonly IOrderCloudIntegrationsBlobService _translationsBlob;
 
 		private readonly string _buyerApiClientName = "Default HeadStart Buyer UI";
 		private readonly string _buyerLocalApiClientName = "Default HeadStart Buyer UI LOCAL"; // used for pointing integration events to the ngrok url
@@ -40,44 +39,69 @@ namespace Headstart.Common.Commands
 
 		public EnvironmentSeedCommand(
 			AppSettings settings,
-			IDevCenterService dev,
+			IPortalService portal,
 			IMarketplaceSupplierCommand supplierCommand,
 			IHSBuyerCommand buyerCommand,
-			ICMSClient cms,
-			IOrderCloudClient oc
+			IOrderCloudClient oc,
+			IExchangeRatesCommand exchangeRatesCommand
 		)
 		{
 			_settings = settings;
-			_dev = dev;
+			_portal = portal;
 			_supplierCommand = supplierCommand;
 			_buyerCommand = buyerCommand;
-			_cms = cms;
 			_oc = oc;
+			_exchangeRatesCommand = exchangeRatesCommand;
+			_translationsBlob = new OrderCloudIntegrationsBlobService(new BlobServiceConfig { 
+					ConnectionString = _settings.BlobSettings.ConnectionString,
+					Container = _settings.BlobSettings.ContainerNameTranslations
+				}
+			);
 		}
 
-		public async Task<string> Seed(EnvironmentSeed seed, VerifiedUserContext devUserContext)
+		public async Task<string> Seed(EnvironmentSeed seed)
 		{
-			await VerifyOrgExists(seed.SellerOrgID, devUserContext.AccessToken);
-			var orgToken = await _dev.GetOrgToken(seed.SellerOrgID, devUserContext.AccessToken);
+            if (string.IsNullOrEmpty(_settings.OrderCloudSettings.ApiUrl))
+            {
+                throw new Exception("Missing required app setting OrderCloudSettings:ApiUrl");
+            }
+            if (string.IsNullOrEmpty(_settings.OrderCloudSettings.WebhookHashKey))
+            {
+                throw new Exception("Missing required app setting OrderCloudSettings:WebhookHashKey");
+            }
+            if (string.IsNullOrEmpty(_settings.EnvironmentSettings.BaseUrl))
+            {
+                throw new Exception("Missing required app setting EnvironmentSettings:BaseUrl");
+            }
+            if (string.IsNullOrEmpty(_settings.BlobSettings.ConnectionString))
+            {
+                throw new Exception("Missing required app setting BlobSettings:ConnectionString");
+            }
 
-			await CreateDefaultSellerUser(orgToken);
-			await CreateApiClients(orgToken);
-			await CreateSecurityProfiles(seed, orgToken);
-			await AssignSecurityProfiles(seed, orgToken);
+            var portalUserToken = await _portal.Login(seed.PortalUsername, seed.PortalPassword);
+            await VerifyOrgExists(seed.SellerOrgID, portalUserToken);
+            var orgToken = await _portal.GetOrgToken(seed.SellerOrgID, portalUserToken);
 
-			var apiClients = await GetApiClients(orgToken);
-			await CreateWebhooks(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.AdminUiApiClient.ID, orgToken);
-			await CreateMessageSenders(orgToken);
-			await CreateIncrementors(orgToken); // must be before CreateBuyers
+            await CreateDefaultSellerUser(orgToken);
+            await CreateApiClients(orgToken);
+            await CreateSecurityProfiles(seed, orgToken);
+            await AssignSecurityProfiles(seed, orgToken);
 
-			var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
-			await CreateBuyers(seed, userContext);
-			await CreateXPIndices(orgToken);
-			await CreateAndAssignIntegrationEvents(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.BuyerLocalUiApiClient.ID, orgToken);
-			await CreateSuppliers(userContext, seed, orgToken);
-            await CreateContentDocSchemas(userContext);
-            await CreateDefaultContentDocs(userContext);
-			
+            var apiClients = await GetApiClients(orgToken);
+            await CreateWebhooks(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.AdminUiApiClient.ID, orgToken);
+            await CreateMessageSenders(orgToken);
+            await CreateIncrementors(orgToken); // must be before CreateBuyers
+
+            var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
+            await CreateBuyers(seed, userContext);
+            await CreateXPIndices(orgToken);
+            await CreateAndAssignIntegrationEvents(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.BuyerLocalUiApiClient.ID, orgToken);
+            await CreateSuppliers(userContext, seed, orgToken);
+
+            // non-ordercloud data
+            await _exchangeRatesCommand.Update();
+			await _translationsBlob.Save("en.json", File.ReadAllText("../Marketplace.Common/Assets/english-translations.json"));
+
 			return orgToken;
 
 		}
@@ -86,10 +110,10 @@ namespace Headstart.Common.Commands
         {
 			try
             {
-				await _dev.GetOrganization(orgID, devToken);
+				await _portal.GetOrganization(orgID, devToken);
             } catch
             {
-				// the devcenter API no longer allows us to create an organization outside of devcenter
+				// the portal API no longer allows us to create an organization outside of portal
 				// so we need to create the org first before seeding it
 				throw new Exception("Failed to retrieve seller organization with SellerOrgID. The organization must exist before it can be seeded");
             }
@@ -199,102 +223,6 @@ namespace Headstart.Common.Commands
 			return await new VerifiedUserContext(_oc).Define(ocConfig);
 		}
 
-		private async Task CreateContentDocSchemas(VerifiedUserContext userContext)
-        {
-            var kitSchema = new DocSchema
-            {
-                ID = "HSKitProductAssignment",
-				RestrictedAssignmentTypes = new List<ResourceType> { },
-				Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/kitproduct.json"))
-			};
-
-            var supplierFilterConfigSchema = new DocSchema
-            {
-                ID = "SupplierFilterConfig",
-                RestrictedAssignmentTypes = new List<ResourceType> { },
-                Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/supplierfilterconfig.json"))
-			};
-
-			await Task.WhenAll(
-				_cms.Schemas.Create(kitSchema, userContext.AccessToken),
-				_cms.Schemas.Create(supplierFilterConfigSchema, userContext.AccessToken)
-			);
-        }
-
-		private async Task CreateDefaultContentDocs(VerifiedUserContext userContext)
-        {
-			// any default created docs should be generic enough to be used by all orgs
-			await Task.WhenAll(
-				_cms.Documents.Create("SupplierFilterConfig", GetCountriesServicingDoc(), userContext.AccessToken),
-				_cms.Documents.Create("SupplierFilterConfig", GetServiceCategoryDoc(), userContext.AccessToken),
-				_cms.Documents.Create("SupplierFilterConfig", GetVendorLevelDoc(), userContext.AccessToken)
-			);
-        }
-
-		private Document<SupplierFilterConfig> GetCountriesServicingDoc()
-        {
-			return new Document<SupplierFilterConfig>
-			{
-				ID = "CountriesServicing",
-				Doc = new SupplierFilterConfig
-				{
-					Display = "Countries Servicing",
-					Path = "xp.CountriesServicing",
-					Items = new List<Filter>
-					{
-						new Filter
-						{
-							Text = "UnitedStates",
-							Value = "US"
-						}
-					},
-					AllowSellerEdit = true,
-					AllowSupplierEdit = true,
-					BuyerAppFilterType  = "NonUI"
-				}
-			};
-		}
-
-		private dynamic GetServiceCategoryDoc()
-		{
-			return new Document<SupplierFilterConfig>
-			{
-				ID = "ServiceCategory",
-				Doc = new SupplierFilterConfig
-				{
-					Display = "Service Category",
-					Path = "xp.Categories.ServiceCategory",
-					AllowSupplierEdit = false,
-					AllowSellerEdit = true,
-					BuyerAppFilterType = "SelectOption",
-					Items = new List<Filter>
-					{
-
-					}
-				}
-			};
-		}
-
-		private Document<SupplierFilterConfig> GetVendorLevelDoc()
-        {
-			return new Document<SupplierFilterConfig>
-			{
-				ID = "VendorLevel",
-				Doc = new SupplierFilterConfig
-				{
-					Display = "Vendor Level",
-					Path = "xp.Categories.VendorLevel",
-					AllowSupplierEdit = true,
-					AllowSellerEdit = true,
-					BuyerAppFilterType = "SelectOption",
-					Items = new List<Filter>
-					{
-
-					}
-				}
-			};
-		}
-
 		private async Task CreateDefaultSellerUser(string token)
         {
 			var defaultSellerUser = new User
@@ -304,7 +232,11 @@ namespace Headstart.Common.Commands
 				Email = "test@test.com",
 				Active = true,
 				FirstName = "Default",
-				LastName = "User"
+				LastName = "User",
+				xp = new
+                {
+					Description = "This admin as used as the default context user for middleware integrations client. This user has and needs no password set"
+                }
 			};
 			await _oc.AdminUsers.CreateAsync(defaultSellerUser, token);
 		}
