@@ -40,7 +40,7 @@ namespace Headstart.Common.Commands
 #else
                 ConnectionString = settings.BlobSettings.ConnectionString,
 #endif
-                Container = settings.BlobSettings.QueueName
+                Container = settings.BlobSettings.ContainerNameQueue
             });
 
             _blobCache = new OrderCloudIntegrationsBlobService(new BlobServiceConfig()
@@ -50,7 +50,7 @@ namespace Headstart.Common.Commands
 #else
                 ConnectionString = settings.BlobSettings.ConnectionString,
 #endif
-                Container = settings.BlobSettings.CacheName
+                Container = settings.BlobSettings.ContainerNameCache
             });
             _log = log;
         }

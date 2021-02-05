@@ -32,13 +32,7 @@ namespace Headstart.Orchestration
                 settings.CosmosSettings.DatabaseName,
                 settings.CosmosSettings.EndpointUri,
                 settings.CosmosSettings.PrimaryKey,
-                settings.CosmosSettings.RequestTimeoutInSeconds,
-                settings.CosmosSettings.MaxConnectionLimit,
-                settings.CosmosSettings.IdleTcpConnectionTimeoutInMinutes,
-                settings.CosmosSettings.OpenTcpConnectionTimeoutInSeconds,
-                settings.CosmosSettings.MaxTcpConnectionsPerEndpoint,
-                settings.CosmosSettings.MaxRequestsPerTcpConnection,
-                settings.CosmosSettings.EnableTcpConnectionEndpointRediscovery
+                settings.CosmosSettings.RequestTimeoutInSeconds
             );
             builder.Services
                 .AddLazyCache()
@@ -51,8 +45,8 @@ namespace Headstart.Orchestration
                 {
                     ApiUrl = settings.OrderCloudSettings.ApiUrl,
                     AuthUrl = settings.OrderCloudSettings.ApiUrl,
-                    ClientId = settings.OrderCloudSettings.ClientID,
-                    ClientSecret = settings.OrderCloudSettings.ClientSecret,
+                    ClientId = settings.OrderCloudSettings.MiddlewareClientID,
+                    ClientSecret = settings.OrderCloudSettings.MiddlewareClientSecret,
                     Roles = new[]
                     {
                         ApiRole.FullAccess

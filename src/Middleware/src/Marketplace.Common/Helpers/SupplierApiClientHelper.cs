@@ -50,7 +50,7 @@ namespace Headstart.Common.Helpers
                 AppName = $"Integration Client {supplierDetails.Name}",
                 Active = true,
                 DefaultContextUserName = $"dev_{supplierDetails.ID}",
-                ClientSecret = _settings.OrderCloudSettings.ClientSecret,
+                ClientSecret = _settings.OrderCloudSettings.MiddlewareClientSecret,
                 AccessTokenDuration = 600,
                 RefreshTokenDuration = 43200,
                 AllowAnyBuyer = false,

@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using ordercloud.integrations.cardconnect;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using ordercloud.integrations.smartystreets;
-using ordercloud.integrations.tecra;
 
 namespace Headstart.Common
 {
@@ -20,11 +16,9 @@ namespace Headstart.Common
         public CosmosSettings CosmosSettings { get; set; } = new CosmosSettings();
         public OrderCloudSettings OrderCloudSettings { get; set; } = new OrderCloudSettings();
         public OrderCloudIntegrationsCardConnectConfig CardConnectSettings { get; set; } = new OrderCloudIntegrationsCardConnectConfig();
-        public OrderCloudTecraConfig TecraSettings { get; set; } = new OrderCloudTecraConfig();
         public ZohoSettings ZohoSettings { get; set; } = new ZohoSettings();
 		public SmartyStreetsConfig SmartyStreetSettings { get; set; } = new SmartyStreetsConfig();
         public ExchangeRatesSettings ExchangeRatesSettings { get; set; }
-        public ChiliPublishSettings ChiliPublishSettings { get; set; } = new ChiliPublishSettings();
         public EasyPostSettings EasyPostSettings { get; set; } = new EasyPostSettings();
         public SendgridSettings SendgridSettings { get; set; } = new SendgridSettings();
         public FlurlSettings FlurlSettings { get; set; } = new FlurlSettings();
@@ -41,7 +35,6 @@ namespace Headstart.Common
 
     public class UI
     {
-        public string BaseBuyerUrl { get; set; }
         public string BaseAdminUrl { get; set; }
     }
 
@@ -84,8 +77,8 @@ namespace Headstart.Common
 	public class OrderCloudSettings
 	{
 		public string ApiUrl { get; set; }
-        public string ClientID { get; set; }
-        public string ClientSecret { get; set; }
+        public string MiddlewareClientID { get; set; }
+        public string MiddlewareClientSecret { get; set; }
         public string WebhookHashKey { get; set; }
         public string DevcenterApiUrl { get; set; }
         public string ProvisionSupplierID { get; set; }
@@ -111,18 +104,12 @@ namespace Headstart.Common
 
 	public class AvalaraSettings
 	{
+        public string BaseApiUrl { get; set; }
 		public int AccountID { get; set; }
 		public string LicenseKey { get; set; }
 		public string CompanyCode { get; set; }
         public int CompanyID { get; set; }
 	}
-
-    public class ChiliPublishSettings
-    {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-    }
-
     public class EasyPostSettings
 	{
         public string APIKey { get; set; }

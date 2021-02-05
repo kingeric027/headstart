@@ -31,15 +31,29 @@ We keep track of what needs to be done on a [Jira Board](https://four51.atlassia
 In general we have three environments cooresponding to our three branchs, _dev_, _staging_ and _master_.
 
 - **Test**, where QA happens. Builds automatically on PRs to _dev_.
-  - https://marketplace-buyer-ui-test.azurewebsites.net    
-  - https://marketplace-admin-ui-test.azurewebsites.net  
-  - https://marketplace-middleware-test.azurewebsites.net   
+  - https://marketplace-buyer-ui-test.azurewebsites.net
+  - https://marketplace-admin-ui-test.azurewebsites.net
+  - https://marketplace-middleware-test.azurewebsites.net
 - **Staging**, for demos. Builds automatically on PRs to _staging_.
-  - https://marketplace-buyer-ui-staging.azurewebsites.net      
-  - https://marketplace-admin-ui-staging.azurewebsites.net      
-  - https://marketplace-middleware-staging.azurewebsites.net   
+  - https://marketplace-buyer-ui-staging.azurewebsites.net
+  - https://marketplace-admin-ui-staging.azurewebsites.net
+  - https://marketplace-middleware-staging.azurewebsites.net
 - **Production**, the real deal. Manual builds from staging. Code gets merged to _master_ after the release has been validated.
-  - https://marketplace-buyer-ui.azurewebsites.net      
+  - https://marketplace-buyer-ui.azurewebsites.net
   - https://marketplace-admin-ui.azurewebsites.net
-  - https://marketplace-middleware.azurewebsites.net      
+  - https://marketplace-middleware.azurewebsites.net
 
+## Seeding data
+
+In order to fully use this app, it will need some data to run against. There are also some configurations that need to be filled out.
+
+- Azure
+
+  - Three app services need to be created. One for Buyer, Seller, and Middleware. From the Azure portal, click 'Create a resource'. Follow the creation flow to create an App Service for each app you'll be hosting.
+  - If Application Insights are desired, create a resource for each Application Insight also.
+
+- App Configuration
+
+  -App configs can be imported from JSON. To start with a template, see [Middleware Api Config Template](./src/Middleware/src/Marketplace.Common/AppSettingConfigTemplate.json)
+
+  - If more information is needed on each configuration, see [Middleware Api Config Readme](./src/Middleware/src/Marketplace.Common/AppSettingsReadme.md)

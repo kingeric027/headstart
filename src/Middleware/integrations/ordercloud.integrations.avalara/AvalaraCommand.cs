@@ -28,8 +28,6 @@ namespace ordercloud.integrations.avalara
 
 	public class AvalaraCommand : IAvalaraCommand
 	{
-        private const string PROD_URL = "https://rest.avatax.com/api/v2";
-        private const string SANDBOX_URL = "https://sandbox-rest.avatax.com/api/v2";
 		private readonly AvalaraConfig _settings;
 		private readonly AvaTaxClient _avaTax;
 		private readonly string _companyCode;
@@ -39,7 +37,7 @@ namespace ordercloud.integrations.avalara
 		{
 			_settings = settings;
 			_companyCode = _settings.CompanyCode;
-			_baseUrl = _settings.Env == AvaTaxEnvironment.Production ? PROD_URL : SANDBOX_URL;
+			_baseUrl = _settings.BaseApiUrl;
             _avaTax = client;
         }
 
