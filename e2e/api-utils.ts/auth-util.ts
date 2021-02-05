@@ -45,8 +45,8 @@ export async function authAdminBrowser(user: Partial<OrderCloudSDK.User>) {
 		adminUserRoles
 	)
 
-	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.token')
-	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.access-token')
+	await setBrowserAuthCookie(userToken, 'headstart_admin_test.token')
+	await setBrowserAuthCookie(userToken, 'headstart_admin_test.access-token')
 	//Below cookie is set on the browser when logging in, but does not seem to be needed
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
@@ -61,8 +61,8 @@ export async function authVendorBrowser(user: Partial<OrderCloudSDK.User>) {
 		vendorUserRoles
 	)
 
-	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.token')
-	await setBrowserAuthCookie(userToken, 'marketplace_admin_test.access-token')
+	await setBrowserAuthCookie(userToken, 'headstart_admin_test.token')
+	await setBrowserAuthCookie(userToken, 'mheadstart_admin_test.access-token')
 	//Below cookie is set on the browser when logging in, but does not seem to be needed
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
@@ -79,7 +79,7 @@ export async function authBuyerBrowser(user: Partial<OrderCloudSDK.User>) {
 
 	await setBrowserAuthCookie(
 		userToken,
-		'marketplacetestbuyer-staging.access-token'
+		'headstarttestbuyer-staging.access-token'
 	)
 	await setBrowserAuthCookie(userToken, 'ordercloud.access-token')
 
