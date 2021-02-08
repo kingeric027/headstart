@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Headstart.Common;
-using Headstart.Common.Commands;
 using Headstart.Common.Helpers;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
@@ -13,6 +12,7 @@ using ordercloud.integrations.library;
 using Headstart.Common.Services;
 using Flurl.Http.Configuration;
 using Headstart.Common.Services.CMS;
+using Headstart.API.Commands;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Headstart.Orchestration

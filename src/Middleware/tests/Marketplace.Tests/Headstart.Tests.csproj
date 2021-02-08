@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\integrations\ordercloud.integrations.exchangerates\ordercloud.integrations.exchangerates.csproj" />
+    <ProjectReference Include="..\..\src\Marketplace.API\Headstart.API.csproj" />
     <ProjectReference Include="..\..\src\Marketplace.Common\Headstart.Common.csproj" />
   </ItemGroup>
 

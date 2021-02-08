@@ -1,5 +1,4 @@
-﻿using Headstart.Common.Commands;
-using OrderCloud.SDK;
+﻿using OrderCloud.SDK;
 using NSubstitute;
 using NUnit.Framework;
 using System;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models.Models.Marketplace;
 using System.Linq;
-using Headstart.Common.Models.Marketplace;
+using Headstart.API.Commands;
 
 namespace Headstart.Tests
 {

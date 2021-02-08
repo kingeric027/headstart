@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Headstart.Common.Commands;
 using Headstart.Common.Queries;
 using Headstart.Common;
 using System.Threading.Tasks;
@@ -9,6 +8,7 @@ using System.Linq;
 using Headstart.Common.Helpers;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
+using Headstart.API.Commands;
 
 namespace Headstart.Orchestration
 {

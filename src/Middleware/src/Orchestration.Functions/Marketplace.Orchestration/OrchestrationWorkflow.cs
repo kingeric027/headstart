@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using Headstart.Common.Commands;
 using Headstart.Common.Exceptions;
 using Headstart.Common.Helpers;
 using Headstart.Common.Models;

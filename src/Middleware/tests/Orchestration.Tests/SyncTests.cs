@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Cosmonaut;
 using Headstart.Common;
-using Headstart.Common.Commands;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
 using Newtonsoft.Json;
@@ -16,6 +15,7 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using Action = Headstart.Common.Models.Action;
 using Headstart.Common.Services.CMS;
+using Headstart.Orchestration;
 
 namespace Orchestration.Tests
 {
