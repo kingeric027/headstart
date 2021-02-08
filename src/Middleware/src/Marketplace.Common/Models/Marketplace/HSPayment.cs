@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Headstart.Common.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
     [SwaggerModel]
     public class HSPayment : Payment<PaymentXP, HSPaymentTransaction>

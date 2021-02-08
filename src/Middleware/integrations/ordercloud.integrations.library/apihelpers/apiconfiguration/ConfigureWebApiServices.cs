@@ -33,7 +33,7 @@ namespace ordercloud.integrations.library
             services
                 .AddControllers(o => { o.Filters.Add(typeof(ValidateModelAttribute)); })
                 .AddNewtonsoftJson(o => {
-                    o.SerializerSettings.ContractResolver = new MarketplaceSerializer();
+                    o.SerializerSettings.ContractResolver = new HSSerializer();
                     o.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
             return services;

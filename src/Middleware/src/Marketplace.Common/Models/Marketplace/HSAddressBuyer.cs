@@ -10,7 +10,7 @@ namespace Headstart.Models
     {
     }
     [SwaggerModel]
-    public class MarketplaceAddressMeBuyer : BuyerAddress<BuyerAddressXP>, IHSObject
+    public class HSAddressMeBuyer : BuyerAddress<BuyerAddressXP>, IHSObject
     {
     }
 

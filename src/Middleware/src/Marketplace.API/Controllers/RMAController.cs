@@ -11,7 +11,7 @@ using Headstart.API.Commands;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Headstart RMAs\" for managing RMAs in the Headstart application")]
-    [MarketplaceSection.Marketplace(ListOrder = 12)]
+    [HSSection.Headstart(ListOrder = 12)]
     [Route("rma")]
     public class RMAController : BaseController
     {

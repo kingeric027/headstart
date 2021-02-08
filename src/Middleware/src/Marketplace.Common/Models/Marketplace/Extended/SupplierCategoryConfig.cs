@@ -15,7 +15,7 @@ namespace Headstart.Models.Extended
 
         public string id { get; set; }
         public DateTimeOffset timeStamp { get; set; }
-        public string MarketplaceName { get; set; }
+        public string HSName { get; set; }
         public IEnumerable<SupplierCategoriesFilter> Filters { get; set; }
     }
 

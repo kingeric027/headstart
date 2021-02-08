@@ -4,7 +4,7 @@ using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.Collections.Generic;
 
-namespace Headstart.Common.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
     [SwaggerModel]
     public class HSMeKitProduct

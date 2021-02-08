@@ -105,7 +105,7 @@ namespace Headstart.API
                 .Inject<IMeProductCommand>()
                 .Inject<IHSCatalogCommand>()
                 .Inject<ISendgridService>()
-                .Inject<IMarketplaceSupplierCommand>()
+                .Inject<IHeadstartSupplierCommand>()
                 .Inject<ICreditCardCommand>()
                 .Inject<ISupportAlertService>()
                 .Inject<IOrderCalcService>()
@@ -153,7 +153,7 @@ namespace Headstart.API
                 }))
                 .AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Marketplace API", Version = "v1" });
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Headstart API", Version = "v1" });
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();

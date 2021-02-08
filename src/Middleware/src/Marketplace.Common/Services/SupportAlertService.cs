@@ -1,5 +1,3 @@
-using Headstart.Common.Models.Misc;
-﻿using Headstart.Common.Models.Marketplace;
 using Headstart.Models;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
@@ -9,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using static Headstart.Common.Models.SendGridModels;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Common.Services
 {

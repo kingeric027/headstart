@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Headstart.Models;
 using Headstart.Common;
 using System.Security.Cryptography.X509Certificates;
@@ -18,7 +18,6 @@ using System.Dynamic;
 using NSubstitute.Extensions;
 using AutoFixture;
 using SendGrid;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.ShippingIntegration.Models;
 
 namespace Headstart.Tests

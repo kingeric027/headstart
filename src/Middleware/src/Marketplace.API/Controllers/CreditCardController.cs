@@ -8,8 +8,8 @@ using OrderCloud.SDK;
 
 namespace Headstart.Common.Controllers.CardConnect
 {
-    [DocComments("\"Integration\" represents ME Credit Card Payments for Marketplace")]
-    [MarketplaceSection.Integration(ListOrder = 2)]
+    [DocComments("\"Integration\" represents ME Credit Card Payments for Headstart")]
+    [HSSection.Integration(ListOrder = 2)]
     public class MePaymentController : BaseController
     {
         private readonly ICreditCardCommand _card;
@@ -36,8 +36,8 @@ namespace Headstart.Common.Controllers.CardConnect
         }
     }
 
-    [DocComments("\"Integration\" represents ME Credit Card Tokenization for Marketplace")]
-    [MarketplaceSection.Integration(ListOrder = 3)]
+    [DocComments("\"Integration\" represents ME Credit Card Tokenization for Headstart")]
+    [HSSection.Integration(ListOrder = 3)]
     public class MeCreditCardAuthorizationController : BaseController
     {
         private readonly ICreditCardCommand _card;
@@ -54,8 +54,8 @@ namespace Headstart.Common.Controllers.CardConnect
         }
     }
 
-    [DocComments("\"Integration\" represents Credit Card Tokenization for Marketplace")]
-    [MarketplaceSection.Integration(ListOrder = 4)]
+    [DocComments("\"Integration\" represents Credit Card Tokenization for Headstart")]
+    [HSSection.Integration(ListOrder = 4)]
     public class CreditCardController : BaseController
     {
         private readonly ICreditCardCommand _card;

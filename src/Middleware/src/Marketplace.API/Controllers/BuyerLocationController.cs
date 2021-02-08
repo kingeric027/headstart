@@ -11,15 +11,15 @@ using Headstart.API.Commands;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Files\" represents files for Marketplace content management control")]
-    [MarketplaceSection.Marketplace(ListOrder = 6)]
+    [DocComments("\"Files\" represents files for Headstart content management control")]
+    [HSSection.Headstart(ListOrder = 6)]
     [Route("buyerlocations")]
     public class BuyerLocationController : BaseController
     {
-        private readonly IMarketplaceBuyerLocationCommand _buyerLocationCommand;
+        private readonly IHSBuyerLocationCommand _buyerLocationCommand;
         private readonly IOrderCloudClient _oc;
         private readonly ILocationPermissionCommand _locationPermissionCommand;
-        public BuyerLocationController(ILocationPermissionCommand locationPermissionCommand, IMarketplaceBuyerLocationCommand buyerLocationCommand, IOrderCloudClient oc, AppSettings settings) : base(settings)
+        public BuyerLocationController(ILocationPermissionCommand locationPermissionCommand, IHSBuyerLocationCommand buyerLocationCommand, IOrderCloudClient oc, AppSettings settings) : base(settings)
         {
             _buyerLocationCommand = buyerLocationCommand;
             _locationPermissionCommand = locationPermissionCommand;

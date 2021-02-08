@@ -9,12 +9,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 using ordercloud.integrations.library.helpers;
-using Headstart.Common.Models.Marketplace;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 
 namespace Headstart.API.Commands
 {
-    public interface IMarketplaceReportCommand
+    public interface IHSReportCommand
     {
         ListPage<ReportTypeResource> FetchAllReportTypes(VerifiedUserContext verifiedUser);
         Task<List<HSAddressBuyer>> BuyerLocation(string templateID, VerifiedUserContext verifiedUser);
@@ -28,12 +27,12 @@ namespace Headstart.API.Commands
         Task DeleteReportTemplate(string id);
     }
     
-    public class MarketplaceReportCommand : IMarketplaceReportCommand
+    public class HSReportCommand : IHSReportCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly ReportTemplateQuery _template;
 
-        public MarketplaceReportCommand(IOrderCloudClient oc, ReportTemplateQuery template)
+        public HSReportCommand(IOrderCloudClient oc, ReportTemplateQuery template)
         {
             _oc = oc;
             _template = template;

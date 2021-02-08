@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Headstart.Common.Helpers;
 using Headstart.Models;
 using Headstart.Models.Misc;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System.IO;
@@ -28,7 +28,7 @@ namespace Headstart.API.Commands
 		private readonly IOrderCloudClient _oc;
 		private readonly AppSettings _settings;
 		private readonly IPortalService _portal;
-		private readonly IMarketplaceSupplierCommand _supplierCommand;
+		private readonly IHeadstartSupplierCommand _supplierCommand;
 		private readonly IHSBuyerCommand _buyerCommand;
 		private readonly ICMSClient _cms;
 
@@ -42,7 +42,7 @@ namespace Headstart.API.Commands
 		public EnvironmentSeedCommand(
 			AppSettings settings,
 			IPortalService portal,
-			IMarketplaceSupplierCommand supplierCommand,
+			IHeadstartSupplierCommand supplierCommand,
 			IHSBuyerCommand buyerCommand,
 			ICMSClient cms,
 			IOrderCloudClient oc
@@ -146,7 +146,7 @@ namespace Headstart.API.Commands
 			await Task.WhenAll(buyerSecurityProfileAssignmentRequests);
 
 			// assign seller security profiles to seller org
-			var sellerSecurityProfileAssignmentRequests = SellerMarketplaceRoles.Select(role =>
+			var sellerSecurityProfileAssignmentRequests = SellerHsRoles.Select(role =>
 			{
 				return _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
 				{
@@ -744,7 +744,7 @@ namespace Headstart.API.Commands
 			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
 		};
 
-		static readonly List<CustomRole> SellerMarketplaceRoles = new List<CustomRole>() {
+		static readonly List<CustomRole> SellerHsRoles = new List<CustomRole>() {
 			CustomRole.MPProductAdmin,
 			CustomRole.MPPromotionAdmin,
 			CustomRole.MPStoreFrontAdmin,

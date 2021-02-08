@@ -1,5 +1,4 @@
-﻿using Headstart.Common.Models.Marketplace;
-using Headstart.Common.Services.ShippingIntegration.Models;
+﻿using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;

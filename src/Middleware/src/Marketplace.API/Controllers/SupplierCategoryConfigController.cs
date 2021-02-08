@@ -17,7 +17,7 @@ namespace Headstart.Common.Controllers
 	// once we have more time we should aim to remove the whole notion of supplier filter configs and just have this live in code
 
     [DocComments("\"Supplier Filter Config\" represents Supplier Category Configuration")]
-    [MarketplaceSection.Marketplace(ListOrder = 5)]
+    [HSSection.Headstart(ListOrder = 5)]
     public class SupplierFilterConfigController : BaseController
     {
         public SupplierFilterConfigController(AppSettings settings) : base(settings)

@@ -20,7 +20,7 @@ namespace ordercloud.integrations.avalara
 		// Committing the transaction makes it eligible to be filed as part of a tax return. 
 		// When should we do this? 
 		Task<TransactionModel> CommitTransactionAsync(string transactionCode);
-		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs);
+		Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> hsListArgs);
 		Task<TaxCertificate> GetCertificateAsync(int certificateID);
 		Task<TaxCertificate> CreateCertificateAsync(TaxCertificate cert, Address buyerLocation);
 		Task<TaxCertificate> UpdateCertificateAsync(int certificateID, TaxCertificate cert, Address buyerLocation);
@@ -60,9 +60,9 @@ namespace ordercloud.integrations.avalara
 			return transaction;
 		}
 
-		public async Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> marketplaceListArgs)
+		public async Task<ListPage<TaxCode>> ListTaxCodesAsync(ListArgs<TaxCode> hsListArgs)
 		{
-			var args = TaxCodeMapper.Map(marketplaceListArgs);
+			var args = TaxCodeMapper.Map(hsListArgs);
 			var avataxCodes = await _avaTax.ListTaxCodesAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
 			var codeList = TaxCodeMapper.Map(avataxCodes, args);
 			return codeList;

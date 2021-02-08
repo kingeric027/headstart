@@ -3,7 +3,7 @@ using Headstart.Common.Extensions;
 using Headstart.Common.Services;
 using Headstart.Models;
 using Headstart.Models.Extended;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Microsoft.ApplicationInsights;
 using Newtonsoft.Json;
 using ordercloud.integrations.library;

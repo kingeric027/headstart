@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Headstart.Common.Services.ShippingIntegration.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using System.Linq;
 using Headstart.API.Commands;
 

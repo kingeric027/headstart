@@ -7,7 +7,7 @@ using Headstart.Common.Models.Misc;
 using Headstart.Common.Services;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;

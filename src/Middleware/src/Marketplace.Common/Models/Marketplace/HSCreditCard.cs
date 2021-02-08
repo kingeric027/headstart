@@ -1,22 +1,22 @@
 ﻿using ordercloud.integrations.library;
 using OrderCloud.SDK;
 
-namespace Headstart.Models.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
 	[SwaggerModel]
-	public class HSCreditCard: CreditCard<CreditCardXP>
+	public class HSCreditCard: CreditCard<HSCreditCardXP>
 	{
 
 	}
 
 	[SwaggerModel]
-	public class HSBuyerCreditCard : BuyerCreditCard<CreditCardXP>
+	public class HSBuyerCreditCard : BuyerCreditCard<HSCreditCardXP>
 	{
 
 	}
 
 	[SwaggerModel]
-	public class CreditCardXP
+	public class HSCreditCardXP
 	{
 		[Required]
 		public Address CCBillingAddress { get; set; }

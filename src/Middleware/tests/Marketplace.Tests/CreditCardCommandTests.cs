@@ -1,8 +1,8 @@
 ﻿using Headstart.Common;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
+using Headstart.Models.Headstart;
 using Headstart.Tests.Mocks;
 using NSubstitute;
 using NUnit.Framework;

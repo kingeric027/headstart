@@ -9,8 +9,8 @@ using Headstart.API.Commands.Crud;
 
 namespace Headstart.Common.Controllers
 {
-	[DocComments("\"Marketplace Catalogs\" for product groupings and visibility in Marketplace")]
-	[MarketplaceSection.Marketplace(ListOrder = 2)]
+	[DocComments("\"Headstart Catalogs\" for product groupings and visibility in Headstart")]
+	[HSSection.Headstart(ListOrder = 2)]
 	[Route("buyers")]
 	public class CatalogController : BaseController
 	{

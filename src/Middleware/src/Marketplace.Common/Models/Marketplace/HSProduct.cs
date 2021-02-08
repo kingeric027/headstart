@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.CMS.Models;
 using Headstart.Models.Attributes;
 using Headstart.Models.Extended;

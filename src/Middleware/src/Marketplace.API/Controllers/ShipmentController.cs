@@ -10,8 +10,8 @@ using Headstart.API.Commands;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Marketplace Shipments\" for making shipments in seller app")]
-    [MarketplaceSection.Marketplace(ListOrder = 2)]
+    [DocComments("\"Headstart Shipments\" for making shipments in seller app")]
+    [HSSection.Headstart(ListOrder = 2)]
     [Route("shipment")]
     public class ShipmentController : BaseController
     {
@@ -22,7 +22,7 @@ namespace Headstart.Common.Controllers
             _command = command;
         }
 
-        [DocName("POST Marketplace Shipment")]
+        [DocName("POST Headstart Shipment")]
         // todo update auth
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.ShipmentAdmin)]
         public async Task<SuperHSShipment> Create([FromBody] SuperHSShipment superShipment)

@@ -106,7 +106,7 @@ namespace avalara.tests.Mocks
 				}
 			};
 		}
-		public static List<TaxCode> marketplaceTaxCodeListPageFirstRecord()
+		public static List<TaxCode> headstartTaxCodeListPageFirstRecord()
 		{
 			return new List<TaxCode>
 
@@ -119,7 +119,7 @@ namespace avalara.tests.Mocks
 				}
 			};
 		}
-		public static List<TaxCode> marketplaceTaxCodeListPageSecondRecord()
+		public static List<TaxCode> headstartTaxCodeListPageSecondRecord()
 		{
 			return new List<TaxCode>
 
@@ -132,7 +132,7 @@ namespace avalara.tests.Mocks
 				}
 			};
 		}
-		public static List<TaxCode> marketplaceTaxCodeListPageAllRecords()
+		public static List<TaxCode> headstartTaxCodeListPageAllRecords()
 		{
 			return new List<TaxCode>
 

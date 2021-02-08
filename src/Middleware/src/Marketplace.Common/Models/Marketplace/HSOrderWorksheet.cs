@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dynamitey.DynamicObjects;
 using Headstart.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Newtonsoft.Json.Linq;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;

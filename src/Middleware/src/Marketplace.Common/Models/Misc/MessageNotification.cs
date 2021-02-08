@@ -1,7 +1,7 @@
-﻿using Headstart.Models.Models.Marketplace;
-using OrderCloud.SDK;
+﻿using OrderCloud.SDK;
 using System.Collections.Generic;
 using ordercloud.integrations.library;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Models.Misc
 {

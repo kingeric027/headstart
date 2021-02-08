@@ -27,7 +27,7 @@ namespace Headstart.Orchestration
 
     public class SyncCommand : ISyncCommand
     {
-        private const string ASSEMBLY = "Marketplace.Common.Commands.";
+        private const string ASSEMBLY = "Headstart.Common.Commands.";
         protected readonly AppSettings _settings;
         protected readonly LogQuery _log;
         private readonly IOrderCloudClient _client;

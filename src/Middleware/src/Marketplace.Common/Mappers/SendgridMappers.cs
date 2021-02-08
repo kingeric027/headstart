@@ -1,5 +1,5 @@
 ﻿using Headstart.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using OrderCloud.SDK;
 using System;
 using System.Collections.Generic;

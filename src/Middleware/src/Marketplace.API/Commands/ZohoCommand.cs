@@ -8,7 +8,7 @@ using Headstart.Common.Services.Zoho.Mappers;
 using Headstart.Common.Services.Zoho.Models;
 using Headstart.Models;
 using Headstart.Models.Extended;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using ordercloud.integrations.library;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;

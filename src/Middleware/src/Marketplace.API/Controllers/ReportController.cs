@@ -7,21 +7,21 @@ using ordercloud.integrations.library;
 using Headstart.Models.Attributes;
 using Headstart.Common.Models;
 using Headstart.Models.Misc;
-using Headstart.Common.Models.Marketplace;
 using Headstart.API.Controllers;
 using Headstart.API.Commands;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Marketplace Reports\" for generating and downloading reports in the Admin application")]
-    [MarketplaceSection.Marketplace(ListOrder = 11)]
+    [DocComments("\"Headstart Reports\" for generating and downloading reports in the Admin application")]
+    [HSSection.Headstart(ListOrder = 11)]
     [Route("reports")]
     public class ReportController : BaseController
     {
-        private readonly IMarketplaceReportCommand _reportDataCommand;
+        private readonly IHSReportCommand _reportDataCommand;
         private readonly DownloadReportCommand _downloadReportCommand;
 
-        public ReportController(IMarketplaceReportCommand reportDataCommand, AppSettings settings, DownloadReportCommand downloadReportCommand) : base(settings)
+        public ReportController(IHSReportCommand reportDataCommand, AppSettings settings, DownloadReportCommand downloadReportCommand) : base(settings)
         {
             _reportDataCommand = reportDataCommand;
             _downloadReportCommand = downloadReportCommand;

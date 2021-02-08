@@ -26,11 +26,11 @@ namespace Headstart.Common.Controllers
                 .CollectMetaData(Path.Combine(reference, "reference.md"), ErrorCodes.All)
                 .DefineSpec(new SwaggerConfig()
                 {
-                    Name = "Marketplace",
+                    Name = "Headstart",
                     ContactEmail = "oheywood@four51.com",
-                    Description = "Marketplace API",
+                    Description = "Headstart API",
                     Host = _settings.EnvironmentSettings.BaseUrl,
-                    Title = "Marketplace API",
+                    Title = "Headstart API",
                     Url = "https://ordercloud.io",
                     Version = "1.0"
                 });

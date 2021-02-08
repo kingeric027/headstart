@@ -32,7 +32,7 @@ namespace Headstart.Common.Helpers
         }
     }
 
-    public class MarketplaceSerializer : DefaultContractResolver
+    public class HSSerializer : DefaultContractResolver
     {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {

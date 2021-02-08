@@ -13,9 +13,8 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using System.Net;
 using Newtonsoft.Json;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.ShippingIntegration.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Headstart.Common;
 
 namespace Headstart.API.Commands

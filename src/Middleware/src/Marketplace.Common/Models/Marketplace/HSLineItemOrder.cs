@@ -1,8 +1,6 @@
-﻿using Headstart.Models;
-using Headstart.Models.Models.Marketplace;
-using ordercloud.integrations.library;
+﻿using ordercloud.integrations.library;
 
-namespace Headstart.Common.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
     [SwaggerModel]
     public class HSLineItemOrder
