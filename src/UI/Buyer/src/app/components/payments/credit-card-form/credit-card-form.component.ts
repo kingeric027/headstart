@@ -10,10 +10,18 @@ import { CreditCardFormatPipe } from 'src/app/pipes/credit-card-format.pipe'
 import { ValidateCreditCard } from 'src/app/validators/validators'
 import { OrderCloudIntegrationsCreditCardToken } from '@ordercloud/headstart-sdk'
 import { GeographyConfig } from 'src/app/config/geography.class'
-import { faCcMastercard, faCcVisa } from '@fortawesome/free-brands-svg-icons'
+import {
+  faCcAmex,
+  faCcMastercard,
+  faCcVisa,
+} from '@fortawesome/free-brands-svg-icons'
 import { getZip } from 'src/app/services/zip-validator.helper'
 import { TypedFormGroup } from 'ngx-forms-typed'
-import { ComponentChanges, CreditCard, CreditCardFormOutput } from 'src/app/models/credit-card.types'
+import {
+  ComponentChanges,
+  CreditCard,
+  CreditCardFormOutput,
+} from 'src/app/models/credit-card.types'
 
 @Component({
   templateUrl: './credit-card-form.component.html',
@@ -51,6 +59,7 @@ export class OCMCreditCardForm implements OnChanges {
   countryOptions: { label: string; abbreviation: string }[]
   faCcVisa = faCcVisa
   faCcMastercard = faCcMastercard
+  faCcAmex = faCcAmex
   private readonly defaultCountry = 'US'
 
   constructor(private creditCardFormatPipe: CreditCardFormatPipe) {
