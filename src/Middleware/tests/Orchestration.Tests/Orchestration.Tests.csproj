@@ -53,7 +53,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Marketplace.API\Headstart.API.csproj" />
     <ProjectReference Include="..\..\src\Marketplace.Common\Headstart.Common.csproj" />
+    <ProjectReference Include="..\..\src\Orchestration.Functions\Marketplace.Orchestration\Headstart.Orchestration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

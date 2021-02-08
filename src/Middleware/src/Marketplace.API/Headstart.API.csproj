@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <StartupObject></StartupObject>
+    <LangVersion>8</LangVersion>
     <ApplicationInsightsResourceId>/subscriptions/736cd8bd-0185-4184-b3dd-8c372c076f3f/resourceGroups/Marketplace/providers/microsoft.insights/components/marketplace-middleware</ApplicationInsightsResourceId>
   </PropertyGroup>
 

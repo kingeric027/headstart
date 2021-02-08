@@ -1,6 +1,3 @@
-using Headstart.Common.Commands;
-using Headstart.Common.Commands.Zoho;
-using Headstart.Common.Services;
 using NUnit.Framework;
 using NSubstitute;
 using ordercloud.integrations.avalara;
@@ -16,6 +13,9 @@ using ordercloud.integrations.library;
 using Headstart.Models.Models.Marketplace;
 using System.Security.Claims;
 using Headstart.Models;
+using System;
+using NSubstitute.ExceptionExtensions;
+using Headstart.API.Commands;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;

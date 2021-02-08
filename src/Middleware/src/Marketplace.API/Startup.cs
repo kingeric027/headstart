@@ -1,10 +1,10 @@
 using Avalara.AvaTax.RestClient;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Headstart.API.Commands;
+using Headstart.API.Commands.Crud;
+using Headstart.API.Commands.Zoho;
 using Headstart.Common;
-using Headstart.Common.Commands;
-using Headstart.Common.Commands.Crud;
-using Headstart.Common.Commands.Zoho;
 using Headstart.Common.Helpers;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
@@ -93,10 +93,7 @@ namespace Headstart.API
                 .InjectCosmosStore<ResourceHistoryQuery<PriceScheduleHistory>, PriceScheduleHistory>(cosmosConfig)
                 .AddCosmosDb(_settings.CosmosSettings.EndpointUri, _settings.CosmosSettings.PrimaryKey, _settings.CosmosSettings.DatabaseName, cosmosContainers)
                 .Inject<IPortalService>()
-                .Inject<ISyncCommand>()
                 .Inject<ISmartyStreetsCommand>()
-                .Inject<IOrchestrationCommand>()
-                .Inject<IOrchestrationLogCommand>()
                 .Inject<ICheckoutIntegrationCommand>()
                 .Inject<IShipmentCommand>()
                 .Inject<IOrderCommand>()

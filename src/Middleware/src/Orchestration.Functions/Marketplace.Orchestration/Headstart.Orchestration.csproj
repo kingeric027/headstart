@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
@@ -14,6 +15,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Marketplace.API\Headstart.API.csproj" />
     <ProjectReference Include="..\..\Marketplace.Common\Headstart.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
