@@ -1,6 +1,5 @@
 ﻿using Headstart.Common;
 using Headstart.Models.Misc;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ordercloud.integrations.library;
@@ -10,7 +9,6 @@ using System.Security.Claims;
 
 namespace Headstart.API.Controllers
 {
-	[EnableCors("marketplacecors")]
 	[Produces("application/json")]
 	public class BaseController : Controller
 	{

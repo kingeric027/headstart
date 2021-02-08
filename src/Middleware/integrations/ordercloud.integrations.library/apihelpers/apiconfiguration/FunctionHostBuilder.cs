@@ -12,82 +12,46 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
+using Headstart.Common.Helpers;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-
-#if NETCOREAPP3_1
-using System.Text.Json.Serialization;
-#endif
+using Newtonsoft.Json;
 
 namespace ordercloud.integrations.library
 {
     public static class FunctionHostBuilderExtensions
     {
-#if NETCOREAPP2_2
-    public static IFunctionsHostBuilder InjectAzureFunctionSettings<T>(this IFunctionsHostBuilder host,
-        string appSettingsConnectionString, string section = "AppSettings") where T : class, new()
-    {
-        var settings = new T();
-        var builder = new ConfigurationBuilder();
-        if (host.Services.FirstOrDefault(d => d.ServiceType == typeof(IConfiguration))?.ImplementationInstance is
-            IConfiguration configRoot)
-            builder.AddConfiguration(configRoot);
-        var config = builder
-            .AddAzureAppConfiguration(appSettingsConnectionString)
-            .Build();
-        config.GetSection(section).Bind(settings);
-
-        host.Services
-            .Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config))
-            .BuildServiceProvider()
-            .GetService<IConfiguration>();
-        host.Services.AddMvcCore().AddJsonFormatters(f =>
-        {
-            f.ContractResolver = new DefaultContractResolver();
-            f.Converters.Add(new StringEnumConverter());
-        }).AddJsonOptions(o => o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
-        host.Services.AddSingleton(settings);
-        return host;
-    }
-
-    public static T BindSettings<T>(this IFunctionsHostBuilder builder, string section = "AppSettings")
-        where T : class, new()
-    {
-        var settings = new T();
-        builder.Services.BuildServiceProvider().GetService<IConfiguration>()
-            .GetSection(section)
-            .Bind(settings);
-        return settings;
-    }
-#endif
-
-#if NETCOREAPP3_1
-        public static IFunctionsHostBuilder InjectAzureFunctionSettings<T>(this IFunctionsHostBuilder host, string section
- = null, string connection_string = null)
+        public static T BindSettings<T>(
+            this IFunctionsHostBuilder host, 
+            string connection_string = null,
+            string section = "AppSettings"
+         )
             where T : class, new()
         {
             var settings = new T();
 
             var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
                 .AddAzureAppConfiguration(connection_string ?? Environment.GetEnvironmentVariable("APP_CONFIG_CONNECTION"))
                 .Build();
 
-            config.GetSection(section ?? Environment.GetEnvironmentVariable("APP_SETTINGS_SECTION_NAME")).Bind(settings);
+            config
+                .GetSection(section ?? Environment.GetEnvironmentVariable("APP_SETTINGS_SECTION_NAME"))
+                .Bind(settings);
 
             host
-                .Services.AddMvcCore().AddJsonOptions(opt =>
-                {
-					opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-					opt.JsonSerializerOptions.IgnoreNullValues = true;
-                    opt.JsonSerializerOptions.PropertyNamingPolicy = null;
+                .Services.AddMvcCore()
+                .AddNewtonsoftJson(o => {
+                    o.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                    o.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 })
                 .Services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config))
                 .BuildServiceProvider()
                 .GetService<IConfiguration>();
 
             host.Services.AddSingleton(settings);
-            return host;
+            return settings;
         }
 
         public static IFunctionsHostBuilder InjectDependencies(this IFunctionsHostBuilder builder, IEnumerable<Type> services)
@@ -121,6 +85,5 @@ namespace ordercloud.integrations.library
                 collection.AddCosmosStore<TModel>(cs);
             });
         }
-#endif
     }
 }
