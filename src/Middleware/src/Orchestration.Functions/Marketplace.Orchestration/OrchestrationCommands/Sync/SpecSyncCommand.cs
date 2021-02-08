@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using Headstart.Common.Queries;
 using OrderCloud.SDK;
 using Headstart.Common;
-using static Headstart.Models.Chili.ChiliModels;
 
 namespace Headstart.Orchestration
 {
