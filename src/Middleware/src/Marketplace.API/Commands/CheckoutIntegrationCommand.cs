@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Headstart.Common;
 using Headstart.Common.Constants;
 using Headstart.Common.Models;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
 using Headstart.Models.Headstart;

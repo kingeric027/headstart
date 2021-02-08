@@ -9,7 +9,7 @@ namespace Headstart.Orchestration
 {
     public interface IOrchestrationLogCommand
     {
-        Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> marketplaceListArgs);
+        Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> hsListArgs);
     }
 
     public class OrchestrationLogCommand : IOrchestrationLogCommand
@@ -23,9 +23,9 @@ namespace Headstart.Orchestration
             _log = log;
         }
 
-        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> marketplaceListArgs)
+        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> hsListArgs)
         {
-            var logs = await _log.List(marketplaceListArgs);
+            var logs = await _log.List(hsListArgs);
             return logs;
         }
     }

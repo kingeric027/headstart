@@ -47,9 +47,9 @@ namespace Headstart.Common.Controllers.Avalara
 
 		[DocName("List Tax Codes")]
 		[HttpGet, Route("code"), OrderCloudIntegrationsAuth(ApiRole.ProductAdmin)]
-		public async Task<ListPage<TaxCode>> ListTaxCodes(ListArgs<TaxCode> marketplaceListArgs)
+		public async Task<ListPage<TaxCode>> ListTaxCodes(ListArgs<TaxCode> hsListArgs)
 		{
-			return await _avalara.ListTaxCodesAsync(marketplaceListArgs);
+			return await _avalara.ListTaxCodesAsync(hsListArgs);
 		}
 
 		[DocName("Get tax exeption certificate details")]

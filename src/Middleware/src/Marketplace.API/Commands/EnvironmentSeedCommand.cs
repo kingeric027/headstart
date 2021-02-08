@@ -146,7 +146,7 @@ namespace Headstart.API.Commands
 			await Task.WhenAll(buyerSecurityProfileAssignmentRequests);
 
 			// assign seller security profiles to seller org
-			var sellerSecurityProfileAssignmentRequests = SellerMarketplaceRoles.Select(role =>
+			var sellerSecurityProfileAssignmentRequests = SellerHsRoles.Select(role =>
 			{
 				return _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
 				{
@@ -744,7 +744,7 @@ namespace Headstart.API.Commands
 			new HSSecurityProfile() { CustomRole = CustomRole.MPLocationResaleCertAdmin }
 		};
 
-		static readonly List<CustomRole> SellerMarketplaceRoles = new List<CustomRole>() {
+		static readonly List<CustomRole> SellerHsRoles = new List<CustomRole>() {
 			CustomRole.MPProductAdmin,
 			CustomRole.MPPromotionAdmin,
 			CustomRole.MPStoreFrontAdmin,

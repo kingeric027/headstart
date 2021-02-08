@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using Headstart.Models.Attributes;
 using ordercloud.integrations.library;
 using Headstart.Models;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.CMS.Models;
 using Headstart.API.Controllers;
 using Headstart.API.Commands.Crud;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Kit Products\" represents Kit Products for Marketplace")]
+    [DocComments("\"Kit Products\" represents Kit Products for Headstart")]
     [HSSection.Headstart(ListOrder = 3)]
     [Route("kitproducts")]
     public class KitProductController : BaseController

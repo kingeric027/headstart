@@ -9,7 +9,7 @@ using Headstart.Common;
 
 namespace Headstart.API.Commands
 {
-    public interface IMarketplaceBuyerLocationCommand
+    public interface IHSBuyerLocationCommand
     {
         Task<HSBuyerLocation> Create(string buyerID, HSBuyerLocation buyerLocation, string token);
         Task<HSBuyerLocation> Get(string buyerID, string buyerLocationID, string token);
@@ -17,11 +17,11 @@ namespace Headstart.API.Commands
         Task Delete(string buyerID, string buyerLocationID, string token);
     }
 
-    public class MarketplaceBuyerLocationCommand : IMarketplaceBuyerLocationCommand
+    public class HSBuyerLocationCommand : IHSBuyerLocationCommand
     {
         private IOrderCloudClient _oc;
         private readonly AppSettings _settings;
-        public MarketplaceBuyerLocationCommand(AppSettings settings, IOrderCloudClient oc)
+        public HSBuyerLocationCommand(AppSettings settings, IOrderCloudClient oc)
         {
             _settings = settings;
             _oc = oc;
@@ -135,22 +135,22 @@ namespace Headstart.API.Commands
             });
         }
 
-        public async Task AddUserTypeToLocation(string token, string buyerLocationID, HSUserType marketplaceUserType)
+        public async Task AddUserTypeToLocation(string token, string buyerLocationID, HSUserType hsUserType)
         {
             var buyerID = buyerLocationID.Split('-').First();
-            var userGroupID = $"{buyerLocationID}-{marketplaceUserType.UserGroupIDSuffix}";
+            var userGroupID = $"{buyerLocationID}-{hsUserType.UserGroupIDSuffix}";
             await _oc.UserGroups.CreateAsync(buyerID, new PartialUserGroup()
             {
                 ID = userGroupID,
-                Name = marketplaceUserType.UserGroupName,
+                Name = hsUserType.UserGroupName,
                 xp = new
                 {
-                    Role = marketplaceUserType.UserGroupIDSuffix.ToString(),
-                    Type = marketplaceUserType.UserGroupType,
+                    Role = hsUserType.UserGroupIDSuffix.ToString(),
+                    Type = hsUserType.UserGroupType,
                     Location = buyerLocationID
                 }
             }, token);
-            foreach (var customRole in marketplaceUserType.CustomRoles)
+            foreach (var customRole in hsUserType.CustomRoles)
             {
                 await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
                 {

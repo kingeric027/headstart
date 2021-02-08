@@ -25,21 +25,21 @@ namespace Headstart.API.Commands
 	public class MeProductCommand : IMeProductCommand
 	{
 		private readonly IOrderCloudClient _oc;
-		private readonly IHSBuyerCommand _marketplaceBuyerCommand;
-		private readonly IHSProductCommand _marketplaceProductCommand;
+		private readonly IHSBuyerCommand _hsBuyerCommand;
+		private readonly IHSProductCommand _hsProductCommand;
 		private readonly ISendgridService _sendgridService;
 		private readonly IAppCache _cache;
 		public MeProductCommand(
 			IOrderCloudClient elevatedOc, 
-			IHSBuyerCommand marketplaceBuyerCommand,
-			IHSProductCommand marketplaceProductCommand,
+			IHSBuyerCommand hsBuyerCommand,
+			IHSProductCommand hsProductCommand,
 			ISendgridService sendgridService,
 			IAppCache cache
 		)
 		{
 			_oc = elevatedOc;
-			_marketplaceBuyerCommand = marketplaceBuyerCommand;
-			_marketplaceProductCommand = marketplaceProductCommand;
+			_hsBuyerCommand = hsBuyerCommand;
+			_hsProductCommand = hsProductCommand;
 			_sendgridService = sendgridService;
 			_cache = cache;
 		}
@@ -48,9 +48,9 @@ namespace Headstart.API.Commands
 			var _product = _oc.Me.GetProductAsync<HSMeProduct>(id, user.AccessToken);
 			var _specs = _oc.Me.ListSpecsAsync(id, null, null, user.AccessToken);
 			var _variants = _oc.Products.ListVariantsAsync<HSVariant>(id, null, null, null, 1, 100, null);
-			var _images = _marketplaceProductCommand.GetProductImages(id, user.AccessToken);
-			var _attachments = _marketplaceProductCommand.GetProductAttachments(id, user.AccessToken);
-			var unconvertedSuperMarketplaceProduct = new SuperHSMeProduct 
+			var _images = _hsProductCommand.GetProductImages(id, user.AccessToken);
+			var _attachments = _hsProductCommand.GetProductAttachments(id, user.AccessToken);
+			var unconvertedSuperHsProduct = new SuperHSMeProduct 
 			{
 				Product = await _product,
 				PriceSchedule = (await _product).PriceSchedule,
@@ -59,22 +59,22 @@ namespace Headstart.API.Commands
 				Images = await _images,
 				Attachments = await _attachments
 			};
-			return await ApplyBuyerPricing(unconvertedSuperMarketplaceProduct, user);
+			return await ApplyBuyerPricing(unconvertedSuperHsProduct, user);
 		}
 
-		private async Task<SuperHSMeProduct> ApplyBuyerPricing(SuperHSMeProduct superMarketplaceProduct, VerifiedUserContext user)
+		private async Task<SuperHSMeProduct> ApplyBuyerPricing(SuperHSMeProduct superHsProduct, VerifiedUserContext user)
 		{
 			var defaultMarkupMultiplierRequest = GetDefaultMarkupMultiplier(user);
 
 			var defaultMarkupMultiplier = await defaultMarkupMultiplierRequest;
 
-			var markedupProduct = ApplyBuyerProductPricing(superMarketplaceProduct.Product, defaultMarkupMultiplier);
-			var productCurrency = superMarketplaceProduct.Product.xp.Currency;
-			var markedupSpecs = ApplySpecMarkups(superMarketplaceProduct.Specs.ToList(), defaultMarkupMultiplier, productCurrency);
+			var markedupProduct = ApplyBuyerProductPricing(superHsProduct.Product, defaultMarkupMultiplier);
+			var productCurrency = superHsProduct.Product.xp.Currency;
+			var markedupSpecs = ApplySpecMarkups(superHsProduct.Specs.ToList(), defaultMarkupMultiplier, productCurrency);
 		
-			superMarketplaceProduct.Product = markedupProduct;
-			superMarketplaceProduct.Specs = markedupSpecs;
-			return superMarketplaceProduct;
+			superHsProduct.Product = markedupProduct;
+			superHsProduct.Specs = markedupSpecs;
+			return superHsProduct;
 		}
 
 		public async Task<HSMeKitProduct> ApplyBuyerPricing(HSMeKitProduct kitProduct, VerifiedUserContext user)
@@ -184,7 +184,7 @@ namespace Headstart.API.Commands
 
         private async Task<decimal> GetDefaultMarkupMultiplier(VerifiedUserContext user)
 		{
-			var buyer = await _cache.GetOrAddAsync($"buyer_{user.BuyerID}", () => _marketplaceBuyerCommand.Get(user.BuyerID), TimeSpan.FromHours(1));
+			var buyer = await _cache.GetOrAddAsync($"buyer_{user.BuyerID}", () => _hsBuyerCommand.Get(user.BuyerID), TimeSpan.FromHours(1));
 
 			// must convert markup to decimal before division to prevent rouding error
 			var markupPercent = (decimal)buyer.Markup.Percent / 100;

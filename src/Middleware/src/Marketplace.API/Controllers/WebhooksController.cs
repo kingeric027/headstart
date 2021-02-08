@@ -5,8 +5,8 @@ using ordercloud.integrations.library;
 using System;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
-using Headstart.Common.Models.Marketplace;
 using Headstart.API.Controllers;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Common.Controllers
 {

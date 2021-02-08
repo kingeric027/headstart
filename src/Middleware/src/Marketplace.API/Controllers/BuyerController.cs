@@ -9,7 +9,7 @@ using Headstart.API.Commands;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Buyers\" represents Buyers for Marketplace")]
+    [DocComments("\"Buyers\" represents Buyers for Headstart")]
     [HSSection.Headstart(ListOrder = 1)]
     [Route("buyer")]
     public class BuyerController : BaseController
@@ -23,21 +23,21 @@ namespace Headstart.Common.Controllers
             _oc = oc;
         }
 
-        [DocName("POST Marketplace Buyer")]
+        [DocName("POST Headstart Buyer")]
         [HttpPost, OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
         public async Task<SuperHSBuyer> Create([FromBody] SuperHSBuyer buyer)
         {
             return await _command.Create(buyer, VerifiedUserContext);
         }
 
-        [DocName("PUT Marketplace Buyer")]
+        [DocName("PUT Headstart Buyer")]
         [HttpPut, Route("{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
         public async Task<SuperHSBuyer> Put([FromBody] SuperHSBuyer superBuyer, string buyerID)
         {
             return await _command.Update(buyerID, superBuyer, VerifiedUserContext.AccessToken);
         }
 
-        [DocName("GET Marketplace Buyer")]
+        [DocName("GET Headstart Buyer")]
         [HttpGet, Route("{buyerID}"), OrderCloudIntegrationsAuth(ApiRole.BuyerAdmin)]
         public async Task<SuperHSBuyer> Get(string buyerID)
         {

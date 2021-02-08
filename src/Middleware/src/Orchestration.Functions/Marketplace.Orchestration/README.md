@@ -8,7 +8,7 @@ Sources are consumed through an Azure function and individual records are mapped
 
 ## Models and API
 
-Access to the Orchestration is provided through POST methods by object type. Upon hitting the endpoint the record is validated and temporarily stored in an Azure Blob for processing. The Orchestration models are not direct replicas of the OrderCloud definitions. These models are constructed to support the Marketplace application and take advantage of the OrderCloud xp functionality.
+Access to the Orchestration is provided through POST methods by object type. Upon hitting the endpoint the record is validated and temporarily stored in an Azure Blob for processing. The Orchestration models are not direct replicas of the OrderCloud definitions. These models are constructed to support the Headstart application and take advantage of the OrderCloud xp functionality.
 
 Currently the API is available at: https://mktp-orchestration.azurewebsites.net/
 

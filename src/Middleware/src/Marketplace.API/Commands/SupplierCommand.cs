@@ -20,14 +20,14 @@ namespace Headstart.API.Commands
         Task<HSSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user);
         Task<HSSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user);
     }
-    public class MarketplaceSupplierCommand : IHeadstartSupplierCommand
+    public class HSSupplierCommand : IHeadstartSupplierCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly ISupplierSyncCommand _supplierSync;
         private readonly AppSettings _settings;
         private readonly ISupplierApiClientHelper _apiClientHelper;
 
-        public MarketplaceSupplierCommand(AppSettings settings, IOrderCloudClient oc, ISupplierApiClientHelper apiClientHelper, ISupplierSyncCommand supplierSync)
+        public HSSupplierCommand(AppSettings settings, IOrderCloudClient oc, ISupplierApiClientHelper apiClientHelper, ISupplierSyncCommand supplierSync)
         {
             _settings = settings;
             _oc = oc;

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Headstart.API.Commands;
 using Headstart.API.Commands.Crud;
 using Headstart.API.Controllers;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Models;
 using Headstart.Models.Attributes;
 using Headstart.Models.Misc;

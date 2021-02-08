@@ -17,7 +17,7 @@ namespace Headstart.API.Commands
         Task<Order> AcknowledgeQuoteOrder(string orderID);
         Task<ListPage<HSOrder>> ListOrdersForLocation(string locationID, ListArgs<HSOrder> listArgs, VerifiedUserContext verifiedUser);
         Task<OrderDetails> GetOrderDetails(string orderID, VerifiedUserContext verifiedUser);
-        Task<List<HSShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
+        Task<List<HSShipmentWithItems>> ListHSShipmentWithItems(string orderID, VerifiedUserContext verifiedUser);
         Task<HSOrder> AddPromotion(string orderID, string promoCode, VerifiedUserContext verifiedUser);
         Task<HSOrder> ApplyAutomaticPromotions(string orderID);
         Task PatchOrderRequiresApprovalStatus(string orderID);
@@ -114,7 +114,7 @@ namespace Headstart.API.Commands
             };
         }
 
-        public async Task<List<HSShipmentWithItems>> ListMarketplaceShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
+        public async Task<List<HSShipmentWithItems>> ListHSShipmentWithItems(string orderID, VerifiedUserContext verifiedUser)
         {
             var order = await _oc.Orders.GetAsync<HSOrder>(OrderDirection.Incoming, orderID);
             await EnsureUserCanAccessOrder(order, verifiedUser);

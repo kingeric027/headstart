@@ -17,7 +17,6 @@ using Headstart.Common.Constants;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Common;
 using Headstart.API.Commands.Zoho;
-using Headstart.Common.Models.Marketplace;
 
 namespace Headstart.API.Commands
 {
@@ -328,19 +327,19 @@ namespace Headstart.API.Commands
 
             // creating relationship between the buyer order and the supplier order
             // no relationship exists currently in the platform
-            var (updateAction, marketplaceOrders) = await ProcessActivityCall(
+            var (updateAction, hsOrders) = await ProcessActivityCall(
                 ProcessType.Forwarding, "Create Order Relationships And Transfer XP",
                 CreateOrderRelationshipsAndTransferXP(orderWorksheet, supplierOrders));
             activities.Add(updateAction);
 
             // need to get fresh order worksheet because this process has changed things about the worksheet
-            var (getAction, marketplaceOrderWorksheet) = await ProcessActivityCall(
+            var (getAction, hsOrderWorksheet) = await ProcessActivityCall(
                 ProcessType.Forwarding, 
                 "Get Updated Order Worksheet",
                 _oc.IntegrationEvents.GetWorksheetAsync<HSOrderWorksheet>(OrderDirection.Incoming, orderWorksheet.Order.ID));
             activities.Add(getAction);
 
-            return await Task.FromResult(new Tuple<List<HSOrder>, HSOrderWorksheet, List<ProcessResultAction>>(marketplaceOrders, marketplaceOrderWorksheet, activities));
+            return await Task.FromResult(new Tuple<List<HSOrder>, HSOrderWorksheet, List<ProcessResultAction>>(hsOrders, hsOrderWorksheet, activities));
         }
 
         public  async Task<List<HSOrder>> CreateOrderRelationshipsAndTransferXP(HSOrderWorksheet buyerOrder, List<Order> supplierOrders)

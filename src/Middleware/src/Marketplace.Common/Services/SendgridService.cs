@@ -20,7 +20,6 @@ using SendGrid.Helpers.Mail;
 using static Headstart.Common.Models.SendGridModels;
 using Headstart.Common.Mappers;
 using Newtonsoft.Json;
-using Headstart.Common.Models.Marketplace;
 using ordercloud.integrations.cardconnect;
 using Headstart.Common.Models.Misc;
 using ordercloud.integrations.library;

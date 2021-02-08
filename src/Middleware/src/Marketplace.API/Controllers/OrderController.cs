@@ -13,7 +13,7 @@ using Headstart.API.Commands;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Marketplace Orders\" for handling order commands in Marketplace")]
+    [DocComments("\"Headstart Orders\" for handling order commands in Headstart")]
     [HSSection.Headstart(ListOrder = 2)]
     [Route("order")]
     public class OrderController : BaseController
@@ -62,7 +62,7 @@ namespace Headstart.Common.Controllers
         [HttpGet, Route("{orderID}/shipmentswithitems"), OrderCloudIntegrationsAuth(ApiRole.Shopper)]
         public async Task<List<HSShipmentWithItems>> ListShipmentsWithItems(string orderID)
         {
-            return await _command.ListMarketplaceShipmentWithItems(orderID, VerifiedUserContext);
+            return await _command.ListHSShipmentWithItems(orderID, VerifiedUserContext);
         }
 
         [DocName("Add or update a line item to an order")]

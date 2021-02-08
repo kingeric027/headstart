@@ -22,9 +22,9 @@ namespace Headstart.Orchestration
 
         [DocName("GET Orchestration Logs")]
         [HttpGet]
-        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> marketplaceListArgs)
+        public async Task<ListPage<OrchestrationLog>> List(ListArgs<OrchestrationLog> hsListArgs)
         {
-            return await _command.List(marketplaceListArgs);
+            return await _command.List(hsListArgs);
         }
     }
 }
