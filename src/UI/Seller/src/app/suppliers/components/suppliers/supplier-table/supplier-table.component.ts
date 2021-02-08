@@ -23,9 +23,9 @@ import {
   AssetUpload,
 } from '@ordercloud/headstart-sdk'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
-import { AppAuthService } from '@app-seller/auth'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 
 function createSupplierForm(supplier: HSSupplier) {
   return new FormGroup({

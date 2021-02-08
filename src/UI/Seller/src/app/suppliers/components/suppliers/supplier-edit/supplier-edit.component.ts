@@ -23,7 +23,6 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { HeaderComponent } from '@app-seller/layout/header/header.component'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
-import { AppAuthService } from '@app-seller/auth'
 import {
   faTimes,
   faSpinner,
@@ -39,7 +38,11 @@ import { Router } from '@angular/router'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
 import { FileHandle } from '@app-seller/models/file-upload.types'
-import { SupportedCurrencies, SupportedRates } from '@app-seller/models/currency-geography.types'
+import {
+  SupportedCurrencies,
+  SupportedRates,
+} from '@app-seller/models/currency-geography.types'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 @Component({
   selector: 'app-supplier-edit',
   templateUrl: './supplier-edit.component.html',
@@ -108,9 +111,7 @@ export class SupplierEditComponent implements OnInit, OnChanges {
     }
   }
 
-  async handleSelectedSupplierChange(
-    supplier: HSSupplier
-  ): Promise<void> {
+  async handleSelectedSupplierChange(supplier: HSSupplier): Promise<void> {
     this.logoUrl = `${environment.cmsUrl}/assets/${this.appConfig.sellerID}/Suppliers/${supplier.ID}/thumbnail?size=m`
     !this.isCreatingNew &&
       (this.hasLogo =

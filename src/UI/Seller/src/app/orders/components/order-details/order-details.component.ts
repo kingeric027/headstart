@@ -8,7 +8,7 @@ import {
   Payment,
   OcOrderService,
   OrderDirection,
-  OcAddressService
+  OcAddressService,
 } from '@ordercloud/angular-sdk'
 
 // temporarily any with sdk update
@@ -23,12 +23,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { MiddlewareAPIService } from '@app-seller/shared/services/middleware-api/middleware-api.service'
 import { applicationConfiguration } from '@app-seller/config/app.config'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { ReturnReason } from '@app-seller/shared/models/return-reason.interface'
-import {
-  HSLineItem,
-  HSOrder,
-} from '@ordercloud/headstart-sdk'
+import { HSLineItem, HSOrder } from '@ordercloud/headstart-sdk'
 import { flatten as _flatten } from 'lodash'
 import { OrderProgress } from '@app-seller/models/order.types'
 import { AppConfig } from '@app-seller/models/environment.types'
@@ -40,8 +37,6 @@ export const LineItemTableStatus = {
   Returned: 'Returned',
   Backorered: 'Backorered',
 }
-
-
 
 @Component({
   selector: 'app-order-details',
@@ -209,12 +204,14 @@ export class OrderDetailsComponent {
       this._buyerOrder = order
       this._lineItems = await this.getAllLineItems(order)
     }
-    if(this.isQuoteOrder(order)) {
+    if (this.isQuoteOrder(order)) {
       const buyerId = this._buyerOrder.FromCompanyID
-      if(this._buyerOrder.ShippingAddressID) {
-        const address = await this.ocAddressService.Get(buyerId, this._buyerOrder.ShippingAddressID).toPromise()
+      if (this._buyerOrder.ShippingAddressID) {
+        const address = await this.ocAddressService
+          .Get(buyerId, this._buyerOrder.ShippingAddressID)
+          .toPromise()
         this._buyerQuoteAddress = address
-      } 
+      }
     }
   }
 
@@ -252,10 +249,7 @@ export class OrderDetailsComponent {
     const lineItemsResponse = await this.ocLineItemService
       .List(this.orderDirection, order.ID, listOptions)
       .toPromise()
-    lineItems = [
-      ...lineItems,
-      ...(lineItemsResponse.Items as HSLineItem[]),
-    ]
+    lineItems = [...lineItems, ...(lineItemsResponse.Items as HSLineItem[])]
     if (lineItemsResponse.Meta.TotalPages <= 1) {
       return lineItems
     } else {

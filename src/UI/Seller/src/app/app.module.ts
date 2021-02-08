@@ -20,17 +20,14 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
 // app modules
 import { AppConfig, SharedModule } from '@app-seller/shared'
-import { AppRoutingModule } from '@app-seller/app-routing.module'
 import { LayoutModule } from '@app-seller/layout/layout.module'
-import { AuthModule } from '@app-seller/auth'
 
 // app component
 import { AppComponent } from '@app-seller/app.component'
 
 // interceptors
 import { HTTP_INTERCEPTORS } from '@angular/common/http'
-import { AutoAppendTokenInterceptor } from '@app-seller/auth'
-import { RefreshTokenInterceptor } from '@app-seller/auth'
+
 import { CacheInterceptor } from '@app-seller/auth/interceptors/cache/cache-interceptor'
 
 // error handler config
@@ -42,6 +39,10 @@ import {
 } from 'ordercloud-javascript-sdk'
 import { applicationConfiguration, ocAppConfig } from './config/app.config'
 import { CMSConfiguration } from '@ordercloud/cms-sdk'
+import { AuthModule } from './auth/auth.module'
+import { AutoAppendTokenInterceptor } from './auth/interceptors/auto-append-token/auto-append-token.interceptor'
+import { RefreshTokenInterceptor } from './auth/interceptors/refresh-token/refresh-token.interceptor'
+import { AppRoutingModule } from './app-routing.module'
 
 export function HttpLoaderFactory(
   http: HttpClient,

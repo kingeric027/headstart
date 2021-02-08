@@ -32,7 +32,7 @@ import {
 } from '@ordercloud/angular-sdk'
 import { getProductSmallImageUrl } from '@app-seller/products/product-image.helper'
 import { HttpHeaders } from '@angular/common/http'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { OrderService } from '@app-seller/orders/order.service'
 import {

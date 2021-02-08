@@ -4,7 +4,7 @@ import { AccountContent } from '@app-seller/shared/components/account-content/ac
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { MeUser } from '@ordercloud/angular-sdk'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({

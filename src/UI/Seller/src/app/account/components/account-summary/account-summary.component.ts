@@ -5,7 +5,7 @@ import { applicationConfiguration } from '@app-seller/config/app.config'
 import { AccountContent } from '@app-seller/shared/components/account-content/account-content.component'
 import { MeUser } from '@ordercloud/angular-sdk'
 import { faEdit } from '@fortawesome/free-solid-svg-icons'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { AppConfig } from '@app-seller/models/environment.types'
 
 @Component({

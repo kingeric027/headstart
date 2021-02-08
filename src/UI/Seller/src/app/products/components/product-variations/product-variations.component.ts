@@ -33,7 +33,7 @@ import {
   Asset,
   HSVariant,
 } from '@ordercloud/headstart-sdk'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { BehaviorSubject } from 'rxjs'
 import { Products } from 'ordercloud-javascript-sdk'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'

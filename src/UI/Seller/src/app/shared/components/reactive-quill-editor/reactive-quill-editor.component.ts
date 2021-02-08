@@ -7,7 +7,6 @@ import {
 } from '@angular/core'
 import { FormGroup, FormControl } from '@angular/forms'
 import { get as _get } from 'lodash'
-import { ValidateRichTextDescription } from '@app-seller/validators/validators'
 
 @Component({
   selector: 'reactive-quill-editor-component',
