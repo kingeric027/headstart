@@ -19,26 +19,25 @@ namespace ordercloud.integrations.library
         Task Save(string reference, JObject blob, string fileType = null);
         Task Save(string reference, IFormFile blob, string fileType = null);
         Task Save(string reference, Stream file, string fileType = null);
-        Task Save(string reference, byte[] bytes, string fileType = null);
         Task Save(BlobBase64Image base64Image);
         Task Delete(string id);
-		Task DeleteContainer();
+        Task DeleteContainer();
 
-	}
-	public class OrderCloudIntegrationsBlobService : IOrderCloudIntegrationsBlobService
+    }
+    public class OrderCloudIntegrationsBlobService : IOrderCloudIntegrationsBlobService
     {
-        public CloudBlobContainer Container { get;  }
-		private readonly BlobServiceConfig _config;
+        public CloudBlobContainer Container { get; }
+        private readonly BlobServiceConfig _config;
 
-		// BlobServiceConfig must be required for this service to function properly
-		public OrderCloudIntegrationsBlobService() : this(new BlobServiceConfig())
+        // BlobServiceConfig must be required for this service to function properly
+        public OrderCloudIntegrationsBlobService() : this(new BlobServiceConfig())
         {
 
         }
 
         public OrderCloudIntegrationsBlobService(BlobServiceConfig config)
         {
-			_config = config;
+            _config = config;
             try
             {
                 if (config.ConnectionString == null)
@@ -56,18 +55,18 @@ namespace ordercloud.integrations.library
                 throw new Exception($"{ex.Message}. The blob service must be invoked with a valid configuration");
             }
         }
-		private async Task Init()
-		{
-			var created = await Container.CreateIfNotExistsAsync();
-			if (created)
-			{
-				var permissions = await Container.GetPermissionsAsync();
-				permissions.PublicAccess = _config.AccessType;
-				await Container.SetPermissionsAsync(permissions);
-			}
-		}
+        private async Task Init()
+        {
+            var created = await Container.CreateIfNotExistsAsync();
+            if (created)
+            {
+                var permissions = await Container.GetPermissionsAsync();
+                permissions.PublicAccess = _config.AccessType;
+                await Container.SetPermissionsAsync(permissions);
+            }
+        }
 
-		public async Task<string> Get(string id)
+        public async Task<string> Get(string id)
         {
             await this.Init();
             var value = await Container.GetBlockBlobReference(id).DownloadTextAsync();
@@ -110,7 +109,7 @@ namespace ordercloud.integrations.library
 
         public async Task Save(string reference, IFormFile blob, string fileType = null)
         {
-			await this.Init();
+            await this.Init();
             var block = Container.GetBlockBlobReference(reference);
             block.Properties.ContentType = fileType ?? blob.ContentType;
             await using var stream = blob.OpenReadStream();
@@ -118,7 +117,7 @@ namespace ordercloud.integrations.library
         }
         public async Task Save(string reference, Stream file, string fileType = null)
         {
-			await this.Init();
+            await this.Init();
             var block = Container.GetBlockBlobReference(reference);
             block.Properties.ContentType = fileType;
             await block.UploadFromStreamAsync(file);
@@ -138,9 +137,9 @@ namespace ordercloud.integrations.library
             await Container.GetBlockBlobReference(id).DeleteIfExistsAsync();
         }
 
-		public async Task DeleteContainer()
-		{
-			await Container.DeleteAsync();
-		}
-	}
+        public async Task DeleteContainer()
+        {
+            await Container.DeleteAsync();
+        }
+    }
 }

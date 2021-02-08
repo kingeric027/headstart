@@ -19,7 +19,7 @@ namespace Headstart.Orchestration
         {
             _command = new ExchangeRatesCommand(new BlobServiceConfig()
             {
-                ConnectionString = settings.ExchangeRatesSettings.ConnectionString,
+                ConnectionString = settings.BlobSettings.ConnectionString,
                 Container = settings.BlobSettings.ContainerNameExchangeRates
             }, flurlFactory, cache);
         }
