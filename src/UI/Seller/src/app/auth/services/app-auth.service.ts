@@ -1,25 +1,23 @@
 import { Injectable, Inject } from '@angular/core'
-import { Observable, throwError, of, BehaviorSubject } from 'rxjs'
-import { tap, catchError, finalize, map } from 'rxjs/operators'
 import { Router } from '@angular/router'
-
-// 3rd party
-import { OcTokenService, OcAuthService } from '@ordercloud/angular-sdk'
 import { applicationConfiguration } from '@app-seller/config/app.config'
-import { CookieService } from 'ngx-cookie'
-import { keys as _keys } from 'lodash'
-import { isUndefined as _isUndefined } from 'lodash'
-import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service'
-import * as jwtDecode from 'jwt-decode'
+import { AppConfig } from '@app-seller/models/environment.types'
 import {
-  AppConfig,
   DecodedOrderCloudToken,
   OrderCloudUserType,
   SELLER,
   SUPPLIER,
-} from '@app-seller/shared'
-import { HeadStartSDK } from '@ordercloud/headstart-sdk'
+} from '@app-seller/models/user.types'
+import { AppStateService } from '@app-seller/shared/services/app-state/app-state.service'
+
+import { OcTokenService, OcAuthService } from '@ordercloud/angular-sdk'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
+import { HeadStartSDK } from '@ordercloud/headstart-sdk'
+import { CookieService } from 'ngx-cookie'
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs'
+import { tap, catchError, finalize, map } from 'rxjs/operators'
+import * as jwtDecode from 'jwt-decode'
+import { keys as _keys } from 'lodash'
 
 export const TokenRefreshAttemptNotPossible =
   'Token refresh attempt not possible'

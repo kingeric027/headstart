@@ -8,7 +8,7 @@ import { OcTokenService } from '@ordercloud/angular-sdk'
 import { BehaviorSubject, of } from 'rxjs'
 import { Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 
 describe('HeaderComponent', () => {

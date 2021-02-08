@@ -14,7 +14,7 @@ import { MeUser, OcTokenService } from '@ordercloud/angular-sdk'
 import { Router, NavigationEnd } from '@angular/router'
 import { AppConfig, AppStateService, MPRoute } from '@app-seller/shared'
 import { getHeaderConfig } from './header.config'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { CurrentUserService } from '@app-seller/shared/services/current-user/current-user.service'
 import { environment } from 'src/environments/environment.local'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
@@ -126,5 +126,3 @@ export class HeaderComponent implements OnInit {
     this.currentUserInitials = `${firstFirst}${firstLast}`
   }
 }
-
-

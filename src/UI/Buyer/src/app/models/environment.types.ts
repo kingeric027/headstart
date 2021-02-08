@@ -54,7 +54,7 @@ export interface EnvironmentConfig {
   creditCardIframeUrl: string
   sellerID: string
   translateBlobUrl: string
-  orderCloudApiUrl: string
+  ordercloudEnv: string
   theme?: Theme
   appInsightsInstrumentationKey?: string
 }
@@ -96,7 +96,7 @@ export class AppConfig {
    * link to where the translation files for the application are hosted
    */
   translateBlobUrl: string
-  orderCloudApiUrl: string
+  ordercloudEnv: string
   cmsUrl: string
   middlewareUrl: string
   creditCardIframeUrl: string

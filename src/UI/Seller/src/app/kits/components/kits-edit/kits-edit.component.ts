@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { KitService } from '@app-seller/kits/kits.service'
 import {
   faCircle,

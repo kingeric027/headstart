@@ -17,19 +17,19 @@ using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using OrderCloud.SDK;
+using ordercloud.integrations.smartystreets;
+using ordercloud.integrations.easypost;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.cardconnect;
-using ordercloud.integrations.easypost;
 using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
-using ordercloud.integrations.smartystreets;
-using OrderCloud.SDK;
 using SendGrid;
 using SmartyStreets;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using Microsoft.OpenApi.Models;
 
 namespace Headstart.API
 {
@@ -86,7 +86,7 @@ namespace Headstart.API
 
             services
                 .AddLazyCache()
-                .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, "marketplacecors")
+                .OrderCloudIntegrationsConfigureWebApiServices(_settings, middlewareErrorsConfig, corsPolicyName: "headstarcors")
                 .InjectCosmosStore<LogQuery, OrchestrationLog>(cosmosConfig)
                 .InjectCosmosStore<ReportTemplateQuery, ReportTemplate>(cosmosConfig)
                 .InjectCosmosStore<ResourceHistoryQuery<ProductHistory>, ProductHistory>(cosmosConfig)
@@ -153,11 +153,10 @@ namespace Headstart.API
                 }))
                 .AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc("v1", new Info { Title = "Marketplace API", Version = "v1" });
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Marketplace API", Version = "v1" });
                     c.CustomSchemaIds(x => x.FullName);
                 })
                 .AddAuthentication();
-
             var serviceProvider = services.BuildServiceProvider();
             services
                 .AddAuthenticationScheme<OrderCloudIntegrationsAuthOptions, OrderCloudIntegrationsAuthHandler>("OrderCloudIntegrations", opts => opts.OrderCloudClient = serviceProvider.GetService<IOrderCloudClient>())
@@ -173,10 +172,11 @@ namespace Headstart.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.OrderCloudIntegrationsConfigureWebApp(env, "v1")
-                .UseSwaggerUI(c => {
+            app.OrderCloudIntegrationsConfigureWebApp(env, corsPolicyName: "headstarcors")
+                .UseSwaggerUI(c =>
+                {
                     c.SwaggerEndpoint($"/swagger", $"API v1");
                     c.RoutePrefix = string.Empty;
                 });

@@ -5,13 +5,16 @@ import { Component, Inject } from '@angular/core'
 import { applicationConfiguration } from '@app-seller/config/app.config'
 import { Observable } from 'rxjs'
 import { DomSanitizer } from '@angular/platform-browser'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { Asset, AssetUpload, HeadStartSDK } from '@ordercloud/headstart-sdk'
 import { getPsHeight } from '@app-seller/shared/services/dom.helper'
 import { NgxSpinnerService } from 'ngx-spinner'
 import { ContentManagementClient } from '@ordercloud/cms-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
-import { BatchProcessResult, FileHandle } from '@app-seller/models/file-upload.types'
+import {
+  BatchProcessResult,
+  FileHandle,
+} from '@app-seller/models/file-upload.types'
 
 @Component({
   selector: 'upload-shipments',

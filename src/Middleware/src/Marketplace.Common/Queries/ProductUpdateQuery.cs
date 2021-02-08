@@ -1,17 +1,12 @@
 using Cosmonaut;
 using Cosmonaut.Extensions;
 using Headstart.Common.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.SystemFunctions;
 using ordercloud.integrations.library;
-using Remotion.Linq.Clauses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Headstart.Common.Queries

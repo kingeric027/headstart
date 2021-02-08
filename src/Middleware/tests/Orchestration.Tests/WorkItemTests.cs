@@ -7,7 +7,6 @@ using Headstart.Common.Helpers;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
 using Headstart.Models.Attributes;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NSubstitute;

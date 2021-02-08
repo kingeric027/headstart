@@ -52,7 +52,7 @@ import {
 } from '@ordercloud/headstart-sdk'
 import { Location } from '@angular/common'
 import { TabIndexMapper, setProductEditTab } from './tab-mapper'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import {
   ValidateMinMax,
   ValidateNoSpecialCharactersAndSpaces,

@@ -5,14 +5,12 @@ using Headstart.Common.Helpers;
 using Headstart.Common.Models;
 using Headstart.Common.Queries;
 using Headstart.Orchestration;
-using Flurl.Http;
 using Microsoft.Extensions.DependencyInjection;
-using OrderCloud.SDK;
 using ordercloud.integrations.library;
 using Headstart.Common.Services;
 using Flurl.Http.Configuration;
+using OrderCloud.SDK;
 using Headstart.Common.Services.CMS;
-using Headstart.API.Commands;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 namespace Headstart.Orchestration
@@ -25,8 +23,8 @@ namespace Headstart.Orchestration
         {
             var connectionString = Environment.GetEnvironmentVariable("APP_CONFIG_CONNECTION");
             var settings = builder
-                .InjectAzureFunctionSettings<AppSettings>(connectionString)
-                .BindSettings<AppSettings>();
+                .BindSettings<AppSettings>(connectionString);
+
 
             var cosmosConfig = new CosmosConfig(
                 settings.CosmosSettings.DatabaseName,

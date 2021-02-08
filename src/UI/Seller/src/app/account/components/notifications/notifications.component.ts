@@ -8,7 +8,7 @@ import {
   faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons'
 import { ToastrService } from 'ngx-toastr'
-import { AppAuthService } from '@app-seller/auth'
+import { AppAuthService } from '@app-seller/auth/services/app-auth.service'
 import { get as _get } from 'lodash'
 import { JDocument } from '@ordercloud/cms-sdk'
 import { AppConfig } from '@app-seller/models/environment.types'
