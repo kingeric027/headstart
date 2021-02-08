@@ -10,7 +10,7 @@ using Headstart.API.Commands;
 
 namespace Headstart.Common.Controllers
 {
-    [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
+    [DocComments("\"Headstart Suppliers\" represents Supplier in Headstart")]
     [HSSection.Headstart(ListOrder = 2)]
     [Route("supplier")]
     public class SupplierController: BaseController
@@ -31,7 +31,7 @@ namespace Headstart.Common.Controllers
 			return await _command.GetMySupplier(supplierID, VerifiedUserContext);
 		}
 
-		[DocName("POST Marketplace Supplier")]
+		[DocName("POST Headstart Supplier")]
 		[HttpPost, OrderCloudIntegrationsAuth(ApiRole.SupplierAdmin)]
 		public async Task<HSSupplier> Create([FromBody] HSSupplier supplier)
 		{

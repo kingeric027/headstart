@@ -12,8 +12,8 @@ The OrderCloud.io API implements OAuth2 combined with our own notion of Roles to
 # Orchestration
 Orchestration resources
 
-# Marketplace
-Marketplace resources
+# Headstart
+Headstart resources
 
 # Integration
 Integration resources

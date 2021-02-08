@@ -1,4 +1,4 @@
-﻿using Headstart.Common.Models.Marketplace;
+﻿using Headstart.Models.Headstart;
 using ordercloud.integrations.cardconnect;
 using OrderCloud.SDK;
 using System;

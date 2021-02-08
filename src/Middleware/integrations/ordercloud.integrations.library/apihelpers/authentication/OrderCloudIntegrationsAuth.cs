@@ -57,7 +57,7 @@ namespace ordercloud.integrations.library
                 var token = GetTokenFromAuthHeader();
 
                 if (string.IsNullOrEmpty(token))
-                    return AuthenticateResult.Fail("The Marketplace bearer token was not provided in the Authorization header.");
+                    return AuthenticateResult.Fail("The Headstart bearer token was not provided in the Authorization header.");
 
                 var jwt = new JwtSecurityToken(token);
 				var clientId = jwt.GetClientID();

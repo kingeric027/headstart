@@ -18,7 +18,6 @@ using System.Dynamic;
 using NSubstitute.Extensions;
 using AutoFixture;
 using SendGrid;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.ShippingIntegration.Models;
 
 namespace Headstart.Tests
