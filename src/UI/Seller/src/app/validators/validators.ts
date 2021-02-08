@@ -146,7 +146,7 @@ export const ValidateMinMax: ValidatorFn = (
 ): ValidationErrors | null => {
   const min = control.get('MinQuantity')
   const max = control.get('MaxQuantity')
-  if (min.value <= max.value) {
+  if (min.value <= max.value || max.value === null) {
     if (min.errors) {
       min.setErrors(null)
       min.setValue(min.value)

@@ -32,7 +32,7 @@ export class ProductPricingComponent {
   @Input()
   isRequired: boolean
   @Input()
-  set superHSProductStatic(value: SuperHSProduct) {
+  set superHSProductEditable(value: SuperHSProduct) {
     this.setData(value)
     if (value && this.readonly) {
       this.setUpBuyers()

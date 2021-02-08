@@ -48,7 +48,15 @@ namespace Headstart.API.Commands
                 payment.OrderID = incrementedOrderID;
                 await _card.AuthorizePayment(payment, userToken, GetMerchantID(payment));
             }
-            return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<HSOrder>(direction, incrementedOrderID, userToken));
+            try
+            {
+                return await WithRetry().ExecuteAsync(() => _oc.Orders.SubmitAsync<HSOrder>(direction, incrementedOrderID, userToken));
+            }
+            catch (Exception)
+            {
+                await _card.VoidPaymentAsync(incrementedOrderID, userToken);
+                throw;
+            }
         }
 
         private async Task ValidateOrderAsync(HSOrderWorksheet worksheet, OrderCloudIntegrationsCreditCardPayment payment, string userToken)

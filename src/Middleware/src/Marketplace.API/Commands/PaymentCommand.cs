@@ -65,7 +65,7 @@ namespace Headstart.API.Commands
             }
             else if (existingPayment.CreditCardID == requestedPayment.CreditCardID)
             {
-                await _ccCommand.VoidPaymentAsync(existingPayment, worksheet.Order, userToken);
+                await _ccCommand.VoidTransactionAsync(existingPayment, worksheet.Order, userToken);
                 await _oc.Payments.PatchAsync<HSPayment>(OrderDirection.Incoming, worksheet.Order.ID, existingPayment.ID, new PartialPayment
                 {
                     Accepted = false,
@@ -102,7 +102,7 @@ namespace Headstart.API.Commands
 
         private async Task DeleteCreditCardPaymentAsync(HSPayment payment, HSOrder order, string userToken)
         {
-            await _ccCommand.VoidPaymentAsync(payment, order, userToken);
+            await _ccCommand.VoidTransactionAsync(payment, order, userToken);
             await _oc.Payments.DeleteAsync(OrderDirection.Incoming, order.ID, payment.ID);
         }
 
