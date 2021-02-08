@@ -10,7 +10,7 @@ using Headstart.API.Commands;
 namespace Headstart.Common.Controllers.Avalara
 {
 	[DocComments("\"Integration\" represents Avalara Tax Functionality")]
-	[MarketplaceSection.Integration(ListOrder = 1)]
+	[HSSection.Integration(ListOrder = 1)]
 	[Route("avalara")]
 	public class AvalaraController : BaseController
 	{

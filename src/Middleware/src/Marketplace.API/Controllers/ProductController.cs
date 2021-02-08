@@ -11,7 +11,7 @@ using Headstart.API.Commands.Crud;
 namespace Headstart.Common.Controllers
 {
 	[DocComments("\"Products\" represents Products for Marketplace")]
-	[MarketplaceSection.Marketplace(ListOrder = 3)]
+	[HSSection.Headstart(ListOrder = 3)]
 	[Route("products")]
 	public class ProductController : BaseController
 	{

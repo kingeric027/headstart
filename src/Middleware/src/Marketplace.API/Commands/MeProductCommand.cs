@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LazyCache;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services;
 using Headstart.Models;
 using Headstart.Models.Misc;
@@ -11,6 +10,7 @@ using ordercloud.integrations.exchangerates;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using Headstart.API.Commands.Crud;
+using Headstart.Models.Headstart;
 
 namespace Headstart.API.Commands
 {

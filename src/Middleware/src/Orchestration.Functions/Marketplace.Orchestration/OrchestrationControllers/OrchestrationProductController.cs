@@ -13,7 +13,7 @@ using Headstart.API.Commands;
 namespace Headstart.Orchestration
 {
     [DocComments("\"Orchestration\" represents objects exposed for orchestration control")]
-    [MarketplaceSection.Orchestration(ListOrder = 1)]
+    [HSSection.Orchestration(ListOrder = 1)]
     [Route("orchestration")]
     public class OrchestrationProductController : BaseController
     {

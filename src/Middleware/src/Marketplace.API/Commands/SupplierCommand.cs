@@ -1,4 +1,4 @@
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
 using ordercloud.integrations.library;
@@ -13,14 +13,14 @@ using Headstart.Common;
 
 namespace Headstart.API.Commands
 {
-    public interface IMarketplaceSupplierCommand
+    public interface IHeadstartSupplierCommand
     {
         Task<HSSupplier> Create(HSSupplier supplier, VerifiedUserContext user, bool isSeedingEnvironment = false);
         Task<HSSupplier> GetMySupplier(string supplierID, VerifiedUserContext user);
         Task<HSSupplier> UpdateSupplier(string supplierID, PartialSupplier supplier, VerifiedUserContext user);
         Task<HSSupplierOrderData> GetSupplierOrderData(string supplierOrderID, VerifiedUserContext user);
     }
-    public class MarketplaceSupplierCommand : IMarketplaceSupplierCommand
+    public class MarketplaceSupplierCommand : IHeadstartSupplierCommand
     {
         private readonly IOrderCloudClient _oc;
         private readonly ISupplierSyncCommand _supplierSync;

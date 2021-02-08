@@ -1,4 +1,4 @@
-using Headstart.Common.Models.Marketplace;
+using Headstart.Models.Headstart;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
 using System;

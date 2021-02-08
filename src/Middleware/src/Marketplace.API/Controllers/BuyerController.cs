@@ -10,7 +10,7 @@ using Headstart.API.Commands;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Buyers\" represents Buyers for Marketplace")]
-    [MarketplaceSection.Marketplace(ListOrder = 1)]
+    [HSSection.Headstart(ListOrder = 1)]
     [Route("buyer")]
     public class BuyerController : BaseController
     {

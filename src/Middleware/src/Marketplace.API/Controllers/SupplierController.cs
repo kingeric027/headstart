@@ -1,4 +1,4 @@
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Microsoft.AspNetCore.Mvc;
 using OrderCloud.SDK;
 using System.Threading.Tasks;
@@ -11,14 +11,14 @@ using Headstart.API.Commands;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Suppliers\" represents Supplier in Marketplace")]
-    [MarketplaceSection.Marketplace(ListOrder = 2)]
+    [HSSection.Headstart(ListOrder = 2)]
     [Route("supplier")]
     public class SupplierController: BaseController
     {
 
-		private readonly IMarketplaceSupplierCommand _command;
+		private readonly IHeadstartSupplierCommand _command;
         private readonly IOrderCloudClient _oc;
-        public SupplierController(IMarketplaceSupplierCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
+        public SupplierController(IHeadstartSupplierCommand command, IOrderCloudClient oc, AppSettings settings) : base(settings)
         {
             _command = command;
 			_oc = oc;

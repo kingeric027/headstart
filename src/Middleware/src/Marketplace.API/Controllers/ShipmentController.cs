@@ -11,7 +11,7 @@ using Headstart.API.Commands;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Shipments\" for making shipments in seller app")]
-    [MarketplaceSection.Marketplace(ListOrder = 2)]
+    [HSSection.Headstart(ListOrder = 2)]
     [Route("shipment")]
     public class ShipmentController : BaseController
     {

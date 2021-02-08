@@ -4,9 +4,9 @@ using ordercloud.integrations.library;
 namespace Headstart.Models.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class MarketplaceSection : DocSection
+    public sealed class HSSection : DocSection
     {
-        public MarketplaceSection()
+        public HSSection()
         {
             
         }
@@ -15,9 +15,9 @@ namespace Headstart.Models.Attributes
         /// </summary>
         public class OrchestrationAttribute : DocSection { }
         /// <summary>
-        /// Use on controllers to indicate that they belong in the Marketplace section of the API reference docs.
+        /// Use on controllers to indicate that they belong in the Headstart section of the API reference docs.
         /// </summary>
-        public class MarketplaceAttribute : DocSection { }
+        public class HeadstartAttribute : DocSection { }
 
         public class IntegrationAttribute : DocSection { }
 

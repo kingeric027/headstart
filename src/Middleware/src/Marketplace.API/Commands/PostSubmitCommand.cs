@@ -6,10 +6,9 @@ using Flurl.Http;
 using Newtonsoft.Json;
 using OrderCloud.SDK;
 using Headstart.Common.Exceptions;
-using Headstart.Common.Models.Marketplace;
 using Headstart.Models;
 using Headstart.Common.Services;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using ordercloud.integrations.avalara;
 using ordercloud.integrations.library;
 using Headstart.Models.Extended;
@@ -18,6 +17,7 @@ using Headstart.Common.Constants;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Common;
 using Headstart.API.Commands.Zoho;
+using Headstart.Common.Models.Marketplace;
 
 namespace Headstart.API.Commands
 {

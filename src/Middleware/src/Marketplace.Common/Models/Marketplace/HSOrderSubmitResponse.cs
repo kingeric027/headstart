@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OrderCloud.SDK;
 
-namespace Headstart.Common.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
 
     public class OrderSubmitResponseXp

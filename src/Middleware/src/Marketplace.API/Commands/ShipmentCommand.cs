@@ -1,7 +1,7 @@
 using Headstart.Common;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models.Extended;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Microsoft.AspNetCore.Http;
 using Npoi.Mapper;
 using ordercloud.integrations.library;
@@ -220,32 +220,55 @@ namespace Headstart.API.Commands
 
             return processResult;
 
-        }
+        }
 
-        private async void PatchOrderStatus(Order ocOrder, ShippingStatus shippingStatus, OrderStatus orderStatus)
-        {
+
+        private async void PatchOrderStatus(Order ocOrder, ShippingStatus shippingStatus, OrderStatus orderStatus)
+
+        {
+
             var partialOrder = new PartialOrder { xp = new { ShippingStatus = shippingStatus, SubmittedOrderStatus = orderStatus } };
 
-            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, ocOrder.ID, partialOrder);
-        }
-
-        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
-        {
-            if (lineItemList == null || lineItemList?.Items?.Count < 1)
-            {
-                return false;
-            }
-
-            foreach(LineItem lineItem in lineItemList.Items)
-            {
-                if (lineItem.Quantity > lineItem.QuantityShipped)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
+            await _oc.Orders.PatchAsync(OrderDirection.Outgoing, ocOrder.ID, partialOrder);
+
+        }
+
+
+
+        private bool ValidateLineItemCounts(ListPage<LineItem> lineItemList)
+
+        {
+
+            if (lineItemList == null || lineItemList?.Items?.Count < 1)
+
+            {
+
+                return false;
+
+            }
+
+
+
+            foreach(LineItem lineItem in lineItemList.Items)
+
+            {
+
+                if (lineItem.Quantity > lineItem.QuantityShipped)
+
+                {
+
+                    return false;
+
+                }
+
+            }
+
+            return true;
+
+        }
+
+
+
         private BatchProcessFailure CreateBatchProcessFailureItem(Misc.Shipment shipment, OrderCloudException ex)
         {
             BatchProcessFailure failure = new BatchProcessFailure();

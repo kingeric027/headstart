@@ -9,7 +9,7 @@ using Headstart.API.Controllers;
 namespace Headstart.Common.Controllers
 {
 	[DocComments("\"Integration\" represents Validated Addresses with suggestions")]
-	[MarketplaceSection.Integration(ListOrder = 5)]
+	[HSSection.Integration(ListOrder = 5)]
 	public class ValidatedAddressController: BaseController
 	{
 		private readonly ISmartyStreetsCommand _command;

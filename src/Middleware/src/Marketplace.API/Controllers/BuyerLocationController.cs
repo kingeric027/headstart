@@ -12,7 +12,7 @@ using Headstart.API.Commands;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Files\" represents files for Marketplace content management control")]
-    [MarketplaceSection.Marketplace(ListOrder = 6)]
+    [HSSection.Headstart(ListOrder = 6)]
     [Route("buyerlocations")]
     public class BuyerLocationController : BaseController
     {

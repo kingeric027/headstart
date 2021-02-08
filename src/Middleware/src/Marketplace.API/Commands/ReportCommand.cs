@@ -9,8 +9,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using ordercloud.integrations.library.helpers;
-using Headstart.Common.Models.Marketplace;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 
 namespace Headstart.API.Commands
 {

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Converters;
 using System.Text.Json.Serialization;
 
-namespace Headstart.Models.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum VerifiedUserType

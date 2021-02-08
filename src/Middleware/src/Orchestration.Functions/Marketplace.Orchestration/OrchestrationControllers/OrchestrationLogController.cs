@@ -10,7 +10,7 @@ using Headstart.Common;
 namespace Headstart.Orchestration
 {
     [DocComments("\"Orchestration Logs\" represents logs of orchestration activities")]
-    [MarketplaceSection.Orchestration(ListOrder = 3)]
+    [HSSection.Orchestration(ListOrder = 3)]
     [Route("orchestration/logs")]
     public class OrchestrationLogController : BaseController
     {

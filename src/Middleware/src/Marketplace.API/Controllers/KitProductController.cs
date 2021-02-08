@@ -12,7 +12,7 @@ using Headstart.API.Commands.Crud;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Kit Products\" represents Kit Products for Marketplace")]
-    [MarketplaceSection.Marketplace(ListOrder = 3)]
+    [HSSection.Headstart(ListOrder = 3)]
     [Route("kitproducts")]
     public class KitProductController : BaseController
     {

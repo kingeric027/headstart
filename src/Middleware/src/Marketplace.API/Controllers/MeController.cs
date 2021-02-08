@@ -14,7 +14,7 @@ using OrderCloud.SDK;
 namespace Headstart.Common.Controllers
 {
 	[DocComments("Me and my stuff")]
-	[MarketplaceSection.Marketplace(ListOrder = 10)]
+	[HSSection.Headstart(ListOrder = 10)]
 	[Route("me")]
 	public class MeController : BaseController
 	{

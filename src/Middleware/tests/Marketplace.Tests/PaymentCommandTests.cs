@@ -9,7 +9,7 @@ using ordercloud.integrations.cardconnect;
 using System.Threading.Tasks;
 using Headstart.Common.Models.Marketplace;
 using Headstart.Common.Services.ShippingIntegration.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using Headstart.Models;
 using Headstart.Tests.Mocks;
 using Headstart.API.Commands;

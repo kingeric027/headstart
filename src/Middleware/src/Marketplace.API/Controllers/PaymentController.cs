@@ -3,6 +3,7 @@ using Headstart.API.Controllers;
 using Headstart.Common.Models;
 using Headstart.Common.Models.Marketplace;
 using Headstart.Models.Attributes;
+using Headstart.Models.Headstart;
 using Microsoft.AspNetCore.Mvc;
 using ordercloud.integrations.library;
 using OrderCloud.SDK;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Orders\" for handling payment commands in Marketplace")]
-    [MarketplaceSection.Marketplace(ListOrder = 2)]
+    [HSSection.Headstart(ListOrder = 2)]
     [Route("payments")]
     public class PaymentController : BaseController
     {

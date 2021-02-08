@@ -1,6 +1,6 @@
 ﻿using ordercloud.integrations.library;
 
-namespace Headstart.Models.Marketplace.Extended
+namespace Headstart.Models.Headstart.Extended
 {
     [SwaggerModel]
     public class Contact

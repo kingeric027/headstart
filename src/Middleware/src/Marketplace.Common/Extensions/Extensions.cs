@@ -1,5 +1,5 @@
 using Headstart.Common.Services.ShippingIntegration.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 using System.Collections.Generic;
 using System.Linq;
 

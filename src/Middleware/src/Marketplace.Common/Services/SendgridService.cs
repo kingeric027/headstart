@@ -12,7 +12,6 @@ using Headstart.Common.Constants;
 using Headstart.Common.Services.ShippingIntegration.Models;
 using Headstart.Models;
 using Headstart.Models.Misc;
-using Headstart.Models.Models.Marketplace;
 using Microsoft.WindowsAzure.Storage.Blob;
 using ordercloud.integrations.library.helpers;
 using OrderCloud.SDK;
@@ -25,6 +24,7 @@ using Headstart.Common.Models.Marketplace;
 using ordercloud.integrations.cardconnect;
 using Headstart.Common.Models.Misc;
 using ordercloud.integrations.library;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Common.Services
 {

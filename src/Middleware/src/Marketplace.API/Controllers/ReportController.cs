@@ -10,11 +10,12 @@ using Headstart.Models.Misc;
 using Headstart.Common.Models.Marketplace;
 using Headstart.API.Controllers;
 using Headstart.API.Commands;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Common.Controllers
 {
     [DocComments("\"Marketplace Reports\" for generating and downloading reports in the Admin application")]
-    [MarketplaceSection.Marketplace(ListOrder = 11)]
+    [HSSection.Headstart(ListOrder = 11)]
     [Route("reports")]
     public class ReportController : BaseController
     {

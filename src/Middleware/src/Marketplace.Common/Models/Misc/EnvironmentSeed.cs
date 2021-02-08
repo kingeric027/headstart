@@ -1,10 +1,10 @@
-﻿using Headstart.Models.Models.Marketplace;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ordercloud.integrations.library;
 using SendGrid.Helpers.Mail;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Models.Misc
 {

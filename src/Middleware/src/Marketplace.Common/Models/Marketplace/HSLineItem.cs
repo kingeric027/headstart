@@ -3,7 +3,7 @@ using OrderCloud.SDK;
 using Headstart.Models.Extended;
 using System.Collections.Generic;
 
-namespace Headstart.Models.Models.Marketplace
+namespace Headstart.Models.Headstart
 {
     [SwaggerModel]
 	public class HSLineItem : LineItem<LineItemXp, HSLineItemProduct, LineItemVariant, HSAddressBuyer, HSAddressSupplier> { }

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Avalara.AvaTax.RestClient;
 using Headstart.Common.Exceptions;
 using Headstart.Common.Services.ShippingIntegration.Models;
-using Headstart.Models.Models.Marketplace;
+using Headstart.Models.Headstart;
 
 namespace Headstart.Models
 {
