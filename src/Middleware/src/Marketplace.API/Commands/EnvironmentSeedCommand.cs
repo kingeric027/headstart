@@ -85,16 +85,12 @@ namespace Headstart.API.Commands
 			await CreateMessageSenders(orgToken);
 			await CreateIncrementors(orgToken); // must be before CreateBuyers
 
-			var userContext = await GetVerifiedUserContext(apiClients.MiddlewareApiClient);
-			await CreateBuyers(seed, userContext);
+			await CreateBuyers(seed, orgToken);
 			await CreateXPIndices(orgToken);
 			await CreateAndAssignIntegrationEvents(new string[] { apiClients.BuyerUiApiClient.ID }, apiClients.BuyerLocalUiApiClient.ID, orgToken);
-			await CreateSuppliers(userContext, seed, orgToken);
-			await CreateContentDocSchemas(userContext);
-			await CreateDefaultContentDocs(userContext);
+			await CreateSuppliers(seed, orgToken);
 
 			return orgToken;
-
 		}
 
 		public async Task VerifyOrgExists(string orgID, string devToken)
@@ -164,7 +160,7 @@ namespace Headstart.API.Commands
 			}, orgToken);
 		}
 
-		private async Task CreateBuyers(EnvironmentSeed seed, VerifiedUserContext user)
+		private async Task CreateBuyers(EnvironmentSeed seed, string token)
 		{
 			seed.Buyers.Add(new HSBuyer
 			{
@@ -183,69 +179,17 @@ namespace Headstart.API.Commands
 					Buyer = buyer,
 					Markup = new BuyerMarkup() { Percent = 0 }
 				};
-				await _buyerCommand.Create(superBuyer, user, isSeedingEnvironment: true);
+				await _buyerCommand.Update(buyer.ID, superBuyer, token);
 			}
 		}
 
-		private async Task CreateSuppliers(VerifiedUserContext user, EnvironmentSeed seed, string token)
+		private async Task CreateSuppliers(EnvironmentSeed seed, string token)
 		{
 			// Create Suppliers and necessary user groups and security profile assignments
 			foreach (HSSupplier supplier in seed.Suppliers)
 			{
-				await _supplierCommand.Create(supplier, user, isSeedingEnvironment: true);
+				await _supplierCommand.Create(supplier, token, isSeedingEnvironment: true);
 			}
-		}
-
-		private async Task<VerifiedUserContext> GetVerifiedUserContext(ApiClient middlewareApiClient)
-		{
-			// some endpoints such as documents and documentschemas require a verified user context for a user in the seller org
-			// however the context that we get when calling this endpoint is for the dev user so we need to create a user context
-			// with the seller user
-			var ocConfig = new OrderCloudClientConfig
-			{
-				ApiUrl = _settings.OrderCloudSettings.ApiUrl,
-				AuthUrl = _settings.OrderCloudSettings.ApiUrl,
-				ClientId = middlewareApiClient.ID,
-				ClientSecret = middlewareApiClient.ClientSecret,
-				GrantType = GrantType.ClientCredentials,
-				Roles = new[]
-				{
-					ApiRole.FullAccess
-				}
-			};
-			return await new VerifiedUserContext(_oc).Define(ocConfig);
-		}
-
-		private async Task CreateContentDocSchemas(VerifiedUserContext userContext)
-		{
-			var kitSchema = new DocSchema
-			{
-				ID = "HSKitProductAssignment",
-				RestrictedAssignmentTypes = new List<ResourceType> { },
-				Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/kitproduct.json"))
-			};
-
-			var supplierFilterConfigSchema = new DocSchema
-			{
-				ID = "SupplierFilterConfig",
-				RestrictedAssignmentTypes = new List<ResourceType> { },
-				Schema = JObject.Parse(File.ReadAllText("../Marketplace.Common/Assets/ContentDocSchemas/supplierfilterconfig.json"))
-			};
-
-			await Task.WhenAll(
-				_cms.Schemas.Create(kitSchema, userContext.AccessToken),
-				_cms.Schemas.Create(supplierFilterConfigSchema, userContext.AccessToken)
-			);
-		}
-
-		private async Task CreateDefaultContentDocs(VerifiedUserContext userContext)
-		{
-			// any default created docs should be generic enough to be used by all orgs
-			await Task.WhenAll(
-				_cms.Documents.Create("SupplierFilterConfig", GetCountriesServicingDoc(), userContext.AccessToken),
-				_cms.Documents.Create("SupplierFilterConfig", GetServiceCategoryDoc(), userContext.AccessToken),
-				_cms.Documents.Create("SupplierFilterConfig", GetVendorLevelDoc(), userContext.AccessToken)
-			);
 		}
 
 		private Document<SupplierFilterConfig> GetCountriesServicingDoc()
@@ -349,7 +293,14 @@ namespace Headstart.API.Commands
 		{
 			foreach (var index in DefaultIndices)
 			{
-				await _oc.XpIndices.PutAsync(index, token);
+				try
+                {
+					await _oc.XpIndices.PutAsync(index, token);
+				} catch (Exception ex)
+                {
+					Console.WriteLine(ex);
+                }
+				
 			}
 		}
 
@@ -444,10 +395,10 @@ namespace Headstart.API.Commands
 				RefreshTokenDuration = 43200
 			};
 
-			var integrationsClientRequest = _oc.ApiClients.SaveAsync(integrationsClient.ID, integrationsClient, token);
-			var sellerClientRequest = _oc.ApiClients.SaveAsync(sellerClient.ID, sellerClient, token);
-			var buyerClientRequest = _oc.ApiClients.SaveAsync(buyerClient.ID, buyerClient, token);
-			var buyerLocalClientRequest = _oc.ApiClients.SaveAsync(buyerLocalClient.ID, buyerLocalClient, token);
+			var integrationsClientRequest = _oc.ApiClients.CreateAsync(integrationsClient, token);
+			var sellerClientRequest = _oc.ApiClients.CreateAsync(sellerClient, token);
+			var buyerClientRequest = _oc.ApiClients.CreateAsync(buyerClient, token);
+			var buyerLocalClientRequest = _oc.ApiClients.CreateAsync(buyerLocalClient, token);
 
 			await Task.WhenAll(integrationsClientRequest, sellerClientRequest, buyerClientRequest, buyerLocalClientRequest);
 		}
@@ -462,7 +413,7 @@ namespace Headstart.API.Commands
 		}
 		private async Task CreateAndAssignIntegrationEvents(string[] buyerClientIDs, string localBuyerClientID, string token)
 		{
-			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
+			var checkoutIntegration = new IntegrationEvent()
 			{
 				ElevatedRoles = new[] { ApiRole.FullAccess },
 				ID = "HeadStartCheckout",
@@ -475,8 +426,10 @@ namespace Headstart.API.Commands
 					ExcludePOProductsFromShipping = false,
 					ExcludePOProductsFromTax = true,
 				}
-			}, token);
-			await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent()
+			};
+			await _oc.IntegrationEvents.SaveAsync(checkoutIntegration.ID, checkoutIntegration, token);
+
+			var checkoutLocalIntegration = new IntegrationEvent()
 			{
 				ElevatedRoles = new[] { ApiRole.FullAccess },
 				ID = "HeadStartCheckoutLOCAL",
@@ -489,7 +442,8 @@ namespace Headstart.API.Commands
 					ExcludePOProductsFromShipping = false,
 					ExcludePOProductsFromTax = true,
 				}
-			}, token);
+			};
+			await _oc.IntegrationEvents.SaveAsync(checkoutLocalIntegration.ID,checkoutLocalIntegration, token);
 
 			await _oc.ApiClients.PatchAsync(localBuyerClientID, new PartialApiClient { OrderCheckoutIntegrationEventID = "HeadStartCheckoutLOCAL" }, token);
 			await Throttler.RunAsync(buyerClientIDs, 500, 20, clientID =>
@@ -523,13 +477,7 @@ namespace Headstart.API.Commands
 			Console.WriteLine(profiles);
 
 			var profileCreateRequests = profiles.Select(p => _oc.SecurityProfiles.SaveAsync(p.ID, p, accessToken));
-			try
-            {
-				await Task.WhenAll(profileCreateRequests);
-			} catch (Exception ex)
-            {
-				Console.WriteLine(ex);
-            }
+			await Task.WhenAll(profileCreateRequests);
 		}
 
 		public async Task DeleteAllWebhooks(string token)
@@ -562,6 +510,7 @@ namespace Headstart.API.Commands
 		{
 			var DefaultWebhooks = new List<Webhook>() {
 			new Webhook() {
+				ID="ordershipped",
 			  Name = "Order Shipped",
 			  Description = "Triggers email letting user know the order was shipped.",
 			  Url = "/ordershipped",
@@ -578,6 +527,7 @@ namespace Headstart.API.Commands
 			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
+				ID="ordercancelled",
 			  Name = "Order Cancelled",
 			  Description = "Triggers email letting user know the order has been cancelled.",
 			  Url = "/ordercancelled",
@@ -594,6 +544,7 @@ namespace Headstart.API.Commands
 			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
+				ID = "newuser",
 			  Name = "New User",
 			  Description = "Triggers an email welcoming the buyer user.  Triggers an email letting admin know about the new buyer user.",
 			  Url = "/newuser",
@@ -610,6 +561,7 @@ namespace Headstart.API.Commands
 			  ApiClientIDs = new [] { adminUiApiClientID }.Concat(buyerClientIDs).ToArray()
 			},
 			new Webhook() {
+				ID = "productcreated",
 			  Name = "Product Created",
 			  Description = "Triggers email to user with details of newly created product.",
 			  Url = "/productcreated",
@@ -626,7 +578,8 @@ namespace Headstart.API.Commands
 			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
-			  Name = "Product Update",
+				ID = "productupdated",
+			  Name = "Product Updated",
 			  Description = "Triggers email to user indicating that a product has been updated.",
 			  Url = "/productupdate",
 			  ElevatedRoles =
@@ -642,6 +595,7 @@ namespace Headstart.API.Commands
 			  ApiClientIDs = new [] { adminUiApiClientID }
 			},
 			new Webhook() {
+				ID = "supplierupdated",
 			  Name = "Supplier Updated",
 			  Description = "Triggers email letting user know the supplier has been updated.",
 			  Url = "/supplierupdated",
@@ -662,7 +616,7 @@ namespace Headstart.API.Commands
 			{
 				webhook.Url = $"{_settings.EnvironmentSettings.BaseUrl}{webhook.Url}";
 				webhook.HashKey = _settings.OrderCloudSettings.WebhookHashKey;
-				await _oc.Webhooks.CreateAsync(webhook, accessToken: token);
+				await _oc.Webhooks.SaveAsync(webhook.ID, webhook, accessToken: token);
 			}
 		}
 
@@ -671,6 +625,7 @@ namespace Headstart.API.Commands
 			return new List<MessageSender>() {
 				new MessageSender()
 				{
+					ID = "passwordreset",
 					Name = "Password Reset",
 					MessageTypes = new[] { MessageType.ForgottenPassword },
 					URL = "/passwordreset",
@@ -687,6 +642,7 @@ namespace Headstart.API.Commands
 				},
 				new MessageSender()
 				{
+					ID = "registration",
 					Name = "New User Registration",
 					MessageTypes = new[] { MessageType.NewUserInvitation },
 					URL = "/newuser",
